@@ -1,0 +1,84 @@
+# SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
+#
+# SPDX-License-Identifier: MPL-2.0
+services:
+
+  dysleksi-web:
+    user: "75190:1000"  # Override in docker-compose.override.yml if your local user is different
+    container_name: dysleksi-web
+    image: dysleksi:latest
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    env_file:
+      - ./dev-environment/dysleksi.env
+    volumes:
+      - ./dysleksi/:/app
+      - ./log/dysleksi.log:/log/dysleksi.log:rw
+      - ./dev-environment/cert:/ssl:ro
+      - ./mypy.ini:/mypy.ini:ro
+      - file-data:/upload:rw
+      - idp-data:/app/idp:rw
+    environment:
+      - PULL_IDP_METADATA=true
+      - COLLECT_STATIC=true
+      - MAKE_MIGRATIONS=true
+      - MIGRATE=true
+      - MAKE_MESSAGES=true
+    networks:
+      - default
+      - database
+    ports:
+      - "8140:8000"
+    command: gunicorn -b 0.0.0.0:8000 project.wsgi:application --timeout 120 --reload -w 1 --access-logfile - --error-logfile - --capture-output # reload on code changes
+
+  dysleksi-db:
+    # Do not set `user` here
+    container_name: dysleksi-db
+    image: postgres:18
+    env_file:
+      - ./dev-environment/dysleksi.env
+    volumes:
+      - postgres-data:/var/lib/postgresql/18/data
+    networks:
+      - database
+
+  dysleksi-idp:
+    user: "1000:1000"  # Override in docker-compose.override.yml if your local user is different
+    image: kenchan0130/simplesamlphp
+    container_name: dysleksi-idp
+    environment:
+      HTTP_PORT: 8142
+      SIMPLESAMLPHP_SP_ENTITY_ID: http://dysleksi-web:8140/mitid/saml/metadata/
+      SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: http://dysleksi-web:8140/mitid/login/callback/
+      SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE: http://dysleksi-web:8140/mitid/logout/callback/
+      SIMPLESAMLPHP_IDP_CERTIFICATE: /var/www/simplesamlphp/cert/selfsigned.crt
+      SIMPLESAMLPHP_IDP_PRIVATEKEY: /var/www/simplesamlphp/cert/selfsigned.key
+    volumes:
+      - ./dev-environment/cert/idp/selfsigned.crt:/var/www/simplesamlphp/cert/server.crt:ro
+      - ./dev-environment/cert/idp/selfsigned.key:/var/www/simplesamlphp/cert/server.pem:ro
+      - ./dev-environment/idp/authsources.php:/var/www/simplesamlphp/config/authsources.php:ro
+      - ./dev-environment/idp/saml20-sp-remote.php:/var/www/simplesamlphp/metadata/saml20-sp-remote.php:ro
+      - ./dev-environment/idp/ports.conf:/etc/apache2/ports.conf:ro
+      - ./dev-environment/idp/site.conf:/etc/apache2/sites-available/simplesamlphp.conf:ro
+    ports:
+      - "8142:8142"
+    networks:
+      - default
+
+  dysleksi-hosts-updater:
+    container_name: dysleksi-hosts-updater
+    image: bash
+    volumes:
+      - ./dev-environment/hosts.sh:/hosts.sh:ro
+      - /etc/hosts:/hosts:rw
+    command: [ "bash", "/hosts.sh" ]
+
+volumes:
+  postgres-data:
+  file-data:
+  idp-data:
+
+networks:
+  default:
+  database:
