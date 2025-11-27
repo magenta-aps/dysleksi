@@ -1,0 +1,31 @@
+{% extends "dysleksi/base.html" %}
+
+{% comment %}
+SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
+
+SPDX-License-Identifier: MPL-2.0
+{% endcomment %}
+
+{% load i18n %}
+
+{% block content %}
+<div class="card-container d-flex justify-content-center">
+    <div class="d-flex justify-content-center align-items-center">
+        <div class="card">
+            {% if form.non_field_errors %}
+            <div class="row">
+                {% for error in form.non_field_errors %}
+                <div class="alert alert-danger" role="alert">
+                    {{ error }}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            <h1 class="card-header">{% block card_title %}{% endblock %}</h1>
+            <div class="card-body">
+                {% block card_content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

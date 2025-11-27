@@ -1,0 +1,20 @@
+{# SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk> #}
+{# SPDX-License-Identifier: MPL-2.0 #}
+
+{% extends "card.html" %}
+{% load i18n %}
+
+{% block title %}
+{% translate "Login mislykkedes" %}
+{% endblock %}
+
+{% block userinfo %}
+{% endblock %}
+
+{% block content %}
+    {% translate "Adgang nægtet" as header %}
+    {% translate 'Der kunne ikke logges ind med den angivne bruger.' as body %}
+    <h1>{{ header }}</h1>
+    <p>{{ body }}</p>
+    <a class="btn btn-primary" href="{% url 'login:logout' %}">{% translate 'Log ud' %}</a>
+{% endblock %}
