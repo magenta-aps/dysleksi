@@ -18,8 +18,8 @@ CREATE_DUMMY_DATA=${CREATE_DUMMY_DATA:=false}
 python manage.py wait_for_db
 
 if [ "${COLLECT_STATIC,,}" = true ]; then
-  python manage.py collectstatic --no-input --clear
-  python manage.py compress --force
+  python manage.py collectstatic --no-input --clear --verbosity=0
+  python manage.py compress --force --verbosity=1
 fi
 
 if [ "${MAKE_MIGRATIONS,,}" = true ]; then
@@ -51,10 +51,10 @@ if [ "${PULL_IDP_METADATA,,}" = true ]; then
   python manage.py update_mitid_idp_metadata
 fi
 
-if [ "${MAKEMESSAGES,,}" = true ]; then
+if [ "${MAKE_MESSAGES,,}" = true ]; then
   echo 'making messages'
-  python manage.py make_messages --locale=kl --locale=da --no-obsolete --add-location file
-  python manage.py make_messages --locale=kl --locale=da --no-obsolete --add-location file --domain djangojs
+  python manage.py makemessages --locale=kl --locale=da --no-obsolete --add-location file
+  python manage.py makemessages --locale=kl --locale=da --no-obsolete --add-location file --domain djangojs
   python manage.py compilemessages --locale=da --locale=kl --verbosity=2
 fi
 
