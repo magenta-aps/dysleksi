@@ -1,0 +1,21 @@
+# SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
+#
+# SPDX-License-Identifier: MPL-2.0
+
+*.pyc
+**/__pycache__/
+*.mo
+env/
+.idea/
+docker-compose.override.yml
+*.sqlite3
+**/.coverage
+*.log.*
+*.venv*/
+*.vscode/
+*.code-workspace
+**/.DS_Store
+*.swp
+
+ssl/
+dysleksi/project/static/

@@ -1,0 +1,46 @@
+version = 1
+SPDX-PackageName = "Dysleksi"
+SPDX-PackageSupplier = "Magenta ApS <info@magenta.dk>"
+
+[[annotations]]
+path = [
+    "dysleksi/**",
+    "dev-environment/**",
+    "docker/**",
+    "docker-compose.yml",
+    "docker-compose.override.template.yml",
+    ".eslint/**",
+    ".coveragerc",
+    ".gitlab-ci.yml",
+    "mypy.ini",
+    "requirements.txt",
+    ".coveragerc",
+    "REUSE.toml",
+    "README.md",
+    ".renovaterc",
+    "dev-idp/**",
+    "rfc/**",
+    "data/**"
+]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2025 Magenta ApS <info@magenta.dk>"
+SPDX-License-Identifier = "MPL-2.0"
+
+
+[[annotations]]
+path = "dysleksi/common/static/jquery/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2022 OpenJS Foundation and jQuery contributors"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "dysleksi/common/static/bootstrap/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2011-2021 The Bootstrap Authors (https://github.com/twbs/bootstrap/graphs/contributors)"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
+path = "dysleksi/common/static/figtree/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "Copyright 2022 The Figtree Project Authors (https://github.com/erikdkennedy/figtree)"
+SPDX-License-Identifier = "OFL-1.1"
