@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
