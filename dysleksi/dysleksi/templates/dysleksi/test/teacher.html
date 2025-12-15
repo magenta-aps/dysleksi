@@ -1,0 +1,98 @@
+{% extends 'dysleksi/test/base.html' %}
+
+{% block js %}
+{{ block.super }}
+<script>
+    let testIndex;
+
+    const updateTable = function (data, test) {
+        const eventsEl = document.querySelector('table#events tbody');
+        const eventEl = document.createElement('tr');
+
+        const typeEl = document.createElement('td');
+        const questionEl = document.createElement('td');
+        const answerEl = document.createElement('td');
+        const durationEl = document.createElement('td');
+
+        eventEl.append(typeEl);
+        eventEl.append(questionEl);
+        eventEl.append(answerEl);
+        eventEl.append(durationEl);
+
+        typeEl.innerHTML = data.event;
+        questionEl.innerHTML = test.question;
+        answerEl.innerHTML = data.choice || '-';
+        if (data.event === 'test.answered') {
+            durationEl.innerHTML = data.answeredAt;
+        } else {
+            durationEl.innerHTML = data.displayedAt;
+        }
+
+        eventsEl.prepend(eventEl);
+    };
+
+    const updateButtons = function (attr, val) {
+        const actionEls = document.querySelectorAll('button');
+        actionEls.forEach(function (el) {
+            el.classList.toggle(attr, val);
+        });
+    }
+
+    chatSocket.onmessage = function (e) {
+        console.log('chat: received', e.data);
+
+        const data = JSON.parse(e.data);
+        if (data.event.match(/test.(answered|displayed)/)) {
+            const test = tests[data.index];
+            testIndex = data.index;
+            updateTable(data, test);
+            if (data.event === 'test.answered') {
+                updateButtons('disabled', false);
+            }
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function (e) {
+        const actionEls = document.querySelectorAll('button');
+        actionEls.forEach(function (el) {
+            el.addEventListener('click', function (e) {
+                const val = e.target.id;
+                if ((testIndex >= 0) && (testIndex < tests.length)) {
+                    chatSocket.send(
+                        JSON.stringify(
+                            {
+                                'event': 'test.' + val,
+                                'id': '{{ room_name }}',
+                                'index': testIndex,
+                            }
+                        )
+                    )
+                    updateButtons('disabled', true);
+                } else {
+                    console.error('invalid test index', testIndex);
+                }
+            });
+        });
+    });
+</script>
+{% endblock js %}
+
+{% block content %}
+<div class="container">
+    <button class="btn btn-success disabled" id="correct">Korrekt</button>
+    <button class="btn btn-danger disabled" id="wrong">Forkert</button>
+    <button class="btn btn-outline-primary disabled" id="skipped">Sprunget over</button>
+    <table id="events" class="table">
+        <thead>
+            <tr>
+                <th>Begivenhed</th>
+                <th>Spørgsmål</th>
+                <th>Svar</th>
+                <th>Tid</th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</div>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends "dysleksi/lobby/base.html" %}
+{% load i18n %}
+
+{% block js %}
+{{ block.super }}
+<script>
+    lobbySocket.onmessage = function (e) {
+        console.log("lobby: received", e.data);
+
+        const data = JSON.parse(e.data);
+
+        if (data.event === 'lobby.joined') {
+            const chatId = data.id;
+            const matchingElem = document.querySelector("a[data-id='" + chatId + "'] .btn.disabled");
+
+            // When students enter the lobby, enable the "start" link belonging to that student
+            matchingElem.classList.remove("disabled");
+
+            // Notify student when teacher clicks student to start session
+            matchingElem.addEventListener("click", function (e) {
+                e.preventDefault();
+
+                const chatSocket = getWebSocket(chatId);
+                chatSocket.addEventListener("open", (event) => {
+                    chatSocket.send(JSON.stringify({'event': 'session.start', 'id': chatId}));
+                    setTimeout(function () { window.location = "/chat/" + chatId + "/" }, 1);
+                });
+            });
+        }
+    };
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{% translate "Lærer" %}</h1>
+    <div class="list-group">
+        {% for student in students %}
+        <a class="list-group-item list-group-item-action"
+           href="{% url 'dysleksi:room' room_name=student.id %}"
+           data-id="{{ student.id }}">
+            <p>{{ student.name }}</p>
+            <div class="btn btn-primary disabled">{% translate "Start individueltest" %}</div>
+        </a>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
