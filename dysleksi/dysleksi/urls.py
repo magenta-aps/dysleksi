@@ -4,7 +4,7 @@
 
 from django.urls import URLPattern, URLResolver, path
 
-from dysleksi.views import RootView, RoomView
+from dysleksi.views import RoomView, RootView
 
 app_name = "dysleksi"
 

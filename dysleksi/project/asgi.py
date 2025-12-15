@@ -14,11 +14,15 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
 # is populated before importing code that may import ORM models.
 django_asgi_app = get_asgi_application()
 
-from dysleksi.routing import websocket_urlpatterns
+from dysleksi.routing import websocket_urlpatterns  # noqa: E402
 
-application = ProtocolTypeRouter({
-    "http": django_asgi_app,
-    "websocket": AllowedHostsOriginValidator(
-        AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
-    ),
-})
+application = ProtocolTypeRouter(
+    {
+        "http": django_asgi_app,
+        "websocket": AllowedHostsOriginValidator(
+            AuthMiddlewareStack(
+                URLRouter(websocket_urlpatterns)  # type: ignore[arg-type]
+            )
+        ),
+    }
+)

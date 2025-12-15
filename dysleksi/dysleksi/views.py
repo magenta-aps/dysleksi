@@ -6,13 +6,14 @@ from typing import Any
 from django.utils.functional import cached_property
 from django.views.generic import TemplateView
 from login.view_mixins import LoginRequiredMixin
+
 from dysleksi.models import User, UserType
 
 
 class UserTypeMixin:
     @cached_property
     def user_type(self) -> UserType:
-        user = User.objects.get(pk=self.request.user.pk)
+        user = User.objects.get(pk=self.request.user.pk)  # type: ignore[attr-defined]
         return user.user_type
 
 

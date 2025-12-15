@@ -10,6 +10,7 @@ env/
 docker-compose.override.yml
 *.sqlite3
 **/.coverage
+**/coverage.xml
 *.log.*
 *.venv*/
 *.vscode/
