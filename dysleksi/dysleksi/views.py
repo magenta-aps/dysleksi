@@ -12,9 +12,15 @@ from dysleksi.models import User, UserType
 
 class UserTypeMixin:
     @cached_property
-    def user_type(self) -> UserType:
-        user = User.objects.get(pk=self.request.user.pk)  # type: ignore[attr-defined]
-        return user.user_type
+    def user_type(self) -> UserType | None:
+        try:
+            user = User.objects.get(
+                pk=self.request.user.pk  # type: ignore[attr-defined]
+            )
+        except User.DoesNotExist:
+            return None
+        else:
+            return user.user_type
 
 
 class RootView(LoginRequiredMixin, UserTypeMixin, TemplateView):
