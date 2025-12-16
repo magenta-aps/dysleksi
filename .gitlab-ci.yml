@@ -151,6 +151,8 @@ Lint Javascript:
   services:
     - name: postgres:18
       alias: dysleksi-db
+    - name: redis:8
+      alias: dysleksi-redis
   variables:
     # Simulate development environment while running tests so we use mockup data
     DJANGO_SECRET_KEY: 1DqtQVSbLLmgBvkhPyptqFwPpJE9Kkgdo2kZFZ57UnzuRMiFgw
