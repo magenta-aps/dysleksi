@@ -19,6 +19,7 @@ services:
       - ./mypy.ini:/mypy.ini:ro
       - file-data:/upload:rw
       - idp-data:/app/idp:rw
+      - staticfiles-data:/app/project/static/
     environment:
       - PULL_IDP_METADATA=true
       - COLLECT_STATIC=true
@@ -84,6 +85,7 @@ volumes:
   postgres-data:
   file-data:
   idp-data:
+  staticfiles-data:
 
 networks:
   default:
