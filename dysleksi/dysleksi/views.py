@@ -22,10 +22,21 @@ class UserTypeMixin:
         else:
             return user.user_type
 
+    def get_template_prefix(self) -> str:
+        # Override this in subclass
+        return "dysleksi/"  # pragma: no cover
+
+    def get_template_names(self) -> list[str]:
+        # Find template name matching prefix and user type
+        if self.user_type is not None:
+            return [f"{self.get_template_prefix()}{self.user_type.lower()}.html"]
+        else:
+            return []  # pragma: no cover
+
 
 class RootView(LoginRequiredMixin, UserTypeMixin, TemplateView):
-    def get_template_names(self) -> list[str]:
-        return [f"dysleksi/lobby/{self.user_type.lower()}.html"]
+    def get_template_prefix(self) -> str:
+        return "dysleksi/lobby/"
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
@@ -39,5 +50,5 @@ class RootView(LoginRequiredMixin, UserTypeMixin, TemplateView):
 
 
 class RoomView(LoginRequiredMixin, UserTypeMixin, TemplateView):
-    def get_template_names(self) -> list[str]:
-        return [f"dysleksi/test/{self.user_type.lower()}.html"]
+    def get_template_prefix(self) -> str:
+        return "dysleksi/test/"
