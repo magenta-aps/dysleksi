@@ -4,10 +4,11 @@
 
 from django.urls import URLPattern, URLResolver, path
 
-from dysleksi.views import RootView
+from dysleksi.views import RoomView, RootView
 
 app_name = "dysleksi"
 
 urlpatterns: list[URLResolver | URLPattern] = [
     path("", RootView.as_view(), name="root"),
+    path("chat/<str:room_name>/", RoomView.as_view(), name="room"),
 ]

@@ -19,6 +19,7 @@ services:
       - ./mypy.ini:/mypy.ini:ro
       - file-data:/upload:rw
       - idp-data:/app/idp:rw
+      - staticfiles-data:/app/project/static/
     environment:
       - PULL_IDP_METADATA=true
       - COLLECT_STATIC=true
@@ -30,7 +31,7 @@ services:
       - database
     ports:
       - "8140:8000"
-    command: gunicorn -b 0.0.0.0:8000 project.wsgi:application --timeout 120 --reload -w 1 --access-logfile - --error-logfile - --capture-output # reload on code changes
+    command: uvicorn project.asgi:application --host 0.0.0.0 --port 8000 --reload
 
   dysleksi-db:
     # Do not set `user` here
@@ -40,6 +41,12 @@ services:
       - ./dev-environment/dysleksi.env
     volumes:
       - postgres-data:/var/lib/postgresql/18/data
+    networks:
+      - database
+
+  dysleksi-redis:
+    container_name: dysleksi-redis
+    image: redis:8
     networks:
       - database
 
@@ -78,6 +85,7 @@ volumes:
   postgres-data:
   file-data:
   idp-data:
+  staticfiles-data:
 
 networks:
   default:

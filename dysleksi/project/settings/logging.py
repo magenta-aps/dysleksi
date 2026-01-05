@@ -31,9 +31,8 @@ LOGGING: dict = {
     },
     "formatters": {
         "simple": {
-            "format": "[{asctime}] [{levelname}] {name}: {message}",
+            "format": "{levelname}: {name}: {message}",
             "style": "{",
-            "datefmt": "%Y-%m-%d %H:%M:%S %z",
         },
     },
     "handlers": {

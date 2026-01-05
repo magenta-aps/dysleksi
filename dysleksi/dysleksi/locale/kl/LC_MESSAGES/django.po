@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-27 07:34-0200\n"
+"POT-Creation-Date: 2025-12-11 13:31-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,14 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: dysleksi/models.py dysleksi/templates/dysleksi/lobby/teacher.html
+msgid "Lærer"
+msgstr ""
+
+#: dysleksi/models.py dysleksi/templates/dysleksi/lobby/student.html
+msgid "Elev"
+msgstr ""
 
 #: dysleksi/models.py
 msgid "CPR"
@@ -27,4 +35,17 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/base.html
 msgid "Dysleksi"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/student.html
+#, python-format
+msgid "Velkommen %(name)s"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/student.html
+msgid "Start"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/teacher.html
+msgid "Start individueltest"
 msgstr ""

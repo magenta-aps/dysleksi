@@ -151,6 +151,8 @@ Lint Javascript:
   services:
     - name: postgres:18
       alias: dysleksi-db
+    - name: redis:8
+      alias: dysleksi-redis
   variables:
     # Simulate development environment while running tests so we use mockup data
     DJANGO_SECRET_KEY: 1DqtQVSbLLmgBvkhPyptqFwPpJE9Kkgdo2kZFZ57UnzuRMiFgw
@@ -202,7 +204,7 @@ Unittest:
     - coverage run manage.py test --parallel
     - coverage combine
     - coverage report --show-missing --fail-under=100
-    - coverage xml
+    - coverage xml -o /app/coverage.xml
   coverage: '/^TOTAL.+?(\d+\%)$/'
   artifacts:
     reports:

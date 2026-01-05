@@ -37,6 +37,7 @@ MEDIA_ROOT = "/upload"
 ROOT_URLCONF = "project.urls"
 
 WSGI_APPLICATION = "dysleksi.wsgi.application"
+ASGI_APPLICATION = "dysleksi.asgi.application"
 
 CRISPY_TEMPLATE_PACK = "uni_form"
 

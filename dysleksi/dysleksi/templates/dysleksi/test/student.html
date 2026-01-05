@@ -1,0 +1,111 @@
+{% extends 'dysleksi/test/base.html' %}
+
+{% block js %}
+{{ block.super }}
+<script>
+    let testIndex = 0;
+
+    const updateTest = function () {
+        const test = tests[testIndex];
+        const displayedAt = document.timeline.currentTime;
+        const questionEl = document.querySelector('h1#question');
+        const choicesEl = document.querySelector('div#choices');
+
+        questionEl.innerHTML = "" + (testIndex + 1) + "/" + tests.length  + ": " + test.question;
+        choicesEl.innerHTML = '';
+        for (const choice of test.choices) {
+            const choiceEl = document.createElement('button');
+            choiceEl.innerHTML = choice;
+            choiceEl.classList.add('btn');
+            choiceEl.classList.add('btn-outline-primary');
+            choicesEl.append(choiceEl);
+            choiceEl.addEventListener('click', function (e) {
+                updateChoice(e, testIndex, displayedAt);
+            });
+        }
+
+        // Inform teacher that a new question is being displayed
+        chatSocket.send(
+            JSON.stringify(
+                {
+                    'event': 'test.displayed',
+                    'id': '{{ room_name }}',
+                    'index': testIndex,
+                    'displayedAt': displayedAt,
+                }
+            )
+        )
+    }
+
+    const updateChoice = function (e, testIndex, displayedAt) {
+        // Update which choice is the active one
+        const choiceEl = e.target;
+        const choicesEls = document.querySelectorAll('div#choices button');
+        choicesEls.forEach(function (el) {
+            el.classList.remove('btn-primary');
+            el.classList.add('disabled');
+        });
+        choiceEl.classList.replace('btn-outline-primary', 'btn-primary');
+
+        // Inform teacher of answer event
+        chatSocket.send(
+            JSON.stringify(
+                {
+                    'event': 'test.answered',
+                    'id': '{{ room_name }}',
+                    'choice': choiceEl.innerHTML,
+                    'index': testIndex,
+                    'displayedAt': displayedAt,
+                    'answeredAt': document.timeline.currentTime,
+                }
+            )
+        )
+    };
+
+    chatSocket.onmessage = function (e) {
+        console.log('chat: received', e.data);
+        const data = JSON.parse(e.data);
+
+        if (data.event.match(/test.(correct|wrong|skipped)/)) {
+            // Go to next question, if possible
+            if ((data.index >= 0) && (data.index < tests.length - 1)) {
+                testIndex++;
+                updateTest();
+            } else {
+                alert("Testen er færdig!");
+            }
+        }
+    };
+
+    document.addEventListener('DOMContentLoaded', function (e) {
+        chatSocket.addEventListener('open', function (e) {
+            updateTest();
+        });
+    });
+</script>
+{% endblock %}
+
+{% block css %}
+<style>
+    div#choices {
+        display: flex;
+        width: 50%;
+        padding: 0;
+        justify-content: space-between;
+        list-style: none inside none;
+    }
+    div#choices button {
+        padding: 1rem 3rem;
+        border: 1px solid #ccc;
+        border-radius: 0.5rem;
+    }
+ </style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 id="question"></h1>
+    <div id="choices"></div>
+    <p id="choice"></p>
+</div>
+{% endblock %}

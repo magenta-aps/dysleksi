@@ -16,4 +16,5 @@ include(
     "cache.py",
     "staticfiles.py",
     "bootstrap5.py",
+    "channels.py",
 )

@@ -1,0 +1,35 @@
+{% extends "dysleksi/lobby/base.html" %}
+{% load i18n %}
+
+{% block js %}
+{{ block.super }}
+<script>
+    // When student enters the lobby, broadcast a message to all users connected to the lobby
+    lobbySocket.addEventListener("open", (event) => {
+        lobbySocket.send(JSON.stringify({'event': 'lobby.joined', 'id': '{{ student.id }}'}));
+    });
+
+    // Listen for session start events
+    const chatSocket = getWebSocket('{{ student.id }}');
+    chatSocket.onmessage = function (e) {
+        console.log("chat: received", e.data);
+        const data = JSON.parse(e.data);
+        if (data.event === 'session.start') {
+            const url = '{% url "dysleksi:room" room_name=student.id %}';
+            window.location = url;
+        }
+    };
+</script>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>{% translate "Elev" %}</h1>
+    <p>
+        {% blocktrans trimmed with name=student.name %}
+        Velkommen {{ name }}
+        {% endblocktrans %}
+    </p>
+    <p>{% translate "Venter på at testen begynder ..." %}</p>
+</div>
+{% endblock %}
