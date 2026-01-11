@@ -26,6 +26,8 @@ services:
       - MAKE_MIGRATIONS=true
       - MIGRATE=true
       - MAKE_MESSAGES=true
+      - CREATE_DUMMY_USERS=true
+      - TEST=true
     networks:
       - default
       - database

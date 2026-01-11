@@ -11,9 +11,8 @@ TEST=${TEST:=false}
 MAKEMESSAGES=${MAKEMESSAGES:=false}
 PULL_IDP_METADATA=${PULL_IDP_METADATA:=false}
 COLLECT_STATIC=${COLLECT_STATIC:=true}
-CREATE_USER_GROUPS=${CREATE_USER_GROUPS:=false}
-CREATE_DUMMY_USERS=${CREATE_DUMMY_USERS:=false}
 CREATE_DUMMY_DATA=${CREATE_DUMMY_DATA:=false}
+CREATE_DUMMY_USERS=${CREATE_DUMMY_USERS:=false}
 
 python manage.py wait_for_db
 
@@ -32,18 +31,20 @@ if [ "${MIGRATE,,}" = true ]; then
   python manage.py migrate
 fi
 
-if [ "${CREATE_USER_GROUPS,,}" = true ]; then
-  echo 'creating api group'
-  python manage.py create_groups
-fi
+echo 'creating groups'
+python manage.py create_groups
 
 if [ "${CREATE_DUMMY_USERS,,}" = true ]; then
-  echo 'creating test user'
-  python manage.py create_user 0111111111 guest --cpr 0111111111 --cvr 12345678
-  python manage.py create_user bruce bruce --cpr 0222222222 --cvr 22345678
+  echo 'creating test users'
+  # "0111111111" er brugerens cpr og username
+  # dev-idp godkender ud fra username som står i authsources
+  python manage.py create_user 0111111111 elev --cpr 0111111111 -g Elever
+  python manage.py create_user 0222222222 lærer --cpr 0222222222 -g Lærere
   python manage.py create_user admin admin --is_superuser
 fi
 
+
+echo 'creating cache table'
 python manage.py createcachetable
 
 if [ "${PULL_IDP_METADATA,,}" = true ]; then

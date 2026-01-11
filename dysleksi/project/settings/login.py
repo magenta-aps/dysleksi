@@ -80,9 +80,9 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 SESSION_EXPIRE_CALLABLE = "login.views.on_session_expired"
 SAML_DEFAULT_BINDING = saml2.BINDING_HTTP_REDIRECT
 SAML_ATTRIBUTE_MAPPING = {
+    # map of User model fields to SAML attributes
     "username": "cpr",
     "cpr": "cpr",
-    "cvr": "cvr",
     "first_name": "firstname",
     "last_name": "lastname",
     "email": "email",
@@ -131,7 +131,6 @@ SAML = {
             "optional_attributes": [
                 "https://data.gov.dk/model/core/eid/email",
                 "https://data.gov.dk/model/core/eid/professional/orgName",
-                "https://data.gov.dk/model/core/eid/professional/cvr",
             ],
             "name_id_format": [
                 "urn:oasis:names:tc:SAML:2.0:nameid-format:persistent",

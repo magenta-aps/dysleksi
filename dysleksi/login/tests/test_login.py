@@ -29,10 +29,7 @@ class LoginTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        # cls.group = Group.objects.create(name="Borgerservice")
-        cls.staff_user = User.objects.create(
-            username="test", cvr=12345678, is_staff=True
-        )
+        cls.staff_user = User.objects.create(username="test", is_staff=True)
         cls.staff_user.set_password("test")
         cls.staff_user.save()
 
@@ -64,7 +61,6 @@ class SamlLoginTest(LoginTest):
                 "saml": {
                     "ava": {
                         "cpr": ["1234567890"],
-                        "cvr": ["12345678"],
                         "firstname": ["Test"],
                         "lastname": ["Testersen"],
                         "email": ["test@example.com"],
@@ -85,7 +81,6 @@ class SamlLoginTest(LoginTest):
                 "saml": {
                     "ava": {
                         "cpr": ["1234567890"],
-                        "cvr": ["12345678"],
                         "firstname": ["Test"],
                         "lastname": ["Testersen"],
                         "email": ["test@example.com"],
@@ -108,7 +103,6 @@ class SamlLoginTest(LoginTest):
                 "saml": {
                     "ava": {
                         "cpr": ["1234567890"],
-                        "cvr": ["12345678"],
                         "firstname": ["Test"],
                         "lastname": ["Testersen"],
                         "email": ["test@example.com"],

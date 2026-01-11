@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-11 13:31-0200\n"
+"POT-Creation-Date: 2026-01-07 12:19-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,24 +18,20 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: dysleksi/models.py dysleksi/templates/dysleksi/lobby/teacher.html
-msgid "Lærer"
-msgstr ""
-
-#: dysleksi/models.py dysleksi/templates/dysleksi/lobby/student.html
-msgid "Elev"
-msgstr ""
-
 #: dysleksi/models.py
 msgid "CPR"
 msgstr ""
 
-#: dysleksi/models.py
-msgid "CVR"
-msgstr ""
-
 #: dysleksi/templates/dysleksi/base.html
 msgid "Dysleksi"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/staff.html
+msgid "Administrator"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/student.html
+msgid "Elev"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/student.html
@@ -44,7 +40,11 @@ msgid "Velkommen %(name)s"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/student.html
-msgid "Start"
+msgid "Venter på at testen begynder ..."
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/teacher.html
+msgid "Lærer"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/teacher.html

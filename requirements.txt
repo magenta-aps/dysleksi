@@ -37,8 +37,9 @@ django-stubs-ext==5.2.7
 django-tables2==2.7.5
 django-two-factor-auth==1.18.1
 django_compressor==4.6.0
-django_mitid_auth @ git+https://github.com/magenta-aps/gl-django-login.git@127fff28a691046bf780daa43389b6f408abc96c
 elementpath==4.8.0
+freezegun==1.5.5
+gl-mitid==1.7.0
 gunicorn==23.0.0
 h11==0.16.0
 httptools==0.7.1
