@@ -5,20 +5,18 @@
 from django.contrib.auth.models import AnonymousUser
 from django.views import View
 
-from dysleksi.models import User, UserType
+from dysleksi.models import User
 from dysleksi.tests.base import DysleksiTest
 from dysleksi.views import RoomView, RootView, UserTypeMixin
 
 
 class TestUserTypeMixin(DysleksiTest):
-    def test_user_type_property(self):
-        """`UserTypeMixin.user_type` returns `user.user_type` of the current user"""
-
+    def test_template_name(self):
         class UserTypeView(UserTypeMixin, View):
             pass
 
         view = self.setup_view(UserTypeView, self.student)
-        self.assertIs(view.user_type, UserType.Student)
+        self.assertEqual(view.get_template_names(), ["dysleksi/student.html"])
 
 
 class TestRootView(DysleksiTest):

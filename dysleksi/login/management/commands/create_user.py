@@ -16,7 +16,6 @@ class Command(BaseCommand):
         parser.add_argument("-S", "--is_superuser", action="store_true")
         parser.add_argument("-g", "--groups", type=str, nargs="+")
         parser.add_argument("--cpr", type=str)
-        parser.add_argument("--cvr", type=str)
 
     def handle(self, *args, **options):
         name = options["username"].capitalize()
@@ -28,7 +27,6 @@ class Command(BaseCommand):
                 "first_name": name,
                 "last_name": f"{name}sen",
                 "cpr": options["cpr"],
-                "cvr": options["cvr"],
             },
         )
         password = options["password"]

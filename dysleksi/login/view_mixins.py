@@ -7,8 +7,6 @@ from django.contrib.auth.models import AnonymousUser
 from django.template.response import TemplateResponse
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
-from dysleksi.models import User
-
 
 class LoginRequiredMixin(DjangoLoginRequiredMixin):
 
@@ -21,17 +19,19 @@ class LoginRequiredMixin(DjangoLoginRequiredMixin):
         )
 
     def get_context_data(self, **kwargs):
-        user = self.request.user
         return super().get_context_data(
             **{
                 **kwargs,
-                "user_twofactor_enabled": user.is_authenticated
-                and TOTPDevice.objects.filter(user=user).exists(),
+                "user_twofactor_enabled": self.user.is_authenticated
+                and TOTPDevice.objects.filter(user=self.user).exists(),
             }
         )
 
+    def setup(self, request):
+        super().setup(request)
+        self.user = request.user
+
     def dispatch(self, request, *args, **kwargs):
-        self.user: User = request.user
         if not settings.PUBLIC:
             if (
                 not isinstance(self.user, AnonymousUser)

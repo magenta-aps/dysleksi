@@ -10,7 +10,7 @@ $config = array(
     'example-userpass' => array(
         'exampleauth:UserPass',
 
-        'teacher:teacher' => array(
+        'lærer:lærer' => array(
             # Claims fra OIOSAML
             'https://data.gov.dk/model/core/specVersion' => 'OIO-SAML-3.0',
             'https://data.gov.dk/concept/core/nsis/loa' => 'Substantial',
@@ -19,7 +19,7 @@ $config = array(
             'https://data.gov.dk/model/core/eid/fullName' => 'Lærer Lærersen',
             'https://data.gov.dk/model/core/eid/firstName' => 'Lærer',
             'https://data.gov.dk/model/core/eid/lastName' => 'Lærersen',
-            'https://data.gov.dk/model/core/eid/cprNumber' => '0111111111',
+            'https://data.gov.dk/model/core/eid/cprNumber' => '0222222222',
             'https://data.gov.dk/model/core/eid/age' => '60',
             'https://data.gov.dk/model/core/eid/cprUuid' => 'urn:uuid:323e4567-e89b-12d3-a456-426655440000',
             'https://data.gov.dk/model/core/eid/professional/cvr' => '12345678',
@@ -38,7 +38,7 @@ $config = array(
                 Pgo8L2JwcDpQcml2aWxlZ2VMaXN0Pgo='
         ),
 
-        'student:student' => array(
+        'elev:elev' => array(
             # Claims fra OIOSAML
             'https://data.gov.dk/model/core/specVersion' => 'OIO-SAML-3.0',
             'https://data.gov.dk/concept/core/nsis/loa' => 'Substantial',
@@ -47,7 +47,7 @@ $config = array(
             'https://data.gov.dk/model/core/eid/fullName' => 'Elev Elevsen',
             'https://data.gov.dk/model/core/eid/firstName' => 'Elev',
             'https://data.gov.dk/model/core/eid/lastName' => 'Elevsen',
-            'https://data.gov.dk/model/core/eid/cprNumber' => '0111111110',
+            'https://data.gov.dk/model/core/eid/cprNumber' => '0111111111',
             'https://data.gov.dk/model/core/eid/age' => '10',
             'https://data.gov.dk/model/core/eid/cprUuid' => 'urn:uuid:323e4567-e89b-12d3-a456-426655440000',
             'https://data.gov.dk/model/core/eid/privilegesIntermediate' =>
