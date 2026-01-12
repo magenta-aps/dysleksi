@@ -14,9 +14,9 @@ docker compose up -d
 
 ## Usage hints
 
-In your browser, go to http://dysleksi-web:8140/ and log in using the credentials `teacher/teacher`.
+In your browser, go to http://dysleksi-web:8140/ and log in using the credentials `lærer/lærer`.
 
-Now open a second browser in incognito mode, and go to http://dysleksi-web:8140/ there as well. Log in using the credentials `student/student`.
+Now open a second browser in incognito mode, and go to http://dysleksi-web:8140/ there as well. Log in using the credentials `elev/elev`.
 
 In the "teacher window", you should see a list of students (with only one student.)
 
