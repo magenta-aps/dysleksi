@@ -3,10 +3,21 @@
 # SPDX-License-Identifier: MPL-2.0
 
 from django.contrib.auth.models import Group
+from django.core.files.images import ImageFile
 from django.test import TestCase
 from django.test.client import RequestFactory
 
-from dysleksi.models import STUDENTS, TEACHERS, Class, Student, Teacher, User
+from dysleksi.models import (
+    STUDENTS,
+    TEACHERS,
+    Class,
+    Student,
+    Teacher,
+    Test,
+    TestPart,
+    TestResource,
+    User,
+)
 
 
 class DysleksiTest(TestCase):
@@ -15,7 +26,7 @@ class DysleksiTest(TestCase):
         super().setUpTestData()
         Group.objects.get_or_create(name=TEACHERS)
         Group.objects.get_or_create(name=STUDENTS)
-        cls.klasse, _ = Class.objects.get_or_create(start_year=2025, letter="A")
+        cls.klasse = cls.create_class(2025, "A")
         cls.student = cls.create_student(
             "TestStudent",
             cpr=1234567890,
@@ -36,6 +47,28 @@ class DysleksiTest(TestCase):
             last_name="Admin",
             is_superuser=True,
         )
+        cls.test = Test.objects.create(name="Test1")
+        cls.part = TestPart.objects.create(
+            name="TestPart1", test=cls.test, timeout=60, partial_score_after=30
+        )
+        cls.resource1 = TestResource.objects.create(
+            name="TestResource1",
+            text="TestOrd",
+        )
+        cls.resource2 = TestResource.objects.create(
+            name="TestResource2",
+            image=ImageFile(
+                open("/app/dysleksi/tests/resources/test1.jpg", "rb"), name="test1.jpg"
+            ),
+        )
+
+    @classmethod
+    def create_class(cls, start_year: int, letter: str) -> Class:
+        klasse, _ = Class.objects.get_or_create(
+            start_year=start_year,
+            letter=letter,
+        )
+        return klasse
 
     @classmethod
     def create_teacher(cls, username: str, **kwargs) -> Teacher:

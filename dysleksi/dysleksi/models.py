@@ -5,8 +5,10 @@ from datetime import date
 from typing import List
 
 from django.contrib.auth.models import AbstractUser, Group
+from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
+from django.db.models import CheckConstraint
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -119,3 +121,197 @@ class Class(models.Model):
 
     def __str__(self) -> str:
         return f"{self.number}.{self.letter}"
+
+
+class TestResource(models.Model):
+    name = models.CharField(max_length=200, blank=False, null=False)
+    image = models.ImageField(upload_to="images", blank=True, null=True)
+    sound = models.FileField(upload_to="sounds", blank=True, null=True)
+    text = models.CharField(max_length=200, blank=True, null=True, default=None)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                # Django FileFields (and ImageFields) do not store null values,
+                # but empty strings. See https://code.djangoproject.com/ticket/10244
+                condition=~models.Q(image="")
+                | ~models.Q(sound="")
+                | models.Q(text__isnull=False),
+                name="image_or_sound_or_text_must_be_set",
+            )
+        ]
+
+
+class Test(models.Model):
+    name = models.CharField(max_length=255)
+
+
+class TestAssignment(models.Model):
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(student__isnull=False)
+                | models.Q(klasse__isnull=False),
+                name="student_or_class_must_be_set",
+            )
+        ]
+
+    test = models.ForeignKey(
+        Test,
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+    )
+    teacher = models.ForeignKey(
+        Teacher,
+        on_delete=models.CASCADE,
+        blank=False,
+        null=False,
+    )
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name="assignments",
+        blank=True,
+        null=True,
+    )
+    klasse = models.ForeignKey(
+        Class,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+
+
+class TestPart(models.Model):
+    test = models.ForeignKey(
+        Test,
+        on_delete=models.CASCADE,
+        related_name="parts",
+        null=False,
+    )
+    name = models.CharField(max_length=255)
+    instructions = models.FileField(upload_to="instructions", blank=True, null=True)
+    intro = models.TextField(blank=True, null=True)
+    timeout = models.PositiveSmallIntegerField(blank=False, null=False)
+    partial_score_after = models.PositiveSmallIntegerField(blank=False, null=False)
+
+
+class TestQuestion(models.Model):
+    part = models.ForeignKey(
+        TestPart,
+        on_delete=models.CASCADE,
+        related_name="questions",
+        null=False,
+    )
+    challenge = models.ForeignKey(
+        TestResource,
+        on_delete=models.PROTECT,
+        blank=False,
+        null=False,
+    )
+
+
+class PossibleAnswer(models.Model):
+
+    question = models.ForeignKey(
+        TestQuestion,
+        on_delete=models.CASCADE,
+        related_name="possible_answers",
+    )
+    resource = models.ForeignKey(
+        TestResource,
+        on_delete=models.PROTECT,
+        blank=False,
+        null=False,
+    )
+    is_correct = models.BooleanField(
+        blank=False,
+        null=False,
+        default=False,
+    )
+
+
+class TestResponse(models.Model):
+
+    def clean(self):
+        if self.assignment.student is not None:
+            if self.student != self.assignment.student:
+                raise ValidationError({"student": _("Student must match assignment.")})
+        else:
+            if self.student.klasse != self.assignment.klasse:
+                raise ValidationError(
+                    {"student": _("Student class must match assignment class.")}
+                )
+
+    assignment = models.ForeignKey(
+        TestAssignment,
+        on_delete=models.CASCADE,
+        related_name="responses",
+    )
+    student = models.ForeignKey(
+        Student,
+        on_delete=models.CASCADE,
+        related_name="responses",
+        blank=False,
+        null=False,
+    )
+
+
+class PartResponse(models.Model):
+    testresponse = models.ForeignKey(
+        TestResponse,
+        on_delete=models.CASCADE,
+        related_name="partresponses",
+    )
+    finished_after = models.PositiveSmallIntegerField(
+        blank=False,
+        null=False,
+    )
+
+
+class QuestionResponse(models.Model):
+
+    class Meta:
+        constraints = [
+            CheckConstraint(
+                check=models.Q(answer_option__isnull=False)
+                | models.Q(answer_text__isnull=False)
+                | models.Q(answer_sound__isnull=False),
+                name="answer_must_be_set",
+            )
+        ]
+
+    question = models.ForeignKey(
+        TestQuestion,
+        on_delete=models.CASCADE,
+        related_name="questionresponse",
+    )
+    partresponse = models.ForeignKey(
+        PartResponse,
+        on_delete=models.CASCADE,
+        related_name="questionresponses",
+    )
+    answer_option = models.ForeignKey(
+        PossibleAnswer,
+        verbose_name=_("Svar valgt af testdeltageren"),
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    answer_text = models.TextField(
+        verbose_name=_("Svar indtastet af testdeltageren"),
+        blank=True,
+        null=True,
+    )
+    answer_sound = models.FileField(
+        verbose_name=_("Svar indtalt af testdeltageren"),
+        upload_to="answers",
+        blank=True,
+        null=True,
+    )
+
+    correct = models.BooleanField(blank=False, null=False)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    finished_after = models.PositiveSmallIntegerField(blank=False, null=False)
