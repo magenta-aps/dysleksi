@@ -20,7 +20,7 @@ path = [
     ".renovaterc",
     "dev-idp/**",
     "rfc/**",
-    "data/**"
+    "file-data/**",
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2025 Magenta ApS <info@magenta.dk>"
