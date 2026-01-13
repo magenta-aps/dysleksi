@@ -80,7 +80,7 @@ Twisted==25.5.0
 txaio==25.12.2
 types-channels==4.3.0.20250822
 types-PyYAML==6.0.12.20250915
-types-requests==2.32.4.20250913
+types-requests==2.32.4.20260107
 typing_extensions==4.15.0
 ujson==5.11.0
 urllib3==2.6.3
