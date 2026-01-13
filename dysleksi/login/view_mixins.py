@@ -27,8 +27,8 @@ class LoginRequiredMixin(DjangoLoginRequiredMixin):
             }
         )
 
-    def setup(self, request):
-        super().setup(request)
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
         self.user = request.user
 
     def dispatch(self, request, *args, **kwargs):
