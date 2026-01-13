@@ -183,3 +183,76 @@ class TestTestQuestion(DysleksiTest):
         )
         self.assertEqual(answer1.question, question)
         self.assertEqual(answer1.resource.name, "TestResource2")
+
+
+class TestTest(DysleksiTest):
+    def test_to_json(self):
+        json = self.test.to_json()
+
+        # Test basic Test -> parts
+        self.assertEqual(self.test.parts.count(), 1)
+        self.assertEqual(len(json["parts"]), self.test.parts.count())
+
+        part_model = self.test.parts.all().order_by("id")[0]
+        part_json = json["parts"][0]
+
+        self.assertEqual(part_model.name, "TestPart1")
+        self.assertEqual(part_json["name"], part_model.name)
+        self.assertEqual(part_model.timeout, part_json["timeout"])
+        self.assertEqual(
+            part_model.partial_score_after, part_json["partial_score_after"]
+        )
+        self.assertEqual(
+            part_model.instructions.url if part_model.instructions else None,
+            part_json["instructions_url"],
+        )
+        self.assertEqual(part_model.intro, part_json["intro"])
+
+        # Test questions
+        self.assertEqual(part_model.questions.count(), 1)
+        self.assertEqual(len(part_json["questions"]), part_model.questions.count())
+
+        question_model = part_model.questions.all().order_by("id")[0]
+        question_json = part_json["questions"][0]
+
+        self.assertEqual(question_model.challenge.name, question_json["challenge_name"])
+        self.assertEqual(
+            (
+                question_model.challenge.image.url
+                if question_model.challenge.image
+                else None
+            ),
+            question_json["challenge_image_url"],
+        )
+        self.assertEqual(
+            (
+                question_model.challenge.sound.url
+                if question_model.challenge.sound
+                else None
+            ),
+            question_json["challenge_sound_url"],
+        )
+        self.assertEqual(question_model.challenge.text, question_json["challenge_text"])
+
+        # Test possible answers
+        self.assertEqual(question_model.possible_answers.count(), 2)
+        self.assertEqual(
+            len(question_json["possible_answers"]),
+            question_model.possible_answers.count(),
+        )
+
+        for ans_model, ans_json in zip(
+            question_model.possible_answers.all().order_by("id"),
+            question_json["possible_answers"],
+        ):
+            self.assertEqual(ans_model.resource.name, ans_json["resource_name"])
+            self.assertEqual(
+                ans_model.resource.image.url if ans_model.resource.image else None,
+                ans_json["resource_image_url"],
+            )
+            self.assertEqual(
+                ans_model.resource.sound.url if ans_model.resource.sound else None,
+                ans_json["resource_sound_url"],
+            )
+            self.assertEqual(ans_model.resource.text, ans_json["resource_text"])
+            self.assertEqual(ans_model.is_correct, ans_json["is_correct"])

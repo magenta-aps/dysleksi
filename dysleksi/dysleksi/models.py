@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 from datetime import date
-from typing import List
+from typing import Any, Dict, List
 
 from django.contrib.auth.models import AbstractUser, Group
 from django.core.exceptions import ValidationError
@@ -144,6 +144,71 @@ class TestResource(models.Model):
 
 class Test(models.Model):
     name = models.CharField(max_length=255)
+
+    def to_json(self) -> dict:
+        """
+        Serialize the Test with its parts, questions, and possible answers.
+        Returns a Python dict that can be converted to JSON with json.dumps().
+        """
+        test_data: Dict[str, Any] = {
+            "id": self.id,
+            "name": self.name,
+            "parts": [],
+        }
+
+        for part in self.parts.all().order_by("id"):
+            part_data = {
+                "id": part.id,
+                "name": part.name,
+                "instructions_url": (
+                    part.instructions.url if part.instructions else None
+                ),
+                "intro": part.intro,
+                "timeout": part.timeout,
+                "partial_score_after": part.partial_score_after,
+                "questions": [],
+            }
+
+            for question in part.questions.all().order_by("id"):
+                question_data = {
+                    "id": question.id,
+                    "challenge_id": question.challenge.id,
+                    "challenge_name": question.challenge.name,
+                    "challenge_image_url": (
+                        question.challenge.image.url
+                        if question.challenge.image
+                        else None
+                    ),
+                    "challenge_sound_url": (
+                        question.challenge.sound.url
+                        if question.challenge.sound
+                        else None
+                    ),
+                    "challenge_text": question.challenge.text,
+                    "possible_answers": [],
+                }
+
+                for answer in question.possible_answers.all().order_by("id"):
+                    answer_data = {
+                        "id": answer.id,
+                        "resource_id": answer.resource.id,
+                        "resource_name": answer.resource.name,
+                        "resource_image_url": (
+                            answer.resource.image.url if answer.resource.image else None
+                        ),
+                        "resource_sound_url": (
+                            answer.resource.sound.url if answer.resource.sound else None
+                        ),
+                        "resource_text": answer.resource.text,
+                        "is_correct": answer.is_correct,
+                    }
+                    question_data["possible_answers"].append(answer_data)
+
+                part_data["questions"].append(question_data)
+
+            test_data["parts"].append(part_data)
+
+        return test_data
 
 
 class TestAssignment(models.Model):
