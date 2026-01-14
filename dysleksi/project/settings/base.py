@@ -17,7 +17,7 @@ VERSION = os.environ["COMMIT_TAG"]
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
-ENVIRONMENT = os.environ.get("ENVIRONMENT", "development")
+ENVIRONMENT = os.environ.get("ENVIRONMENT", "production")
 DEBUG = strtobool(os.environ.get("DJANGO_DEBUG", "False"))
 TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
 PUBLIC = strtobool(os.environ.get("PUBLIC", "True"))
