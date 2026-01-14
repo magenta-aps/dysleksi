@@ -30,7 +30,7 @@ django-filter==25.2
 django-forms-dynamic==1.0.0
 django-formtools==2.5.1
 django-libsass==0.9
-django-otp==1.6.3
+django-otp==1.7.0
 django-phonenumber-field==8.3.0
 django-session-timeout @ git+https://github.com/Lapeth/django-session-timeout@8e50dc6223164368be8c8e1754a90a2c6dca2dc2
 django-simple-history==3.10.1
