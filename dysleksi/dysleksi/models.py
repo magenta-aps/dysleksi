@@ -61,7 +61,17 @@ class User(AbstractUser):
         return self.has_group(STUDENTS)
 
     def __str__(self) -> str:
-        return f"{self.first_name} {self.last_name} ({self.user_type})"
+        return (
+            f"{' '.join(filter(None, [self.first_name, self.last_name]))} "
+            f"(type={self.user_type}, pk={self.pk})"
+        )
+
+    def subclass_instance(self) -> "User":
+        if self.is_teacher:
+            return Teacher.objects.get_or_create(user_ptr=self)[0]
+        elif self.is_student:
+            return Student.objects.get_or_create(user_ptr=self)[0]
+        return self
 
 
 class Student(User):
@@ -106,6 +116,7 @@ class Class(models.Model):
     )
     teachers = models.ManyToManyField(
         Teacher,
+        related_name="classes",
     )
 
     @property
@@ -119,8 +130,12 @@ class Class(models.Model):
             years += 1
         return years
 
-    def __str__(self) -> str:
+    @property
+    def name(self) -> str:
         return f"{self.number}.{self.letter}"
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class TestResource(models.Model):
@@ -307,7 +322,12 @@ class TestResponse(models.Model):
         else:
             if self.student.klasse != self.assignment.klasse:
                 raise ValidationError(
-                    {"student": _("Student class must match assignment class.")}
+                    {
+                        "student": _(
+                            "Student class (pk=%d) must match assignment class (pk=%d)."
+                        )
+                        % (self.student.klasse.pk, self.assignment.klasse.pk)
+                    }
                 )
 
     assignment = models.ForeignKey(

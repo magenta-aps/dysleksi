@@ -43,6 +43,11 @@ if [ "${CREATE_DUMMY_USERS,,}" = true ]; then
   python manage.py create_user admin admin --is_superuser
 fi
 
+
+if [ "${CREATE_DUMMY_DATA,,}" = true ]; then
+  python manage.py create_dummy_classes
+fi
+
 if [ "${CREATE_DUMMY_TESTS,,}" = true ]; then
   echo 'creating dummy tests'
   python manage.py create_dummy_tests

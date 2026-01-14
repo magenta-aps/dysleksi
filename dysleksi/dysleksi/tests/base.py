@@ -49,15 +49,22 @@ class DysleksiTest(TestCase):
             last_name="Admin",
             is_superuser=True,
         )
-        cls.test = Test.objects.create(name="Test1")
-        cls.part = TestPart.objects.create(
+        cls.other_user, _ = User.objects.update_or_create(
+            username="TestOtherUser",
+            first_name="Test",
+            last_name="OtherUser",
+            is_superuser=False,
+            is_staff=False,
+        )
+        cls.test, _ = Test.objects.get_or_create(name="Test1")
+        cls.part, _ = TestPart.objects.get_or_create(
             name="TestPart1", test=cls.test, timeout=60, partial_score_after=30
         )
-        cls.resource1 = TestResource.objects.create(
+        cls.resource1, _ = TestResource.objects.get_or_create(
             name="TestResource1",
             text="TestOrd",
         )
-        cls.resource2 = TestResource.objects.create(
+        cls.resource2, _ = TestResource.objects.get_or_create(
             name="TestResource2",
             image=ImageFile(
                 open("/app/dysleksi/tests/resources/test1.jpg", "rb"), name="test1.jpg"
@@ -84,6 +91,9 @@ class DysleksiTest(TestCase):
             is_correct=False,
         )
 
+        cls.klasse, _ = Class.objects.get_or_create(start_year=2025, letter="A")
+        cls.teacher.classes.add(cls.klasse)
+
     @classmethod
     def create_class(cls, start_year: int, letter: str) -> Class:
         klasse, _ = Class.objects.get_or_create(
@@ -108,10 +118,12 @@ class DysleksiTest(TestCase):
         )
         return student
 
-    def setup_view(self, view_class, user: User):
+    def setup_view(self, view_class, user: User, get: bool = True):
         request_factory = RequestFactory()
         request = request_factory.get("")
         request.user = user
         view = view_class()
         view.setup(request)
+        if get:
+            view.get(request)
         return view
