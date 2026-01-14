@@ -46,10 +46,6 @@ fi
 
 if [ "${CREATE_DUMMY_DATA,,}" = true ]; then
   python manage.py create_dummy_classes
-fi
-
-if [ "${CREATE_DUMMY_TESTS,,}" = true ]; then
-  echo 'creating dummy tests'
   python manage.py create_dummy_tests
 fi
 

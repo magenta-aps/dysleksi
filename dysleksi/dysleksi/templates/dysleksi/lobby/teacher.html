@@ -10,8 +10,8 @@
         const data = JSON.parse(e.data);
 
         if (data.event === 'lobby.joined') {
-            const chatId = data.id;
-            const matchingElem = document.querySelector("a[data-id='" + chatId + "'] .btn.disabled");
+            const chatId = data.room;                       
+            const matchingElem = document.querySelector("a[data-room='" + chatId + "'] .btn.disabled");
 
             // When students enter the lobby, enable the "start" link belonging to that student
             matchingElem.classList.remove("disabled");
@@ -37,10 +37,20 @@
     <div class="list-group">
         {% for student in students %}
         <a class="list-group-item list-group-item-action"
-           href="{% url 'dysleksi:room' room_name=student.id %}"
-           data-id="{{ student.id }}">
+           href="{% url 'dysleksi:room' room_name='student_'|add:student.id %}"
+           data-room="{{ 'student_'|add:student.id }}">
             <p>{{ student.name }}</p>
             <div class="btn btn-primary disabled">{% translate "Start individueltest" %}</div>
+        </a>
+        {% endfor %}
+    </div>
+    <div class="list-group">
+        {% for class in classes %}
+        <a class="list-group-item list-group-item-action"
+           href="{% url 'dysleksi:room' room_name='class_'|add:class.id %}"
+           data-room="{{ 'class_'|add:class.id }}">
+            <p>{{ class.name }}</p>
+            <div class="btn btn-primary disabled">{% translate "Start Gruppetest" %}</div>
         </a>
         {% endfor %}
     </div>

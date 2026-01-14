@@ -7,7 +7,7 @@ from django.views.generic import TemplateView
 from django_tables2 import SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
 
-from dysleksi.models import TEACHERS, Class, User
+from dysleksi.models import TEACHERS, Class, Test, User
 from dysleksi.tables import ClassTable
 
 
@@ -38,9 +38,11 @@ class RootView(UserTypeMixin, TemplateView):
         context_data = super().get_context_data(**kwargs)
         if not self.user.is_anonymous:
             # Mock student data
-            mock_student = {"id": "1234", "name": "Elev Elevsen"}
+            mock_class = {"id": "111", "name": "1. G"}
+            mock_student = {"id": "1234", "name": "Elev Elevsen", "class": mock_class}
             if self.user.is_teacher:
                 context_data["students"] = [mock_student]
+                context_data["classes"] = [mock_class]
             elif self.user.is_student:
                 context_data["student"] = mock_student
         return context_data
@@ -48,7 +50,20 @@ class RootView(UserTypeMixin, TemplateView):
 
 class RoomView(UserTypeMixin, TemplateView):
     def get_template_prefix(self) -> str:
-        return "dysleksi/test"
+        room_name = self.kwargs["room_name"]
+
+        if room_name.startswith("student"):
+            return "dysleksi/screening/individual"
+        else:
+            return "dysleksi/screening/group"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context_data = super().get_context_data(**kwargs)
+
+        # TODO: Allow teacher to pick a test rather than hard-coding test3
+        context_data["test_contents"] = Test.objects.get(id=3).to_json()
+
+        return context_data
 
 
 class ClassListView(GroupRequiredMixin, SingleTableView):

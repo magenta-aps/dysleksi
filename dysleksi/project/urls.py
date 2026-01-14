@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
@@ -32,3 +33,5 @@ if settings.MITID_TEST_ENABLED:  # type: ignore[misc]
     urlpatterns.append(
         path("mitid_test/", include("mitid_test.urls", namespace="mitid_test"))
     )
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -17,7 +17,7 @@ services:
       - ./log/dysleksi.log:/log/dysleksi.log:rw
       - ./dev-environment/cert:/ssl:ro
       - ./mypy.ini:/mypy.ini:ro
-      - file-data:/upload:rw
+      - ./file-data:/upload:rw
       - idp-data:/app/idp:rw
       - staticfiles-data:/app/project/static/
     environment:

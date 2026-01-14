@@ -23,27 +23,27 @@ def create_wordreading_2_test(test):
 
     questions_data = [
         {
-            "image": "images/wordreading_2/dog.png",
+            "image": "wordreading_2/dog.png",
             "correct": _("hund"),
             "wrong": [_("kat"), _("ko"), _("hest")],
         },
         {
-            "image": "images/wordreading_2/bike.jpeg",
+            "image": "wordreading_2/bike.jpeg",
             "correct": _("cykel"),
             "wrong": [_("bil"), _("bus"), _("tog")],
         },
         {
-            "image": "images/wordreading_2/cat.jpg",
+            "image": "wordreading_2/cat.jpg",
             "correct": _("kat"),
             "wrong": [_("hund"), _("mus"), _("fugl")],
         },
         {
-            "image": "images/wordreading_2/house.jpg",
+            "image": "wordreading_2/house.jpg",
             "correct": _("hus"),
             "wrong": [_("bil"), _("træ"), _("vej")],
         },
         {
-            "image": "images/wordreading_2/car.jpg",
+            "image": "wordreading_2/car.jpg",
             "correct": _("bil"),
             "wrong": [_("cykel"), _("tog"), _("bus")],
         },
