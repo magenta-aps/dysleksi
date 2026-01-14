@@ -28,6 +28,7 @@ services:
       - MAKE_MESSAGES=true
       - CREATE_DUMMY_USERS=true
       - TEST=true
+      - CREATE_DUMMY_TESTS=true
     networks:
       - default
       - database
