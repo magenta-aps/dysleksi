@@ -11,10 +11,12 @@ from dysleksi.models import (
     STUDENTS,
     TEACHERS,
     Class,
+    PossibleAnswer,
     Student,
     Teacher,
     Test,
     TestPart,
+    TestQuestion,
     TestResource,
     User,
 )
@@ -60,6 +62,26 @@ class DysleksiTest(TestCase):
             image=ImageFile(
                 open("/app/dysleksi/tests/resources/test1.jpg", "rb"), name="test1.jpg"
             ),
+        )
+        cls.resource3 = TestResource.objects.create(
+            name="TestResource3",
+            text="TestOrd",
+        )
+
+        cls.question1 = TestQuestion.objects.create(
+            part=cls.part,
+            challenge=cls.resource1,
+        )
+
+        cls.possible_correct_answer1 = PossibleAnswer.objects.create(
+            question=cls.question1,
+            resource=cls.resource2,
+            is_correct=True,
+        )
+        cls.possible_wrong_answer1 = PossibleAnswer.objects.create(
+            question=cls.question1,
+            resource=cls.resource3,
+            is_correct=False,
         )
 
     @classmethod
