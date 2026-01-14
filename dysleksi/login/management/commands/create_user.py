@@ -5,6 +5,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 
+from dysleksi.models import STUDENTS, TEACHERS, Student, Teacher
+
 User = get_user_model()
 
 
@@ -19,7 +21,15 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         name = options["username"].capitalize()
-        user, _ = User.objects.update_or_create(
+        groups = options.get("groups") or []
+
+        user_class = User
+        if TEACHERS in groups:
+            user_class = Teacher
+        elif STUDENTS in groups:
+            user_class = Student
+
+        user, _ = user_class.objects.update_or_create(
             username=options["username"],
             defaults={
                 "is_staff": options["is_staff"],
@@ -35,11 +45,13 @@ class Command(BaseCommand):
 
         user.save()
 
+        self.stdout.write(f"Created user {user} with pk {user.pk}")
         groups = options.get("groups")
         if groups:
             for group_name in groups:
                 try:
                     group = Group.objects.get(name=group_name)
                     user.groups.add(group)
+                    print(f"  Member of {group.name}")
                 except Group.DoesNotExist:
                     self.stdout.write(f"Group {group_name} does not exist")

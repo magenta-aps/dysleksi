@@ -25,10 +25,14 @@ class TestUser(DysleksiTest):
             username="UnknownUser", first_name="Unknown", last_name="User"
         )
         cases: list[tuple[User, str]] = [
-            (self.admin, "Test Admin (Administrator)"),
-            (self.student, "Test Elev (Elev)"),
-            (self.teacher, "Test Lærer (Lærer)"),
-            (unknown_user, "Unknown User (Ukendt brugertype)"),
+            (self.admin, f"Test Admin (type=Administrator, pk={self.admin.pk})"),
+            (self.student, f"Test Elev (type=Elev, pk={self.student.pk})"),
+            (self.teacher, f"Test Lærer (type=Lærer, pk={self.teacher.pk})"),
+            (
+                self.other_user,
+                f"Test OtherUser (type=Ukendt brugertype, pk={self.other_user.pk})",
+            ),
+            (unknown_user, "Unknown User (type=Ukendt brugertype, pk=None)"),
         ]
         for user, expected_str in cases:
             with self.subTest(user=user, expected_str=expected_str):
@@ -127,7 +131,13 @@ class TestTestResponse(DysleksiTest):
         exception: ValidationError = cm.exception
 
         self.assertEqual(
-            dict(exception), {"student": ["Student class must match assignment class."]}
+            dict(exception),
+            {
+                "student": [
+                    f"Student class (pk={klasse2.pk}) must match "
+                    f"assignment class (pk={self.klasse.pk})."
+                ]
+            },
         )
 
     def test_validation_3(self):

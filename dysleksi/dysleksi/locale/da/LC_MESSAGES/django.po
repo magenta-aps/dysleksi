@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-13 08:25-0200\n"
+"POT-Creation-Date: 2026-01-12 06:34-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,7 +83,8 @@ msgid "Student must match assignment."
 msgstr ""
 
 #: dysleksi/models.py
-msgid "Student class must match assignment class."
+#, python-format
+msgid "Student class (pk=%d) must match assignment class (pk=%d)."
 msgstr ""
 
 #: dysleksi/models.py
@@ -100,6 +101,10 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/base.html
 msgid "Dysleksi"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/class/list.html
+msgid "Klasser"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/staff.html

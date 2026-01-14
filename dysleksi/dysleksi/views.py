@@ -4,7 +4,11 @@
 from typing import Any
 
 from django.views.generic import TemplateView
-from login.view_mixins import LoginRequiredMixin
+from django_tables2 import SingleTableView
+from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
+
+from dysleksi.models import TEACHERS, Class, User
+from dysleksi.tables import ClassTable
 
 
 class UserTypeMixin(LoginRequiredMixin):
@@ -15,14 +19,15 @@ class UserTypeMixin(LoginRequiredMixin):
 
     def get_template_names(self) -> list[str]:
         # Find template name matching prefix and user type
-        if self.user.is_teacher:
-            return [f"{self.get_template_prefix()}/teacher.html"]
-        if self.user.is_student:
-            return [f"{self.get_template_prefix()}/student.html"]
-        if self.user.is_staff or self.user.is_superuser:
-            return [f"{self.get_template_prefix()}/staff.html"]
-        else:
-            raise ValueError(f"Unknown type for user: {self.user}")  # pragma: no cover
+        prefix = self.get_template_prefix()
+        if isinstance(self.user, User):
+            if self.user.is_teacher:
+                return [f"{prefix}/teacher.html"]
+            if self.user.is_student:
+                return [f"{prefix}/student.html"]
+            if self.user.is_staff or self.user.is_superuser:
+                return [f"{prefix}/staff.html"]
+        return [f"{prefix}/other.html"]
 
 
 class RootView(UserTypeMixin, TemplateView):
@@ -44,3 +49,13 @@ class RootView(UserTypeMixin, TemplateView):
 class RoomView(UserTypeMixin, TemplateView):
     def get_template_prefix(self) -> str:
         return "dysleksi/test"
+
+
+class ClassListView(GroupRequiredMixin, SingleTableView):
+    model = Class
+    table_class = ClassTable
+    groups_required = [TEACHERS]
+    template_name = "dysleksi/class/list.html"
+
+    def get_queryset(self):
+        return Class.objects.filter(teachers=self.user)

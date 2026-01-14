@@ -1,9 +1,13 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
+from typing import List
+
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin as DjangoLoginRequiredMixin
 from django.contrib.auth.models import AnonymousUser
+from django.core.exceptions import PermissionDenied
+from django.db.models import Q
 from django.template.response import TemplateResponse
 from django_otp.plugins.otp_totp.models import TOTPDevice
 
@@ -29,6 +33,8 @@ class LoginRequiredMixin(DjangoLoginRequiredMixin):
 
     def setup(self, request, *args, **kwargs):
         super().setup(request, *args, **kwargs)
+        if hasattr(request.user, "subclass_instance"):
+            request.user = request.user.subclass_instance()
         self.user = request.user
 
     def dispatch(self, request, *args, **kwargs):
@@ -41,3 +47,20 @@ class LoginRequiredMixin(DjangoLoginRequiredMixin):
             ):
                 return self.two_factor_setup_required
         return super().dispatch(request, *args, **kwargs)
+
+
+class GroupRequiredMixin(LoginRequiredMixin):
+
+    groups_required: List[str] = []
+
+    def get_group_filter(self) -> Q:
+        q = Q()
+        for group in self.groups_required:
+            q &= Q(name=group)
+        return q
+
+    def get(self, request, *args, **kwargs):
+        if request.user.groups.filter(self.get_group_filter()).exists():
+            return super().get(request, *args, **kwargs)
+        else:
+            raise PermissionDenied
