@@ -75,7 +75,7 @@ rjsmin==1.2.5
 service-identity==24.2.0
 six==1.17.0
 soupsieve==2.8.1
-sqlparse==0.5.4
+sqlparse==0.5.5
 Twisted==25.5.0
 txaio==25.12.2
 types-channels==4.3.0.20250822
