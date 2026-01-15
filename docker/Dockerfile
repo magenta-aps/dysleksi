@@ -52,6 +52,7 @@ COPY --chown=dysleksi:dysleksi ./dysleksi /app
 RUN chown dysleksi:dysleksi /app
 USER dysleksi
 EXPOSE 8000
+EXPOSE 8443
 ENTRYPOINT ["/entrypoint.sh"]
 WORKDIR /app
 RUN django-admin compilemessages --locale=da --locale=kl --verbosity=1
