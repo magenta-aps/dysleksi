@@ -5,9 +5,6 @@
 <script>
     // Events
     const chatSocket = getWebSocket('{{ room_name }}');
-    // chatSocket.onmessage = function (e) {
-    //     console.log('chat: received', e.data);
-    // };
 
     // Mock data
     const tests = [
@@ -20,6 +17,10 @@
             'type': 'multiple-choice',
             'question': 'Hvad kommer efter bogstavet "M"?',
             'choices': ['Q', 'N', 'S', 'E'],
+        },
+        {
+            'type': 'audio-recording',
+            'question': 'S',
         },
     ];
 </script>
