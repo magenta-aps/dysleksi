@@ -26,13 +26,6 @@ precedence = "aggregate"
 SPDX-FileCopyrightText = "2025 Magenta ApS <info@magenta.dk>"
 SPDX-License-Identifier = "MPL-2.0"
 
-
-[[annotations]]
-path = "dysleksi/common/static/jquery/**"
-precedence = "aggregate"
-SPDX-FileCopyrightText = "2022 OpenJS Foundation and jQuery contributors"
-SPDX-License-Identifier = "MIT"
-
 [[annotations]]
 path = "dysleksi/common/static/bootstrap/**"
 precedence = "aggregate"

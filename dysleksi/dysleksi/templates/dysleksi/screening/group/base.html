@@ -4,6 +4,8 @@
 {{ block.super }}
 <script>
     const chatSocket = getWebSocket('{{ room_name }}');
-    const test_contents = JSON.parse($("#test_contents").text());    
+
+    const testContentsElement = document.getElementById("test_contents");
+    const test_contents = JSON.parse(testContentsElement.textContent);
 </script>
 {% endblock %}

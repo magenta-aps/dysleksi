@@ -4,24 +4,26 @@
 {% block js %}
 {{ block.super }}
 <script>
-    const IndividualRoomName = "student_{{ student.id }}";
+    const individualRoomName = "student_{{ student.id }}";
     const ClassRoomName = "class_{{ student.class.id }}";
+    const individualRoomUrl = '{% url "dysleksi:room" room_name='student_'|add:student.id %}';
+    const ClassRoomUrl = '{% url "dysleksi:room" room_name='class_'|add:student.class.id %}';
 
     // When student enters the lobby, broadcast a message to all users connected to the lobby
     lobbySocket.addEventListener("open", (event) => {
-        lobbySocket.send(JSON.stringify({'event': 'lobby.joined', 'room': IndividualRoomName}));
+        lobbySocket.send(JSON.stringify({'event': 'lobby.joined', 'room': individualRoomName}));
     });
     lobbySocket.addEventListener("open", (event) => {
         lobbySocket.send(JSON.stringify({'event': 'lobby.joined', 'room': ClassRoomName}));
     });    
     
     // Listen for session start events
-    const IndividualChatSocket = getWebSocket(IndividualRoomName);
+    const IndividualChatSocket = getWebSocket(individualRoomName);
     IndividualChatSocket.onmessage = function (e) {
         console.log("chat: received", e.data);
         const data = JSON.parse(e.data);
         if (data.event === 'session.start') {
-            const url = '{% url "dysleksi:room" room_name='student_'|add:student.id %}';
+            const url = individualRoomUrl;
             window.location = url;
         }
     };
@@ -30,7 +32,7 @@
         console.log("chat: received", e.data);
         const data = JSON.parse(e.data);
         if (data.event === 'session.start') {
-            const url = '{% url "dysleksi:room" room_name='class_'|add:student.class.id %}';
+            const url = ClassRoomUrl;
             window.location = url;
         }
     };
