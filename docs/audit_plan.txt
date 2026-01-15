@@ -1,0 +1,66 @@
+# SPDX-FileCopyrightText: 2026 Magenta ApS <info@magenta.dk>
+# SPDX-License-Identifier: MPL-2.0
+
+# NOTE: This audit plan must be checked and be compliant on all points
+# in all production releases.
+
+
+version: 1.1.0
+
+
+Application repo
+================
+
+[x] The application fails on startup when configuration is invalid.
+[x] When secrets are not provided, the application crashes. It has no unsafe
+    fallback values.
+[x] In the app git repo, the only secrets are in `dev-environment/` and
+    docker-compose.
+[x] The application configuration defaults to production values (verify tls,
+    "PRODUCTION"-mode, no hot reload) etc by default. Development needs are
+    injected in the docker-compose file.
+[x] The Dockerfile is written for production. Development needs are injected in
+    the docker-compose file.
+[x] We trust the docker base images:
+    https://labs.docs.magenta.dk/projects/general/third-party-images.html
+[x] Hadolint is run on all our images in CI.
+[x] All curl/wget calls in the Dockerfile are verified by a checksum.
+[ ] All containers run with least privileged user necessary. It is documented
+    if and why a container runs as root.
+[x] No secrets in docker build arg.
+[ ] The application does not ship outdated/insecure third party dependencies
+    see https://labs.docs.magenta.dk/projects/general/dependencies.html
+[x] Up-to-date versions of protocols are used, e.g. HTTPS > HTTP, TLS > SSL,
+    Email over port 587, not 25 etc.
+
+
+salt-automation
+===============
+
+[ ] Rootfs of all containers is mounted as read-only (`read_only: true`).
+[ ] All config files are mounted as read-only.
+[ ] Docker socket is not mounted into containers.
+[ ] All ports mappings bind to a specific network interface.
+[ ] No container is running as `--privileged`.
+[ ] All files provisioned by salt have explicit set user, group and mode.
+[x] No plaintext secrets in salt-automation.
+[ ] unattended-upgrades salt state is installed.
+
+
+Live system
+===========
+
+[ ] Port 80 redirects to 443 or no HTTP service is running.
+[ ] Incoming web requests are encrypted.
+[ ] Incoming web requests are authenticated (in application).
+[ ] You can vouch for all listening processes:
+    `netstat -tulpn`, `nmap -sT -O localhost`.
+[ ] There are iptables rules whitelisting intended services.
+    Everything else is blocked.
+[ ] No missing security updates.
+[ ] You can vouch for all installed packages: `dpkg --list`.
+[ ] You can vouch for all users on the server. There are no former employees
+    and unused service accounts (see system.users salt state).
+[ ] docker is the only user in the docker group.
+[ ] You can vouch for all users in sudoers group.
+
