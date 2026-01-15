@@ -1,0 +1,11 @@
+{% extends "dysleksi/base.html" %}
+{% block js %}
+{{ test_contents|json_script:"test_contents" }}
+{{ block.super }}
+<script>
+    const chatSocket = getWebSocket('{{ room_name }}');
+
+    const testContentsElement = document.getElementById("test_contents");
+    const test_contents = JSON.parse(testContentsElement.textContent);
+</script>
+{% endblock %}

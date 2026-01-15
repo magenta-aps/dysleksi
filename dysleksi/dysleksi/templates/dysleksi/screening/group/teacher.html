@@ -1,31 +1,32 @@
-{% extends 'dysleksi/test/base.html' %}
+{% extends 'dysleksi/screening/group/base.html' %}
 
 {% block js %}
 {{ block.super }}
 <script>
     let testIndex;
 
-    const updateTable = function (data, test) {
+    const updateTable = function (data) {
         const eventsEl = document.querySelector('table#events tbody');
         const eventEl = document.createElement('tr');
 
         const typeEl = document.createElement('td');
-        const questionEl = document.createElement('td');
+        const messageEl = document.createElement('td');
         const answerEl = document.createElement('td');
-        const durationEl = document.createElement('td');
+        const timeEl = document.createElement('td');
 
         eventEl.append(typeEl);
-        eventEl.append(questionEl);
+        eventEl.append(messageEl);
         eventEl.append(answerEl);
-        eventEl.append(durationEl);
+        eventEl.append(timeEl);
 
         typeEl.innerHTML = data.event;
-        questionEl.innerHTML = test.question;
+        messageEl.innerHTML = data.message || '-';
         answerEl.innerHTML = data.choice || '-';
         if (data.event === 'test.answered') {
-            durationEl.innerHTML = data.answeredAt;
+            timeEl.innerHTML = data.duration ? `${data.duration} sekunder` : '-';
         } else {
-            durationEl.innerHTML = data.displayedAt;
+            // For displayed or completed events, show the timestamp
+            timeEl.innerHTML = data.displayedAt ? data.displayedAt.toFixed(1) : '-';
         }
 
         eventsEl.prepend(eventEl);
@@ -42,31 +43,32 @@
         console.log('chat: received', e.data);
 
         const data = JSON.parse(e.data);
-        if (data.event.match(/test.(answered|displayed)/)) {
-            const test = tests[data.index];
-            testIndex = data.index;
-            updateTable(data, test);
+
+        // Only handle test events
+        if (data.event && data.event.startsWith('test.')) {
+            if (data.index !== undefined) {
+                testIndex = data.index;
+            }
+            updateTable(data);
+
+            // Enable buttons after student answered
             if (data.event === 'test.answered') {
                 updateButtons('disabled', false);
             }
         }
     };
 
-    document.addEventListener('DOMContentLoaded', function (e) {
+    document.addEventListener('DOMContentLoaded', function () {
         const actionEls = document.querySelectorAll('button');
         actionEls.forEach(function (el) {
             el.addEventListener('click', function (e) {
                 const val = e.target.id;
-                if ((testIndex >= 0) && (testIndex < tests.length)) {
-                    chatSocket.send(
-                        JSON.stringify(
-                            {
-                                'event': 'test.' + val,
-                                'id': '{{ room_name }}',
-                                'index': testIndex,
-                            }
-                        )
-                    )
+                if ((testIndex !== undefined) && (testIndex >= 0)) {
+                    chatSocket.send(JSON.stringify({
+                        event: 'test.' + val,
+                        id: '{{ room_name }}',
+                        index: testIndex,
+                    }));
                     updateButtons('disabled', true);
                 } else {
                     console.error('invalid test index', testIndex);
@@ -79,14 +81,11 @@
 
 {% block content %}
 <div class="container">
-    <button class="btn btn-success disabled" id="correct">Korrekt</button>
-    <button class="btn btn-danger disabled" id="wrong">Forkert</button>
-    <button class="btn btn-outline-primary disabled" id="skipped">Sprunget over</button>
     <table id="events" class="table">
         <thead>
             <tr>
                 <th>Begivenhed</th>
-                <th>Spørgsmål</th>
+                <th>Beskrivelse</th>
                 <th>Svar</th>
                 <th>Tid</th>
             </tr>

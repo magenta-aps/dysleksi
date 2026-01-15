@@ -6,7 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.views import View
 
-from dysleksi.models import User
+from dysleksi.models import Test, User
 from dysleksi.tests.base import DysleksiTest
 from dysleksi.views import ClassListView, RoomView, RootView, UserTypeMixin
 
@@ -50,15 +50,29 @@ class TestRootView(DysleksiTest):
 
 
 class TestRoomView(DysleksiTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        cls.test = Test.objects.create(id=3, name="test-test")
+
     def test_get_template_names(self):
         cases: list[tuple[User, str | None]] = [
-            (self.teacher, "dysleksi/test/teacher.html"),
-            (self.student, "dysleksi/test/student.html"),
+            (self.teacher, "dysleksi/screening/individual/teacher.html", "student_123"),
+            (self.student, "dysleksi/screening/individual/student.html", "student_123"),
+            (self.teacher, "dysleksi/screening/group/teacher.html", "class_123"),
+            (self.student, "dysleksi/screening/group/student.html", "class_123"),
         ]
-        for user, template_name in cases:
+        for user, template_name, room_name in cases:
             with self.subTest(user=user, template_name=template_name):
-                view = self.setup_view(RoomView, user)
+                view = self.setup_view(RoomView, user, room_name=room_name)
                 self.assertListEqual(view.get_template_names(), [template_name])
+
+    def test_context_data(self):
+        view = self.setup_view(RoomView, self.teacher, room_name="class_1")
+        context = view.get_context_data()
+        self.assertIn("test_contents", context)
 
 
 class TestClassListView(DysleksiTest):
