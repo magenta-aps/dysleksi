@@ -157,7 +157,7 @@ Lint Javascript:
     # Simulate development environment while running tests so we use mockup data
     DJANGO_SECRET_KEY: 1DqtQVSbLLmgBvkhPyptqFwPpJE9Kkgdo2kZFZ57UnzuRMiFgw
     TZ: Europe/Copenhagen
-    HOST_DOMAIN: http://localhost
+    HOST_DOMAIN: https://localhost:8443
     POSTGRES_USER: dysleksi
     POSTGRES_PASSWORD: dysleksi
     POSTGRES_DB: dysleksi

@@ -23,7 +23,7 @@ TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
 PUBLIC = strtobool(os.environ.get("PUBLIC", "True"))
 CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "")
 
-HOST_DOMAIN = os.environ.get("HOST_DOMAIN", "http://dysleksi.gl")
+HOST_DOMAIN = os.environ.get("HOST_DOMAIN", "https://dysleksi.gl")
 ALLOWED_HOSTS: list[str] = json.loads(os.environ.get("ALLOWED_HOSTS", "[]"))
 CSRF_TRUSTED_ORIGINS = json.loads(os.environ.get("CSRF_TRUSTED_ORIGINS", "[]")) or [
     HOST_DOMAIN
