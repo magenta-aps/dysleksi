@@ -50,3 +50,18 @@ The project uses `django-channels` to synchronize events between teacher and stu
 * To begin an individual screening session, a separate "room" is created for that particular session. In this "room", all session events are communicated between the teacher's and the student's browser. 
 
 Messages in the lobby and in the session-specific rooms take the form `{"event": "some.event", "id": 1234}`.
+
+## Real data (wordreading 2)
+To load some real wordreading 2 data into the system:
+
+Add the zipped files from https://redmine.magenta.dk/documents/382 to 
+`file-data/wordreading_2`
+
+You can also run `extract_wordreading_2_images.py` from the `scripts` folder. This 
+generates the same files.
+
+Then run the following command to add the word-reading 2 subtest to the test named 
+`Middle 2. grade`
+```
+docker exec dysleksi-web python manage.py import_test "Middle 2. grade" "/upload/wordreading_2/wordreading_2.json"
+```
