@@ -21,7 +21,17 @@
 
         typeEl.innerHTML = data.event;
         questionEl.innerHTML = test.question;
-        answerEl.innerHTML = data.choice || '-';
+        answerEl.innerHTML = '';
+
+        if ((data.event === 'test.answered') && (test.type === 'audio-recording')) {
+            const playerEl = document.createElement("audio");
+            playerEl.controls = true;
+            playerEl.src = data.recordingBase64;
+            answerEl.append(playerEl);
+        } else {
+            answerEl.innerHTML = data.choice || '-';
+        }
+
         if (data.event === 'test.answered') {
             durationEl.innerHTML = data.answeredAt;
         } else {
