@@ -361,7 +361,7 @@ class QuestionResponse(models.Model):
     class Meta:
         constraints = [
             CheckConstraint(
-                check=models.Q(answer_option__isnull=False)
+                condition=models.Q(answer_option__isnull=False)
                 | models.Q(answer_text__isnull=False)
                 | models.Q(answer_sound__isnull=False),
                 name="answer_must_be_set",
