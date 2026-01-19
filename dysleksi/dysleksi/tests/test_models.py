@@ -8,9 +8,12 @@ from freezegun import freeze_time
 from dysleksi.models import (
     STUDENTS,
     TEACHERS,
+    PartResponse,
     PossibleAnswer,
+    QuestionResponse,
     Test,
     TestAssignment,
+    TestPart,
     TestQuestion,
     TestResource,
     TestResponse,
@@ -71,7 +74,56 @@ class TestClass(DysleksiTest):
             self.assertEqual(str(self.klasse), "3.A")
 
 
+class TestPartResponse(DysleksiTest):
+    def test_str(self):
+        test = Test.objects.create(name="Test")
+        assignment = TestAssignment.objects.create(
+            test=test,
+            teacher=self.teacher,
+            student=self.student,
+        )
+        response = TestResponse(
+            assignment=assignment,
+            student=self.student,
+        )
+        pr = PartResponse(testresponse=response)
+        pr.finished_after = "World"
+        self.assertEqual(str(pr), f"{str(pr.testresponse)} / {str(pr.finished_after)}")
+
+
+class TestQuestionResponse(DysleksiTest):
+    def test_str(self):
+        test = Test.objects.create(name="Test")
+        assignment = TestAssignment.objects.create(
+            test=test,
+            teacher=self.teacher,
+            student=self.student,
+        )
+        response = TestResponse(
+            assignment=assignment,
+            student=self.student,
+        )
+        pr = PartResponse(testresponse=response)
+        question = TestQuestion.objects.create(part=self.part, challenge=self.resource1)
+        qr = QuestionResponse(partresponse=pr, question=question)
+        qr.finished_after = "World"
+        self.assertEqual(str(qr), f"{str(qr.question)} / {str(qr.partresponse)}")
+
+
+class TestTestPart(DysleksiTest):
+    def test_str(self):
+        test_part = TestPart(name="Test")
+        self.assertEqual(str(test_part), "Test")
+
+
 class TestTestAssignment(DysleksiTest):
+    def test_str(self):
+        test = Test.objects.create(name="Test")
+        ta = TestAssignment(test=test, teacher=self.teacher, student=self.student)
+        self.assertTrue(
+            str(ta) == f"{ta.test.name}/{str(ta.teacher)} ({str(ta.student)})"
+        )
+
     def test_validation(self):
         test = Test.objects.create(name="Test")
         with self.assertRaises(IntegrityError) as cm:
@@ -89,6 +141,21 @@ class TestTestAssignment(DysleksiTest):
 
 
 class TestTestResponse(DysleksiTest):
+
+    def test_str(self):
+        test = Test.objects.create(name="Test")
+        assignment = TestAssignment.objects.create(
+            test=test,
+            teacher=self.teacher,
+            student=self.student,
+        )
+        response = TestResponse(
+            assignment=assignment,
+            student=self.student,
+        )
+        self.assertEqual(
+            str(response), f"{str(response.assignment)} / {str(self.student)}"
+        )
 
     def test_validation_1(self):
         test = Test.objects.create(name="Test")
@@ -170,6 +237,10 @@ class TestTestResponse(DysleksiTest):
 
 
 class TestTestResource(DysleksiTest):
+    def test_str(self):
+        test_resource = TestResource(name="StrTest")
+        self.assertTrue(str(test_resource)) == "StrTest"
+
     def test_constraints(self):
         with self.assertRaises(IntegrityError) as cm:
             TestResource.objects.create(name="TestResource")
@@ -183,6 +254,11 @@ class TestTestResource(DysleksiTest):
 
 
 class TestTestQuestion(DysleksiTest):
+    def test_str(self):
+        question = TestQuestion.objects.create(part=self.part, challenge=self.resource1)
+        quest_str = f"{str(question.part)} / {str(question.part.test)} {question.pk}"
+        self.assertEqual(quest_str, str(question))
+
     def test_create(self):
         question = TestQuestion.objects.create(part=self.part, challenge=self.resource1)
         self.assertEqual(question.part, self.part)
@@ -195,7 +271,20 @@ class TestTestQuestion(DysleksiTest):
         self.assertEqual(answer1.resource.name, "TestResource2")
 
 
+class TestPossibleAnswer(DysleksiTest):
+    def test_str(self):
+        question = TestQuestion.objects.create(part=self.part, challenge=self.resource1)
+        pa = PossibleAnswer.objects.create(
+            question=question, resource=self.resource2, is_correct=True
+        )
+        self.assertTrue(str(pa) == f"{str(pa.question)} / {str(pa.is_correct)}")
+
+
 class TestTest(DysleksiTest):
+    def test_str(self):
+        test = Test(name="StrTest")
+        self.assertTrue(str(test) == "StrTest")
+
     def test_to_json(self):
         json = self.test.to_json()
 

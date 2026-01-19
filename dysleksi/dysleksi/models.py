@@ -156,6 +156,9 @@ class TestResource(models.Model):
             )
         ]
 
+    def __str__(self) -> str:
+        return self.name
+
 
 class Test(models.Model):
     name = models.CharField(max_length=255)
@@ -225,6 +228,9 @@ class Test(models.Model):
 
         return test_data
 
+    def __str__(self) -> str:
+        return self.name
+
 
 class TestAssignment(models.Model):
 
@@ -263,6 +269,10 @@ class TestAssignment(models.Model):
         null=True,
     )
 
+    def __str__(self) -> str:
+        assignee = self.student or self.klasse
+        return f"{self.test.name}/{str(self.teacher)} ({str(assignee)})"
+
 
 class TestPart(models.Model):
     test = models.ForeignKey(
@@ -276,6 +286,9 @@ class TestPart(models.Model):
     intro = models.TextField(blank=True, null=True)
     timeout = models.PositiveSmallIntegerField(blank=False, null=False)
     partial_score_after = models.PositiveSmallIntegerField(blank=False, null=False)
+
+    def __str__(self) -> str:
+        return self.name
 
 
 class TestQuestion(models.Model):
@@ -291,6 +304,9 @@ class TestQuestion(models.Model):
         blank=False,
         null=False,
     )
+
+    def __str__(self) -> str:
+        return f"{str(self.part)} / {str(self.part.test)} {self.pk}"
 
 
 class PossibleAnswer(models.Model):
@@ -311,6 +327,9 @@ class PossibleAnswer(models.Model):
         null=False,
         default=False,
     )
+
+    def __str__(self) -> str:
+        return f"{str(self.question)} / {str(self.is_correct)}"
 
 
 class TestResponse(models.Model):
@@ -343,6 +362,9 @@ class TestResponse(models.Model):
         null=False,
     )
 
+    def __str__(self) -> str:
+        return f"{str(self.assignment)} / {str(self.student)}"
+
 
 class PartResponse(models.Model):
     testresponse = models.ForeignKey(
@@ -354,6 +376,9 @@ class PartResponse(models.Model):
         blank=False,
         null=False,
     )
+
+    def __str__(self) -> str:
+        return f"{str(self.testresponse)} / {str(self.finished_after)}"
 
 
 class QuestionResponse(models.Model):
@@ -400,3 +425,6 @@ class QuestionResponse(models.Model):
     correct = models.BooleanField(blank=False, null=False)
     submitted_at = models.DateTimeField(auto_now_add=True)
     finished_after = models.PositiveSmallIntegerField(blank=False, null=False)
+
+    def __str__(self) -> str:
+        return f"{str(self.question)} / {str(self.partresponse)}"
