@@ -1,27 +1,7 @@
 {% extends "dysleksi/base.html" %}
+{% load static %}
 
 {% block js %}
 {{ block.super }}
-<script>
-    // Events
-    const chatSocket = getWebSocket('{{ room_name }}');
-
-    // Mock data
-    const tests = [
-        {
-            'type': 'multiple-choice',
-            'question': 'Hvilket bogstav starter "kaffe" med?',
-            'choices': ['A', 'B', 'K', 'L'],
-        },
-        {
-            'type': 'multiple-choice',
-            'question': 'Hvad kommer efter bogstavet "M"?',
-            'choices': ['Q', 'N', 'S', 'E'],
-        },
-        {
-            'type': 'audio-recording',
-            'question': 'S',
-        },
-    ];
-</script>
+<script type="module" src="{% static 'js/screening/individual/index.js' %}"></script>
 {% endblock %}

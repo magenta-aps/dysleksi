@@ -1,11 +1,8 @@
 {% extends "dysleksi/base.html" %}
-{% block js %}
-{{ test_contents|json_script:"test_contents" }}
-{{ block.super }}
-<script>
-    const chatSocket = getWebSocket('{{ room_name }}');
+{% load static %}
 
-    const testContentsElement = document.getElementById("test_contents");
-    const test_contents = JSON.parse(testContentsElement.textContent);
-</script>
+{% block js %}
+{{ block.super }}
+{{ test_contents|json_script:"test_contents" }}
+<script type="module" src="{% static 'js/screening/group/index.js' %}"></script>
 {% endblock %}

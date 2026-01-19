@@ -23,17 +23,6 @@ SPDX-License-Identifier: MPL-2.0
     {% block extra_headers %}
     {% endblock %}
     {% block js %}
-    <script>
-        const getWebSocket = function (chatId) {
-            return new WebSocket(
-                'wss://'
-                + window.location.host
-                + '/ws/chat/'
-                + chatId
-                + '/'
-            );
-        };
-    </script>
     {% endblock %}
 </head>
 <body>
