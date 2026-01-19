@@ -29,6 +29,15 @@
     let displayedAt = 0;
     let selectedChoice = null;
 
+    function shuffleArray(array) {
+        const arr = [...array]; // do not mutate original
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+    }
+
     const updateTest = function () {
         const test = tests[testIndex];
         displayedAt = document.timeline.currentTime;
@@ -43,7 +52,9 @@
         choicesEl.innerHTML = '';
         nextBtn.style.display = 'none'; // hide Next until answer selected
 
-        for (const choice of test.choices) {
+        const shuffledChoices = shuffleArray(test.choices);
+
+        for (const choice of shuffledChoices) {
             const choiceEl = document.createElement('button');
             choiceEl.innerHTML = choice.text;
             choiceEl.classList.add('btn', 'btn-outline-primary');
