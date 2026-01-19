@@ -21,7 +21,17 @@
 
         typeEl.innerHTML = data.event;
         questionEl.innerHTML = test.question;
-        answerEl.innerHTML = data.choice || '-';
+        answerEl.innerHTML = '';
+
+        if ((data.event === 'test.answered') && (test.type === 'audio-recording')) {
+            const playerEl = document.createElement("audio");
+            playerEl.controls = true;
+            playerEl.src = data.recordingBase64;
+            answerEl.append(playerEl);
+        } else {
+            answerEl.innerHTML = data.choice || '-';
+        }
+
         if (data.event === 'test.answered') {
             durationEl.innerHTML = data.answeredAt;
         } else {
@@ -46,7 +56,16 @@
             const test = tests[data.index];
             testIndex = data.index;
             updateTable(data, test);
-            if (data.event === 'test.answered') {
+
+            // Allow teacher to mark a multiple-choice question correct, wrong or skipped
+            // once the student has given an answer.
+            if ((data.event === 'test.answered') && (test.type === 'multiple-choice')) {
+                updateButtons('disabled', false);
+            }
+
+            // Allow teacher to mark an audio recording question correct, wrong or skipped
+            // when the question has been displayed to the student.
+            if ((data.event === 'test.displayed') && (test.type === 'audio-recording')) {
                 updateButtons('disabled', false);
             }
         }

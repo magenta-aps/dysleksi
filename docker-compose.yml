@@ -33,8 +33,8 @@ services:
       - default
       - database
     ports:
-      - "8140:8000"
-    command: uvicorn project.asgi:application --host 0.0.0.0 --port 8000 --reload
+      - "8140:8443"
+    command: uvicorn project.asgi:application --host 0.0.0.0 --port 8443 --reload --ssl-certfile=/ssl/web/cert.pem --ssl-keyfile=/ssl/web/key.pem
 
   dysleksi-db:
     # Do not set `user` here
@@ -59,9 +59,9 @@ services:
     container_name: dysleksi-idp
     environment:
       HTTP_PORT: 8142
-      SIMPLESAMLPHP_SP_ENTITY_ID: http://dysleksi-web:8140/mitid/saml/metadata/
-      SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: http://dysleksi-web:8140/mitid/login/callback/
-      SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE: http://dysleksi-web:8140/mitid/logout/callback/
+      SIMPLESAMLPHP_SP_ENTITY_ID: https://dysleksi-web:8140/mitid/saml/metadata/
+      SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: https://dysleksi-web:8140/mitid/login/callback/
+      SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE: https://dysleksi-web:8140/mitid/logout/callback/
       SIMPLESAMLPHP_IDP_CERTIFICATE: /var/www/simplesamlphp/cert/selfsigned.crt
       SIMPLESAMLPHP_IDP_PRIVATEKEY: /var/www/simplesamlphp/cert/selfsigned.key
     volumes:

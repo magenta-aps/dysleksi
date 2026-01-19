@@ -50,20 +50,23 @@ class RootView(UserTypeMixin, TemplateView):
 
 class RoomView(UserTypeMixin, TemplateView):
     def get_template_prefix(self) -> str:
-        room_name = self.kwargs["room_name"]
-
-        if room_name.startswith("student"):
-            return "dysleksi/screening/individual"
-        else:
-            return "dysleksi/screening/group"
+        return f"dysleksi/screening/{self.get_room_type()}"
 
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
 
-        # TODO: Allow teacher to pick a test rather than hard-coding test3
-        context_data["test_contents"] = Test.objects.get(id=3).to_json()
+        if self.get_room_type() == "group":
+            # TODO: Allow teacher to pick a test rather than hard-coding test3
+            context_data["test_contents"] = Test.objects.get(id=3).to_json()
 
         return context_data
+
+    def get_room_type(self) -> str:
+        room_name = self.kwargs["room_name"]
+        if room_name.startswith("student"):
+            return "individual"
+        else:
+            return "group"
 
 
 class ClassListView(GroupRequiredMixin, SingleTableView):

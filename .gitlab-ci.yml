@@ -157,7 +157,7 @@ Lint Javascript:
     # Simulate development environment while running tests so we use mockup data
     DJANGO_SECRET_KEY: 1DqtQVSbLLmgBvkhPyptqFwPpJE9Kkgdo2kZFZ57UnzuRMiFgw
     TZ: Europe/Copenhagen
-    HOST_DOMAIN: http://localhost
+    HOST_DOMAIN: https://localhost:8443
     POSTGRES_USER: dysleksi
     POSTGRES_PASSWORD: dysleksi
     POSTGRES_DB: dysleksi
@@ -166,9 +166,9 @@ Lint Javascript:
     ALLOWED_HOSTS: '["dysleksi-web", "localhost", "host.docker.internal"]'
 
     # Local SAML configuration
-    SAML_SP_ENTITY_ID: http://localhost:8000/mitid/saml/metadata/
-    SAML_SP_LOGIN_CALLBACK_URI: http://localhost:8000/mitid/login/callback/
-    SAML_SP_LOGOUT_CALLBACK_URI: http://localhost:8000/mitid/logout/callback/
+    SAML_SP_ENTITY_ID: https://localhost:8443/mitid/saml/metadata/
+    SAML_SP_LOGIN_CALLBACK_URI: https://localhost:8443/mitid/login/callback/
+    SAML_SP_LOGOUT_CALLBACK_URI: https://localhost:8443/mitid/logout/callback/
     SAML_SP_KEY: /ssl/sp/selfsigned.key
     SAML_SP_CERTIFICATE: /ssl/sp/selfsigned.crt
     SAML_IDP_ENTITY_ID: http://localhost:8080/simplesaml/saml2/idp/metadata.php
