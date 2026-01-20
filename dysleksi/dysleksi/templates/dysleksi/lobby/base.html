@@ -1,9 +1,7 @@
 {% extends "dysleksi/base.html" %}
-{% load i18n %}
+{% load i18n static %}
 
 {% block js %}
 {{ block.super }}
-<script>
-    const lobbySocket = getWebSocket('lobby');
-</script>
+<script type="module" src="{% static 'js/lobby/index.js' %}"></script>
 {% endblock %}

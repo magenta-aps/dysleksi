@@ -1,47 +1,15 @@
 {% extends "dysleksi/lobby/base.html" %}
 {% load i18n %}
 
-{% block js %}
-{{ block.super }}
-<script>
-    const individualRoomName = "student_{{ student.id }}";
-    const ClassRoomName = "class_{{ student.class.id }}";
-    const individualRoomUrl = '{% url "dysleksi:room" room_name='student_'|add:student.id %}';
-    const ClassRoomUrl = '{% url "dysleksi:room" room_name='class_'|add:student.class.id %}';
-
-    // When student enters the lobby, broadcast a message to all users connected to the lobby
-    lobbySocket.addEventListener("open", (event) => {
-        lobbySocket.send(JSON.stringify({'event': 'lobby.joined', 'room': individualRoomName}));
-    });
-    lobbySocket.addEventListener("open", (event) => {
-        lobbySocket.send(JSON.stringify({'event': 'lobby.joined', 'room': ClassRoomName}));
-    });    
-    
-    // Listen for session start events
-    const IndividualChatSocket = getWebSocket(individualRoomName);
-    IndividualChatSocket.onmessage = function (e) {
-        console.log("chat: received", e.data);
-        const data = JSON.parse(e.data);
-        if (data.event === 'session.start') {
-            const url = individualRoomUrl;
-            window.location = url;
-        }
-    };
-    const ClassChatSocket = getWebSocket(ClassRoomName);
-    ClassChatSocket.onmessage = function (e) {
-        console.log("chat: received", e.data);
-        const data = JSON.parse(e.data);
-        if (data.event === 'session.start') {
-            const url = ClassRoomUrl;
-            window.location = url;
-        }
-    };
-
-</script>
-{% endblock %}
-
 {% block content %}
-<div class="container">
+<div
+    class="container"
+    data-lobby-role="student"
+    data-individual-room-name="student_{{ student.id }}"
+    data-class-room-name="class_{{ student.class.id }}"
+    data-individual-room-url="{% url 'dysleksi:room' room_name='student_'|add:student.id %}"
+    data-class-room-url="{% url 'dysleksi:room' room_name='class_'|add:student.class.id %}"
+>
     <h1>{% translate "Elev" %}</h1>
     <p>
         {% blocktrans trimmed with name=student.name %}

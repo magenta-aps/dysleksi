@@ -1,38 +1,8 @@
 {% extends "dysleksi/lobby/base.html" %}
 {% load i18n %}
 
-{% block js %}
-{{ block.super }}
-<script>
-    lobbySocket.onmessage = function (e) {
-        console.log("lobby: received", e.data);
-
-        const data = JSON.parse(e.data);
-
-        if (data.event === 'lobby.joined') {
-            const chatId = data.room;                       
-            const matchingElem = document.querySelector("a[data-room='" + chatId + "'] .btn.disabled");
-
-            // When students enter the lobby, enable the "start" link belonging to that student
-            matchingElem.classList.remove("disabled");
-
-            // Notify student when teacher clicks student to start session
-            matchingElem.addEventListener("click", function (e) {
-                e.preventDefault();
-
-                const chatSocket = getWebSocket(chatId);
-                chatSocket.addEventListener("open", (event) => {
-                    chatSocket.send(JSON.stringify({'event': 'session.start', 'id': chatId}));
-                    setTimeout(function () { window.location = "/chat/" + chatId + "/" }, 1);
-                });
-            });
-        }
-    };
-</script>
-{% endblock %}
-
 {% block content %}
-<div class="container">
+<div class="container" data-lobby-role="teacher">
     <h1>{% translate "Lærer" %}</h1>
     <div class="list-group">
         {% for student in students %}
