@@ -7,8 +7,8 @@ from typing import Literal
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext_lazy as _
 
-from dysleksi.models import Test
-from dysleksi.utils import create_wordreading_2_test
+from dysleksi.models import Test, TestPart
+from dysleksi.utils import create_test_resources, create_wordreading_2_test
 
 
 def create_group_test(
@@ -54,6 +54,28 @@ def create_group_test(
     return test
 
 
+def create_individual_test():
+    questions_data = [
+        {"text": "Udtal følgende bogstav: 'S'", "correct": None, "wrong": []},
+        {"text": "Udtal følgende bogstav: 'V'", "correct": None, "wrong": []},
+        {"text": "Udtal følgende bogstav: 'K'", "correct": None, "wrong": []},
+    ]
+
+    test, created = Test.objects.get_or_create(name="Individual dummy test")
+
+    part, created = TestPart.objects.get_or_create(
+        test=test,
+        name="Individual dummy testpart",
+        defaults={
+            "timeout": 60,
+            "partial_score_after": 30,
+            "intro": "Dette er en dummy test",
+        },
+    )
+
+    create_test_resources(questions_data, part)
+
+
 class Command(BaseCommand):
     help = "Create group tests for grades 1–3 (middle and end)"
 
@@ -61,3 +83,5 @@ class Command(BaseCommand):
         for grade in (1, 2, 3):
             for period in ("middle", "end"):
                 create_group_test(grade, period)
+
+        create_individual_test()

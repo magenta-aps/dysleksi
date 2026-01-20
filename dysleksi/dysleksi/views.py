@@ -55,9 +55,15 @@ class RoomView(UserTypeMixin, TemplateView):
     def get_context_data(self, **kwargs) -> dict[str, Any]:
         context_data = super().get_context_data(**kwargs)
 
+        # TODO: Allow teacher to pick a test rather than hard-coding tests
         if self.get_room_type() == "group":
-            # TODO: Allow teacher to pick a test rather than hard-coding test3
-            context_data["test_contents"] = Test.objects.get(id=3).to_json()
+            context_data["test_contents"] = Test.objects.get(
+                name="Middle 2. grade"
+            ).to_json()
+        else:
+            context_data["test_contents"] = Test.objects.get(
+                name="Individual dummy test"
+            ).to_json()
 
         return context_data
 

@@ -3,5 +3,6 @@
 
 {% block js %}
 {{ block.super }}
+{{ test_contents|json_script:"test_contents" }}
 <script type="module" src="{% static 'js/screening/individual/index.js' %}"></script>
 {% endblock %}

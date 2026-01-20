@@ -1,4 +1,5 @@
 import { getWebSocket } from "../../ws.js";
+import { extractQuestions } from "../utils.js"
 
 export function initStudent(roomName, testContents) {
     const chatSocket = getWebSocket(roomName);
@@ -13,21 +14,7 @@ export function initStudent(roomName, testContents) {
     }
 
     // Flatten all questions
-    const tests = testContents.parts.flatMap(part =>
-        part.questions.map(q => ({
-            partId: part.id,
-            partName: part.name,
-            questionId: q.id,
-            challengeName: q.challenge_name,
-            challengeImageUrl: q.challenge_image_url,
-            challengeSoundUrl: q.challenge_sound_url,
-            choices: q.possible_answers.map(a => ({
-                id: a.id,
-                text: a.resource_text,
-                isCorrect: a.is_correct
-            }))
-        }))
-    );
+    const tests = extractQuestions(testContents)
 
     let testIndex = 0;
     let displayedAt = 0;

@@ -15,8 +15,9 @@ class DummyDataTest(TestCase):
         word_reading_2_tests = TestPart.objects.filter(name="Wordreading 2 (dummy)")
         tests = Test.objects.all()
 
-        # We expect 6 tests; each grade needs to do a test twice a year
-        self.assertEqual(tests.count(), 6)
+        # We expect 6 group tests; each grade needs to do a test twice a year
+        # We expect a single individual test
+        self.assertEqual(tests.count(), 7)
 
         # We expect 4 wordreading 2 tests; 1. grade does not need to do this test
         self.assertEqual(word_reading_2_tests.count(), 4)
