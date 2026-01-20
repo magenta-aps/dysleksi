@@ -130,12 +130,6 @@ export function initStudent(roomName, testContents) {
         console.log('chat: received', e.data);
         const data = JSON.parse(e.data);
     
-        if (data.event === 'teacher.ready') {
-            console.log("Teacher ready, starting test");
-            updateTest();  // now safe to send test.displayed
-            return;
-        }
-    
         if (data.event.match(/test\.(correct|wrong|skipped)/)) {
             // Ensure test.answered is sent BEFORE moving on
             await stopRecordingAndSendAnswer();
@@ -152,10 +146,8 @@ export function initStudent(roomName, testContents) {
     // Start when socket is ready
     chatSocket.addEventListener("open", async () => {
         try {
-            await setupAudioRecording();  // initialize microphone
-    
-            // Don't start test yet — wait for teacher
-            console.log("Student socket open, waiting for teacher ready");
+            await setupAudioRecording();  // initialize microphone    
+            updateTest();
         } catch (err) {
             console.error("Cannot start test because audio setup failed:", err);
         }

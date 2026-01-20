@@ -6,11 +6,6 @@ export function initTeacher(roomName, testContents) {
     const chatSocket = getWebSocket(roomName);
     let testIndex;
 
-    chatSocket.addEventListener("open", () => {
-        console.log("Teacher socket open, signaling ready");
-        chatSocket.send(JSON.stringify({ event: 'teacher.ready' }));
-    });
-
     // Flatten all questions
     const tests = extractQuestions(testContents)
 
