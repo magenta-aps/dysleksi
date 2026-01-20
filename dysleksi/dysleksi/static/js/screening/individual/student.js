@@ -43,7 +43,7 @@ export function initStudent(roomName, tests) {
                                 JSON.stringify(
                                     {
                                         'event': 'test.answered',
-                                        'id': '{{ room_name }}',
+                                        'id': roomName,
                                         'index': testIndex,
                                         'answeredAt': document.timeline.currentTime,
                                         'recordingBase64': reader.result,
@@ -62,7 +62,7 @@ export function initStudent(roomName, tests) {
                         JSON.stringify(
                             {
                                 'event': 'setup.error',
-                                'id': '{{ room_name }}',
+                                'id': roomName,
                                 'index': testIndex,
                                 'error': err,
                             }
@@ -75,7 +75,7 @@ export function initStudent(roomName, tests) {
                 JSON.stringify(
                     {
                         'event': 'setup.error',
-                        'id': '{{ room_name }}',
+                        'id': roomName,
                         'index': testIndex,
                         'error': 'getUserMedia not supported',
                     }
@@ -122,7 +122,7 @@ export function initStudent(roomName, tests) {
             JSON.stringify(
                 {
                     'event': 'test.displayed',
-                    'id': '{{ room_name }}',
+                    'id': roomName,
                     'index': testIndex,
                     'displayedAt': displayedAt,
                 }
@@ -145,7 +145,7 @@ export function initStudent(roomName, tests) {
             JSON.stringify(
                 {
                     'event': 'test.answered',
-                    'id': '{{ room_name }}',
+                    'id': roomName,
                     'choice': choiceEl.innerHTML,
                     'index': testIndex,
                     'displayedAt': displayedAt,

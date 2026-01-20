@@ -81,7 +81,7 @@ export function initTeacher(roomName, tests) {
                     JSON.stringify(
                         {
                             'event': 'test.' + val,
-                            'id': '{{ room_name }}',
+                            'id': roomName,
                             'index': testIndex,
                         }
                     )
