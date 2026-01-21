@@ -4,11 +4,11 @@
 
 from typing import Literal
 
+from data_tools.utils import create_test_resources, create_wordreading_2_test
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext_lazy as _
 
 from dysleksi.models import Test, TestPart
-from dysleksi.utils import create_test_resources, create_wordreading_2_test
 
 
 def create_group_test(

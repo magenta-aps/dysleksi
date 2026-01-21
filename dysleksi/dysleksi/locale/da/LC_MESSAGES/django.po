@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-16 07:50-0200\n"
+"POT-Creation-Date: 2026-01-21 06:48-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -130,8 +130,4 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/teacher.html
 msgid "Start Gruppetest"
-msgstr ""
-
-#: dysleksi/utils.py
-msgid "Vælg det rigtige ord, der passer til billedet."
 msgstr ""
