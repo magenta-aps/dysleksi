@@ -61,7 +61,7 @@ psycopg==3.1.12
 py-ubjson==0.16.1
 pyasn1==0.6.2
 pyasn1_modules==0.4.2
-pycparser==2.23
+pycparser==3.0
 pyOpenSSL==24.2.1
 pysaml2==7.5.4
 python-dateutil==2.9.0.post0
