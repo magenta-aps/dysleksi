@@ -5,10 +5,10 @@
 import json
 from pathlib import Path
 
+from data_tools.utils import create_wordreading_2_test
 from django.core.management.base import BaseCommand
 
 from dysleksi.models import Test
-from dysleksi.utils import create_wordreading_2_test
 
 
 class Command(BaseCommand):
