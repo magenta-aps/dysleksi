@@ -7,27 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const role = roleEl.dataset.role;
     const roomName = roleEl.dataset.roomName;
 
-    const tests = [
-        {
-            'type': 'multiple-choice',
-            'question': 'Hvilket bogstav starter "kaffe" med?',
-            'choices': ['A', 'B', 'K', 'L'],
-        },
-        {
-            'type': 'multiple-choice',
-            'question': 'Hvad kommer efter bogstavet "M"?',
-            'choices': ['Q', 'N', 'S', 'E'],
-        },
-        {
-            'type': 'audio-recording',
-            'question': 'S',
-        },
-    ];
+    const testContentsEl = document.getElementById("test_contents");
+    const testContents = testContentsEl ? JSON.parse(testContentsEl.textContent) : null;
 
     if (role === "student") {
-        initStudent(roomName, tests);
+        initStudent(roomName, testContents);
     }
     if (role === "teacher") {
-        initTeacher(roomName, tests);
+        initTeacher(roomName, testContents);
     }
 });

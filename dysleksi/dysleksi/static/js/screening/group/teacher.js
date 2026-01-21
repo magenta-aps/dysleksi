@@ -41,22 +41,4 @@ export function initTeacher(roomName) {
             if (data.event === 'test.answered') updateButtons('disabled', false);
         }
     };
-
-    document.addEventListener('DOMContentLoaded', () => {
-        document.querySelectorAll('button').forEach(el => {
-            el.addEventListener('click', (e) => {
-                const val = e.target.id;
-                if ((testIndex !== undefined) && (testIndex >= 0)) {
-                    chatSocket.send(JSON.stringify({
-                        event: 'test.' + val,
-                        id: roomName,
-                        index: testIndex,
-                    }));
-                    updateButtons('disabled', true);
-                } else {
-                    console.error('invalid test index', testIndex);
-                }
-            });
-        });
-    });
 }

@@ -1,9 +1,13 @@
 import { getWebSocket } from "../../ws.js";
+import { extractQuestions } from "../utils.js"
 
-export function initTeacher(roomName, tests) {
+export function initTeacher(roomName, testContents) {
 
     const chatSocket = getWebSocket(roomName);
     let testIndex;
+
+    // Flatten all questions
+    const tests = extractQuestions(testContents)
 
     const updateTable = function (data, test) {
         const eventsEl = document.querySelector('table#events tbody');
@@ -20,10 +24,10 @@ export function initTeacher(roomName, tests) {
         eventEl.append(durationEl);
 
         typeEl.innerHTML = data.event;
-        questionEl.innerHTML = test.question;
+        questionEl.innerHTML = test.challengeText;
         answerEl.innerHTML = '';
 
-        if ((data.event === 'test.answered') && (test.type === 'audio-recording')) {
+        if ((data.event === 'test.answered')) {
             const playerEl = document.createElement("audio");
             playerEl.controls = true;
             playerEl.src = data.recordingBase64;
@@ -57,15 +61,9 @@ export function initTeacher(roomName, tests) {
             testIndex = data.index;
             updateTable(data, test);
 
-            // Allow teacher to mark a multiple-choice question correct, wrong or skipped
-            // once the student has given an answer.
-            if ((data.event === 'test.answered') && (test.type === 'multiple-choice')) {
-                updateButtons('disabled', false);
-            }
-
             // Allow teacher to mark an audio recording question correct, wrong or skipped
             // when the question has been displayed to the student.
-            if ((data.event === 'test.displayed') && (test.type === 'audio-recording')) {
+            if (data.event === 'test.displayed') {
                 updateButtons('disabled', false);
             }
         }

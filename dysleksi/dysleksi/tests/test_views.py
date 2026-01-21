@@ -55,7 +55,8 @@ class TestRoomView(DysleksiTest):
     def setUpTestData(cls):
         super().setUpTestData()
 
-        cls.test = Test.objects.create(id=3, name="test-test")
+        cls.test = Test.objects.create(name="Middle 2. grade")
+        cls.test2 = Test.objects.create(name="Individual dummy test")
 
     def test_get_template_names(self):
         cases: list[tuple[User, str | None]] = [
