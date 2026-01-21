@@ -4,7 +4,7 @@
 services:
 
   dysleksi-web:
-    user: "75190:1000"  # Override in docker-compose.override.yml if your local user is different
+    user: "75200:1000"  # Override in docker-compose.override.yml if your local user is different
     container_name: dysleksi-web
     image: dysleksi:latest
     build:
