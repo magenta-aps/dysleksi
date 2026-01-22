@@ -84,6 +84,22 @@ services:
       - /etc/hosts:/hosts:rw
     command: [ "bash", "/hosts.sh" ]
 
+  dysleksi-js-tests:
+    container_name: dysleksi-js-tests
+    image: node:20
+    working_dir: /app
+    volumes:
+      - ./dysleksi/dysleksi/static/js:/app/src:ro
+      - ./dysleksi/package.json:/app/package.json:ro
+      - ./dysleksi/package-lock.json:/app/package-lock.json:ro      
+    command: >
+      sh -c "
+        npm ci &&
+        npx vitest run --coverage --coverage.provider=istanbul --coverage.include='/app/src/**/*.js' --coverage.reportsDirectory=/app/coverage
+      "
+    networks:
+      - default
+
 volumes:
   postgres-data:
   file-data:

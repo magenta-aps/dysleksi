@@ -1,0 +1,10 @@
+{
+  "scripts": {
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@vitest/coverage-istanbul": "^4.0.17",
+    "jsdom": "^27.4.0",
+    "vitest": "^4.0.17"
+  }
+}
