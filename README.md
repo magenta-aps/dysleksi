@@ -29,6 +29,11 @@ To run the tests run
 docker exec dysleksi-web bash -c 'coverage run manage.py test --parallel ; coverage combine ; coverage report --show-missing'
 ```
 
+To run Javascript tests run the following command:
+```
+docker-compose run --rm dysleksi-js-tests
+```
+
 To run tests only in a specific file run
 ```shell
 docker exec dysleksi-web bash -c 'coverage run manage.py test dysleksi.tests.test_specific'
