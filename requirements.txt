@@ -54,7 +54,7 @@ libsass==0.23.0
 msgpack==1.1.2
 mypy==1.7.0
 mypy_extensions==1.1.0
-packaging==25.0
+packaging==26.0
 phonenumberslite==9.0.22
 pillow==12.1.0
 psycopg==3.1.12
