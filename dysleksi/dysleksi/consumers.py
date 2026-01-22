@@ -1,13 +1,12 @@
-import json
 import logging
 
 from asgiref.sync import async_to_sync
-from channels.generic.websocket import WebsocketConsumer
+from channels.generic.websocket import JsonWebsocketConsumer
 
 logger = logging.getLogger(__name__)
 
 
-class ChatConsumer(WebsocketConsumer):
+class ChatConsumer(JsonWebsocketConsumer):
     def connect(self):
         # Join room group
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
@@ -26,18 +25,17 @@ class ChatConsumer(WebsocketConsumer):
         logger.info("'%s' left room '%s'", self.scope["user"], self.room_name)
 
     # Receive message from WebSocket
-    def receive(self, text_data=None, bytes_data=None):
+    def receive_json(self, content: dict, **kwargs):
+        # required by `django-channels`, must match our method name in this class
+        # (dots are replaced with underscores,
+        # then the class is checked for a method with that name)
+        content["type"] = "chat.message"
         # Send message to room group
-        text_data_json = json.loads(text_data)
-        text_data_json["type"] = "chat.message"  # required by `django-channels`
-        async_to_sync(self.channel_layer.group_send)(
-            self.room_group_name, text_data_json
-        )
-        logger.info("'%s' sent '%s'", self.scope["user"], text_data)
+        async_to_sync(self.channel_layer.group_send)(self.room_group_name, content)
+        logger.info("'%s' sent '%s'", self.scope["user"], content)
 
     # Receive message from room group
-    def chat_message(self, message):
+    # method name must match the type attribute in the received json
+    def chat_message(self, message: dict):
         # Send message to WebSocket
-        self.send(
-            text_data=json.dumps({k: v for k, v in message.items() if k != "type"})
-        )
+        self.send_json({k: v for k, v in message.items() if k != "type"})
