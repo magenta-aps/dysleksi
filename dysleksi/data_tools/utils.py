@@ -7,7 +7,7 @@ from django.utils.translation import gettext_lazy as _
 from dysleksi.models import PossibleAnswer, TestPart, TestQuestion, TestResource
 
 
-def create_test_resources(questions_data, part):
+def create_test_resources(questions_data, part, is_practice=False):
     for data in questions_data:
         # Challenge resource (image)
 
@@ -23,7 +23,7 @@ def create_test_resources(questions_data, part):
 
         # Get or create question for this part + challenge
         question, created = TestQuestion.objects.get_or_create(
-            part=part, challenge=challenge_resource
+            part=part, challenge=challenge_resource, is_practice=is_practice
         )
 
         # Correct answer
@@ -53,7 +53,9 @@ def create_test_resources(questions_data, part):
             )
 
 
-def create_wordreading_2_test(test, questions_data, name="Wordreading 2"):
+def create_wordreading_2_test(
+    test, questions_data, practice_questions_data=None, name="Wordreading 2"
+):
     part, created = TestPart.objects.get_or_create(
         test=test,
         name=name,
@@ -63,4 +65,6 @@ def create_wordreading_2_test(test, questions_data, name="Wordreading 2"):
             "intro": _("Vælg det rigtige ord, der passer til billedet."),
         },
     )
-    create_test_resources(questions_data, part)
+    create_test_resources(questions_data, part, False)
+    if practice_questions_data:
+        create_test_resources(practice_questions_data, part, True)

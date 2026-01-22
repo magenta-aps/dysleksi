@@ -184,45 +184,55 @@ class Test(models.Model):
                 "intro": part.intro,
                 "timeout": part.timeout,
                 "partial_score_after": part.partial_score_after,
+                "practice": [],
                 "questions": [],
             }
 
-            for question in part.questions.all().order_by("id"):
-                question_data = {
-                    "id": question.id,
-                    "challenge_id": question.challenge.id,
-                    "challenge_name": question.challenge.name,
-                    "challenge_image_url": (
-                        question.challenge.image.url
-                        if question.challenge.image
-                        else None
-                    ),
-                    "challenge_sound_url": (
-                        question.challenge.sound.url
-                        if question.challenge.sound
-                        else None
-                    ),
-                    "challenge_text": question.challenge.text,
-                    "possible_answers": [],
-                }
-
-                for answer in question.possible_answers.all().order_by("id"):
-                    answer_data = {
-                        "id": answer.id,
-                        "resource_id": answer.resource.id,
-                        "resource_name": answer.resource.name,
-                        "resource_image_url": (
-                            answer.resource.image.url if answer.resource.image else None
+            for practice, questions in (
+                (True, part.questions.filter(is_practice=True)),
+                (False, part.questions.filter(is_practice=False)),
+            ):
+                for question in questions.order_by("id"):
+                    question_data = {
+                        "id": question.id,
+                        "challenge_id": question.challenge.id,
+                        "challenge_name": question.challenge.name,
+                        "challenge_image_url": (
+                            question.challenge.image.url
+                            if question.challenge.image
+                            else None
                         ),
-                        "resource_sound_url": (
-                            answer.resource.sound.url if answer.resource.sound else None
+                        "challenge_sound_url": (
+                            question.challenge.sound.url
+                            if question.challenge.sound
+                            else None
                         ),
-                        "resource_text": answer.resource.text,
-                        "is_correct": answer.is_correct,
+                        "challenge_text": question.challenge.text,
+                        "possible_answers": [],
                     }
-                    question_data["possible_answers"].append(answer_data)
 
-                part_data["questions"].append(question_data)
+                    for answer in question.possible_answers.all().order_by("id"):
+                        answer_data = {
+                            "id": answer.id,
+                            "resource_id": answer.resource.id,
+                            "resource_name": answer.resource.name,
+                            "resource_image_url": (
+                                answer.resource.image.url
+                                if answer.resource.image
+                                else None
+                            ),
+                            "resource_sound_url": (
+                                answer.resource.sound.url
+                                if answer.resource.sound
+                                else None
+                            ),
+                            "resource_text": answer.resource.text,
+                            "is_correct": answer.is_correct,
+                        }
+                        question_data["possible_answers"].append(answer_data)
+
+                    key = "practice" if practice else "questions"
+                    part_data[key].append(question_data)
 
             test_data["parts"].append(part_data)
 
@@ -304,6 +314,11 @@ class TestQuestion(models.Model):
         blank=False,
         null=False,
     )
+    is_practice = models.BooleanField(
+        blank=False,
+        null=False,
+        default=False,
+    )
 
     def __str__(self) -> str:
         return f"{str(self.part)} / {str(self.part.test)} {self.pk}"
@@ -343,9 +358,9 @@ class TestResponse(models.Model):
                 raise ValidationError(
                     {
                         "student": _(
-                            "Student class (pk=%d) must match assignment class (pk=%d)."
+                            f"Student class (pk={self.student.klasse.pk}) must match"
+                            + f" assignment class (pk={self.assignment.klasse.pk})."
                         )
-                        % (self.student.klasse.pk, self.assignment.klasse.pk)
                     }
                 )
 
