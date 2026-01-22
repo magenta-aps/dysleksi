@@ -15,9 +15,9 @@ RUN mkdir /app && \
     mkdir -p /var/cache/idp && \
     mkdir -p /upload && \
     #gid/uid from salt
-    groupadd -g 75190 -r dysleksi && \
+    groupadd -g 75200 -r dysleksi && \
     groupadd -g 75100 -r certificate_exporter && \
-    useradd -u 75190 --no-log-init -r -g dysleksi -G certificate_exporter dysleksi && \
+    useradd -u 75200 --no-log-init -r -g dysleksi -G certificate_exporter dysleksi && \
     chown -R dysleksi:dysleksi /var/cache/idp && \
     chown -R dysleksi:dysleksi /upload && \
     chmod a+w /var/cache/idp && \
