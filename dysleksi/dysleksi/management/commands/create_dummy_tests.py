@@ -20,7 +20,7 @@ def create_group_test(
 
     test, created = Test.objects.get_or_create(name=name)
 
-    questions_data = [
+    questions_data_1 = [
         {
             "image": "wordreading_2_dummy/dog.png",
             "correct": _("hund"),
@@ -48,8 +48,40 @@ def create_group_test(
         },
     ]
 
-    if grade in {2, 3}:
-        create_wordreading_2_test(test, questions_data, name="Wordreading 2 (dummy)")
+    practice_questions_data = [
+        {
+            "image": "wordreading_2_dummy/dog.png",
+            "correct": _("hund"),
+            "wrong": [_("kat"), _("ko"), _("hest")],
+        },
+        {
+            "image": "wordreading_2_dummy/cat.jpeg",
+            "correct": _("kat"),
+            "wrong": [_("hund"), _("ko"), _("hest")],
+        },
+    ]
+
+    # A test with practice run
+    create_wordreading_2_test(
+        test, questions_data_1, practice_questions_data, name="Wordreading 2A (dummy)"
+    )
+
+    questions_data_2 = [
+        {
+            "image": "wordreading_2_dummy/dog.png",
+            "correct": _("hund"),
+            "wrong": [_("kat"), _("ko"), _("hest")],
+        },
+        {
+            "image": "wordreading_2_dummy/bike.jpeg",
+            "correct": _("cykel"),
+            "wrong": [_("bil"), _("bus"), _("tog")],
+        },
+    ]
+    # A test without practice run
+    create_wordreading_2_test(
+        test, questions_data_2, None, name="Wordreading 2B (dummy)"
+    )
 
     return test
 
