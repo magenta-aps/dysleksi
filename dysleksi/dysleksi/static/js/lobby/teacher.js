@@ -6,8 +6,9 @@ export function initTeacherLobby() {
 
     lobbySocket.onmessage = (e) => {
         const data = JSON.parse(e.data);
+        console.log("Received lobby message: ", data);
 
-        if (data.event !== "lobby.joined") return;
+        if (data.event !== "lobby.joined" && data.event !== "lobby.present") return;
 
         const chatId = data.room;
         const button = document.querySelector(

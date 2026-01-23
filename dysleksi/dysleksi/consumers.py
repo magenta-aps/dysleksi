@@ -1,9 +1,12 @@
 import logging
+from datetime import datetime
 
 from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
+from django.core.cache import caches
 
 logger = logging.getLogger(__name__)
+cache = caches["chat"]  # As defined in settings/cache.py
 
 
 class ChatConsumer(JsonWebsocketConsumer):
@@ -16,6 +19,14 @@ class ChatConsumer(JsonWebsocketConsumer):
         )
         self.accept()
         logger.info("'%s' joined room '%s'", self.scope["user"], self.room_name)
+
+        values = cache.get_many(sorted(cache.keys(f"{self.room_group_name}_*")))
+        for key, message in values.items():
+            if message.get("event") in ("lobby.joined", "lobby.present"):
+                # Send only cached "joined" and "present" messages
+                async_to_sync(self.channel_layer.send)(
+                    self.channel_name, {"type": "chat.message", **message}
+                )
 
     def disconnect(self, close_code):
         # Leave room group
@@ -33,6 +44,13 @@ class ChatConsumer(JsonWebsocketConsumer):
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(self.room_group_name, content)
         logger.info("'%s' sent '%s'", self.scope["user"], content)
+
+        # Store message in cache
+        cache.set(
+            f"{self.room_group_name}_{datetime.now().timestamp()}",
+            content,
+            timeout=300,
+        )
 
     # Receive message from room group
     # method name must match the type attribute in the received json
