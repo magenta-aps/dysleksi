@@ -12,15 +12,23 @@ export function initStudentLobby(config) {
     const lobbySocket = getLobbySocket();
 
     lobbySocket.addEventListener("open", () => {
-        lobbySocket.send(JSON.stringify({
-            event: "lobby.joined",
-            room: individualRoomName,
-        }));
+        const rooms = [individualRoomName, classRoomName];
 
-        lobbySocket.send(JSON.stringify({
-            event: "lobby.joined",
-            room: classRoomName,
-        }));
+        for (let room of rooms) {
+            lobbySocket.send(JSON.stringify({
+                event: "lobby.joined",
+                room: room,
+            }));
+        }
+
+        setInterval(() => {
+            for (let room of rooms) {
+                lobbySocket.send(JSON.stringify({
+                    event: "lobby.present",
+                    room: room,
+                }));
+            }
+        }, 60000);
     });
 
     const individualSocket = getWebSocket(individualRoomName);

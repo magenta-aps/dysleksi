@@ -11,4 +11,11 @@ CACHES = {
         "LOCATION": "saml_cache",
         "TIMEOUT": 7200,
     },
+    "chat": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://dysleksi-redis:6379",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        },
+    },
 }
