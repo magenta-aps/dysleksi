@@ -224,7 +224,7 @@ Django check:
 
 Javascript Unittest:
   stage: test
-  image: node:20
+  image: node:25
   cache:
     key: ${CI_COMMIT_REF_SLUG}-node
     paths:

@@ -86,7 +86,7 @@ services:
 
   dysleksi-js-tests:
     container_name: dysleksi-js-tests
-    image: node:20
+    image: node:25
     working_dir: /app
     volumes:
       - ./dysleksi/dysleksi/static/js:/app/src:ro
