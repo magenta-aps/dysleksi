@@ -45,7 +45,7 @@ django_compressor==4.6.0
 elementpath==4.8.0
 freezegun==1.5.5
 gl-mitid==1.7.0
-gunicorn==23.0.0
+gunicorn==24.1.1
 h11==0.16.0
 httptools==0.7.1
 hyperlink==21.0.0
