@@ -4,6 +4,7 @@ export function extractQuestions(testContents) {
             partId: part.id,
             partName: part.name,
             questionId: q.id,
+            questionType: q.question_type,
             challengeName: q.challenge_name,
             challengeImageUrl: q.challenge_image_url,
             challengeSoundUrl: q.challenge_sound_url,
@@ -27,7 +28,7 @@ function shuffleArray(array) {
 }
 
 
-class TestDomElements {
+export class TestDomElements {
     instructionsSoundEl;
     introTextEl;
     startPracticeButton;
@@ -101,7 +102,7 @@ class TestDomElements {
         this.questionEl.textContent = text || "";
     }
     showQuestionChallenge(text, sound, image_url) {
-        // TODO: render text and sound
+        // TODO: render text
         let img = document.querySelector("#challenge-image");
         if (image_url) {
             if (!img) {
@@ -118,6 +119,42 @@ class TestDomElements {
                 img.remove();
             }
         }
+
+        let playBtn = document.querySelector("#challenge-sound-btn");
+        let audio = document.querySelector("#challenge-audio");
+    
+        if (sound) {
+            if (!audio) {
+                audio = document.createElement("audio");
+                audio.id = "challenge-audio";
+                audio.preload = "none";
+                audio.style.display = "none"; // hidden audio element
+                document.body.appendChild(audio);
+            }
+    
+            audio.src = sound;
+            audio.load();
+    
+            if (!playBtn) {
+                playBtn = document.createElement("button");
+                playBtn.id = "challenge-sound-btn";
+                playBtn.textContent = "▶ Afspil lyd";
+                playBtn.className = "btn btn-secondary";
+                playBtn.style.margin = "1rem 0";
+    
+                const insertAfter = img || this.questionEl;
+                insertAfter.after(playBtn);
+            }
+    
+            playBtn.onclick = () => {
+                audio.currentTime = 0; // restart every time
+                audio.play();
+            };
+        } else {
+            if (playBtn) playBtn.remove();
+            if (audio) audio.remove();
+        }
+        
     }
     clearQuestionChoices() {
         this.choicesEl.innerHTML = "";
@@ -132,6 +169,23 @@ class TestDomElements {
        this.choicesEl.append(btn);
         return btn;
     }
+
+    showQuestionFreeText(placeholder = "", sound = null, image_url = null) {
+        const wrapper = document.createElement("div");
+        wrapper.className = "mb-3";
+    
+        const input = document.createElement("input");
+        input.type = "text";
+        input.className = "form-control";
+        input.placeholder = placeholder;
+    
+        wrapper.append(input);
+        this.choicesEl.append(wrapper);
+    
+        return input;
+    }
+
+    
 }
 
 /*
@@ -317,6 +371,7 @@ class TestPart {
 class Question {
     part;
     id;
+    question_type;
     index;
     challenge_id;
     challenge_name;
@@ -334,10 +389,10 @@ class Question {
         this.index = index;
         this.dom_elements = part.dom_elements;
         this.id = data.id;
+        this.question_type = data.question_type;
         this.challenge_id = data.challenge_id;
         this.challenge_name = data.challenge_name;
         this.challenge_image_url = data.challenge_image_url;
-
         this.challenge_sound_url = data.challenge_sound_url;
         this.challenge_text = data.challenge_text;
         this.possible_answers = data.possible_answers.map(data_item => new PossibleAnswer(data_item, this));
@@ -419,6 +474,7 @@ class PossibleAnswer {
 
     constructor(data, question) {
         this.question = question;
+        this.question_type = question.question_type;
         this.dom_elements = question.dom_elements;
         this.id = data.id;
         this.resource_id = data.resource_id;
@@ -430,8 +486,13 @@ class PossibleAnswer {
     }
 
     show() {
-        this.button = this.dom_elements.showQuestionChoice(this.resource_text, this.resource_sound_url, this.resource_image_url);
-        this.button.addEventListener("click", () => this.select());
+        if (this.question_type == "multiple_choice"){
+            this.button = this.dom_elements.showQuestionChoice(this.resource_text, this.resource_sound_url, this.resource_image_url);
+            this.button.addEventListener("click", () => this.select());
+        } else if (this.question_type == "free_text"){
+            this.input = this.dom_elements.showQuestionFreeText();
+            this.input.addEventListener("input", () => this.selectFreeText());
+        }
     }
     select() {
         this.question.select(this);
@@ -443,5 +504,10 @@ class PossibleAnswer {
                 other_answer.button.classList.remove("btn-primary");
             }
         }
+    }
+    selectFreeText() {
+        if (this.input.value.trim() !== "") {
+            this.question.select(this);
+        }    
     }
 }

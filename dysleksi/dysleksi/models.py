@@ -8,7 +8,7 @@ from django.contrib.auth.models import AbstractUser, Group
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import CheckConstraint
+from django.db.models import CheckConstraint, TextChoices
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils.functional import cached_property
@@ -19,6 +19,11 @@ from simple_history.models import HistoricalRecords
 # they are present in the database as Group names, and rows are searched for by these
 TEACHERS = "Lærere"
 STUDENTS = "Elever"
+
+
+class QuestionType(TextChoices):
+    MULTIPLE_CHOICE = "multiple_choice"
+    FREE_TEXT = "free_text"
 
 
 class User(AbstractUser):
@@ -195,6 +200,7 @@ class Test(models.Model):
                 for question in questions.order_by("id"):
                     question_data = {
                         "id": question.id,
+                        "question_type": question.question_type,
                         "challenge_id": question.challenge.id,
                         "challenge_name": question.challenge.name,
                         "challenge_image_url": (
@@ -318,6 +324,10 @@ class TestQuestion(models.Model):
         blank=False,
         null=False,
         default=False,
+    )
+    question_type = models.CharField(
+        choices=QuestionType,
+        default=QuestionType.MULTIPLE_CHOICE,
     )
 
     def __str__(self) -> str:
