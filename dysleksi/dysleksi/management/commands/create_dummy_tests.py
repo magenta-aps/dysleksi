@@ -4,7 +4,11 @@
 
 from typing import Literal
 
-from data_tools.utils import create_test_resources, create_wordreading_2_test
+from data_tools.utils import (
+    create_test_resources,
+    create_wordreading_2_test,
+    create_wordspelling_test,
+)
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext_lazy as _
 
@@ -20,7 +24,7 @@ def create_group_test(
 
     test, created = Test.objects.get_or_create(name=name)
 
-    questions_data_1 = [
+    wordreading_2a_data = [
         {
             "image": "wordreading_2_dummy/dog.png",
             "correct": _("hund"),
@@ -48,7 +52,7 @@ def create_group_test(
         },
     ]
 
-    practice_questions_data = [
+    wordreading_2a_practice_data = [
         {
             "image": "wordreading_2_dummy/dog.png",
             "correct": _("hund"),
@@ -61,12 +65,7 @@ def create_group_test(
         },
     ]
 
-    # A test with practice run
-    create_wordreading_2_test(
-        test, questions_data_1, practice_questions_data, name="Wordreading 2A (dummy)"
-    )
-
-    questions_data_2 = [
+    wordreading_2b_data = [
         {
             "image": "wordreading_2_dummy/dog.png",
             "correct": _("hund"),
@@ -78,10 +77,60 @@ def create_group_test(
             "wrong": [_("bil"), _("bus"), _("tog")],
         },
     ]
-    # A test without practice run
-    create_wordreading_2_test(
-        test, questions_data_2, None, name="Wordreading 2B (dummy)"
-    )
+
+    wordspelling_data = [
+        {
+            "sound": "wordspelling_dummy/iki.mp3",
+            "correct": "iki",
+            "wrong": [],
+        },
+        {
+            "sound": "wordspelling_dummy/aput.mp3",
+            "correct": "aput",
+            "wrong": [],
+        },
+        {
+            "sound": "wordspelling_dummy/arsaq.mp3",
+            "correct": "arsaq",
+            "wrong": [],
+        },
+        {
+            "sound": "wordspelling_dummy/sorluk.mp3",
+            "correct": "sorluk",
+            "wrong": [],
+        },
+    ]
+
+    wordspelling_practise_data = [
+        {
+            "sound": "wordspelling_dummy/niu.mp3",
+            "correct": "niu",
+            "wrong": [],
+        },
+    ]
+
+    if grade >= 2:
+
+        # A wordspelling test with practice run
+        create_wordspelling_test(
+            test,
+            wordspelling_data,
+            wordspelling_practise_data,
+            name="Wordspelling (dummy)",
+        )
+
+        # A wordreading 2 test with practice run
+        create_wordreading_2_test(
+            test,
+            wordreading_2a_data,
+            wordreading_2a_practice_data,
+            name="Wordreading 2A (dummy)",
+        )
+
+        # A wordreading 2 test without practice run
+        create_wordreading_2_test(
+            test, wordreading_2b_data, None, name="Wordreading 2B (dummy)"
+        )
 
     return test
 
