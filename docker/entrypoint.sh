@@ -36,16 +36,12 @@ python manage.py create_groups
 
 if [ "${CREATE_DUMMY_USERS,,}" = true ]; then
   echo 'creating test users'
-  # "0111111111" er brugerens cpr og username
-  # dev-idp godkender ud fra username som står i authsources
-  python manage.py create_user 0111111111 elev --cpr 0111111111 -g Elever
-  python manage.py create_user 0222222222 lærer --cpr 0222222222 -g Lærere
   python manage.py create_user admin admin --is_superuser
 fi
 
 
 if [ "${CREATE_DUMMY_DATA,,}" = true ]; then
-  python manage.py create_dummy_classes
+  python manage.py create_dummy_classes_and_users
   python manage.py create_dummy_tests
 fi
 

@@ -18,6 +18,7 @@ from dysleksi.models import (
     TestPart,
     TestQuestion,
     TestResource,
+    TestType,
     User,
 )
 
@@ -56,7 +57,12 @@ class DysleksiTest(TestCase):
             is_superuser=False,
             is_staff=False,
         )
-        cls.test, _ = Test.objects.get_or_create(name="Test1")
+        cls.test, _ = Test.objects.get_or_create(
+            name="Test1", test_type=TestType.INDIVIDUAL
+        )
+        cls.group_test, _ = Test.objects.get_or_create(
+            name="Test2", test_type=TestType.GROUP
+        )
         cls.part, _ = TestPart.objects.get_or_create(
             name="TestPart1", test=cls.test, timeout=60, partial_score_after=30
         )

@@ -6,7 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.views import View
 
-from dysleksi.models import Test, User
+from dysleksi.models import Test, TestType, User
 from dysleksi.tests.base import DysleksiTest
 from dysleksi.views import ClassListView, RoomView, RootView, UserTypeMixin
 
@@ -35,7 +35,7 @@ class TestRootView(DysleksiTest):
 
     def test_get_context_data(self):
         cases: list[tuple[User, str | None]] = [
-            (self.teacher, "students"),
+            (self.teacher, None),
             (self.student, "student"),
             (AnonymousUser(), None),
         ]
@@ -67,11 +67,15 @@ class TestRoomView(DysleksiTest):
         ]
         for user, template_name, room_name in cases:
             with self.subTest(user=user, template_name=template_name):
-                view = self.setup_view(RoomView, user, room_name=room_name)
+                view = self.setup_view(
+                    RoomView, user, room_name=room_name, test_id=self.test.id
+                )
                 self.assertListEqual(view.get_template_names(), [template_name])
 
     def test_context_data(self):
-        view = self.setup_view(RoomView, self.teacher, room_name="class_1")
+        view = self.setup_view(
+            RoomView, self.teacher, room_name="class_1", test_id=self.test.id
+        )
         context = view.get_context_data()
         self.assertIn("test_contents", context)
 
@@ -100,3 +104,59 @@ class TestClassListView(DysleksiTest):
         self.client.force_login(self.student)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
+
+
+class TestStartRoomView(DysleksiTest):
+    def test_group_view_context(self):
+        self.client.force_login(self.teacher)
+        response = self.client.get(reverse("dysleksi:start_group_room"))
+
+        context_data = response.context
+
+        self.assertEqual(context_data.get("test_type"), TestType.GROUP)
+
+    def test_individual_view_context(self):
+        self.client.force_login(self.teacher)
+        response = self.client.get(reverse("dysleksi:start_individual_room"))
+
+        context_data = response.context
+
+        self.assertEqual(context_data.get("test_type"), TestType.INDIVIDUAL)
+
+    def test_create_individual_room(self):
+        data = {"student": self.student.id, "test": self.test.id}
+
+        self.client.force_login(self.teacher)
+        response = self.client.post(
+            reverse("dysleksi:start_individual_room"), data=data
+        )
+
+        self.assertEqual(response.status_code, 302)
+
+        expected_url = reverse(
+            "dysleksi:room",
+            kwargs={
+                "room_name": f"student_{self.student.pk}",
+                "test_id": self.test.pk,
+            },
+        )
+
+        self.assertRedirects(response, expected_url)
+
+    def test_create_group_room(self):
+        data = {"klasse": self.klasse.id, "test": self.group_test.id}
+
+        self.client.force_login(self.teacher)
+        response = self.client.post(reverse("dysleksi:start_group_room"), data=data)
+
+        self.assertEqual(response.status_code, 302)
+
+        expected_url = reverse(
+            "dysleksi:room",
+            kwargs={
+                "room_name": f"class_{self.klasse.pk}",
+                "test_id": self.group_test.pk,
+            },
+        )
+
+        self.assertRedirects(response, expected_url)

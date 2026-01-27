@@ -26,6 +26,11 @@ class QuestionType(TextChoices):
     FREE_TEXT = "free_text"
 
 
+class TestType(TextChoices):
+    INDIVIDUAL = "individual"
+    GROUP = "group"
+
+
 class User(AbstractUser):
     history = HistoricalRecords()
 
@@ -167,6 +172,11 @@ class TestResource(models.Model):
 
 class Test(models.Model):
     name = models.CharField(max_length=255)
+
+    test_type = models.CharField(
+        choices=TestType,
+        default=TestType.INDIVIDUAL,
+    )
 
     def to_json(self) -> dict:
         """

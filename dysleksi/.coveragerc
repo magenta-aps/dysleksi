@@ -20,7 +20,6 @@ omit =
     */common/form_mixins.py
     */management/commands/create_user.py
     */management/commands/create_groups.py
-    */management/commands/create_dummy_classes.py
     */management/commands/make_messages.py
     */management/commands/wait_for_db.py
 parallel = true
