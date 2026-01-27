@@ -1,0 +1,23 @@
+@import "./vendor/scss/bootstrap";
+@import "./vendor/fonts/phosphor/style.css";
+
+@font-face {
+  font-family: "Andika Normal";
+  font-weight: normal;
+  src: url("./vendor/fonts/andika/Andika-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Andika Italic";
+  font-weight: normal;
+  src: url("./vendor/fonts/andika/Andika-Italic.ttf") format("truetype");
+}
+
+body {
+  font-family: "Andika Normal", "Helvetica", sans-serif;
+}
+
+i {
+  font-family: "Andika Italic", "Helvetica", sans-serif;
+  font-style: normal; /* avoid "double italicization" */
+}
