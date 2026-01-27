@@ -1,3 +1,32 @@
+// "Design names"
+$student-grey-lightest: #F9F7F4;
+$student-grey-light: #DED9D2;
+$student-grey: #ACA9A4;
+$student-grey-dark: #7B7670;
+$student-grey-darker: #494743;
+$student-grey-darkest: #1E1D1A;
+$student-purple-lightest: #e5d4df;
+$student-purple-light: #bd94af;
+$student-purple: #7b295e;
+$student-purple-dark: #3d142f;
+$student-green-lightest: #d5dfd2;
+$student-green-light: #95af8f;
+$student-green: #2b5f20;
+$student-green-dark: #163010;
+$student-red-lightest: #ecd0d0;
+$student-red-light: #cf898a;
+$student-red: #9f1415;
+$student-red-dark: #500a0b;
+$student-yellow-lightest: #faf2dd;
+$student-yellow-light: #f2deaa;
+$student-yellow: #e6bd54;
+$student-yellow-dark: #685526;
+
+// Map "design names" to known Bootstrap variables
+$body-bg: $student-grey-lightest;
+$primary: $student-purple;
+$secondary: $student-grey-darker;
+
 @import "./vendor/scss/bootstrap";
 @import "./vendor/fonts/phosphor/style.css";
 
