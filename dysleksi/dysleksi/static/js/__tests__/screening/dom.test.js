@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { TestDomElements } from "../../screening/utils.js";
+import { GroupTestDomElements } from "../../screening/dom.js";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
 describe("TestDomElements.showQuestionChallenge (sound only)", () => {
@@ -13,12 +13,13 @@ describe("TestDomElements.showQuestionChallenge (sound only)", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
-      <div id="question"></div>
+      <div id="question-title"></div>
+      <div id="question-challenge"></div>
       <div id="choices"></div>
       <button id="next"></button>
     `;
 
-    dom = new TestDomElements();
+    dom = new GroupTestDomElements();
 
     vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(() => {});
   });

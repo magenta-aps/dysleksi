@@ -19,7 +19,12 @@
 
 {% block content %}
 <div class="container" data-role="student" data-room-name="{{ room_name }}">
-    <h1 id="question"></h1>
+
+    <h1 id="instructions-text"></h1>
+    <audio id="instructions-sound"></audio>
+
+    <h1 id="question-title"></h1>
+    <div id="question-challenge"></div>
     <div id="choices"></div>
     <p id="choice"></p>
 </div>
