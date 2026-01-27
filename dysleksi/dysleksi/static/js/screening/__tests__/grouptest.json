@@ -1,0 +1,443 @@
+{
+  "id": 3,
+  "name": "Middle 2. grade",
+  "parts": [
+    {
+      "id": 5,
+      "name": "Wordreading 2A (dummy)",
+      "instructions_url": null,
+      "intro": "Vælg det rigtige ord, der passer til billedet.",
+      "timeout": 60,
+      "partial_score_after": 30,
+      "practice": [
+        {
+          "id": 24,
+          "challenge_id": 1,
+          "challenge_name": "challenge",
+          "challenge_image_url": "/media/wordreading_2_dummy/dog.png",
+          "challenge_sound_url": null,
+          "challenge_text": null,
+          "possible_answers": [
+            {
+              "id": 93,
+              "resource_id": 2,
+              "resource_name": "hund",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "hund",
+              "is_correct": true
+            },
+            {
+              "id": 94,
+              "resource_id": 3,
+              "resource_name": "kat",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "kat",
+              "is_correct": false
+            },
+            {
+              "id": 95,
+              "resource_id": 4,
+              "resource_name": "ko",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "ko",
+              "is_correct": false
+            },
+            {
+              "id": 96,
+              "resource_id": 5,
+              "resource_name": "hest",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "hest",
+              "is_correct": false
+            }
+          ]
+        },
+        {
+          "id": 25,
+          "challenge_id": 19,
+          "challenge_name": "challenge",
+          "challenge_image_url": "/media/wordreading_2_dummy/cat.jpeg",
+          "challenge_sound_url": null,
+          "challenge_text": null,
+          "possible_answers": [
+            {
+              "id": 97,
+              "resource_id": 3,
+              "resource_name": "kat",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "kat",
+              "is_correct": true
+            },
+            {
+              "id": 98,
+              "resource_id": 2,
+              "resource_name": "hund",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "hund",
+              "is_correct": false
+            },
+            {
+              "id": 99,
+              "resource_id": 4,
+              "resource_name": "ko",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "ko",
+              "is_correct": false
+            },
+            {
+              "id": 100,
+              "resource_id": 5,
+              "resource_name": "hest",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "hest",
+              "is_correct": false
+            }
+          ]
+        }
+      ],
+      "questions": [
+        {
+          "id": 19,
+          "challenge_id": 1,
+          "challenge_name": "challenge",
+          "challenge_image_url": "/media/wordreading_2_dummy/dog.png",
+          "challenge_sound_url": null,
+          "challenge_text": null,
+          "possible_answers": [
+            {
+              "id": 73,
+              "resource_id": 2,
+              "resource_name": "hund",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "hund",
+              "is_correct": true
+            },
+            {
+              "id": 74,
+              "resource_id": 3,
+              "resource_name": "kat",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "kat",
+              "is_correct": false
+            },
+            {
+              "id": 75,
+              "resource_id": 4,
+              "resource_name": "ko",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "ko",
+              "is_correct": false
+            },
+            {
+              "id": 76,
+              "resource_id": 5,
+              "resource_name": "hest",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "hest",
+              "is_correct": false
+            }
+          ]
+        },
+        {
+          "id": 20,
+          "challenge_id": 6,
+          "challenge_name": "challenge",
+          "challenge_image_url": "/media/wordreading_2_dummy/bike.jpeg",
+          "challenge_sound_url": null,
+          "challenge_text": null,
+          "possible_answers": [
+            {
+              "id": 77,
+              "resource_id": 7,
+              "resource_name": "cykel",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "cykel",
+              "is_correct": true
+            },
+            {
+              "id": 78,
+              "resource_id": 8,
+              "resource_name": "bil",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "bil",
+              "is_correct": false
+            },
+            {
+              "id": 79,
+              "resource_id": 9,
+              "resource_name": "bus",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "bus",
+              "is_correct": false
+            },
+            {
+              "id": 80,
+              "resource_id": 10,
+              "resource_name": "tog",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "tog",
+              "is_correct": false
+            }
+          ]
+        },
+        {
+          "id": 21,
+          "challenge_id": 11,
+          "challenge_name": "challenge",
+          "challenge_image_url": "/media/wordreading_2_dummy/cat.jpg",
+          "challenge_sound_url": null,
+          "challenge_text": null,
+          "possible_answers": [
+            {
+              "id": 81,
+              "resource_id": 3,
+              "resource_name": "kat",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "kat",
+              "is_correct": true
+            },
+            {
+              "id": 82,
+              "resource_id": 2,
+              "resource_name": "hund",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "hund",
+              "is_correct": false
+            },
+            {
+              "id": 83,
+              "resource_id": 12,
+              "resource_name": "mus",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "mus",
+              "is_correct": false
+            },
+            {
+              "id": 84,
+              "resource_id": 13,
+              "resource_name": "fugl",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "fugl",
+              "is_correct": false
+            }
+          ]
+        },
+        {
+          "id": 22,
+          "challenge_id": 14,
+          "challenge_name": "challenge",
+          "challenge_image_url": "/media/wordreading_2_dummy/house.jpg",
+          "challenge_sound_url": null,
+          "challenge_text": null,
+          "possible_answers": [
+            {
+              "id": 85,
+              "resource_id": 15,
+              "resource_name": "hus",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "hus",
+              "is_correct": true
+            },
+            {
+              "id": 86,
+              "resource_id": 8,
+              "resource_name": "bil",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "bil",
+              "is_correct": false
+            },
+            {
+              "id": 87,
+              "resource_id": 16,
+              "resource_name": "træ",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "træ",
+              "is_correct": false
+            },
+            {
+              "id": 88,
+              "resource_id": 17,
+              "resource_name": "vej",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "vej",
+              "is_correct": false
+            }
+          ]
+        },
+        {
+          "id": 23,
+          "challenge_id": 18,
+          "challenge_name": "challenge",
+          "challenge_image_url": "/media/wordreading_2_dummy/car.jpg",
+          "challenge_sound_url": null,
+          "challenge_text": null,
+          "possible_answers": [
+            {
+              "id": 89,
+              "resource_id": 8,
+              "resource_name": "bil",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "bil",
+              "is_correct": true
+            },
+            {
+              "id": 90,
+              "resource_id": 7,
+              "resource_name": "cykel",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "cykel",
+              "is_correct": false
+            },
+            {
+              "id": 91,
+              "resource_id": 10,
+              "resource_name": "tog",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "tog",
+              "is_correct": false
+            },
+            {
+              "id": 92,
+              "resource_id": 9,
+              "resource_name": "bus",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "bus",
+              "is_correct": false
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Wordreading 2B (dummy)",
+      "instructions_url": null,
+      "intro": "Vælg det rigtige ord, der passer til billedet.",
+      "timeout": 60,
+      "partial_score_after": 30,
+      "practice": [],
+      "questions": [
+        {
+          "id": 26,
+          "challenge_id": 1,
+          "challenge_name": "challenge",
+          "challenge_image_url": "/media/wordreading_2_dummy/dog.png",
+          "challenge_sound_url": null,
+          "challenge_text": null,
+          "possible_answers": [
+            {
+              "id": 101,
+              "resource_id": 2,
+              "resource_name": "hund",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "hund",
+              "is_correct": true
+            },
+            {
+              "id": 102,
+              "resource_id": 3,
+              "resource_name": "kat",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "kat",
+              "is_correct": false
+            },
+            {
+              "id": 103,
+              "resource_id": 4,
+              "resource_name": "ko",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "ko",
+              "is_correct": false
+            },
+            {
+              "id": 104,
+              "resource_id": 5,
+              "resource_name": "hest",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "hest",
+              "is_correct": false
+            }
+          ]
+        },
+        {
+          "id": 27,
+          "challenge_id": 6,
+          "challenge_name": "challenge",
+          "challenge_image_url": "/media/wordreading_2_dummy/bike.jpeg",
+          "challenge_sound_url": null,
+          "challenge_text": null,
+          "possible_answers": [
+            {
+              "id": 105,
+              "resource_id": 7,
+              "resource_name": "cykel",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "cykel",
+              "is_correct": true
+            },
+            {
+              "id": 106,
+              "resource_id": 8,
+              "resource_name": "bil",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "bil",
+              "is_correct": false
+            },
+            {
+              "id": 107,
+              "resource_id": 9,
+              "resource_name": "bus",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "bus",
+              "is_correct": false
+            },
+            {
+              "id": 108,
+              "resource_id": 10,
+              "resource_name": "tog",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "tog",
+              "is_correct": false
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
