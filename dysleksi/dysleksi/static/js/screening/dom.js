@@ -51,9 +51,6 @@ class TestDomElements {
             if (!img) {
                 img = document.createElement("img");
                 img.id = "challenge-image";
-                img.style.maxWidth = "300px";
-                img.style.display = "block";
-                img.style.margin = "1rem 0";
                 this.questionChallengeEl.append(img);
             }
             img.src = imageUrl;
@@ -84,9 +81,8 @@ class TestDomElements {
             if (!playBtn) {
                 playBtn = document.createElement("button");
                 playBtn.id = "challenge-sound-btn";
-                playBtn.textContent = "▶ Afspil lyd";
-                playBtn.className = "btn btn-secondary";
-                playBtn.style.margin = "1rem 0";
+                playBtn.innerHTML = '<span class="material-icons">volume_up</span>';
+                playBtn.className = "btn sound-btn";
 
                 const insertAfter = img || this.questionChallengeEl;
                 insertAfter.after(playBtn);
@@ -103,22 +99,68 @@ class TestDomElements {
     }
 
     showQuestionFreeText(placeholder = "", sound = null, image_url = null, listener = null) {
-        const wrapper = document.createElement("div");
-        wrapper.className = "mb-3";
+        // Shows a free text field, as well as a screen-keyboard
 
-        const input = document.createElement("input");
-        input.type = "text";
-        input.className = "form-control";
-        input.placeholder = placeholder;
-
-        wrapper.append(input);
-        this.choicesEl.append(wrapper);
-
-        if (listener) {
-            input.addEventListener("input", listener);
+        function updateEraseBtnState() {
+            eraseBtn.disabled = displayField.textContent.length === 0;
         }
 
-        return input;
+        const wrapper = document.createElement("div");
+        wrapper.className = "mb-3";
+    
+        // --- Button rows ---
+        const buttonRows = [
+            ["a", "e", "f", "g", "i", "j"],
+            ["k", "l", "m", "n", "o", "p"],
+            ["q", "r", "s", "t", "u", "v"]
+        ];
+    
+        // --- Display field (label-only feel) ---
+        const textFieldWrapper = document.createElement("div");
+        textFieldWrapper.style.display = "flex";           
+        textFieldWrapper.style.alignItems = "center";     
+        textFieldWrapper.style.gap = "0.5rem";            
+    
+        const displayField = document.createElement("div");
+        displayField.className = "form-control display-field";
+    
+        // --- Erase button ---
+        const eraseBtn = document.createElement("button");
+        eraseBtn.innerHTML = '<span class="material-icons">backspace</span>';
+        eraseBtn.className = "btn erase-btn";
+        updateEraseBtnState();
+    
+        eraseBtn.addEventListener("click", () => {
+            displayField.textContent = displayField.textContent.slice(0, -1);
+            updateEraseBtnState();
+            if (listener) listener({ target: { value: displayField.textContent } });
+        });
+    
+        textFieldWrapper.append(displayField, eraseBtn);
+        wrapper.append(textFieldWrapper);
+    
+        // --- Letter buttons ---
+        buttonRows.forEach(rowLetters => {
+            const rowDiv = document.createElement("div");
+            rowDiv.className = "letter-row";
+            rowLetters.forEach(letter => {
+                const btn = document.createElement("button");
+                btn.type = "button";
+                btn.className = "btn letter-btn";
+                btn.textContent = letter;
+                btn.addEventListener("click", () => {
+                    displayField.textContent += letter;
+                    updateEraseBtnState();
+                    if (listener) listener({ target: { value: displayField.textContent } });
+                });
+                rowDiv.appendChild(btn);
+            });
+            wrapper.insertBefore(rowDiv, textFieldWrapper); // above display
+        });
+    
+        this.choicesEl.append(wrapper);
+    
+        return displayField;
     }
 }
 
@@ -164,7 +206,7 @@ export class GroupTestDomElements extends TestDomElements {
     }
 
     toggleNextButton(show) {
-        this.nextBtn.style.display = show ? "inline-block" : "none";
+        this.nextBtn.style.display = show ? "block" : "none";
     }
 
     setNextButtonListener(listener) {

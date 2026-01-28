@@ -538,11 +538,13 @@ class PossibleAnswer {
         }
     }
     selectFreeText() {
-        const answer = this.input.value.trim();
+        const answer = this.input.textContent.trim(); 
         if (answer !== "") {
             this.textAnswer = answer;
             this.isCorrect = answer === this.resourceText;
             this.question.select(this);
+        } else {
+            this.domElements.toggleNextButton(false);
         }
     }
 }

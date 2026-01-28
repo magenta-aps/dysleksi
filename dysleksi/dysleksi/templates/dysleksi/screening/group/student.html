@@ -1,27 +1,5 @@
 {% extends 'dysleksi/screening/group/base.html' %}
 
-{% block css %}
-<style>
-div#choices {
-    display: flex;
-    width: 50%;
-    padding: 0;
-    justify-content: space-between;
-    list-style: none inside none;
-}
-div#choices button {
-    padding: 1rem 3rem;
-    border: 1px solid #ccc;
-    border-radius: 0.5rem;
-}
-button#next {
-    margin-top: 1rem;
-    padding: 0.75rem 2rem;
-    display: none; /* hidden until answer selected */
-}
-</style>
-{% endblock %}
-
 {% block content %}
 <div class="container" data-test-type="group" data-role="student" data-room-name="{{ room_name }}">
 
@@ -33,6 +11,8 @@ button#next {
     <h1 id="question-title"></h1>
     <div id="question-challenge"></div>
     <div id="choices"></div>
-    <button id="next" class="btn btn-success">Næste</button>
+    <button id="next" class="btn next-btn">
+        <span class="material-icons">arrow_forward</span>
+    </button>
 </div>
 {% endblock %}

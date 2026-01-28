@@ -50,3 +50,127 @@ i {
   font-family: "Andika Italic", "Helvetica", sans-serif;
   font-style: normal; /* avoid "double italicization" */
 }
+
+
+.erase-btn {
+  background-color: $student-grey-light !important;
+  color: black;
+  border: 1px solid black !important;
+  height: 4rem;
+  padding: 0 2rem;       
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  margin: 0.5rem;    
+
+  .material-icons {
+    font-size: 2.5rem;
+    line-height: 1;
+  }
+
+  &:disabled {
+    color: white; // changes text/icon color when button is disabled
+
+    .material-icons {
+      color: white; // ensures icon itself is white
+    }
+  }
+}
+
+.sound-btn {
+  background-color: $student-purple !important;
+  color: white;
+  font-size: 2rem;
+  padding: 0.5rem 2rem;
+  margin: 2rem auto;
+  display: flex; 
+  border-radius: 50px;
+
+  align-items: center;    
+  justify-content: center;
+
+
+  .material-icons {
+    font-size: 3rem;
+    line-height: 1;
+  }
+}
+
+.next-btn {
+  background-color: $student-green !important;
+  color: white;
+  font-size: 2rem;
+  padding: 0.5rem 2rem;
+  margin: 2rem auto;
+  display: flex; 
+  display: none; // hidden until answer selected
+
+  align-items: center;  
+  justify-content: center;
+
+  .material-icons {
+    font-size: 3rem;
+    line-height: 1;
+  }
+}
+
+
+.letter-btn {
+    background-color: $student-purple-lightest !important;
+    color: black;
+    font-size: 2rem;
+    border: 1px solid $student-purple !important;
+    margin: 0.5rem;
+    width: 5rem;
+    height: 4rem;
+    text-align: center; 
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.letter-row {
+  display: flex;              // make buttons go side by side
+  gap: 0.5rem;                // space between buttons
+  margin-bottom: 0.5rem;      // space between rows
+  flex-wrap: wrap;            // wrap if too many buttons
+}
+
+.display-field {
+  background-color: white;
+  pointer-events: none; // makes it unclickable
+  user-select: none;    // cannot select text
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  padding: 0 0.75rem;
+  white-space: pre;    // preserve spaces
+  flex-grow: 1;
+  height: 4rem;
+  margin: 0.5rem;
+}
+
+
+#choices {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 0;
+  list-style: none;
+  gap: 1rem;
+
+  button {
+    padding: 1rem 3rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+  }
+}
+
+#challenge-image {
+  display: block;  
+  margin: 1rem auto;
+  height: 200px;
+  object-fit: contain;
+}
