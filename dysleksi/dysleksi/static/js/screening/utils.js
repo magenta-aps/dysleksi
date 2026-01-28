@@ -30,10 +30,18 @@ export function startSession(roomName) {
         }));
     }, { once: true });
 
+    chatSocket.addEventListener("message", (e) => {
+        const data = JSON.parse(e.data);
+
+        if (data.event == "student.ready") {
+            refreshSession(roomName);
+        }
+    });
+
     return chatSocket;
 }
 
-export function refreshSession(roomName) {
+function refreshSession(roomName) {
     const chatSocket = getWebSocket(roomName);
 
     if (chatSocket.readyState === WebSocket.OPEN) {
