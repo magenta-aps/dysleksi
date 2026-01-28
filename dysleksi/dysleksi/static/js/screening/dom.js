@@ -102,7 +102,7 @@ class TestDomElements {
         }
     }
 
-    showQuestionFreeText(placeholder = "", sound = null, image_url = null) {
+    showQuestionFreeText(placeholder = "", sound = null, image_url = null, listener = null) {
         const wrapper = document.createElement("div");
         wrapper.className = "mb-3";
 
@@ -113,6 +113,10 @@ class TestDomElements {
 
         wrapper.append(input);
         this.choicesEl.append(wrapper);
+
+        if (listener) {
+            input.addEventListener("input", listener);
+        }
 
         return input;
     }
@@ -171,7 +175,7 @@ export class GroupTestDomElements extends TestDomElements {
         this.choicesEl.innerHTML = "";
     }
 
-    showQuestionChoice(text, sound, imageUrl) {
+    showQuestionChoice(text, sound, imageUrl, listener) {
         console.log("showQuestionChoice", text, sound, imageUrl);
         const btn = document.createElement("button");
         if (text) {
@@ -180,7 +184,15 @@ export class GroupTestDomElements extends TestDomElements {
         // TODO: render sound and image
         btn.className = "btn btn-outline-primary";
         this.choicesEl.append(btn);
+        if (listener) {
+            btn.addEventListener("click", listener);
+        }
         return btn;
+    }
+
+    toggleButtonSelected(button, selected) {
+        button.classList.toggle("btn-primary", selected);
+        button.classList.toggle("btn-outline-primary", !selected);
     }
 
 }

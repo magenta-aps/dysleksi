@@ -356,7 +356,8 @@ class Question {
     onShow() {
         this.part.test.send({
             event: 'test.displayed',
-            index: this.index,
+            part: this.part.index,
+            question: this.index,
             displayedAt: this.displayedAt,
         });
     }
@@ -428,10 +429,13 @@ class GroupQuestion extends Question {
                 message: `Elev har gennemført spørgsmål ${this.index + 1}`,
                 choice: this.selectedChoice.id,
                 recordingBase64: null,
-                index: this.index,
+                part: this.part.index,
+                question: this.index,
                 displayedAt: this.displayedAt,
                 answeredAt: this.answeredAt,
-                duration: duration
+                duration: duration,
+                correct: this.selectedChoice.isCorrect,
+                textAnswer: this.selectedChoice.textAnswer,
             });
             this.part.onQuestionComplete();
         }
@@ -462,7 +466,8 @@ class IndividualQuestion extends Question {
             message: `Elev har gennemført spørgsmål ${this.index + 1}`,
             choice: null,
             recordingBase64: this.recordedAudio,
-            index: this.index,
+            part: this.part.index,
+            question: this.index,
             displayedAt: this.displayedAt,
             answeredAt: this.answeredAt,
             duration: duration
@@ -489,6 +494,7 @@ class PossibleAnswer {
     resourceText;
     isCorrect;
     button;
+    textAnswer;
 
     constructor(data, question) {
         this.question = question;
@@ -501,31 +507,41 @@ class PossibleAnswer {
         this.resourceSoundUrl = data.resource_sound_url;
         this.resourceText = data.resource_text;
         this.isCorrect = data.is_correct;
+        this.textAnswer = null;
     }
 
     show() {
         if (this.question_type === "multiple_choice"){
-            this.button = this.domElements.showQuestionChoice(this.resourceText, this.resourceSoundUrl, this.resourceImageUrl);
-            this.button.addEventListener("click", () => this.select());
+            this.button = this.domElements.showQuestionChoice(
+                this.resourceText,
+                this.resourceSoundUrl,
+                this.resourceImageUrl,
+                () => this.select(),
+            );
         } else if (this.question_type === "free_text"){
-            this.input = this.domElements.showQuestionFreeText();
-            this.input.addEventListener("input", () => this.selectFreeText());
+            this.input = this.domElements.showQuestionFreeText(
+                null, null, null,
+                () => this.selectFreeText()
+            );
         }
     }
 
     select() {
         this.question.select(this);
-        this.button.classList.add("btn-primary");
-        this.button.classList.remove("btn-outline-primary");
-        for (let otherAnswer of this.question.possibleAnswers) {
-            if (otherAnswer !== this) {
-                otherAnswer.button.classList.add("btn-outline-primary");
-                otherAnswer.button.classList.remove("btn-primary");
+        if (this.button) {
+            this.domElements.toggleButtonSelected(this.button, true);
+            for (let otherAnswer of this.question.possibleAnswers) {
+                if (otherAnswer !== this) {
+                    this.domElements.toggleButtonSelected(otherAnswer.button, false);
+                }
             }
         }
     }
     selectFreeText() {
-        if (this.input.value.trim() !== "") {
+        const answer = this.input.value.trim();
+        if (answer !== "") {
+            this.textAnswer = answer;
+            this.isCorrect = answer === this.resourceText;
             this.question.select(this);
         }
     }
