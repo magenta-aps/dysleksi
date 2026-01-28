@@ -57,8 +57,10 @@ export function initTeacher(roomName, testContents) {
 
         const data = JSON.parse(e.data);
         if (data.event.match(/test.(answered|displayed)/)) {
-            const test = tests[data.index];
-            testIndex = data.index;
+            const test = tests[data.question];
+            console.log("data:",data);
+            console.log('tests:', tests);
+            testIndex = data.question;
             updateTable(data, test);
 
             // Allow teacher to mark an audio recording question correct, wrong or skipped
