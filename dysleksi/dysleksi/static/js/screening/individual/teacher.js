@@ -52,7 +52,7 @@ export function initTeacher(roomName, testContents) {
         });
     }
 
-    chatSocket.onmessage = function (e) {
+    chatSocket.addEventListener("message", (e) => {
         console.log('chat: received', e.data);
 
         const data = JSON.parse(e.data);
@@ -67,7 +67,7 @@ export function initTeacher(roomName, testContents) {
                 updateButtons('disabled', false);
             }
         }
-    };
+    });
 
 
     const actionEls = document.querySelectorAll('button');

@@ -1,5 +1,4 @@
 import { startSession } from "./utils.js";
-import { refreshSession } from "./utils.js";
 import { getWebSocket } from "../ws.js";
 
 
@@ -34,8 +33,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         }
             
         startSession(roomName); 
-        setInterval(() => {
-            refreshSession(roomName);
-        }, 1000);
     }
 });

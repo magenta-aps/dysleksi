@@ -32,7 +32,7 @@ export function initTeacher(roomName) {
         actionEls.forEach(el => el.classList.toggle(attr, val));
     };
 
-    chatSocket.onmessage = function (e) {
+    chatSocket.addEventListener("message", (e) => {
         const data = JSON.parse(e.data);
         if (data.event && data.event.startsWith('test.')) {
             if (data.index !== undefined) testIndex = data.index;
@@ -40,5 +40,5 @@ export function initTeacher(roomName) {
 
             if (data.event === 'test.answered') updateButtons('disabled', false);
         }
-    };
+    });
 }
