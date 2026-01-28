@@ -29,6 +29,7 @@ services:
       - CREATE_DUMMY_USERS=true
       - CREATE_DUMMY_DATA=true
       - TEST=true
+      - ECHO_INTERFACE=https://localhost:8140
     networks:
       - default
       - database
