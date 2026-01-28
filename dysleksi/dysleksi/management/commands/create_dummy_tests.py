@@ -12,7 +12,7 @@ from data_tools.utils import (
 from django.core.management.base import BaseCommand
 from django.utils.translation import gettext_lazy as _
 
-from dysleksi.models import Test, TestPart
+from dysleksi.models import Test, TestPart, TestType
 
 
 def create_group_test(
@@ -21,8 +21,6 @@ def create_group_test(
 ):
 
     name = f"{period} {grade}. grade".capitalize()
-
-    test, created = Test.objects.get_or_create(name=name)
 
     wordreading_2a_data = [
         {
@@ -111,6 +109,8 @@ def create_group_test(
 
     if grade >= 2:
 
+        test, created = Test.objects.get_or_create(name=name, test_type=TestType.GROUP)
+
         # A wordspelling test with practice run
         create_wordspelling_test(
             test,
@@ -132,8 +132,6 @@ def create_group_test(
             test, wordreading_2b_data, None, name="Wordreading 2B (dummy)"
         )
 
-    return test
-
 
 def create_individual_test():
     questions_data = [
@@ -142,7 +140,9 @@ def create_individual_test():
         {"text": "Udtal følgende bogstav: 'K'", "correct": None, "wrong": []},
     ]
 
-    test, created = Test.objects.get_or_create(name="Individual dummy test")
+    test, created = Test.objects.get_or_create(
+        name="Individual dummy test", test_type=TestType.INDIVIDUAL
+    )
 
     part, created = TestPart.objects.get_or_create(
         test=test,

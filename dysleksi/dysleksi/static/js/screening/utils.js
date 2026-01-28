@@ -1,3 +1,5 @@
+import { getWebSocket } from "../ws.js";
+
 export function extractQuestions(testContents) {
     return testContents.parts.flatMap(part =>
         part.questions.map(q => ({
@@ -16,6 +18,33 @@ export function extractQuestions(testContents) {
             }))
         }))
     );
+}
+
+export function startSession(roomName) {
+    const chatSocket = getWebSocket(roomName);
+
+    chatSocket.addEventListener("open", () => {
+        chatSocket.send(JSON.stringify({
+            event: "session.start",
+            roomUrl: window.location.href
+        }));
+    }, { once: true });
+
+    return chatSocket;
+}
+
+export function refreshSession(roomName) {
+    const chatSocket = getWebSocket(roomName);
+
+    if (chatSocket.readyState === WebSocket.OPEN) {
+        chatSocket.send(JSON.stringify({
+            event: "session.in_progress",
+            roomUrl: window.location.href
+        }));
+    } else {
+        // queue the message until the socket opens
+        chatSocket.addEventListener("open", () => sendSessionMessage(chatSocket), { once: true });
+    }
 }
 
 export function shuffleArray(array) {

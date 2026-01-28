@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-23 10:30-0200\n"
+"POT-Creation-Date: 2026-01-27 08:09-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,26 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: dysleksi/forms.py
+msgid "Test"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Vælg test"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Vælg elev"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Klasse"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Vælg klasse"
+msgstr ""
 
 #: dysleksi/management/commands/create_dummy_tests.py
 msgid "hund"
@@ -101,6 +121,24 @@ msgstr ""
 msgid "Administrator"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/lobby/start_room.html
+#: dysleksi/templates/dysleksi/lobby/teacher.html
+msgid "Start gruppetest"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/start_room.html
+#: dysleksi/templates/dysleksi/lobby/teacher.html
+msgid "Start individueltest"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/start_room.html
+msgid "Start test"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/start_room.html
+msgid "Cancel"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/lobby/student.html
 msgid "Elev"
 msgstr ""
@@ -116,12 +154,4 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/teacher.html
 msgid "Lærer"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/lobby/teacher.html
-msgid "Start individueltest"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/lobby/teacher.html
-msgid "Start Gruppetest"
 msgstr ""

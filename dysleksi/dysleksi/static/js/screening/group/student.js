@@ -14,7 +14,7 @@ export function initStudent(roomName, testContents) {
             test.addEventListener("test.complete", (evt) => {
                 // What to do when the test is completed?
                 chatSocket.close();
-                document.location = "/";
+                document.location = "/exit";
             });
             test.start()
         } catch (err) {

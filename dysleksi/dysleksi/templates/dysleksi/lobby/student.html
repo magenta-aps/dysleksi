@@ -1,18 +1,20 @@
 {% extends "dysleksi/lobby/base.html" %}
-{% load i18n %}
+{% load i18n static %}
+
+{% block js %}
+{{ block.super }}
+<script type="module" src="{% static 'js/lobby/index.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 <div
     class="container"
-    data-lobby-role="student"
     data-individual-room-name="student_{{ student.id }}"
-    data-class-room-name="class_{{ student.class.id }}"
-    data-individual-room-url="{% url 'dysleksi:room' room_name='student_'|add:student.id %}"
-    data-class-room-url="{% url 'dysleksi:room' room_name='class_'|add:student.class.id %}"
+    data-class-room-name="class_{{ student.klasse.id }}"
 >
-    <h1>{% translate "Elev" %}</h1>
+    <h1>{% translate "Elev" %} ({{ student.klasse }})</h1>
     <p>
-        {% blocktrans trimmed with name=student.name %}
+        {% blocktrans trimmed with name=student.first_name %}
         Velkommen {{ name }}
         {% endblocktrans %}
     </p>

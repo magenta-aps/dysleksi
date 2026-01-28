@@ -4,5 +4,5 @@
 {% block js %}
 {{ block.super }}
 {{ test_contents|json_script:"test_contents" }}
-<script type="module" src="{% static 'js/screening/individual/index.js' %}"></script>
+<script type="module" src="{% static 'js/screening/index.js' %}"></script>
 {% endblock %}

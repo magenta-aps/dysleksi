@@ -1,28 +1,17 @@
-{% extends "dysleksi/lobby/base.html" %}
+{% extends "dysleksi/base.html" %}
 {% load i18n %}
 
 {% block content %}
 <div class="container" data-lobby-role="teacher">
     <h1>{% translate "Lærer" %}</h1>
-    <div class="list-group">
-        {% for student in students %}
-        <a class="list-group-item list-group-item-action"
-           href="{% url 'dysleksi:room' room_name='student_'|add:student.id %}"
-           data-room="{{ 'student_'|add:student.id }}">
-            <p>{{ student.name }}</p>
-            <div class="btn btn-primary disabled">{% translate "Start individueltest" %}</div>
-        </a>
-        {% endfor %}
-    </div>
-    <div class="list-group">
-        {% for class in classes %}
-        <a class="list-group-item list-group-item-action"
-           href="{% url 'dysleksi:room' room_name='class_'|add:class.id %}"
-           data-room="{{ 'class_'|add:class.id }}">
-            <p>{{ class.name }}</p>
-            <div class="btn btn-primary disabled">{% translate "Start Gruppetest" %}</div>
-        </a>
-        {% endfor %}
-    </div>
+
+    <a href="{% url 'dysleksi:start_individual_room' %}" class="btn btn-primary">
+      {% translate "Start individueltest" %}
+    </a>
+
+    <a href="{% url 'dysleksi:start_group_room' %}" class="btn btn-primary">
+      {% translate "Start gruppetest" %}
+    </a>
+
 </div>
 {% endblock %}
