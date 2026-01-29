@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 anyio==4.12.1
-asgi-types==0.1.0
+asgi-types==0.2.0
 asgiref==3.11.0
 attrs==25.4.0
 autobahn==25.12.2
