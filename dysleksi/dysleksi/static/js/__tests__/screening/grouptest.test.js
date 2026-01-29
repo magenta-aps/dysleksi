@@ -247,7 +247,7 @@ describe('getWebSocket', () => {
         testSpy(test);
         domElements.showQuestionFreeText = vi.fn(() => {
             return {
-                value: {
+                textContent: {
                     trim: () => "dummy_answer"
                 }
             }
@@ -306,4 +306,79 @@ describe('getWebSocket', () => {
         });
     });
 
+});
+
+
+
+describe("GroupTestDomElements - showQuestionFreeText", () => {
+    let domElements;
+    let listenerMock;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="choices"></div>
+            <audio id="instructions-sound"></audio>
+            <div id="instructions-text"></div>
+            <button id="start-practice"></button>
+            <button id="start-questions"></button>
+            <div id="question-title"></div>
+            <div id="question-challenge"></div>
+            <button id="next"></button>
+        `;
+
+        domElements = new GroupTestDomElements();
+        listenerMock = vi.fn();
+    });
+
+    it("renders free text input with letters and erase button", () => {
+        const displayField = domElements.showQuestionFreeText("Type here", null, null, listenerMock);
+
+        // Display field exists
+        expect(displayField).toBeInstanceOf(HTMLElement);
+        expect(displayField.classList.contains("display-field")).toBe(true);
+
+        // Letter buttons exist
+        const letterButtons = document.querySelectorAll(".letter-btn");
+        expect(letterButtons.length).toBe(18); // 3 rows * 6 letters
+
+        // Erase button exists
+        const eraseBtn = document.querySelector(".erase-btn");
+        expect(eraseBtn).toBeInstanceOf(HTMLElement);
+        expect(eraseBtn.disabled).toBe(true); // initially disabled
+
+        // Click a letter button
+        letterButtons[0].click(); // should append "a" to display
+        expect(displayField.textContent).toBe("a");
+        expect(listenerMock).toHaveBeenCalledWith({ target: { value: "a" } });
+        expect(eraseBtn.disabled).toBe(false);
+
+        // Click erase button
+        eraseBtn.click();
+        expect(displayField.textContent).toBe("");
+        expect(listenerMock).toHaveBeenCalledWith({ target: { value: "" } });
+        expect(eraseBtn.disabled).toBe(true);
+    });
+
+    it("supports multiple letters and listener calls", () => {
+        const displayField = domElements.showQuestionFreeText("", null, null, listenerMock);
+        const letterButtons = document.querySelectorAll(".letter-btn");
+        const eraseBtn = document.querySelector(".erase-btn");
+
+        // Type "abc"
+        letterButtons[0].click();
+        letterButtons[1].click();
+        letterButtons[2].click();
+        expect(displayField.textContent).toBe("aef"); // first row letters: a, e, f, g, i, j
+        expect(listenerMock).toHaveBeenCalledTimes(3);
+
+        // Erase last letter
+        eraseBtn.click();
+        expect(displayField.textContent).toBe("ae");
+    });
+
+    it("returns the display field element", () => {
+        const displayField = domElements.showQuestionFreeText();
+        expect(displayField).toBeInstanceOf(HTMLElement);
+        expect(displayField.classList.contains("display-field")).toBe(true);
+    });
 });
