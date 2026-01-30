@@ -10,16 +10,10 @@ MIGRATE=${MIGRATE:=false}
 TEST=${TEST:=false}
 MAKEMESSAGES=${MAKEMESSAGES:=false}
 PULL_IDP_METADATA=${PULL_IDP_METADATA:=false}
-COLLECT_STATIC=${COLLECT_STATIC:=true}
 CREATE_DUMMY_DATA=${CREATE_DUMMY_DATA:=false}
 CREATE_DUMMY_USERS=${CREATE_DUMMY_USERS:=false}
 
 python manage.py wait_for_db
-
-if [ "${COLLECT_STATIC,,}" = true ]; then
-  python manage.py collectstatic --no-input --clear --verbosity=0
-  python manage.py compress --force --verbosity=1
-fi
 
 if [ "${MAKE_MIGRATIONS,,}" = true ]; then
   echo 'generating migrations'
