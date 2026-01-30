@@ -106,3 +106,8 @@ class StartGroupRoomView(StartRoomView):
         context["test_type"] = TestType.GROUP
 
         return context
+
+
+class AdminRootView(GroupRequiredMixin, TemplateView):
+    groups_required = [TEACHERS]
+    template_name = "dysleksi/admin/base.html"

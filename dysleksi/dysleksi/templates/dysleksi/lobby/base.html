@@ -1,4 +1,11 @@
 {% extends "dysleksi/base.html" %}
 {% load i18n static %}
+{% load compress %}
+
+{% block css %}
+{% compress css %}
+<link type="text/x-scss" href="{% static 'theme.scss' %}" rel="stylesheet" media="screen">
+{% endcompress %}
+{% endblock %}
 
 

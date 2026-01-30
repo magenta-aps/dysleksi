@@ -12,7 +12,7 @@ from two_factor.urls import urlpatterns as two_factor_urls
 urlpatterns = [
     path("i18n/", include("django.conf.urls.i18n")),
     path("jsi18n/", JavaScriptCatalog.as_view(), name="javascript-catalog"),
-    path("admin/", admin.site.urls),
+    path("django-admin/", admin.site.urls),
     path(
         "",
         include(

@@ -6,6 +6,7 @@ from django.urls import URLPattern, URLResolver, path
 from django.views.generic import TemplateView
 
 from dysleksi.views import (
+    AdminRootView,
     ClassListView,
     RoomView,
     RootView,
@@ -28,4 +29,5 @@ urlpatterns: list[URLResolver | URLPattern] = [
     path(
         "exit/", TemplateView.as_view(template_name="dysleksi/exit.html"), name="exit"
     ),
+    path("admin/", AdminRootView.as_view(), name="admin_base"),
 ]
