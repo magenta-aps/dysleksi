@@ -1,0 +1,8 @@
+{% extends "dysleksi/admin/base.html" %}
+{% load i18n %}
+{% load render_table from django_tables2 %}
+
+{% block inner_content %}
+<h2>{% translate "Elever" %}</h2>
+{% render_table table %}
+{% endblock %}

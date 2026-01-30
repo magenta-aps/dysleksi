@@ -3,14 +3,23 @@
 # SPDX-License-Identifier: MPL-2.0
 from typing import Any
 
+from django.db.models import Case, Count, F, Value, When
 from django.shortcuts import redirect
 from django.views.generic import FormView, TemplateView
 from django_tables2 import SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
 
 from dysleksi.forms import StartClassRoomForm, StartIndividualRoomForm
-from dysleksi.models import TEACHERS, Class, Test, TestType, User
-from dysleksi.tables import ClassTable
+from dysleksi.models import (
+    TEACHERS,
+    Class,
+    Student,
+    Test,
+    TestAssignment,
+    TestType,
+    User,
+)
+from dysleksi.tables import ClassTable, StudentTable, TestAssignmentTable
 
 
 class UserTypeMixin(LoginRequiredMixin):
@@ -65,10 +74,71 @@ class ClassListView(GroupRequiredMixin, SingleTableView):
     model = Class
     table_class = ClassTable
     groups_required = [TEACHERS]
-    template_name = "dysleksi/class/list.html"
+    template_name = "dysleksi/admin/class/list.html"
 
     def get_queryset(self):
-        return Class.objects.filter(teachers=self.user)
+        qs = super().get_queryset()
+        # Only show classes belonging to the teacher viewing the page
+        qs = qs.filter(teachers=self.user)
+        # Add annotations used by `ClassTable`
+        qs = qs.annotate(
+            number_of_students=Count("student__pk", distinct=True),
+        )
+        return qs
+
+
+class StudentListView(GroupRequiredMixin, SingleTableView):
+    model = Student
+    table_class = StudentTable
+    groups_required = [TEACHERS]
+    template_name = "dysleksi/admin/student/list.html"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # Only show students belonging to the teacher viewing the page
+        qs = qs.filter(klasse__teachers=self.user)
+        return qs
+
+
+class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
+    model = TestAssignment
+    table_class = TestAssignmentTable
+    groups_required = [TEACHERS]
+    template_name = "dysleksi/admin/test_assignment/list.html"
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        # Only show test assignments belonging to the teacher viewing the page
+        qs = qs.filter(teacher=self.user)
+        # Add annotations used by `TestAssignmentTable`
+        qs = qs.annotate(
+            number_of_students=Case(
+                When(
+                    student__isnull=True,
+                    then=Count("klasse__student__pk", distinct=True),
+                ),
+                When(
+                    student__isnull=False,
+                    then=Value(1),
+                ),
+            ),
+            number_of_students_responded=Count("responses__student__pk", distinct=True),
+        )
+        qs = qs.annotate(
+            status=Case(
+                When(
+                    number_of_students_responded=F("number_of_students"),
+                    then=Value("Gennemført"),
+                ),
+                When(
+                    number_of_students_responded__gt=0,
+                    number_of_students_responded__lt=F("number_of_students"),
+                    then=Value("I gang"),
+                ),
+                default=Value("Afventer"),
+            )
+        )
+        return qs
 
 
 class StartRoomView(FormView):
@@ -106,8 +176,3 @@ class StartGroupRoomView(StartRoomView):
         context["test_type"] = TestType.GROUP
 
         return context
-
-
-class AdminRootView(GroupRequiredMixin, TemplateView):
-    groups_required = [TEACHERS]
-    template_name = "dysleksi/admin/base.html"
