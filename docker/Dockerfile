@@ -57,6 +57,17 @@ ENTRYPOINT ["/entrypoint.sh"]
 WORKDIR /app
 RUN django-admin compilemessages --locale=da --locale=kl --verbosity=1
 
+# Compress css & js in the image. Needs DJANGO_DEBUG=False
+COPY --chown=dysleksi:dysleksi ./dev-environment/dysleksi.env dysleksi.env
+# hadolint ignore=SC1091
+RUN set -a && \
+    source dysleksi.env && \
+    export DJANGO_DEBUG=False && \
+    set +a && \
+    python manage.py collectstatic --verbosity=0 --no-input --clear && \
+    python manage.py compress --verbosity=0 --force && \
+    rm dysleksi.env
+
 VOLUME /var/cache/idp
 
 CMD ["gunicorn","--bind","0.0.0.0:8000","project.asgi:application","-w","4","-k","uvicorn.workers.UvicornWorker","--timeout","120","--error-logfile","-","--capture-output"]

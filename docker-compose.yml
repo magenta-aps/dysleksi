@@ -22,7 +22,6 @@ services:
       - staticfiles-data:/app/project/static/
     environment:
       - PULL_IDP_METADATA=true
-      - COLLECT_STATIC=true
       - MAKE_MIGRATIONS=true
       - MIGRATE=true
       - MAKE_MESSAGES=true
