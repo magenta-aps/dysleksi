@@ -26,12 +26,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         initStudent(roomName, testContents);
     }
     if (role === "teacher") {
-        if (testType === "individual") {
-            initTeacher(roomName, testContents);  
-        } else if (testType === "group") {
-            initTeacher(roomName);  
-        }
-            
+        initTeacher(roomName, testContents);             
         startSession(roomName); 
     }
 });
