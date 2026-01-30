@@ -35,7 +35,7 @@ export function initTeacher(roomName) {
     chatSocket.addEventListener("message", (e) => {
         const data = JSON.parse(e.data);
         if (data.event && data.event.startsWith('test.')) {
-            if (data.index !== undefined) testIndex = data.index;
+            if (data.questionIndex !== undefined) testIndex = data.questionIndex;
             updateTable(data);
 
             if (data.event === 'test.answered') updateButtons('disabled', false);

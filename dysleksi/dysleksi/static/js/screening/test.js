@@ -74,7 +74,7 @@ class Test extends EventTarget {
         alert("Testen er færdig!");
         this.send({
             event: "test.completed",
-            message: "Testen er afsluttet"
+            message: "Testen er afsluttet",
         });
 
         this.dispatchEvent(new Event("test.complete", {
@@ -357,8 +357,10 @@ class Question {
     onShow() {
         this.part.test.send({
             event: 'test.displayed',
-            part: this.part.index,
-            question: this.index,
+            partIndex: this.part.index,
+            partId: this.part.id,
+            questionIndex: this.index,
+            questionId: this.id,
             displayedAt: this.displayedAt,
         });
     }
@@ -430,8 +432,10 @@ class GroupQuestion extends Question {
                 message: `Elev har gennemført spørgsmål ${this.index + 1}`,
                 choice: this.selectedChoice.id,
                 recordingBase64: null,
-                part: this.part.index,
-                question: this.index,
+                partIndex: this.part.index,
+                partId: this.part.id,
+                questionIndex: this.index,
+                questionId: this.id,
                 displayedAt: this.displayedAt,
                 answeredAt: this.answeredAt,
                 duration: duration,
@@ -467,8 +471,10 @@ class IndividualQuestion extends Question {
             message: `Elev har gennemført spørgsmål ${this.index + 1}`,
             choice: null,
             recordingBase64: this.recordedAudio,
-            part: this.part.index,
-            question: this.index,
+            partIndex: this.part.index,
+            partId: this.part.id,
+            questionIndex: this.index,
+            questionId: this.id,
             displayedAt: this.displayedAt,
             answeredAt: this.answeredAt,
             duration: duration
