@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-29 12:46-0200\n"
+"POT-Creation-Date: 2026-01-30 10:13-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,19 +18,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: dysleksi/forms.py
-msgid "Test"
-msgstr ""
-
-#: dysleksi/forms.py
-msgid "Vælg test"
-msgstr ""
-
-#: dysleksi/forms.py
 msgid "Vælg elev"
 msgstr ""
 
 #: dysleksi/forms.py
-msgid "Klasse"
+msgid "Vælg test"
 msgstr ""
 
 #: dysleksi/forms.py
