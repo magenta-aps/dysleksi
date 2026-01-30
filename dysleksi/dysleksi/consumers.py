@@ -5,6 +5,8 @@ from asgiref.sync import async_to_sync
 from channels.generic.websocket import JsonWebsocketConsumer
 from django.core.cache import caches
 
+from dysleksi.models import Message
+
 logger = logging.getLogger(__name__)
 cache = caches["chat"]  # As defined in settings/cache.py
 
@@ -51,6 +53,17 @@ class ChatConsumer(JsonWebsocketConsumer):
             content,
             timeout=300,
         )
+
+        # Store message in database
+        event = content["event"]
+        if event in Message.store_events:
+            message, created = Message.objects.get_or_create(
+                uuid=content["uuid"],
+                defaults={"event": content["event"], "data": content},
+            )
+            if created:
+                # Only handle messages that were not already stored
+                message.handle()
 
     # Receive message from room group
     # method name must match the type attribute in the received json

@@ -84,6 +84,7 @@ class Test extends EventTarget {
 
     send(data) {
         data.id = this.roomName;
+        data.uuid = crypto.randomUUID();
         console.log("Chat: sending", data);
         this.chatSocket.send(JSON.stringify(data));
     }

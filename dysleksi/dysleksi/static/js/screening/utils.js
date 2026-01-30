@@ -25,6 +25,7 @@ export function startSession(roomName) {
 
     chatSocket.addEventListener("open", () => {
         chatSocket.send(JSON.stringify({
+            uuid: crypto.randomUUID(),
             event: "session.start",
             roomUrl: window.location.href
         }));
@@ -46,6 +47,7 @@ function refreshSession(roomName) {
 
     if (chatSocket.readyState === WebSocket.OPEN) {
         chatSocket.send(JSON.stringify({
+            uuid: crypto.randomUUID(),
             event: "session.in_progress",
             roomUrl: window.location.href
         }));

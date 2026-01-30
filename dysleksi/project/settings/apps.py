@@ -17,6 +17,7 @@ INSTALLED_APPS = [
     "login",
     "django_mitid_auth",
     "compressor",
+    "crispy_forms",
     "csp_helpers",
     "two_factor",
     "django_bootstrap5",

@@ -463,3 +463,29 @@ class QuestionResponse(models.Model):
 
     def __str__(self) -> str:
         return f"{str(self.question)} / {str(self.partresponse)}"
+
+
+class HandledEvent(TextChoices):
+    TEST_ANSWERED = "test.answered"
+    TEST_COMPLETE = "test.complete"
+
+
+class Message(models.Model):
+
+    # only store events of these types
+    store_events = {"test.answered", "test.complete"}
+
+    uuid = models.UUIDField(
+        primary_key=True,
+    )
+    received = models.DateTimeField(auto_now_add=True)
+    processed = models.DateTimeField(blank=True, null=True)
+    event = models.CharField(max_length=32, choices=HandledEvent.choices)
+    data = models.JSONField()
+
+    def handle(self):  # pragma: no cover
+        # Message is new, process it so that significant data is stored in other models
+        if self.event == HandledEvent.TEST_ANSWERED:
+            pass
+        elif self.event == HandledEvent.TEST_COMPLETE:
+            pass

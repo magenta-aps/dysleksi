@@ -92,7 +92,7 @@ services:
     volumes:
       - ./dysleksi/dysleksi/static/js:/app/src:ro
       - ./dysleksi/package.json:/app/package.json:ro
-      - ./dysleksi/package-lock.json:/app/package-lock.json:ro      
+      - ./dysleksi/package-lock.json:/app/package-lock.json:ro
     command: >
       sh -c "
         npm ci &&

@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { initStudentLobby } from "../../lobby/student.js";
 import * as wsModule from "../../ws.js";
+import { withAnyUUID } from "../utils.js"
 
 
 // Mock getWebSocket
@@ -67,10 +68,10 @@ describe("initStudentLobby / initRedirectSocket", () => {
     socket.__trigger("open");
 
     expect(socket.send).toHaveBeenCalledWith(
-      JSON.stringify({
-        event: "student.ready",
-        roomName: "room-1",
-      })
+      withAnyUUID(JSON.stringify({
+          event: "student.ready",
+          roomName: "room-1",
+      }))
     );
   });
 

@@ -3,15 +3,20 @@
 # SPDX-License-Identifier: MPL-2.0
 
 import json
-from unittest.mock import ANY, call, patch
+import uuid
+from asyncio import Future, wait_for
+from unittest.mock import ANY, MagicMock, call, patch
 
+from asgiref.sync import async_to_sync
 from channels.auth import AuthMiddlewareStack
 from channels.routing import URLRouter
 from channels.testing import WebsocketCommunicator
 from channels_redis.core import RedisChannelLayer
 from django.core.cache import caches
-from django.test import TestCase
+from django.db.models.signals import post_save
+from django.test import TestCase, TransactionTestCase
 
+from dysleksi.models import Message
 from dysleksi.routing import websocket_urlpatterns
 
 
@@ -23,7 +28,7 @@ class TestChatConsumer(TestCase):
         await communicator.disconnect()
 
     async def test_receive_broadcasts_to_group(self):
-        message: str = json.dumps({"foo": "bar"})
+        message: str = json.dumps({"foo": "bar", "event": "unit.test"})
         communicator = await self._get_communicator()
         await communicator.connect()
         await communicator.send_to(message)
@@ -92,3 +97,82 @@ class TestChatConsumer(TestCase):
                 ),
                 mock_send.call_args_list,
             )
+
+
+class TestChatConsumerMessageIntegration(TransactionTestCase):
+    async def _get_communicator(self) -> WebsocketCommunicator:
+        # This is the same definition as in `dysleksi.project.asgi`, but without the
+        # `AllowedHostsOriginValidator`, etc.
+        application = AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
+        communicator = WebsocketCommunicator(application, "/ws/chat/1234/")
+        return communicator
+
+    def data(self):
+        id = str(uuid.uuid4())
+        return {
+            "uuid": id,
+            "event": "test.answered",
+            "message": "Elev har besvaret spørgsmål 1",
+            "choice": 2,
+        }
+
+    async def send_message(self, message: str, timeout: float = 2.0):
+        communicator = await self._get_communicator()
+        await communicator.connect()
+        await communicator.send_to(message)
+
+        # Wait for a message to be saved, by listing for a post_save signal
+        # and fulfilling an awaitable Future
+        future = Future()
+
+        def post_save_handler(sender, instance, created, **kwargs):
+            # detected saving a Message
+            future.set_result(True)
+
+        post_save.connect(post_save_handler, sender=Message)
+
+        try:
+            # Do not wait forever, timeout after 2 seconds
+            await wait_for(future, timeout=timeout)
+        finally:
+            post_save.disconnect(post_save_handler, sender=Message)
+
+    @patch.object(Message, "handle")
+    def test_create_message_object(self, handle_mock: MagicMock):
+        # Need a sync function, or DB lookup fails with "connection closed"
+        data = self.data()
+        message: str = json.dumps(data)
+        handle_mock.return_value = None
+
+        async_to_sync(self.send_message)(message)
+
+        message_object = Message.objects.filter(uuid=data["uuid"]).first()
+        self.assertIsNotNone(message_object)
+        self.assertEqual(message_object.event, "test.answered")
+        self.assertEqual(message_object.data, {"type": "chat.message", **data})
+        handle_mock.assert_called_once()
+
+    @patch.object(Message, "handle")
+    def test_create_message_object_already_exists(self, handle_mock: MagicMock):
+        data = self.data()
+        message: str = json.dumps(data)
+        handle_mock.return_value = None
+        Message.objects.create(uuid=data["uuid"], event="test.answered", data=data)
+
+        # Message object already exists, so handle() should not be called
+        with self.assertRaises(TimeoutError):
+            async_to_sync(self.send_message)(message)
+        handle_mock.assert_not_called()
+
+    @patch.object(Message, "handle")
+    def test_unhandled_event(self, handle_mock: MagicMock):
+        data = self.data()
+        data["event"] = "other.event"
+        message: str = json.dumps(data)
+        handle_mock.return_value = None
+
+        # Message object already exists, so handle() should not be called
+        with self.assertRaises(TimeoutError):
+            async_to_sync(self.send_message)(message)
+        self.assertFalse(Message.objects.filter(uuid=data["uuid"]).exists())
+        handle_mock.assert_not_called()
