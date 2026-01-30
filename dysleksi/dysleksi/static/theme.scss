@@ -24,11 +24,10 @@ $student-yellow-dark: #685526;
 
 // Map "design names" to known Bootstrap variables
 $body-bg: $student-grey-lightest;
-$primary: $student-purple;
-$secondary: $student-grey-darker;
+$primary: $student-purple-light;
+$secondary: $student-grey-light;
 
 @import "./vendor/scss/bootstrap";
-@import "./vendor/fonts/phosphor/style.css";
 
 @font-face {
   font-family: "Andika Normal";
@@ -51,17 +50,16 @@ i {
   font-style: normal; /* avoid "double italicization" */
 }
 
-
 .erase-btn {
   background-color: $student-grey-light !important;
   color: black;
   border: 1px solid black !important;
   height: 4rem;
-  padding: 0 2rem;       
+  padding: 0 2rem;
   display: flex;
   align-items: center;
-  justify-content: center; 
-  margin: 0.5rem;    
+  justify-content: center;
+  margin: 0.5rem;
 
   .material-icons {
     font-size: 2.5rem;
@@ -83,10 +81,10 @@ i {
   font-size: 2rem;
   padding: 0.5rem 2rem;
   margin: 2rem auto;
-  display: flex; 
+  display: flex;
   border-radius: 50px;
 
-  align-items: center;    
+  align-items: center;
   justify-content: center;
 
 
@@ -102,10 +100,10 @@ i {
   font-size: 2rem;
   padding: 0.5rem 2rem;
   margin: 2rem auto;
-  display: flex; 
+  display: flex;
   display: none; // hidden until answer selected
 
-  align-items: center;  
+  align-items: center;
   justify-content: center;
 
   .material-icons {
@@ -123,7 +121,7 @@ i {
     margin: 0.5rem;
     width: 5rem;
     height: 4rem;
-    text-align: center; 
+    text-align: center;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -169,7 +167,7 @@ i {
 }
 
 #challenge-image {
-  display: block;  
+  display: block;
   margin: 1rem auto;
   height: 200px;
   object-fit: contain;

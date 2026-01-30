@@ -1,0 +1,80 @@
+{% extends "dysleksi/base.html" %}
+{% load static %}
+{% load i18n %}
+{% load compress %}
+
+{% block css %}
+{% compress css %}
+<link type="text/x-scss" href="{% static 'theme-admin.scss' %}" rel="stylesheet" media="screen">
+{% endcompress %}
+{% endblock %}
+
+{% block content %}
+<div class="main">
+    <button id="toggle-sidebar-nav" class="btn d-flex d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasResponsive" aria-controls="offcanvasResponsive">
+        <i class="ph ph-list"></i>
+    </button>
+    <div class="navigation offcanvas-md offcanvas-start" tabindex="-1" id="offcanvasResponsive" aria-labelledby="offcanvasResponsiveLabel">
+        <div class="offcanvas-header justify-content-end">
+            <button type="button" class="btn ph-fill ph-caret-line-left" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasResponsive" aria-label="{% translate 'Luk' %}"></button>
+        </div>
+        <div class="offcanvas-body">
+            <nav class="navbar">
+                <div class="navbar-nav">
+                    <a class="nav-link mb-3 active" aria-current="page" href="#">
+                        <i class="ph-fill ph-notebook fs-5"></i>
+                        <span>{% translate "Tests" %}</span>
+                    </a>
+                    <a class="nav-link mb-3" href="#">
+                        <i class="ph-fill ph-users-three fs-5"></i>
+                        <span>{% translate "Klasser" %}</span>
+                    </a>
+                    <a class="nav-link mb-3" href="#">
+                        <i class="ph-fill ph-user-rectangle fs-5"></i>
+                        <span>{% translate "Elever" %}</span>
+                    </a>
+                </div>
+            </nav>
+            <nav id="user" class="navbar d-flex pt-3">
+                <div class="navbar-nav">
+                    <a class="nav-link" href="#">
+                        <i class="ph-fill ph-user-circle fs-5"></i>
+                        <span>Navn Navnesen</span>
+                    </a>
+                </div>
+                <a id="logout" class="btn mb-3" href="#">
+                    <i class="ph-fill ph-sign-out fs-5"></i>
+                    <span>{% translate "Log ud" %}</span>
+                </a>
+            </nav>
+        </div>
+    </div>
+
+    <div class="content d-flex">
+        Content goes here ...
+    </div>
+</div>
+{% endblock %}
+
+{% block js_module %}
+<script type="importmap">
+    {
+        "imports": {
+            "@popperjs/core": "{% static 'vendor/js/popper/popper.esm.min.js' %}",
+            "bootstrap": "{% static 'vendor/js/bootstrap/bootstrap.esm.min.js' %}"
+        }
+    }
+</script>
+<script type="module">
+    // This import uses the import map defined above
+    import * as bootstrap from 'bootstrap';
+
+    document.addEventListener(
+        "DOMContentLoaded",
+        function (e) {
+            const bsOffcanvas = new bootstrap.Offcanvas('#offcanvasResponsive');
+            bsOffcanvas.hide();
+        }
+    );
+</script>
+{% endblock %}

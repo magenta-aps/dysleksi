@@ -1,0 +1,127 @@
+// "Design names"
+$other-grey-light: #efefef;
+$other-grey-medium: #bbbbbb;
+$other-grey: #888888;
+
+// Define our own constants
+$sidebar-navigation-min-width: 15rem;
+$sidebar-navigation-med-width: 10vw;
+$sidebar-navigation-max-width: 20vw;
+
+// Map "design names" to known Bootstrap variables
+$body-tertiary-bg: $other-grey-light;
+
+// Reset other relevant Bootstrap variables
+$offcanvas-horizontal-width: $sidebar-navigation-max-width;
+$offcanvas-bg-color: $other-grey-light;
+$offcanvas-backdrop-bg: $other-grey-medium;
+$offcanvas-border-width: none;
+$offcanvas-padding-x: 0;
+$offcanvas-padding-y: 0;
+
+@import "./vendor/scss/bootstrap";
+@import "./vendor/fonts/phosphor/regular/style.css";
+@import "./vendor/fonts/phosphor/fill/style.css";
+
+@font-face {
+  font-family: "Figtree Normal";
+  font-weight: normal;
+  src: url("./vendor/fonts/figtree/Figtree-VariableFont_wght.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Figtree Italic";
+  font-weight: normal;
+  src: url("./vendor/fonts/figtree/Figtree-Italic-VariableFont_wght.ttf") format("truetype");
+}
+
+body {
+  font-family: "Figtree Normal", "Helvetica", sans-serif;
+}
+
+i {
+  font-family: "Figtree Italic", "Helvetica", sans-serif;
+  font-style: normal; /* avoid "double italicization" */
+}
+
+// Layout when sidebar navigation is expanded to full size
+.main {
+  display: flex;
+  flex-flow: row nowrap;
+}
+.main #toggle-sidebar-nav:active {
+  border-color: transparent;
+}
+.main .content {
+  flex-grow: 10;
+  padding: $spacer;
+}
+.main .navigation {
+  display: flex;
+  flex-flow: column nowrap;
+  box-sizing: border-box;
+  overflow: clip;
+  width: $sidebar-navigation-max-width;
+  height: 100vh;
+  background: $other-grey-light !important;
+}
+.main .navigation .offcanvas-body {
+  display: flex;
+  flex-flow: column nowrap;
+  flex-grow: 1;
+  justify-content: space-between;
+}
+.main .navigation nav {
+  padding: $spacer;
+}
+.main .navigation a.nav-link {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+.main .navigation a.nav-link i.ph-fill {
+  margin-right: 0.25 * $spacer;
+}
+.main .navigation nav#user {
+  flex-flow: column nowrap;
+  align-items: stretch;
+  border-top: 1px solid $other-grey-medium;
+}
+.main .navigation nav#user .navbar-nav {
+  margin-left: $spacer;
+}
+.main .navigation a#logout {
+  text-align: left;
+  border-radius: 10 * $spacer;
+  border-color: $other-grey-medium;
+}
+
+@include media-breakpoint-down(lg) {
+  // Layout where sidebar navigation is "medium size"
+  // and sidebar is not manually expanded
+  .main .navigation:not(.show,.showing) {
+    width: $sidebar-navigation-med-width;
+  }
+  .main .navigation:not(.show,.showing) nav {
+    justify-content: center;
+  }
+  .main .navigation:not(.show,.showing) a span {
+    display: none;
+  }
+}
+
+@include media-breakpoint-down(md) {
+  // Layout when sidebar navigation is collapsed
+  .main {
+    flex-direction: column;
+  }
+  .main #toggle-sidebar-nav {
+    align-items: start;
+  }
+  .main .content {
+    flex: max-content;
+  }
+  .main .navigation {
+    min-width: $sidebar-navigation-min-width;
+  }
+}
