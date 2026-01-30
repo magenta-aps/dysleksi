@@ -6,9 +6,15 @@ from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.views import View
 
-from dysleksi.models import Test, TestType, User
+from dysleksi.models import Student, Test, TestType, User
 from dysleksi.tests.base import DysleksiTest
-from dysleksi.views import ClassListView, RoomView, RootView, UserTypeMixin
+from dysleksi.views import (
+    ClassListView,
+    RoomView,
+    RootView,
+    StudentListView,
+    UserTypeMixin,
+)
 
 
 class TestUserTypeMixin(DysleksiTest):
@@ -99,6 +105,31 @@ class TestClassListView(DysleksiTest):
         self.assertQuerySetEqual(
             response.context_data["object_list"], self.teacher.classes.all()
         )
+
+    def test_student_view(self):
+        self.client.force_login(self.student)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+
+class TestStudentListView(DysleksiTest):
+
+    url = reverse("dysleksi:student_list")
+
+    def test_get_template_names(self):
+        view = self.setup_view(StudentListView, self.teacher)
+        self.assertEqual(
+            view.get_template_names()[0], "dysleksi/admin/student/list.html"
+        )
+
+    def test_teacher_view(self):
+        view = self.setup_view(StudentListView, self.teacher)
+        expected_objs = Student.objects.filter(klasse__teachers=self.teacher)
+        self.assertQuerySetEqual(view.get_context_data()["object_list"], expected_objs)
+        self.client.force_login(self.teacher)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerySetEqual(response.context_data["object_list"], expected_objs)
 
     def test_student_view(self):
         self.client.force_login(self.student)
