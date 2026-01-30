@@ -86,7 +86,7 @@ class TestClassListView(DysleksiTest):
 
     def test_get_template_names(self):
         view = self.setup_view(ClassListView, self.teacher)
-        self.assertEqual(view.get_template_names()[0], "dysleksi/class/list.html")
+        self.assertEqual(view.get_template_names()[0], "dysleksi/admin/class/list.html")
 
     def test_teacher_view(self):
         view = self.setup_view(ClassListView, self.teacher)
