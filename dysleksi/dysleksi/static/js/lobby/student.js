@@ -13,6 +13,7 @@ function initRedirectSocket(roomName) {
 
     chatSocket.addEventListener("open", () => {
         chatSocket.send(JSON.stringify({
+            uuid: crypto.randomUUID(),
             event: "student.ready",
             roomName: roomName
         }));    

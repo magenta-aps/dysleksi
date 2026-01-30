@@ -78,9 +78,10 @@ export function initTeacher(roomName, testContents) {
                 chatSocket.send(
                     JSON.stringify(
                         {
-                            'event': 'test.' + val,
-                            'id': roomName,
-                            'index': testIndex,
+                            uuid: crypto.randomUUID(),
+                            event: 'test.' + val,
+                            id: roomName,
+                            index: testIndex,
                         }
                     )
                 )

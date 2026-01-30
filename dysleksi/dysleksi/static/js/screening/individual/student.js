@@ -15,6 +15,7 @@ export function initStudent(roomName, testContents) {
         await testMediaRecorder.setup().catch(err => {
             console.error("Cannot start audio recording:", err);
             chatSocket.send(JSON.stringify({
+                uuid: crypto.randomUUID(),
                 event: 'setup.error',
                 id: roomName,
                 index: testIndex,

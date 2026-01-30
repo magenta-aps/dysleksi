@@ -186,6 +186,7 @@ describe('getWebSocket', () => {
             );
         }
         expect(test.send).toHaveBeenCalledWith({
+            uuid: expect.any(String),
             event: "test.displayed",
             part: part.index,
             question: question.index,
@@ -223,6 +224,7 @@ describe('getWebSocket', () => {
         question.onComplete();
 
         expect(test.send).toHaveBeenCalledWith({
+            uuid: expect.any(String),
             event: "test.answered",
             message: `Elev har gennemført spørgsmål 1`,
             choice: secondAnswer.id,
@@ -300,6 +302,7 @@ describe('getWebSocket', () => {
         expect(test.onComplete).toHaveBeenCalled();
         expect(domElements.hideInstructions).toHaveBeenCalled();
         expect(test.send).toHaveBeenCalledWith({
+            uuid: expect.any(String),
             event: "test.completed",
             message: "Testen er afsluttet",
             id: test.roomName,
