@@ -57,8 +57,8 @@ export function initTeacher(roomName, testContents) {
 
         const data = JSON.parse(e.data);
         if (data.event.match(/test.(answered|displayed)/)) {
-            const test = tests[data.question];
-            testIndex = data.question;
+            const test = tests[data.questionIndex];
+            testIndex = data.questionIndex;
             updateTable(data, test);
 
             // Allow teacher to mark an audio recording question correct, wrong or skipped
@@ -81,7 +81,7 @@ export function initTeacher(roomName, testContents) {
                             uuid: crypto.randomUUID(),
                             event: 'test.' + val,
                             id: roomName,
-                            index: testIndex,
+                            questionIndex: testIndex,
                         }
                     )
                 )
