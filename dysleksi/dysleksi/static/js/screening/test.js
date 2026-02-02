@@ -345,12 +345,16 @@ class Question {
         this.possibleAnswers = data.possible_answers.map(dataItem => new PossibleAnswer(dataItem, this));
     }
 
+    questionTitle() {
+        return `${this.index + 1}/${this.part.questionsCount()} (${this.part.name})`;
+    }
+
     show() {
         console.log("---------------------------------------------")
         console.log("Showing question " + this.part.index+"."+this.index);
         this.displayedAt = document.timeline.currentTime;
         this.selectedChoice = null;
-        this.domElements.showQuestionTitle(`${this.index + 1}/${this.part.questionsCount()} (${this.part.name})`);
+        this.domElements.showQuestionTitle(this.questionTitle());
         this.domElements.showQuestionChallenge(this.challengeText, this.challengeSoundUrl, this.challengeImageUrl);
     }
 
@@ -362,6 +366,7 @@ class Question {
             questionIndex: this.index,
             questionId: this.id,
             displayedAt: this.displayedAt,
+            questionTitle: this.questionTitle(),
         });
     }
 
@@ -436,6 +441,7 @@ class GroupQuestion extends Question {
                 partId: this.part.id,
                 questionIndex: this.index,
                 questionId: this.id,
+                questionTitle: this.questionTitle(),
                 displayedAt: this.displayedAt,
                 answeredAt: this.answeredAt,
                 duration: duration,
@@ -475,6 +481,7 @@ class IndividualQuestion extends Question {
             partId: this.part.id,
             questionIndex: this.index,
             questionId: this.id,
+            questionTitle: this.questionTitle(),
             displayedAt: this.displayedAt,
             answeredAt: this.answeredAt,
             duration: duration

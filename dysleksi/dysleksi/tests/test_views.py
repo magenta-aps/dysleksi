@@ -67,9 +67,9 @@ class TestRoomView(DysleksiTest):
 
     def test_get_template_names(self):
         cases: list[tuple[User, str | None]] = [
-            (self.teacher, "dysleksi/screening/individual/teacher.html", "student_123"),
+            (self.teacher, "dysleksi/screening/teacher.html", "student_123"),
             (self.student, "dysleksi/screening/individual/student.html", "student_123"),
-            (self.teacher, "dysleksi/screening/group/teacher.html", "class_123"),
+            (self.teacher, "dysleksi/screening/teacher.html", "class_123"),
             (self.student, "dysleksi/screening/group/student.html", "class_123"),
         ]
         for user, template_name, room_name in cases:

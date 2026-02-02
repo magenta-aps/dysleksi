@@ -54,12 +54,17 @@ class RootView(UserTypeMixin, TemplateView):
 
 class RoomView(UserTypeMixin, TemplateView):
     def get_template_prefix(self) -> str:
-        return f"dysleksi/screening/{self.get_room_type()}"
+        if self.user.is_teacher:
+            return "dysleksi/screening"
+        if self.user.is_student:
+            return f"dysleksi/screening/{self.get_room_type()}"
+        return ""  # pragma: no cover
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         test = Test.objects.get(pk=self.kwargs["test_id"])
         context["test_contents"] = test.to_json()
+        context["test_type"] = self.get_room_type()
         return context
 
     def get_room_type(self) -> str:

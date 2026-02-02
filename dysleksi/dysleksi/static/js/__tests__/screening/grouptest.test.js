@@ -192,6 +192,7 @@ describe('getWebSocket', () => {
             partId: part.id,
             questionIndex: question.index,
             questionId: question.id,
+            questionTitle: question.questionTitle(),
             displayedAt: 0,
             id: test.roomName,
         })
@@ -235,6 +236,7 @@ describe('getWebSocket', () => {
             partId: part.id,
             questionIndex: question.index,
             questionId: question.id,
+            questionTitle: question.questionTitle(),
             displayedAt: 0,
             answeredAt: 0,
             duration: "0.0",
