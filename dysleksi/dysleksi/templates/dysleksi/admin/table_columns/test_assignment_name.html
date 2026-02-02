@@ -1,0 +1,7 @@
+{% if record.student %}
+{{ record.student.get_full_name }}
+{% else %}
+{{ record.klasse.name }}
+{% endif %}
+-
+{{ record.test }}

@@ -15,9 +15,11 @@ from dysleksi.models import (
     Student,
     Teacher,
     Test,
+    TestAssignment,
     TestPart,
     TestQuestion,
     TestResource,
+    TestResponse,
     TestType,
     User,
 )
@@ -99,6 +101,23 @@ class DysleksiTest(TestCase):
 
         cls.klasse, _ = Class.objects.get_or_create(start_year=2025, letter="A")
         cls.teacher.classes.add(cls.klasse)
+        for student in ("elev1", "elev2"):
+            cls.klasse.student_set.add(cls.create_student(student))
+
+        cls.test_assignment_student, _ = TestAssignment.objects.get_or_create(
+            test=cls.test,  # individual test
+            teacher=cls.teacher,
+            student=cls.student,
+        )
+        cls.test_assignment_class, _ = TestAssignment.objects.get_or_create(
+            test=cls.group_test,
+            teacher=cls.teacher,
+            klasse=cls.klasse,
+        )
+        cls.test_response_class, _ = TestResponse.objects.get_or_create(
+            assignment=cls.test_assignment_class,
+            student=cls.klasse.student_set.first(),
+        )
 
     @classmethod
     def create_class(cls, start_year: int, letter: str) -> Class:

@@ -1,4 +1,5 @@
 // "Design names"
+$other-grey-lightest: #f9f9f9;
 $other-grey-light: #efefef;
 $other-grey-medium: #bbbbbb;
 $other-grey: #888888;
@@ -9,7 +10,7 @@ $sidebar-navigation-med-width: 10vw;
 $sidebar-navigation-max-width: 20vw;
 
 // Map "design names" to known Bootstrap variables
-$body-tertiary-bg: $other-grey-light;
+$body-bg: $other-grey-lightest;
 
 // Reset other relevant Bootstrap variables
 $offcanvas-horizontal-width: $sidebar-navigation-max-width;
@@ -18,6 +19,7 @@ $offcanvas-backdrop-bg: $other-grey-medium;
 $offcanvas-border-width: none;
 $offcanvas-padding-x: 0;
 $offcanvas-padding-y: 0;
+$btn-border-radius: 5rem;
 
 @import "./vendor/scss/bootstrap";
 @import "./vendor/fonts/phosphor/regular/style.css";
@@ -54,6 +56,8 @@ i {
 }
 .main .content {
   flex-grow: 10;
+  height: 100vh;
+  overflow: scroll;
   padding: $spacer;
 }
 .main .navigation {
@@ -78,6 +82,11 @@ i {
   display: flex;
   flex-direction: row;
   align-items: center;
+  padding: 0.5 * $spacer;
+}
+.main .navigation a.nav-link.active {
+  background: $other-grey-medium;
+  border-radius: $spacer;
 }
 .main .navigation a.nav-link i.ph-fill {
   margin-right: 0.25 * $spacer;
@@ -124,4 +133,59 @@ i {
   .main .navigation {
     min-width: $sidebar-navigation-min-width;
   }
+}
+
+// Table styles
+.table-container {
+  overflow: hidden !important;
+  padding: $spacer;
+  background-color: $white;
+  border-radius: $spacer;
+  box-shadow: 0 0 $spacer $other-grey-light;
+}
+.table tr {
+  vertical-align: middle;
+}
+.table th {
+  white-space: nowrap;
+  width: 1%;
+  padding: $spacer $spacer 0.5 * $spacer $spacer;
+  background-color: $white;
+  text-transform: uppercase;
+}
+.table th a {
+  text-decoration: none;
+}
+.table th.orderable a::after {
+  font-family: "Phosphor-Fill";
+  content: "\e140";  // `caret-up-down`
+  color: $other-grey;
+  float: right;
+  vertical-align: bottom;
+}
+.table th.orderable.asc a::after {
+  font-family: "Phosphor-Fill";
+  content: "\e13c";  // `caret-up`
+}
+.table th.orderable.desc a::after {
+  font-family: "Phosphor-Fill";
+  content: "\e136";  // `caret-down`
+}
+.table td {
+  white-space: nowrap;
+  width: 1%;
+  padding: $spacer;
+  background-color: $white;
+  vertical-align: middle;
+}
+// Forces all table headers to be `black`
+.table > :not(caption) > * > th {
+  color: $black;
+}
+// ...and the headers that act as links (sorting)
+.table > :not(caption) > * > th > a {
+  color: $black;
+}
+table tbody > tr:last-child > td {
+  border-bottom: 0;
 }

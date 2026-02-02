@@ -6,12 +6,13 @@ from django.urls import URLPattern, URLResolver, path
 from django.views.generic import TemplateView
 
 from dysleksi.views import (
-    AdminRootView,
     ClassListView,
     RoomView,
     RootView,
     StartGroupRoomView,
     StartIndividualRoomView,
+    StudentListView,
+    TestAssignmentListView,
 )
 
 app_name = "dysleksi"
@@ -25,9 +26,14 @@ urlpatterns: list[URLResolver | URLPattern] = [
     ),
     path("room/group/setup/", StartGroupRoomView.as_view(), name="start_group_room"),
     path("room/<str:room_name>/<int:test_id>/", RoomView.as_view(), name="room"),
-    path("class/", ClassListView.as_view(), name="class_list"),
     path(
         "exit/", TemplateView.as_view(template_name="dysleksi/exit.html"), name="exit"
     ),
-    path("admin/", AdminRootView.as_view(), name="admin_base"),
+    path("admin/classes/", ClassListView.as_view(), name="class_list"),
+    path("admin/students/", StudentListView.as_view(), name="student_list"),
+    path(
+        "admin/test-assignments/",
+        TestAssignmentListView.as_view(),
+        name="test_assignment_list",
+    ),
 ]

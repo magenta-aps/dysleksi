@@ -21,15 +21,15 @@
         <div class="offcanvas-body">
             <nav class="navbar">
                 <div class="navbar-nav">
-                    <a class="nav-link mb-3 active" aria-current="page" href="#">
+                    <a href="{% url 'dysleksi:test_assignment_list' %}" class="nav-link mb-3 {% if current_view == 'dysleksi:test_assignment_list' %}active{% endif %}">
                         <i class="ph-fill ph-notebook fs-5"></i>
                         <span>{% translate "Tests" %}</span>
                     </a>
-                    <a class="nav-link mb-3" href="#">
+                    <a href="{% url 'dysleksi:class_list' %}" class="nav-link mb-3 {% if current_view == 'dysleksi:class_list' %}active{% endif %}">
                         <i class="ph-fill ph-users-three fs-5"></i>
                         <span>{% translate "Klasser" %}</span>
                     </a>
-                    <a class="nav-link mb-3" href="#">
+                    <a href="{% url 'dysleksi:student_list' %}" class="nav-link mb-3 {% if current_view == 'dysleksi:student_list' %}active{% endif %}">
                         <i class="ph-fill ph-user-rectangle fs-5"></i>
                         <span>{% translate "Elever" %}</span>
                     </a>
@@ -50,8 +50,9 @@
         </div>
     </div>
 
-    <div class="content d-flex">
-        Content goes here ...
+    <div class="content">
+        {% block inner_content %}
+        {% endblock %}
     </div>
 </div>
 {% endblock %}
