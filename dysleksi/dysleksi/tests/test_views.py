@@ -6,13 +6,14 @@ from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.views import View
 
-from dysleksi.models import Student, Test, TestType, User
+from dysleksi.models import Student, Test, TestAssignment, TestType, User
 from dysleksi.tests.base import DysleksiTest
 from dysleksi.views import (
     ClassListView,
     RoomView,
     RootView,
     StudentListView,
+    TestAssignmentListView,
     UserTypeMixin,
 )
 
@@ -125,16 +126,68 @@ class TestStudentListView(DysleksiTest):
     def test_teacher_view(self):
         view = self.setup_view(StudentListView, self.teacher)
         expected_objs = Student.objects.filter(klasse__teachers=self.teacher)
-        self.assertQuerySetEqual(view.get_context_data()["object_list"], expected_objs)
+        self.assertQuerySetEqual(
+            view.get_context_data()["object_list"], expected_objs, ordered=False
+        )
         self.client.force_login(self.teacher)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertQuerySetEqual(response.context_data["object_list"], expected_objs)
+        self.assertQuerySetEqual(
+            response.context_data["object_list"], expected_objs, ordered=False
+        )
 
     def test_student_view(self):
         self.client.force_login(self.student)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
+
+
+class TestTestAssignmentListView(DysleksiTest):
+
+    url = reverse("dysleksi:test_assignment_list")
+
+    def test_get_template_names(self):
+        view = self.setup_view(TestAssignmentListView, self.teacher)
+        self.assertEqual(
+            view.get_template_names()[0], "dysleksi/admin/test_assignment/list.html"
+        )
+
+    def test_teacher_view(self):
+        view = self.setup_view(TestAssignmentListView, self.teacher)
+        expected_objs = TestAssignment.objects.filter(teacher=self.teacher)
+        self.assertQuerySetEqual(
+            view.get_context_data()["object_list"], expected_objs, ordered=False
+        )
+        self.client.force_login(self.teacher)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerySetEqual(
+            response.context_data["object_list"], expected_objs, ordered=False
+        )
+
+    def test_student_view(self):
+        self.client.force_login(self.student)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+    def test_queryset_annotations(self):
+        # Arrange
+        view = self.setup_view(TestAssignmentListView, self.teacher)
+        objs = view.get_context_data()["object_list"]
+        # Assert
+        self.assertQuerySetEqual(
+            objs,
+            [
+                (1, 0, "Afventer"),  # Individual student test assignment
+                (3, 1, "I gang"),  # Group test assignment
+            ],
+            ordered=False,
+            transform=lambda obj: (
+                obj.number_of_students,
+                obj.number_of_students_responded,
+                obj.status,
+            ),
+        )
 
 
 class TestStartRoomView(DysleksiTest):
