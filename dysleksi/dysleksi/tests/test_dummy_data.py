@@ -12,7 +12,7 @@ class DummyDataTest(TestCase):
     def test_dummy_data_creation(self):
         call_command("create_dummy_tests")
 
-        word_reading_2_tests = TestPart.objects.filter(name="Wordreading 2A (dummy)")
+        word_reading_2_tests = TestPart.objects.filter(name="Ordlæsning 2A (dummy)")
 
         # We expect 4 wordreading 2 tests; 1. grade does not need to do this test
         # Matches the for loops in the management command (2 grades, 2 periods)

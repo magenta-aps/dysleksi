@@ -17,10 +17,10 @@ from dysleksi.models import Test, TestPart, TestType
 
 def create_group_test(
     grade: Literal[1, 2, 3],
-    period: Literal["middle", "end"],
+    period: Literal["midt", "slut"],
 ):
 
-    name = f"{period} {grade}. grade".capitalize()
+    name = f"{period} {grade}. klasse".capitalize()
 
     wordreading_2a_data = [
         {
@@ -116,7 +116,7 @@ def create_group_test(
             test,
             wordspelling_data,
             wordspelling_practise_data,
-            name="Wordspelling (dummy)",
+            name="Ordstavning (dummy)",
         )
 
         # A wordreading 2 test with practice run
@@ -124,12 +124,12 @@ def create_group_test(
             test,
             wordreading_2a_data,
             wordreading_2a_practice_data,
-            name="Wordreading 2A (dummy)",
+            name="Ordlæsning 2A (dummy)",
         )
 
         # A wordreading 2 test without practice run
         create_wordreading_2_test(
-            test, wordreading_2b_data, None, name="Wordreading 2B (dummy)"
+            test, wordreading_2b_data, None, name="Ordlæsning 2B (dummy)"
         )
 
 
@@ -141,12 +141,12 @@ def create_individual_test():
     ]
 
     test, created = Test.objects.get_or_create(
-        name="Individual dummy test", test_type=TestType.INDIVIDUAL
+        name="Individuel test (dummy)", test_type=TestType.INDIVIDUAL
     )
 
     part, created = TestPart.objects.get_or_create(
         test=test,
-        name="Individual dummy testpart",
+        name="Individuel deltest (dummy)",
         defaults={
             "timeout": 60,
             "partial_score_after": 30,
@@ -162,7 +162,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         for grade in (1, 2, 3):
-            for period in ("middle", "end"):
+            for period in ("midt", "slut"):
                 create_group_test(grade, period)
 
         create_individual_test()

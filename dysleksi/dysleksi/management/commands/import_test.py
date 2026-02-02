@@ -64,6 +64,6 @@ class Command(BaseCommand):
             questions_data = json.load(f)
 
         test = Test.objects.get(name=name)
-        create_wordreading_2_test(test, questions_data)
+        create_wordreading_2_test(test, questions_data, questions_data[0:1])
 
         self.stdout.write(self.style.SUCCESS(f"Created test '{name}' from {json_path}"))

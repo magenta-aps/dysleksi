@@ -68,7 +68,7 @@ def create_test_resources(questions_data, part, is_practice=False):
 
 
 def create_wordreading_2_test(
-    test, questions_data, practice_questions_data=None, name="Wordreading 2"
+    test, questions_data, practice_questions_data=None, name="Ordlæsning 2"
 ):
     part, created = TestPart.objects.get_or_create(
         test=test,
@@ -85,7 +85,7 @@ def create_wordreading_2_test(
 
 
 def create_wordspelling_test(
-    test, questions_data, practice_questions_data=None, name="Wordspelling"
+    test, questions_data, practice_questions_data=None, name="Ordstavning"
 ):
     part, created = TestPart.objects.get_or_create(
         test=test,

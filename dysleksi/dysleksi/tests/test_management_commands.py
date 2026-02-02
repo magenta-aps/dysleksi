@@ -56,10 +56,10 @@ class ImportTestTest(TestCase):
         call_command("import_test", self.test_name, str(tmp_file_path))
 
         # Fetch the created TestPart
-        word_reading_2_test = TestPart.objects.get(name="Wordreading 2", test=self.test)
+        word_reading_2_test = TestPart.objects.get(name="Ordlæsning 2", test=self.test)
 
         # Assert we created all 5 questions
-        self.assertEqual(word_reading_2_test.questions.count(), 5)
+        self.assertEqual(word_reading_2_test.questions.count(), 6)
 
         # Clean up temporary file
         tmp_file_path.unlink()
