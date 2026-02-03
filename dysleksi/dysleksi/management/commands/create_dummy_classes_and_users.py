@@ -68,7 +68,7 @@ class Command(BaseCommand):
                 c.teachers.set([teacher])
 
         # Add students to classes
-        student.klasse = Class.objects.get(start_year=current_year, letter="A")
+        student.klasse = Class.objects.get(start_year=current_year - 2, letter="A")
         student.save()
 
         student2.klasse = Class.objects.get(start_year=current_year, letter="B")
