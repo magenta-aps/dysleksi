@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { EventTable, ActionButtons, TeacherView } from "../../screening/controlroom.js";
+import {EventTable, ActionButtons, TeacherView, NoteField} from "../../screening/controlroom.js";
 import * as wsModule from "../../screening/utils.js"; 
 
 vi.mock("../../screening/utils.js");
@@ -11,29 +11,31 @@ describe("TeacherView Test", () => {
   let socket;
   let table;
   let buttons;
+  let note;
 
   beforeEach(() => {
     document.body.innerHTML = `<table id="events"><tbody></tbody></table>
-                               <button id="btn1"></button>`;
+                               <button id="btn1"></button><textarea id="note"></textarea>`;
     table = new EventTable();
     buttons = new ActionButtons();
+    note = new NoteField();
 
     socket = {
       addEventListener: vi.fn(),
       send: vi.fn(),
     };
 
-    vi.spyOn(wsModule, "extractQuestions").mockReturnValue(["Q1", "Q2"]);
+    vi.spyOn(wsModule, "extractQuestions").mockReturnValue([{"questionId":1, "partId":1},{"questionId":2, "partId":1}]);
   });
 
   afterEach(() => {
-    vi.restoreAllMocks(); 
+    vi.restoreAllMocks();
   });
 
   it("initializes socket and button listeners", () => {
     const wsGetter = vi.fn().mockReturnValue(socket);
 
-    new TeacherView("room1", ["test1"], wsGetter, table, buttons);
+    new TeacherView("room1", ["test1"], 1, wsGetter, table, buttons);
 
     expect(wsGetter).toHaveBeenCalledWith("room1");
     expect(socket.addEventListener).toHaveBeenCalledWith(
@@ -44,7 +46,7 @@ describe("TeacherView Test", () => {
 
   it("enables buttons on question.displayed", () => {
     const wsGetter = vi.fn().mockReturnValue(socket);
-    const view = new TeacherView("room1", ["test1"], wsGetter, table, buttons);
+    const view = new TeacherView("room1", ["test1"], 1, wsGetter, table, buttons);
 
     // get the message handler registered on the socket
     const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
@@ -66,10 +68,18 @@ describe("TeacherView Test", () => {
   it("sends message and disables buttons on click", () => {
     vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
     const wsGetter = vi.fn().mockReturnValue(socket);
-    const view = new TeacherView("room1", ["test1"], wsGetter, table, buttons);
+    const view = new TeacherView(
+        "room1",
+        [{"id":1,"name":"part1","questions":[{"questionId":1,"partId":1},{"questionId":2,"partId":1}]}],
+        1, wsGetter, table, buttons, note
+    );
 
     // simulate displayed event to set testIndex
-    view.testIndex = 0;
+    view.questionIndex = 0;
+    view.question = {"questionId":1,"partId":1};
+
+    // Add data in note field
+    note.noteEl.value = "Test note";
 
     // click the button
     buttons.buttons[0].click();
@@ -79,6 +89,10 @@ describe("TeacherView Test", () => {
       event: "question.btn1",
       roomName: "room1",
       questionIndex: 0,
+      questionId: 1,
+      partId: 1,
+      assignmentId: 1,
+      note: "Test note",
     }));
 
     expect(buttons.buttons[0].classList.contains("disabled")).toBe(true);

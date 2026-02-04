@@ -482,7 +482,6 @@ class GroupQuestion extends Question {
 class IndividualQuestion extends Question {
 
     recordedAudio;
-    correct;
 
     constructor(data, part, index) {
         super(data, part, index);
@@ -510,15 +509,13 @@ class IndividualQuestion extends Question {
             questionTitle: this.questionTitle(),
             displayedAt: this.displayedAt,
             answeredAt: this.answeredAt,
-            duration: duration,
-            correct: this.correct
+            duration: duration
         });
         this.part.onQuestionComplete();
     }
 
     async teacherFeedback(outcome) {
         this.answeredAt = document.timeline.currentTime;
-        this.correct = outcome;
         this.recordedAudio = await this.part.test.mediaRecorder.interval();
         this.onComplete();
     }

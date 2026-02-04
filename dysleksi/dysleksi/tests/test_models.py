@@ -368,10 +368,15 @@ class TestMessage(DysleksiTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.assignment = TestAssignment.objects.create(
+        cls.individual_assignment = TestAssignment.objects.create(
             test=cls.test,
             teacher=cls.teacher,
             student=cls.student,
+        )
+        cls.group_assignment = TestAssignment.objects.create(
+            test=cls.group_test,
+            teacher=cls.teacher,
+            klasse=cls.klasse,
         )
 
     def test_question_answer(self):
@@ -379,7 +384,7 @@ class TestMessage(DysleksiTest):
             uuid=uuid4(),
             event="question.answered",
             data={
-                "assignmentId": self.assignment.pk,
+                "assignmentId": self.individual_assignment.pk,
                 "partId": self.part.pk,
                 "questionId": self.question1.pk,
                 "choiceId": self.possible_correct_answer1.pk,
@@ -389,7 +394,7 @@ class TestMessage(DysleksiTest):
         )
         message.handle()
         testresponse = TestResponse.objects.filter(
-            assignment__pk=self.assignment.pk,
+            assignment__pk=self.individual_assignment.pk,
             student__pk=self.student.pk,
         ).first()
         self.assertIsNotNone(testresponse)
@@ -419,7 +424,7 @@ class TestMessage(DysleksiTest):
             uuid=uuid4(),
             event="question.answered",
             data={
-                "assignmentId": self.assignment.pk,
+                "assignmentId": self.individual_assignment.pk,
                 "partId": self.part.pk,
                 "questionId": self.question1.pk,
                 "choiceId": self.possible_correct_answer1.pk,
@@ -432,7 +437,7 @@ class TestMessage(DysleksiTest):
         )
         message.handle()
         testresponse = TestResponse.objects.filter(
-            assignment__pk=self.assignment.pk,
+            assignment__pk=self.individual_assignment.pk,
             student__pk=self.student.pk,
         ).first()
         self.assertIsNotNone(testresponse)
@@ -444,7 +449,7 @@ class TestMessage(DysleksiTest):
         self.assertIsNotNone(partresponse)
 
         questionresponse = QuestionResponse.objects.filter(
-            partresponse__testresponse__assignment__pk=self.assignment.pk,
+            partresponse__testresponse__assignment__pk=self.individual_assignment.pk,
             partresponse__testresponse__student__pk=self.student.pk,
             partresponse__testpart=self.part,
             question__pk=self.question1.pk,
@@ -463,7 +468,7 @@ class TestMessage(DysleksiTest):
             uuid=uuid4(),
             event="question.answered",
             data={
-                "assignmentId": self.assignment.pk,
+                "assignmentId": self.individual_assignment.pk,
                 "partId": self.part.pk,
                 "choiceId": self.possible_correct_answer1.pk,
                 "duration": 10000,
@@ -478,7 +483,7 @@ class TestMessage(DysleksiTest):
             uuid=uuid4(),
             event="part.complete",
             data={
-                "assignmentId": self.assignment.pk,
+                "assignmentId": self.individual_assignment.pk,
                 "partIndex": 0,
                 "partId": self.part.pk,
                 "duration": 10000,
@@ -487,7 +492,7 @@ class TestMessage(DysleksiTest):
         )
         message.handle()
         testresponse = TestResponse.objects.filter(
-            assignment=self.assignment,
+            assignment=self.individual_assignment,
             student=self.student,
         ).first()
         self.assertIsNotNone(testresponse)
@@ -504,7 +509,7 @@ class TestMessage(DysleksiTest):
             uuid=uuid4(),
             event="part.complete",
             data={
-                "assignmentId": self.assignment.pk,
+                "assignmentId": self.individual_assignment.pk,
                 "partIndex": 0,
                 "duration": 10000,
             },
@@ -518,13 +523,13 @@ class TestMessage(DysleksiTest):
             uuid=uuid4(),
             event="test.complete",
             data={
-                "assignmentId": self.assignment.pk,
+                "assignmentId": self.individual_assignment.pk,
             },
             user=self.student,
         )
         message.handle()
         testresponse = TestResponse.objects.filter(
-            assignment=self.assignment,
+            assignment=self.individual_assignment,
             student=self.student,
         ).first()
         self.assertIsNotNone(testresponse)
@@ -539,3 +544,30 @@ class TestMessage(DysleksiTest):
         )
         message.handle()
         self.assertEqual(message.error, f"No assignmentId in message {message.uuid}")
+
+    def test_student_from_assignment(self):
+        message = Message.objects.create(
+            uuid=uuid4(),
+            event="test.event",
+            data={"assignmentId": self.individual_assignment.pk},
+            user=self.teacher,
+        )
+        self.assertEqual(message.student, self.student)
+
+    def test_student_from_message(self):
+        message = Message.objects.create(
+            uuid=uuid4(),
+            event="test.event",
+            data={"assignmentId": self.group_assignment.pk},
+            user=self.student,
+        )
+        self.assertEqual(message.student, self.student)
+
+    def test_no_student(self):
+        message = Message.objects.create(
+            uuid=uuid4(),
+            event="test.event",
+            data={"assignmentId": self.group_assignment.pk},
+            user=self.teacher,
+        )
+        self.assertIsNone(message.student)

@@ -29,7 +29,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         initStudent(roomName, assignmentId, testContents);
     }
     if (role === "teacher") {
-        initTeacher(roomName, testContents);             
+        initTeacher(roomName, assignmentId, testContents);
         startSession(roomName); 
     }
 });
