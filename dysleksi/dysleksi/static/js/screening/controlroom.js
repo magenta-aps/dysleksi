@@ -85,8 +85,56 @@ export class NoteField {
     }
 }
 
+export class QuestionView {
+    containerElement;
+    titleElement;
+    contentElement;
+    constructor(containerSelector="#question-container", titleSelector = '#question-title', contentSelector = '#question-content') {
+        this.containerElement = document.querySelector(containerSelector);
+        this.titleElement = document.querySelector(titleSelector);
+        this.contentElement = document.querySelector(contentSelector);
+    }
+
+    show() {
+        this.containerElement.classList.toggle('d-none', false);
+    }
+
+    showTitle(titleText) {
+        this.titleElement.textContent = titleText;
+    }
+
+    showContent(contentText, contentImageUrl) {
+        let img = document.querySelector("#challenge-image");
+        if (contentImageUrl) {
+            if (!img) {
+                img = document.createElement("img");
+                img.id = "challenge-image";
+                this.contentElement.append(img);
+            }
+            img.src = contentImageUrl;
+        } else {
+            if (img) {
+                img.remove();
+            }
+        }
+        let txt = document.querySelector("#challenge-text");
+        if (contentText) {
+            if (!txt) {
+                txt = document.createElement("p");
+                txt.id = "challenge-text";
+                this.contentElement.append(txt);
+            }
+            txt.textContent = contentText || "";
+        } else {
+            if (txt) {
+                txt.remove();
+            }
+        }
+    }
+}
+
 export class TeacherView {
-    constructor(roomName, testContents, assignmentId, wsGetter, table, buttons, noteField) {
+    constructor(roomName, testContents, assignmentId, wsGetter, table, buttons, noteField, questionView) {
         this.assignmentId = assignmentId;
         this.roomName = roomName;
         this.chatSocket = wsGetter(roomName);
@@ -96,6 +144,7 @@ export class TeacherView {
         this.table = table || new EventTable();
         this.buttons = buttons || new ActionButtons();
         this.noteField = noteField || new NoteField();
+        this.questionView = questionView || new QuestionView();
 
         this._initSocket();
         this._initButtonListeners();
@@ -112,6 +161,7 @@ export class TeacherView {
                 this.table.updateTable(data, question);
                 if (data.event === 'question.displayed') {
                     this.buttons.enableButtons();
+                    this.showQuestion(question);
                 }
             }
         });
@@ -137,9 +187,20 @@ export class TeacherView {
                 );
                 this.buttons.disableButtons();
                 this.noteField.clearNote();
+                this.hideQuestion();
             } else {
                 console.error('invalid question index', this.questionIndex);
             }
         });
+    }
+
+    showQuestion(question) {
+        this.questionView.showTitle(`${this.questionIndex + 1}/${this.questions.length} (${question.partName})`);
+        this.questionView.showContent(question.challengeText, question.challengeImageUrl);
+    }
+
+    hideQuestion() {
+        this.questionView.showTitle('');
+        this.questionView.showContent('');
     }
 }
