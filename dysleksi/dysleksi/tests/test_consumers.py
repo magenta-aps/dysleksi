@@ -12,15 +12,39 @@ from channels.auth import AuthMiddlewareStack
 from channels.routing import URLRouter
 from channels.testing import WebsocketCommunicator
 from channels_redis.core import RedisChannelLayer
+from django.contrib.auth.models import AnonymousUser, Group
 from django.core.cache import caches
 from django.db.models.signals import post_save
 from django.test import TestCase, TransactionTestCase
 
-from dysleksi.models import Message
+from dysleksi.models import STUDENTS, Message, Student
 from dysleksi.routing import websocket_urlpatterns
 
 
 class TestChatConsumer(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        Group.objects.get_or_create(name=STUDENTS)
+        cls.test_user = cls.create_student("TestUser")
+
+    @classmethod
+    def create_student(cls, username: str, **kwargs) -> Student:
+        student, _ = Student.objects.get_or_create(
+            username=username,
+            defaults=kwargs,
+        )
+        return student
+
+    async def _get_communicator(self) -> WebsocketCommunicator:
+        # This is the same definition as in `dysleksi.project.asgi`, but without the
+        # `AllowedHostsOriginValidator`, etc.
+        application = AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
+        communicator = WebsocketCommunicator(application, "/ws/chat/1234/")
+        communicator.scope["user"] = self.test_user
+        return communicator
+
     async def test_connect(self):
         communicator = await self._get_communicator()
         connected, subprotocol = await communicator.connect()
@@ -36,12 +60,10 @@ class TestChatConsumer(TestCase):
         self.assertEqual(response, message)
         await communicator.disconnect()
 
-    async def _get_communicator(self) -> WebsocketCommunicator:
-        # This is the same definition as in `dysleksi.project.asgi`, but without the
-        # `AllowedHostsOriginValidator`, etc.
-        application = AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
-        communicator = WebsocketCommunicator(application, "/ws/chat/1234/")
-        return communicator
+    async def test_broadcasts_no_user(self):
+        communicator = await self._get_communicator()
+        communicator.scope["user"] = AnonymousUser()
+        await communicator.connect()
 
     async def test_send_cached_messages(self):
         with (
@@ -100,20 +122,36 @@ class TestChatConsumer(TestCase):
 
 
 class TestChatConsumerMessageIntegration(TransactionTestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        Group.objects.get_or_create(name=STUDENTS)
+        cls.test_user = cls.create_student("TestUser")
+
+    @classmethod
+    def create_student(cls, username: str, **kwargs) -> Student:
+        student, _ = Student.objects.get_or_create(
+            username=username,
+            defaults=kwargs,
+        )
+        return student
+
     async def _get_communicator(self) -> WebsocketCommunicator:
         # This is the same definition as in `dysleksi.project.asgi`, but without the
         # `AllowedHostsOriginValidator`, etc.
         application = AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
         communicator = WebsocketCommunicator(application, "/ws/chat/1234/")
+        communicator.scope["user"] = self.test_user
         return communicator
 
     def data(self):
         id = str(uuid.uuid4())
         return {
             "uuid": id,
-            "event": "test.answered",
+            "event": "question.answered",
             "message": "Elev har besvaret spørgsmål 1",
-            "choice": 2,
+            "choiceId": 2,
         }
 
     async def send_message(self, message: str, timeout: float = 2.0):
@@ -148,7 +186,7 @@ class TestChatConsumerMessageIntegration(TransactionTestCase):
 
         message_object = Message.objects.filter(uuid=data["uuid"]).first()
         self.assertIsNotNone(message_object)
-        self.assertEqual(message_object.event, "test.answered")
+        self.assertEqual(message_object.event, "question.answered")
         self.assertEqual(message_object.data, {"type": "chat.message", **data})
         handle_mock.assert_called_once()
 
@@ -156,8 +194,7 @@ class TestChatConsumerMessageIntegration(TransactionTestCase):
     def test_create_message_object_already_exists(self, handle_mock: MagicMock):
         data = self.data()
         message: str = json.dumps(data)
-        handle_mock.return_value = None
-        Message.objects.create(uuid=data["uuid"], event="test.answered", data=data)
+        Message.objects.create(uuid=data["uuid"], event="question.answered", data=data)
 
         # Message object already exists, so handle() should not be called
         with self.assertRaises(TimeoutError):

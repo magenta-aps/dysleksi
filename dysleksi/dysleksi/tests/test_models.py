@@ -1,13 +1,20 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
+import base64
+import os
+from uuid import uuid4
+
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
+from django.db.models.fields.files import FieldFile
 from freezegun import freeze_time
 
 from dysleksi.models import (
     STUDENTS,
     TEACHERS,
+    Message,
     PartResponse,
     PossibleAnswer,
     QuestionResponse,
@@ -194,7 +201,6 @@ class TestTestResponse(DysleksiTest):
                 student=student2,
             )
             response.full_clean()
-            print(response.assignment.klasse, response.student.klasse)
         exception: ValidationError = cm.exception
 
         self.assertEqual(
@@ -355,3 +361,181 @@ class TestTest(DysleksiTest):
             )
             self.assertEqual(ans_model.resource.text, ans_json["resource_text"])
             self.assertEqual(ans_model.is_correct, ans_json["is_correct"])
+
+
+class TestMessage(DysleksiTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.assignment = TestAssignment.objects.create(
+            test=cls.test,
+            teacher=cls.teacher,
+            student=cls.student,
+        )
+
+    def test_question_answer(self):
+        message = Message.objects.create(
+            uuid=uuid4(),
+            event="question.answered",
+            data={
+                "assignmentId": self.assignment.pk,
+                "partId": self.part.pk,
+                "questionId": self.question1.pk,
+                "choiceId": self.possible_correct_answer1.pk,
+                "duration": 10000,
+            },
+            user=self.student,
+        )
+        message.handle()
+        testresponse = TestResponse.objects.filter(
+            assignment__pk=self.assignment.pk,
+            student__pk=self.student.pk,
+        ).first()
+        self.assertIsNotNone(testresponse)
+
+        partresponse = PartResponse.objects.filter(
+            testresponse=testresponse,
+            testpart=self.part,
+        ).first()
+        self.assertIsNotNone(partresponse)
+
+        questionresponse = QuestionResponse.objects.filter(
+            partresponse=partresponse,
+            question__pk=self.question1.pk,
+        ).first()
+        self.assertIsNotNone(questionresponse)
+
+        self.assertEqual(questionresponse.answer_option, self.possible_correct_answer1)
+        self.assertTrue(questionresponse.correct)
+
+    def test_question_answer_with_sound(self):
+        with open(
+            os.path.join(settings.MEDIA_ROOT, "wordspelling_dummy", "iki.mp3"), "rb"
+        ) as file:
+            sounddata: bytes = file.read()
+            sound_base64 = base64.b64encode(sounddata).decode("utf-8")
+        message = Message.objects.create(
+            uuid=uuid4(),
+            event="question.answered",
+            data={
+                "assignmentId": self.assignment.pk,
+                "partId": self.part.pk,
+                "questionId": self.question1.pk,
+                "choiceId": self.possible_correct_answer1.pk,
+                "duration": 10000,
+                "recordingBase64": (
+                    f'data:audio/mp3; codecs="mpeg, mp4a.40.2";base64,{sound_base64}'
+                ),
+            },
+            user=self.student,
+        )
+        message.handle()
+        testresponse = TestResponse.objects.filter(
+            assignment__pk=self.assignment.pk,
+            student__pk=self.student.pk,
+        ).first()
+        self.assertIsNotNone(testresponse)
+
+        partresponse = PartResponse.objects.filter(
+            testresponse=testresponse,
+            testpart=self.part,
+        ).first()
+        self.assertIsNotNone(partresponse)
+
+        questionresponse = QuestionResponse.objects.filter(
+            partresponse__testresponse__assignment__pk=self.assignment.pk,
+            partresponse__testresponse__student__pk=self.student.pk,
+            partresponse__testpart=self.part,
+            question__pk=self.question1.pk,
+        ).first()
+        self.assertIsNotNone(questionresponse)
+        answer_sound = questionresponse.answer_sound
+        self.assertIsNotNone(answer_sound)
+        self.assertEqual(type(answer_sound), FieldFile)
+        self.assertEqual(answer_sound.size, 8384)
+        with answer_sound.open() as file:
+            answer_sound_data: bytes = file.read()
+        self.assertEqual(answer_sound_data, sounddata)
+
+    def test_question_missing_id(self):
+        message = Message.objects.create(
+            uuid=uuid4(),
+            event="question.answered",
+            data={
+                "assignmentId": self.assignment.pk,
+                "partId": self.part.pk,
+                "choiceId": self.possible_correct_answer1.pk,
+                "duration": 10000,
+            },
+            user=self.student,
+        )
+        message.handle()
+        self.assertEqual(message.error, f"No questionId in message {message.uuid}")
+
+    def test_part_complete(self):
+        message = Message.objects.create(
+            uuid=uuid4(),
+            event="part.complete",
+            data={
+                "assignmentId": self.assignment.pk,
+                "partIndex": 0,
+                "partId": self.part.pk,
+                "duration": 10000,
+            },
+            user=self.student,
+        )
+        message.handle()
+        testresponse = TestResponse.objects.filter(
+            assignment=self.assignment,
+            student=self.student,
+        ).first()
+        self.assertIsNotNone(testresponse)
+
+        partresponse = PartResponse.objects.filter(
+            testresponse=testresponse,
+            testpart=self.part,
+        ).first()
+        self.assertIsNotNone(partresponse)
+        self.assertEqual(partresponse.finished_after, 10000)
+
+    def test_part_missing_id(self):
+        message = Message.objects.create(
+            uuid=uuid4(),
+            event="part.complete",
+            data={
+                "assignmentId": self.assignment.pk,
+                "partIndex": 0,
+                "duration": 10000,
+            },
+            user=self.student,
+        )
+        message.handle()
+        self.assertEqual(message.error, f"No partId in message {message.uuid}")
+
+    def test_test_complete(self):
+        message = Message.objects.create(
+            uuid=uuid4(),
+            event="test.complete",
+            data={
+                "assignmentId": self.assignment.pk,
+            },
+            user=self.student,
+        )
+        message.handle()
+        testresponse = TestResponse.objects.filter(
+            assignment=self.assignment,
+            student=self.student,
+        ).first()
+        self.assertIsNotNone(testresponse)
+        self.assertTrue(testresponse.completed)
+
+    def test_test_missing_id(self):
+        message = Message.objects.create(
+            uuid=uuid4(),
+            event="test.complete",
+            data={},
+            user=self.student,
+        )
+        message.handle()
+        self.assertEqual(message.error, f"No assignmentId in message {message.uuid}")

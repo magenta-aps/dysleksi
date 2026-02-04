@@ -4,7 +4,7 @@ import { TestMediaRecorder } from "../media.js"
 import { IndividualTest } from "../test.js"
 
 
-export function initStudent(roomName, testContents) {
+export function initStudent(roomName, assignmentId, testContents) {
     const chatSocket = getWebSocket(roomName);
     const domElements = new IndividualTestDomElements();
 
@@ -23,7 +23,7 @@ export function initStudent(roomName, testContents) {
             }));
         }).then(() => {
             console.log("Audio recording setup complete");
-            const test = new IndividualTest(testContents, chatSocket, roomName, domElements, testMediaRecorder);
+            const test = new IndividualTest(testContents, chatSocket, roomName, assignmentId, domElements, testMediaRecorder);
             test.addEventListener("test.complete", (evt) => {
                 // What to do when the test is completed?
                 chatSocket.close();

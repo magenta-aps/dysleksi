@@ -8,9 +8,10 @@ class Test extends EventTarget {
     partIndex;
     chatSocket;
     roomName;
+    assignmentId;
     domElements;
 
-    constructor(data, chatSocket, roomName, domElements) {
+    constructor(data, chatSocket, roomName, assignmentId, domElements) {
         super()
         this.name = data.name;
         this.domElements = domElements;
@@ -18,6 +19,7 @@ class Test extends EventTarget {
         this.currentPart = null;
         this.chatSocket = chatSocket;
         this.roomName = roomName;
+        this.assignmentId = assignmentId;
         this.chatSocket.addEventListener("message", (e) => {
             this.onChatMessage(JSON.parse(e.data));
         });
@@ -73,7 +75,7 @@ class Test extends EventTarget {
 
         alert("Testen er færdig!");
         this.send({
-            event: "test.completed",
+            event: "test.complete",
             message: "Testen er afsluttet",
         });
 
@@ -83,7 +85,8 @@ class Test extends EventTarget {
     }
 
     send(data) {
-        data.id = this.roomName;
+        data.roomName = this.roomName;
+        data.assignmentId = this.assignmentId;
         data.uuid = crypto.randomUUID();
         console.log("Chat: sending", data);
         this.chatSocket.send(JSON.stringify(data));
@@ -97,8 +100,8 @@ class Test extends EventTarget {
 
 export class GroupTest extends Test {
 
-    constructor(data, chatSocket, roomName, domElements) {
-        super(data, chatSocket, roomName, domElements);
+    constructor(data, chatSocket, roomName, assignmentId, domElements) {
+        super(data, chatSocket, roomName, assignmentId, domElements);
         this.parts = data.parts.map((dataItem, index) => new GroupTestPart(dataItem, this, index));
         if (this.parts.length === 0) {
             throw new Error("Test has no parts");
@@ -111,8 +114,8 @@ export class IndividualTest extends Test {
 
     mediaRecorder;
 
-    constructor(data, chatSocket, roomName, domElements, mediaRecorder) {
-        super(data, chatSocket, roomName, domElements);
+    constructor(data, chatSocket, roomName, assignmentId, domElements, mediaRecorder) {
+        super(data, chatSocket, roomName, assignmentId, domElements);
         this.parts = data.parts.map((dataItem, index) => new IndividualTestPart(dataItem, this, index));
         if (this.parts.length === 0) {
             throw new Error("Test has no parts");
@@ -123,10 +126,10 @@ export class IndividualTest extends Test {
     onChatMessage(data) {
         super.onChatMessage(data);
 
-        if (data.event.match(/test\.(correct|wrong|skipped)/)) {
+        if (data.event.match(/question\.(correct|wrong|skipped)/)) {
             let outcome = null;
-            if (data.event === "test.correct" || data.event === "wrong") {
-                outcome = (data.event === "test.correct");
+            if (data.event === "question.correct" || data.event === "wrong") {
+                outcome = (data.event === "question.correct");
             }
             this.teacherFeedback(outcome);
         }
@@ -178,10 +181,19 @@ class TestPart {
         this.domElements.showInstructions(this.intro, this.instructionsUrl);
         this.domElements.showQuestionTitle();
         this.domElements.showQuestionChallenge();
+        this.displayedAt = document.timeline.currentTime;
     }
 
     onComplete() {
+        this.answeredAt = document.timeline.currentTime;
+        const duration = this.answeredAt - this.displayedAt;
         this.test.onPartComplete(this);
+        this.test.send({
+            event: "part.complete",
+            partIndex: this.index,
+            partId: this.id,
+            duration: duration,
+        })
     }
 
     onQuestionComplete(question) {
@@ -360,7 +372,7 @@ class Question {
 
     onShow() {
         this.part.test.send({
-            event: 'test.displayed',
+            event: 'question.displayed',
             partIndex: this.part.index,
             partId: this.part.id,
             questionIndex: this.index,
@@ -431,11 +443,11 @@ class GroupQuestion extends Question {
                 this.show();
             }
         } else {
-            const duration = ((this.answeredAt - this.displayedAt) / 1000).toFixed(1);
+            const duration = this.answeredAt - this.displayedAt;
             this.part.test.send({
-                event: "test.answered",
+                event: "question.answered",
                 message: `Elev har gennemført spørgsmål ${this.index + 1}`,
-                choice: this.selectedChoice.id,
+                choiceId: this.selectedChoice.id,
                 recordingBase64: null,
                 partIndex: this.part.index,
                 partId: this.part.id,
@@ -457,6 +469,7 @@ class GroupQuestion extends Question {
 class IndividualQuestion extends Question {
 
     recordedAudio;
+    correct;
 
     constructor(data, part, index) {
         super(data, part, index);
@@ -471,11 +484,11 @@ class IndividualQuestion extends Question {
 
     onComplete() {
         super.onComplete();
-        const duration = ((this.answeredAt - this.displayedAt) / 1000).toFixed(1);
+        const duration = this.answeredAt - this.displayedAt;
         this.part.test.send({
-            event: "test.answered",
+            event: "question.answered",
             message: `Elev har gennemført spørgsmål ${this.index + 1}`,
-            choice: null,
+            choiceId: null,
             recordingBase64: this.recordedAudio,
             partIndex: this.part.index,
             partId: this.part.id,
@@ -484,13 +497,15 @@ class IndividualQuestion extends Question {
             questionTitle: this.questionTitle(),
             displayedAt: this.displayedAt,
             answeredAt: this.answeredAt,
-            duration: duration
+            duration: duration,
+            correct: this.correct
         });
         this.part.onQuestionComplete();
     }
 
     async teacherFeedback(outcome) {
         this.answeredAt = document.timeline.currentTime;
+        this.correct = outcome;
         this.recordedAudio = await this.part.test.mediaRecorder.interval();
         this.onComplete();
     }

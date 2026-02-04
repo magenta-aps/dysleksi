@@ -4,8 +4,8 @@
 from typing import Any
 
 from django.db.models import Case, Count, F, Value, When
-from django.shortcuts import redirect
-from django.views.generic import FormView, TemplateView
+from django.urls import reverse
+from django.views.generic import CreateView, DetailView, TemplateView
 from django_tables2 import SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
 
@@ -52,27 +52,37 @@ class RootView(UserTypeMixin, TemplateView):
         return context_data
 
 
-class RoomView(UserTypeMixin, TemplateView):
+class AssignmentView(UserTypeMixin, DetailView):
+
+    model = TestAssignment
+
     def get_template_prefix(self) -> str:
         if self.user.is_teacher:
             return "dysleksi/screening"
         if self.user.is_student:
             return f"dysleksi/screening/{self.get_room_type()}"
-        return ""  # pragma: no cover
+        raise ValueError("User is neither teacher nor student")
+
+    @property
+    def room_name(self):
+        if self.object.klasse is not None:
+            return f"class_{self.object.klasse_id}"
+        else:
+            return f"student_{self.object.student_id}"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        test = Test.objects.get(pk=self.kwargs["test_id"])
+        test = Test.objects.get(pk=self.object.test_id)
         context["test_contents"] = test.to_json()
+        context["room_name"] = self.room_name
         context["test_type"] = self.get_room_type()
         return context
 
     def get_room_type(self) -> str:
-        room_name = self.kwargs["room_name"]
-        if room_name.startswith("student"):
-            return "individual"
-        else:
+        if self.object.klasse is not None:
             return "group"
+        else:
+            return "individual"
 
 
 class ClassListView(GroupRequiredMixin, SingleTableView):
@@ -146,24 +156,23 @@ class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
         return qs
 
 
-class StartRoomView(FormView):
+class StartAssignmentView(CreateView):
     template_name = "dysleksi/lobby/start_room.html"
+    model = TestAssignment
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["teacher"] = self.request.user.subclass_instance()
         return kwargs
 
-    def form_valid(self, form):
-        test = form.cleaned_data["test"]
-        return redirect(
+    def get_success_url(self):
+        return reverse(
             "dysleksi:room",
-            room_name=form.get_room_name(),
-            test_id=test.pk,
+            kwargs={"pk": self.object.pk},
         )
 
 
-class StartIndividualRoomView(StartRoomView):
+class StartIndividualAssignmentView(StartAssignmentView):
     form_class = StartIndividualRoomForm
 
     def get_context_data(self, **kwargs):
@@ -173,7 +182,7 @@ class StartIndividualRoomView(StartRoomView):
         return context
 
 
-class StartGroupRoomView(StartRoomView):
+class StartGroupAssignmentView(StartAssignmentView):
     form_class = StartClassRoomForm
 
     def get_context_data(self, **kwargs):
@@ -181,3 +190,8 @@ class StartGroupRoomView(StartRoomView):
         context["test_type"] = TestType.GROUP
 
         return context
+
+
+class AdminRootView(GroupRequiredMixin, TemplateView):
+    groups_required = [TEACHERS]
+    template_name = "dysleksi/admin/base.html"

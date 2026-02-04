@@ -23,7 +23,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
     };
 
     // Mock getWebSocket
-    vi.spyOn(wsModule, "getWebSocket").mockImplementation((roomName) => {
+    vi.spyOn(wsModule, "getWebSocket").mockImplementation((assignment) => {
       const listeners = {};
 
       const socket = {
@@ -36,7 +36,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
         },
       };
 
-      sockets[roomName] = socket;
+      sockets[assignment] = socket;
       return socket;
     });
   });

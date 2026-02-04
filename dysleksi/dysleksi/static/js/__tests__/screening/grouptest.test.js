@@ -98,7 +98,7 @@ describe('getWebSocket', () => {
     it('Test Structure loads', () => {
         // Test that the instance with subinstances is correctly created from json
         const ws = getWebSocket('class_123');
-        const test = new GroupTest(groupTestData, ws, 'class_123', domElements);
+        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         expect(test.roomName).toBe("class_123");
         expect(test.name).toBe("Middle 2. grade");
         expect(test.partIndex).toBe(0);
@@ -137,7 +137,7 @@ describe('getWebSocket', () => {
 
     it("Render first part", () => {
         // Should show the first part with options to begin practicing or start the real test
-        const test = new GroupTest(groupTestData, ws, 'class_123', domElements);
+        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
         test.start();
 
@@ -151,7 +151,7 @@ describe('getWebSocket', () => {
 
     it("Render second part", () => {
         // Should show the second part with option start the real test (As no practice is defined for the second part)
-        const test = new GroupTest(groupTestData, ws, 'class_123', domElements);
+        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
         test.showPart(1);
 
@@ -164,7 +164,7 @@ describe('getWebSocket', () => {
     })
 
     it("Display first question", () => {
-        const test = new GroupTest(groupTestData, ws, 'class_123', domElements);
+        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
         test.start();
         const part = test.currentPart;
@@ -187,19 +187,20 @@ describe('getWebSocket', () => {
         }
         expect(test.send).toHaveBeenCalledWith({
             uuid: expect.any(String),
-            event: "test.displayed",
+            event: "question.displayed",
+            assignmentId: 1,
             partIndex: part.index,
             partId: part.id,
             questionIndex: question.index,
             questionId: question.id,
             questionTitle: question.questionTitle(),
             displayedAt: 0,
-            id: test.roomName,
+            roomName: test.roomName,
         })
     });
 
     it("Select second answer of first question", () => {
-        const test = new GroupTest(groupTestData, ws, 'class_123', domElements);
+        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
         test.start();
         const part = test.currentPart;
@@ -216,7 +217,7 @@ describe('getWebSocket', () => {
     });
 
     it("Go to next question", () => {
-        const test = new GroupTest(groupTestData, ws, 'class_123', domElements);
+        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
         test.start();
         const part = test.currentPart;
@@ -228,10 +229,11 @@ describe('getWebSocket', () => {
 
         expect(test.send).toHaveBeenCalledWith({
             uuid: expect.any(String),
-            event: "test.answered",
+            event: "question.answered",
             message: `Elev har gennemført spørgsmål 1`,
-            choice: secondAnswer.id,
+            choiceId: secondAnswer.id,
             recordingBase64: null,
+            assignmentId: 1,
             partIndex: part.index,
             partId: part.id,
             questionIndex: question.index,
@@ -239,8 +241,8 @@ describe('getWebSocket', () => {
             questionTitle: question.questionTitle(),
             displayedAt: 0,
             answeredAt: 0,
-            duration: "0.0",
-            id: test.roomName,
+            duration: 0,
+            roomName: test.roomName,
             correct: false,
             textAnswer: null,
         });
@@ -251,7 +253,7 @@ describe('getWebSocket', () => {
     });
 
     it("Answer freetext question", () => {
-        const test = new GroupTest(groupTestData, ws, 'class_123', domElements);
+        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
         domElements.showQuestionFreeText = vi.fn(() => {
             return {
@@ -275,7 +277,7 @@ describe('getWebSocket', () => {
     })
 
     it("Answer last question in part", () => {
-        const test = new GroupTest(groupTestData, ws, 'class_123', domElements);
+        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
         test.start();
         const part = test.currentPart;
@@ -292,7 +294,7 @@ describe('getWebSocket', () => {
     });
 
     it("Answer last question in last part", () => {
-        const test = new GroupTest(groupTestData, ws, 'class_123', domElements);
+        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
         test.showPart(test.parts.length - 1);
         const part = test.currentPart;
@@ -309,9 +311,10 @@ describe('getWebSocket', () => {
         expect(domElements.hideInstructions).toHaveBeenCalled();
         expect(test.send).toHaveBeenCalledWith({
             uuid: expect.any(String),
-            event: "test.completed",
+            event: "test.complete",
+            assignmentId: 1,
             message: "Testen er afsluttet",
-            id: test.roomName,
+            roomName: test.roomName,
         });
     });
 

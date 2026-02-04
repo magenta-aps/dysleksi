@@ -42,17 +42,17 @@ describe("TeacherView Test", () => {
     );
   });
 
-  it("enables buttons on test.displayed", () => {
+  it("enables buttons on question.displayed", () => {
     const wsGetter = vi.fn().mockReturnValue(socket);
     const view = new TeacherView("room1", ["test1"], wsGetter, table, buttons);
 
     // get the message handler registered on the socket
     const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
 
-    // trigger a test.displayed event
+    // trigger a question.displayed event
     handler({
       data: JSON.stringify({
-        event: "test.displayed",
+        event: "question.displayed",
         questionIndex: 0,
         questionTitle: "Q1",
         displayedAt: "10:00"
@@ -76,8 +76,8 @@ describe("TeacherView Test", () => {
 
     expect(socket.send).toHaveBeenCalledWith(JSON.stringify({
       uuid: "UUID123",
-      event: "test.btn1",
-      id: "room1",
+      event: "question.btn1",
+      roomName: "room1",
       questionIndex: 0,
     }));
 

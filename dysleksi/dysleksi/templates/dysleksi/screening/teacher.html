@@ -1,7 +1,7 @@
 {% extends 'dysleksi/screening/individual/base.html' %}
 
 {% block content %}
-<div class="container" data-test-type="{{ test_type }}" data-role="teacher" data-room-name="{{ room_name }}">
+<div class="container" data-test-type="{{ test_type }}" data-role="teacher" data-room-name="{{ room_name }}" data-assignment-id="{{ object.pk }}">
     <button class="btn btn-success d-none" id="correct">Korrekt</button>
     <button class="btn btn-danger d-none" id="wrong">Forkert</button>
     <button class="btn btn-outline-primary d-none" id="skipped">Sprunget over</button>
