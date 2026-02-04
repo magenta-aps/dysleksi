@@ -5,7 +5,7 @@ export class EventTable {
         this.eventsEl = document.querySelector(tableSelector);
     }
 
-    updateTable(data, test) {
+    updateTable(data, question) {
         const eventEl = document.createElement('tr');
 
         const typeEl = document.createElement('td');
@@ -90,7 +90,7 @@ export class TeacherView {
         this.assignmentId = assignmentId;
         this.roomName = roomName;
         this.chatSocket = wsGetter(roomName);
-        this.tests = extractQuestions(testContents);
+        this.questions = extractQuestions(testContents);
         this.questionIndex = null;
 
         this.table = table || new EventTable();
@@ -106,7 +106,7 @@ export class TeacherView {
             const data = JSON.parse(e.data);
 
             if (data.event.match(/question.(answered|displayed)/)) {
-                const question = this.tests[data.questionIndex];
+                const question = this.questions[data.questionIndex];
                 this.questionIndex = data.questionIndex;
                 this.question = question;
                 this.table.updateTable(data, question);
@@ -121,7 +121,7 @@ export class TeacherView {
         this.buttons.addClickListener((e) => {
             const val = e.target.id;
             const correct = (val === "skipped") ? null : (val === "correct");
-            if ((this.questionIndex >= 0) && (this.questionIndex < this.tests.length)) {
+            if ((this.questionIndex >= 0) && (this.questionIndex < this.questions.length)) {
                 this.chatSocket.send(
                     JSON.stringify({
                         uuid: crypto.randomUUID(),
@@ -138,7 +138,7 @@ export class TeacherView {
                 this.buttons.disableButtons();
                 this.noteField.clearNote();
             } else {
-                console.error('invalid test index', this.questionIndex);
+                console.error('invalid question index', this.questionIndex);
             }
         });
     }
