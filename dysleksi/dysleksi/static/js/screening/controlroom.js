@@ -67,15 +67,35 @@ export class ActionButtons {
     }
 }
 
+export class NoteField {
+    constructor(noteSelector = 'textarea#note') {
+        this.noteEl = document.querySelector(noteSelector);
+    }
+
+    getNote() {
+        return this.noteEl.value;
+    }
+
+    clearNote() {
+        this.noteEl.value = '';
+    }
+
+    show() {
+        this.noteEl.classList.toggle('d-none', false);
+    }
+}
+
 export class TeacherView {
-    constructor(roomName, testContents, wsGetter, table, buttons) {
+    constructor(roomName, testContents, assignmentId, wsGetter, table, buttons, noteField) {
+        this.assignmentId = assignmentId;
         this.roomName = roomName;
         this.chatSocket = wsGetter(roomName);
         this.tests = extractQuestions(testContents);
-        this.testIndex = null;
+        this.questionIndex = null;
 
         this.table = table || new EventTable();
         this.buttons = buttons || new ActionButtons();
+        this.noteField = noteField || new NoteField();
 
         this._initSocket();
         this._initButtonListeners();
@@ -83,15 +103,13 @@ export class TeacherView {
 
     _initSocket() {
         this.chatSocket.addEventListener("message", (e) => {
-            console.log('chat: received', e.data);
             const data = JSON.parse(e.data);
 
             if (data.event.match(/question.(answered|displayed)/)) {
-                const test = this.tests[data.questionIndex];;
-                this.testIndex = data.questionIndex;
-
-                this.table.updateTable(data, test);
-
+                const question = this.tests[data.questionIndex];
+                this.questionIndex = data.questionIndex;
+                this.question = question;
+                this.table.updateTable(data, question);
                 if (data.event === 'question.displayed') {
                     this.buttons.enableButtons();
                 }
@@ -102,18 +120,23 @@ export class TeacherView {
     _initButtonListeners() {
         this.buttons.addClickListener((e) => {
             const val = e.target.id;
-            if ((this.testIndex >= 0) && (this.testIndex < this.tests.length)) {
+            if ((this.questionIndex >= 0) && (this.questionIndex < this.tests.length)) {
                 this.chatSocket.send(
                     JSON.stringify({
                         uuid: crypto.randomUUID(),
                         event: 'question.' + val,
                         roomName: this.roomName,
-                        questionIndex: this.testIndex,
+                        questionIndex: this.questionIndex,
+                        questionId: this.question.questionId,
+                        partId: this.question.partId,
+                        assignmentId: this.assignmentId,
+                        note: this.noteField.getNote(),
                     })
                 );
                 this.buttons.disableButtons();
+                this.noteField.clearNote();
             } else {
-                console.error('invalid test index', this.testIndex);
+                console.error('invalid test index', this.questionIndex);
             }
         });
     }

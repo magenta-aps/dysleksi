@@ -12,7 +12,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import CheckConstraint, TextChoices
+from django.db.models import TextChoices
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -443,16 +443,6 @@ class PartResponse(models.Model):
 
 class QuestionResponse(models.Model):
 
-    class Meta:
-        constraints = [
-            CheckConstraint(
-                condition=models.Q(answer_option__isnull=False)
-                | models.Q(answer_text__isnull=False)
-                | models.Q(answer_sound__isnull=False),
-                name="answer_must_be_set",
-            )
-        ]
-
     question = models.ForeignKey(
         TestQuestion,
         on_delete=models.CASCADE,
@@ -481,11 +471,19 @@ class QuestionResponse(models.Model):
         blank=True,
         null=True,
     )
-
-    correct = models.BooleanField(blank=False, null=False)
-    submitted_at = models.DateTimeField(auto_now_add=True)
+    correct = models.BooleanField(
+        blank=True,
+        null=True,
+    )
+    submitted_at = models.DateTimeField(
+        auto_now_add=True,
+    )
     finished_after = models.IntegerField(
-        verbose_name=_("Completion time in milliseconds"), blank=False, null=False
+        verbose_name=_("Completion time in milliseconds"), blank=True, null=True
+    )
+    note = models.TextField(
+        null=True,
+        blank=True,
     )
 
     def __str__(self) -> str:
@@ -494,6 +492,9 @@ class QuestionResponse(models.Model):
 
 class HandledEvent(TextChoices):
     QUESTION_ANSWERED = "question.answered"
+    QUESTION_CORRECT = "question.correct"
+    QUESTION_INCORRECT = "question.wrong"
+    QUESTION_SKIPPED = "question.skipped"
     PART_COMPLETE = "part.complete"
     TEST_COMPLETE = "test.complete"
 
@@ -517,7 +518,21 @@ class Message(models.Model):
 
     @cached_property
     def student(self):
-        return Student.objects.get(user_ptr=self.user)
+
+        # Obtain student from assignment
+        assignment = self.assignment
+        if assignment.student is not None:
+            return assignment.student
+
+        # Obtain student id from sending user (should work for group tests)
+        try:
+            return Student.objects.get(user_ptr=self.user)
+        except Student.DoesNotExist:
+            pass
+
+        # The only way we get here is if the sender is a Teacher
+        # (or other non-Student), and it is not an individual test room
+        return None
 
     @cached_property
     def assignment(self):
@@ -556,6 +571,19 @@ class Message(models.Model):
         )
         return part_response
 
+    @cached_property
+    def question_response(self):
+        try:
+            return QuestionResponse.objects.get(
+                question=self.question,
+                partresponse=self.part_response,
+            )
+        except QuestionResponse.DoesNotExist:
+            return QuestionResponse(
+                question=self.question,
+                partresponse=self.part_response,
+            )
+
     def handle(self):  # pragma: no cover
         if self.processed is not None:
             return
@@ -571,14 +599,14 @@ class Message(models.Model):
                     if choiceId is not None
                     else None
                 )
-                question_response = QuestionResponse(
-                    question=self.question,
-                    partresponse=self.part_response,
-                    answer_option=choice,
-                    answer_text=self.data.get("textAnswer"),
-                    correct=choice.is_correct if choice else self.data.get("correct"),
-                    finished_after=duration,
-                )
+                question_response = self.question_response
+
+                question_response.answer_option = choice
+                question_response.answer_text = self.data.get("textAnswer")
+                correct = choice.is_correct if choice else self.data.get("correct")
+                if correct is not None:
+                    question_response.correct = correct
+                question_response.finished_after = duration
 
                 sound_data = self.data.get("recordingBase64")
                 if sound_data is not None:
@@ -607,6 +635,24 @@ class Message(models.Model):
                 except ValidationError as e:
                     self.error = str(e)
                     raise e
+                question_response.save()
+
+            elif self.event == HandledEvent.QUESTION_CORRECT:
+                question_response = self.question_response
+                question_response.correct = True
+                question_response.note = self.data.get("note")
+                question_response.save()
+
+            elif self.event == HandledEvent.QUESTION_INCORRECT:
+                question_response = self.question_response
+                question_response.correct = False
+                question_response.note = self.data.get("note")
+                question_response.save()
+
+            elif self.event == HandledEvent.QUESTION_SKIPPED:
+                question_response = self.question_response
+                question_response.note = self.data.get("note")
+                question_response.correct = None
                 question_response.save()
 
             elif self.event == HandledEvent.PART_COMPLETE:
