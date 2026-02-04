@@ -2,6 +2,13 @@
 
 {% block content %}
 <div class="container" data-test-type="{{ test_type }}" data-role="teacher" data-room-name="{{ room_name }}" data-assignment-id="{{ object.pk }}">
+
+    <div id="question-container" class="d-none">
+        <h1 id="question-title"></h1>
+        <div id="question-content"></div>
+    </div>
+
+
     <textarea id="note" class="form-control d-none" rows="10" placeholder="Notat"></textarea>
     <button class="btn btn-success d-none" id="correct">Korrekt</button>
     <button class="btn btn-danger d-none" id="wrong">Forkert</button>

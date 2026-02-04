@@ -2,7 +2,7 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import {EventTable, ActionButtons, TeacherView, NoteField} from "../../screening/controlroom.js";
+import {EventTable, ActionButtons, TeacherView, NoteField, QuestionView} from "../../screening/controlroom.js";
 import * as wsModule from "../../screening/utils.js"; 
 
 vi.mock("../../screening/utils.js");
@@ -12,20 +12,32 @@ describe("TeacherView Test", () => {
   let table;
   let buttons;
   let note;
+  let questionView;
 
   beforeEach(() => {
-    document.body.innerHTML = `<table id="events"><tbody></tbody></table>
-                               <button id="btn1"></button><textarea id="note"></textarea>`;
+    document.body.innerHTML = `
+        <div id="question-container">
+        <h1 id="question-title"></h1>
+        <div id="question-content"></div>
+        </div>
+        <table id="events"><tbody></tbody></table>
+        <button id="btn1"></button>
+        <textarea id="note"></textarea>
+    `;
     table = new EventTable();
     buttons = new ActionButtons();
     note = new NoteField();
+    questionView = new QuestionView();
 
     socket = {
       addEventListener: vi.fn(),
       send: vi.fn(),
     };
 
-    vi.spyOn(wsModule, "extractQuestions").mockReturnValue([{"questionId":1, "partId":1},{"questionId":2, "partId":1}]);
+    vi.spyOn(wsModule, "extractQuestions").mockReturnValue([
+        {"questionId":1, "partId":1, "partName":"Test part 1", "challengeImageUrl": "/challenge.png"},
+        {"questionId":2, "partId":1, "partName":"Test part 1", "challengeText": "Råb så højt du kan"}
+    ]);
   });
 
   afterEach(() => {
@@ -63,6 +75,42 @@ describe("TeacherView Test", () => {
 
     const btn = document.querySelector("button");
     expect(btn.classList.contains("disabled")).toBe(false);
+  });
+
+
+  it("show question on question.displayed", () => {
+    const wsGetter = vi.fn().mockReturnValue(socket);
+    const view = new TeacherView(
+        "room1", ["test1"], 1, wsGetter, table, buttons, questionView
+    );
+
+    questionView.show();
+    expect(questionView.containerElement.classList.contains("d-none")).toBe(false)
+
+    // get the message handler registered on the socket
+    const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+
+    // trigger a question.displayed event
+    handler({
+        data: JSON.stringify({
+            event: "question.displayed",
+            questionIndex: 0,
+        }),
+    });
+
+    expect(questionView.titleElement.textContent).toBe("1/2 (Test part 1)");
+    expect(questionView.contentElement.firstElementChild.attributes.getNamedItem("src").value).toBe("/challenge.png");
+
+    handler({
+        data: JSON.stringify({
+            event: "question.displayed",
+            questionIndex: 1,
+        }),
+    });
+
+    expect(questionView.titleElement.textContent).toBe("2/2 (Test part 1)");
+    expect(questionView.contentElement.firstElementChild.textContent).toBe("Råb så højt du kan");
+
   });
 
   it("sends message and disables buttons on click", () => {
