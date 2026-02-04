@@ -20,19 +20,32 @@ class Test extends EventTarget {
         this.chatSocket = chatSocket;
         this.roomName = roomName;
         this.assignmentId = assignmentId;
+        this.summary = data.summary;
+        this.summaryText = data.summary_text;
         this.chatSocket.addEventListener("message", (e) => {
             this.onChatMessage(JSON.parse(e.data));
         });
     }
 
     start() {
-        this.currentPart = this.parts[0];
-        this.currentPart.start();
+        this.startSummary();
     }
 
     next() {
         this.currentPart.onQuestionComplete();
     }
+
+    startSummary() {
+        console.log("Test started, showing summary");
+        this.domElements.showSummary(this.summaryText, this.summary);
+        this.domElements.setSummaryButtonListener(() => this.endSummary());
+    }
+
+    endSummary() {
+        this.domElements.hideSummary();
+        this.currentPart = this.parts[0];
+        this.currentPart.start();
+    }	
 
     showPart(index) {
         if (index >= this.parts.length) {

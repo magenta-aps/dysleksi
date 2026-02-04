@@ -394,5 +394,10 @@
         }
       ]
     }
-  ]
+  ],
+  "summary": [
+    "Wordreading 2A (dummy)",
+    "Wordspelling 2B (dummy)"
+  ],
+  "summary_text": "The test contains"
 }

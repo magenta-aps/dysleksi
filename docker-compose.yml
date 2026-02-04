@@ -13,7 +13,7 @@ services:
     env_file:
       - ./dev-environment/dysleksi.env
     volumes:
-      - ./dysleksi/:/app
+      - ./dysleksi/:/app:rw
       - ./log/dysleksi.log:/log/dysleksi.log:rw
       - ./dev-environment/cert:/ssl:ro
       - ./mypy.ini:/mypy.ini:ro
@@ -24,7 +24,7 @@ services:
       - PULL_IDP_METADATA=true
       - MAKE_MIGRATIONS=true
       - MIGRATE=true
-      - MAKE_MESSAGES=true
+      - MAKEMESSAGES=true
       - CREATE_DUMMY_USERS=true
       - CREATE_DUMMY_DATA=true
       - TEST=true
@@ -34,6 +34,8 @@ services:
       - database
     ports:
       - "8140:8443"
+    depends_on:
+      - dysleksi-db
     command: uvicorn project.asgi:application --host 0.0.0.0 --port 8443 --reload --ssl-certfile=/ssl/web/cert.pem --ssl-keyfile=/ssl/web/key.pem
 
   dysleksi-db:

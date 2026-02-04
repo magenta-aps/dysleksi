@@ -73,6 +73,8 @@ describe('getWebSocket', () => {
             <div id="instructions-text"></div>
             <button id="start-practice"></button>
             <button id="start-questions"></button>
+            <table id="summary-table"></table>
+            <button id="end-summary"></button>
             <div id="question-title"></div>
             <div id="question-challenge"></div>
             <div id="choices"></div>
@@ -84,7 +86,7 @@ describe('getWebSocket', () => {
 
         global.testSpy = (test) => {
             // Apply spying to a test instance
-            spyAttributes(test, ["chatSocket", "domElements"]);
+            spyAttributes(test, ["chatSocket", "domElements", "summary", "summaryText"]);
         }
 
         global.ws = getWebSocket('class_123');
@@ -135,14 +137,28 @@ describe('getWebSocket', () => {
         ).toThrowError("Test has no parts");
     });
 
-    it("Render first part", () => {
-        // Should show the first part with options to begin practicing or start the real test
+    it("Render Summary", () => {
         const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
         test.start();
 
+        expect(test.currentPart).toBe(null);
+        expect(test.parts[0].start).not.toHaveBeenCalled();
+        expect(domElements.showSummary).toHaveBeenCalled();
+        expect(domElements.toggleSummaryTable).toHaveBeenCalledWith(true);
+        expect(domElements.togglePracticeButton).toHaveBeenCalledWith(false);
+        expect(domElements.toggleQuestionsButton).toHaveBeenCalledWith(false);
+    })
+
+    it("Render first part", () => {
+        // Should show the first part with options to begin practicing or start the real test
+        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
+        testSpy(test);
+        test.endSummary();
+
         expect(test.currentPart).toBe(test.parts[0]);
         expect(test.parts[0].start).toHaveBeenCalled();
+        expect(domElements.hideSummary).toHaveBeenCalled();
         expect(domElements.clearQuestionChoices).toHaveBeenCalled();
         expect(domElements.toggleNextButton).toHaveBeenCalledWith(false)
         expect(domElements.togglePracticeButton).toHaveBeenCalledWith(true)
@@ -166,7 +182,7 @@ describe('getWebSocket', () => {
     it("Display first question", () => {
         const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
-        test.start();
+        test.endSummary();
         const part = test.currentPart;
         part.showFirstQuestion(false);
 
@@ -202,7 +218,7 @@ describe('getWebSocket', () => {
     it("Select second answer of first question", () => {
         const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
-        test.start();
+        test.endSummary();
         const part = test.currentPart;
         part.showFirstQuestion(false);
         const question = part.currentQuestion;
@@ -219,7 +235,7 @@ describe('getWebSocket', () => {
     it("Go to next question", () => {
         const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
-        test.start();
+        test.endSummary();
         const part = test.currentPart;
         part.showFirstQuestion(false);
         const question = part.currentQuestion;
@@ -279,7 +295,7 @@ describe('getWebSocket', () => {
     it("Answer last question in part", () => {
         const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
-        test.start();
+        test.endSummary();
         const part = test.currentPart;
         part.showQuestion(false, part.questions.length - 1);
         const question = part.currentQuestion;
@@ -333,6 +349,8 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
             <div id="instructions-text"></div>
             <button id="start-practice"></button>
             <button id="start-questions"></button>
+            <table id="summary-table"></table>
+            <button id="end-summary"></button>
             <div id="question-title"></div>
             <div id="question-challenge"></div>
             <button id="next"></button>
