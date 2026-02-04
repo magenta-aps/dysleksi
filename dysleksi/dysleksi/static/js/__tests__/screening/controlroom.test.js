@@ -86,12 +86,13 @@ describe("TeacherView Test", () => {
 
     expect(socket.send).toHaveBeenCalledWith(JSON.stringify({
       uuid: "UUID123",
-      event: "question.btn1",
+      event: "question.feedback",
       roomName: "room1",
       questionIndex: 0,
       questionId: 1,
       partId: 1,
       assignmentId: 1,
+      correct: false,
       note: "Test note",
     }));
 

@@ -492,9 +492,7 @@ class QuestionResponse(models.Model):
 
 class HandledEvent(TextChoices):
     QUESTION_ANSWERED = "question.answered"
-    QUESTION_CORRECT = "question.correct"
-    QUESTION_INCORRECT = "question.wrong"
-    QUESTION_SKIPPED = "question.skipped"
+    QUESTION_FEEDBACK = "question.feedback"
     PART_COMPLETE = "part.complete"
     TEST_COMPLETE = "test.complete"
 
@@ -637,22 +635,10 @@ class Message(models.Model):
                     raise e
                 question_response.save()
 
-            elif self.event == HandledEvent.QUESTION_CORRECT:
+            elif self.event == HandledEvent.QUESTION_FEEDBACK:
                 question_response = self.question_response
-                question_response.correct = True
+                question_response.correct = self.data.get("correct")
                 question_response.note = self.data.get("note")
-                question_response.save()
-
-            elif self.event == HandledEvent.QUESTION_INCORRECT:
-                question_response = self.question_response
-                question_response.correct = False
-                question_response.note = self.data.get("note")
-                question_response.save()
-
-            elif self.event == HandledEvent.QUESTION_SKIPPED:
-                question_response = self.question_response
-                question_response.note = self.data.get("note")
-                question_response.correct = None
                 question_response.save()
 
             elif self.event == HandledEvent.PART_COMPLETE:

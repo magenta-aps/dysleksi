@@ -139,12 +139,8 @@ export class IndividualTest extends Test {
     onChatMessage(data) {
         super.onChatMessage(data);
 
-        if (data.event.match(/question\.(correct|wrong|skipped)/)) {
-            let outcome = null;
-            if (data.event === "question.correct" || data.event === "wrong") {
-                outcome = (data.event === "question.correct");
-            }
-            this.teacherFeedback(outcome);
+        if (data.event === "question.feedback") {
+            this.teacherFeedback(data.correct);
         }
     }
 

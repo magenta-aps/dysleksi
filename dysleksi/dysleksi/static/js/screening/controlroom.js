@@ -120,16 +120,18 @@ export class TeacherView {
     _initButtonListeners() {
         this.buttons.addClickListener((e) => {
             const val = e.target.id;
+            const correct = (val === "skipped") ? null : (val === "correct");
             if ((this.questionIndex >= 0) && (this.questionIndex < this.tests.length)) {
                 this.chatSocket.send(
                     JSON.stringify({
                         uuid: crypto.randomUUID(),
-                        event: 'question.' + val,
+                        event: 'question.feedback',
                         roomName: this.roomName,
                         questionIndex: this.questionIndex,
                         questionId: this.question.questionId,
                         partId: this.question.partId,
                         assignmentId: this.assignmentId,
+                        correct: correct, // true=correct, false=wrong, null=skipped
                         note: this.noteField.getNote(),
                     })
                 );
