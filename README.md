@@ -53,6 +53,7 @@ follows:
 services:
   dysleksi-web:
     environment:
+      - TEST=false
       - ALLOWED_HOSTS=["<ip address>","dysleksi-web","localhost","host.docker.internal"]
       - LOGIN_BYPASS_ENABLED=True
 ```
