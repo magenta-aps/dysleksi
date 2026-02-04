@@ -28,6 +28,22 @@ class Command(BaseCommand):
         )
         teacher.set_password("lærer")
         teacher.groups.add(teacher_group)
+        teacher.save()
+
+        # Create teacher who is not in idp (for easy-access on an ipad)
+        teacher2, _ = Teacher.objects.update_or_create(
+            username="lærer",
+            defaults={
+                "is_staff": False,
+                "is_superuser": False,
+                "first_name": "Lærer",
+                "last_name": "Lærersen",
+                "cpr": "0222222223",
+            },
+        )
+        teacher2.set_password("lærer")
+        teacher2.groups.add(teacher_group)
+        teacher2.save()
 
         # Create student who is in idp
         student, _ = Student.objects.update_or_create(
@@ -57,6 +73,20 @@ class Command(BaseCommand):
         student2.set_password("elev2")
         student2.groups.add(student_group)
 
+        # Create student who is not in idp (for easy-access on an ipad)
+        student3, _ = Student.objects.update_or_create(
+            username="elev",
+            defaults={
+                "is_staff": False,
+                "is_superuser": False,
+                "first_name": "Steve",
+                "last_name": "Jobs",
+                "cpr": "0111111113",
+            },
+        )
+        student3.set_password("elev")
+        student3.groups.add(student_group)
+
         # Create classes
         current_year = date.today().year
         for start_year in range(current_year, current_year - 7, -1):
@@ -65,7 +95,7 @@ class Command(BaseCommand):
                     start_year=start_year,
                     letter=letter,
                 )
-                c.teachers.set([teacher])
+                c.teachers.set([teacher, teacher2])
 
         # Add students to classes
         student.klasse = Class.objects.get(start_year=current_year - 2, letter="A")
@@ -73,3 +103,6 @@ class Command(BaseCommand):
 
         student2.klasse = Class.objects.get(start_year=current_year, letter="B")
         student2.save()
+
+        student3.klasse = Class.objects.get(start_year=current_year, letter="C")
+        student3.save()

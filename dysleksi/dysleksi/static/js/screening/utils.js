@@ -27,7 +27,7 @@ export function startSession(roomName) {
         chatSocket.send(JSON.stringify({
             uuid: crypto.randomUUID(),
             event: "session.start",
-            roomUrl: window.location.href
+            roomUrl: window.location.href.replace(window.location.origin, "")
         }));
     }, { once: true });
 
@@ -49,7 +49,7 @@ function refreshSession(roomName) {
         chatSocket.send(JSON.stringify({
             uuid: crypto.randomUUID(),
             event: "session.in_progress",
-            roomUrl: window.location.href
+            roomUrl: window.location.href.replace(window.location.origin, "")
         }));
     } else {
         // queue the message until the socket opens

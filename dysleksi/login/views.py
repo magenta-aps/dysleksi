@@ -58,7 +58,7 @@ class LoginView(TwoFactorLoginView):
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            if settings.PUBLIC:
+            if settings.PUBLIC and not settings.LOGIN_BYPASS_ENABLED:
                 # MitID login
                 return self.login_mitid(request, *args, **kwargs)
             else:
