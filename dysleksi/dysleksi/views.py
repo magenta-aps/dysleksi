@@ -5,6 +5,7 @@ from typing import Any
 
 from django.db.models import Case, Count, F, Value, When
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DetailView, TemplateView
 from django_tables2 import SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
@@ -23,7 +24,6 @@ from dysleksi.tables import ClassTable, StudentTable, TestAssignmentTable
 
 
 class UserTypeMixin(LoginRequiredMixin):
-
     def get_template_prefix(self) -> str:
         # Override this in subclass
         return "dysleksi"  # pragma: no cover
@@ -76,6 +76,10 @@ class AssignmentView(UserTypeMixin, DetailView):
         context["test_contents"] = test.to_json()
         context["room_name"] = self.room_name
         context["test_type"] = self.get_room_type()
+        context["test_contents"]["summary"] = [
+            testpart["name"] for testpart in context["test_contents"]["parts"]
+        ]
+        context["test_contents"]["summary_text"] = _("Prøven indeholder:")
         return context
 
     def get_room_type(self) -> str:

@@ -4,16 +4,54 @@ class TestDomElements {
     introTextEl;
     questionTitleEl;
     questionChallengeEl;
+    endSummaryButton;
+    summaryTable;
 
     constructor() {
         this.instructionsSoundEl = document.querySelector("#instructions-sound");
         this.introTextEl = document.querySelector("#instructions-text");
         this.questionTitleEl = document.querySelector("#question-title");
         this.questionChallengeEl = document.querySelector("#question-challenge");
+        this.endSummaryButton = document.querySelector("#end-summary");
+        this.summaryTable = document.querySelector("#summary-table");
 
-        if (!this.instructionsSoundEl || !this.introTextEl || !this.questionTitleEl || !this.questionChallengeEl) {
+        if (!this.instructionsSoundEl || !this.introTextEl || !this.questionTitleEl || !this.questionChallengeEl || !this.endSummaryButton || !this.summaryTable) {
             throw new Error("Required DOM elements missing");
         }
+    }
+
+    showSummary(text, parts) {
+        this.showSummaryTable(parts);
+        this.showInstructions(text);
+    }
+
+    showSummaryTable(parts) {
+        this.toggleSummaryTable(true);
+        this.toggleEndSummaryButton(true);
+
+        parts.forEach(partname => {
+            const row = document.createElement('tr');
+            const td = document.createElement('td');
+            td.textContent = partname;
+            row.appendChild(td);
+            this.summaryTable.appendChild(row);
+        });
+    }
+
+    hideSummary() {
+        this.toggleSummaryTable(false);
+        this.toggleEndSummaryButton(false);
+    }
+
+    toggleSummaryTable(show) {
+        this.summaryTable.style.display = show ? "table-cell" : "none";
+    }
+    toggleEndSummaryButton(show) {
+        this.endSummaryButton.style.display = show ? "inline-block" : "none";
+    }
+
+    setSummaryButtonListener(listener) {
+        this.endSummaryButton = this._setButtonListener(this.endSummaryButton, listener);
     }
 
     showInstructions(text, audio) {
@@ -181,6 +219,13 @@ export class GroupTestDomElements extends TestDomElements {
         if (!this.startPracticeButton || !this.startQuestionsButton || !this.choicesEl || !this.nextBtn) {
             throw new Error("Required DOM elements missing");
         }
+    }
+
+    showSummary(text, parts) {
+        this.showSummaryTable(parts);
+        this.showInstructions(text);
+        this.togglePracticeButton(false);
+        this.toggleQuestionsButton(false);
     }
 
     showInstructions(text, audio) {

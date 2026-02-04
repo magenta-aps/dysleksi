@@ -47,7 +47,7 @@ if [ "${PULL_IDP_METADATA,,}" = true ]; then
   python manage.py update_mitid_idp_metadata
 fi
 
-if [ "${MAKE_MESSAGES,,}" = true ]; then
+if [ "${MAKEMESSAGES,,}" = true ]; then
   echo 'making messages'
   python manage.py makemessages --locale=kl --locale=da --no-obsolete --add-location file
   python manage.py makemessages --locale=kl --locale=da --no-obsolete --add-location file --domain djangojs
