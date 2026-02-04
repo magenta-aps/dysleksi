@@ -184,6 +184,7 @@ Lint Javascript:
     LOGIN_PROVIDER_CLASS: django_mitid_auth.saml.oiosaml.OIOSaml
     CREATE_DUMMY_USERS: True
     BYPASS_2FA: 'True'
+    MEDIA_ROOT: /builds/gronlandsprojekter/dysleksi/file-data
 
   image: ${IMAGE_SHA}
   before_script:
@@ -198,6 +199,7 @@ Python Unittest:
   <<: *test-default
   script:
     - cd /app
+    - ls /builds/gronlandsprojekter/dysleksi/file-data
     - coverage run manage.py test --parallel
     - coverage combine
     - coverage report --show-missing --fail-under=100

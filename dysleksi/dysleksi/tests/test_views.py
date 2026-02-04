@@ -9,8 +9,8 @@ from django.views import View
 from dysleksi.models import Student, Test, TestAssignment, TestType, User
 from dysleksi.tests.base import DysleksiTest
 from dysleksi.views import (
+    AssignmentView,
     ClassListView,
-    RoomView,
     RootView,
     StudentListView,
     TestAssignmentListView,
@@ -56,7 +56,7 @@ class TestRootView(DysleksiTest):
                     self.assertIsInstance(context_data, dict)
 
 
-class TestRoomView(DysleksiTest):
+class TestAssignmentView(DysleksiTest):
 
     @classmethod
     def setUpTestData(cls):
@@ -65,23 +65,69 @@ class TestRoomView(DysleksiTest):
         cls.test = Test.objects.create(name="Middle 2. grade")
         cls.test2 = Test.objects.create(name="Individual dummy test")
 
+        cls.assignment1 = TestAssignment.objects.create(
+            test=cls.test, teacher=cls.teacher, klasse=cls.klasse
+        )
+        cls.assignment2 = TestAssignment.objects.create(
+            test=cls.test, teacher=cls.teacher, student=cls.student
+        )
+
     def test_get_template_names(self):
-        cases: list[tuple[User, str | None]] = [
-            (self.teacher, "dysleksi/screening/teacher.html", "student_123"),
-            (self.student, "dysleksi/screening/individual/student.html", "student_123"),
-            (self.teacher, "dysleksi/screening/teacher.html", "class_123"),
-            (self.student, "dysleksi/screening/group/student.html", "class_123"),
+        cases: list[tuple[User, str | None, TestAssignment]] = [
+            (
+                self.teacher,
+                "dysleksi/screening/teacher.html",
+                "student_123",
+                self.assignment2,
+            ),
+            (
+                self.student,
+                "dysleksi/screening/individual/student.html",
+                "student_123",
+                self.assignment2,
+            ),
+            (
+                self.teacher,
+                "dysleksi/screening/teacher.html",
+                "class_123",
+                self.assignment1,
+            ),
+            (
+                self.student,
+                "dysleksi/screening/group/student.html",
+                "class_123",
+                self.assignment1,
+            ),
         ]
-        for user, template_name, room_name in cases:
+        for user, template_name, room_name, assignment in cases:
             with self.subTest(user=user, template_name=template_name):
                 view = self.setup_view(
-                    RoomView, user, room_name=room_name, test_id=self.test.id
+                    AssignmentView,
+                    user,
+                    room_name=room_name,
+                    test_id=self.test.id,
+                    pk=assignment.id,
                 )
                 self.assertListEqual(view.get_template_names(), [template_name])
 
+        with self.assertRaises(ValueError) as cm:
+            self.setup_view(
+                AssignmentView,
+                self.other_user,
+                room_name="class_123",
+                test_id=self.test.id,
+                pk=self.assignment1.id,
+            )
+            exception = cm.exception
+            self.assertEqual(str(exception), "User is neither teacher nor student")
+
     def test_context_data(self):
         view = self.setup_view(
-            RoomView, self.teacher, room_name="class_1", test_id=self.test.id
+            AssignmentView,
+            self.teacher,
+            room_name="class_1",
+            test_id=self.test.id,
+            pk=self.assignment1.id,
         )
         context = view.get_context_data()
         self.assertIn("test_contents", context)
@@ -191,6 +237,7 @@ class TestTestAssignmentListView(DysleksiTest):
 
 
 class TestStartRoomView(DysleksiTest):
+
     def test_group_view_context(self):
         self.client.force_login(self.teacher)
         response = self.client.get(reverse("dysleksi:start_group_room"))
@@ -215,13 +262,13 @@ class TestStartRoomView(DysleksiTest):
             reverse("dysleksi:start_individual_room"), data=data
         )
 
+        assignment = TestAssignment.objects.order_by("-pk").first()
         self.assertEqual(response.status_code, 302)
 
         expected_url = reverse(
             "dysleksi:room",
             kwargs={
-                "room_name": f"student_{self.student.pk}",
-                "test_id": self.test.pk,
+                "pk": assignment.pk,
             },
         )
 
@@ -233,14 +280,13 @@ class TestStartRoomView(DysleksiTest):
         self.client.force_login(self.teacher)
         response = self.client.post(reverse("dysleksi:start_group_room"), data=data)
 
+        assignment = TestAssignment.objects.order_by("-pk").first()
+
         self.assertEqual(response.status_code, 302)
 
         expected_url = reverse(
             "dysleksi:room",
-            kwargs={
-                "room_name": f"class_{self.klasse.pk}",
-                "test_id": self.group_test.pk,
-            },
+            kwargs={"pk": assignment.pk},
         )
 
         self.assertRedirects(response, expected_url)

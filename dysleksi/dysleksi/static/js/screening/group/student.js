@@ -2,7 +2,7 @@ import { getWebSocket } from "../../ws.js";
 import { GroupTestDomElements } from "../dom.js"
 import { GroupTest } from "../test.js"
 
-export function initStudent(roomName, testContents) {
+export function initStudent(roomName, assignmentId, testContents) {
     const chatSocket = getWebSocket(roomName);
     const domElements = new GroupTestDomElements();
 
@@ -10,7 +10,7 @@ export function initStudent(roomName, testContents) {
     chatSocket.addEventListener("open", async () => {
         console.log("Socket open");
         try {
-            const test = new GroupTest(testContents, chatSocket, roomName, domElements);
+            const test = new GroupTest(testContents, chatSocket, roomName, assignmentId, domElements);
             test.addEventListener("test.complete", (evt) => {
                 // What to do when the test is completed?
                 chatSocket.close();

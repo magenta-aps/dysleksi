@@ -6,6 +6,6 @@ export function initTeacher(roomName, testContents) {
     const table = new EventTable();
     const buttons = new ActionButtons();
     buttons.showButtons()
-    
+
     new TeacherView(roomName, testContents, getWebSocket, table, buttons);
 }

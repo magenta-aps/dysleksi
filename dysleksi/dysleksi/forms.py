@@ -3,7 +3,7 @@ from django.forms import ModelChoiceField
 from django.utils.translation import gettext_lazy as _
 from dynamic_forms import DynamicField, DynamicFormMixin
 
-from dysleksi.models import Class, Student, Test, TestAssignment, TestType
+from dysleksi.models import Student, Test, TestAssignment, TestType
 
 
 class StartRoomForm(forms.ModelForm):
@@ -44,10 +44,6 @@ class StartIndividualRoomForm(DynamicFormMixin, StartRoomForm):
         queryset=Test.objects.filter(test_type=TestType.INDIVIDUAL),
     )
 
-    def get_room_name(self) -> str:
-        student: Student = self.cleaned_data["student"]
-        return f"student_{student.pk}"
-
 
 class StartClassRoomForm(DynamicFormMixin, StartRoomForm):
 
@@ -68,7 +64,3 @@ class StartClassRoomForm(DynamicFormMixin, StartRoomForm):
         label=_("Vælg test"),
         queryset=Test.objects.filter(test_type=TestType.GROUP),
     )
-
-    def get_room_name(self) -> str:
-        klasse: Class = self.cleaned_data["klasse"]
-        return f"class_{klasse.pk}"

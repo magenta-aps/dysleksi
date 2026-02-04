@@ -11,5 +11,6 @@
 {% block js %}
 {{ block.super }}
 {{ test_contents|json_script:"test_contents" }}
+{{ assignment|json_script:"assignment" }}
 <script type="module" src="{% static 'js/screening/index.js' %}"></script>
 {% endblock %}

@@ -16,14 +16,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     } else if (testType === "group") {
         ({ initStudent } = await import("./group/student.js"));
         ({ initTeacher } = await import("./group/teacher.js"));
+    } else {
+        throw new Error("Invalid test type '"+testType+"'");
     }
     
     const roomName = roleEl.dataset.roomName;
+    const assignmentId = roleEl.dataset.assignmentId;
     const testContentsEl = document.getElementById("test_contents");
     const testContents = testContentsEl ? JSON.parse(testContentsEl.textContent) : null;
 
     if (role === "student") {
-        initStudent(roomName, testContents);
+        initStudent(roomName, assignmentId, testContents);
     }
     if (role === "teacher") {
         initTeacher(roomName, testContents);             

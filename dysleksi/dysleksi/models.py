@@ -1,24 +1,33 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
+import logging
+import re
+from base64 import b64decode
 from datetime import date
 from typing import Any, Dict, List
 
 from django.contrib.auth.models import AbstractUser, Group
 from django.core.exceptions import ValidationError
+from django.core.files.base import ContentFile
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
 from django.db.models import CheckConstraint, TextChoices
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
+
+from dysleksi.exceptions import MissingIdException
 
 # Do not change these values;
 # they are present in the database as Group names, and rows are searched for by these
 TEACHERS = "Lærere"
 STUDENTS = "Elever"
+
+logger = logging.getLogger(__name__)
 
 
 class QuestionType(TextChoices):
@@ -396,6 +405,11 @@ class TestResponse(models.Model):
         blank=False,
         null=False,
     )
+    completed = models.BooleanField(
+        blank=False,
+        null=False,
+        default=False,
+    )
 
     def __str__(self) -> str:
         return f"{str(self.assignment)} / {str(self.student)}"
@@ -407,9 +421,20 @@ class PartResponse(models.Model):
         on_delete=models.CASCADE,
         related_name="partresponses",
     )
-    finished_after = models.PositiveSmallIntegerField(
+    testpart = models.ForeignKey(
+        TestPart,
+        on_delete=models.CASCADE,
+        related_name="partresponses",
+    )
+    finished_after = models.IntegerField(
+        verbose_name=_("Completion time in milliseconds"),
+        blank=True,
+        null=True,
+    )
+    completed = models.BooleanField(
         blank=False,
         null=False,
+        default=False,
     )
 
     def __str__(self) -> str:
@@ -459,21 +484,21 @@ class QuestionResponse(models.Model):
 
     correct = models.BooleanField(blank=False, null=False)
     submitted_at = models.DateTimeField(auto_now_add=True)
-    finished_after = models.PositiveSmallIntegerField(blank=False, null=False)
+    finished_after = models.IntegerField(
+        verbose_name=_("Completion time in milliseconds"), blank=False, null=False
+    )
 
     def __str__(self) -> str:
         return f"{str(self.question)} / {str(self.partresponse)}"
 
 
 class HandledEvent(TextChoices):
-    TEST_ANSWERED = "test.answered"
+    QUESTION_ANSWERED = "question.answered"
+    PART_COMPLETE = "part.complete"
     TEST_COMPLETE = "test.complete"
 
 
 class Message(models.Model):
-
-    # only store events of these types
-    store_events = {"test.answered", "test.complete"}
 
     uuid = models.UUIDField(
         primary_key=True,
@@ -482,10 +507,123 @@ class Message(models.Model):
     processed = models.DateTimeField(blank=True, null=True)
     event = models.CharField(max_length=32, choices=HandledEvent.choices)
     data = models.JSONField()
+    error = models.TextField(blank=True, null=True)
+    user = models.ForeignKey(
+        User,
+        blank=True,
+        null=True,
+        on_delete=models.SET_NULL,
+    )
+
+    @cached_property
+    def student(self):
+        return Student.objects.get(user_ptr=self.user)
+
+    @cached_property
+    def assignment(self):
+        assignment_id = self.data.get("assignmentId")
+        if assignment_id is None:
+            raise MissingIdException(f"No assignmentId in message {self.uuid}")
+        return TestAssignment.objects.get(pk=assignment_id)
+
+    @cached_property
+    def question(self):
+        question_id = self.data.get("questionId")
+        if question_id is None:
+            raise MissingIdException(f"No questionId in message {self.uuid}")
+        return TestQuestion.objects.get(pk=question_id, part=self.part.id)
+
+    @cached_property
+    def part(self):
+        part_id = self.data.get("partId")
+        if part_id is None:
+            raise MissingIdException(f"No partId in message {self.uuid}")
+        return TestPart.objects.get(pk=part_id, test=self.assignment.test)
+
+    @cached_property
+    def test_response(self):
+        test_response, created = TestResponse.objects.get_or_create(
+            assignment=self.assignment,
+            student=self.student,
+        )
+        return test_response
+
+    @cached_property
+    def part_response(self):
+        part_response, created = PartResponse.objects.get_or_create(
+            testresponse=self.test_response,
+            testpart=self.part,
+        )
+        return part_response
 
     def handle(self):  # pragma: no cover
+        if self.processed is not None:
+            return
+
         # Message is new, process it so that significant data is stored in other models
-        if self.event == HandledEvent.TEST_ANSWERED:
-            pass
-        elif self.event == HandledEvent.TEST_COMPLETE:
-            pass
+        try:
+
+            if self.event == HandledEvent.QUESTION_ANSWERED:
+                choiceId = self.data.get("choiceId")
+                duration = self.data.get("duration")
+                choice: PossibleAnswer | None = (
+                    self.question.possible_answers.get(pk=choiceId)
+                    if choiceId is not None
+                    else None
+                )
+                question_response = QuestionResponse(
+                    question=self.question,
+                    partresponse=self.part_response,
+                    answer_option=choice,
+                    answer_text=self.data.get("textAnswer"),
+                    correct=choice.is_correct if choice else self.data.get("correct"),
+                    finished_after=duration,
+                )
+
+                sound_data = self.data.get("recordingBase64")
+                if sound_data is not None:
+                    parts = sound_data.split(";")
+                    metadata = {}
+                    for part in parts[:-1]:
+                        key, value = re.split(r":|=", part, maxsplit=1)
+                        key = key.strip()
+                        value = value.strip('" ')
+                        if key == "codecs":
+                            value = [s.strip() for s in value.split(",")]
+                        metadata[key] = value
+                    filetype = metadata["data"].split("/")[-1]
+                    format, data = parts[-1].split(",", maxsplit=1)
+                    if format == "base64":
+                        question_response.answer_sound.save(
+                            f"answer.{filetype}",
+                            # TODO: convert bytes to the correct audio format
+                            ContentFile(b64decode(data)),
+                        )
+                    else:
+                        raise Exception(f"Invalid sound metadata: {metadata}")
+
+                try:
+                    question_response.full_clean()
+                except ValidationError as e:
+                    self.error = str(e)
+                    raise e
+                question_response.save()
+
+            elif self.event == HandledEvent.PART_COMPLETE:
+                part = self.part_response
+                part.completed = True
+                part.finished_after = self.data.get("duration")
+                part.save()
+
+            elif self.event == HandledEvent.TEST_COMPLETE:
+                test_response = self.test_response
+                test_response.completed = True
+                test_response.save()
+
+        except Exception as e:
+            self.processed = timezone.now()
+            self.error = str(e)
+            logger.error(e)
+        finally:
+            self.processed = timezone.now()
+            self.save()

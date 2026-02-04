@@ -2,10 +2,11 @@ import logging
 from datetime import datetime
 
 from asgiref.sync import async_to_sync
+from channels.exceptions import DenyConnection
 from channels.generic.websocket import JsonWebsocketConsumer
 from django.core.cache import caches
 
-from dysleksi.models import Message
+from dysleksi.models import HandledEvent, Message
 
 logger = logging.getLogger(__name__)
 cache = caches["chat"]  # As defined in settings/cache.py
@@ -13,6 +14,13 @@ cache = caches["chat"]  # As defined in settings/cache.py
 
 class ChatConsumer(JsonWebsocketConsumer):
     def connect(self):
+        # Ensure user is authenticated
+        # cf https://www.w3tutorials.net/blog/require-login-in-a-django-channels-socket/
+        self.user = self.scope["user"]
+        # Reject connection if user is not authenticated
+        if self.user is None or not self.user.is_authenticated:
+            raise DenyConnection("User not authenticated")
+
         # Join room group
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
@@ -43,9 +51,13 @@ class ChatConsumer(JsonWebsocketConsumer):
         # (dots are replaced with underscores,
         # then the class is checked for a method with that name)
         content["type"] = "chat.message"
+        log_content = content.copy()
+        if log_content.get("recordingBase64"):
+            log_content["recordingBase64"] = "<redacted>"  # pragma: no cover
+
         # Send message to room group
         async_to_sync(self.channel_layer.group_send)(self.room_group_name, content)
-        logger.info("'%s' sent '%s'", self.scope["user"], content)
+        logger.info("'%s' sent '%s'", self.user, log_content)
 
         # Store message in cache
         cache.set(
@@ -56,10 +68,15 @@ class ChatConsumer(JsonWebsocketConsumer):
 
         # Store message in database
         event = content["event"]
-        if event in Message.store_events:
+
+        if event in HandledEvent:
             message, created = Message.objects.get_or_create(
                 uuid=content["uuid"],
-                defaults={"event": content["event"], "data": content},
+                defaults={
+                    "event": content["event"],
+                    "data": content,
+                    "user": self.user,
+                },
             )
             if created:
                 # Only handle messages that were not already stored

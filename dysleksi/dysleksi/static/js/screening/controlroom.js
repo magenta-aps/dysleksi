@@ -18,7 +18,7 @@ export class EventTable {
         typeEl.textContent = data.event;
         questionEl.textContent = data.questionTitle;
 
-        if (data.event === 'test.answered') {
+        if (data.event === 'question.answered') {
             if (data.recordingBase64) {
                 const audioEl = document.createElement('audio');
                 audioEl.controls = true;
@@ -27,13 +27,13 @@ export class EventTable {
             } else if (data.textAnswer){
                 answerEl.textContent = data.textAnswer;
             } else {
-                answerEl.textContent = data.choice || "";
+                answerEl.textContent = data.choiceId || "";
             }
         } else {
             answerEl.textContent = '-';
         }
 
-        durationEl.textContent = data.event === 'test.answered' ? data.answeredAt : data.displayedAt;
+        durationEl.textContent = data.event === 'question.answered' ? data.answeredAt : data.displayedAt;
 
         this.eventsEl.prepend(eventEl);
     }
@@ -86,13 +86,13 @@ export class TeacherView {
             console.log('chat: received', e.data);
             const data = JSON.parse(e.data);
 
-            if (data.event.match(/test.(answered|displayed)/)) {
+            if (data.event.match(/question.(answered|displayed)/)) {
                 const test = this.tests[data.questionIndex];;
                 this.testIndex = data.questionIndex;
 
                 this.table.updateTable(data, test);
 
-                if (data.event === 'test.displayed') {
+                if (data.event === 'question.displayed') {
                     this.buttons.enableButtons();
                 }
             }
@@ -106,8 +106,8 @@ export class TeacherView {
                 this.chatSocket.send(
                     JSON.stringify({
                         uuid: crypto.randomUUID(),
-                        event: 'test.' + val,
-                        id: this.roomName,
+                        event: 'question.' + val,
+                        roomName: this.roomName,
                         questionIndex: this.testIndex,
                     })
                 );
