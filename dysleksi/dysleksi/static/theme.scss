@@ -50,6 +50,10 @@ i {
   font-style: normal; /* avoid "double italicization" */
 }
 
+.btn {
+  touch-action: manipulation; /* prevent double-tap zoom on iPads */
+}
+
 .erase-btn {
   background-color: $student-grey-light !important;
   color: black;
