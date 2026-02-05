@@ -337,7 +337,6 @@ describe('getWebSocket', () => {
 });
 
 
-
 describe("GroupTestDomElements - showQuestionFreeText", () => {
     let domElements;
     let listenerMock;

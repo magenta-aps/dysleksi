@@ -222,8 +222,7 @@ export class GroupTestDomElements extends TestDomElements {
     }
 
     showSummary(text, parts) {
-        this.showSummaryTable(parts);
-        this.showInstructions(text);
+        super.showSummary(text, parts);
         this.togglePracticeButton(false);
         this.toggleQuestionsButton(false);
     }
@@ -267,6 +266,11 @@ export class GroupTestDomElements extends TestDomElements {
         const btn = document.createElement("button");
         if (text) {
             btn.textContent = text;
+        }
+        if (imageUrl) {
+            const image = document.createElement("img");
+            image.src = imageUrl;
+            btn.append(image);
         }
         // TODO: render sound and image
         btn.className = "btn btn-outline-primary";
