@@ -604,6 +604,11 @@ class TestResponse(models.Model):
         null=False,
         default=False,
     )
+    cancelled = models.BooleanField(
+        blank=False,
+        null=False,
+        default=False,
+    )
 
     def __str__(self) -> str:
         return f"{str(self.assignment)} / {str(self.student)}"
@@ -689,6 +694,7 @@ class HandledEvent(TextChoices):
     QUESTION_FEEDBACK = "question.feedback"
     PART_COMPLETE = "part.complete"
     TEST_COMPLETE = "test.complete"
+    TEST_CANCELLED = "test.cancelled"
 
 
 class Message(models.Model):
@@ -844,6 +850,14 @@ class Message(models.Model):
             elif self.event == HandledEvent.TEST_COMPLETE:
                 test_response = self.test_response
                 test_response.completed = True
+                test_response.save()
+
+            elif self.event == HandledEvent.TEST_CANCELLED:
+                question_response = self.question_response
+                question_response.note = self.data.get("note")
+                question_response.save()
+                test_response = self.test_response
+                test_response.cancelled = True
                 test_response.save()
 
         except Exception as e:

@@ -5,7 +5,7 @@ export class EventTable {
         this.eventsEl = document.querySelector(tableSelector);
     }
 
-    updateTable(data, question) {
+    updateTable(data) {
         const eventEl = document.createElement('tr');
 
         const typeEl = document.createElement('td');
@@ -154,11 +154,14 @@ export class TeacherView {
         this.chatSocket.addEventListener("message", (e) => {
             const data = JSON.parse(e.data);
 
-            if (data.event.match(/question.(answered|displayed)/)) {
+            if (["test.cancelled", "test.complete", "question.answered", "question.displayed"].includes(data.event)) {
+                this.table.updateTable(data);
+            }
+
+            if (["question.answered", "question.displayed"].includes(data.event)) {
                 const question = this.questions[data.questionIndex];
                 this.questionIndex = data.questionIndex;
                 this.question = question;
-                this.table.updateTable(data, question);
                 if (data.event === 'question.displayed') {
                     this.buttons.enableButtons();
                     this.showQuestion(question);
@@ -170,26 +173,42 @@ export class TeacherView {
     _initButtonListeners() {
         this.buttons.addClickListener((e) => {
             const val = e.target.id;
-            const correct = (val === "skipped") ? null : (val === "correct");
-            if ((this.questionIndex >= 0) && (this.questionIndex < this.questions.length)) {
-                this.chatSocket.send(
-                    JSON.stringify({
+            if (val === "cancelled") {
+                if (confirm("Er du sikker på at du vil afbryde testen")) {
+                    this.chatSocket.send(JSON.stringify({
                         uuid: crypto.randomUUID(),
-                        event: 'question.feedback',
+                        event: 'test.cancelled',
                         roomName: this.roomName,
                         questionIndex: this.questionIndex,
                         questionId: this.question.questionId,
                         partId: this.question.partId,
                         assignmentId: this.assignmentId,
-                        correct: correct, // true=correct, false=wrong, null=skipped
                         note: this.noteField.getNote(),
-                    })
-                );
-                this.buttons.disableButtons();
-                this.noteField.clearNote();
-                this.hideQuestion();
+                    }));
+                    this.buttons.disableButtons();
+                }
             } else {
-                console.error('invalid question index', this.questionIndex);
+                const correct = (val === "skipped") ? null : (val === "correct");
+                if ((this.questionIndex >= 0) && (this.questionIndex < this.questions.length)) {
+                    this.chatSocket.send(
+                        JSON.stringify({
+                            uuid: crypto.randomUUID(),
+                            event: 'question.feedback',
+                            roomName: this.roomName,
+                            questionIndex: this.questionIndex,
+                            questionId: this.question.questionId,
+                            partId: this.question.partId,
+                            assignmentId: this.assignmentId,
+                            correct: correct, // true=correct, false=wrong, null=skipped
+                            note: this.noteField.getNote(),
+                        })
+                    );
+                    this.buttons.disableButtons();
+                    this.noteField.clearNote();
+                    this.hideQuestion();
+                } else {
+                    console.error('invalid question index', this.questionIndex);
+                }
             }
         });
     }

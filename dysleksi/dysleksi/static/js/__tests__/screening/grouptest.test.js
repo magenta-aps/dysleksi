@@ -7,7 +7,7 @@ import * as groupTestData from './grouptest.json' with { type: 'json' }
 import {getWebSocket} from "../../ws";
 import {GroupTestDomElements} from "../../screening/dom.js";
 
-describe('getWebSocket', () => {
+describe('GroupTestFlow', () => {
     let originalWebSocket;
     let mockSend;
 

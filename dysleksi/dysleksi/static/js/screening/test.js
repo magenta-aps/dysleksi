@@ -81,17 +81,20 @@ class Test extends EventTarget {
         }
     }
 
-    async onComplete() {
-        console.log("Test complete");
+    async onComplete(cancelled = false) {
         this.domElements.hideInstructions();
         this.domElements.showQuestionTitle();
         this.domElements.showQuestionChallenge();
 
-        alert("Testen er færdig!");
-        this.send({
-            event: "test.complete",
-            message: "Testen er afsluttet",
-        });
+        if (cancelled) {
+            alert("Testen er afbrudt");
+        } else {
+            alert("Testen er færdig!");
+            this.send({
+                event: "test.complete",
+                message: "Testen er afsluttet",
+            });
+        }
 
         this.dispatchEvent(new Event("test.complete", {
             test: this
@@ -143,17 +146,20 @@ export class IndividualTest extends Test {
         if (data.event === "question.feedback") {
             this.teacherFeedback(data.correct);
         }
+        if (data.event === "test.cancelled") {
+            this.onComplete(true);
+        }
     }
 
     async teacherFeedback(outcome) {
         await this.currentPart.currentQuestion.teacherFeedback(outcome)
     }
 
-    async onComplete() {
+    async onComplete(cancelled = false) {
         if (this.mediaRecorder) {
             await this.mediaRecorder.stop();
         }
-        super.onComplete();
+        super.onComplete(cancelled);
     }
 }
 

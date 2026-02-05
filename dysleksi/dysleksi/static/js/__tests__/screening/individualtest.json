@@ -1,0 +1,51 @@
+{
+  "id": 5,
+  "name": "Individuel test",
+  "parts": [
+    {
+      "id": 1,
+      "name": "Individuel deltest",
+      "instructions_url": null,
+      "intro": "Dette er en dummy test",
+      "timeout": 60,
+      "partial_score_after": 30,
+      "practice": [],
+      "questions": [
+        {
+          "id": 1,
+          "question_type": "free_text",
+          "challenge_id": 30,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "Udtal følgende bogstav: 'S'",
+          "possible_answers": []
+        },
+        {
+          "id": 2,
+          "question_type": "free_text",
+          "challenge_id": 31,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "Udtal ølgende bogstav: 'V'",
+          "possible_answers": []
+        },
+        {
+          "id": 3,
+          "question_type": "free_text",
+          "challenge_id": 32,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "Udtal følgende bogstav: 'K'",
+          "possible_answers": []
+        }
+      ]
+    }
+  ],
+  "summary": [
+    "Individuel deltest (dummy)"
+  ],
+  "summary_text": "Prøven indeholder:"
+}
