@@ -105,7 +105,6 @@ i {
   padding: 0.5rem 2rem;
   margin: 2rem auto;
   display: flex;
-  display: none; // hidden until answer selected
 
   align-items: center;
   justify-content: center;
@@ -175,4 +174,10 @@ i {
   margin: 1rem auto;
   height: 200px;
   object-fit: contain;
+}
+
+.highlight {
+    outline: 5px solid $student-red;
+    box-shadow: 0 0 10px $student-red;
+    transition: outline 0.3s, box-shadow 0.3s;
 }

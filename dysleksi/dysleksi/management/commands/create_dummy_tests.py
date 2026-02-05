@@ -4,15 +4,10 @@
 
 from typing import Literal
 
-from data_tools.utils import (
-    create_test_resources,
-    create_wordreading_2_test,
-    create_wordspelling_test,
-)
+from django.core.management import call_command
 from django.core.management.base import BaseCommand
-from django.utils.translation import gettext_lazy as _
 
-from dysleksi.models import Test, TestPart, TestType
+from dysleksi.models import Test, TestType
 
 
 def create_group_test(
@@ -22,139 +17,56 @@ def create_group_test(
 
     name = f"{period} {grade}. klasse".capitalize()
 
-    wordreading_2a_data = [
-        {
-            "image": "wordreading_2_dummy/dog.png",
-            "correct": _("hund"),
-            "wrong": [_("kat"), _("ko"), _("hest")],
-        },
-        {
-            "image": "wordreading_2_dummy/bike.jpeg",
-            "correct": _("cykel"),
-            "wrong": [_("bil"), _("bus"), _("tog")],
-        },
-        {
-            "image": "wordreading_2_dummy/cat.jpg",
-            "correct": _("kat"),
-            "wrong": [_("hund"), _("mus"), _("fugl")],
-        },
-        {
-            "image": "wordreading_2_dummy/house.jpg",
-            "correct": _("hus"),
-            "wrong": [_("bil"), _("træ"), _("vej")],
-        },
-        {
-            "image": "wordreading_2_dummy/car.jpg",
-            "correct": _("bil"),
-            "wrong": [_("cykel"), _("tog"), _("bus")],
-        },
-    ]
-
-    wordreading_2a_practice_data = [
-        {
-            "image": "wordreading_2_dummy/dog.png",
-            "correct": _("hund"),
-            "wrong": [_("kat"), _("ko"), _("hest")],
-        },
-        {
-            "image": "wordreading_2_dummy/cat.jpeg",
-            "correct": _("kat"),
-            "wrong": [_("hund"), _("ko"), _("hest")],
-        },
-    ]
-
-    wordreading_2b_data = [
-        {
-            "image": "wordreading_2_dummy/dog.png",
-            "correct": _("hund"),
-            "wrong": [_("kat"), _("ko"), _("hest")],
-        },
-        {
-            "image": "wordreading_2_dummy/bike.jpeg",
-            "correct": _("cykel"),
-            "wrong": [_("bil"), _("bus"), _("tog")],
-        },
-    ]
-
-    wordspelling_data = [
-        {
-            "sound": "wordspelling_dummy/iki.mp3",
-            "correct": "iki",
-            "wrong": [],
-        },
-        {
-            "sound": "wordspelling_dummy/aput.mp3",
-            "correct": "aput",
-            "wrong": [],
-        },
-        {
-            "sound": "wordspelling_dummy/arsaq.mp3",
-            "correct": "arsaq",
-            "wrong": [],
-        },
-        {
-            "sound": "wordspelling_dummy/sorluk.mp3",
-            "correct": "sorluk",
-            "wrong": [],
-        },
-    ]
-
-    wordspelling_practise_data = [
-        {
-            "sound": "wordspelling_dummy/niu.mp3",
-            "correct": "niu",
-            "wrong": [],
-        },
-    ]
-
     if grade >= 2:
 
         test, created = Test.objects.get_or_create(name=name, test_type=TestType.GROUP)
 
-        # A wordspelling test with practice run
-        create_wordspelling_test(
-            test,
-            wordspelling_data,
-            wordspelling_practise_data,
-            name="Ordstavning (dummy)",
-        )
-
         # A wordreading 2 test with practice run
-        create_wordreading_2_test(
-            test,
-            wordreading_2a_data,
-            wordreading_2a_practice_data,
-            name="Ordlæsning 2A (dummy)",
+        call_command(
+            "import_test",
+            name,
+            "Ordlæsning 2A (dummy)",
+            "/upload/wordreading_2_dummy/wordreading_2a.json",
+            "wordreading_2",
+            practice_json_path=(
+                "/upload/wordreading_2_dummy/wordreading_2a_practice.json"
+            ),
         )
 
         # A wordreading 2 test without practice run
-        create_wordreading_2_test(
-            test, wordreading_2b_data, None, name="Ordlæsning 2B (dummy)"
+        call_command(
+            "import_test",
+            name,
+            "Ordlæsning 2B (dummy)",
+            "/upload/wordreading_2_dummy/wordreading_2b.json",
+            "wordreading_2",
+        )
+
+        # A wordspelling test with practice run
+        call_command(
+            "import_test",
+            name,
+            "Ordstavning (dummy)",
+            "/upload/wordspelling_dummy/wordspelling.json",
+            "wordspelling",
+            practice_json_path="/upload/wordspelling_dummy/wordspelling_practice.json",
         )
 
 
 def create_individual_test():
-    questions_data = [
-        {"text": "Udtal følgende bogstav: 'S'", "correct": None, "wrong": []},
-        {"text": "Udtal følgende bogstav: 'V'", "correct": None, "wrong": []},
-        {"text": "Udtal følgende bogstav: 'K'", "correct": None, "wrong": []},
-    ]
 
+    test_name = "Individuel test (dummy)"
     test, created = Test.objects.get_or_create(
-        name="Individuel test (dummy)", test_type=TestType.INDIVIDUAL
+        name=test_name, test_type=TestType.INDIVIDUAL
     )
 
-    part, created = TestPart.objects.get_or_create(
-        test=test,
-        name="Individuel deltest (dummy)",
-        defaults={
-            "timeout": 60,
-            "partial_score_after": 30,
-            "intro": "Dette er en dummy test",
-        },
+    call_command(
+        "import_test",
+        test_name,
+        "Individuel deltest (dummy)",
+        "/upload/letter_pronunciation_dummy/letter_pronunciation.json",
+        "letter_pronunciation",
     )
-
-    create_test_resources(questions_data, part)
 
 
 class Command(BaseCommand):

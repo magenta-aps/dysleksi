@@ -280,3 +280,96 @@ describe("IndividualTestDomElements constructor", () => {
         }
     });
 })
+
+
+
+describe("TestDomElements DOM utilities", () => {
+  let dom;
+  let el;
+
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <audio id="instructions-sound"></audio>
+      <div id="instructions-text"></div>
+      <button id="start-practice"></button>
+      <button id="start-questions"></button>
+      <table id="summary-table"></table>
+      <button id="end-summary"></button>
+      <div id="question-title"></div>
+      <div id="question-challenge"></div>
+      <div id="choices"></div>
+      <button id="next"></button>
+      <div id="test-el"></div>
+    `;
+    dom = new GroupTestDomElements();
+    el = document.getElementById("test-el");
+  });
+
+  it("showElement sets display to block", () => {
+    dom.showElement(el);
+    expect(el.style.display).toBe("block");
+  });
+
+  it("hideElement sets display to none", () => {
+    dom.hideElement(el);
+    expect(el.style.display).toBe("none");
+  });
+
+  it("fadeIn sets opacity to 1", async () => {
+    el.style.opacity = "0.4";
+
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    dom.fadeIn(el);
+    await new Promise(resolve => requestAnimationFrame(resolve));
+
+    expect(el.style.opacity).toBe("1");
+    expect(el.style.transition).toContain("opacity");
+  });
+
+  it("fadeOut sets opacity to 0.4", async () => {
+    el.style.opacity = "1";
+
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    dom.fadeOut(el);
+    await new Promise(resolve => requestAnimationFrame(resolve));
+
+    expect(el.style.opacity).toBe("0.4");
+    expect(el.style.transition).toContain("opacity");
+  });
+
+  it("highlight adds highlight class temporarily", async () => {
+    vi.useFakeTimers();
+    dom.highlight(el);
+    expect(el.classList.contains("highlight")).toBe(true);
+    vi.advanceTimersByTime(1500);
+    expect(el.classList.contains("highlight")).toBe(false);
+    vi.useRealTimers();
+  });
+
+  it("lockInput disables all choice buttons and next button", () => {
+    const btn1 = document.createElement("button");
+    const btn2 = document.createElement("button");
+    document.getElementById("choices").append(btn1, btn2);
+    const nextBtn = document.getElementById("next");
+
+    dom.lockInput();
+
+    expect(btn1.disabled).toBe(true);
+    expect(btn2.disabled).toBe(true);
+    expect(nextBtn.disabled).toBe(true);
+  });
+
+  it("unlockInput enables all choice buttons and next button", () => {
+    const btn1 = document.createElement("button");
+    const btn2 = document.createElement("button");
+    document.getElementById("choices").append(btn1, btn2);
+    const nextBtn = document.getElementById("next");
+
+    dom.lockInput(); // first lock
+    dom.unlockInput();
+
+    expect(btn1.disabled).toBe(false);
+    expect(btn2.disabled).toBe(false);
+    expect(nextBtn.disabled).toBe(false);
+  });
+});

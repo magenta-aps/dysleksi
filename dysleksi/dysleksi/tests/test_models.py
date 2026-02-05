@@ -14,6 +14,9 @@ from freezegun import freeze_time
 from dysleksi.models import (
     STUDENTS,
     TEACHERS,
+    Instruction,
+    InstructionAction,
+    InstructionSequence,
     Message,
     PartResponse,
     PossibleAnswer,
@@ -571,3 +574,185 @@ class TestMessage(DysleksiTest):
             user=self.teacher,
         )
         self.assertIsNone(message.student)
+
+
+class TestInstructionSequence(DysleksiTest):
+
+    def test_str(self):
+        seq = InstructionSequence.objects.create(question=self.question1)
+
+        self.assertEqual(
+            str(seq), f"Practice sequence for question {self.question1.id}"
+        )
+
+    def test_to_json(self):
+        seq = InstructionSequence.objects.create(question=self.question1)
+
+        # Two instructions, but intentionally out of order in creation
+        Instruction.objects.create(
+            sequence=seq,
+            order=2,
+            action=InstructionAction.HIDE,
+            element="choices",
+            delay_after=123,
+        )
+        Instruction.objects.create(
+            sequence=seq,
+            order=1,
+            action=InstructionAction.SHOW,
+            element="intro",
+            delay_after=0,
+        )
+
+        data = seq.to_json()
+
+        self.assertIn("instructions", data)
+        self.assertEqual(len(data["instructions"]), 2)
+
+        # Must be ordered by "order"
+        self.assertEqual(data["instructions"][0]["action"], InstructionAction.SHOW)
+        self.assertEqual(data["instructions"][0]["element"], "intro")
+        self.assertEqual(data["instructions"][0]["delayAfter"], 0)
+
+        self.assertEqual(data["instructions"][1]["action"], InstructionAction.HIDE)
+        self.assertEqual(data["instructions"][1]["element"], "choices")
+        self.assertEqual(data["instructions"][1]["delayAfter"], 123)
+
+
+class TestInstruction(DysleksiTest):
+
+    def test_str(self):
+
+        seq = InstructionSequence.objects.create(question=self.question1)
+
+        instr = Instruction.objects.create(
+            sequence=seq,
+            order=1,
+            action=InstructionAction.SHOW,
+            element="intro",
+            delay_after=500,
+        )
+
+        self.assertEqual(str(instr), f"{str(seq)} [{instr.order}] {instr.action}")
+
+    def test_to_json_minimal(self):
+        seq = InstructionSequence.objects.create(question=self.question1)
+
+        instr = Instruction.objects.create(
+            sequence=seq,
+            order=1,
+            action=InstructionAction.FADE_OUT,
+            delay_after=0,
+        )
+
+        data = instr.to_json()
+        self.assertEqual(data, {"action": InstructionAction.FADE_OUT, "delayAfter": 0})
+
+    def test_to_json_with_element(self):
+        seq = InstructionSequence.objects.create(question=self.question1)
+
+        instr = Instruction.objects.create(
+            sequence=seq,
+            order=1,
+            action=InstructionAction.HIGHLIGHT,
+            element="choice-isi",
+            delay_after=250,
+        )
+
+        data = instr.to_json()
+        self.assertEqual(data["action"], InstructionAction.HIGHLIGHT)
+        self.assertEqual(data["delayAfter"], 250)
+        self.assertEqual(data["element"], "choice-isi")
+
+    def test_to_json_with_resource_sound(self):
+        seq = InstructionSequence.objects.create(question=self.question1)
+
+        instr = Instruction.objects.create(
+            sequence=seq,
+            order=1,
+            action=InstructionAction.PLAY_SOUND,
+            resource=self.resource4,
+            delay_after=0,
+        )
+
+        data = instr.to_json()
+        self.assertEqual(data["action"], InstructionAction.PLAY_SOUND)
+        self.assertEqual(data["delayAfter"], 0)
+
+        self.assertIn("url", data)
+        self.assertTrue(data["url"])
+
+    def test_to_json_with_resource_image(self):
+        seq = InstructionSequence.objects.create(question=self.question1)
+
+        instr = Instruction.objects.create(
+            sequence=seq,
+            order=1,
+            action=InstructionAction.SHOW,
+            resource=self.resource2,
+            delay_after=0,
+        )
+
+        data = instr.to_json()
+        self.assertEqual(data["action"], InstructionAction.SHOW)
+        self.assertEqual(data["delayAfter"], 0)
+
+        self.assertIn("url", data)
+        self.assertTrue(data["url"])
+
+    def test_to_json_with_resource_text(self):
+        seq = InstructionSequence.objects.create(question=self.question1)
+
+        instr = Instruction.objects.create(
+            sequence=seq,
+            order=1,
+            action=InstructionAction.SHOW,
+            resource=self.resource1,
+            delay_after=0,
+        )
+
+        data = instr.to_json()
+        self.assertEqual(data["action"], InstructionAction.SHOW)
+        self.assertEqual(data["delayAfter"], 0)
+
+        self.assertNotIn("url", data)
+
+    def test_constraint_play_sound_requires_resource(self):
+        seq = InstructionSequence.objects.create(question=self.question1)
+
+        with self.assertRaises(IntegrityError) as cm:
+            Instruction.objects.create(
+                sequence=seq,
+                order=1,
+                action=InstructionAction.PLAY_SOUND,
+                resource=None,
+                delay_after=0,
+            )
+
+        exception = cm.exception
+        self.assertIn("play_sound_requires_resource", str(exception))
+
+    def test_default_ordering(self):
+        seq = InstructionSequence.objects.create(question=self.question1)
+
+        Instruction.objects.create(
+            sequence=seq,
+            order=3,
+            action=InstructionAction.SHOW,
+            element="a",
+        )
+        Instruction.objects.create(
+            sequence=seq,
+            order=1,
+            action=InstructionAction.SHOW,
+            element="b",
+        )
+        Instruction.objects.create(
+            sequence=seq,
+            order=2,
+            action=InstructionAction.SHOW,
+            element="c",
+        )
+
+        orders = list(seq.instructions.values_list("order", flat=True))
+        self.assertEqual(orders, [1, 2, 3])

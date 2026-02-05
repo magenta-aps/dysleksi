@@ -199,11 +199,13 @@ Python Unittest:
   <<: *test-default
   script:
     - cd /app
-    - ls /builds/gronlandsprojekter/dysleksi/file-data
+    - mkdir -p /upload
+    - cp -r /builds/gronlandsprojekter/dysleksi/file-data/* /upload/
     - coverage run manage.py test --parallel
     - coverage combine
     - coverage report --show-missing --fail-under=100
     - coverage xml -o /app/coverage.xml
+    - rm -rf /upload/*
   coverage: '/^TOTAL.+?(\d+\%)$/'
   artifacts:
     reports:
@@ -238,10 +240,10 @@ Javascript Unittest:
     - |
       npx vitest run \
         --coverage \
-        --coverage.thresholds.statements=71.70 \
-        --coverage.thresholds.branches=65.96 \
-        --coverage.thresholds.functions=64.07 \
-        --coverage.thresholds.lines=72.39 \
+        --coverage.thresholds.statements=73.11 \
+        --coverage.thresholds.branches=67.28 \
+        --coverage.thresholds.functions=67.55 \
+        --coverage.thresholds.lines=73.7 \
         --coverage.provider=istanbul \
         --coverage.include="dysleksi/static/js/**/*.js" \
       2>&1 | tee vitest_output.txt

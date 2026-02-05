@@ -54,6 +54,49 @@ class TestDomElements {
         this.endSummaryButton = this._setButtonListener(this.endSummaryButton, listener);
     }
 
+    showElement(el) {
+        el.style.display = "block";
+    }
+
+    hideElement(el) {
+        el.style.display = "none";
+    }
+    
+    fadeIn(el) {
+        el.style.transition = "opacity 0.5s";
+        requestAnimationFrame(() => {
+            el.style.opacity = 1;
+        });
+    }
+    
+    fadeOut(el) {
+        el.style.transition = "opacity 0.5s";
+        requestAnimationFrame(() => {
+            el.style.opacity = 0.4;
+        });
+    }
+    
+    highlight(el) {
+        el.classList.add("highlight");
+        setTimeout(() => el.classList.remove("highlight"), 1500);
+    }
+
+    lockInput() {
+        this._updateInputState(true);
+    }
+    
+    unlockInput() {
+        this._updateInputState(false);
+    }
+    
+    _updateInputState(inputLocked) {
+        const buttons = document.querySelectorAll("button");
+        buttons.forEach(btn => {
+            btn.disabled = inputLocked;
+        });
+    }
+
+
     showInstructions(text, audio) {
         if (text) {
             this.introTextEl.textContent = text;
@@ -274,6 +317,7 @@ export class GroupTestDomElements extends TestDomElements {
         }
         // TODO: render sound and image
         btn.className = "btn btn-outline-primary";
+        btn.id = "choice-" + text;
         this.choicesEl.append(btn);
         if (listener) {
             btn.addEventListener("click", listener);
