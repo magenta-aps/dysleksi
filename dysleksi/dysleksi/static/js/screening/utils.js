@@ -33,8 +33,7 @@ export function startSession(roomName) {
 
     chatSocket.addEventListener("message", (e) => {
         const data = JSON.parse(e.data);
-
-        if (data.event == "student.ready") {
+        if (data.event === "student.ready") {
             refreshSession(roomName);
         }
     });
@@ -44,7 +43,6 @@ export function startSession(roomName) {
 
 function refreshSession(roomName) {
     const chatSocket = getWebSocket(roomName);
-
     if (chatSocket.readyState === WebSocket.OPEN) {
         chatSocket.send(JSON.stringify({
             uuid: crypto.randomUUID(),

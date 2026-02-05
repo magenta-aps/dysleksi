@@ -1,7 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { initStudentLobby } from "../../lobby/student.js";
 import * as wsModule from "../../ws.js";
-import { withAnyUUID } from "../utils.js"
 
 
 // Mock getWebSocket
@@ -58,6 +57,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
   });
 
   it("sends student.ready once when socket opens", () => {
+    vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
     initStudentLobby({
       individualRoomName: "room-1",
       classRoomName: "room-2",
@@ -68,10 +68,11 @@ describe("initStudentLobby / initRedirectSocket", () => {
     socket.__trigger("open");
 
     expect(socket.send).toHaveBeenCalledWith(
-      withAnyUUID(JSON.stringify({
+      JSON.stringify({
+          "uuid": "UUID123",
           event: "student.ready",
           roomName: "room-1",
-      }))
+      })
     );
   });
 
