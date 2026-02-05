@@ -82,6 +82,10 @@ class DysleksiTest(TestCase):
             name="TestResource3",
             text="TestOrd",
         )
+        cls.resource4 = TestResource.objects.create(
+            name="TestResource4",
+            sound="foo.mp3",
+        )
 
         cls.question1 = TestQuestion.objects.create(
             part=cls.part,

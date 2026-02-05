@@ -1,0 +1,12 @@
+[
+    {
+        "image": "wordreading_2_dummy/dog.png",
+        "correct": "hund",
+        "wrong": ["kat", "ko", "hest"]
+    },
+    {
+        "image": "wordreading_2_dummy/bike.jpeg",
+        "correct": "cykel",
+        "wrong": ["bil", "bus", "tog"]
+    }
+]

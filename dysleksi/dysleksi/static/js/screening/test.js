@@ -1,4 +1,5 @@
 import {shuffleArray} from "./utils.js";
+import {InstructionSequenceRunner} from "./instruction.js"
 
 class Test extends EventTarget {
 
@@ -229,7 +230,7 @@ class TestPart {
             //throw new Error("Cannot show question index " + index + ", only " + questions.length + " questions available.")
             return false;
         }
-        this.currentQuestion = this.questions[index];
+        this.currentQuestion = questions[index];
         this.currentQuestion.show();
         return true;
     }
@@ -351,6 +352,7 @@ class Question {
     answeredAt;
     selectedChoice;
     domElements;
+    instruction_sequence;
 
     constructor(data, part, index) {
         this.part = part;
@@ -364,10 +366,15 @@ class Question {
         this.challengeSoundUrl = data.challenge_sound_url;
         this.challengeText = data.challenge_text;
         this.possibleAnswers = data.possible_answers.map(dataItem => new PossibleAnswer(dataItem, this));
+        this.instruction_sequence = data.instruction_sequence;
     }
 
     questionTitle() {
-        return `${this.index + 1}/${this.part.questionsCount()} (${this.part.name})`;
+        if (this.instruction_sequence){
+            return "Instruks"
+        } else {
+            return `${this.index + 1}/${this.part.questionsCount()} (${this.part.name})`;
+        }
     }
 
     show() {
@@ -377,6 +384,21 @@ class Question {
         this.selectedChoice = null;
         this.domElements.showQuestionTitle(this.questionTitle());
         this.domElements.showQuestionChallenge(this.challengeText, this.challengeSoundUrl, this.challengeImageUrl);
+
+        if (this.instruction_sequence){
+            console.log("---------------------------------------------")
+            console.log("Starting instruction sequence: ", this.instruction_sequence)
+
+            this.instructionRunner = new InstructionSequenceRunner(
+                this.instruction_sequence.instructions,
+                this.domElements
+            );
+
+            this.instructionRunner.run().then(() => {
+                this.domElements.unlockInput();
+            });
+
+        }
     }
 
     onShow() {
@@ -418,28 +440,32 @@ class GroupQuestion extends Question {
     show() {
         super.show();
 
-        this.domElements.toggleNextButton(false);
         this.domElements.setNextButtonListener(() => this.onComplete());
 
         this.domElements.clearQuestionChoices();
         let answers = this.possibleAnswers;
-        if (!this.isPracticing()) {
-            answers = shuffleArray(answers);
-        }
+        answers = shuffleArray(answers);
 
         for (let answer of answers) {
             answer.show();
         }
+
+        if (this.instruction_sequence){
+            this.domElements.lockInput();
+        } else {
+            this.domElements.toggleNextButton(false);
+        }
+
         super.onShow();
     }
 
     onComplete() {
         super.onComplete();
-        if (!this.selectedChoice) {
+        if (!this.selectedChoice && !this.instruction_sequence) {
             alert("Vælg et svar, før du går videre.");
             return;
         }
-        if (this.isPracticing()) {
+        if (this.isPracticing()  && !this.instruction_sequence) {
             if (this.selectedChoice.isCorrect) {
                 if (this.isLast()) {
                     alert("Øveopgaver gennemført. Begynd den rigtige test")
@@ -451,6 +477,8 @@ class GroupQuestion extends Question {
                 alert("Nej, det er forkert. Prøv at vælge igen.");
                 this.show();
             }
+        } else if (this.instruction_sequence) {
+            this.part.onQuestionComplete();
         } else {
             const duration = this.answeredAt - this.displayedAt;
             this.part.test.send({

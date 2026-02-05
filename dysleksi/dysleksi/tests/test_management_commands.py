@@ -18,7 +18,7 @@ class ImportTestTest(TestCase):
         self.test_name = "Test1"
         self.test = Test.objects.create(name=self.test_name)
 
-    def test_import(self):
+    def test_import_wordreading_2_test(self):
         questions_data = [
             {
                 "image": "wordreading_2_dummy/dog.png",
@@ -53,13 +53,82 @@ class ImportTestTest(TestCase):
             tmp_file_path = Path(tmp_file.name)
 
         # Call the management command with name and JSON path
-        call_command("import_test", self.test_name, str(tmp_file_path))
+        call_command(
+            "import_test",
+            self.test_name,
+            "Ordlæsning 2",
+            str(tmp_file_path),
+            "wordreading_2",
+        )
 
         # Fetch the created TestPart
         word_reading_2_test = TestPart.objects.get(name="Ordlæsning 2", test=self.test)
 
         # Assert we created all 5 questions
-        self.assertEqual(word_reading_2_test.questions.count(), 6)
+        self.assertEqual(word_reading_2_test.questions.count(), 5)
 
         # Clean up temporary file
         tmp_file_path.unlink()
+
+    def test_import_letter_pronunciation_test(self):
+        questions_data = [
+            {"text": "Udtal følgende bogstav: 'S'", "correct": None, "wrong": []},
+            {"text": "Udtal følgende bogstav: 'V'", "correct": None, "wrong": []},
+            {"text": "Udtal følgende bogstav: 'K'", "correct": None, "wrong": []},
+        ]
+        practice_data = [
+            {"text": "Udtal følgende bogstav: 'Q'", "correct": None, "wrong": []},
+        ]
+
+        # Write JSON data to a temporary file
+        with tempfile.NamedTemporaryFile("w", delete=False, suffix=".json") as tmp_file:
+            json.dump(questions_data, tmp_file, ensure_ascii=False)
+            tmp_questions_data_path = Path(tmp_file.name)
+
+        with tempfile.NamedTemporaryFile("w", delete=False, suffix=".json") as tmp_file:
+            json.dump(practice_data, tmp_file, ensure_ascii=False)
+            tmp_practice_data_path = Path(tmp_file.name)
+
+        # Call the management command with name and JSON path
+        call_command(
+            "import_test",
+            self.test_name,
+            "Bogstavsbenævnelse",
+            str(tmp_questions_data_path),
+            "letter_pronunciation",
+            practice_json_path=str(tmp_practice_data_path),
+        )
+
+        # Fetch the created TestPart
+        word_reading_2_test = TestPart.objects.get(
+            name="Bogstavsbenævnelse", test=self.test
+        )
+
+        # Assert we created all 4 questions
+        self.assertEqual(word_reading_2_test.questions.count(), 4)
+
+        # Clean up temporary file
+        tmp_questions_data_path.unlink()
+        tmp_practice_data_path.unlink()
+
+    def test_invalid_test_type(self):
+        questions_data = [
+            {"text": "Udtal følgende bogstav: 'S'", "correct": None, "wrong": []},
+            {"text": "Udtal følgende bogstav: 'V'", "correct": None, "wrong": []},
+            {"text": "Udtal følgende bogstav: 'K'", "correct": None, "wrong": []},
+        ]
+
+        # Write JSON data to a temporary file
+        with tempfile.NamedTemporaryFile("w", delete=False, suffix=".json") as tmp_file:
+            json.dump(questions_data, tmp_file, ensure_ascii=False)
+            tmp_questions_data_path = Path(tmp_file.name)
+
+        with self.assertRaises(ValueError):
+
+            call_command(
+                "import_test",
+                self.test_name,
+                "Bogstavsbenævnelse",
+                str(tmp_questions_data_path),
+                "invalid_test_type",
+            )

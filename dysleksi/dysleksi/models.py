@@ -30,9 +30,20 @@ STUDENTS = "Elever"
 logger = logging.getLogger(__name__)
 
 
+class InstructionAction(TextChoices):
+    SHOW = "show"
+    HIDE = "hide"
+    FADE_IN = "fadeIn"
+    FADE_OUT = "fadeOut"
+    PLAY_SOUND = "playSound"
+    HIGHLIGHT = "highlight"
+    SELECT = "select"
+
+
 class QuestionType(TextChoices):
     MULTIPLE_CHOICE = "multiple_choice"
     FREE_TEXT = "free_text"
+    NO_INPUT_REQUIRED = "no_input_required"
 
 
 class TestType(TextChoices):
@@ -178,6 +189,14 @@ class TestResource(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    @property
+    def url(self):
+        if self.sound:
+            return self.sound.url
+        elif self.image:
+            return self.image.url
+        return None
+
 
 class Test(models.Model):
     name = models.CharField(max_length=255)
@@ -234,6 +253,12 @@ class Test(models.Model):
                         ),
                         "challenge_text": question.challenge.text,
                         "possible_answers": [],
+                        "instruction_sequence": (
+                            question.instruction_sequence.to_json()
+                            if question.is_practice
+                            and hasattr(question, "instruction_sequence")
+                            else None
+                        ),
                     }
 
                     for answer in question.possible_answers.all().order_by("id"):
@@ -325,6 +350,67 @@ class TestPart(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    def create_test_resources(self, questions_data, is_practice=False):
+        for data in questions_data:
+            # Challenge resource (image)
+
+            test_resource_kwargs = {"name": "challenge"}
+            if "image" in data:
+                test_resource_kwargs["image"] = data["image"]
+            if "sound" in data:
+                test_resource_kwargs["sound"] = data["sound"]
+            if "text" in data:
+                test_resource_kwargs["text"] = data["text"]
+
+            challenge_resource, created = TestResource.objects.get_or_create(
+                **test_resource_kwargs
+            )
+
+            # Get or create question for this part + challenge
+            if data["correct"]:
+                if data["wrong"]:
+                    question_type = QuestionType.MULTIPLE_CHOICE
+                else:
+                    question_type = QuestionType.FREE_TEXT
+            else:
+                question_type = QuestionType.NO_INPUT_REQUIRED
+
+            question, created = TestQuestion.objects.get_or_create(
+                part=self,
+                challenge=challenge_resource,
+                is_practice=is_practice,
+                question_type=question_type,
+            )
+
+            if is_practice and "instruction_sequence" in data:
+                question.create_instruction_sequence(data["instruction_sequence"])
+
+            # Correct answer
+            if data["correct"]:
+                correct_resource, created = TestResource.objects.get_or_create(
+                    name=data["correct"],
+                    text=data["correct"],
+                )
+
+                PossibleAnswer.objects.get_or_create(
+                    question=question,
+                    resource=correct_resource,
+                    defaults={"is_correct": True},
+                )
+
+            # Wrong answers
+            for wrong_text in data["wrong"]:
+                wrong_resource, created = TestResource.objects.get_or_create(
+                    name=wrong_text,
+                    text=wrong_text,
+                )
+
+                PossibleAnswer.objects.get_or_create(
+                    question=question,
+                    resource=wrong_resource,
+                    defaults={"is_correct": False},
+                )
+
 
 class TestQuestion(models.Model):
     part = models.ForeignKey(
@@ -351,6 +437,114 @@ class TestQuestion(models.Model):
 
     def __str__(self) -> str:
         return f"{str(self.part)} / {str(self.part.test)} {self.pk}"
+
+    def create_instruction_sequence(self, instructions_data):
+        sequence, _ = InstructionSequence.objects.get_or_create(question=self)
+
+        for order, data in enumerate(instructions_data):
+            resource = None
+
+            if "resource" in data:
+                resource, _ = TestResource.objects.get_or_create(
+                    name=data["resource"], sound=data["resource"]
+                )
+
+            Instruction.objects.get_or_create(
+                sequence=sequence,
+                order=order,
+                defaults={
+                    "action": data["action"],
+                    "element": data.get("element"),
+                    "resource": resource,
+                    "delay_after": data.get("delayAfter", 0),
+                },
+            )
+
+
+class InstructionSequence(models.Model):
+    question = models.OneToOneField(
+        TestQuestion,
+        on_delete=models.CASCADE,
+        related_name="instruction_sequence",
+    )
+
+    def to_json(self) -> dict:
+        return {
+            "instructions": [
+                instr.to_json() for instr in self.instructions.order_by("order")
+            ]
+        }
+
+    def __str__(self) -> str:
+        return f"Practice sequence for question {self.question_id}"
+
+
+class Instruction(models.Model):
+    sequence = models.ForeignKey(
+        InstructionSequence,
+        on_delete=models.CASCADE,
+        related_name="instructions",
+    )
+
+    order = models.PositiveSmallIntegerField()
+
+    action = models.CharField(
+        max_length=32,
+        choices=InstructionAction.choices,
+    )
+
+    element = models.CharField(
+        max_length=64,
+        blank=True,
+        null=True,
+        help_text="DOM element id or logical name",
+    )
+
+    resource = models.ForeignKey(
+        TestResource,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        help_text="Used for playSound / show image",
+    )
+
+    delay_after = models.IntegerField(
+        default=0,
+        help_text="Delay in milliseconds after this instruction",
+    )
+
+    class Meta:
+        ordering = ["order"]
+
+        constraints = [
+            models.CheckConstraint(
+                condition=(
+                    models.Q(
+                        action=InstructionAction.PLAY_SOUND,
+                        resource__isnull=False,
+                    )
+                    | ~models.Q(action=InstructionAction.PLAY_SOUND)
+                ),
+                name="play_sound_requires_resource",
+            ),
+        ]
+
+    def to_json(self) -> dict:
+        data = {
+            "action": self.action,
+            "delayAfter": self.delay_after,
+        }
+
+        if self.element:
+            data["element"] = self.element
+
+        if self.resource and self.resource.url:
+            data["url"] = self.resource.url
+
+        return data
+
+    def __str__(self) -> str:
+        return f"{self.sequence} [{self.order}] {self.action}"
 
 
 class PossibleAnswer(models.Model):

@@ -1,0 +1,27 @@
+[
+    {
+        "image": "wordreading_2_dummy/dog.png",
+        "correct": "hund",
+        "wrong": ["kat", "ko", "hest"]
+    },
+    {
+        "image": "wordreading_2_dummy/bike.jpeg",
+        "correct": "cykel",
+        "wrong": ["bil", "bus", "tog"]
+    },
+    {
+        "image": "wordreading_2_dummy/cat.jpg",
+        "correct": "kat",
+        "wrong": ["hund", "mus", "fugl"]
+    },
+    {
+        "image": "wordreading_2_dummy/house.jpg",
+        "correct": "hus",
+        "wrong": ["bil", "træ", "vej"]
+    },
+    {
+        "image": "wordreading_2_dummy/car.jpg",
+        "correct": "bil",
+        "wrong": ["cykel", "tog", "bus"]
+    }
+]

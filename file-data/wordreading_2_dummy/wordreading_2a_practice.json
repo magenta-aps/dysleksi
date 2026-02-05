@@ -1,0 +1,383 @@
+[
+    {
+        "image": "wordreading_intro/Indledning/Læsning.jpg",
+        "correct": "",
+        "wrong": [],
+        "instruction_sequence": [
+            {
+                "action": "show",
+                "element": "challenge-image",
+                "delayAfter": 0
+            },
+            {
+                "action": "hide",
+                "element": "next",
+                "delayAfter": 0
+            },
+            {
+                // Ordlæsning er nu ved at starte.
+                "action": "playSound",
+                "resource": "wordreading_intro/Indledning/7a.1.wav",
+                "delayAfter": 500
+            },
+            {
+                // Først skal du øve dig på øveopgaverne, inden opgaverne starter.
+                "action": "playSound",
+                "resource": "wordreading_intro/Indledning/7a.2.wav",
+                "delayAfter": 500
+            },
+            {
+                // Du vil få besked, hvis du vælger forkert under øveopgaverne. Når
+                // deltesten starter, vil du ikke få besked.
+                "action": "playSound",
+                "resource": "wordreading_intro/Indledning/7a.3.wav",
+                "delayAfter": 500
+            },
+            {
+                // Ordlæsningen varer i 10minutter.
+                "action": "playSound",
+                "resource": "wordreading_intro/Indledning/7a.4.wav",
+                "delayAfter": 500
+            },
+            {
+                // Øveopgaverne er nu ved at starte. Først får du vist, hvad du skal
+                // gøre
+                "action": "playSound",
+                "resource": "wordreading_intro/Indledning/7a.5.wav",
+                "delayAfter": 500
+            },
+            {
+                "action": "fadeOut",
+                "element": "challenge-image",
+                "delayAfter": 500
+            },
+            {
+                "action": "show",
+                "element": "next",
+                "delayAfter": 0
+            }
+        ]
+    },
+    {
+        "image": "wordreading_intro/Instruktion/Øje.png",
+        "correct": "isi",
+        "wrong": ["isigak", "illu", "immuk"],
+        "instruction_sequence": [
+            {
+                "action": "show",
+                "element": "next",
+                "delayAfter": 0
+            },
+            {
+                // Lyt godt efter.
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.1_martha.mp3",
+                "delayAfter": 2000
+            },
+            {
+                "action": "fadeOut",
+                "element": "challenge-image",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-isigak",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-isi",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-illu",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-immuk",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "next",
+                "delayAfter": 0
+            },
+            {
+                // Her kan du se
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.2.wav",
+                "delayAfter": 2000
+            },
+            {
+                "action": "fadeIn",
+                "element": "challenge-image",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "element": "challenge-image",
+                "delayAfter": 0
+            },
+            {
+                // En tegning
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.2a.wav",
+                "delayAfter": 2000
+            },
+            {
+                "action": "fadeIn",
+                "element": "choice-isigak",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeIn",
+                "element": "choice-isi",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeIn",
+                "element": "choice-illu",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeIn",
+                "element": "choice-immuk",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "element": "choice-isigak",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "element": "choice-isi",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "element": "choice-illu",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "element": "choice-immuk",
+                "delayAfter": 0
+            },
+            {
+                // Ordene
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.2b.wav",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeIn",
+                "element": "next",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "element": "next",
+                "delayAfter": 0
+            },
+            {
+                // Og pilen.
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.2c.wav",
+                "delayAfter": 2000
+            },
+            {
+                // Du
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.3.wav",
+                "delayAfter": 500
+            },
+            {
+                "action": "highlight",
+                "element": "choice-isigak",
+                "delayAfter": 500
+            },
+            {
+                "action": "highlight",
+                "element": "choice-isi",
+                "delayAfter": 500
+            },
+            {
+                "action": "highlight",
+                "element": "choice-illu",
+                "delayAfter": 500
+            },
+            {
+                "action": "highlight",
+                "element": "choice-immuk",
+                "delayAfter": 0
+            },
+            {
+                // Skal læse ordene stille og,
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.3a.wav",
+                "delayAfter": 2000
+            },
+            {
+                "action": "highlight",
+                "element": "challenge-image",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "element": "choice-isigak",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "element": "choice-isi",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "element": "choice-illu",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "element": "choice-immuk",
+                "delayAfter": 0
+            },
+            {
+                // Vælge det ord, som passer til tegningen.
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.3b.wav",
+                "delayAfter": 2000
+            },
+            {
+                "action": "highlight",
+                "element": "next",
+                "delayAfter": 0
+            },
+            {
+                // Når du har valgt, går du videre til næste opgave ved at trykke
+                // på pilen.
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.3c.wav",
+                "delayAfter": 2000
+            },
+            {
+                // Hvis du vælger forkert, kan du ændre dit valg, inden du trykker
+                // på pilen. Du må også gerne gætte, hvis du ikke kan finde ud af
+                // opgaven.
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.3d.wav",
+                "delayAfter": 2000
+            },
+            {
+                // Se
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.4.wav",
+                "delayAfter": 2000
+            },
+            {
+                "action": "highlight",
+                "element": "challenge-image",
+                "delayAfter": 0
+            },
+            {
+                // Her er et øje.
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.4a.wav",
+                "delayAfter": 2000
+            },
+            {
+                "action": "select",
+                "element": "choice-isi",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "element": "choice-isi",
+                "delayAfter": 0
+            },
+            {
+                // Ordet, der passer til tegningen, er isi, og det vælges derfor.
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.4b.wav",
+                "delayAfter": 2000
+            },
+            {
+                "action": "highlight",
+                "element": "next",
+                "delayAfter": 0
+            },
+            {
+                // Og derefter trykkes der på pilen.
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.4c.wav",
+                "delayAfter": 2000
+            },
+            {
+                "action": "fadeOut",
+                "element": "challenge-image",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-isigak",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-isi",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-illu",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-immuk",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "next",
+                "delayAfter": 0
+            },
+            {
+                // Det er sådan, du skal løse opgaverne.
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.4d.wav",
+                "delayAfter": 2000
+            },
+            {
+                // Nu skal du selv prøve øveropgaverne.
+                "action": "playSound",
+                "resource": "wordreading_intro/Instruktion/7b.5.wav",
+                "delayAfter": 2000
+            },
+            {
+                // Klik på den grønne pil, når du er klar.
+                "action": "playSound",
+                "resource": "wordreading_intro/Øveopgave/7c.1.wav",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeIn",
+                "element": "next",
+                "delayAfter": 0
+            }
+        ]
+    },
+    {
+        "image": "wordreading_intro/Øveopgave/Fod.jpg",
+        "correct": "isigak",
+        "wrong": ["isi", "immuk", "ini"]
+    },
+    {
+        "image": "wordreading_intro/Øveopgave/Mælk.jpg",
+        "correct": "immuk",
+        "wrong": ["imaq", "illu", "imeq"]
+    }
+]
