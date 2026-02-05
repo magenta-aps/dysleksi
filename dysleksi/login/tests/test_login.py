@@ -52,6 +52,7 @@ class LoginGeneralTest(TestCase):
 
 
 @override_settings(PUBLIC=True)
+@override_settings(LOGIN_BYPASS_ENABLED=False)
 class SamlLoginTest(LoginTest):
 
     def test_postlogin(self):
