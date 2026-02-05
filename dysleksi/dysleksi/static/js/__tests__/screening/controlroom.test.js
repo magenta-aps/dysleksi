@@ -22,6 +22,7 @@ describe("TeacherView Test", () => {
         </div>
         <table id="events"><tbody></tbody></table>
         <button id="btn1"></button>
+        <button id="cancelled"></button>
         <textarea id="note"></textarea>
     `;
     table = new EventTable();
@@ -146,4 +147,43 @@ describe("TeacherView Test", () => {
 
     expect(buttons.buttons[0].classList.contains("disabled")).toBe(true);
   });
+
+
+    it("sends message and disables buttons on cancel click", () => {
+        vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
+        const wsGetter = vi.fn().mockReturnValue(socket);
+        const view = new TeacherView(
+            "room1",
+            [{"id":1,"name":"part1","questions":[{"questionId":1,"partId":1},{"questionId":2,"partId":1}]}],
+            1, wsGetter, table, buttons, note
+        );
+
+        // simulate displayed event to set testIndex
+        view.questionIndex = 0;
+        view.question = {"questionId":1,"partId":1};
+
+        // Add data in note field
+        note.noteEl.value = "Test note";
+
+        const expectedContent = JSON.stringify({
+            uuid: "UUID123",
+            event: "test.cancelled",
+            roomName: "room1",
+            questionIndex: 0,
+            questionId: 1,
+            partId: 1,
+            assignmentId: 1,
+            note: "Test note",
+        });
+
+        global.confirm = vi.fn().mockReturnValue(false);
+        buttons.buttons[1].click();
+        expect(socket.send).not.toHaveBeenCalledWith(expectedContent);
+        expect(buttons.buttons[0].classList.contains("disabled")).toBe(false);
+
+        global.confirm = vi.fn().mockReturnValue(true);
+        buttons.buttons[1].click();
+        expect(socket.send).toHaveBeenCalledWith(expectedContent);
+        expect(buttons.buttons[0].classList.contains("disabled")).toBe(true);
+    });
 });
