@@ -19,6 +19,7 @@ SECRET_KEY = os.environ["DJANGO_SECRET_KEY"]
 
 ENVIRONMENT = os.environ.get("ENVIRONMENT", "production")
 DEBUG = strtobool(os.environ.get("DJANGO_DEBUG", "False"))
+SHOW_DEBUG_CONSOLE = strtobool(os.environ.get("SHOW_DEBUG_CONSOLE", "False"))
 TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
 PUBLIC = strtobool(os.environ.get("PUBLIC", "True"))
 CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "")

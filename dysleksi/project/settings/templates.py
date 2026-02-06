@@ -24,6 +24,7 @@ TEMPLATES = [
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
                 "dysleksi.context_processors.nav_context",
+                "dysleksi.context_processors.debug_context",
             ],
             "loaders": default_loaders if DEBUG else cached_loaders,
             "libraries": {
