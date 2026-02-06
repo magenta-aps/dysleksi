@@ -215,6 +215,42 @@ describe('GroupTestFlow', () => {
         })
     });
 
+    it("Let first question time out", () => {
+        vi.useFakeTimers();
+        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
+        test.parts[0].questions[0].timeout = 10000
+        testSpy(test);
+        test.endSummary();
+        const part = test.currentPart;
+        part.showFirstQuestion(false);
+        const question = part.currentQuestion;
+
+        // TODO: Get correct runAllTimers-function for whatever test framework we're using
+        vi.runAllTimers();
+
+        expect(question.onTimeout).toHaveBeenCalled();
+        expect(test.send).toHaveBeenCalledWith({
+            uuid: expect.any(String),
+            event: "question.answered",
+            message: `Elev besvarede ikke spørgsmål 1 indenfor tidsfristen`,
+            choiceId: null,
+            recordingBase64: null,
+            assignmentId: 1,
+            partIndex: part.index,
+            partId: part.id,
+            questionIndex: question.index,
+            questionId: question.id,
+            questionTitle: question.questionTitle(),
+            displayedAt: 0,
+            answeredAt: expect.any(Number),
+            duration: 10000,
+            roomName: test.roomName,
+            correct: false,
+            textAnswer: null,
+        });
+        expect(part.onQuestionComplete).toHaveBeenCalled();
+    });
+
     it("Select second answer of first question", () => {
         const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
         testSpy(test);
