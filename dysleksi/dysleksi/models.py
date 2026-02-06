@@ -293,7 +293,6 @@ class Test(models.Model):
 
 
 class TestAssignment(models.Model):
-
     class Meta:
         constraints = [
             models.CheckConstraint(
@@ -434,6 +433,7 @@ class TestQuestion(models.Model):
         choices=QuestionType,
         default=QuestionType.MULTIPLE_CHOICE,
     )
+    timeout = models.PositiveSmallIntegerField(blank=False, null=False, default=0)
 
     def __str__(self) -> str:
         return f"{str(self.part)} / {str(self.part.test)} {self.pk}"
@@ -548,7 +548,6 @@ class Instruction(models.Model):
 
 
 class PossibleAnswer(models.Model):
-
     question = models.ForeignKey(
         TestQuestion,
         on_delete=models.CASCADE,
@@ -571,7 +570,6 @@ class PossibleAnswer(models.Model):
 
 
 class TestResponse(models.Model):
-
     def clean(self):
         if self.assignment.student is not None:
             if self.student != self.assignment.student:
@@ -641,7 +639,6 @@ class PartResponse(models.Model):
 
 
 class QuestionResponse(models.Model):
-
     question = models.ForeignKey(
         TestQuestion,
         on_delete=models.CASCADE,
@@ -698,7 +695,6 @@ class HandledEvent(TextChoices):
 
 
 class Message(models.Model):
-
     uuid = models.UUIDField(
         primary_key=True,
     )
@@ -716,7 +712,6 @@ class Message(models.Model):
 
     @cached_property
     def student(self):
-
         # Obtain student from assignment
         assignment = self.assignment
         if assignment.student is not None:
@@ -788,7 +783,6 @@ class Message(models.Model):
 
         # Message is new, process it so that significant data is stored in other models
         try:
-
             if self.event == HandledEvent.QUESTION_ANSWERED:
                 choiceId = self.data.get("choiceId")
                 duration = self.data.get("duration")
