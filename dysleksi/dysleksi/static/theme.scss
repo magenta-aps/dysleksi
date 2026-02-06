@@ -181,3 +181,20 @@ i {
     box-shadow: 0 0 10px $student-red;
     transition: outline 0.3s, box-shadow 0.3s;
 }
+
+.logbox {
+  position: fixed;
+  bottom: 10px;
+  left: 10px;
+  right: 10px;
+  height: 200px;
+  overflow-y: auto;
+  background: #111;
+  color: #0f0;
+  font-family: monospace;
+  padding: 10px;
+  border-radius: 8px;
+  white-space: pre-wrap;
+  z-index: -999999;
+
+}
