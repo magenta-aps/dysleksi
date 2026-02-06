@@ -46,21 +46,35 @@ docker exec dysleksi-web mypy --config ../mypy.ini dysleksi/
 ```
 
 ## Running a dev environment on an iPad
-To run the application on an iPad, configure docker-compose.override.yml as
-follows:
+To run the application on an iPad, start an avahi-daemon on your host PC:
+
+```
+sudo apt install avahi-daemon
+sudo systemctl enable --now avahi-daemon
+```
+
+This will broadcast your hostname on the local network. Find your hostname using the
+following command:
+
+```
+hostname
+```
+
+Now configure docker-compose.override.yml as follows:
 
 ```
 services:
   dysleksi-web:
     environment:
       - TEST=false
-      - ALLOWED_HOSTS=["<ip address>","dysleksi-web","localhost","host.docker.internal"]
+      - ALLOWED_HOSTS=["<hostname>.local","dysleksi-web","localhost","host.docker.internal"]
       - LOGIN_BYPASS_ENABLED=True
 ```
 
-Where `<ip address>` should be replaced by your machine's ip-address.
+Where `<hostname>` should be replaced by your machine's hostname, which you obtained
+using the `hostname` command.
 
-Now you can visit `https://<ip address>:8140` on your ipad and log in with 
+Now you can visit `https://<hostname>.local:8140` on your ipad and log in with
 `elev:elev`. You can also bookmark the URL and add it to your home screen. If
 you decide to do so, make sure "open as web app" is disabled.
 
