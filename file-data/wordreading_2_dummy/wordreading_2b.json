@@ -2,7 +2,8 @@
     {
         "image": "wordreading_2_dummy/dog.png",
         "correct": "hund",
-        "wrong": ["kat", "ko", "hest"]
+        "wrong": ["kat", "ko", "hest"],
+        "timeout": 10000
     },
     {
         "image": "wordreading_2_dummy/bike.jpeg",

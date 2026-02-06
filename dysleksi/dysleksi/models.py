@@ -259,6 +259,7 @@ class Test(models.Model):
                             and hasattr(question, "instruction_sequence")
                             else None
                         ),
+                        "timeout": question.timeout,
                     }
 
                     for answer in question.possible_answers.all().order_by("id"):
@@ -373,12 +374,17 @@ class TestPart(models.Model):
                     question_type = QuestionType.FREE_TEXT
             else:
                 question_type = QuestionType.NO_INPUT_REQUIRED
+            if "timeout" in data and not is_practice:
+                question_timeout = data["timeout"]
+            else:
+                question_timeout = 0
 
             question, created = TestQuestion.objects.get_or_create(
                 part=self,
                 challenge=challenge_resource,
                 is_practice=is_practice,
                 question_type=question_type,
+                timeout=question_timeout,
             )
 
             if is_practice and "instruction_sequence" in data:

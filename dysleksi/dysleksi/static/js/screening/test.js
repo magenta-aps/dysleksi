@@ -439,12 +439,22 @@ class Question {
 
 class GroupQuestion extends Question {
 
+    timeout;
+    timeoutId;
+
     constructor(data, part, index) {
         super(data, part, index);
+        this.timeout = data.timeout;
     }
 
     show() {
         super.show();
+        if (Number(this.timeout) > 1) {
+            this.timeoutId = setTimeout(() => {
+                this.onTimeout()
+            }, this.timeout);
+        }
+
 
         this.domElements.setNextButtonListener(() => this.onComplete());
 
@@ -486,6 +496,7 @@ class GroupQuestion extends Question {
         } else if (this.instruction_sequence) {
             this.part.onQuestionComplete();
         } else {
+            clearTimeout(this.timeoutid);
             const duration = this.answeredAt - this.displayedAt;
             this.part.test.send({
                 event: "question.answered",
@@ -505,6 +516,26 @@ class GroupQuestion extends Question {
             });
             this.part.onQuestionComplete();
         }
+    }
+
+    onTimeout() {
+        this.part.test.send({
+            event: "question.answered",
+            message: `Elev besvarede ikke spørgsmål ${this.index + 1} indenfor tidsfristen`,
+            choiceId: null,
+            recordingBase64: null,
+            partIndex: this.part.index,
+            partId: this.part.id,
+            questionIndex: this.index,
+            questionId: this.id,
+            questionTitle: this.questionTitle(),
+            displayedAt: this.displayedAt,
+            answeredAt: document.timeline.currentTime,
+            duration: this.timeout,
+            correct: false,
+            textAnswer: null,
+        });
+        this.part.onQuestionComplete();
     }
 
 }
