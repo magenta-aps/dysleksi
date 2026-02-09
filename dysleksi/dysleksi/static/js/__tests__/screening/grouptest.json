@@ -11,6 +11,30 @@
       "partial_score_after": 30,
       "practice": [
         {
+          "id": 6,
+          "question_type": "no_input_required",
+          "challenge_id": 19,
+          "challenge_name": "challenge",
+          "challenge_image_url": "/media/wordreading_intro/Indledning/L%C3%A6sning.jpg",
+          "challenge_sound_url": null,
+          "challenge_text": null,
+          "possible_answers": [],
+          "instruction_sequence": {
+            "instructions": [
+              {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "challenge-image"
+              },
+              {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+              }
+            ]
+          }
+        },
+        {
           "id": 24,
           "challenge_id": 1,
           "challenge_name": "challenge",
@@ -350,7 +374,9 @@
       "intro": "Skriv det rigtige ord, der passer til billedet.",
       "timeout": 60,
       "partial_score_after": 30,
-      "practice": [],
+      "practice": [
+
+      ],
       "questions": [
         {
           "id": 25,

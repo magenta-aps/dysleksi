@@ -11,6 +11,7 @@ export function initTeacher(roomName, assignmentId, testContents) {
     noteField.show();
     questionView.show();
 
+    // const test = new TeacherTest(testContents);
 
     new TeacherView(roomName, testContents, assignmentId, getWebSocket, table, buttons, noteField, questionView);
 }

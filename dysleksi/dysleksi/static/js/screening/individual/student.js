@@ -1,7 +1,8 @@
 import { getWebSocket } from "../../ws.js";
 import { IndividualTestDomElements } from "../dom.js"
 import { TestMediaRecorder } from "../media.js"
-import { IndividualTest } from "../test.js"
+import { IndividualTestView } from "./student-individual-test.js";
+import { Test } from "../model.js";
 
 
 export function initStudent(roomName, assignmentId, testContents) {
@@ -23,13 +24,16 @@ export function initStudent(roomName, assignmentId, testContents) {
             }));
         }).then(() => {
             console.log("Audio recording setup complete");
-            const test = new IndividualTest(testContents, chatSocket, roomName, assignmentId, domElements, testMediaRecorder);
-            test.addEventListener("test.complete", (evt) => {
+            /*test.addEventListener("test.complete", (evt) => {
                 // What to do when the test is completed?
                 chatSocket.close();
                 document.location = "/exit";
-            });
-            test.start()
+            });*/
+            //test.start()
+
+            const test = new Test(testContents);
+            const view = new IndividualTestView(test, chatSocket, roomName, assignmentId, domElements, testMediaRecorder);
+            view.start();
         });
 
     });

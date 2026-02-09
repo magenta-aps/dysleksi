@@ -39,6 +39,7 @@ class TestDomElements {
     }
 
     hideSummary() {
+        this.showInstructions("");
         this.toggleSummaryTable(false);
         this.toggleEndSummaryButton(false);
     }
@@ -98,7 +99,7 @@ class TestDomElements {
 
 
     showInstructions(text, audio) {
-        if (text) {
+        if (text !== undefined && text !== null) {
             this.introTextEl.textContent = text;
         }
         if (audio) {
@@ -127,6 +128,9 @@ class TestDomElements {
         this.questionTitleEl.textContent = text || "";
     }
     showQuestionChallenge(text, sound, imageUrl) {
+        if (!text && !sound && !imageUrl) {
+            this.questionChallengeEl.innerHTML = "";
+        }
         let img = document.querySelector("#challenge-image");
         if (imageUrl) {
             if (!img) {
