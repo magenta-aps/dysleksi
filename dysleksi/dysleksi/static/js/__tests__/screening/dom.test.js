@@ -373,3 +373,46 @@ describe("TestDomElements DOM utilities", () => {
     expect(nextBtn.disabled).toBe(false);
   });
 });
+
+
+describe("TestDomElements.fadeScreenOverlay", () => {
+  let dom;
+  let overlay;
+
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <div id="fade-overlay" style="opacity: 0;"></div>
+      <audio id="instructions-sound"></audio>
+      <div id="instructions-text"></div>
+      <button id="start-practice"></button>
+      <button id="start-questions"></button>
+      <table id="summary-table"></table>
+      <button id="end-summary"></button>
+      <div id="question-title"></div>
+      <div id="question-challenge"></div>
+      <div id="choices"></div>
+      <button id="next"></button>
+      <div id="test-el"></div>
+    `;
+    dom = new GroupTestDomElements();
+    overlay = document.getElementById("fade-overlay");
+  });
+
+  it("fades overlay from opaque to transparent", () => {
+    vi.useFakeTimers();
+
+    vi.stubGlobal("requestAnimationFrame", (cb) => cb());
+    dom.fadeScreenOverlay();
+
+    expect(overlay.style.opacity).toBe("1");
+    expect(overlay.style.transition).toBe("none");
+
+    vi.advanceTimersByTime(200);
+
+    expect(overlay.style.opacity).toBe("0");
+    expect(overlay.style.transition).toBe("opacity 200ms ease");
+
+    vi.useRealTimers();
+    vi.unstubAllGlobals();
+  });
+});

@@ -71,6 +71,7 @@ describe('GroupTestFlow', () => {
         };
 
         document.body.innerHTML = `
+            <div id="fade-overlay"></div>
             <audio id="instructions-sound"></audio>
             <div id="instructions-text"></div>
             <button id="start-practice"></button>

@@ -14,10 +14,26 @@ class TestDomElements {
         this.questionChallengeEl = document.querySelector("#question-challenge");
         this.endSummaryButton = document.querySelector("#end-summary");
         this.summaryTable = document.querySelector("#summary-table");
+        this.overlay = document.getElementById("fade-overlay");
 
         if (!this.instructionsSoundEl || !this.introTextEl || !this.questionTitleEl || !this.questionChallengeEl || !this.endSummaryButton || !this.summaryTable) {
             throw new Error("Required DOM elements missing");
         }
+    }
+
+    fadeScreenOverlay() {
+
+        // Immediately hide all content on the screen
+        this.overlay.style.transition = "none";
+        this.overlay.style.opacity = 1;
+    
+        // Fade content in gradually
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                this.overlay.style.transition = "opacity 200ms ease";
+                this.overlay.style.opacity = 0;
+            }, 200); // Pause 200 miliseconds before starting the fade
+        });
     }
 
     showSummary(text, parts) {
