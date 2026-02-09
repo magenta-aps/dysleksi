@@ -125,10 +125,16 @@ export class StudentTestView extends EventTarget {
     }
 
     showNextQuestion() {
-        return this.showQuestion(
+
+        const canShow =  this.showQuestion(
             this.isPracticing,
             this.currentQuestionIndex + 1
         );
+
+        if (canShow) {
+            this.domElements.fadeScreenOverlay()
+        }
+        return canShow
     }
 
 }
