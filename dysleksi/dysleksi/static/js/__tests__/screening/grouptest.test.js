@@ -2,10 +2,11 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { GroupTest } from '../../screening/test.js';
 import * as groupTestData from './grouptest.json' with { type: 'json' }
-import {getWebSocket} from "../../ws";
-import {GroupTestDomElements} from "../../screening/dom.js";
+import { getWebSocket } from "../../ws";
+import { GroupTestDomElements } from "../../screening/dom.js";
+import { Test } from "../../screening/model.js";
+import { GroupTestView } from "../../screening/group/student-group-test.js";
 
 describe('GroupTestFlow', () => {
     let originalWebSocket;
@@ -19,6 +20,7 @@ describe('GroupTestFlow', () => {
         global.document.timeline = {
                 currentTime: 0,
         }
+        global.alert = vi.fn();
 
         // Save original WebSocket
         originalWebSocket = global.WebSocket;
@@ -99,11 +101,8 @@ describe('GroupTestFlow', () => {
 
     it('Test Structure loads', () => {
         // Test that the instance with subinstances is correctly created from json
-        const ws = getWebSocket('class_123');
-        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
-        expect(test.roomName).toBe("class_123");
+        const test = new Test(groupTestData);
         expect(test.name).toBe("Middle 2. grade");
-        expect(test.partIndex).toBe(0);
         expect(test.parts.length).toBe(2);
         expect(test.parts[0].test).toBe(test);
         expect(test.parts[0].id).toBe(5);
@@ -116,15 +115,13 @@ describe('GroupTestFlow', () => {
         expect(test.parts[0].questions.length).toBe(5);
         expect(test.parts[0].questionIndex).toBe(0);
         expect(test.parts[0].currentQuestion).toBe(null);
-        expect(test.parts[0].domElements).toBe(domElements);
-        expect(test.parts[0].practice.length).toBe(2);
-        expect(test.parts[0].isPracticing).toBe(false);
+        expect(test.parts[0].practice.length).toBe(3);
     });
 
     it("Test complain when there are no parts", () => {
         const ws = getWebSocket('class_123');
         expect(
-            () => new GroupTest(
+            () => new Test(
                 {
                     "id": 1,
                     "name": "Middle 2. grade",
@@ -138,12 +135,13 @@ describe('GroupTestFlow', () => {
     });
 
     it("Render Summary", () => {
-        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
-        testSpy(test);
-        test.start();
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.start();
 
-        expect(test.currentPart).toBe(null);
-        expect(test.parts[0].start).not.toHaveBeenCalled();
+        expect(view.currentPart).toBe(null);
+        expect(view.showPart).not.toHaveBeenCalled();
         expect(domElements.showSummary).toHaveBeenCalled();
         expect(domElements.toggleSummaryTable).toHaveBeenCalledWith(true);
         expect(domElements.togglePracticeButton).toHaveBeenCalledWith(false);
@@ -152,12 +150,13 @@ describe('GroupTestFlow', () => {
 
     it("Render first part", () => {
         // Should show the first part with options to begin practicing or start the real test
-        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
-        testSpy(test);
-        test.endSummary();
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.endSummary();
 
-        expect(test.currentPart).toBe(test.parts[0]);
-        expect(test.parts[0].start).toHaveBeenCalled();
+        expect(view.currentPart).toBe(test.parts[0]);
+        expect(view.showPart).toHaveBeenCalledWith(0);
         expect(domElements.hideSummary).toHaveBeenCalled();
         expect(domElements.clearQuestionChoices).toHaveBeenCalled();
         expect(domElements.toggleNextButton).toHaveBeenCalledWith(false)
@@ -167,12 +166,12 @@ describe('GroupTestFlow', () => {
 
     it("Render second part", () => {
         // Should show the second part with option start the real test (As no practice is defined for the second part)
-        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
-        testSpy(test);
-        test.showPart(1);
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.showPart(1);
 
-        expect(test.currentPart).toBe(test.parts[1]);
-        expect(test.parts[1].start).toHaveBeenCalled();
+        expect(view.currentPart).toBe(test.parts[1]);
         expect(domElements.clearQuestionChoices).toHaveBeenCalled();
         expect(domElements.toggleNextButton).toHaveBeenCalledWith(false)
         expect(domElements.togglePracticeButton).toHaveBeenCalledWith(false)
@@ -180,17 +179,20 @@ describe('GroupTestFlow', () => {
     })
 
     it("Display first question", () => {
-        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
-        testSpy(test);
-        test.endSummary();
-        const part = test.currentPart;
-        part.showFirstQuestion(false);
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.start();
 
-        expect(part.questionIndex).toBe(0);
-        expect(part.isPracticing).toBe(false);
-        expect(part.currentQuestion).toBe(part.questions[0]);
-        const question = part.currentQuestion;
-        expect(question.show).toHaveBeenCalled();
+        view.endSummary();
+        const part = view.currentPart;
+        view.showFirstQuestion(false);
+
+        expect(view.currentQuestionIndex).toBe(0);
+        expect(view.isPracticing).toBe(false);
+        expect(view.currentQuestion).toBe(part.questions[0]);
+        const question = view.currentQuestion;
+        expect(view.showQuestion).toHaveBeenCalled();
         expect(domElements.showQuestionChallenge).toHaveBeenCalled();
         expect(domElements.toggleNextButton).toHaveBeenLastCalledWith(false);
         for (let answer of question.possibleAnswers) {
@@ -201,7 +203,7 @@ describe('GroupTestFlow', () => {
                 expect.any(Function)
             );
         }
-        expect(test.send).toHaveBeenCalledWith({
+        expect(view.send).toHaveBeenCalledWith({
             uuid: expect.any(String),
             event: "question.displayed",
             assignmentId: 1,
@@ -209,30 +211,31 @@ describe('GroupTestFlow', () => {
             partId: part.id,
             questionIndex: question.index,
             questionId: question.id,
-            questionTitle: question.questionTitle(),
+            questionTitle: "1/5 (Wordreading 2A (dummy))",
             displayedAt: 0,
-            roomName: test.roomName,
+            roomName: view.roomName,
         })
     });
 
     it("Let first question time out", () => {
         vi.useFakeTimers();
-        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
         test.parts[0].questions[0].timeout = 10000
-        testSpy(test);
-        test.endSummary();
-        const part = test.currentPart;
-        part.showFirstQuestion(false);
-        const question = part.currentQuestion;
+        testSpy(view);
+        view.endSummary();
+        const part = view.currentPart;
+        view.showFirstQuestion(false);
+        const question = view.currentQuestion;
 
         // TODO: Get correct runAllTimers-function for whatever test framework we're using
         vi.runAllTimers();
 
-        expect(question.onTimeout).toHaveBeenCalled();
-        expect(test.send).toHaveBeenCalledWith({
+        expect(view.onTimeout).toHaveBeenCalled();
+        expect(view.send).toHaveBeenCalledWith({
             uuid: expect.any(String),
             event: "question.answered",
-            message: `Elev besvarede ikke spørgsmål 1 indenfor tidsfristen`,
+            message: `Elev besvarede ikke spørgsmål 1.1 indenfor tidsfristen`,
             choiceId: null,
             recordingBase64: null,
             assignmentId: 1,
@@ -240,49 +243,53 @@ describe('GroupTestFlow', () => {
             partId: part.id,
             questionIndex: question.index,
             questionId: question.id,
-            questionTitle: question.questionTitle(),
+            questionTitle: view.questionTitle(),
             displayedAt: 0,
             answeredAt: expect.any(Number),
             duration: 10000,
-            roomName: test.roomName,
+            roomName: 'class_123',
             correct: false,
             textAnswer: null,
         });
-        expect(part.onQuestionComplete).toHaveBeenCalled();
+        expect(view.onQuestionComplete).toHaveBeenCalled();
     });
 
     it("Select second answer of first question", () => {
-        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
-        testSpy(test);
-        test.endSummary();
-        const part = test.currentPart;
-        part.showFirstQuestion(false);
-        const question = part.currentQuestion;
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.endSummary();
+        const part = view.currentPart;
+        view.showFirstQuestion(false);
+        const question = view.currentQuestion;
         const secondAnswer = question.possibleAnswers[1]
-        secondAnswer.select();
+        view.selectAnswer(secondAnswer);
 
-        expect(question.selectedChoice, secondAnswer)
+        expect(view.selectedAnswer, secondAnswer)
         expect(domElements.toggleNextButton).toHaveBeenLastCalledWith(true);
-        for (let answer of question.possibleAnswers) {
-            expect(domElements.toggleButtonSelected).toHaveBeenCalledWith(answer.button, answer === secondAnswer);
+        for (let d of view.answerButtons) {
+            expect(domElements.toggleButtonSelected).toHaveBeenCalledWith(
+                d["button"], d["answer"] === secondAnswer
+            );
         }
     });
 
     it("Go to next question", () => {
-        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
-        testSpy(test);
-        test.endSummary();
-        const part = test.currentPart;
-        part.showFirstQuestion(false);
-        const question = part.currentQuestion;
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.endSummary();
+        const part = view.currentPart;
+        view.showFirstQuestion(false);
+        const question = view.currentQuestion;
         const secondAnswer = question.possibleAnswers[1]
-        secondAnswer.select();
-        question.onComplete();
+        view.selectAnswer(secondAnswer);
+        view.onQuestionComplete(question);
 
-        expect(test.send).toHaveBeenCalledWith({
+        expect(view.send).toHaveBeenCalledWith({
             uuid: expect.any(String),
             event: "question.answered",
-            message: `Elev har gennemført spørgsmål 1`,
+            message: `Elev har gennemført spørgsmål 1.1`,
             choiceId: secondAnswer.id,
             recordingBase64: null,
             assignmentId: 1,
@@ -290,84 +297,196 @@ describe('GroupTestFlow', () => {
             partId: part.id,
             questionIndex: question.index,
             questionId: question.id,
-            questionTitle: question.questionTitle(),
+            questionTitle: "1/5 (Wordreading 2A (dummy))",
             displayedAt: 0,
             answeredAt: 0,
             duration: 0,
-            roomName: test.roomName,
+            roomName: view.roomName,
             correct: false,
             textAnswer: null,
         });
-        expect(part.onQuestionComplete).toHaveBeenCalled();
-        expect(part.showNextQuestion).toHaveBeenCalled();
-        expect(part.showQuestion).toHaveBeenCalledWith(false, 1);
-        expect(part.questions[1].show).toHaveBeenCalled();
+        expect(view.onQuestionComplete).toHaveBeenCalled();
+        expect(view.showNextQuestion).toHaveBeenCalled();
+        expect(view.showQuestion).toHaveBeenCalledWith(false, 1);
     });
 
-    it("Answer freetext question", () => {
-        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
-        testSpy(test);
-        domElements.showQuestionFreeText = vi.fn(() => {
-            return {
-                textContent: {
-                    trim: () => "dummy_answer"
-                }
-            }
-        })
-        test.showPart(1);
-        const part = test.currentPart;
-        part.showQuestion(false, part.questions.length - 1);
-        const question = part.currentQuestion;
+    it("Answer practice question without selecting answer", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.endSummary();
+        const part = view.currentPart;
+        view.showQuestion(true, 1);
+        const question = view.currentQuestion;
+        view.onQuestionComplete(question);
+        expect(view.showNextQuestion).not.toHaveBeenCalled();
+        expect(global.alert).toHaveBeenCalledWith("Vælg et svar, før du går videre.");
+    });
 
-        expect(domElements.showQuestionFreeText).toHaveBeenCalled();
+    it("Answer practice question correctly", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.endSummary();
+        const part = view.currentPart;
+        view.showQuestion(true, 1);
+        const question = view.currentQuestion;
+        const correctAnswer = question.possibleAnswers.find(a => a.isCorrect);
+        view.selectAnswer(correctAnswer);
+        view.onQuestionComplete(question);
 
-        const answer = question.possibleAnswers[0];
-        answer.selectFreeText();
+        expect(view.showNextQuestion).toHaveBeenCalled();
+        expect(global.alert).toHaveBeenCalledWith("Ja, det er rigtigt. Prøv næste øveopgave.");
+    });
 
-        expect(answer.textAnswer).toBe("dummy_answer");
-        expect(answer.isCorrect).toBe(false);
-    })
+    it("Answer practice question incorrectly", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.endSummary();
+        const part = view.currentPart;
+        view.showQuestion(true, 1);
+        const question = view.currentQuestion;
+        const incorrectAnswer = question.possibleAnswers.find(a => !a.isCorrect);
+        view.selectAnswer(incorrectAnswer);
+        view.onQuestionComplete(question);
+
+        expect(view.showNextQuestion).not.toHaveBeenCalled();
+        expect(global.alert).toHaveBeenCalledWith("Nej, det er forkert. Prøv at vælge igen.");
+    });
+
+    it("Answer last practice question in part", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.endSummary();
+        const part = view.currentPart;
+        view.showQuestion(true, 2);
+        const question = view.currentQuestion;
+        const correctAnswer = question.possibleAnswers.find(a => a.isCorrect);
+        view.selectAnswer(correctAnswer);
+        view.onQuestionComplete(question);
+
+        expect(view.showNextQuestion).toHaveBeenCalled();
+        expect(global.alert).toHaveBeenCalledWith("Øveopgaver gennemført. Begynd den rigtige test");
+    });
 
     it("Answer last question in part", () => {
-        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
-        testSpy(test);
-        test.endSummary();
-        const part = test.currentPart;
-        part.showQuestion(false, part.questions.length - 1);
-        const question = part.currentQuestion;
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.endSummary();
+        const part = view.currentPart;
+        view.showQuestion(false, part.questions.length - 1);
+        const question = view.currentQuestion;
         const firstAnswer = question.possibleAnswers[0]
-        firstAnswer.select();
-        question.onComplete();
+        view.selectAnswer(firstAnswer);
+        view.onQuestionComplete(question);
 
-        expect(part.onQuestionComplete).toHaveBeenCalled();
-        expect(part.onComplete).toHaveBeenCalled();
-        expect(test.onPartComplete).toHaveBeenCalled();
-        expect(test.showPart).toHaveBeenCalledWith(1);
+        expect(view.onQuestionComplete).toHaveBeenCalled();
+        expect(view.onPartComplete).toHaveBeenCalled();
+        expect(view.showPart).toHaveBeenCalledWith(1);
+    });
+
+    it("Answer freetext question correctly", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.endSummary();
+        view.showPart(1);
+        const part = view.currentPart;
+        view.showQuestion(false, 0);
+        expect(view.input).not.toBe(null);
+        const question = view.currentQuestion;
+        view.input.textContent = "aput";
+        view.selectFreeText();
+        view.onQuestionComplete(question);
+        expect(view.send).toHaveBeenCalledWith({
+            "answeredAt": 0,
+            "assignmentId": 1,
+            "choiceId": 100,
+            "correct": true,
+            "displayedAt": 0,
+            "duration": 0,
+            "event": "question.answered",
+            "message": "Elev har gennemført spørgsmål 2.1",
+            "partId": 6,
+            "partIndex": 1,
+            "questionId": 25,
+            "questionIndex": 0,
+            "questionTitle": "1/2 (Wordspelling 2B (dummy))",
+            "recordingBase64": null,
+            "roomName": "class_123",
+            "textAnswer": "aput",
+            "uuid": expect.any(String),
+        });
+    });
+
+    it("Answer freetext question incorrectly", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.endSummary();
+        view.showPart(1);
+        view.showQuestion(false, 0);
+        expect(view.input).not.toBe(null);
+        const question = view.currentQuestion;
+        view.input.textContent = "forkert";
+        view.selectFreeText();
+        view.onQuestionComplete(question);
+        expect(view.send).toHaveBeenCalledWith({
+            "answeredAt": 0,
+            "assignmentId": 1,
+            "choiceId": 100,
+            "correct": false,
+            "displayedAt": 0,
+            "duration": 0,
+            "event": "question.answered",
+            "message": "Elev har gennemført spørgsmål 2.1",
+            "partId": 6,
+            "partIndex": 1,
+            "questionId": 25,
+            "questionIndex": 0,
+            "questionTitle": "1/2 (Wordspelling 2B (dummy))",
+            "recordingBase64": null,
+            "roomName": "class_123",
+            "textAnswer": "forkert",
+            "uuid": expect.any(String),
+        });
     });
 
     it("Answer last question in last part", () => {
-        const test = new GroupTest(groupTestData, ws, 'class_123', 1, domElements);
-        testSpy(test);
-        test.showPart(test.parts.length - 1);
-        const part = test.currentPart;
-        part.showQuestion(false, part.questions.length - 1);
-        const question = part.currentQuestion;
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        const canShow = view.showPart(test.parts.length - 1);
+        expect(canShow).toBe(true);
+        const part = view.currentPart;
+        view.showQuestion(false, part.questions.length - 1);
+        const question = view.currentQuestion;
         const firstAnswer = question.possibleAnswers[0]
-        firstAnswer.select();
-        question.onComplete();
+        view.selectAnswer(firstAnswer);
+        view.onQuestionComplete(question);
 
-        expect(part.onQuestionComplete).toHaveBeenCalled();
-        expect(part.onComplete).toHaveBeenCalled();
-        expect(test.onPartComplete).toHaveBeenCalled();
-        expect(test.onComplete).toHaveBeenCalled();
+        expect(view.onQuestionComplete).toHaveBeenCalled();
+        expect(view.onPartComplete).toHaveBeenCalled();
         expect(domElements.hideInstructions).toHaveBeenCalled();
-        expect(test.send).toHaveBeenCalledWith({
+        expect(view.send).toHaveBeenCalledWith({
             uuid: expect.any(String),
             event: "test.complete",
             assignmentId: 1,
             message: "Testen er afsluttet",
-            roomName: test.roomName,
+            roomName: view.roomName,
         });
+    });
+
+    it("Show instructions", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.showPart(0);
+        view.showQuestion(true, 0);
+        expect(domElements.showQuestionTitle).toHaveBeenCalledWith("Instruks");
     });
 
 });
