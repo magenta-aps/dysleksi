@@ -523,6 +523,7 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
 
         // Letter buttons exist
         const letterButtons = document.querySelectorAll(".letter-btn");
+        letterButtons.forEach(b => b.disabled = false);
         expect(letterButtons.length).toBe(18); // 3 rows * 6 letters
 
         // Erase button exists
@@ -549,6 +550,7 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
         const eraseBtn = document.querySelector(".erase-btn");
 
         // Type "abc"
+        letterButtons.forEach(b => b.disabled = false);
         letterButtons[0].click();
         letterButtons[1].click();
         letterButtons[2].click();
@@ -565,4 +567,147 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
         expect(displayField).toBeInstanceOf(HTMLElement);
         expect(displayField.classList.contains("display-field")).toBe(true);
     });
+});
+
+
+describe("GroupTestDomElements - showQuestionChallenge", () => {
+    let domElements;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="choices"></div>
+            <audio id="instructions-sound"></audio>
+            <div id="instructions-text"></div>
+            <button id="start-practice"></button>
+            <button id="start-questions"></button>
+            <table id="summary-table"></table>
+            <button id="end-summary"></button>
+            <div id="question-title"></div>
+            <div id="question-challenge"></div>
+            <button id="next"></button>
+        `;
+        domElements = new GroupTestDomElements();
+    });
+
+    it("displays a question with sound correctly", () => {
+        const soundUrl = "https://example.com/audio.mp3";
+        const questionText = "Listen carefully";
+
+        domElements.showQuestionChallenge(null, soundUrl);
+
+        // Audio element should exist
+        const audioEl = document.getElementById("challenge-audio");
+        expect(audioEl).toBeInstanceOf(HTMLAudioElement);
+        expect(audioEl.src).toBe(soundUrl);
+
+        // Play button exists
+        const playBtn = document.getElementById("challenge-sound-btn");
+        expect(playBtn).toBeInstanceOf(HTMLButtonElement);
+        expect(playBtn.classList.contains("pulse")).toBe(true);
+
+        // Mock audio play
+        audioEl.play = vi.fn();
+
+        // Click play button
+        playBtn.click();
+
+        // Audio should be played and pulse removed
+        expect(audioEl.play).toHaveBeenCalled();
+        expect(playBtn.classList.contains("pulse")).toBe(false);
+    });
+
+    it("removes audio and play button if sound is removed", () => {
+        const soundUrl = "https://example.com/audio.mp3";
+        domElements.showQuestionChallenge(null, soundUrl);
+
+        // Now call again with no sound
+        domElements.showQuestionChallenge("Test", null);
+
+        const audioEl = document.getElementById("challenge-audio");
+        const playBtn = document.getElementById("challenge-sound-btn");
+
+        expect(audioEl).toBeNull();
+        expect(playBtn).toBeNull();
+    });
+
+    it("replaces audio when a new audio URL is given", () => {
+        const firstSound = "https://example.com/audio.mp3";
+        const secondSound = "https://example.com/audio2.mp3";
+
+        domElements.showQuestionChallenge(null, firstSound, null);
+        let audioEl = document.getElementById("challenge-audio");
+        expect(audioEl.src).toBe(firstSound);
+
+        domElements.showQuestionChallenge(null, secondSound, null);
+        audioEl = document.getElementById("challenge-audio");
+        expect(audioEl.src).toBe(secondSound);
+    });
+
+
+    it("displays a question with an image correctly", () => {
+        const imageUrl = "https://example.com/image.png";
+
+        domElements.showQuestionChallenge(null, null, imageUrl);
+
+        const challengeEl = document.getElementById("question-challenge");
+
+        // Image element should exist
+        const imgEl = document.querySelector("#challenge-image");
+        expect(imgEl).toBeInstanceOf(HTMLImageElement);
+        expect(imgEl.src).toBe(imageUrl);
+
+        // Image element should be removed when called with text
+        domElements.showQuestionChallenge("foo", null, null);
+        const removedImg = document.querySelector("#challenge-image");
+        expect(removedImg).toBeNull();
+    });
+
+    it("replaces image when a new image URL is given", () => {
+        const firstImage = "https://example.com/first.png";
+        const secondImage = "https://example.com/second.png";
+
+        domElements.showQuestionChallenge(null, null, firstImage);
+        let imgEl = document.querySelector("#challenge-image");
+        expect(imgEl.src).toBe(firstImage);
+
+        domElements.showQuestionChallenge(null, null, secondImage);
+        imgEl = document.querySelector("#challenge-image");
+        expect(imgEl.src).toBe(secondImage);
+    });
+
+    it("enables all letter buttons when audio is played", () => {
+        // First, create some disabled letter buttons
+        const letterBtn1 = document.createElement("button");
+        letterBtn1.className = "letter-btn";
+        letterBtn1.disabled = true;
+        const letterBtn2 = document.createElement("button");
+        letterBtn2.className = "letter-btn";
+        letterBtn2.disabled = true;
+        document.body.append(letterBtn1, letterBtn2);
+    
+        // Set up audio challenge
+        const soundUrl = "https://example.com/audio.mp3";
+        domElements.showQuestionChallenge(null, soundUrl);
+    
+        const audioEl = document.getElementById("challenge-audio");
+        const playBtn = document.getElementById("challenge-sound-btn");
+    
+        audioEl.play = vi.fn();
+    
+        // Before clicking, buttons are disabled
+        expect(letterBtn1.disabled).toBe(true);
+        expect(letterBtn2.disabled).toBe(true);
+    
+        // Click play
+        playBtn.click();
+    
+        // Audio played
+        expect(audioEl.play).toHaveBeenCalled();
+    
+        // Letter buttons should now be enabled
+        expect(letterBtn1.disabled).toBe(false);
+        expect(letterBtn2.disabled).toBe(false);
+    });
+
+
 });
