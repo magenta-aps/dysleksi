@@ -228,11 +228,11 @@ describe('GroupTestFlow', () => {
         const part = view.currentPart;
         view.showFirstQuestion(false);
         const question = view.currentQuestion;
+        const firstQuestionTitle = view.questionTitle();
 
-        // TODO: Get correct runAllTimers-function for whatever test framework we're using
         vi.runAllTimers();
 
-        expect(view.onTimeout).toHaveBeenCalled();
+        expect(view.onQuestionComplete).toHaveBeenCalledWith(question, true);
         expect(view.send).toHaveBeenCalledWith({
             uuid: expect.any(String),
             event: "question.answered",
@@ -244,15 +244,14 @@ describe('GroupTestFlow', () => {
             partId: part.id,
             questionIndex: question.index,
             questionId: question.id,
-            questionTitle: view.questionTitle(),
+            questionTitle: firstQuestionTitle,
             displayedAt: 0,
             answeredAt: expect.any(Number),
-            duration: 10000,
+            duration: expect.any(Number),
             roomName: 'class_123',
             correct: false,
             textAnswer: null,
         });
-        expect(view.onQuestionComplete).toHaveBeenCalled();
     });
 
     it("Select second answer of first question", () => {

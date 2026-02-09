@@ -120,7 +120,7 @@ export class GroupTestView extends StudentTestView {
             } else {
                 if (Number(this.currentQuestion.timeout) > 1) {
                     this.timeoutId = setTimeout(() => {
-                        this.onTimeout()
+                        this.onQuestionComplete(this.currentQuestion, true);
                     }, this.currentQuestion.timeout);
                 }
                 this.domElements.toggleNextButton(false);
@@ -140,11 +140,11 @@ export class GroupTestView extends StudentTestView {
         return canShow;
     }
 
-    onQuestionComplete(question) {
+    onQuestionComplete(question, outOfTime = false) {
         const questionAnsweredAt = document.timeline.currentTime;
 
         if (!question.instruction_sequence) {
-            if (!this.selectedAnswer && !this.textAnswer) {
+            if (!this.selectedAnswer && !this.textAnswer && !outOfTime) {
                 alert("Vælg et svar, før du går videre.");
                 return;
             }
@@ -162,11 +162,15 @@ export class GroupTestView extends StudentTestView {
                 }
             } else {
                 clearTimeout(this.timeoutId);
+                let messageText = `Elev har gennemført spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1}`
+                if (outOfTime) {
+                    messageText = `Elev besvarede ikke spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1} indenfor tidsfristen`
+                }
                 const duration = questionAnsweredAt - this.questionDisplayedAt;
                 this.send({
                     event: "question.answered",
-                    message: `Elev har gennemført spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1}`,
-                    choiceId: this.selectedAnswer.id,
+                    message: messageText,
+                    choiceId: outOfTime ? null : this.selectedAnswer.id,
                     recordingBase64: null,
                     partIndex: this.currentPartIndex,
                     partId: this.currentPart.id,
@@ -176,7 +180,7 @@ export class GroupTestView extends StudentTestView {
                     displayedAt: this.questionDisplayedAt,
                     answeredAt: questionAnsweredAt,
                     duration: duration,
-                    correct: this.answerIsCorrect(),
+                    correct: outOfTime ? false : this.answerIsCorrect(),
                     textAnswer: this.textAnswer,
                 });
             }
@@ -198,26 +202,6 @@ export class GroupTestView extends StudentTestView {
                 this.onPartComplete();
             }
         }
-    }
-
-    onTimeout() {
-        this.send({
-            event: "question.answered",
-            message: `Elev besvarede ikke spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1} indenfor tidsfristen`,
-            choiceId: null,
-            recordingBase64: null,
-            partIndex: this.currentPartIndex,
-            partId: this.currentPart.id,
-            questionIndex: this.currentQuestionIndex,
-            questionId: this.currentQuestion.id,
-            questionTitle: this.questionTitle(),
-            displayedAt: this.questionDisplayedAt,
-            answeredAt: document.timeline.currentTime,
-            duration: this.currentQuestion.timeout,
-            correct: false,
-            textAnswer: null,
-        });
-        this.onQuestionComplete(this.currentQuestion);
     }
 
     questionTitle() {
