@@ -85,7 +85,6 @@ export class StudentTestView extends EventTarget {
             // throw new Error("Cannot show part index " + index + ", only " + this.parts.length + " parts available.");
             return false;
         }
-        console.log("Showing part " + index);
         this.currentPartIndex = index;
         this.currentPart = this.test.parts[index];
         return true;
@@ -119,7 +118,6 @@ export class StudentTestView extends EventTarget {
             //throw new Error("Cannot show question index " + index + ", only " + questions.length + " questions available.")
             return false;
         }
-        console.log("Showing question " + questionIndex);
         this.currentQuestion = questions[questionIndex];
         return true;
     }

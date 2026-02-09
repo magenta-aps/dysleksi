@@ -1,5 +1,3 @@
-import { extractQuestions } from "./utils.js"
-
 export class EventTable {
     constructor(tableSelector = 'table#events tbody') {
         this.eventsEl = document.querySelector(tableSelector);
@@ -65,6 +63,24 @@ export class ActionButtons {
             el.addEventListener('click', callback);
         });
     }
+
+    buttonById(id) {
+        return this.buttons.values().find(b => b.id === id);
+    }
+
+    correctButton() {
+        return this.buttonById('correct');
+    }
+    wrongButton() {
+        return this.buttonById('wrong');
+    }
+    cancelButton() {
+        return this.buttonById('cancelled');
+    }
+    skipButton() {
+        return this.buttonById('skipped');
+    }
+
 }
 
 export class NoteField {
@@ -134,12 +150,16 @@ export class QuestionView {
 }
 
 export class TeacherView {
-    constructor(roomName, testContents, assignmentId, wsGetter, table, buttons, noteField, questionView) {
+    constructor(roomName, test, assignmentId, wsGetter, table, buttons, noteField, questionView) {
         this.assignmentId = assignmentId;
         this.roomName = roomName;
         this.chatSocket = wsGetter(roomName);
-        this.questions = extractQuestions(testContents);
+        this.test = test;
+
+        this.partIndex = null;
         this.questionIndex = null;
+        this.currentPart = null;
+        this.currentQuestion = null;
 
         this.table = table || new EventTable();
         this.buttons = buttons || new ActionButtons();
@@ -148,6 +168,28 @@ export class TeacherView {
 
         this._initSocket();
         this._initButtonListeners();
+    }
+
+    validatePartIndex(partIndex) {
+        if (partIndex === null || partIndex === undefined || partIndex < 0 || partIndex >= this.test.parts.length) {
+            throw new Error(`Invalid part index ${partIndex}`);
+        }
+    }
+    setPartIndex(partIndex) {
+        this.validatePartIndex(partIndex);
+        this.partIndex = partIndex;
+        this.currentPart = this.test.parts[partIndex];
+    }
+
+    validateQuestionIndex(questionIndex) {
+        if (questionIndex === null || questionIndex === undefined || questionIndex < 0 || questionIndex >= this.test.parts[this.partIndex].questions.length) {
+            throw new Error(`Invalid question index ${questionIndex}`)
+        }
+    }
+    setQuestionIndex(questionIndex) {
+        this.validateQuestionIndex(questionIndex);
+        this.questionIndex = questionIndex;
+        this.currentQuestion = this.currentPart.questions[questionIndex];
     }
 
     _initSocket() {
@@ -159,12 +201,11 @@ export class TeacherView {
             }
 
             if (["question.answered", "question.displayed"].includes(data.event)) {
-                const question = this.questions[data.questionIndex];
-                this.questionIndex = data.questionIndex;
-                this.question = question;
+                this.setPartIndex(data.partIndex);
+                this.setQuestionIndex(data.questionIndex);
                 if (data.event === 'question.displayed') {
                     this.buttons.enableButtons();
-                    this.showQuestion(question);
+                    this.showQuestion();
                 }
             }
         });
@@ -179,9 +220,10 @@ export class TeacherView {
                         uuid: crypto.randomUUID(),
                         event: 'test.cancelled',
                         roomName: this.roomName,
+                        partIndex: this.partIndex,
                         questionIndex: this.questionIndex,
-                        questionId: this.question.questionId,
-                        partId: this.question.partId,
+                        questionId: this.currentQuestion.id,
+                        partId: this.currentPart.id,
                         assignmentId: this.assignmentId,
                         note: this.noteField.getNote(),
                     }));
@@ -189,33 +231,30 @@ export class TeacherView {
                 }
             } else {
                 const correct = (val === "skipped") ? null : (val === "correct");
-                if ((this.questionIndex >= 0) && (this.questionIndex < this.questions.length)) {
-                    this.chatSocket.send(
-                        JSON.stringify({
-                            uuid: crypto.randomUUID(),
-                            event: 'question.feedback',
-                            roomName: this.roomName,
-                            questionIndex: this.questionIndex,
-                            questionId: this.question.questionId,
-                            partId: this.question.partId,
-                            assignmentId: this.assignmentId,
-                            correct: correct, // true=correct, false=wrong, null=skipped
-                            note: this.noteField.getNote(),
-                        })
-                    );
-                    this.buttons.disableButtons();
-                    this.noteField.clearNote();
-                    this.hideQuestion();
-                } else {
-                    console.error('invalid question index', this.questionIndex);
-                }
+                this.chatSocket.send(
+                    JSON.stringify({
+                        uuid: crypto.randomUUID(),
+                        event: 'question.feedback',
+                        roomName: this.roomName,
+                        partIndex: this.partIndex,
+                        questionIndex: this.questionIndex,
+                        questionId: this.currentQuestion.id,
+                        partId: this.currentPart.id,
+                        assignmentId: this.assignmentId,
+                        correct: correct, // true=correct, false=wrong, null=skipped
+                        note: this.noteField.getNote(),
+                    })
+                );
+                this.buttons.disableButtons();
+                this.noteField.clearNote();
+                this.hideQuestion();
             }
         });
     }
 
-    showQuestion(question) {
-        this.questionView.showTitle(`${this.questionIndex + 1}/${this.questions.length} (${question.partName})`);
-        this.questionView.showContent(question.challengeText, question.challengeImageUrl);
+    showQuestion() {
+        this.questionView.showTitle(`${this.questionIndex + 1}/${this.currentPart.questions.length} (${this.currentPart.name})`);
+        this.questionView.showContent(this.currentQuestion.challengeText, this.currentQuestion.challengeImageUrl);
     }
 
     hideQuestion() {

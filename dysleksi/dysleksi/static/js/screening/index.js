@@ -1,5 +1,5 @@
 import { startSession } from "./utils.js";
-import { getWebSocket } from "../ws.js";
+import { Test } from "./model.js";
 
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const assignmentId = roleEl.dataset.assignmentId;
     const testContentsEl = document.getElementById("test_contents");
     const testContents = testContentsEl ? JSON.parse(testContentsEl.textContent) : null;
+    const test = new Test(testContents);
 
     if (testType === "individual") {
         if (role === "student") {
@@ -34,10 +35,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
 
     if (role === "student") {
-        initStudent(roomName, assignmentId, testContents, testType);
+        initStudent(roomName, assignmentId, test, testType);
     }
     if (role === "teacher") {
-        initTeacher(roomName, assignmentId, testContents);
+        initTeacher(roomName, assignmentId, test);
         startSession(roomName); 
     }
 });

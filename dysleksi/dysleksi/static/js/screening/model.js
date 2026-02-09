@@ -12,8 +12,6 @@ export class Test extends EventTarget {
         this.currentPart = null;
         this.summary = data.summary;
         this.summaryText = data.summary_text;
-        console.log("Creating test", data);
-
         const partClass = this.getPartClass();
         this.parts = data.parts.map((dataItem, index) => new partClass(dataItem, this, index));
         if (this.parts.length === 0) {

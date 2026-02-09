@@ -1,7 +1,7 @@
 import {EventTable, ActionButtons, TeacherView, NoteField, QuestionView} from "../controlroom.js";
 import { getWebSocket } from "../../ws.js";
 
-export function initTeacher(roomName, assignmentId, testContents) {
+export function initTeacher(roomName, assignmentId, test) {
 
     const table = new EventTable();
     const buttons = new ActionButtons();
@@ -11,7 +11,5 @@ export function initTeacher(roomName, assignmentId, testContents) {
     noteField.show();
     questionView.show();
 
-    // const test = new TeacherTest(testContents);
-
-    new TeacherView(roomName, testContents, assignmentId, getWebSocket, table, buttons, noteField, questionView);
+    new TeacherView(roomName, test, assignmentId, getWebSocket, table, buttons, noteField, questionView);
 }
