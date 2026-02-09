@@ -515,7 +515,7 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
     });
 
     it("renders free text input with letters and erase button", () => {
-        const displayField = domElements.showQuestionFreeText("Type here", null, null, listenerMock);
+        const displayField = domElements.showQuestionFreeText(listenerMock);
 
         // Display field exists
         expect(displayField).toBeInstanceOf(HTMLElement);
@@ -544,7 +544,7 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
     });
 
     it("supports multiple letters and listener calls", () => {
-        const displayField = domElements.showQuestionFreeText("", null, null, listenerMock);
+        const displayField = domElements.showQuestionFreeText(listenerMock);
         const letterButtons = document.querySelectorAll(".letter-btn");
         const eraseBtn = document.querySelector(".erase-btn");
 
@@ -561,7 +561,7 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
     });
 
     it("returns the display field element", () => {
-        const displayField = domElements.showQuestionFreeText();
+        const displayField = domElements.showQuestionFreeText(() => {});
         expect(displayField).toBeInstanceOf(HTMLElement);
         expect(displayField.classList.contains("display-field")).toBe(true);
     });

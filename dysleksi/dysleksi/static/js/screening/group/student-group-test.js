@@ -99,7 +99,6 @@ export class GroupTestView extends StudentTestView {
 
                 } else if (this.currentQuestion.type === "free_text"){
                     this.input = this.domElements.showQuestionFreeText(
-                        null, null, null,
                         () => this.selectFreeText()
                     );
                 }
