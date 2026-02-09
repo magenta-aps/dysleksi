@@ -210,3 +210,13 @@ i {
     opacity: 0;
     z-index: 9999;
 }
+
+@keyframes pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.sound-btn.pulse {
+  animation: pulse 1s infinite;
+}

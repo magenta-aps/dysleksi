@@ -188,10 +188,15 @@ class TestDomElements {
                 const insertAfter = img || this.questionChallengeEl;
                 insertAfter.after(playBtn);
             }
-
+            playBtn.classList.add("pulse");
             playBtn.onclick = () => {
                 audio.currentTime = 0; // restart every time
                 audio.play();
+                playBtn.classList.remove("pulse");
+
+                const letterBtns = document.querySelectorAll(".letter-btn");
+                letterBtns.forEach(b => b.disabled = false);
+
             };
         } else {
             if (playBtn) playBtn.remove();
@@ -249,6 +254,7 @@ class TestDomElements {
                 btn.type = "button";
                 btn.className = "btn letter-btn";
                 btn.textContent = letter;
+                btn.disabled = true;
                 btn.addEventListener("click", () => {
                     displayField.textContent += letter;
                     updateEraseBtnState();
