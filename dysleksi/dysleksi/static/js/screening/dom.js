@@ -199,7 +199,7 @@ class TestDomElements {
         }
     }
 
-    showQuestionFreeText(placeholder = "", sound = null, image_url = null, listener = null) {
+    showQuestionFreeText(listener) {
         // Shows a free text field, as well as a screen-keyboard
 
         function updateEraseBtnState() {
@@ -234,7 +234,7 @@ class TestDomElements {
         eraseBtn.addEventListener("click", () => {
             displayField.textContent = displayField.textContent.slice(0, -1);
             updateEraseBtnState();
-            if (listener) listener({ target: { value: displayField.textContent } });
+            listener({ target: { value: displayField.textContent } });
         });
     
         textFieldWrapper.append(displayField, eraseBtn);
@@ -252,7 +252,7 @@ class TestDomElements {
                 btn.addEventListener("click", () => {
                     displayField.textContent += letter;
                     updateEraseBtnState();
-                    if (listener) listener({ target: { value: displayField.textContent } });
+                    listener({ target: { value: displayField.textContent } });
                 });
                 rowDiv.appendChild(btn);
             });
