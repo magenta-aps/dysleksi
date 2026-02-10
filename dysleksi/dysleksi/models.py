@@ -344,8 +344,8 @@ class TestPart(models.Model):
     name = models.CharField(max_length=255)
     instructions = models.FileField(upload_to="instructions", blank=True, null=True)
     intro = models.TextField(blank=True, null=True)
-    timeout = models.PositiveSmallIntegerField(blank=False, null=False)
-    partial_score_after = models.PositiveSmallIntegerField(blank=False, null=False)
+    timeout = models.PositiveIntegerField(blank=False, null=False)
+    partial_score_after = models.PositiveIntegerField(blank=False, null=False)
 
     def __str__(self) -> str:
         return self.name
@@ -439,7 +439,7 @@ class TestQuestion(models.Model):
         choices=QuestionType,
         default=QuestionType.MULTIPLE_CHOICE,
     )
-    timeout = models.PositiveSmallIntegerField(blank=False, null=False, default=0)
+    timeout = models.PositiveIntegerField(blank=False, null=False, default=0)
 
     def __str__(self) -> str:
         return f"{str(self.part)} / {str(self.part.test)} {self.pk}"

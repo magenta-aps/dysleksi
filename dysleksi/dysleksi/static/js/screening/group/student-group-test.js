@@ -9,7 +9,8 @@ export class GroupTestView extends StudentTestView {
     questionDisplayedAt;
     selectedAnswer;
     textAnswer;
-    timeoutId;
+    questionTimeoutId;
+    partTimeoutId;
 
     constructor(test, chatSocket, roomName, assignmentId, domElements) {
         super(test, chatSocket, roomName, assignmentId, domElements);
@@ -46,7 +47,15 @@ export class GroupTestView extends StudentTestView {
         this.domElements.toggleNextButton(false);
         this.domElements.togglePracticeButton(false);
         this.domElements.toggleQuestionsButton(false);
+
         super.onPartComplete();
+    }
+
+    onPartTimeout() {
+        const remainingQuestions = this.currentPart.questions.slice(this.currentQuestionIndex);
+        remainingQuestions.forEach((question) => {
+            this.onQuestionComplete(question, true);
+        });
     }
 
     canPractice() {
@@ -62,6 +71,11 @@ export class GroupTestView extends StudentTestView {
             if (!isPracticing) {
                 this.domElements.toggleQuestionsButton(false);
             }
+        }
+        if (!isPracticing && Number(this.currentPart.timeout) > 1) {
+            this.partTimeoutId = setTimeout(() => {
+                this.onPartTimeout();
+            }, this.currentPart.timeout);
         }
         return result;
     }
@@ -118,7 +132,7 @@ export class GroupTestView extends StudentTestView {
                 });
             } else {
                 if (Number(this.currentQuestion.timeout) > 1) {
-                    this.timeoutId = setTimeout(() => {
+                    this.questionTimeoutId = setTimeout(() => {
                         this.onQuestionComplete(this.currentQuestion, true);
                     }, this.currentQuestion.timeout);
                 }
@@ -160,7 +174,7 @@ export class GroupTestView extends StudentTestView {
                     return;
                 }
             } else {
-                clearTimeout(this.timeoutId);
+                clearTimeout(this.questionTimeoutId);
                 let messageText = `Elev har gennemført spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1}`
                 if (outOfTime) {
                     messageText = `Elev besvarede ikke spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1} indenfor tidsfristen`
