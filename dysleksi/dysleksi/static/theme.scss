@@ -30,9 +30,9 @@ $secondary: $student-grey-light;
 @import "./vendor/scss/bootstrap";
 
 @font-face {
-  font-family: "Andika Normal";
+  font-family: "Karinika";
   font-weight: normal;
-  src: url("./vendor/fonts/andika/Andika-Regular.ttf") format("truetype");
+  src: url("./fonts/Karinika-Regular.otf") format("opentype");
 }
 
 @font-face {
@@ -42,7 +42,7 @@ $secondary: $student-grey-light;
 }
 
 body {
-  font-family: "Andika Normal", "Helvetica", sans-serif;
+  font-family: "Karinika", "Helvetica", sans-serif;
 }
 
 i {
