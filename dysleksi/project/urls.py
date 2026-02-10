@@ -7,6 +7,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path
 from django.views.i18n import JavaScriptCatalog
+from metrics.urls import urlpatterns as metrics_urls
 from two_factor.urls import urlpatterns as two_factor_urls
 
 urlpatterns = [
@@ -28,6 +29,7 @@ urlpatterns = [
         ),
     ),
     path("", include(two_factor_urls)),
+    path("metrics/", include(metrics_urls)),
 ]
 if settings.MITID_TEST_ENABLED:  # type: ignore[misc]
     urlpatterns.append(
