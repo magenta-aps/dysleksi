@@ -3,6 +3,8 @@ $other-grey-lightest: #f9f9f9;
 $other-grey-light: #efefef;
 $other-grey-medium: #bbbbbb;
 $other-grey: #888888;
+$other-grey-dark: #545257;
+$white: #ffffff;
 
 // Define our own constants
 $sidebar-navigation-min-width: 15rem;
@@ -11,6 +13,9 @@ $sidebar-navigation-max-width: 20vw;
 
 // Map "design names" to known Bootstrap variables
 $body-bg: $other-grey-lightest;
+$primary: $other-grey-medium;
+$btn-color: $white;
+$list-group-disabled-color: $other-grey-medium;
 
 // Reset other relevant Bootstrap variables
 $offcanvas-horizontal-width: $sidebar-navigation-max-width;
@@ -20,6 +25,10 @@ $offcanvas-border-width: none;
 $offcanvas-padding-x: 0;
 $offcanvas-padding-y: 0;
 $btn-border-radius: 5rem;
+$btn-disabled-opacity: 0.35;
+$breadcrumb-margin-bottom: 0;
+$breadcrumb-divider: '/';
+$form-select-border-radius: 1rem;
 
 @import "./vendor/scss/bootstrap";
 @import "./vendor/fonts/phosphor/regular/style.css";
@@ -51,15 +60,15 @@ i {
   display: flex;
   flex-flow: row nowrap;
 }
-.main #toggle-sidebar-nav:active {
-  border-color: transparent;
-}
 .main .content {
   flex-grow: 10;
   height: 100vh;
   overflow: scroll;
+}
+.main .content .inner-content {
   padding: $spacer;
 }
+// Primary navigation: links to each subsection of site
 .main .navigation {
   display: flex;
   flex-flow: column nowrap;
@@ -67,7 +76,10 @@ i {
   overflow: clip;
   width: $sidebar-navigation-max-width;
   height: 100vh;
-  background: $other-grey-light !important;
+  background: $other-grey-dark !important;
+}
+.main .navigation .offcanvas-header button {
+  color: $white;
 }
 .main .navigation .offcanvas-body {
   display: flex;
@@ -78,31 +90,55 @@ i {
 .main .navigation nav {
   padding: $spacer;
 }
+.main .navigation div.navbar-nav {
+  flex-basis: 100%;
+}
 .main .navigation a.nav-link {
   display: flex;
   flex-direction: row;
   align-items: center;
   padding: 0.5 * $spacer;
+  color: $white;
 }
 .main .navigation a.nav-link.active {
   background: $other-grey-medium;
   border-radius: $spacer;
+  color: $black;
 }
 .main .navigation a.nav-link i.ph-fill {
   margin-right: 0.25 * $spacer;
 }
-.main .navigation nav#user {
-  flex-flow: column nowrap;
-  align-items: stretch;
-  border-top: 1px solid $other-grey-medium;
+.main .navigation .logo {
+  text-align: center;
+  color: $white;
+  padding: $spacer;
+  border-top: 1px solid $other-grey;
 }
-.main .navigation nav#user .navbar-nav {
-  margin-left: $spacer;
+// Secondary navigation: breadcrumb, search field and user menu
+.main .content nav.navbar {
+  flex-flow: row nowrap;
+  justify-items: center;
+  background: $white;
+  padding: 0.5 * $spacer $spacer;
+  box-shadow: 0 0.25 * $spacer $spacer $other-grey-light;
 }
-.main .navigation a#logout {
-  text-align: left;
-  border-radius: 10 * $spacer;
-  border-color: $other-grey-medium;
+.main .content nav.navbar .breadcrumb-item a {
+  color: $black;
+  text-decoration: none;
+}
+.main .content nav.navbar form .input-group .input-group-text {
+  border-radius: 5 * $spacer;
+  border-right: none;
+  background: transparent;
+}
+.main .content nav.navbar form .input-group .form-control {
+  border-radius: 5 * $spacer;
+  background: transparent;
+  border-left: none;
+  padding-left: 0;
+}
+.main .content nav.navbar form .input-group .form-control:focus {
+  box-shadow: none;
 }
 
 @include media-breakpoint-down(lg) {
@@ -114,7 +150,10 @@ i {
   .main .navigation:not(.show,.showing) nav {
     justify-content: center;
   }
-  .main .navigation:not(.show,.showing) a span {
+  .main .navigation:not(.show,.showing) a.nav-link {
+    justify-content: center;
+  }
+  .main .navigation:not(.show,.showing) a.nav-link span {
     display: none;
   }
 }
@@ -125,13 +164,27 @@ i {
     flex-direction: column;
   }
   .main #toggle-sidebar-nav {
-    align-items: start;
+    box-sizing: border-box;
+    height: (1.5 * $spacer) + (2 * $btn-padding-y) + 0.2 * $spacer;
+    align-items: center;
+    color: $white;
+    background: $other-grey-dark;
+    border-radius: 0;
+  }
+  .main #toggle-sidebar-nav:active {
+    border-color: transparent;
   }
   .main .content {
     flex: max-content;
   }
   .main .navigation {
     min-width: $sidebar-navigation-min-width;
+  }
+  .main .navigation .offcanvas-header {
+    border-bottom: 1px solid $other-grey;
+  }
+  .main .navigation .offcanvas-header button {
+    border-color: transparent;
   }
 }
 

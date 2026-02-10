@@ -11,12 +11,13 @@
 
 {% block content %}
 <div class="main">
+    {# Primary navigation (offcanvas on smaller screens) #}
     <button id="toggle-sidebar-nav" class="btn d-flex d-md-none" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasResponsive" aria-controls="offcanvasResponsive">
         <i class="ph ph-list"></i>
     </button>
     <div class="navigation offcanvas-md offcanvas-start" tabindex="-1" id="offcanvasResponsive" aria-labelledby="offcanvasResponsiveLabel">
         <div class="offcanvas-header justify-content-end">
-            <button type="button" class="btn ph-fill ph-caret-line-left" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasResponsive" aria-label="{% translate 'Luk' %}"></button>
+            <button type="button" class="btn ph ph-caret-left" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasResponsive" aria-label="{% translate 'Luk' %}"></button>
         </div>
         <div class="offcanvas-body">
             <nav class="navbar">
@@ -35,26 +36,41 @@
                     </a>
                 </div>
             </nav>
-            <nav id="user" class="navbar d-flex pt-3">
-                <div class="navbar-nav">
-                    <a class="nav-link" href="#">
-                        <i class="ph-fill ph-user-circle fs-5"></i>
-                        <span>Navn Navnesen</span>
-                    </a>
-                </div>
-                <a id="logout" class="btn mb-3" href="#">
-                    <i class="ph-fill ph-sign-out fs-5"></i>
-                    <span>{% translate "Log ud" %}</span>
-                </a>
-            </nav>
+            <div class="logo">
+                <span>Logo</span>
+            </div>
         </div>
     </div>
-
     <div class="content">
-        {% block inner_content %}
-        {% endblock %}
+        {# Secondary navigation: breadcrumb, search, and user menu #}
+        <nav class="navbar">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    {% block breadcrumb %}
+                    {% endblock %}
+                </ol>
+            </nav>
+            <form role="search" class="ms-auto me-5">
+                <div class="input-group">
+                    <div class="input-group-text"><i class="ph ph-magnifying-glass"></i></div>
+                    <input class="form-control" type="search" placeholder="{% translate 'Søg efter test, klasse eller elev' %}" aria-label="{% translate 'Søg' %}" />
+                </div>
+            </form>
+            <div class="navbar-nav">
+                <a class="nav-link d-flex align-items-center text-black" href="#">
+                    <i class="ph-fill ph-user-circle fs-5 me-1"></i>
+                    <span>{{ request.user.get_full_name }}</span>
+                </a>
+            </div>
+        </nav>
+        <div class="inner-content">
+            {% block inner_content %}
+            {% endblock %}
+        </div>
     </div>
 </div>
+{% block modals %}
+{% endblock %}
 {% endblock %}
 
 {% block js_module %}
@@ -69,13 +85,5 @@
 <script type="module">
     // This import uses the import map defined above
     import * as bootstrap from 'bootstrap';
-
-    document.addEventListener(
-        "DOMContentLoaded",
-        function (e) {
-            const bsOffcanvas = new bootstrap.Offcanvas('#offcanvasResponsive');
-            bsOffcanvas.hide();
-        }
-    );
 </script>
 {% endblock %}
