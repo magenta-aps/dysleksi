@@ -2,6 +2,10 @@
 {% load i18n %}
 {% load render_table from django_tables2 %}
 
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page"><a href="#">{% translate 'Tests' %}</a></li>
+{% endblock %}
+
 {% block inner_content %}
 <h2>{% translate "Aktive tests" %}</h2>
 {% render_table table %}
