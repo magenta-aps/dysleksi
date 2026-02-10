@@ -28,6 +28,8 @@ $primary: $student-purple-light;
 $secondary: $student-grey-light;
 
 @import "./vendor/scss/bootstrap";
+@import "./vendor/fonts/phosphor/regular/style.css";
+@import "./vendor/fonts/phosphor/fill/style.css";
 
 @font-face {
   font-family: "Karinika";
@@ -65,15 +67,14 @@ i {
   justify-content: center;
   margin: 0.5rem;
 
-  .material-icons {
+  .ph {
     font-size: 2.5rem;
-    line-height: 1;
   }
 
   &:disabled {
     color: white; // changes text/icon color when button is disabled
 
-    .material-icons {
+    .ph {
       color: white; // ensures icon itself is white
     }
   }
@@ -91,10 +92,8 @@ i {
   align-items: center;
   justify-content: center;
 
-
-  .material-icons {
+  .ph {
     font-size: 3rem;
-    line-height: 1;
   }
 }
 
@@ -109,9 +108,8 @@ i {
   align-items: center;
   justify-content: center;
 
-  .material-icons {
+  .ph {
     font-size: 3rem;
-    line-height: 1;
   }
 }
 
