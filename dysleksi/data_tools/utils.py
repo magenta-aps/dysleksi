@@ -14,8 +14,8 @@ def create_wordreading_2_test(
         test=test,
         name=name,
         defaults={
-            "timeout": 60,
-            "partial_score_after": 30,
+            "timeout": 60000,  # 60 seconds
+            "partial_score_after": 30000,  # 30 seconds
             "intro": _("Vælg det rigtige ord, der passer til billedet."),
         },
     )
@@ -31,8 +31,8 @@ def create_wordspelling_test(
         test=test,
         name=name,
         defaults={
-            "timeout": 60,
-            "partial_score_after": 30,
+            "timeout": 60000,
+            "partial_score_after": 30000,
             "intro": _("Stav ordet som du hører."),
         },
     )
@@ -48,8 +48,8 @@ def create_letter_pronunciation_test(
         test=test,
         name=name,
         defaults={
-            "timeout": 60,
-            "partial_score_after": 30,
+            "timeout": 60000,
+            "partial_score_after": 30000,
             "intro": _("Sig bogstavet på skærmen højt"),
         },
     )

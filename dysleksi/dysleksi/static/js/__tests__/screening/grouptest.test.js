@@ -222,7 +222,8 @@ describe('GroupTestFlow', () => {
         vi.useFakeTimers();
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
-        test.parts[0].questions[0].timeout = 10000
+        test.parts[0].timeout = 0;
+        test.parts[0].questions[0].timeout = 10000;
         testSpy(view);
         view.endSummary();
         const part = view.currentPart;
@@ -250,6 +251,67 @@ describe('GroupTestFlow', () => {
             duration: expect.any(Number),
             roomName: 'class_123',
             correct: false,
+            textAnswer: null,
+        });
+    });
+
+    it("Let first testpart time out on second question", () => {
+        vi.useFakeTimers();
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        test.parts[0].timeout = 60000;
+        testSpy(view);
+        view.endSummary();
+        const part = view.currentPart;
+        view.showFirstQuestion(false);
+        const firstQuestion = view.currentQuestion;
+        const firstQuestionTitle = view.questionTitle();
+
+        view.showQuestion(false, 1);
+        const remainingQuestions = part.questions.slice(view.currentQuestionIndex);
+
+        vi.runAllTimers();
+        
+        remainingQuestions.forEach((question) => {
+            expect(view.onQuestionComplete).toHaveBeenCalledWith(question, true);
+            expect(view.send).toHaveBeenCalledWith({
+                uuid: expect.any(String),
+                event: "question.answered",
+                message: `Elev besvarede ikke spørgsmål 1.${question.index+1} indenfor tidsfristen`,
+                choiceId: null,
+                recordingBase64: null,
+                assignmentId: 1,
+                partIndex: part.index,
+                partId: part.id,
+                questionIndex: question.index,
+                questionId: question.id,
+                questionTitle: `${question.index+1}/${part.questions.length} (${part.name})`,
+                displayedAt: 0,
+                answeredAt: expect.any(Number),
+                duration: expect.any(Number),
+                roomName: 'class_123',
+                correct: false,
+                textAnswer: null,
+            });
+        });
+        expect(view.onQuestionComplete).not.toHaveBeenCalledWith(firstQuestion, true);
+        expect(view.send).not.toHaveBeenCalledWith({
+            uuid: expect.any(String),
+            event: "question.answered",
+            message: expect.any(String),
+            choiceId: expect.toBeOneOf([null, expect.any(Number)]),
+            recordingBase64: null,
+            assignmentId: 1,
+            partIndex: part.index,
+            partId: part.id,
+            questionIndex: firstQuestion.index,
+            questionId: firstQuestion.id,
+            questionTitle: firstQuestionTitle,
+            displayedAt: expect.any(Number),
+            answeredAt: expect.any(Number),
+            duration: expect.any(Number),
+            roomName: 'class_123',
+            correct: expect.toBeOneOf([null, true, false]),
             textAnswer: null,
         });
     });

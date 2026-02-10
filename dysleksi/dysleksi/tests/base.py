@@ -66,7 +66,10 @@ class DysleksiTest(TestCase):
             name="Test2", test_type=TestType.GROUP
         )
         cls.part, _ = TestPart.objects.get_or_create(
-            name="TestPart1", test=cls.test, timeout=60, partial_score_after=30
+            name="TestPart1",
+            test=cls.test,
+            timeout=60000,
+            partial_score_after=30000,
         )
         cls.resource1, _ = TestResource.objects.get_or_create(
             name="TestResource1",
