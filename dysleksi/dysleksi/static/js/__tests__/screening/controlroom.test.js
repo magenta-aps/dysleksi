@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi, assert } from "vitest";
 import {EventTable, ActionButtons, TeacherView, NoteField, QuestionView} from "../../screening/controlroom.js";
 import * as groupTestData from './grouptest.json' with { type: 'json' }
 import * as individualTestData from './individualtest.json' with { type: 'json' }
@@ -35,7 +35,8 @@ describe("TeacherView Test", () => {
                 <button id="correct"></button>
                 <button id="wrong"></button>
                 <button id="cancelled"></button>
-                <textarea id="note"></textarea>
+                <button id="skipped"></button>
+                <textarea id="note" class="d-none"></textarea>
         `;
         table = new EventTable();
         buttons = new ActionButtons();
@@ -174,5 +175,79 @@ describe("TeacherView Test", () => {
         buttons.cancelButton().click();
         expect(socket.send).toHaveBeenCalledWith(expectedContent);
         expect(buttons.cancelButton().classList.contains("disabled")).toBe(true);
+    });
+
+    it("raise error when incorrect partindex is received", () => {
+        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
+
+        const invalidIndexes = [null, undefined, -1, individualTest.parts.length, individualTest.parts.length+1];
+        for (const index of invalidIndexes) {
+            try {
+                view.validatePartIndex(index);
+                assert.fail("Exception not raised for part index " + index);
+            } catch (e) {
+            }
+        }
+    });
+
+    it("raise error when incorrect questionindex is received", () => {
+        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
+        view.setPartIndex(0);
+
+        const invalidIndexes = [null, undefined, -1, individualTest.parts[0].questions.length, individualTest.parts[0].questions.length+1];
+        for (const index of invalidIndexes) {
+            try {
+                view.validateQuestionIndex(index);
+                assert.fail("Exception not raised for question index " + index);
+            } catch (e) {
+            }
+        }
+    });
+
+    it("buttonview hide buttons", () => {
+        buttons.hideButtons();
+        expect(buttons.correctButton().classList.contains("d-none")).toBe(true);
+        expect(buttons.wrongButton().classList.contains("d-none")).toBe(true);
+        expect(buttons.cancelButton().classList.contains("d-none")).toBe(true);
+        expect(buttons.skipButton().classList.contains("d-none")).toBe(true);
+    });
+
+    it("buttonview show buttons", () => {
+        buttons.showButtons();
+        expect(buttons.correctButton().classList.contains("d-none")).toBe(false);
+        expect(buttons.wrongButton().classList.contains("d-none")).toBe(false);
+        expect(buttons.cancelButton().classList.contains("d-none")).toBe(false);
+        expect(buttons.skipButton().classList.contains("d-none")).toBe(false);
+    });
+
+    it("noteview get note", () => {
+        note.noteEl.value = "Test note";
+        expect(note.getNote()).toBe("Test note");
+    });
+
+    it("noteview clear note", () => {
+        note.noteEl.value = "Test note";
+        note.clearNote();
+        expect(note.getNote()).toBe("");
+    });
+
+    it("noteview show", () => {
+        note.noteEl.value = "Test note";
+        note.show();
+        expect(note.noteEl.classList.contains("d-none")).toBe(false);
+        expect(note.noteEl.outerHTML).toBe('<textarea id="note" class=""></textarea>');
+    });
+
+    it("questionview cleans up", () => {
+        const container = document.querySelector("#question-content");
+
+        questionView.showContent("Test content", "/test/image.png");
+        expect(container.innerHTML).toBe('<img id="challenge-image" src="/test/image.png"><p id="challenge-text">Test content</p>');
+
+        questionView.showContent("Test content");
+        expect(container.innerHTML).toBe('<p id="challenge-text">Test content</p>');
+
+        questionView.showContent(null, "/test/image.png");
+        expect(container.innerHTML).toBe('<img id="challenge-image" src="/test/image.png">');
     });
 });
