@@ -2,7 +2,7 @@ import {EventTable, ActionButtons, TeacherView, NoteField, QuestionView} from ".
 import { getWebSocket } from "../../ws.js";
 
 export function initTeacher(roomName, assignmentId, test) {
-
+    console.log("called initTeacher");
     const table = new EventTable();
     const buttons = new ActionButtons();
     const noteField = new NoteField();
@@ -12,4 +12,5 @@ export function initTeacher(roomName, assignmentId, test) {
     questionView.show();
 
     new TeacherView(roomName, test, assignmentId, getWebSocket, table, buttons, noteField, questionView);
+    console.log("TeacherView created");
 }
