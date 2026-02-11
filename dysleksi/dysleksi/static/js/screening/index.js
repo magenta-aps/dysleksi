@@ -1,8 +1,7 @@
 import { startSession } from "./utils.js";
 import { Test } from "./model.js";
 
-
-document.addEventListener('DOMContentLoaded', async () => {
+export async function start() {
     const roleEl = document.querySelector("[data-role]");
 
     const role = roleEl.dataset.role;
@@ -41,4 +40,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         initTeacher(roomName, assignmentId, test);
         startSession(roomName); 
     }
-});
+}
+
+document.addEventListener('DOMContentLoaded', start);
