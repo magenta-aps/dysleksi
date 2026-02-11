@@ -130,7 +130,7 @@ class TestDomElements {
         this.introTextEl.textContent = "";
         this.instructionsSoundEl.innerHTML = "";
     }
-
+    
     _setButtonListener(button, listener) {
         // Removes existing listeners and sets a new one.
         // by just replacing the whole thing
@@ -273,6 +273,7 @@ class TestDomElements {
 
 export class GroupTestDomElements extends TestDomElements {
 
+    reminderSoundEl;
     startPracticeButton;
     startQuestionsButton;
     choicesEl;
@@ -280,12 +281,13 @@ export class GroupTestDomElements extends TestDomElements {
 
     constructor() {
         super();
+        this.reminderSoundEl = document.querySelector("#reminder-sound");
         this.startPracticeButton = document.querySelector("#start-practice");
         this.startQuestionsButton = document.querySelector("#start-questions");
         this.choicesEl = document.querySelector("#choices");
         this.nextBtn = document.querySelector("#next");
 
-        if (!this.startPracticeButton || !this.startQuestionsButton || !this.choicesEl || !this.nextBtn) {
+        if (!this.reminderSoundEl || !this.startPracticeButton || !this.startQuestionsButton || !this.choicesEl || !this.nextBtn) {
             throw new Error("Required DOM elements missing");
         }
     }

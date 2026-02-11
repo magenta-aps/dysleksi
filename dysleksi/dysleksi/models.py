@@ -259,6 +259,7 @@ class Test(models.Model):
                             and hasattr(question, "instruction_sequence")
                             else None
                         ),
+                        "reminder": question.reminder,
                         "timeout": question.timeout,
                     }
 
@@ -346,6 +347,7 @@ class TestPart(models.Model):
     intro = models.TextField(blank=True, null=True)
     timeout = models.PositiveIntegerField(blank=False, null=False)
     partial_score_after = models.PositiveIntegerField(blank=False, null=False)
+    reminder = models.PositiveIntegerField(blank=False, null=False, default=0)
 
     def __str__(self) -> str:
         return self.name
@@ -374,6 +376,10 @@ class TestPart(models.Model):
                     question_type = QuestionType.FREE_TEXT
             else:
                 question_type = QuestionType.NO_INPUT_REQUIRED
+            if "reminder" in data and not is_practice:
+                question_reminder = data["reminder"]
+            else:
+                question_reminder = self.reminder
             if "timeout" in data and not is_practice:
                 question_timeout = data["timeout"]
             else:
@@ -385,6 +391,7 @@ class TestPart(models.Model):
                 is_practice=is_practice,
                 question_type=question_type,
                 timeout=question_timeout,
+                reminder=question_reminder,
             )
 
             if is_practice and "instruction_sequence" in data:
@@ -440,6 +447,7 @@ class TestQuestion(models.Model):
         default=QuestionType.MULTIPLE_CHOICE,
     )
     timeout = models.PositiveIntegerField(blank=False, null=False, default=0)
+    reminder = models.PositiveIntegerField(blank=False, null=False, default=0)
 
     def __str__(self) -> str:
         return f"{str(self.part)} / {str(self.part.test)} {self.pk}"
