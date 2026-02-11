@@ -17,6 +17,7 @@ def create_wordreading_2_test(
             "timeout": 60000,  # 60 seconds
             "partial_score_after": 30000,  # 30 seconds
             "intro": _("Vælg det rigtige ord, der passer til billedet."),
+            "reminder": 20000,  # 20 seconds
         },
     )
     part.create_test_resources(questions_data, False)

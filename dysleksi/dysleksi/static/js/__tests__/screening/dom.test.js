@@ -5,12 +5,13 @@ import { GroupTestDomElements, IndividualTestDomElements } from "../../screening
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
 
-describe("TestDomElements.showInstructions (sound only)", () => {
+describe("GroupTestDomElements.showInstructions (sound only)", () => {
     let dom;
 
     beforeEach(() => {
         document.body.innerHTML = `
       <audio id="instructions-sound"></audio>
+      <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
@@ -39,12 +40,13 @@ describe("TestDomElements.showInstructions (sound only)", () => {
 });
 
 
-describe("TestDomElements.showQuestionChallenge (sound only)", () => {
+describe("GroupTestDomElements.showQuestionChallenge (sound only)", () => {
   let dom;
 
   beforeEach(() => {
     document.body.innerHTML = `
       <audio id="instructions-sound"></audio>
+      <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
@@ -93,12 +95,13 @@ describe("TestDomElements.showQuestionChallenge (sound only)", () => {
 });
 
 
-describe("TestDomElements.showSummary (text only)", () => {
+describe("GroupTestDomElements.showSummary (text only)", () => {
     let dom;
 
     beforeEach(() => {
         document.body.innerHTML = `
       <audio id="instructions-sound"></audio>
+      <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
@@ -132,12 +135,13 @@ describe("TestDomElements.showSummary (text only)", () => {
     });
 });
 
-describe("TestDomElements.showQuestionChallenge (text only)", () => {
+describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
     let dom;
 
     beforeEach(() => {
         document.body.innerHTML = `
       <audio id="instructions-sound"></audio>
+      <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
@@ -193,6 +197,7 @@ describe("GroupTestDomElements constructor", () => {
     it("creates elements", () => {
         document.body.innerHTML = `
       <audio id="instructions-sound"></audio>
+      <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
@@ -283,13 +288,14 @@ describe("IndividualTestDomElements constructor", () => {
 
 
 
-describe("TestDomElements DOM utilities", () => {
+describe("GroupTestDomElements DOM utilities", () => {
   let dom;
   let el;
 
   beforeEach(() => {
     document.body.innerHTML = `
       <audio id="instructions-sound"></audio>
+      <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
@@ -375,7 +381,7 @@ describe("TestDomElements DOM utilities", () => {
 });
 
 
-describe("TestDomElements.fadeScreenOverlay", () => {
+describe("GroupTestDomElements.fadeScreenOverlay", () => {
   let dom;
   let overlay;
 
@@ -383,6 +389,7 @@ describe("TestDomElements.fadeScreenOverlay", () => {
     document.body.innerHTML = `
       <div id="fade-overlay" style="opacity: 0;"></div>
       <audio id="instructions-sound"></audio>
+      <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>

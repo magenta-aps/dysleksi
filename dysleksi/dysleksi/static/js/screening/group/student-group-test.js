@@ -136,6 +136,12 @@ export class GroupTestView extends StudentTestView {
                         this.onQuestionComplete(this.currentQuestion, true);
                     }, this.currentQuestion.timeout);
                 }
+                if (Number(this.currentQuestion.reminder) > 1) {
+                    this.questionReminderId = setTimeout(() => {
+                        this.domElements.reminderSoundEl.currentTime = 0;
+                        this.domElements.reminderSoundEl.play();
+                    }, this.currentQuestion.reminder);
+                }
                 this.domElements.toggleNextButton(false);
             }
 
@@ -175,6 +181,7 @@ export class GroupTestView extends StudentTestView {
                 }
             } else {
                 clearTimeout(this.questionTimeoutId);
+                clearTimeout(this.questionReminderId);
                 let messageText = `Elev har gennemført spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1}`
                 if (outOfTime) {
                     messageText = `Elev besvarede ikke spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1} indenfor tidsfristen`

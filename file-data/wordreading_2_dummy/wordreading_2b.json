@@ -8,6 +8,7 @@
     {
         "image": "wordreading_2_dummy/bike.jpeg",
         "correct": "cykel",
-        "wrong": ["bil", "bus", "tog"]
+        "wrong": ["bil", "bus", "tog"],
+        "reminder": 5000
     }
 ]

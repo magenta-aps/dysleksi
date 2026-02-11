@@ -73,6 +73,7 @@ describe('GroupTestFlow', () => {
         document.body.innerHTML = `
             <div id="fade-overlay"></div>
             <audio id="instructions-sound"></audio>
+            <audio id="reminder-sound"></audio>
             <div id="instructions-text"></div>
             <button id="start-practice"></button>
             <button id="start-questions"></button>
@@ -216,6 +217,25 @@ describe('GroupTestFlow', () => {
             displayedAt: 0,
             roomName: view.roomName,
         })
+    });
+
+    it("Trigger for first question reminder", () => {
+        vi.useFakeTimers();
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        test.parts[0].timeout = 0;
+        test.parts[0].questions[0].reminder = 5000;
+        // Mock audio play
+        view.domElements.reminderSoundEl.play = vi.fn();
+        testSpy(view);
+        view.endSummary();
+        const part = view.currentPart;
+        view.showFirstQuestion(false);
+        const question = view.currentQuestion;
+        const firstQuestionTitle = view.questionTitle();
+
+        vi.runAllTimers();
+        expect(view.domElements.reminderSoundEl.play).toHaveBeenCalled();
     });
 
     it("Let first question time out", () => {
@@ -562,6 +582,7 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
         document.body.innerHTML = `
             <div id="choices"></div>
             <audio id="instructions-sound"></audio>
+            <audio id="reminder-sound"></audio>
             <div id="instructions-text"></div>
             <button id="start-practice"></button>
             <button id="start-questions"></button>
@@ -639,6 +660,7 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         document.body.innerHTML = `
             <div id="choices"></div>
             <audio id="instructions-sound"></audio>
+            <audio id="reminder-sound"></audio>
             <div id="instructions-text"></div>
             <button id="start-practice"></button>
             <button id="start-questions"></button>
