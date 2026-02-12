@@ -21,6 +21,7 @@ path = [
     "dev-idp/**",
     "rfc/**",
     "file-data/**",
+    "js_coverage/**",
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2025 Magenta ApS <info@magenta.dk>"

@@ -1,9 +1,16 @@
 {% extends "dysleksi/base.html" %}
-{% load i18n %}
-
+{% load static %}
 
 {% block content %}
-<div class="container">
-    Du er nu færdig med testen.
+<div class="center-screen">
+    <div class="center-content">
+        <h1>Færdig</h1>
+        <h3>Tiden er nu gået og testen er gennemført</h3>
+
+        <img src="{% static 'images/Grin.svg' %}"
+             alt="Smiley"
+             class="smiley-image"
+             id="testpart-intro-image">
+    </div>
 </div>
 {% endblock %}

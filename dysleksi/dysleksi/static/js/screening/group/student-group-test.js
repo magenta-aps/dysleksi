@@ -18,8 +18,6 @@ export class GroupTestView extends StudentTestView {
 
     start() {
         super.start();
-        this.domElements.setPracticeButtonListener(() => this.showFirstQuestion(true));
-        this.domElements.setQuestionsButtonListener(() => this.showFirstQuestion(false));
         this.domElements.setNextButtonListener(() => this.onQuestionComplete(this.currentQuestion));
     }
 
@@ -30,8 +28,6 @@ export class GroupTestView extends StudentTestView {
         if (canShow) {
             this.domElements.clearQuestionChoices();
             this.domElements.toggleNextButton(false);
-            this.domElements.toggleQuestionsButton(true);
-            this.domElements.togglePracticeButton(this.canPractice());
             this.domElements.showQuestionChallenge(
                 this.challengeText,
                 this.challengeSoundUrl,
@@ -42,11 +38,8 @@ export class GroupTestView extends StudentTestView {
     }
 
     onPartComplete() {
-        this.domElements.showQuestionTitle();
         this.domElements.clearQuestionChoices();
         this.domElements.toggleNextButton(false);
-        this.domElements.togglePracticeButton(false);
-        this.domElements.toggleQuestionsButton(false);
 
         super.onPartComplete();
     }
@@ -58,36 +51,23 @@ export class GroupTestView extends StudentTestView {
         });
     }
 
-    canPractice() {
-        return this.currentPart.practice.length > 0;
-    }
-
     // ---- Questions ----
-
-    showFirstQuestion(isPracticing) {
-        const result = this.showQuestion(isPracticing, 0);
-        if (result) {
-            this.domElements.togglePracticeButton(false);
-            if (!isPracticing) {
-                this.domElements.toggleQuestionsButton(false);
-            }
-        }
-        if (!isPracticing && Number(this.currentPart.timeout) > 1) {
-            this.partTimeoutId = setTimeout(() => {
-                this.onPartTimeout();
-            }, this.currentPart.timeout);
-        }
-        return result;
-    }
-
     showQuestion(isPracticing, questionIndex) {
         const canShow = this.setQuestion(isPracticing, questionIndex);
         if (canShow) {
             console.log("---------------------------------------------")
             console.log("Showing question " + this.currentPartIndex+"."+this.currentQuestionIndex);
+
+            if (this.currentQuestion.instruction_sequence) {
+                this.domElements.setStudentHeader("Lyt godt efter");
+            } else if (this.isPracticing) {
+                this.domElements.setStudentHeader("Øveopgave");
+            } else {
+                this.domElements.hideStudentHeader();
+            }
+
             this.domElements.toggleNextButton(false);
             this.domElements.clearQuestionChoices();
-            this.domElements.showQuestionTitle(this.questionTitle());
             this.domElements.showQuestionChallenge(
                 this.currentQuestion.challengeText,
                 this.currentQuestion.challengeSoundUrl,
@@ -127,8 +107,23 @@ export class GroupTestView extends StudentTestView {
                     this.domElements
                 );
 
+                if (this.domElements.skipInstructionButton) {
+                    this.domElements.skipInstructionButton.addEventListener("click", () => {
+                        instructionRunner.skip();
+                    });
+                    this.domElements.skipAllInstructionsButton.addEventListener("click", () => {
+                        instructionRunner.skipToEnd();
+                    });
+                    this.domElements.skipInstructionButton.style.display="block";
+                    this.domElements.skipAllInstructionsButton.style.display="block";
+                }
+
                 instructionRunner.run().then(() => {
                     this.domElements.unlockInput();
+                    if (this.domElements.skipInstructionButton) {
+                        this.domElements.skipInstructionButton.style.display="none";
+                        this.domElements.skipAllInstructionsButton.style.display="none";
+                    }
                 });
             } else {
                 if (Number(this.currentQuestion.timeout) > 1) {
@@ -170,7 +165,8 @@ export class GroupTestView extends StudentTestView {
             if (this.isPracticing) {
                 if (this.selectedAnswer.isCorrect) {
                     if (this.isLast()) {
-                        alert("Øveopgaver gennemført. Begynd den rigtige test")
+                        alert("Øveopgaver gennemført. Den rigtige test starter nu.")
+                        this.showTestPartIntro();
                     } else {
                         alert("Ja, det er rigtigt. Prøv næste øveopgave.");
                     }
@@ -212,23 +208,13 @@ export class GroupTestView extends StudentTestView {
             // no more questions in set
             if (this.isPracticing) {
                 // finished practicing
-                this.domElements.showQuestionTitle();
                 this.domElements.showQuestionChallenge();
                 this.domElements.toggleNextButton(false);
                 this.domElements.clearQuestionChoices();
-                this.domElements.toggleQuestionsButton(true);
             } else {
                 // part complete
                 this.onPartComplete();
             }
-        }
-    }
-
-    questionTitle() {
-        if (this.currentQuestion.instruction_sequence) {
-            return "Instruks"
-        } else {
-            return `${this.currentQuestionIndex + 1}/${this.questionsCount()} (${this.currentPart.name})`;
         }
     }
 

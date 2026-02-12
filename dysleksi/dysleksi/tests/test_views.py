@@ -82,7 +82,7 @@ class TestAssignmentView(DysleksiTest):
             ),
             (
                 self.student,
-                "dysleksi/screening/individual/student.html",
+                "dysleksi/screening/student.html",
                 "student_123",
                 self.assignment2,
             ),
@@ -94,7 +94,7 @@ class TestAssignmentView(DysleksiTest):
             ),
             (
                 self.student,
-                "dysleksi/screening/group/student.html",
+                "dysleksi/screening/student.html",
                 "class_123",
                 self.assignment1,
             ),

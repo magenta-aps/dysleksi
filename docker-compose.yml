@@ -94,10 +94,11 @@ services:
       - ./dysleksi/dysleksi/static/js:/app/src:ro
       - ./dysleksi/package.json:/app/package.json:ro
       - ./dysleksi/package-lock.json:/app/package-lock.json:ro
+      - ./js_coverage:/app/coverage
     command: >
       sh -c "
         npm ci &&
-        npx vitest run --coverage --coverage.provider=istanbul --coverage.include='/app/src/**/*.js' --coverage.reportsDirectory=/app/coverage
+        npx vitest run --coverage --coverage.provider=istanbul --coverage.include='/app/src/**/*.js' --coverage.reportsDirectory=/app/coverage/vitest_coverage
       "
     networks:
       - default

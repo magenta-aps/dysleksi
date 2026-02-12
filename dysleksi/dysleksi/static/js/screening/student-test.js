@@ -6,6 +6,7 @@ export class StudentTestView extends EventTarget {
     domElements;
 
     currentPart = null;
+    previousPart = null;
     currentPartIndex = null;
     currentQuestion = null;
     currentQuestionIndex = null;
@@ -22,6 +23,10 @@ export class StudentTestView extends EventTarget {
         });
     }
 
+    questionTitle() {
+        return `${this.currentQuestionIndex + 1}/${this.currentPart.questions.length} (${this.currentPart.name})`;
+    }
+
     send(data) {
         data.roomName = this.roomName;
         data.assignmentId = this.assignmentId;
@@ -35,38 +40,68 @@ export class StudentTestView extends EventTarget {
     }
 
     start() {
-        this.startSummary();
+        this.setPart(0)
+        this.showIntro();
     }
 
-    next() {
-        this.onQuestionComplete();
+    showIntro() {
+        this.domElements.setStartSummaryButtonListener(() => this.startSummary());
+    }
+
+    showTestPartIntro() {
+        this.domElements.showTestPartIntro()
+        this.domElements.hideTestContainer()
+        this.domElements.setStartTestPartButtonListener(() => this.showFirstQuestion(false));
+        if (this.previousPart) {
+            this.domElements.setTestPartIntroText(this.previousPart.name + " færdig")
+            this.domElements.showTestPartIntroImage()
+        } else {
+            this.domElements.hideTestPartIntroImage()
+        }
     }
 
     startSummary() {
         console.log("Test started, showing summary");
         this.domElements.hideInstructions();
-        this.domElements.showQuestionTitle();
-        this.domElements.showQuestionChallenge();
-        this.domElements.showSummary(this.test.summaryText, this.test.summary);
-        this.domElements.setSummaryButtonListener(() => this.endSummary());
+        this.domElements.showSummary(this.test.summary);
+        this.domElements.hideIntro();
+
+        const buttonText = this.canPractice() ? "Start øveopgave" : "Start deltest";
+
+        this.domElements.setEndSummaryButtonListener(() => this.endSummary(), buttonText);
     }
 
     endSummary() {
         console.log("Summary ended, showing first part");
         this.domElements.hideSummary();
-        this.showPart(0);
+        this.showFirstQuestion(this.canPractice() ? true : false)
+    }
+
+    canPractice() {
+        return this.currentPart.practice.length > 0;
+    }
+
+    showFirstQuestion(isPracticing) {
+        this.domElements.showTestContainer()
+        this.domElements.hideTestPartIntro()
+
+        const result = this.showQuestion(isPracticing, 0);
+        if (!isPracticing && Number(this.currentPart.timeout) > 1) {
+            this.partTimeoutId = setTimeout(() => {
+                this.onPartTimeout();
+            }, this.currentPart.timeout);
+        }
+        return result;
     }
 
     async onTestComplete(cancelled = false) {
         console.log("Test complete");
         this.domElements.hideInstructions();
-        this.domElements.showQuestionTitle();
         this.domElements.showQuestionChallenge();
 
         if (cancelled) {
             alert("Testen er afbrudt");
         } else {
-            alert("Testen er færdig!");
             this.send({
                 event: "test.complete",
                 message: "Testen er afsluttet",
@@ -86,6 +121,7 @@ export class StudentTestView extends EventTarget {
             return false;
         }
         this.currentPartIndex = index;
+        this.previousPart = this.currentPart
         this.currentPart = this.test.parts[index];
         return true;
     }
@@ -101,7 +137,7 @@ export class StudentTestView extends EventTarget {
         }));
         if (this.showPart(this.currentPartIndex + 1)) {
             console.log("Part complete, showing next part");
-            // next part is being shown
+            this.showTestPartIntro()
         } else {
             console.log("Part complete, no more parts");
             this.onTestComplete();

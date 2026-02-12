@@ -10,4 +10,7 @@ def nav_context(request: HttpRequest):
 
 
 def debug_context(request: HttpRequest):
-    return {"show_debug_console": settings.SHOW_DEBUG_CONSOLE}  # type: ignore
+    return {
+        "show_debug_console": settings.SHOW_DEBUG_CONSOLE,  # type: ignore
+        "show_test_debug_buttons": settings.DEBUG,  # type: ignore
+    }

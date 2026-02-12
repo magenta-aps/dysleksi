@@ -49,7 +49,7 @@ def create_letter_pronunciation_test(
         test=test,
         name=name,
         defaults={
-            "timeout": 60000,
+            "timeout": 0,
             "partial_score_after": 30000,
             "intro": _("Sig bogstavet på skærmen højt"),
         },

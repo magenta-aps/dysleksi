@@ -34,6 +34,9 @@ To run Javascript tests run the following command:
 docker-compose run --rm dysleksi-js-tests
 ```
 
+After running this, you will be able to see a detailed coverage overview in the html
+files dumped in the js_coverage folder.
+
 To run tests only in a specific file run
 ```shell
 docker exec dysleksi-web bash -c 'coverage run manage.py test dysleksi.tests.test_specific'

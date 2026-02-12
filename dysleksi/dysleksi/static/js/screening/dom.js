@@ -1,24 +1,28 @@
 class TestDomElements {
 
     instructionsSoundEl;
-    introTextEl;
-    questionTitleEl;
+    studentHeaderEl;
     questionChallengeEl;
     endSummaryButton;
     summaryTable;
 
     constructor() {
         this.instructionsSoundEl = document.querySelector("#instructions-sound");
-        this.introTextEl = document.querySelector("#instructions-text");
-        this.questionTitleEl = document.querySelector("#question-title");
+        this.studentHeaderEl = document.querySelector("#student-header");
         this.questionChallengeEl = document.querySelector("#question-challenge");
         this.endSummaryButton = document.querySelector("#end-summary");
+        this.startSummaryButton = document.querySelector("#start-summary");
+        this.startTestPartButton = document.querySelector("#start-testpart");
         this.summaryTable = document.querySelector("#summary-table");
         this.overlay = document.getElementById("fade-overlay");
-
-        if (!this.instructionsSoundEl || !this.introTextEl || !this.questionTitleEl || !this.questionChallengeEl || !this.endSummaryButton || !this.summaryTable) {
-            throw new Error("Required DOM elements missing");
-        }
+        this.testIntro = document.querySelector("#test-intro");
+        this.testPartIntro = document.querySelector("#testpart-intro");
+        this.testPartIntroText = document.querySelector("#testpart-intro-text");
+        this.testPartIntroImage = document.querySelector("#testpart-intro-image");
+        this.testSummary = document.querySelector("#test-summary");
+        this.testContainer = document.querySelector("#test-container");
+        this.skipInstructionButton = document.querySelector("#skip-instruction");
+        this.skipAllInstructionsButton = document.querySelector("#skip-all-instructions");
     }
 
     fadeScreenOverlay() {
@@ -36,14 +40,9 @@ class TestDomElements {
         });
     }
 
-    showSummary(text, parts) {
-        this.showSummaryTable(parts);
-        this.showInstructions(text);
-    }
 
-    showSummaryTable(parts) {
-        this.toggleSummaryTable(true);
-        this.toggleEndSummaryButton(true);
+    showSummary(parts) {
+        this.testSummary.style.display = "flex";
 
         parts.forEach(partname => {
             const row = document.createElement('tr');
@@ -55,28 +54,46 @@ class TestDomElements {
     }
 
     hideSummary() {
-        this.showInstructions("");
-        this.toggleSummaryTable(false);
-        this.toggleEndSummaryButton(false);
+        this.testSummary.style.display = "none";
     }
 
-    toggleSummaryTable(show) {
-        this.summaryTable.style.display = show ? "table-cell" : "none";
-    }
-    toggleEndSummaryButton(show) {
-        this.endSummaryButton.style.display = show ? "inline-block" : "none";
+    hideTestContainer() {
+        this.testContainer.style.display = "none";
     }
 
-    setSummaryButtonListener(listener) {
+    showTestContainer() {
+        this.testContainer.style.display = "flex";
+    }
+
+    hideIntro() {
+        this.testIntro.style.display = "none";
+    }
+
+    hideTestPartIntro() {
+        this.testPartIntro.style.display = "none";
+    }
+
+    showTestPartIntro() {
+        this.testPartIntro.style.display = "flex";
+    }
+
+    setEndSummaryButtonListener(listener, text) {
         this.endSummaryButton = this._setButtonListener(this.endSummaryButton, listener);
+        this.endSummaryButton.innerHTML = text;
+    }
+    setStartSummaryButtonListener(listener) {
+        this.startSummaryButton = this._setButtonListener(this.startSummaryButton, listener);
+    }
+    setStartTestPartButtonListener(listener) {
+        this.startTestPartButton = this._setButtonListener(this.startTestPartButton, listener);
     }
 
     showElement(el) {
-        el.style.display = "block";
+        el.style.visibility = "visible";
     }
 
     hideElement(el) {
-        el.style.display = "none";
+        el.style.visibility = "hidden";
     }
     
     fadeIn(el) {
@@ -107,17 +124,13 @@ class TestDomElements {
     }
     
     _updateInputState(inputLocked) {
-        const buttons = document.querySelectorAll("button");
+        const buttons = document.querySelectorAll("button:not(.debug-button)");
         buttons.forEach(btn => {
             btn.disabled = inputLocked;
         });
     }
 
-
     showInstructions(text, audio) {
-        if (text !== undefined && text !== null) {
-            this.introTextEl.textContent = text;
-        }
         if (audio) {
             const soundSource = document.createElement("source");
             soundSource.src = audio;
@@ -127,22 +140,43 @@ class TestDomElements {
     }
 
     hideInstructions() {
-        this.introTextEl.textContent = "";
+        this.studentHeaderEl.textContent = "";
         this.instructionsSoundEl.innerHTML = "";
     }
     
     _setButtonListener(button, listener) {
-        // Removes existing listeners and sets a new one.
-        // by just replacing the whole thing
-        const newButton = button.cloneNode(true);
-        button.parentNode.replaceChild(newButton, button);
-        newButton.addEventListener("click", listener);
-        return newButton;
+        if (button._clickHandler) {
+            button.removeEventListener("click", button._clickHandler);
+        }
+    
+        button._clickHandler = listener;
+        button.addEventListener("click", listener);
+
+        return button;
     }
 
-    showQuestionTitle(text) {
-        this.questionTitleEl.textContent = text || "";
+    setStudentHeader(text) {
+        this.studentHeaderEl.textContent = text;
+        this.studentHeaderEl.style.display = "";
     }
+
+    hideStudentHeader() {
+        this.studentHeaderEl.style.display = "none";
+    }
+
+    setTestPartIntroText(text) {
+        this.testPartIntroText.textContent = text;
+    }
+
+    hideTestPartIntroImage() {
+        this.testPartIntroImage.style.display = "none";
+    }
+
+    showTestPartIntroImage() {
+        this.testPartIntroImage.style.display = "flex";
+    }
+
+
     showQuestionChallenge(text, sound, imageUrl) {
         if (!text && !sound && !imageUrl) {
             this.questionChallengeEl.innerHTML = "";
@@ -155,6 +189,7 @@ class TestDomElements {
                 this.questionChallengeEl.append(img);
             }
             img.src = imageUrl;
+            img.style.opacity = 1;
         } else {
             if (img) {
                 img.remove();
@@ -274,54 +309,26 @@ class TestDomElements {
 export class GroupTestDomElements extends TestDomElements {
 
     reminderSoundEl;
-    startPracticeButton;
-    startQuestionsButton;
     choicesEl;
     nextBtn;
 
     constructor() {
         super();
         this.reminderSoundEl = document.querySelector("#reminder-sound");
-        this.startPracticeButton = document.querySelector("#start-practice");
-        this.startQuestionsButton = document.querySelector("#start-questions");
         this.choicesEl = document.querySelector("#choices");
         this.nextBtn = document.querySelector("#next");
-
-        if (!this.reminderSoundEl || !this.startPracticeButton || !this.startQuestionsButton || !this.choicesEl || !this.nextBtn) {
-            throw new Error("Required DOM elements missing");
-        }
     }
 
-    showSummary(text, parts) {
-        super.showSummary(text, parts);
-        this.togglePracticeButton(false);
-        this.toggleQuestionsButton(false);
+    showSummary(parts) {
+        super.showSummary(parts);
     }
 
     showInstructions(text, audio) {
         super.showInstructions(text, audio);
-        this.startPracticeButton.style.display = "inline-block";
-        this.startQuestionsButton.style.display = "inline-block";
-    }
-
-    togglePracticeButton(show) {
-        this.startPracticeButton.style.display = show ? "inline-block" : "none";
-    }
-
-    toggleQuestionsButton(show) {
-        this.startQuestionsButton.style.display = show ? "inline-block" : "none";
-    }
-
-    setPracticeButtonListener(listener) {
-        this.startPracticeButton = this._setButtonListener(this.startPracticeButton, listener);
-    }
-
-    setQuestionsButtonListener(listener) {
-        this.startQuestionsButton = this._setButtonListener(this.startQuestionsButton, listener);
     }
 
     toggleNextButton(show) {
-        this.nextBtn.style.display = show ? "block" : "none";
+        this.nextBtn.style.visibility = show ? "visible" : "hidden";
     }
 
     setNextButtonListener(listener) {
