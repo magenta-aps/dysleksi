@@ -2,6 +2,9 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
+import os
+
+from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.files.images import ImageFile
 from django.test import TestCase
@@ -159,3 +162,19 @@ class DysleksiTest(TestCase):
         if get:
             view.get(request, **kwargs)
         return view
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+
+        # Folder where media files are stored
+        media_root = settings.MEDIA_ROOT
+
+        # Clean up all test1*.jpg files
+        for root, _, files in os.walk(media_root):
+            for f in files:
+                if f.startswith("test1") and f.endswith(".jpg"):
+                    try:
+                        os.remove(os.path.join(root, f))
+                    except FileNotFoundError:
+                        pass

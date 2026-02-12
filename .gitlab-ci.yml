@@ -164,6 +164,7 @@ Lint Javascript:
     POSTGRES_HOST: dysleksi-db
     ENVIRONMENT: development
     ALLOWED_HOSTS: '["dysleksi-web", "localhost", "host.docker.internal"]'
+    DUMMY_DATA_DIR: /builds/gronlandsprojekter/dysleksi/dummy-data
 
     # Local SAML configuration
     SAML_SP_ENTITY_ID: https://localhost:8443/mitid/saml/metadata/
@@ -199,13 +200,10 @@ Python Unittest:
   <<: *test-default
   script:
     - cd /app
-    - mkdir -p /upload
-    - cp -r /builds/gronlandsprojekter/dysleksi/file-data/* /upload/
     - coverage run manage.py test --parallel
     - coverage combine
     - coverage report --show-missing --fail-under=100
     - coverage xml -o /app/coverage.xml
-    - rm -rf /upload/*
   coverage: '/^TOTAL.+?(\d+\%)$/'
   artifacts:
     reports:

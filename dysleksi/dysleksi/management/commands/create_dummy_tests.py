@@ -2,12 +2,21 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
+import shutil
+from pathlib import Path
 from typing import Literal
 
+from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
 
 from dysleksi.models import Test, TestType
+
+
+def copy_dummy_files():
+    for item in Path(settings.DUMMY_DATA_DIR).iterdir():
+        dest = Path(settings.MEDIA_ROOT) / item.name
+        shutil.copytree(item, dest, dirs_exist_ok=True)
 
 
 def create_group_test(
@@ -26,10 +35,11 @@ def create_group_test(
             "import_test",
             name,
             "Ordlæsning 2A (dummy)",
-            "/upload/wordreading_2_dummy/wordreading_2a.json",
+            Path(settings.MEDIA_ROOT) / "wordreading_2_dummy/wordreading_2a.json",
             "wordreading_2",
             practice_json_path=(
-                "/upload/wordreading_2_dummy/wordreading_2a_practice.json"
+                Path(settings.MEDIA_ROOT)
+                / "wordreading_2_dummy/wordreading_2a_practice.json"
             ),
         )
 
@@ -38,7 +48,7 @@ def create_group_test(
             "import_test",
             name,
             "Ordlæsning 2B (dummy)",
-            "/upload/wordreading_2_dummy/wordreading_2b.json",
+            Path(settings.MEDIA_ROOT) / "wordreading_2_dummy/wordreading_2b.json",
             "wordreading_2",
         )
 
@@ -47,9 +57,10 @@ def create_group_test(
             "import_test",
             name,
             "Ordstavning (dummy)",
-            "/upload/wordspelling_dummy/wordspelling.json",
+            Path(settings.MEDIA_ROOT) / "wordspelling_dummy/wordspelling.json",
             "wordspelling",
-            practice_json_path="/upload/wordspelling_dummy/wordspelling_practice.json",
+            practice_json_path=Path(settings.MEDIA_ROOT)
+            / "wordspelling_dummy/wordspelling_practice.json",
         )
 
 
@@ -64,7 +75,8 @@ def create_individual_test():
         "import_test",
         test_name,
         "Individuel deltest (dummy)",
-        "/upload/letter_pronunciation_dummy/letter_pronunciation.json",
+        Path(settings.MEDIA_ROOT)
+        / "letter_pronunciation_dummy/letter_pronunciation.json",
         "letter_pronunciation",
     )
 
@@ -73,6 +85,7 @@ class Command(BaseCommand):
     help = "Create group tests for grades 1–3 (middle and end)"
 
     def handle(self, *args, **options):
+        copy_dummy_files()
         for grade in (1, 2, 3):
             for period in ("midt", "slut"):
                 create_group_test(grade, period)
