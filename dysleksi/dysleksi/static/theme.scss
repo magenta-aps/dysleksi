@@ -198,17 +198,6 @@ i {
 
 }
 
-#fade-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: $body-bg;
-    pointer-events: none;
-    opacity: 0;
-    z-index: 9999;
-}
 
 @keyframes pulse {
   0%   { transform: scale(1); }
@@ -218,4 +207,76 @@ i {
 
 .sound-btn.pulse {
   animation: pulse 1s infinite;
+}
+
+.student-header {
+  position: relative;
+  width: 100%;
+  background: $student-yellow-light;
+  margin: 0;
+  padding: 1rem;
+  font-size: 1rem;
+  text-align: center;
+  z-index: 9999;
+}
+
+.center-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: flex-start;
+  align-items: center;
+
+  text-align: center;
+  z-index: 1000;
+}
+
+.center-content {
+  flex: 1;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+
+.center-content #fade-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: $body-bg;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 10;
+}
+
+.debug-buttons {
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 999999;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.debug-button {
+    display: none;
+}
+
+.smiley-image {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 1rem;
+    margin-top: 2rem;
 }

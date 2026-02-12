@@ -1,0 +1,84 @@
+{% extends "dysleksi/base.html" %}
+{% load i18n static %}
+{% load compress %}
+
+{% block js %}
+{{ block.super }}
+{{ test_contents|json_script:"test_contents" }}
+{{ assignment|json_script:"assignment" }}
+<script type="module" src="{% static 'js/screening/index.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+<h1 id="student-header" class="student-header" style="display: none"></h1>
+
+
+{% if show_test_debug_buttons %}
+<div class="debug-buttons">
+<button id="skip-instruction" class="debug-button">
+    DEBUG: Skip Instruction
+</button>
+
+<button id="skip-all-instructions" class="debug-button">
+    DEBUG: Skip alle instruktioner
+</button>
+</div>
+{% endif %}
+
+<div id="test-intro" class="center-screen">
+    <div class="center-content">
+        <h2 class="student-welcome">
+            {% blocktrans trimmed with name=student.first_name last_name=student.last_name %}
+            Hej {{ name }} {{ last_name }}
+            {% endblocktrans %}
+        </h2>
+        <button class="btn next-btn" id="start-summary">Videre</button>
+    </div>
+</div>
+
+<div id="testpart-intro" class="center-screen" style="display: none">
+    <div class="center-content">
+        <h2 id="testpart-intro-text"> </h2>
+
+        <img src="{% static 'images/Smile.svg' %}"
+             alt="Smiley"
+             class="smiley-image"
+             id="testpart-intro-image">
+
+        <button class="btn next-btn" id="start-testpart">
+            <i class="ph ph-arrow-right"></i>
+        </button>
+    </div>
+</div>
+
+<div id="test-summary" style="display: none" class="center-screen">
+    <div class="center-content">
+        <p> {% translate "Testen indeholder følgende deltests:" %} </p>
+        <table id="summary-table"></table>
+        <button class="btn next-btn" id="end-summary">Start øveopgave</button>
+    </div>
+</div>
+
+
+<div class="center-screen"
+     data-test-type="{{ room_type }}"
+     data-role="student"
+     data-room-name="{{ room_name }}"
+     data-assignment-id="{{ object.pk }}"
+     id="test-container"
+     style="display: none"
+     >
+
+    <div class="center-content">
+        <div id="fade-overlay"></div>
+        <audio id="reminder-sound" src="/media/utils/447307__mabdog__ringtone-1.wav" preload="auto"></audio>
+        <audio id="instructions-sound"></audio>
+        <div id="question-challenge"></div>
+        <div id="choices"></div>
+        <button id="next" class="btn next-btn" style="visibility: hidden;">
+            <i class="ph ph-arrow-right"></i>
+        </button>
+    </div>
+</div>
+
+{% endblock %}

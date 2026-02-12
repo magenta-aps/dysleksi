@@ -32,7 +32,6 @@ export class IndividualTestView extends StudentTestView {
     // ---- Parts ----
 
     showPart(index) {
-        this.domElements.showQuestionTitle();
         this.domElements.showQuestionChallenge();
         const canShow = super.showPart(index);
         if (canShow) {
@@ -57,14 +56,12 @@ export class IndividualTestView extends StudentTestView {
     }
 
     // ---- Questions ----
-
     showQuestion(isPracticing, questionIndex) {
         const canShow = this.setQuestion(isPracticing, questionIndex);
         if (canShow) {
             console.log("---------------------------------------------")
             console.log("Showing question " + this.currentPartIndex + "." + this.currentQuestionIndex);
             this.displayedAt = document.timeline.currentTime;
-            this.domElements.showQuestionTitle(this.questionTitle());
             this.domElements.showQuestionChallenge(
                 this.currentQuestion.challengeText,
                 this.currentQuestion.challengeSoundUrl,
@@ -117,7 +114,4 @@ export class IndividualTestView extends StudentTestView {
         this.onQuestionComplete();
     }
 
-    questionTitle() {
-        return `${this.currentQuestionIndex + 1}/${this.currentPart.questions.length} (${this.currentPart.name})`;
-    }
 }

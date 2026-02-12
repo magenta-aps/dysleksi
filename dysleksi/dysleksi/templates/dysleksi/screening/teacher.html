@@ -1,4 +1,13 @@
-{% extends 'dysleksi/screening/individual/base.html' %}
+{% extends 'dysleksi/base.html' %}
+{% load i18n static %}
+{% load compress %}
+
+{% block js %}
+{{ block.super }}
+{{ test_contents|json_script:"test_contents" }}
+{{ assignment|json_script:"assignment" }}
+<script type="module" src="{% static 'js/screening/index.js' %}"></script>
+{% endblock %}
 
 {% block content %}
 <div class="container" data-test-type="{{ test_type }}" data-role="teacher" data-room-name="{{ room_name }}" data-assignment-id="{{ object.pk }}">

@@ -111,6 +111,7 @@ describe("GroupTestDomElements.showSummary (text only)", () => {
       <div id="question-challenge"></div>
       <div id="choices"></div>
       <button id="next"></button>
+      <div id="test-summary"> </div>
     `;
 
         dom = new GroupTestDomElements();
@@ -119,14 +120,9 @@ describe("GroupTestDomElements.showSummary (text only)", () => {
     });
 
     it("Shows summary", () => {
-        dom.showSummary("Summary text", ["1", "2", "3"]);
-        expect(dom.introTextEl.textContent).toBe("Summary text");
-        expect(dom.summaryTable.style.display).toBe("table-cell");
-        expect(dom.endSummaryButton.style.display).toBe("inline-block");
-        expect(dom.startPracticeButton.style.display).toBe("none");
-        expect(dom.startQuestionsButton.style.display).toBe("none");
+        dom.showSummary(["1", "2", "3"]);
         expect(dom.summaryTable.outerHTML).toBe(
-            '<table id="summary-table" style="display: table-cell;">' +
+            '<table id="summary-table">' +
             '<tr><td>1</td></tr>' +
             '<tr><td>2</td></tr>' +
             '<tr><td>3</td></tr>' +
@@ -215,33 +211,6 @@ describe("GroupTestDomElements constructor", () => {
         expect(dom.nextBtn).not.toBeNull();
     });
 
-    it("missing elements throw error", () => {
-        const required = [
-            '<table id="summary-table"></table>',
-            '<button id="end-summary"></button>',
-            '<div id="question-title"></div>',
-            '<div id="question-challenge"></div>',
-            '<audio id="instructions-sound"></audio>',
-            '<div id="instructions-text"></div>',
-            '<button id="start-practice"></button>',
-            '<button id="start-questions"></button>',
-            '<div id="choices"></div>',
-            '<button id="next"></button>'
-        ];
-
-        for (let element of required) {
-            let html = ""
-            for (let otherElement of required) {
-                if (element !== otherElement) {
-                    html += otherElement;
-                }
-            }
-            document.body.innerHTML = html;
-            expect(() => {
-                new GroupTestDomElements();
-            }).toThrowError("Required DOM elements missing");
-        }
-    });
 })
 
 describe("IndividualTestDomElements constructor", () => {
@@ -261,29 +230,6 @@ describe("IndividualTestDomElements constructor", () => {
         expect(dom.nextBtn).not.toBeNull();
     });
 
-    it("missing elements throw error", () => {
-        const required = [
-            '<table id="summary-table"></table>',
-            '<button id="end-summary"></button>',
-            '<div id="question-title"></div>',
-            '<div id="question-challenge"></div>',
-            '<audio id="instructions-sound"></audio>',
-            '<div id="instructions-text"></div>',
-        ];
-
-        for (let element of required) {
-            let html = ""
-            for (let otherElement of required) {
-                if (element !== otherElement) {
-                    html += otherElement;
-                }
-            }
-            document.body.innerHTML = html;
-            expect(() => {
-                new IndividualTestDomElements();
-            }).toThrowError("Required DOM elements missing");
-        }
-    });
 })
 
 
@@ -311,14 +257,14 @@ describe("GroupTestDomElements DOM utilities", () => {
     el = document.getElementById("test-el");
   });
 
-  it("showElement sets display to block", () => {
+  it("showElement sets visibility to visible", () => {
     dom.showElement(el);
-    expect(el.style.display).toBe("block");
+    expect(el.style.visibility).toBe("visible");
   });
 
-  it("hideElement sets display to none", () => {
+  it("hideElement sets visibility to none", () => {
     dom.hideElement(el);
-    expect(el.style.display).toBe("none");
+    expect(el.style.visibility).toBe("hidden");
   });
 
   it("fadeIn sets opacity to 1", async () => {
@@ -421,5 +367,56 @@ describe("GroupTestDomElements.fadeScreenOverlay", () => {
 
     vi.useRealTimers();
     vi.unstubAllGlobals();
+  });
+});
+
+
+describe("_setButtonListener tests", () => {
+  let dom;
+  let button;
+
+  beforeEach(() => {
+    document.body.innerHTML = `
+      <audio id="instructions-sound"></audio>
+      <audio id="reminder-sound"></audio>
+      <div id="instructions-text"></div>
+      <button id="start-practice"></button>
+      <button id="start-questions"></button>
+      <table id="summary-table"></table>
+      <button id="end-summary"></button>
+      <div id="question-title"></div>
+      <div id="question-challenge"></div>
+      <div id="choices"></div>
+      <button id="next"></button>
+    `;
+
+    dom = new GroupTestDomElements();
+    button = document.createElement("button");
+    document.body.appendChild(button);
+  });
+
+  it("adds a click listener", () => {
+    const listener = vi.fn();
+    const spy = vi.spyOn(button, "addEventListener");
+
+    dom._setButtonListener(button, listener);
+
+    expect(spy).toHaveBeenCalledWith("click", listener);
+    expect(button._clickHandler).toBe(listener);
+  });
+
+  it("removes the old listener when replaced", () => {
+    const listener1 = vi.fn();
+    const listener2 = vi.fn();
+
+    const removeSpy = vi.spyOn(button, "removeEventListener");
+    const addSpy = vi.spyOn(button, "addEventListener");
+
+    dom._setButtonListener(button, listener1);
+    dom._setButtonListener(button, listener2);
+
+    expect(removeSpy).toHaveBeenCalledWith("click", listener1);
+    expect(addSpy).toHaveBeenCalledWith("click", listener2);
+    expect(button._clickHandler).toBe(listener2);
   });
 });

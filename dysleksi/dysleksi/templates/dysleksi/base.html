@@ -17,6 +17,10 @@ SPDX-License-Identifier: MPL-2.0
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
     {% block css %}
+    {% compress css %}
+    <link type="text/x-scss" href="{% static 'theme.scss' %}" rel="stylesheet" media="screen">
+    {% endcompress %}
+
     {% endblock %}
     <title>{% block title %}{% translate "Dysleksi" %}{% endblock %}</title>
     {% block extra_headers %}
@@ -30,7 +34,6 @@ SPDX-License-Identifier: MPL-2.0
 
     <script type="module" src="{% static 'js/debug.js' %}"></script>
     {% endif %}
-    <div id="fade-overlay"></div>
 
     {% block content %}
     {% endblock %}

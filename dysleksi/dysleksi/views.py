@@ -5,7 +5,6 @@ from typing import Any
 
 from django.db.models import Case, Count, F, Value, When
 from django.urls import reverse
-from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DetailView, TemplateView
 from django_tables2 import SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
@@ -57,10 +56,8 @@ class AssignmentView(UserTypeMixin, DetailView):
     model = TestAssignment
 
     def get_template_prefix(self) -> str:
-        if self.user.is_teacher:
+        if self.user.is_teacher or self.user.is_student:
             return "dysleksi/screening"
-        if self.user.is_student:
-            return f"dysleksi/screening/{self.get_room_type()}"
         raise ValueError("User is neither teacher nor student")
 
     @property
@@ -79,7 +76,8 @@ class AssignmentView(UserTypeMixin, DetailView):
         context["test_contents"]["summary"] = [
             testpart["name"] for testpart in context["test_contents"]["parts"]
         ]
-        context["test_contents"]["summary_text"] = _("Prøven indeholder:")
+        context["student"] = self.user
+        context["room_type"] = self.get_room_type()
         return context
 
     def get_room_type(self) -> str:
