@@ -94,7 +94,7 @@ services:
       - ./dysleksi/dysleksi/static/js:/app/src:ro
       - ./dysleksi/package.json:/app/package.json:ro
       - ./dysleksi/package-lock.json:/app/package-lock.json:ro
-      - ./js_coverage:/app/coverage
+      - vitest-coverage:/app/coverage
     command: >
       sh -c "
         npm ci &&
@@ -103,11 +103,22 @@ services:
     networks:
       - default
 
+  dysleksi-js-coverage:
+    container_name: dysleksi-js-coverage
+    image: nginx:alpine
+    volumes:
+      - vitest-coverage:/usr/share/nginx/html:ro
+    ports:
+      - "8143:80"
+    networks:
+      - default
+
 volumes:
   postgres-data:
   file-data:
   idp-data:
   staticfiles-data:
+  vitest-coverage:
 
 networks:
   default:
