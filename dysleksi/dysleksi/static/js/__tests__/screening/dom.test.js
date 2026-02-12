@@ -160,14 +160,17 @@ describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
         const audio = document.querySelector("#challenge-audio");
         const playBtn = document.querySelector("#challenge-sound-btn");
         const image = document.querySelector("#challenge-image");
-        const challenge = document.querySelector("#question-challenge");
+        const text = document.querySelector("#challenge-text");
 
         expect(audio).toBeNull();
         expect(playBtn).toBeNull();
         expect(image).toBeNull();
-        expect(challenge).not.toBeNull();
-        expect(challenge.childElementCount).toBe(0);
-        expect(challenge.textContent).toBe("Testtekst");
+        expect(text).not.toBeNull();
+        expect(text.textContent).toBe("Testtekst");
+
+        dom.showQuestionChallenge(null, null, "option1.png");
+        const text2 = document.querySelector("#challenge-text");
+        expect(text2).toBeNull();
     });
 
     it("Shows question choices", () => {

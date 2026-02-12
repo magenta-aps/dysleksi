@@ -18,7 +18,7 @@
           "challenge_name": "challenge",
           "challenge_image_url": null,
           "challenge_sound_url": null,
-          "challenge_text": "Udtal følgende bogstav: 'S'",
+          "challenge_text": "s",
           "possible_answers": []
         },
         {
@@ -28,7 +28,7 @@
           "challenge_name": "challenge",
           "challenge_image_url": null,
           "challenge_sound_url": null,
-          "challenge_text": "Udtal følgende bogstav: 'V'",
+          "challenge_text": "v",
           "possible_answers": []
         },
         {
@@ -38,7 +38,7 @@
           "challenge_name": "challenge",
           "challenge_image_url": null,
           "challenge_sound_url": null,
-          "challenge_text": "Udtal følgende bogstav: 'K'",
+          "challenge_text": "k",
           "possible_answers": []
         }
       ]

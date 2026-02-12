@@ -195,8 +195,18 @@ class TestDomElements {
                 img.remove();
             }
         }
+        let textEl = document.querySelector("#challenge-text");
         if (text) {
-            this.questionChallengeEl.innerHTML = text;
+            if (!textEl) {
+                textEl = document.createElement("div");
+                textEl.id = "challenge-text";
+                this.questionChallengeEl.append(textEl);
+            }
+            textEl.innerHTML = text;
+        } else {
+            if (textEl) {
+                textEl.remove();
+            }
         }
 
         let playBtn = document.querySelector("#challenge-sound-btn");
