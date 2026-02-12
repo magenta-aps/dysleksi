@@ -182,7 +182,7 @@ class TestDomElements {
             if (!playBtn) {
                 playBtn = document.createElement("button");
                 playBtn.id = "challenge-sound-btn";
-                playBtn.innerHTML = '<span class="material-icons">volume_up</span>';
+                playBtn.innerHTML = '<i class="ph ph-speaker-simple-high"></i>';
                 playBtn.className = "btn sound-btn";
 
                 const insertAfter = img || this.questionChallengeEl;
@@ -232,7 +232,7 @@ class TestDomElements {
     
         // --- Erase button ---
         const eraseBtn = document.createElement("button");
-        eraseBtn.innerHTML = '<span class="material-icons">backspace</span>';
+        eraseBtn.innerHTML = '<i class="ph ph-backspace"></i>';
         eraseBtn.className = "btn erase-btn";
         updateEraseBtnState();
     
