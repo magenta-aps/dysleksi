@@ -72,12 +72,12 @@ class ImportTestTest(TestCase):
 
     def test_import_letter_pronunciation_test(self):
         questions_data = [
-            {"text": "Udtal følgende bogstav: 'S'", "correct": None, "wrong": []},
-            {"text": "Udtal følgende bogstav: 'V'", "correct": None, "wrong": []},
-            {"text": "Udtal følgende bogstav: 'K'", "correct": None, "wrong": []},
+            {"text": "s", "correct": None, "wrong": []},
+            {"text": "v", "correct": None, "wrong": []},
+            {"text": "k", "correct": None, "wrong": []},
         ]
         practice_data = [
-            {"text": "Udtal følgende bogstav: 'Q'", "correct": None, "wrong": []},
+            {"text": "q", "correct": None, "wrong": []},
         ]
 
         # Write JSON data to a temporary file
@@ -113,9 +113,9 @@ class ImportTestTest(TestCase):
 
     def test_invalid_test_type(self):
         questions_data = [
-            {"text": "Udtal følgende bogstav: 'S'", "correct": None, "wrong": []},
-            {"text": "Udtal følgende bogstav: 'V'", "correct": None, "wrong": []},
-            {"text": "Udtal følgende bogstav: 'K'", "correct": None, "wrong": []},
+            {"text": "s", "correct": None, "wrong": []},
+            {"text": "v", "correct": None, "wrong": []},
+            {"text": "k", "correct": None, "wrong": []},
         ]
 
         # Write JSON data to a temporary file

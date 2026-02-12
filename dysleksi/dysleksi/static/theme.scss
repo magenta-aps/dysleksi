@@ -280,3 +280,13 @@ i {
     margin-bottom: 1rem;
     margin-top: 2rem;
 }
+
+.type-individual {
+  #challenge-text {
+    padding: 2rem 3rem 5rem 3rem;
+    border: 1px solid #ccc;
+    border-radius: 0.5rem;
+    line-height: 50%;
+    font-size: 120pt;
+  }
+}

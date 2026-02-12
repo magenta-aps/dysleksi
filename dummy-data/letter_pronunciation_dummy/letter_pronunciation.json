@@ -1,5 +1,5 @@
 [
-    {"text": "Udtal følgende bogstav: 'S'", "correct": null, "wrong": []},
-    {"text": "Udtal følgende bogstav: 'V'", "correct": null, "wrong": []},
-    {"text": "Udtal følgende bogstav: 'K'", "correct": null, "wrong": []}
+    {"text": "s", "correct": null, "wrong": []},
+    {"text": "v", "correct": null, "wrong": []},
+    {"text": "k", "correct": null, "wrong": []}
 ]
