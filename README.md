@@ -34,8 +34,8 @@ To run Javascript tests run the following command:
 docker-compose run --rm dysleksi-js-tests
 ```
 
-After running this, you will be able to see a detailed coverage overview in the html
-files dumped in the js_coverage folder.
+After running this, you will be able to see a detailed coverage overview at
+http://localhost:8143/vitest_coverage/
 
 To run tests only in a specific file run
 ```shell
