@@ -226,6 +226,7 @@ Django check:
 
 Javascript Unittest:
   stage: test
+  needs: []
   image: node:25
   cache:
     key: ${CI_COMMIT_REF_SLUG}-node
@@ -238,10 +239,10 @@ Javascript Unittest:
     - |
       npx vitest run \
         --coverage \
-        --coverage.thresholds.statements=88.56 \
-        --coverage.thresholds.branches=86.87 \
-        --coverage.thresholds.functions=86.38 \
-        --coverage.thresholds.lines=88.41 \
+        --coverage.thresholds.statements=88.96 \
+        --coverage.thresholds.branches=87.06 \
+        --coverage.thresholds.functions=87.21 \
+        --coverage.thresholds.lines=88.83 \
         --coverage.provider=istanbul \
         --coverage.include="dysleksi/static/js/**/*.js" \
       2>&1 | tee vitest_output.txt

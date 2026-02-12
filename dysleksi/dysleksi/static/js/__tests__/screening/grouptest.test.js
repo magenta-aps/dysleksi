@@ -364,7 +364,8 @@ describe('GroupTestFlow', () => {
         view.showFirstQuestion(false);
         const question = view.currentQuestion;
         const secondAnswer = question.possibleAnswers[1]
-        view.selectAnswer(secondAnswer);
+        const answerButtonObj = view.answerButtons.find(a => a.answer === secondAnswer);
+        answerButtonObj.button.click();
 
         expect(view.selectedAnswer, secondAnswer)
         expect(domElements.toggleNextButton).toHaveBeenLastCalledWith(true);
@@ -436,11 +437,12 @@ describe('GroupTestFlow', () => {
         view.showQuestion(true, 1);
         const question = view.currentQuestion;
         const correctAnswer = question.possibleAnswers.find(a => a.isCorrect);
-        view.selectAnswer(correctAnswer);
+        const answerButtonObj = view.answerButtons.find(a => a.answer === correctAnswer);
+        answerButtonObj.button.click();
         view.onQuestionComplete(question);
 
         expect(view.showNextQuestion).toHaveBeenCalled();
-        expect(global.alert).toHaveBeenCalledWith("Ja, det er rigtigt. Prøv næste øveopgave.");
+        expect(view.domElements.makeButtonHappy).toHaveBeenCalled();
     });
 
     it("Answer practice question incorrectly", () => {
@@ -453,11 +455,12 @@ describe('GroupTestFlow', () => {
         view.showQuestion(true, 1);
         const question = view.currentQuestion;
         const incorrectAnswer = question.possibleAnswers.find(a => !a.isCorrect);
-        view.selectAnswer(incorrectAnswer);
+        const answerButtonObj = view.answerButtons.find(a => a.answer === incorrectAnswer);
+        answerButtonObj.button.click();
         view.onQuestionComplete(question);
 
         expect(view.showNextQuestion).not.toHaveBeenCalled();
-        expect(global.alert).toHaveBeenCalledWith("Nej, det er forkert. Prøv at vælge igen.");
+        expect(view.domElements.makeButtonAngry).toHaveBeenCalled();
     });
 
     it("Answer last practice question in part", () => {
@@ -474,7 +477,7 @@ describe('GroupTestFlow', () => {
         view.onQuestionComplete(question);
 
         expect(view.showNextQuestion).toHaveBeenCalled();
-        expect(global.alert).toHaveBeenCalledWith("Øveopgaver gennemført. Den rigtige test starter nu.");
+        expect(view.domElements.makeButtonHappy).toHaveBeenCalled();
     });
 
     it("Answer last question in part", () => {
