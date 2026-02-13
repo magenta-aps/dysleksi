@@ -21,10 +21,12 @@ $student-yellow-lightest: #faf2dd;
 $student-yellow-light: #f2deaa;
 $student-yellow: #e6bd54;
 $student-yellow-dark: #685526;
+$student-blue: #e6ecf3;
+$student-blue-dark: #004382;
 
 // Map "design names" to known Bootstrap variables
 $body-bg: $student-grey-lightest;
-$primary: $student-purple-light;
+$primary: $student-blue;
 $secondary: $student-grey-light;
 
 @import "./vendor/scss/bootstrap";
@@ -54,6 +56,22 @@ i {
 
 .btn {
   touch-action: manipulation; /* prevent double-tap zoom on iPads */
+}
+
+.btn-outline-primary {
+  color: black !important;
+  border-color: $student-blue-dark !important;
+  background-color: white !important;
+  border-width: 2px !important;
+  font-size: 1.1rem !important;
+
+  &:hover, &:focus, &:active {
+    background-color: $student-blue !important;
+  }
+  &.selected {
+    background-color: $student-blue !important;
+  }
+
 }
 
 .erase-btn {
