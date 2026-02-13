@@ -25,6 +25,34 @@ class TestDomElements {
         this.skipAllInstructionsButton = document.querySelector("#skip-all-instructions");
     }
 
+    makeButtonAngry(buttonId) {
+        const btn = document.getElementById(buttonId);
+
+        // Restart animation if it’s already running
+        btn.classList.remove("angry-btn");
+        void btn.offsetWidth; // force reflow
+        btn.classList.add("angry-btn");
+
+        // Remove class after animation ends
+        setTimeout(() => {
+            btn.classList.remove("angry-btn");
+        }, 650);
+    }
+
+    makeButtonHappy(buttonId) {
+        const btn = document.getElementById(buttonId);
+
+        // Restart animation if it’s already running
+        btn.classList.remove("happy-btn");
+        void btn.offsetWidth; // force reflow
+        btn.classList.add("happy-btn");
+
+        // Remove class after animation ends
+        setTimeout(() => {
+            btn.classList.remove("happy-btn");
+        }, 650);
+    }
+
     fadeScreenOverlay() {
 
         // Immediately hide all content on the screen
@@ -340,6 +368,17 @@ export class GroupTestDomElements extends TestDomElements {
         this.nextBtn.style.visibility = show ? "visible" : "hidden";
     }
 
+    disableNextButton() {
+        this.nextBtn.style.transition = ""
+        this.nextBtn.style.opacity = ""
+        this.nextBtn.disabled = true;
+    }
+    
+    enableNextButton() {
+        this.nextBtn.disabled = false;
+    }
+
+
     setNextButtonListener(listener) {
         this.nextBtn = this._setButtonListener(this.nextBtn, listener);
     }
@@ -348,7 +387,10 @@ export class GroupTestDomElements extends TestDomElements {
         this.choicesEl.innerHTML = "";
     }
 
-    showQuestionChoice(text, sound, imageUrl, listener) {
+    showQuestionChoice(answer, listener) {
+        const text = answer.resourceText;
+        const sound = answer.resourceSoundUrl;
+        const imageUrl = answer.resourceImageUrl;
         console.log("showQuestionChoice", text, sound, imageUrl);
         const btn = document.createElement("button");
         if (text) {
@@ -361,7 +403,7 @@ export class GroupTestDomElements extends TestDomElements {
         }
         // TODO: render sound and image
         btn.className = "btn btn-outline-primary";
-        btn.id = "choice-" + text;
+        btn.id = answer.buttonId;
         this.choicesEl.append(btn);
         if (listener) {
             btn.addEventListener("click", listener);

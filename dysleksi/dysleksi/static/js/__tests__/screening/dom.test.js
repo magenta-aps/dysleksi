@@ -177,14 +177,28 @@ describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
         vi.spyOn(HTMLElement.prototype, "addEventListener").mockImplementation(() => {});
         const listener = () => {};
 
-        const button1 = dom.showQuestionChoice(null, null, "option1.png", null);
+        const answer1 = {
+            resourceText: "",
+            resourceSoundUrl: null,
+            resourceImageUrl: "option1.png",
+            buttonId: "btn1",
+        };
+
+        const answer2 = {
+            resourceText: "Option A",
+            resourceSoundUrl: null,
+            resourceImageUrl: null,
+            buttonId: "btn2",
+        };
+
+        const button1 = dom.showQuestionChoice(answer1, null);
         expect(button1.textContent).toBe("");
         expect(button1.addEventListener).not.toHaveBeenCalled();
         const image = button1.firstChild;
         expect(image).not.toBeNull();
         expect(image.src).toContain("option1.png");
 
-        const button2 = dom.showQuestionChoice("Option A", null, null, listener);
+        const button2 = dom.showQuestionChoice(answer2, listener);
         expect(button2.textContent).toBe("Option A");
         expect(button2.addEventListener).toHaveBeenCalledWith("click", listener);
 
@@ -353,6 +367,17 @@ describe("GroupTestDomElements DOM utilities", () => {
     expect(btn2.disabled).toBe(false);
     expect(nextBtn.disabled).toBe(false);
   });
+
+  it("disableNextButton/enableNextButton disable and enable next button", async () => {
+    const nextBtn = document.getElementById("next");
+
+    dom.disableNextButton();
+    expect(nextBtn.disabled).toBe(true);
+
+    dom.enableNextButton();
+    expect(nextBtn.disabled).toBe(false);
+  });
+
 });
 
 
@@ -447,5 +472,52 @@ describe("_setButtonListener tests", () => {
     expect(removeSpy).toHaveBeenCalledWith("click", listener1);
     expect(addSpy).toHaveBeenCalledWith("click", listener2);
     expect(button._clickHandler).toBe(listener2);
+  });
+});
+
+
+describe("GroupTestDomElements button animations", () => {
+  let dom;
+  let btn;
+
+  beforeEach(() => {
+    document.body.innerHTML = `<button id="test-btn"></button>`;
+    dom = new GroupTestDomElements();
+    btn = document.getElementById("test-btn");
+  });
+
+  it("makeButtonHappy adds and removes happy-btn class", () => {
+    vi.useFakeTimers();
+
+    const addSpy = vi.spyOn(btn.classList, "add");
+    const removeSpy = vi.spyOn(btn.classList, "remove");
+
+    dom.makeButtonHappy("test-btn");
+
+    expect(removeSpy).toHaveBeenCalledWith("happy-btn");
+    expect(addSpy).toHaveBeenCalledWith("happy-btn");
+
+    vi.advanceTimersByTime(650);
+
+    expect(removeSpy).toHaveBeenCalledWith("happy-btn");
+    vi.useRealTimers();
+  });
+
+  it("makeButtonAngry adds and removes angry-btn class", () => {
+    vi.useFakeTimers();
+
+    const addSpy = vi.spyOn(btn.classList, "add");
+    const removeSpy = vi.spyOn(btn.classList, "remove");
+
+    dom.makeButtonAngry("test-btn");
+
+    expect(removeSpy).toHaveBeenCalledWith("angry-btn");
+    expect(addSpy).toHaveBeenCalledWith("angry-btn");
+
+    vi.advanceTimersByTime(650);
+
+    expect(removeSpy).toHaveBeenCalledWith("angry-btn");
+
+    vi.useRealTimers();
   });
 });

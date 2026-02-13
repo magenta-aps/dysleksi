@@ -84,10 +84,8 @@ export class GroupTestView extends StudentTestView {
             for (let answer of answers) {
                 if (this.currentQuestion.type === "multiple_choice"){
                     const button = this.domElements.showQuestionChoice(
-                        answer.resourceText,
-                        answer.resourceSoundUrl,
-                        answer.resourceImageUrl,
-                        () => {this.selectAnswer(answer)},
+                        answer,
+                        () => {this.selectAnswer(answer)}
                     );
                     this.answerButtons.push({"button": button, "answer": answer});
 
@@ -165,14 +163,9 @@ export class GroupTestView extends StudentTestView {
             if (this.isPracticing) {
                 if (this.selectedAnswer.isCorrect) {
                     if (this.isLast()) {
-                        alert("Øveopgaver gennemført. Den rigtige test starter nu.")
                         this.showTestPartIntro();
-                    } else {
-                        alert("Ja, det er rigtigt. Prøv næste øveopgave.");
                     }
                 } else {
-                    alert("Nej, det er forkert. Prøv at vælge igen.");
-                    this.showQuestion(this.isPracticing, this.currentQuestionIndex);
                     return;
                 }
             } else {
@@ -225,6 +218,17 @@ export class GroupTestView extends StudentTestView {
     selectAnswer(answer) {
         this.selectedAnswer = answer;
         this.domElements.toggleNextButton(true);
+
+        if (this.isPracticing) {
+            if (this.selectedAnswer.isCorrect){
+                this.domElements.makeButtonHappy(this.selectedAnswer.buttonId)
+                this.domElements.enableNextButton()
+            } else {
+                this.domElements.makeButtonAngry(this.selectedAnswer.buttonId)
+                this.domElements.disableNextButton()
+            }
+        }
+
         for (let a of this.answerButtons) {
             this.domElements.toggleButtonSelected(a["button"], a["answer"] === answer);
         }

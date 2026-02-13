@@ -299,3 +299,42 @@ i {
     font-size: 120pt;
   }
 }
+
+.angry-btn {
+    animation: angry-shake 0.35s ease-in-out 0s 2;
+    box-shadow: 0 0 0.6rem $student-red, 0 0 1.2rem lighten($student-red, 20%);
+}
+
+@keyframes angry-shake {
+    0%   { transform: translateX(0); }
+    10%  { transform: translateX(-3px) rotate(-1deg); }
+    20%  { transform: translateX(3px) rotate(1deg); }
+    30%  { transform: translateX(-5px) rotate(-2deg); }
+    40%  { transform: translateX(5px) rotate(2deg); }
+    50%  { transform: translateX(-4px) rotate(-1deg); }
+    60%  { transform: translateX(4px) rotate(1deg); }
+    70%  { transform: translateX(-2px) rotate(-1deg); }
+    80%  { transform: translateX(2px) rotate(1deg); }
+    90%  { transform: translateX(-1px); }
+    100% { transform: translateX(0); }
+}
+
+.happy-btn {
+    animation: happy-flash 0.5s ease-in-out;
+    box-shadow: 0 0 0.3rem rgba($student-green, 0.6);
+}
+
+@keyframes happy-flash {
+    0% {
+        box-shadow: 0 0 0.3rem rgba($student-green, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 0.9rem rgba($student-green, 0.9);
+    }
+    100% {
+        box-shadow: 0 0 0.3rem rgba($student-green, 0.6);
+    }
+}
+
+
+
