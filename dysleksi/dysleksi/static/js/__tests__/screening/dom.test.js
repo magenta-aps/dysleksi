@@ -219,6 +219,7 @@ describe("GroupTestDomElements constructor", () => {
 describe("IndividualTestDomElements constructor", () => {
     it("creates elements", () => {
         document.body.innerHTML = `
+      <div id="audio-indicator" style="display: none"></div>
       <audio id="instructions-sound"></audio>
       <div id="instructions-text"></div>
       <table id="summary-table"></table>
@@ -231,8 +232,33 @@ describe("IndividualTestDomElements constructor", () => {
         expect(dom.startQuestionsButton).not.toBeNull();
         expect(dom.choicesEl).not.toBeNull();
         expect(dom.nextBtn).not.toBeNull();
+        expect(dom.audioIndicatorEl).not.toBeNull();
     });
+})
 
+describe("IndividualTestDomElements DOM utilities", () => {
+    let dom;
+    beforeEach(() => {
+        document.body.innerHTML = `
+      <div id="audio-indicator" style="display: none"></div>
+      <audio id="instructions-sound"></audio>
+      <div id="instructions-text"></div>
+      <table id="summary-table"></table>
+      <button id="end-summary"></button>
+      <div id="question-title"></div>
+      <div id="question-challenge"></div>
+    `;
+        dom = new IndividualTestDomElements();
+    });
+    it("show audio indicator", () => {
+        dom.toggleAudioIndicator(true);
+        expect(dom.audioIndicatorEl.style.display).toBe("block");
+    });
+    it("hide audio indicator", () => {
+        dom.toggleAudioIndicator(true);
+        dom.toggleAudioIndicator(false);
+        expect(dom.audioIndicatorEl.style.display).toBe("none");
+    });
 })
 
 

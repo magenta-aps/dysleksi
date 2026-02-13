@@ -176,7 +176,6 @@ class TestDomElements {
         this.testPartIntroImage.style.display = "flex";
     }
 
-
     showQuestionChallenge(text, sound, imageUrl) {
         if (!text && !sound && !imageUrl) {
             this.questionChallengeEl.innerHTML = "";
@@ -379,8 +378,15 @@ export class GroupTestDomElements extends TestDomElements {
 
 export class IndividualTestDomElements extends TestDomElements {
 
-    constructor() {
+    audioIndicatorEl;
+
+    constructor(audioIndicatorSelector = "#audio-indicator") {
         super();
+        this.audioIndicatorEl = document.querySelector(audioIndicatorSelector);
+    }
+
+    toggleAudioIndicator(show) {
+        this.audioIndicatorEl.style.display = show ? "block" : "none";
     }
 
 }
