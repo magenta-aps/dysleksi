@@ -183,8 +183,8 @@ class TestDomElements {
         return button;
     }
 
-    setStudentHeader(text) {
-        this.studentHeaderEl.textContent = text;
+    setStudentHeader(html) {
+        this.studentHeaderEl.innerHTML = html;
         this.studentHeaderEl.style.display = "";
     }
 
