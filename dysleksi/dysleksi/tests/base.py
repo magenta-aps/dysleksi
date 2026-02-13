@@ -2,12 +2,12 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
-import os
+import tempfile
+from pathlib import Path
 
-from django.conf import settings
 from django.contrib.auth.models import Group
 from django.core.files.images import ImageFile
-from django.test import TestCase
+from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 
 from dysleksi.models import (
@@ -130,6 +130,29 @@ class DysleksiTest(TestCase):
         )
 
     @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+
+        # Create a temporary MEDIA_ROOT for this test process
+        cls._temp_media = tempfile.TemporaryDirectory()
+        cls.override_media = override_settings(MEDIA_ROOT=cls._temp_media.name)
+        cls.override_media.enable()
+
+        # Create wordspelling_dummy folder
+        cls.wordspelling_dummy_dir = Path(cls._temp_media.name) / "wordspelling_dummy"
+        cls.wordspelling_dummy_dir.mkdir(parents=True, exist_ok=True)
+
+        # Create dummy sound file
+        cls.dummy_sound_path = cls.wordspelling_dummy_dir / "iki.mp3"
+        cls.dummy_sound_path.write_bytes(b"FAKE MP3 DATA")  # dummy content
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        cls.override_media.disable()
+        cls._temp_media.cleanup()
+
+    @classmethod
     def create_class(cls, start_year: int, letter: str) -> Class:
         klasse, _ = Class.objects.get_or_create(
             start_year=start_year,
@@ -162,19 +185,3 @@ class DysleksiTest(TestCase):
         if get:
             view.get(request, **kwargs)
         return view
-
-    @classmethod
-    def tearDownClass(cls):
-        super().tearDownClass()
-
-        # Folder where media files are stored
-        media_root = settings.MEDIA_ROOT
-
-        # Clean up all test1*.jpg files
-        for root, _, files in os.walk(media_root):
-            for f in files:
-                if f.startswith("test1") and f.endswith(".jpg"):
-                    try:
-                        os.remove(os.path.join(root, f))
-                    except FileNotFoundError:
-                        pass
