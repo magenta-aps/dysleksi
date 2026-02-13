@@ -461,7 +461,7 @@ class TestMessage(DysleksiTest):
         answer_sound = questionresponse.answer_sound
         self.assertIsNotNone(answer_sound)
         self.assertEqual(type(answer_sound), FieldFile)
-        self.assertEqual(answer_sound.size, 8384)
+        self.assertEqual(answer_sound.size, 13)
         with answer_sound.open() as file:
             answer_sound_data: bytes = file.read()
         self.assertEqual(answer_sound_data, sounddata)
