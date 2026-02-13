@@ -59,9 +59,9 @@ export class GroupTestView extends StudentTestView {
             console.log("Showing question " + this.currentPartIndex+"."+this.currentQuestionIndex);
 
             if (this.currentQuestion.instruction_sequence) {
-                this.domElements.setStudentHeader("Lyt godt efter");
+                this.domElements.setStudentHeader('<i class="ph ph-ear"></i>');
             } else if (this.isPracticing) {
-                this.domElements.setStudentHeader("Øveopgave");
+                this.domElements.setStudentHeader('<i class="ph ph-pencil-line"></i>');
             } else {
                 this.domElements.hideStudentHeader();
             }

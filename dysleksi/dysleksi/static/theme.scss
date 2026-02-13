@@ -215,9 +215,10 @@ i {
   background: $student-yellow-light;
   margin: 0;
   padding: 1rem;
-  font-size: 1rem;
-  text-align: center;
+  font-size: 2rem;
+  text-align: right;
   z-index: 9999;
+  color: $student-yellow-dark;
 }
 
 .center-screen {

@@ -600,7 +600,7 @@ describe('GroupTestFlow', () => {
         testSpy(view);
         view.showPart(0);
         view.showQuestion(true, 0);
-        expect(domElements.setStudentHeader).toHaveBeenCalledWith("Lyt godt efter");
+        expect(domElements.setStudentHeader).toHaveBeenCalledWith('<i class="ph ph-ear"></i>');
 
     });
 
