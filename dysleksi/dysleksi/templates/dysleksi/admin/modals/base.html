@@ -1,0 +1,24 @@
+{% load i18n %}
+<div class="modal fade {% block modal_classes %}{% endblock %}" id="{{ modal_id }}" tabindex="-1" aria-labelledby="{{ modal_labelled_by }}" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="{{ modal_labelled_by }}">{% block modal_title %}{% endblock %}</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate 'Luk' %}"></button>
+            </div>
+            <div class="modal-body">
+                {% block modal_progress_bar %}
+                {% endblock %}
+                <div class="modal-body-inner">
+                    {% block modal_body %}
+                    {% endblock %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                {% block modal_footer %}
+                <button type="button" class="btn btn-secondary next-btn" data-bs-dismiss="modal">{% translate 'OK' %}</button>
+                {% endblock %}
+            </div>
+        </div>
+    </div>
+</div>

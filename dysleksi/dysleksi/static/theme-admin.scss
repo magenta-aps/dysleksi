@@ -188,6 +188,15 @@ i {
   }
 }
 
+// Button styles
+.btn-secondary-outline {
+  color: $black;
+  border-color: $other-grey-medium;
+}
+.btn-secondary-outline:hover {
+  border: 1px solid $other-grey;
+}
+
 // Table styles
 .table-container {
   overflow: hidden !important;
@@ -241,4 +250,62 @@ i {
 }
 table tbody > tr:last-child > td {
   border-bottom: 0;
+}
+
+// Modal styles
+.modal-body {
+  padding: 0;
+}
+.modal-body-inner {
+  padding: $spacer;
+}
+ul.modal-progress {
+  background: $other-grey-light;
+}
+ul.modal-progress li.list-group-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: transparent;
+  border: none;
+}
+ul.modal-progress li.list-group-item:not(.disabled) {
+  cursor: pointer;
+}
+ul.modal-progress li.list-group-item span {
+  display: flex;
+  width: 2 * $spacer;
+  height: 2 * $spacer;
+  justify-content: space-around;
+  align-items: center;
+  background: $other-grey-dark;
+  color: $white;
+  border-radius: 5 * $spacer;
+}
+ul.modal-progress li.list-group-item.disabled span {
+  background: $other-grey-medium;
+  pointer-events: none;
+}
+.summary {
+  padding: $spacer;
+  margin: $spacer 0;
+  border: 1px solid $other-grey-medium;
+  border-radius: $spacer;
+}
+.summary table tr {
+  border: none;
+  border-bottom: 1px solid $other-grey-medium;
+}
+.summary table tr:last-of-type {
+  border-bottom: none;
+}
+.summary table td {
+  padding: 0.5 * $spacer 0;
+  border: none;
+}
+.summary table td:first-of-type::after {
+  content: ':';
+}
+.summary table td:last-of-type {
+  width: 80%;
 }

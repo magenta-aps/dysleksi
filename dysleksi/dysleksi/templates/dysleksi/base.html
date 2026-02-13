@@ -29,14 +29,15 @@ SPDX-License-Identifier: MPL-2.0
     {% endblock %}
 </head>
 <body>
+    {% block content %}
+    {% endblock %}
+    {% block js_module %}
+    {% endblock %}
+
     {% if show_debug_console %}
     <div id="logbox" class="logbox"></div>
 
     <script type="module" src="{% static 'js/debug.js' %}"></script>
     {% endif %}
-
-    {% block content %}
-    {% endblock %}
-    {% block js_module %}
-    {% endblock %}
+    <div id="fade-overlay"></div>
 </body>

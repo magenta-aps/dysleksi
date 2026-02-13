@@ -157,6 +157,12 @@ class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
         )
         return qs
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["assign_group_form"] = StartClassRoomForm(teacher=self.user)
+        context["assign_individiual_form"] = StartIndividualRoomForm(teacher=self.user)
+        return context
+
 
 class StartAssignmentView(CreateView):
     template_name = "dysleksi/lobby/start_room.html"

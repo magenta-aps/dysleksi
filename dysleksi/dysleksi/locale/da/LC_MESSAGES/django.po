@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-11 07:41-0200\n"
+"POT-Creation-Date: 2026-02-12 13:40-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -22,7 +22,7 @@ msgstr ""
 msgid "Vælg elev"
 msgstr ""
 
-#: dysleksi/forms.py
+#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_group.html
 msgid "Vælg test"
 msgstr ""
 
@@ -83,10 +83,12 @@ msgid "Type"
 msgstr ""
 
 #: dysleksi/tables.py
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
 msgid "Test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/base.html
+#: dysleksi/templates/dysleksi/admin/modals/base.html
 msgid "Luk"
 msgstr ""
 
@@ -114,6 +116,50 @@ msgstr ""
 msgid "Søg"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Tildel gruppetest"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Vælg deltagere"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Bekræft"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Bekræft følgende opsætning"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Deltagere"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Testtype"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Tid"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Tilbage"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Næste"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Bekræft og tildel test"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/base.html
+msgid "OK"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/table_columns/class_actions.html
 #: dysleksi/templates/dysleksi/admin/table_columns/student_actions.html
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
@@ -121,7 +167,7 @@ msgid "Åbn"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/list.html
-msgid "Aktive tests"
+msgid "Tildel test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/base.html
