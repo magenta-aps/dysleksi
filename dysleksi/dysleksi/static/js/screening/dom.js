@@ -73,10 +73,15 @@ class TestDomElements {
         this.testSummary.style.display = "flex";
         this.summaryContainer.innerHTML = "";
         const parts = test.parts;
-
+    
         parts.forEach((part, index) => {
             const block = document.createElement('div');
             block.classList.add('summary-block');
+    
+            // Make the block a flex container so we can push the image to the right
+            block.style.display = 'flex';
+            block.style.alignItems = 'center'; // vertically center text and image
+            block.style.justifyContent = 'space-between'; // ensures image stays on the right
     
             const numQuestions = part.questions.length;
             const partNumber = index + 1;
@@ -88,16 +93,21 @@ class TestDomElements {
             // Normal part name text
             const nameText = document.createTextNode(part.name + ' ');
     
-            // Small grey text for number of questions
-            const questionText = document.createElement('span');
-            questionText.textContent = `(${numQuestions} opgaver)`;
-            questionText.classList.add('summary-count');
+            // Container for text so the image is separate
+            const textContainer = document.createElement('div');
+            textContainer.appendChild(prefix);
+            textContainer.appendChild(nameText);
     
-            // Append all parts to the block
-            block.appendChild(prefix);
-            block.appendChild(nameText);
-            block.appendChild(questionText);
-
+            // Create image element
+            const img = document.createElement('img');
+            img.src = part.image;
+            img.alt = "TestPart icon";
+            img.style.height = "100%";
+    
+            // Append text and image to block
+            block.appendChild(textContainer);
+            block.appendChild(img);
+    
             this.summaryContainer.appendChild(block);
         });
     }

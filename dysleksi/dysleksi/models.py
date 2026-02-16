@@ -221,6 +221,7 @@ class Test(models.Model):
             part_data = {
                 "id": part.id,
                 "name": part.name,
+                "image": part.image_url,
                 "instructions_url": (
                     part.instructions.url if part.instructions else None
                 ),
@@ -343,6 +344,13 @@ class TestPart(models.Model):
         null=False,
     )
     name = models.CharField(max_length=255)
+    image_url = models.CharField(
+        max_length=255,
+        blank=True,
+        null=True,
+        help_text="Path to static image, e.g. '/static/images/wordreading.png'",
+    )
+
     instructions = models.FileField(upload_to="instructions", blank=True, null=True)
     intro = models.TextField(blank=True, null=True)
     timeout = models.PositiveIntegerField(blank=False, null=False)

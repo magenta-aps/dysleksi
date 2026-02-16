@@ -114,9 +114,9 @@ describe("GroupTestDomElements.showSummary (new structure)", () => {
     it("Shows test summary with multiple parts", () => {
         const test = {
             parts: [
-                { name: "Ordlæsning", questions: [1, 2] },
-                { name: "Ordstavning", questions: [1] },
-                { name: "Bogstavbenævnelse", questions: [1, 2, 3] }
+                { name: "Ordlæsning", questions: [1, 2], image: "/static/ol.png" },
+                { name: "Ordstavning", questions: [1], image: "/static/os.png" } ,
+                { name: "Bogstavbenævnelse", questions: [1, 2, 3], image: "/static/bb.png" }
             ]
         };
     
@@ -130,20 +130,21 @@ describe("GroupTestDomElements.showSummary (new structure)", () => {
         // Check first block
         const firstBlock = blocks[0];
         expect(firstBlock.querySelector("strong").textContent).toBe("Deltest 1: ");
-        expect(firstBlock.childNodes[1].textContent.trim()).toBe("Ordlæsning"); // the text node with part name
-        expect(firstBlock.querySelector(".summary-count").textContent).toBe("(2 opgaver)");
-    
+        expect(firstBlock.childNodes[0].childNodes[1].textContent.trim()).toBe("Ordlæsning"); // the text node with part name
+        expect(firstBlock.childNodes[1].src.endsWith("/static/ol.png")).toBe(true);
+
         // Second block
         const secondBlock = blocks[1];
         expect(secondBlock.querySelector("strong").textContent).toBe("Deltest 2: ");
-        expect(secondBlock.childNodes[1].textContent.trim()).toBe("Ordstavning");
-        expect(secondBlock.querySelector(".summary-count").textContent).toBe("(1 opgaver)");
-    
+        expect(secondBlock.childNodes[0].childNodes[1].textContent.trim()).toBe("Ordstavning");
+        expect(secondBlock.childNodes[1].src.endsWith("/static/os.png")).toBe(true);
+
         // Third block
         const thirdBlock = blocks[2];
         expect(thirdBlock.querySelector("strong").textContent).toBe("Deltest 3: ");
-        expect(thirdBlock.childNodes[1].textContent.trim()).toBe("Bogstavbenævnelse");
-        expect(thirdBlock.querySelector(".summary-count").textContent).toBe("(3 opgaver)");
+        expect(thirdBlock.childNodes[0].childNodes[1].textContent.trim()).toBe("Bogstavbenævnelse");
+        expect(thirdBlock.childNodes[1].src.endsWith("/static/bb.png")).toBe(true);
+
     });
 
     it("Handles an empty parts array", () => {
@@ -161,8 +162,7 @@ describe("GroupTestDomElements.showSummary (new structure)", () => {
         const block = dom.summaryContainer.querySelector(".summary-block");
         expect(block).not.toBeNull();
         expect(block.querySelector("strong").textContent).toBe("Deltest 1: ");
-        expect(block.childNodes[1].textContent.trim()).toBe("Bogstavbenævnelse");
-        expect(block.querySelector(".summary-count").textContent).toBe("(0 opgaver)");
+        expect(block.childNodes[0].childNodes[1].textContent.trim()).toBe("Bogstavbenævnelse");
     });
 });
 

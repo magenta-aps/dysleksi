@@ -18,6 +18,7 @@ def create_wordreading_2_test(
             "partial_score_after": 30000,  # 30 seconds
             "intro": _("Vælg det rigtige ord, der passer til billedet."),
             "reminder": 20000,  # 20 seconds
+            "image_url": "/static/images/wordreading.png",
         },
     )
     part.create_test_resources(questions_data, False)
@@ -35,6 +36,7 @@ def create_wordspelling_test(
             "timeout": 60000,
             "partial_score_after": 30000,
             "intro": _("Stav ordet som du hører."),
+            "image_url": "/static/images/wordspelling.png",
         },
     )
     part.create_test_resources(questions_data, False)
@@ -52,6 +54,7 @@ def create_letter_pronunciation_test(
             "timeout": 0,
             "partial_score_after": 30000,
             "intro": _("Sig bogstavet på skærmen højt"),
+            "image_url": "/static/images/letter_pronunciation.png",
         },
     )
     part.create_test_resources(questions_data, False)
