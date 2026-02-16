@@ -1,6 +1,6 @@
 [
     {
-        "image": "wordreading_intro/Indledning/Læsning.jpg",
+        "image": "wordreading_intro/Indledning/Læsning.png",
         "correct": "",
         "wrong": [],
         "instruction_sequence": [
@@ -371,12 +371,12 @@
         ]
     },
     {
-        "image": "wordreading_intro/Øveopgave/Fod.jpg",
+        "image": "wordreading_intro/Øveopgave/Fod.png",
         "correct": "isigak",
         "wrong": ["isi", "immuk", "ini"]
     },
     {
-        "image": "wordreading_intro/Øveopgave/Mælk.jpg",
+        "image": "wordreading_intro/Øveopgave/Mælk.png",
         "correct": "immuk",
         "wrong": ["imaq", "illu", "imeq"]
     }

@@ -113,7 +113,7 @@ describe("TeacherView Test", () => {
         expect(questionView.titleElement.textContent).toBe("2/5 (Wordreading 2A (dummy))");
         expect(
             questionView.contentElement.getElementsByTagName("img").item(0).attributes.getNamedItem("src").value
-        ).toBe("/media/wordreading_2_dummy/bike.jpeg");
+        ).toBe("/media/wordreading_2_dummy/bike.png");
     });
 
     it("sends message and disables buttons on click", () => {
