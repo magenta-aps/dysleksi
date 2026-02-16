@@ -150,7 +150,6 @@ describe("Startup teacher test", () => {
                 <h1 id="instructions-text"></h1>
                 <audio id="instructions-sound"></audio>
                 <h1 id="question-title"></h1>
-                <table id="summary-table"></table>
                 <button class="btn btn-primary" id="end-summary">Ok</button>
                 <div id="question-challenge"></div>
                 <div id="choices"></div>
@@ -180,8 +179,6 @@ describe("Startup teacher test", () => {
                 <audio id="instructions-sound"></audio>
                 <button class="btn btn-primary" id="start-practice"></button>
                 <button class="btn btn-primary" id="start-questions"></button>
-                <table id="summary-table"></table>
-            
                 <button class="btn btn-primary" id="end-summary">Ok</button>
                 <h1 id="question-title"></h1>
                 <div id="question-challenge"></div>

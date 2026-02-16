@@ -355,5 +355,26 @@ i {
     }
 }
 
+#summary-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
 
+.summary-block {
+    background-color: white;
+    color: black;
+    font-size: 2rem;
+    width: 80vw;
+    padding: 1rem 2rem;
+    border-radius: 8px;
+    text-align: left;
+    pointer-events: none;
+    border: 2px solid $student-grey-light;
+}
 
+.summary-count {
+    font-size: 1.5rem;
+    color: $student-grey-dark;
+}

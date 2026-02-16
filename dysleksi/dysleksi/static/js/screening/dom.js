@@ -4,7 +4,7 @@ class TestDomElements {
     studentHeaderEl;
     questionChallengeEl;
     endSummaryButton;
-    summaryTable;
+    summaryContainer;
 
     constructor() {
         this.instructionsSoundEl = document.querySelector("#instructions-sound");
@@ -13,7 +13,7 @@ class TestDomElements {
         this.endSummaryButton = document.querySelector("#end-summary");
         this.startSummaryButton = document.querySelector("#start-summary");
         this.startTestPartButton = document.querySelector("#start-testpart");
-        this.summaryTable = document.querySelector("#summary-table");
+        this.summaryContainer = document.querySelector("#summary-container");
         this.overlay = document.getElementById("fade-overlay");
         this.testIntro = document.querySelector("#test-intro");
         this.testPartIntro = document.querySelector("#testpart-intro");
@@ -69,15 +69,36 @@ class TestDomElements {
     }
 
 
-    showSummary(parts) {
+    showSummary(test) {
         this.testSummary.style.display = "flex";
+        this.summaryContainer.innerHTML = "";
+        const parts = test.parts;
 
-        parts.forEach(partname => {
-            const row = document.createElement('tr');
-            const td = document.createElement('td');
-            td.textContent = partname;
-            row.appendChild(td);
-            this.summaryTable.appendChild(row);
+        parts.forEach((part, index) => {
+            const block = document.createElement('div');
+            block.classList.add('summary-block');
+    
+            const numQuestions = part.questions.length;
+            const partNumber = index + 1;
+    
+            // Create bolded "Deltest x" prefix
+            const prefix = document.createElement('strong');
+            prefix.textContent = `Deltest ${partNumber}: `;
+    
+            // Normal part name text
+            const nameText = document.createTextNode(part.name + ' ');
+    
+            // Small grey text for number of questions
+            const questionText = document.createElement('span');
+            questionText.textContent = `(${numQuestions} opgaver)`;
+            questionText.classList.add('summary-count');
+    
+            // Append all parts to the block
+            block.appendChild(prefix);
+            block.appendChild(nameText);
+            block.appendChild(questionText);
+
+            this.summaryContainer.appendChild(block);
         });
     }
 

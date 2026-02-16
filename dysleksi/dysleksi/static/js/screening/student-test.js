@@ -63,7 +63,7 @@ export class StudentTestView extends EventTarget {
     startSummary() {
         console.log("Test started, showing summary");
         this.domElements.hideInstructions();
-        this.domElements.showSummary(this.test.summary);
+        this.domElements.showSummary(this.test);
         this.domElements.hideIntro();
 
         const buttonText = this.canPractice() ? "Start øveopgave" : "Start deltest";
