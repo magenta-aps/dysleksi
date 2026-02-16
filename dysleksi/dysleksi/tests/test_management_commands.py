@@ -26,22 +26,22 @@ class ImportTestTest(TestCase):
                 "wrong": ["kat", "ko", "hest"],
             },
             {
-                "image": "wordreading_2_dummy/bike.jpeg",
+                "image": "wordreading_2_dummy/bike.png",
                 "correct": "cykel",
                 "wrong": ["bil", "bus", "tog"],
             },
             {
-                "image": "wordreading_2_dummy/cat.jpg",
+                "image": "wordreading_2_dummy/cat.png",
                 "correct": "kat",
                 "wrong": ["hund", "mus", "fugl"],
             },
             {
-                "image": "wordreading_2_dummy/house.jpg",
+                "image": "wordreading_2_dummy/house.png",
                 "correct": "hus",
                 "wrong": ["bil", "træ", "vej"],
             },
             {
-                "image": "wordreading_2_dummy/car.jpg",
+                "image": "wordreading_2_dummy/car.png",
                 "correct": "bil",
                 "wrong": ["cykel", "tog", "bus"],
             },
