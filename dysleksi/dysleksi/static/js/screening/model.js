@@ -31,6 +31,7 @@ export class TestPart {
     id;
     index;
     name;
+    image;
     instructionsUrl;
     intro;
     timeout;
@@ -45,6 +46,7 @@ export class TestPart {
         this.index = index;
         this.id = data.id;
         this.name = data.name;
+        this.image = data.image;
         this.instructionsUrl = data.instructions_url;
         this.intro = data.intro;
         this.timeout = data.timeout;
