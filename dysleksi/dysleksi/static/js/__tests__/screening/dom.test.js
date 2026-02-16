@@ -15,7 +15,6 @@ describe("GroupTestDomElements.showInstructions (sound only)", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
-      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -50,7 +49,6 @@ describe("GroupTestDomElements.showQuestionChallenge (sound only)", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
-      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -95,39 +93,76 @@ describe("GroupTestDomElements.showQuestionChallenge (sound only)", () => {
 });
 
 
-describe("GroupTestDomElements.showSummary (text only)", () => {
+describe("GroupTestDomElements.showSummary (new structure)", () => {
     let dom;
 
     beforeEach(() => {
         document.body.innerHTML = `
-      <audio id="instructions-sound"></audio>
-      <audio id="reminder-sound"></audio>
-      <div id="instructions-text"></div>
-      <button id="start-practice"></button>
-      <button id="start-questions"></button>
-      <table id="summary-table"></table>
-      <button id="end-summary"></button>
-      <div id="question-title"></div>
-      <div id="question-challenge"></div>
-      <div id="choices"></div>
-      <button id="next"></button>
-      <div id="test-summary"> </div>
-    `;
+            <div id="test-summary" style="display: none">
+                <div class="center-content">
+                    <div id="summary-container"></div>
+                </div>
+            </div>
+        `;
 
         dom = new GroupTestDomElements();
 
-        vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(() => {});
+        // Spy on console.log to suppress output during tests
+        vi.spyOn(console, "log").mockImplementation(() => {});
     });
 
-    it("Shows summary", () => {
-        dom.showSummary(["1", "2", "3"]);
-        expect(dom.summaryTable.outerHTML).toBe(
-            '<table id="summary-table">' +
-            '<tr><td>1</td></tr>' +
-            '<tr><td>2</td></tr>' +
-            '<tr><td>3</td></tr>' +
-            '</table>'
-        );
+    it("Shows test summary with multiple parts", () => {
+        const test = {
+            parts: [
+                { name: "Ordlæsning", questions: [1, 2] },
+                { name: "Ordstavning", questions: [1] },
+                { name: "Bogstavbenævnelse", questions: [1, 2, 3] }
+            ]
+        };
+    
+        dom.showSummary(test);
+    
+        expect(dom.testSummary.style.display).toBe("flex");
+    
+        const blocks = dom.summaryContainer.querySelectorAll(".summary-block");
+        expect(blocks.length).toBe(3);
+    
+        // Check first block
+        const firstBlock = blocks[0];
+        expect(firstBlock.querySelector("strong").textContent).toBe("Deltest 1: ");
+        expect(firstBlock.childNodes[1].textContent.trim()).toBe("Ordlæsning"); // the text node with part name
+        expect(firstBlock.querySelector(".summary-count").textContent).toBe("(2 opgaver)");
+    
+        // Second block
+        const secondBlock = blocks[1];
+        expect(secondBlock.querySelector("strong").textContent).toBe("Deltest 2: ");
+        expect(secondBlock.childNodes[1].textContent.trim()).toBe("Ordstavning");
+        expect(secondBlock.querySelector(".summary-count").textContent).toBe("(1 opgaver)");
+    
+        // Third block
+        const thirdBlock = blocks[2];
+        expect(thirdBlock.querySelector("strong").textContent).toBe("Deltest 3: ");
+        expect(thirdBlock.childNodes[1].textContent.trim()).toBe("Bogstavbenævnelse");
+        expect(thirdBlock.querySelector(".summary-count").textContent).toBe("(3 opgaver)");
+    });
+
+    it("Handles an empty parts array", () => {
+        const test = { parts: [] };
+        dom.showSummary(test);
+
+        expect(dom.testSummary.style.display).toBe("flex");
+        expect(dom.summaryContainer.children.length).toBe(0);
+    });
+
+    it("Handles a single part with no questions", () => {
+        const test = { parts: [{ name: "Bogstavbenævnelse", questions: [] }] };
+        dom.showSummary(test);
+    
+        const block = dom.summaryContainer.querySelector(".summary-block");
+        expect(block).not.toBeNull();
+        expect(block.querySelector("strong").textContent).toBe("Deltest 1: ");
+        expect(block.childNodes[1].textContent.trim()).toBe("Bogstavbenævnelse");
+        expect(block.querySelector(".summary-count").textContent).toBe("(0 opgaver)");
     });
 });
 
@@ -141,7 +176,6 @@ describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
-      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -214,7 +248,6 @@ describe("GroupTestDomElements constructor", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
-      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -236,7 +269,6 @@ describe("IndividualTestDomElements constructor", () => {
       <div id="audio-indicator" style="display: none"></div>
       <audio id="instructions-sound"></audio>
       <div id="instructions-text"></div>
-      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -257,7 +289,6 @@ describe("IndividualTestDomElements DOM utilities", () => {
       <div id="audio-indicator" style="display: none"></div>
       <audio id="instructions-sound"></audio>
       <div id="instructions-text"></div>
-      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -288,7 +319,6 @@ describe("GroupTestDomElements DOM utilities", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
-      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -393,7 +423,6 @@ describe("GroupTestDomElements.fadeScreenOverlay", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
-      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -436,7 +465,6 @@ describe("_setButtonListener tests", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
-      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>

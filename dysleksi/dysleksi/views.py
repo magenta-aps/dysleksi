@@ -73,9 +73,6 @@ class AssignmentView(UserTypeMixin, DetailView):
         context["test_contents"] = test.to_json()
         context["room_name"] = self.room_name
         context["test_type"] = self.get_room_type()
-        context["test_contents"]["summary"] = [
-            testpart["name"] for testpart in context["test_contents"]["parts"]
-        ]
         context["student"] = self.user
         context["room_type"] = self.get_room_type()
         return context
