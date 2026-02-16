@@ -412,8 +412,7 @@ export class GroupTestDomElements extends TestDomElements {
     }
 
     toggleButtonSelected(button, selected) {
-        button.classList.toggle("btn-primary", selected);
-        button.classList.toggle("btn-outline-primary", !selected);
+        button.classList.toggle("selected", selected);
     }
 
 }
