@@ -70,6 +70,7 @@ i {
   }
   &.selected {
     background-color: $student-blue !important;
+    outline: 2px solid $student-blue-dark;
   }
 
 }
