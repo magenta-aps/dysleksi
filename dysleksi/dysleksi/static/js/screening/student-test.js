@@ -53,7 +53,9 @@ export class StudentTestView extends EventTarget {
         this.domElements.hideTestContainer()
         this.domElements.setStartTestPartButtonListener(() => this.showFirstQuestion(false));
         if (this.previousPart) {
-            this.domElements.setTestPartIntroText(this.previousPart.name + " færdig")
+            this.domElements.setTestPartIntroText(
+                this.previousPart.name + ' <span class="checkmark"><i class="ph-fill ph-check-fat"></i></span>'
+            )
             this.domElements.showTestPartIntroImage()
         } else {
             this.domElements.hideTestPartIntroImage()
