@@ -86,16 +86,11 @@ class TestDomElements {
             const numQuestions = part.questions.length;
             const partNumber = index + 1;
     
-            // Create bolded "Deltest x" prefix
-            const prefix = document.createElement('strong');
-            prefix.textContent = `Deltest ${partNumber}: `;
-    
             // Normal part name text
             const nameText = document.createTextNode(part.name + ' ');
-    
+
             // Container for text so the image is separate
             const textContainer = document.createElement('div');
-            textContainer.appendChild(prefix);
             textContainer.appendChild(nameText);
     
             // Create image element
