@@ -195,10 +195,20 @@ i {
   object-fit: contain;
 }
 
+@keyframes highlight-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);  // grow
+  }
+  100% {
+    transform: scale(1);    // shrink back
+  }
+}
+
 .highlight {
-    outline: 5px solid $student-red;
-    box-shadow: 0 0 10px $student-red;
-    transition: outline 0.3s, box-shadow 0.3s;
+  animation: highlight-pulse 0.6s ease-in-out forwards;
 }
 
 .logbox {
