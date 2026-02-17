@@ -10,11 +10,11 @@
 <ul class="modal-progress list-group list-group-horizontal">
     <li data-step="1" class="list-group-item col-4">
         <span>1</span>
-        {% translate 'Vælg test' %}
+        {% translate 'Deltagere og test' %}
     </li>
     <li data-step="2" class="list-group-item col-4 disabled">
         <span>2</span>
-        {% translate 'Vælg deltagere' %}
+        {% translate 'Tid' %}
     </li>
     <li data-step="3" class="list-group-item col-4 disabled">
         <span>3</span>
@@ -27,10 +27,33 @@
 <form method="post" action="{% url 'dysleksi:start_group_room' %}">
     {% csrf_token %}
     <fieldset data-step="1">
+        {% bootstrap_field form.klasse %}
         {% bootstrap_field form.test %}
     </fieldset>
     <fieldset data-step="2" class="d-none">
-        {% bootstrap_field form.klasse %}
+        {% bootstrap_field form.is_immediate field_class="d-flex" %}
+        <div class="row d-none start-datetime">
+            <div class="col-8">
+                {% bootstrap_field form.start_datetime layout="horizontal" %}
+            </div>
+            <div class="col-4 add-end-button">
+                <button class="btn" data-show="end-datetime" data-hide="add-end-button">
+                    <i class="ph ph-plus me-1"></i>
+                    {% translate 'Tilføj sluttidspunkt' %}
+                </button>
+            </div>
+        </div>
+        <div class="row d-none end-datetime">
+            <div class="col-8">
+                {% bootstrap_field form.end_datetime layout="horizontal" %}
+            </div>
+            <div class="col-4">
+                <button class="btn" data-show="add-end-button" data-hide="end-datetime">
+                    <i class="ph ph-x me-1"></i>
+                    {% translate 'Fjern sluttidspunkt' %}
+                </button>
+            </div>
+        </div>
     </fieldset>
     <fieldset data-step="3" class="d-none">
         <b>{% translate 'Bekræft følgende opsætning' %}</b>
@@ -50,7 +73,18 @@
                 </tr>
                 <tr>
                     <td>{% translate 'Tid' %}</td>
-                    <td>-</td>
+                    <td>
+                        <table>
+                            <tr>
+                                <td>{% translate 'Start' %}</td>
+                                <td data-id="{{ form.start_datetime.id_for_label }}"></td>
+                            </tr>
+                            <tr>
+                                <td>{% translate 'Slut' %}</td>
+                                <td data-id="{{ form.end_datetime.id_for_label }}"></td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
             </table>
         </div>

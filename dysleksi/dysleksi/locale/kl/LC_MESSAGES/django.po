@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-13 11:08-0200\n"
+"POT-Creation-Date: 2026-02-16 10:34-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -18,10 +18,30 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: dysleksi/forms.py
-msgid "Vælg elev"
+msgid "Vælg tidsrummet for testen"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Start nu"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Planlæg"
 msgstr ""
 
 #: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Start"
+msgstr ""
+
+#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Slut"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Vælg elev"
+msgstr ""
+
+#: dysleksi/forms.py
 msgid "Vælg test"
 msgstr ""
 
@@ -120,11 +140,23 @@ msgid "Tildel gruppetest"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-msgid "Vælg deltagere"
+msgid "Deltagere og test"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Tid"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
 msgid "Bekræft"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Tilføj sluttidspunkt"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+msgid "Fjern sluttidspunkt"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
@@ -137,10 +169,6 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
 msgid "Testtype"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-msgid "Tid"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html

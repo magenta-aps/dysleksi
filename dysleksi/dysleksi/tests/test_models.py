@@ -3,12 +3,14 @@
 # SPDX-License-Identifier: MPL-2.0
 import base64
 import os
+from datetime import datetime
 from uuid import uuid4
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models.fields.files import FieldFile
+from django.utils import timezone
 from freezegun import freeze_time
 
 from dysleksi.models import (
@@ -19,6 +21,7 @@ from dysleksi.models import (
     InstructionSequence,
     Message,
     PartResponse,
+    PlannedDateTime,
     PossibleAnswer,
     QuestionResponse,
     Test,
@@ -124,6 +127,22 @@ class TestTestPart(DysleksiTest):
     def test_str(self):
         test_part = TestPart(name="Test")
         self.assertEqual(str(test_part), "Test")
+
+
+class TestPlannedDateTime(DysleksiTest):
+    def test_str(self):
+        tz = timezone.get_current_timezone()
+        planned_date_time = PlannedDateTime.objects.create(
+            period=(
+                datetime(2020, 1, 1, 12, 0, tzinfo=tz),
+                datetime(2020, 1, 1, 13, 0, tzinfo=tz),
+            )
+        )
+        planned_date_time.refresh_from_db()
+        self.assertEqual(
+            str(planned_date_time),
+            "[2020-01-01 16:00:00+01:00, 2020-01-01 17:00:00+01:00)",
+        )
 
 
 class TestTestAssignment(DysleksiTest):

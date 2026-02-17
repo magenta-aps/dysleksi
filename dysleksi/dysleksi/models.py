@@ -8,6 +8,7 @@ from datetime import date
 from typing import Any, Dict, List
 
 from django.contrib.auth.models import AbstractUser, Group
+from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.validators import MaxValueValidator, MinValueValidator
@@ -295,6 +296,13 @@ class Test(models.Model):
         return self.name
 
 
+class PlannedDateTime(models.Model):
+    period = DateTimeRangeField()
+
+    def __str__(self) -> str:
+        return str(self.period)
+
+
 class TestAssignment(models.Model):
     class Meta:
         constraints = [
@@ -327,6 +335,12 @@ class TestAssignment(models.Model):
     klasse = models.ForeignKey(
         Class,
         on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+    )
+    planned_date_time = models.OneToOneField(
+        PlannedDateTime,
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
