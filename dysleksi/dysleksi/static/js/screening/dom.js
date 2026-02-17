@@ -185,7 +185,13 @@ class TestDomElements {
     _updateInputState(inputLocked) {
         const buttons = document.querySelectorAll("button:not(.debug-button)");
         buttons.forEach(btn => {
-            btn.disabled = inputLocked;
+            if (inputLocked) {
+                btn.style.pointerEvents = "none";  // disables clicks
+                btn.tabIndex = -1;                 // skip focus in tabbing
+            } else {
+                btn.style.pointerEvents = "";      // restore click
+                btn.tabIndex = 0;                  // restore tab focus
+            }
         });
     }
 

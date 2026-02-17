@@ -184,7 +184,7 @@ describe("Startup teacher test", () => {
                 <div id="question-challenge"></div>
                 <div id="choices"></div>
                 <button id="next" class="btn next-btn" style="display: none;">
-                    <i class="ph ph-arrow-right"></i>
+                    <i class="ph-fill ph-arrow-right"></i>
                 </button>
             </div>
         `;

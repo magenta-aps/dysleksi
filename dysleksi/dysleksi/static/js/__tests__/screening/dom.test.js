@@ -379,9 +379,9 @@ describe("GroupTestDomElements DOM utilities", () => {
 
     dom.lockInput();
 
-    expect(btn1.disabled).toBe(true);
-    expect(btn2.disabled).toBe(true);
-    expect(nextBtn.disabled).toBe(true);
+    expect(btn1.style.pointerEvents).toBe("none");
+    expect(btn2.style.pointerEvents).toBe("none");
+    expect(nextBtn.style.pointerEvents).toBe("none");
   });
 
   it("unlockInput enables all choice buttons and next button", () => {
@@ -393,9 +393,9 @@ describe("GroupTestDomElements DOM utilities", () => {
     dom.lockInput(); // first lock
     dom.unlockInput();
 
-    expect(btn1.disabled).toBe(false);
-    expect(btn2.disabled).toBe(false);
-    expect(nextBtn.disabled).toBe(false);
+    expect(btn1.style.pointerEvents).toBe("");
+    expect(btn2.style.pointerEvents).toBe("");
+    expect(nextBtn.style.pointerEvents).toBe("");
   });
 
   it("disableNextButton/enableNextButton disable and enable next button", async () => {
