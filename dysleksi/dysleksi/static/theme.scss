@@ -369,7 +369,7 @@ h1, h2, h3, h4, h5, h6 {
 
 .happy-btn {
     animation: happy-flash 0.5s ease-in-out;
-    box-shadow: 0 0 0.3rem rgba($student-green, 0.6);
+    box-shadow: 0 0 0.3rem rgba($student-green, 0);
 }
 
 @keyframes happy-flash {
@@ -380,7 +380,24 @@ h1, h2, h3, h4, h5, h6 {
         box-shadow: 0 0 0.9rem rgba($student-green, 0.9);
     }
     100% {
-        box-shadow: 0 0 0.3rem rgba($student-green, 0.6);
+        box-shadow: 0 0 0.3rem rgba($student-green, 0);
+    }
+}
+
+.pressed-btn {
+    animation: button-press-flash 0.5s ease-in-out;
+    box-shadow: 0 0 0.3rem rgba($student-grey-darkest, 0);
+}
+
+@keyframes button-press-flash {
+    0% {
+        box-shadow: 0 0 0.3rem rgba($student-grey-darkest, 0.6);
+    }
+    50% {
+        box-shadow: 0 0 0.9rem rgba($student-grey-darkest, 0.9);
+    }
+    100% {
+        box-shadow: 0 0 0.3rem rgba($student-grey-darkest, 0);
     }
 }
 
