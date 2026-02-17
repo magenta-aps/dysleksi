@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-16 10:34-0200\n"
+"POT-Creation-Date: 2026-02-17 08:13-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,10 +30,12 @@ msgid "Planlæg"
 msgstr ""
 
 #: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 msgid "Start"
 msgstr ""
 
 #: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 msgid "Slut"
 msgstr ""
 
@@ -103,6 +105,7 @@ msgstr ""
 
 #: dysleksi/tables.py
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 msgid "Test"
 msgstr ""
 
@@ -136,6 +139,7 @@ msgid "Søg"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/list.html
 msgid "Tildel gruppetest"
 msgstr ""
 
@@ -144,43 +148,62 @@ msgid "Deltagere og test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 msgid "Tid"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 msgid "Bekræft"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 msgid "Tilføj sluttidspunkt"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 msgid "Fjern sluttidspunkt"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 msgid "Bekræft følgende opsætning"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 msgid "Deltagere"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 msgid "Testtype"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 msgid "Tilbage"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 msgid "Næste"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 msgid "Bekræft og tildel test"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/list.html
+msgid "Tildel individuel test"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+msgid "Deltager og test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/base.html
@@ -191,10 +214,6 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/table_columns/student_actions.html
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
 msgid "Åbn"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_assignment/list.html
-msgid "Tildel test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/base.html
