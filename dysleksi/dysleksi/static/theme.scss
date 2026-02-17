@@ -23,6 +23,7 @@ $student-yellow: #e6bd54;
 $student-yellow-dark: #685526;
 $student-blue: #e6ecf3;
 $student-blue-dark: #004382;
+$checkmark-green: #306025;
 
 // Map "design names" to known Bootstrap variables
 $body-bg: $student-grey-lightest;
@@ -378,4 +379,8 @@ i {
 .summary-count {
     font-size: 1.5rem;
     color: $student-grey-dark;
+}
+
+.checkmark {
+    color: $checkmark-green;
 }

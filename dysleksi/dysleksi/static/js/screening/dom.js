@@ -223,8 +223,8 @@ class TestDomElements {
         this.studentHeaderEl.style.display = "none";
     }
 
-    setTestPartIntroText(text) {
-        this.testPartIntroText.textContent = text;
+    setTestPartIntroText(html) {
+        this.testPartIntroText.innerHTML = html;
     }
 
     hideTestPartIntroImage() {
