@@ -4,21 +4,14 @@
 from typing import Any
 
 from django.db.models import Case, Count, F, Value, When
+from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, TemplateView
 from django_tables2 import SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
 
 from dysleksi.forms import StartClassRoomForm, StartIndividualRoomForm
-from dysleksi.models import (
-    TEACHERS,
-    Class,
-    Student,
-    Test,
-    TestAssignment,
-    TestType,
-    User,
-)
+from dysleksi.models import TEACHERS, Class, Student, Test, TestAssignment, User
 from dysleksi.tables import ClassTable, StudentTable, TestAssignmentTable
 
 
@@ -41,6 +34,11 @@ class UserTypeMixin(LoginRequiredMixin):
 
 
 class RootView(UserTypeMixin, TemplateView):
+    def get(self, request, *args, **kwargs):
+        if not self.user.is_anonymous and self.user.is_teacher:
+            return redirect("dysleksi:test_assignment_list")
+        return super().get(request, *args, **kwargs)
+
     def get_template_prefix(self) -> str:
         return "dysleksi/lobby"
 
@@ -157,13 +155,14 @@ class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["assign_group_form"] = StartClassRoomForm(teacher=self.user)
-        context["assign_individiual_form"] = StartIndividualRoomForm(teacher=self.user)
+        context["assign_individual_form"] = StartIndividualRoomForm(teacher=self.user)
         return context
 
 
 class StartAssignmentView(CreateView):
     template_name = "dysleksi/lobby/start_room.html"
     model = TestAssignment
+    http_method_names = ["post"]
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -180,21 +179,9 @@ class StartAssignmentView(CreateView):
 class StartIndividualAssignmentView(StartAssignmentView):
     form_class = StartIndividualRoomForm
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["test_type"] = TestType.INDIVIDUAL
-
-        return context
-
 
 class StartGroupAssignmentView(StartAssignmentView):
     form_class = StartClassRoomForm
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["test_type"] = TestType.GROUP
-
-        return context
 
 
 class AdminRootView(GroupRequiredMixin, TemplateView):

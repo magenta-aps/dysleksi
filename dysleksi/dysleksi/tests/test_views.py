@@ -6,7 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.views import View
 
-from dysleksi.models import Student, Test, TestAssignment, TestType, User
+from dysleksi.models import Student, Test, TestAssignment, User
 from dysleksi.tests.base import DysleksiTest
 from dysleksi.views import (
     AssignmentView,
@@ -237,22 +237,6 @@ class TestTestAssignmentListView(DysleksiTest):
 
 
 class TestStartRoomView(DysleksiTest):
-
-    def test_group_view_context(self):
-        self.client.force_login(self.teacher)
-        response = self.client.get(reverse("dysleksi:start_group_room"))
-
-        context_data = response.context
-
-        self.assertEqual(context_data.get("test_type"), TestType.GROUP)
-
-    def test_individual_view_context(self):
-        self.client.force_login(self.teacher)
-        response = self.client.get(reverse("dysleksi:start_individual_room"))
-
-        context_data = response.context
-
-        self.assertEqual(context_data.get("test_type"), TestType.INDIVIDUAL)
 
     def test_create_individual_room_immediate(self):
         data = {
