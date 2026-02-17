@@ -405,7 +405,7 @@
           "challenge_image_url": "wordspelling_dummy/iki.mp3",
           "challenge_sound_url": null,
           "challenge_text": null,
-          "question_type": "free_text",
+          "question_type": "multiple_choice",
           "possible_answers": [
             {
               "id": 101,

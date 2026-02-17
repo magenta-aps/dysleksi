@@ -25,33 +25,28 @@ class TestDomElements {
         this.skipAllInstructionsButton = document.querySelector("#skip-all-instructions");
     }
 
-    makeButtonAngry(buttonId) {
+    markButtonPress(buttonId, buttonClass) {
         const btn = document.getElementById(buttonId);
 
         // Restart animation if it’s already running
-        btn.classList.remove("angry-btn");
+        btn.classList.remove(buttonClass);
         void btn.offsetWidth; // force reflow
-        btn.classList.add("angry-btn");
+        btn.classList.add(buttonClass);
 
         // Remove class after animation ends
         setTimeout(() => {
-            btn.classList.remove("angry-btn");
+            btn.classList.remove(buttonClass);
         }, 650);
+    }
+
+    makeButtonAngry(buttonId) {
+        this.markButtonPress(buttonId, "angry-btn")
     }
 
     makeButtonHappy(buttonId) {
-        const btn = document.getElementById(buttonId);
-
-        // Restart animation if it’s already running
-        btn.classList.remove("happy-btn");
-        void btn.offsetWidth; // force reflow
-        btn.classList.add("happy-btn");
-
-        // Remove class after animation ends
-        setTimeout(() => {
-            btn.classList.remove("happy-btn");
-        }, 650);
+        this.markButtonPress(buttonId, "happy-btn")
     }
+
 
     fadeScreenOverlay() {
 

@@ -227,6 +227,8 @@ export class GroupTestView extends StudentTestView {
                 this.domElements.makeButtonAngry(this.selectedAnswer.buttonId)
                 this.domElements.disableNextButton()
             }
+        } else {
+            this.domElements.markButtonPress(this.selectedAnswer.buttonId, "pressed-btn")
         }
 
         for (let a of this.answerButtons) {
