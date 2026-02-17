@@ -7,9 +7,13 @@ export class Wizard {
 
     constructor(domElem) {
         this.domElem = domElem;
+
         this.nextBtn = this.domElem.querySelector('button.next-btn');
         this.prevBtn = this.domElem.querySelector('button.prev-btn');
         this.confirmBtn = this.domElem.querySelector('button.confirm-btn');
+        this.showBtns = this.domElem.querySelectorAll('button[data-show]');
+        this.hideBtns = this.domElem.querySelectorAll('button[data-hide]');
+        this.toggleElems = this.domElem.querySelectorAll('[data-toggle]');
 
         this.currentStep = 1;
         this.totalSteps = this.domElem.querySelectorAll('fieldset').length;
@@ -21,6 +25,19 @@ export class Wizard {
         this.nextBtn.addEventListener('click', () => this.gotoNextStep());
         this.prevBtn.addEventListener('click', () => this.gotoPrevStep());
         this.confirmBtn.addEventListener('click', () => this.submit());
+
+        // Hook events for `data-show` and `data-hide` attributes
+        for (const showBtn of this.showBtns) {
+            showBtn.addEventListener('click', this.#getShowHideHandler('show'));
+        }
+        for (const hideBtn of this.hideBtns) {
+            hideBtn.addEventListener('click', this.#getShowHideHandler('hide'));
+        }
+
+        // Hook events for `data-toggle` attributes
+        for (const toggleElem of this.toggleElems) {
+            toggleElem.addEventListener('click', (evt) => this.#toggleElement(evt));
+        }
 
         // Hook events for progress bar steps
         const progressBarSteps = this.domElem.querySelectorAll(
@@ -87,9 +104,15 @@ export class Wizard {
             return true;
         }
 
-        // If any fields have an empty value, consider the form
+        // If any visible fields have an empty value, consider the form
         // step incomplete.
         for (const field of currentFields) {
+            // Skip field if it is not currently visible
+            const hidden = field.closest('div.d-none');
+            if (hidden !== null) {
+                continue
+            }
+            // Otherwise, check if field is blank
             if (field.value === '') {
                 return false;
             }
@@ -166,7 +189,43 @@ export class Wizard {
             return field.options[field.selectedIndex].label;
         }
 
-        return field.value;
+        if ((field.type.toLowerCase() === 'datetime-local') && (field.value !== '')) {
+            const datetimeFormatter = new Intl.DateTimeFormat(
+                document.documentElement.lang || 'da',
+                {dateStyle: 'full', timeStyle: 'short'},
+            )
+            return datetimeFormatter.format(new Date(field.value));
+        }
+
+        return field.value || '-';
+    }
+
+    #getShowHideHandler(type) {
+        return (evt) => {
+            evt.preventDefault();
+            const cls = evt.target.dataset[type];
+            const elems = this.domElem.querySelectorAll('.' + cls);
+            for (const elem of elems) {
+                elem.classList.toggle('d-none', type === 'hide');
+            }
+        }
+    }
+
+    #toggleElement(evt) {
+        const value = evt.target.value;
+        const toggle = evt.target.closest('[data-toggle]').dataset.toggle;
+        const rules = toggle.split(';');
+        for (const rule of rules) {
+            const all = rule.split('=', 2);
+            const rhs = all[1].split(' ');
+            const hide = rhs[0] === 'hide';
+            const elems = this.domElem.querySelectorAll(rhs[1]);
+            if (all[0] === value) {
+                for (const elem of elems) {
+                    elem.classList.toggle('d-none', hide);
+                }
+            }
+        }
     }
 }
 

@@ -17,15 +17,27 @@ const mockDoc = `
                     <option value="">-</option>
                     <option value="42">ABC</option>
                 </select>
+                <button data-show="example1">
+                <button data-hide="example2">
+                <div data-toggle="yes=show div.example1;no=hide div.example2">
+                    <input type="radio" name="toggle" id="toggle" value="yes" />
+                    <input type="radio" name="toggle" id="toggle" value="no" />
+                </div>
+                <div class="d-none example1">
+                    <input type="text" name="invisible" id="invisible" />
+                </div>
+                <div class="example2"></div>
             </fieldset>
             <fieldset data-step="2">
                 <input type="text" name="bar" id="bar" />
-                <input type="text" name="baz" id="baz" />
+                <input type="datetime-local" name="baz" id="baz" />
+                <input type="number" name="quux" id="quux" />                
             </fieldset>
             <fieldset data-step="3" class="d-none">
                 <div class="summary">
                     <span data-id="foo"></span>
                     <span data-id="bar"></span>
+                    <span data-id="baz"></span>
                 </div>
             </fieldset>
         </form>
@@ -159,18 +171,22 @@ describe("Wizard", () => {
 
     it("displays a confirmation page on the last step", () => {
         // Arrange: fill out `select` and `input` fields
-        const select = document.querySelector("select");
+        const select = document.querySelector("select#foo");
         select.value = "42";
-        const input = document.querySelector("input");
-        input.value = "DEF";
+        const textInput = document.querySelector("input#bar");
+        textInput.value = "DEF";
+        const datetimeInput = document.querySelector("input#baz");
+        datetimeInput.value = "2026-01-01T12:00";
         // Act
         const wizard = getInstance();
         wizard.gotoStep(3);
         // Assert
-        const summaryValueFoo = wizard.domElem.querySelector("[data-id='foo']");
-        expect(summaryValueFoo.innerHTML).toBe("ABC");
-        const summaryValueBar = wizard.domElem.querySelector("[data-id='bar']");
-        expect(summaryValueBar.innerHTML).toBe("DEF");
+        const selectDisplay = wizard.domElem.querySelector("[data-id='foo']");
+        expect(selectDisplay.innerHTML).toBe("ABC");
+        const textDisplay = wizard.domElem.querySelector("[data-id='bar']");
+        expect(textDisplay.innerHTML).toBe("DEF");
+        const datetimeDisplay = wizard.domElem.querySelector("[data-id='baz']");
+        expect(datetimeDisplay.innerHTML).toBe("torsdag den 1. januar 2026 kl. 12.00");
     });
 
     it("submits a form", () => {
@@ -192,6 +208,38 @@ describe("Wizard", () => {
         // Assert
         expect(wizard.currentStep).toBe(1);
         expect(form.reset).toBeCalled();
+    });
+
+    it("shows elements according to their 'data-show' attribute", () => {
+        const wizard = getInstance();
+        const btn = wizard.domElem.querySelector("button[data-show]");
+        btn.dispatchEvent(new Event("click"));
+        const div = wizard.domElem.querySelector("div.example1");
+        expect(div.classList).not.toContain("d-none");
+    });
+
+    it("hides elements according to their 'data-hide' attribute", () => {
+        const wizard = getInstance();
+        const btn = wizard.domElem.querySelector("button[data-hide]");
+        btn.dispatchEvent(new Event("click"));
+        const div = wizard.domElem.querySelector("div.example2");
+        expect(div.classList).toContain("d-none");
+    });
+
+    it("toggles elements according to their 'data-toggle' attribute", () => {
+        const wizard = getInstance();
+        const yes = wizard.domElem.querySelector("input[type='radio'][value='yes']");
+        const no = wizard.domElem.querySelector("input[type='radio'][value='no']");
+        // Test `yes=show` rule
+        yes.checked = true;
+        yes.dispatchEvent(new Event("click", { bubbles: true }));
+        const example1 = wizard.domElem.querySelector("div.example1");
+        expect(example1.classList).not.toContain("d-none");
+        // Test `no=hide` rule
+        no.checked = true;
+        no.dispatchEvent(new Event("click", { bubbles: true }));
+        const example2 = wizard.domElem.querySelector("div.example2");
+        expect(example2.classList).toContain("d-none");
     });
 });
 

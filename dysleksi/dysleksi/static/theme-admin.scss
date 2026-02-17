@@ -4,6 +4,7 @@ $other-grey-light: #efefef;
 $other-grey-medium: #bbbbbb;
 $other-grey: #888888;
 $other-grey-dark: #545257;
+$black: #000000;
 $white: #ffffff;
 
 // Define our own constants
@@ -28,6 +29,9 @@ $btn-border-radius: 5rem;
 $btn-disabled-opacity: 0.35;
 $breadcrumb-margin-bottom: 0;
 $breadcrumb-divider: '/';
+$form-check-input-indeterminate-border-color: $other-grey-medium;
+$form-check-input-checked-border-color: $black;
+$form-check-input-checked-color: $black;
 $form-select-border-radius: 1rem;
 
 @import "./vendor/scss/bootstrap";
@@ -189,12 +193,26 @@ i {
 }
 
 // Button styles
+.btn {
+  color: $black;
+}
+.btn-secondary {
+  color: $white;
+}
 .btn-secondary-outline {
   color: $black;
   border-color: $other-grey-medium;
 }
 .btn-secondary-outline:hover {
   border: 1px solid $other-grey;
+}
+
+// Form element styles
+.d-flex .form-check {
+  margin-right: $spacer;
+}
+input[type='datetime-local'] {
+  border-radius: $spacer;
 }
 
 // Table styles
@@ -301,6 +319,7 @@ ul.modal-progress li.list-group-item.disabled span {
 }
 .summary table td {
   padding: 0.5 * $spacer 0;
+  vertical-align: top;
   border: none;
 }
 .summary table td:first-of-type::after {
@@ -308,4 +327,11 @@ ul.modal-progress li.list-group-item.disabled span {
 }
 .summary table td:last-of-type {
   width: 80%;
+}
+.summary table table tr {
+  border: none
+}
+.summary table table td {
+  padding: 0 0 0.25 * $spacer 0;
+  width: 1% !important;
 }

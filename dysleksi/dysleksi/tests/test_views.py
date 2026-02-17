@@ -254,8 +254,14 @@ class TestStartRoomView(DysleksiTest):
 
         self.assertEqual(context_data.get("test_type"), TestType.INDIVIDUAL)
 
-    def test_create_individual_room(self):
-        data = {"student": self.student.id, "test": self.test.id}
+    def test_create_individual_room_immediate(self):
+        data = {
+            "student": self.student.id,
+            "test": self.test.id,
+            "is_immediate": "y",
+            "start_datetime": "",
+            "end_datetime": "",
+        }
 
         self.client.force_login(self.teacher)
         response = self.client.post(
@@ -274,8 +280,31 @@ class TestStartRoomView(DysleksiTest):
 
         self.assertRedirects(response, expected_url)
 
-    def test_create_group_room(self):
-        data = {"klasse": self.klasse.id, "test": self.group_test.id}
+    def test_create_individual_room_planned_date_time(self):
+        data = {
+            "student": self.student.id,
+            "test": self.test.id,
+            "is_immediate": "n",
+            "start_datetime": "2026-01-01T12:00",
+            "end_datetime": "2026-01-01T13:00",
+        }
+        self.client.force_login(self.teacher)
+        response = self.client.post(
+            reverse("dysleksi:start_individual_room"), data=data
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("dysleksi:test_assignment_list"))
+        assignment = TestAssignment.objects.latest("pk")
+        self.assertIsNotNone(assignment.planned_date_time)
+
+    def test_create_group_room_immediate(self):
+        data = {
+            "klasse": self.klasse.id,
+            "test": self.group_test.id,
+            "is_immediate": "y",
+            "start_datetime": "",
+            "end_datetime": "",
+        }
 
         self.client.force_login(self.teacher)
         response = self.client.post(reverse("dysleksi:start_group_room"), data=data)
@@ -290,3 +319,18 @@ class TestStartRoomView(DysleksiTest):
         )
 
         self.assertRedirects(response, expected_url)
+
+    def test_create_group_room_planned_date_time(self):
+        data = {
+            "klasse": self.klasse.id,
+            "test": self.group_test.id,
+            "is_immediate": "n",
+            "start_datetime": "2026-01-01T12:00",
+            "end_datetime": "2026-01-01T13:00",
+        }
+        self.client.force_login(self.teacher)
+        response = self.client.post(reverse("dysleksi:start_group_room"), data=data)
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("dysleksi:test_assignment_list"))
+        assignment = TestAssignment.objects.latest("pk")
+        self.assertIsNotNone(assignment.planned_date_time)

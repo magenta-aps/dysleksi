@@ -171,10 +171,10 @@ class StartAssignmentView(CreateView):
         return kwargs
 
     def get_success_url(self):
-        return reverse(
-            "dysleksi:room",
-            kwargs={"pk": self.object.pk},
-        )
+        if self.object.planned_date_time is not None:
+            return reverse("dysleksi:test_assignment_list")
+        else:
+            return reverse("dysleksi:room", kwargs={"pk": self.object.pk})
 
 
 class StartIndividualAssignmentView(StartAssignmentView):

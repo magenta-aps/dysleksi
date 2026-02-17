@@ -2,6 +2,7 @@
 
 import django.contrib.auth.models
 import django.contrib.auth.validators
+import django.contrib.postgres.fields.ranges
 import django.core.validators
 import django.db.models.deletion
 import django.utils.timezone
@@ -52,6 +53,13 @@ class Migration(migrations.Migration):
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('start_year', models.PositiveSmallIntegerField()),
                 ('letter', models.CharField(blank=True, max_length=1, null=True)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='PlannedDateTime',
+            fields=[
+                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('period', django.contrib.postgres.fields.ranges.DateTimeRangeField()),
             ],
         ),
         migrations.CreateModel(
@@ -147,6 +155,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('klasse', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='dysleksi.class')),
+                ('planned_date_time', models.OneToOneField(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='dysleksi.planneddatetime')),
                 ('test', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dysleksi.test')),
                 ('student', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='assignments', to='dysleksi.student')),
                 ('teacher', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='dysleksi.teacher')),

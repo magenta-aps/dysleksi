@@ -1,9 +1,14 @@
 from django import forms
-from django.forms import ModelChoiceField
+from django.forms import ModelChoiceField, widgets
 from django.utils.translation import gettext_lazy as _
 from dynamic_forms import DynamicField, DynamicFormMixin
 
-from dysleksi.models import Student, Test, TestAssignment, TestType
+from dysleksi.models import PlannedDateTime, Student, Test, TestAssignment, TestType
+
+
+class HTML5DateWidget(widgets.Input):
+    input_type = "datetime-local"
+    template_name = "django/forms/widgets/datetime.html"
 
 
 class StartRoomForm(forms.ModelForm):
@@ -12,9 +17,60 @@ class StartRoomForm(forms.ModelForm):
         fields = ("test",)
         model = TestAssignment
 
+    is_immediate = forms.BooleanField(
+        initial="y",
+        label=_("Vælg tidsrummet for testen"),
+        widget=forms.RadioSelect(
+            choices=[("y", _("Start nu")), ("n", _("Planlæg"))],
+            attrs={
+                "data-toggle": "y=hide .row.start-datetime,.row.end-datetime;"
+                "n=show .row.start-datetime,div.add-end-button"
+            },
+        ),
+    )
+
+    start_datetime = forms.DateTimeField(
+        label=_("Start"),
+        required=False,
+        widget=HTML5DateWidget(),
+    )
+
+    end_datetime = forms.DateTimeField(
+        label=_("Slut"),
+        required=False,
+        widget=HTML5DateWidget(),
+    )
+
     def __init__(self, teacher, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.teacher = self.instance.teacher = teacher
+        self.period = (
+            self.instance.planned_date_time.period
+            if self.instance.planned_date_time
+            else (None, None)
+        )
+
+    def clean_start_datetime(self):
+        start_datetime = self.cleaned_data["start_datetime"]
+        self.period = (start_datetime, self.period[1])
+        return start_datetime
+
+    def clean_end_datetime(self):
+        end_datetime = self.cleaned_data["end_datetime"]
+        self.period = (self.period[0], end_datetime)
+        return end_datetime
+
+    def save(self, commit=True):
+        if self.period is None or self.cleaned_data["start_datetime"] is None:
+            # No planned date time was given, so ensure the field is cleared
+            self.instance.planned_date_time = None
+        else:
+            # Create new planned date time
+            self.instance.planned_date_time = PlannedDateTime.objects.create(
+                period=self.period,
+            )
+
+        return super().save(commit=commit)
 
 
 class StudentChoiceField(ModelChoiceField):
