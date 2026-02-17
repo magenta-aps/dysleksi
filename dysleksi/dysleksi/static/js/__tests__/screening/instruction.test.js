@@ -84,10 +84,21 @@ describe("InstructionSequenceRunner", () => {
 		const playMock = vi.fn();
 	
 	
-		const AudioSpy = vi.fn(function(url) {
-			this.url = url;
-			this.play = playMock;
-			this.addEventListener = (event, cb) => cb();
+		const audioMock = {
+		    preload: "auto",
+		    play: playMock,
+		    pause: vi.fn(),
+		    addEventListener: vi.fn((event, cb) => {
+		        if (event === "ended") cb();
+		    }),
+		    removeEventListener: vi.fn(),
+		    currentTime: 0,
+		    duration: 10,
+		    src: "",
+		};
+    
+		const AudioSpy = vi.fn(function () {
+		    return audioMock;
 		});
 	
 		global.Audio = AudioSpy;
@@ -96,7 +107,9 @@ describe("InstructionSequenceRunner", () => {
 		await runner.playSound("/sound.mp3");
 	
 		expect(playMock).toHaveBeenCalled();
-		expect(global.Audio).toHaveBeenCalledWith("/sound.mp3");
+		expect(AudioSpy).toHaveBeenCalledTimes(1);
+		expect(audioMock.src).toBe("/sound.mp3");
+		expect(audioMock.pause).toHaveBeenCalled();
 	});
 	
 	it("executeInstruction with playSound calls playSound()", async () => {
@@ -132,12 +145,19 @@ describe("InstructionSequenceRunner", () => {
 	it("skip() skips the current playSound", async () => {
 		const playMock = vi.fn(() => Promise.resolve());
 	
-		const AudioSpy = vi.fn(function(url) {
-			this.play = playMock;
-			this.pause = vi.fn();
-			this.addEventListener = (event, cb) => {};
-			this.currentTime = 0;
-			this.duration = 10;
+		const audioMock = {
+		    preload: "auto",
+		    play: playMock,
+		    pause: vi.fn(),
+		    addEventListener: vi.fn(),
+		    removeEventListener: vi.fn(),
+		    currentTime: 0,
+		    duration: 10,
+		    src: "",
+		};
+    
+		const AudioSpy = vi.fn(function () {
+		    return audioMock;
 		});
 	
 		global.Audio = AudioSpy;
@@ -154,8 +174,11 @@ describe("InstructionSequenceRunner", () => {
 	
 		await runPromise;
 	
-		expect(AudioSpy).toHaveBeenCalledWith("/sound.mp3");
+		expect(audioMock.src).toBe("/sound.mp3");
 		expect(playMock).toHaveBeenCalled();
+		expect(AudioSpy).toHaveBeenCalledTimes(1);
+		expect(audioMock.pause).toHaveBeenCalled();
+		expect(audioMock.removeEventListener).toHaveBeenCalled();
 	});
 
 	it("skipToEnd() skips all remaining delays", async () => {

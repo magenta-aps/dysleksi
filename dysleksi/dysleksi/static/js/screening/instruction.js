@@ -6,6 +6,10 @@ export class InstructionSequenceRunner {
         this.skipCurrent = false;
         this.skipAll = false;
         this._currentSkipResolver = null;
+
+        // Reuse one audio element (better for iOS Safari)
+        this._audio = new Audio();
+        this._audio.preload = "auto";
     }
 
     getEl(id) {
@@ -91,9 +95,25 @@ export class InstructionSequenceRunner {
         if (this.skipCurrent) return Promise.resolve();
 
         return new Promise(resolve => {
-            const audio = new Audio(url);
-
-            const onEnd = () => resolve();
+            const audio = this._audio;
+    
+            // Stop anything currently playing
+            audio.pause();
+    
+            // Reset and set new source
+            audio.currentTime = 0;
+            audio.src = url;
+    
+            const cleanup = () => {
+                audio.removeEventListener("ended", onEnd);
+                audio.removeEventListener("error", onEnd);
+            };
+    
+            const onEnd = () => {
+                cleanup();
+                resolve();
+            };
+    
             audio.addEventListener("ended", onEnd);
             audio.addEventListener("error", onEnd);
 
@@ -101,6 +121,7 @@ export class InstructionSequenceRunner {
 
             // Make skipping instant
             this._currentSkipResolver = () => {
+                cleanup();
                 audio.pause();
                 audio.currentTime = audio.duration;
                 resolve();
