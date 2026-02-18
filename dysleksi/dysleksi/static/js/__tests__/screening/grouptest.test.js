@@ -573,13 +573,13 @@ describe('GroupTestFlow', () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
         testSpy(view);
-        const canShow = view.showPart(test.parts.length - 1);
-        expect(canShow).toBe(true);
+        view.setPart(test.parts.length - 1);
         const part = view.currentPart;
         view.showQuestion(false, part.questions.length - 1);
         const question = view.currentQuestion;
         const firstAnswer = question.possibleAnswers[0]
-        view.selectAnswer(firstAnswer);
+        view.input.textContent = firstAnswer.resourceText;
+        view.selectFreeText();
         view.onQuestionComplete(question);
 
         expect(view.onQuestionComplete).toHaveBeenCalled();
