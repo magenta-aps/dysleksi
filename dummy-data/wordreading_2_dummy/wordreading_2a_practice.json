@@ -72,7 +72,7 @@
                 // Lyt godt efter.
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.1_martha.mp3",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 "action": "fadeOut",
@@ -108,7 +108,7 @@
                 // Her kan du se
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.2.wav",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 "action": "fadeIn",
@@ -124,7 +124,7 @@
                 // En tegning
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.2a.wav",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 "action": "fadeIn",
@@ -186,7 +186,7 @@
                 // Og pilen.
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.2c.wav",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 // Du
@@ -218,7 +218,7 @@
                 // Skal læse ordene stille og,
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.3a.wav",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 "action": "highlight",
@@ -249,7 +249,7 @@
                 // Vælge det ord, som passer til tegningen.
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.3b.wav",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 "action": "highlight",
@@ -261,7 +261,7 @@
                 // på pilen.
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.3c.wav",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 // Hvis du vælger forkert, kan du ændre dit valg, inden du trykker
@@ -269,13 +269,13 @@
                 // opgaven.
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.3d.wav",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 // Se
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.4.wav",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 "action": "highlight",
@@ -286,7 +286,7 @@
                 // Her er et øje.
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.4a.wav",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 "action": "select",
@@ -302,7 +302,7 @@
                 // Ordet, der passer til tegningen, er isi, og det vælges derfor.
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.4b.wav",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 "action": "highlight",
@@ -313,7 +313,7 @@
                 // Og derefter trykkes der på pilen.
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.4c.wav",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 "action": "fadeOut",
@@ -349,13 +349,13 @@
                 // Det er sådan, du skal løse opgaverne.
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.4d.wav",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 // Nu skal du selv prøve øveropgaverne.
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.5.wav",
-                "delayAfter": 2000
+                "delayAfter": 750
             },
             {
                 // Klik på den grønne pil, når du er klar.
