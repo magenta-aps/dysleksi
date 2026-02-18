@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-11-27 07:34-0200\n"
+"POT-Creation-Date: 2026-02-18 09:53-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -32,20 +32,6 @@ msgstr "Isissutissaq"
 #, python-brace-format
 msgid "Husk mig på denne maskine i {days} dage"
 msgstr ""
-
-#: login/templates/login/logged_out.html
-msgid "Logget ud"
-msgstr "Anivutit"
-
-#: login/templates/login/logged_out.html
-msgid ""
-"Du er nu logget ud. Vi anbefaler at du lukker denne tab for at fjerne "
-"tilbageværende cookie-data"
-msgstr ""
-
-#: login/templates/login/logged_out.html
-msgid "Log in"
-msgstr "Iserfissaq"
 
 #: login/templates/login/login.html login/templates/login/login_repeat.html
 #: login/templates/login/login_timeout.html
