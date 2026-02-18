@@ -204,6 +204,7 @@ export class GroupTestView extends StudentTestView {
                 this.domElements.showQuestionChallenge();
                 this.domElements.toggleNextButton(false);
                 this.domElements.clearQuestionChoices();
+                this.domElements.hideStudentHeader();
             } else {
                 // part complete
                 this.onPartComplete();
