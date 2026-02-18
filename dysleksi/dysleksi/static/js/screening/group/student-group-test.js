@@ -229,7 +229,7 @@ export class GroupTestView extends StudentTestView {
                 this.domElements.disableNextButton()
             }
         } else {
-            this.domElements.markButtonPress(this.selectedAnswer.buttonId, "pressed-btn")
+            this.domElements.makeButtonGlow(this.selectedAnswer.buttonId)
         }
 
         for (let a of this.answerButtons) {
@@ -252,7 +252,7 @@ export class GroupTestView extends StudentTestView {
             this.textAnswer = answer;
             this.selectedAnswer = this.currentQuestion.possibleAnswers[0];
         }
-        this.domElements.toggleNextButton(answer !== "");
+        this.domElements.toggleNextButton(answer.length >= 2);
     }
 
     isLast() {
