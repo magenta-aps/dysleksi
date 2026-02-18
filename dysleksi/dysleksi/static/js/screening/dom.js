@@ -47,6 +47,10 @@ class TestDomElements {
         this.markButtonPress(buttonId, "happy-btn")
     }
 
+    makeButtonGlow(buttonId) {
+        this.markButtonPress(buttonId, "pressed-btn")
+    }
+
 
     fadeScreenOverlay() {
 
@@ -281,7 +285,7 @@ class TestDomElements {
             if (!playBtn) {
                 playBtn = document.createElement("button");
                 playBtn.id = "challenge-sound-btn";
-                playBtn.innerHTML = '<i class="ph ph-speaker-simple-high"></i>';
+                playBtn.innerHTML = '<i class="ph-fill ph-speaker-simple-high"></i>';
                 playBtn.className = "btn sound-btn";
 
                 const insertAfter = img || this.questionChallengeEl;
@@ -292,9 +296,13 @@ class TestDomElements {
                 audio.currentTime = 0; // restart every time
                 audio.play();
                 playBtn.classList.remove("pulse");
+                playBtn.classList.add('playing');
 
-                const letterBtns = document.querySelectorAll(".letter-btn");
-                letterBtns.forEach(b => b.disabled = false);
+                audio.onended = () => {
+                    const letterBtns = document.querySelectorAll(".letter-btn");
+                    playBtn.classList.remove('playing');
+                    letterBtns.forEach(b => b.disabled = false);
+                };
 
             };
         } else {
@@ -331,14 +339,16 @@ class TestDomElements {
     
         // --- Erase button ---
         const eraseBtn = document.createElement("button");
-        eraseBtn.innerHTML = '<i class="ph ph-backspace"></i>';
+        eraseBtn.innerHTML = '<i class="ph-fill ph-backspace"></i>';
         eraseBtn.className = "btn erase-btn";
+        eraseBtn.id = "erase-button"
         updateEraseBtnState();
     
         eraseBtn.addEventListener("click", () => {
             displayField.textContent = displayField.textContent.slice(0, -1);
             updateEraseBtnState();
             listener({ target: { value: displayField.textContent } });
+            this.makeButtonGlow(eraseBtn.id)
         });
     
         textFieldWrapper.append(displayField, eraseBtn);
@@ -351,13 +361,15 @@ class TestDomElements {
             rowLetters.forEach(letter => {
                 const btn = document.createElement("button");
                 btn.type = "button";
-                btn.className = "btn letter-btn";
+                btn.className = "btn btn-outline-primary letter-btn";
                 btn.textContent = letter;
+                btn.id = "letter-button-" + letter
                 btn.disabled = true;
                 btn.addEventListener("click", () => {
                     displayField.textContent += letter;
                     updateEraseBtnState();
                     listener({ target: { value: displayField.textContent } });
+                    this.makeButtonGlow(btn.id)
                 });
                 rowDiv.appendChild(btn);
             });

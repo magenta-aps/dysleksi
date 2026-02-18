@@ -823,9 +823,19 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         // Audio played
         expect(audioEl.play).toHaveBeenCalled();
     
-        // Letter buttons should now be enabled
+        // Buttons are still disabled before audio ends
+        expect(letterBtn1.disabled).toBe(true);
+        expect(letterBtn2.disabled).toBe(true);
+    
+        // Manually trigger audio.onended
+        audioEl.onended();
+    
+        // Buttons should now be enabled
         expect(letterBtn1.disabled).toBe(false);
         expect(letterBtn2.disabled).toBe(false);
+    
+        // Play button classes updated correctly
+        expect(playBtn.classList.contains("playing")).toBe(false);
     });
 
 

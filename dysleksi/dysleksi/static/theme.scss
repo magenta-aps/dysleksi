@@ -21,8 +21,10 @@ $student-yellow-lightest: #faf2dd;
 $student-yellow-light: #f2deaa;
 $student-yellow: #cfaa4c;
 $student-yellow-dark: #685526;
+$student-blue-light: #80a1c0;
 $student-blue: #e6ecf3;
 $student-blue-dark: #004382;
+$student-blue-darkest: #003668;
 $checkmark-green: #306025;
 
 // Map "design names" to known Bootstrap variables
@@ -79,6 +81,11 @@ h1, h2, h3, h4, h5, h6 {
     outline: 3px solid $student-blue-dark !important;
   }
 
+  &:disabled {
+    color: $student-grey !important;
+    border-color: $student-grey !important;
+  }
+
 }
 
 .erase-btn {
@@ -91,13 +98,12 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
   margin: 0.5rem;
-
-  .ph {
-    font-size: 2.5rem;
-  }
+  font-size: 2.5rem !important;
 
   &:disabled {
     color: white; // changes text/icon color when button is disabled
+    background-color: $student-grey-light !important;
+    border-color: $student-grey !important;
 
     .ph {
       color: white; // ensures icon itself is white
@@ -106,10 +112,10 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .sound-btn {
-  background-color: $student-purple !important;
+  background-color: $student-blue-dark !important;
   color: white;
-  font-size: 2rem;
-  padding: 0.5rem 2rem;
+  font-size: 3rem !important;
+  padding: 0.8rem 2rem;
   margin: 2rem auto;
   display: flex;
   border-radius: 50px;
@@ -117,8 +123,39 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   justify-content: center;
 
-  .ph {
-    font-size: 3rem;
+  &:hover,
+  &:focus,
+  &:focus-visible,
+  &:active {
+    color: white !important;
+    background-color: $student-blue-darkest !important;
+  }
+
+  &.playing {
+    background-color: $student-blue-darkest !important;
+    outline: 10px solid $student-blue-light !important;
+    outline-offset: 0px;
+    animation: pulse-outline 1s ease-in-out infinite alternate;
+  }
+
+  &:disabled {
+    background-color: $student-grey-light !important;
+    cursor: default;
+    color: white !important;
+    pointer-events: none;
+  }
+
+}
+
+@keyframes pulse-outline {
+  0% {
+    outline-offset: 0px;
+  }
+  50% {
+    outline-offset: -4px;
+  }
+  100% {
+    outline-offset: -2px;
   }
 }
 
@@ -144,6 +181,7 @@ h1, h2, h3, h4, h5, h6 {
 
   &:disabled {
     background-color: $student-grey-light !important;
+    border-color: $student-grey !important;
     color: white;
     cursor: default;
     pointer-events: none; // prevents clicks
@@ -153,10 +191,7 @@ h1, h2, h3, h4, h5, h6 {
 
 
 .letter-btn {
-    background-color: $student-purple-lightest !important;
-    color: black;
-    font-size: 2rem;
-    border: 1px solid $student-purple !important;
+    font-size: 2rem !important;
     margin: 0.5rem;
     width: 5rem;
     height: 4rem;
