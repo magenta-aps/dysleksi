@@ -67,15 +67,16 @@ h1, h2, h3, h4, h5, h6 {
   color: black !important;
   border-color: $student-blue-dark !important;
   background-color: white !important;
-  border-width: 2px !important;
+  border-width: 1px !important;
   font-size: 1.1rem !important;
+  border-radius: 16px !important;
 
   &:hover, &:focus, &:active {
     background-color: $student-blue !important;
   }
   &.selected {
     background-color: $student-blue !important;
-    outline: 2px solid $student-blue-dark;
+    outline: 3px solid $student-blue-dark !important;
   }
 
 }
