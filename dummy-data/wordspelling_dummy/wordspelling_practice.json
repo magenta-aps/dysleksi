@@ -74,8 +74,7 @@
     ]
   },
   {
-    // Har en lydfil for at vi kan vise audio-knap
-    "sound": "wordspelling_dummy/Øveopgave/ulu.wav",
+    "sound": "wordspelling_dummy/Øveopgave/tui.mp3",
     "question_type": "free_text",
     "instruction_sequence": [
       {
@@ -317,6 +316,12 @@
         "action": "fadeIn",
         "element": "free-text-buttons"
       },
+      // Tryk på knappen for at tastaturet enabler og lyden spiller
+      {
+        "action": "clickButton",
+        "element": "challenge-sound-btn",
+        "delayAfter": 1500
+      },
       {
         // Ordet, der skal skrives er: Tui
         "action": "playSound",
@@ -324,36 +329,20 @@
         "delayAfter": 500
       },
       {
-        "action": "highlight",
-        "element": "free-text-t"
-      },
-      {
-        "action": "setText",
-        "element": "free-text-field",
-        "data": "t",
+        "action": "clickButton",
+        "element": "free-text-t",
         "delayAfter": 750
       },
       {
-        "action": "highlight",
-        "element": "free-text-u"
-      },
-      {
-        "action": "setText",
-        "element": "free-text-field",
-        "data": "tu",
+        "action": "clickButton",
+        "element": "free-text-u",
         "delayAfter": 750
       },
       {
-        "action": "highlight",
-        "element": "free-text-i"
-      },
-      {
-        "action": "setText",
-        "element": "free-text-field",
-        "data": "tui",
+        "action": "clickButton",
+        "element": "free-text-i",
         "delayAfter": 750
       },
-
       // 6b.4b
       {
         "action": "fadeIn",
@@ -418,26 +407,35 @@
       },
 // TODO: placér markøren midt i teksten
       {
-        "action": "highlight",
+        "action": "clickButton",
         "element": "free-text-erase-btn",
-        "delayAfter": 0
+        "delayAfter": 400
       },
       {
-        "action": "setText",
-        "element": "free-text-field",
-        "data": "ui",
-        "delayAfter": 1000
+        "action": "clickButton",
+        "element": "free-text-erase-btn",
+        "delayAfter": 400
       },
       {
-        "action": "highlight",
+        "action": "clickButton",
+        "element": "free-text-erase-btn",
+        "delayAfter": 400
+      },
+
+      {
+        "action": "clickButton",
         "element": "free-text-t",
-        "delayAfter": 0
+        "delayAfter": 400
       },
       {
-        "action": "setText",
-        "element": "free-text-field",
-        "data": "tui",
-        "delayAfter": 1000
+        "action": "clickButton",
+        "element": "free-text-u",
+        "delayAfter": 400
+      },
+      {
+        "action": "clickButton",
+        "element": "free-text-i",
+        "delayAfter": 400
       },
 
       // 6b.4e

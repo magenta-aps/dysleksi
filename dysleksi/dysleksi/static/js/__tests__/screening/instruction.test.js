@@ -315,4 +315,16 @@ describe("InstructionSequenceRunner", () => {
         runner.executeInstruction({action: "setText", element: "el1", data: "test"});
         expect(domElements.setText).toHaveBeenCalledWith(document.getElementById("el1"), "test");
     });
+
+    it("executeInstruction with clickButton clicks the element", async () => {
+        runner = new InstructionSequenceRunner(null, [], domElements);
+    
+        const btn = document.getElementById("btn1");
+        const clickSpy = vi.spyOn(btn, "click");
+    
+        await runner.executeInstruction({ action: "clickButton", element: "btn1" });
+    
+        expect(clickSpy).toHaveBeenCalledTimes(1);
+    });
+
 });

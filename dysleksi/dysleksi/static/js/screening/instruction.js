@@ -98,6 +98,10 @@ export class InstructionSequenceRunner {
                 this.domElements.setText(this.getEl(element), data);
                 break;
 
+            case "clickButton":
+                this.getEl(element).click();
+                break;
+
             case "setButtonSoundOnce":
                 const self = this;
                 const el = this.getEl(element);
