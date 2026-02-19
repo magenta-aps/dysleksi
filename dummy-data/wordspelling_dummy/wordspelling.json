@@ -1,22 +1,14 @@
 [
-    {
-        "sound": "wordspelling_dummy/iki.mp3",
-        "correct": "iki",
-        "wrong": []
-    },
-    {
-        "sound": "wordspelling_dummy/aput.mp3",
-        "correct": "aput",
-        "wrong": []
-    },
-    {
-        "sound": "wordspelling_dummy/arsaq.mp3",
-        "correct": "arsaq",
-        "wrong": []
-    },
-    {
-        "sound": "wordspelling_dummy/sorluk.mp3",
-        "correct": "sorluk",
-        "wrong": []
-    }
+  {
+    "question_type": "free_text",
+    "sound": "wordspelling_dummy/Øveopgave/ulu.wav",
+    "correct": "ulu",
+    "reminder": 20000
+  },
+  {
+    "question_type": "free_text",
+    "sound": "wordspelling_dummy/Øveopgave/matu.wav",
+    "correct": "matu",
+    "reminder": 20000
+  }
 ]

@@ -68,11 +68,14 @@ class TestDomElements {
     }
 
 
-    showSummary(test) {
+    toggleBodyClass(className, show) {
+        document.body.classList.toggle(className, show);
+    }
+
+    showSummary(parts) {
         this.testSummary.style.display = "flex";
-        this.summaryContainer.innerHTML = "";
-        const parts = test.parts;
-    
+        console.log("showSummary", arguments);
+
         parts.forEach((part, index) => {
             const block = document.createElement('div');
             block.classList.add('summary-block');
@@ -143,10 +146,16 @@ class TestDomElements {
 
     showElement(el) {
         el.style.visibility = "visible";
+        if (el.style.display !== undefined) {
+            el.style.display = "";
+        }
     }
 
     hideElement(el) {
         el.style.visibility = "hidden";
+        if (el.style.display !== undefined) {
+            el.style.display = "none";
+        }
     }
     
     fadeIn(el) {
@@ -168,6 +177,10 @@ class TestDomElements {
         setTimeout(() => el.classList.remove("highlight"), 1500);
     }
 
+    setText(el, text) {
+        el.textContent = text;
+    }
+
     lockInput() {
         this._updateInputState(true);
     }
@@ -187,6 +200,7 @@ class TestDomElements {
                 btn.tabIndex = 0;                  // restore tab focus
             }
         });
+        this.toggleBodyClass("input-locked", inputLocked);
     }
 
     showInstructions(text, audio) {
@@ -203,14 +217,22 @@ class TestDomElements {
         this.instructionsSoundEl.innerHTML = "";
     }
     
+    setButtonAudioCallback(button, audioCallback) {
+        button.audioCallback = audioCallback;
+    }
+
     _setButtonListener(button, listener) {
         if (button._clickHandler) {
             button.removeEventListener("click", button._clickHandler);
         }
-    
-        button._clickHandler = listener;
-        button.addEventListener("click", listener);
-
+        button._listener = listener;
+        button._clickHandler = async function() {
+            if (button.audioCallback) {
+                await button.audioCallback();
+            }
+            button._listener();
+        }
+        button.addEventListener("click", button._clickHandler);
         return button;
     }
 
@@ -235,11 +257,37 @@ class TestDomElements {
         this.testPartIntroImage.style.display = "flex";
     }
 
+    _insert(parent, child, after, before) {
+        // Given lists of elements that `child` should be inserted after and before,
+        // insert `child` into `parent` in the correct place
+        const childrenList = Array.from(parent.children);
+        if (after && after.length > 0) {
+            const afterIndexes = after.filter(a => a != null).map(a => childrenList.indexOf(a)).filter(i => i >= 0)
+            if (afterIndexes.length) {
+                let last = childrenList[Math.max(...afterIndexes)];
+                if (last && last.nextSibling) {
+                    parent.insertBefore(child, last.nextSibling);
+                    return;
+                }
+            }
+        } else if (before && before.length > 0) {
+            const beforeIndexes = before.filter(a => a != null).map(a => childrenList.indexOf(a)).filter(i => i >= 0);
+            if (beforeIndexes.length) {
+                let first = childrenList[Math.min(...beforeIndexes)];
+                parent.insertBefore(child, first);
+                return;
+            }
+        }
+        parent.appendChild(child);
+    }
+
     showQuestionChallenge(text, sound, imageUrl) {
         if (!text && !sound && !imageUrl) {
             this.questionChallengeEl.innerHTML = "";
         }
         let img = document.querySelector("#challenge-image");
+        let textEl = document.querySelector("#challenge-text");
+        let playBtn = document.querySelector("#challenge-sound-btn");
         if (imageUrl) {
             if (!img) {
                 img = document.createElement("img");
@@ -253,12 +301,11 @@ class TestDomElements {
                 img.remove();
             }
         }
-        let textEl = document.querySelector("#challenge-text");
         if (text) {
             if (!textEl) {
                 textEl = document.createElement("div");
                 textEl.id = "challenge-text";
-                this.questionChallengeEl.append(textEl);
+                this._insert(this.questionChallengeEl, textEl, [img], [playBtn]);
             }
             textEl.innerHTML = text;
         } else {
@@ -267,7 +314,6 @@ class TestDomElements {
             }
         }
 
-        let playBtn = document.querySelector("#challenge-sound-btn");
         let audio = document.querySelector("#challenge-audio");
 
         if (sound) {
@@ -287,9 +333,7 @@ class TestDomElements {
                 playBtn.id = "challenge-sound-btn";
                 playBtn.innerHTML = '<i class="ph-fill ph-speaker-simple-high"></i>';
                 playBtn.className = "btn sound-btn";
-
-                const insertAfter = img || this.questionChallengeEl;
-                insertAfter.after(playBtn);
+                this._insert(this.questionChallengeEl, playBtn, [img, textEl], null);
             }
             playBtn.classList.add("pulse");
             playBtn.onclick = () => {
@@ -299,9 +343,9 @@ class TestDomElements {
                 playBtn.classList.add('playing');
 
                 audio.onended = () => {
-                    const letterBtns = document.querySelectorAll(".letter-btn");
+                const letterBtns = document.querySelectorAll(".letter-btn");
                     playBtn.classList.remove('playing');
-                    letterBtns.forEach(b => b.disabled = false);
+                letterBtns.forEach(b => b.disabled = false);
                 };
 
             };
@@ -336,12 +380,13 @@ class TestDomElements {
     
         const displayField = document.createElement("div");
         displayField.className = "form-control display-field";
+        displayField.id = "free-text-field";
     
         // --- Erase button ---
         const eraseBtn = document.createElement("button");
         eraseBtn.innerHTML = '<i class="ph-fill ph-backspace"></i>';
         eraseBtn.className = "btn erase-btn";
-        eraseBtn.id = "erase-button"
+        eraseBtn.id = "free-text-erase-btn";
         updateEraseBtnState();
     
         eraseBtn.addEventListener("click", () => {
@@ -355,6 +400,8 @@ class TestDomElements {
         wrapper.append(textFieldWrapper);
     
         // --- Letter buttons ---
+        const buttonsWrapper = document.createElement("div");
+        buttonsWrapper.id = "free-text-buttons";
         buttonRows.forEach(rowLetters => {
             const rowDiv = document.createElement("div");
             rowDiv.className = "letter-row";
@@ -363,8 +410,8 @@ class TestDomElements {
                 btn.type = "button";
                 btn.className = "btn btn-outline-primary letter-btn";
                 btn.textContent = letter;
-                btn.id = "letter-button-" + letter
                 btn.disabled = true;
+                btn.id = "free-text-" + letter;
                 btn.addEventListener("click", () => {
                     displayField.textContent += letter;
                     updateEraseBtnState();
@@ -373,8 +420,9 @@ class TestDomElements {
                 });
                 rowDiv.appendChild(btn);
             });
-            wrapper.insertBefore(rowDiv, textFieldWrapper); // above display
+            buttonsWrapper.append(rowDiv);
         });
+        wrapper.insertBefore(buttonsWrapper, textFieldWrapper); // above display
     
         this.choicesEl.append(wrapper);
     
@@ -393,10 +441,7 @@ export class GroupTestDomElements extends TestDomElements {
         this.reminderSoundEl = document.querySelector("#reminder-sound");
         this.choicesEl = document.querySelector("#choices");
         this.nextBtn = document.querySelector("#next");
-    }
-
-    showSummary(parts) {
-        super.showSummary(parts);
+        this.repeatBtn = document.querySelector("#repeat");
     }
 
     showInstructions(text, audio) {
@@ -419,7 +464,13 @@ export class GroupTestDomElements extends TestDomElements {
 
 
     setNextButtonListener(listener) {
-        this.nextBtn = this._setButtonListener(this.nextBtn, listener);
+        this._setButtonListener(this.nextBtn, listener);
+    }
+
+    setRepeatButtonListener(listener) {
+        if (this.repeatBtn) {
+            this._setButtonListener(this.repeatBtn, listener);
+        }
     }
 
     clearQuestionChoices() {

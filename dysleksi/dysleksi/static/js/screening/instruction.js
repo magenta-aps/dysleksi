@@ -1,6 +1,7 @@
 export class InstructionSequenceRunner {
 
-    constructor(instructions, domElements) {
+    constructor(view, instructions, domElements) {
+        this.view = view;
         this.instructions = instructions;
         this.domElements = domElements;
         this.skipCurrent = false;
@@ -13,13 +14,14 @@ export class InstructionSequenceRunner {
     }
 
     getEl(id) {
-        const el = document.getElementById(id);
-        return el;
+        return document.getElementById(id);
     }
 
     async run() {
         this.skipAll = false;
-        for (const instruction of this.instructions) {
+        for (let i = 0; i < this.instructions.length; i++) {
+            const instruction = this.instructions[i];
+            console.log("Showing instruction step", i + 1, "of", this.instructions.length, ": ", instruction);
             if (!this.skipAll) this.skipCurrent = false;
             if (this.skipAll) this.skipCurrent = true;
 
@@ -31,7 +33,9 @@ export class InstructionSequenceRunner {
             if (delay > 0) {
                 await this.sleep(delay);
             }
+            console.log("Instruction step complete");
         }
+        console.log("Instruction sequence complete");
     }
 
     // Sleep that can be skipped instantly
@@ -52,12 +56,13 @@ export class InstructionSequenceRunner {
     }
 
     async executeInstruction(instr) {
-        const { action, element, url } = instr;
+        const { action, element, url, data } = instr;
         console.log(
-          "Executing",
-          action,
-          ...(element != null ? ["on element", element] : []),
-          ...(url != null ? ["with url", url] : []),
+            "Executing",
+            action,
+            ...(element != null ? ["on element", element] : []),
+            ...(url != null ? ["with url", url] : []),
+            ...(data != null ? ["with data", data] : []),
         );
 
         switch (action) {
@@ -87,6 +92,29 @@ export class InstructionSequenceRunner {
 
             case "playSound":
                 await this.playSound(url);
+                break;
+
+            case "setText":
+                this.domElements.setText(this.getEl(element), data);
+                break;
+
+            case "setButtonSoundOnce":
+                const self = this;
+                const el = this.getEl(element);
+                const u = url;
+                this.domElements.setButtonAudioCallback(
+                    el,
+                    async function() {
+                        if (u) {
+                            await self.playSound(u);
+                        }
+                        self.domElements.setButtonAudioCallback(el, null);
+                    }
+                )
+                break;
+
+            case "setRepeatButtonDestination":
+                this.view.setRepeatDestination(parseInt(data));
                 break;
         }
     }

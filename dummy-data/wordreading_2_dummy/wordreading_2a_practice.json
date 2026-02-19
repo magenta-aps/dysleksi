@@ -1,6 +1,7 @@
 [
     {
         "image": "wordreading_intro/Indledning/Læsning.png",
+        "question_type": "multiple_choice",
         "correct": "",
         "wrong": [],
         "instruction_sequence": [
@@ -60,6 +61,7 @@
     },
     {
         "image": "wordreading_intro/Instruktion/Øje.png",
+        "question_type": "multiple_choice",
         "correct": "isi",
         "wrong": ["isigak", "illu", "immuk"],
         "instruction_sequence": [
@@ -186,7 +188,7 @@
                 // Og pilen.
                 "action": "playSound",
                 "resource": "wordreading_intro/Instruktion/7b.2c.wav",
-                "delayAfter": 750
+                "delayAfter": 2000
             },
             {
                 // Du
@@ -371,11 +373,13 @@
         ]
     },
     {
+        "question_type": "multiple_choice",
         "image": "wordreading_intro/Øveopgave/Fod.png",
         "correct": "isigak",
         "wrong": ["isi", "immuk", "ini"]
     },
     {
+        "question_type": "multiple_choice",
         "image": "wordreading_intro/Øveopgave/Mælk.png",
         "correct": "immuk",
         "wrong": ["imaq", "illu", "imeq"]

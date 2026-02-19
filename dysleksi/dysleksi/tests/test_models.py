@@ -336,7 +336,7 @@ class TestTest(DysleksiTest):
         self.assertEqual(part_model.intro, part_json["intro"])
 
         # Test questions
-        self.assertEqual(part_model.questions.count(), 1)
+        self.assertEqual(part_model.questions.count(), 4)
         self.assertEqual(len(part_json["questions"]), part_model.questions.count())
 
         question_model = part_model.questions.all().order_by("id")[0]
@@ -383,6 +383,28 @@ class TestTest(DysleksiTest):
             )
             self.assertEqual(ans_model.resource.text, ans_json["resource_text"])
             self.assertEqual(ans_model.is_correct, ans_json["is_correct"])
+
+        question2 = part_json["questions"][1]
+        self.assertEqual(question2.get("possible_answers"), [])
+        self.assertEqual(question2.get("challenge_name"), self.resource2.name)
+        self.assertEqual(question2.get("challenge_image_url"), self.resource2.image.url)
+        self.assertIsNone(question2.get("challenge_text"))
+        self.assertIsNone(question2.get("challenge_sound_url"))
+
+        question3 = part_json["questions"][2]
+        self.assertIsNone(question3.get("challenge_id"))
+        self.assertIsNone(question3.get("challenge_name"))
+        self.assertIsNone(question3.get("challenge_text"))
+        self.assertIsNone(question3.get("challenge_image_url"))
+        self.assertIsNone(question3.get("challenge_sound_url"))
+        self.assertEqual(question3.get("possible_answers"), [])
+
+        question4 = part_json["questions"][3]
+        self.assertEqual(question4.get("possible_answers"), [])
+        self.assertEqual(question4.get("challenge_name"), self.resource4.name)
+        self.assertEqual(question4.get("challenge_sound_url"), self.resource4.sound.url)
+        self.assertIsNone(question4.get("challenge_text"))
+        self.assertIsNone(question4.get("challenge_image_url"))
 
 
 class TestMessage(DysleksiTest):
@@ -750,6 +772,21 @@ class TestInstruction(DysleksiTest):
 
         exception = cm.exception
         self.assertIn("play_sound_requires_resource", str(exception))
+
+    def test_to_json_with_data(self):
+        seq = InstructionSequence.objects.create(question=self.question1)
+        instruction = Instruction.objects.create(
+            sequence=seq,
+            order=1,
+            action=InstructionAction.SET_REPEAT_BUTTON_DESTINATION,
+            data="1",
+        )
+        data = instruction.to_json()
+        self.assertEqual(
+            data["action"],
+            InstructionAction.SET_REPEAT_BUTTON_DESTINATION,
+        )
+        self.assertEqual(data["data"], "1")
 
     def test_default_ordering(self):
         seq = InstructionSequence.objects.create(question=self.question1)

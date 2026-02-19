@@ -7,6 +7,7 @@ import { getWebSocket } from "../../ws";
 import { GroupTestDomElements } from "../../screening/dom.js";
 import { Test } from "../../screening/model.js";
 import { GroupTestView } from "../../screening/group/student-group-test.js";
+import {spyAttributes} from "../utils.js";
 
 describe('GroupTestFlow', () => {
     let originalWebSocket;
@@ -33,40 +34,6 @@ describe('GroupTestFlow', () => {
                 this.send = mockSend;
                 this.close = vi.fn();
                 this.addEventListener = vi.fn();
-            }
-        };
-
-        const visited = new Set();
-        const spyAttributes = function(targetItem, omitkeys=[]) {
-            // Avoid infinite recursion caused by circular references
-            if (visited.has(targetItem)) return;
-            visited.add(targetItem);
-
-            // Get all properties of the object and its prototype chain
-            const props = [];
-            if (!omitkeys.includes("__proto__")) {
-                omitkeys.push("__proto__");
-            }
-            let obj = targetItem;
-            do {
-                props.push(...Object.getOwnPropertyNames(obj));
-            } while (obj = Object.getPrototypeOf(obj));
-
-            // Spy on all functions and list items
-            for (let attributeName of props) {
-                if (omitkeys.includes(attributeName)) continue;
-                let attribute = targetItem[attributeName];
-                if (typeof(attribute) === "function") {
-                    vi.spyOn(targetItem, attributeName);
-                } else if (typeof(attribute) === "object" && attribute !== undefined && attribute !== null) {
-                    if (Array.isArray(attribute)) {
-                        for (let i = 0; i < attribute.length; i++) {
-                            spyAttributes(attribute[i], omitkeys);
-                        }
-                    } else {
-                        // spyAttributes(attribute, omitkeys);
-                    }
-                }
             }
         };
 
@@ -573,12 +540,12 @@ describe('GroupTestFlow', () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
         testSpy(view);
-        view.setPart(test.parts.length - 1);
+        const canShow = view.showPart(test.parts.length - 1);
+        expect(canShow).toBe(true);
         const part = view.currentPart;
         view.showQuestion(false, part.questions.length - 1);
         const question = view.currentQuestion;
-        const firstAnswer = question.possibleAnswers[0]
-        view.input.textContent = firstAnswer.resourceText;
+        view.input.textContent = "iki";
         view.selectFreeText();
         view.onQuestionComplete(question);
 
@@ -833,10 +800,45 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         // Buttons should now be enabled
         expect(letterBtn1.disabled).toBe(false);
         expect(letterBtn2.disabled).toBe(false);
-    
+
         // Play button classes updated correctly
         expect(playBtn.classList.contains("playing")).toBe(false);
     });
+});
 
+describe("GroupTestDomElements - Repeatbutton", () => {
+    let domElements;
 
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="choices"></div>
+            <audio id="instructions-sound"></audio>
+            <audio id="reminder-sound"></audio>
+            <div id="instructions-text"></div>
+            <button id="start-practice"></button>
+            <button id="start-questions"></button>
+            <table id="summary-table"></table>
+            <button id="end-summary"></button>
+            <div id="question-title"></div>
+            <div id="question-challenge"></div>
+            <button id="next"></button>
+            <button id="repeat"></button>
+        `;
+        domElements = new GroupTestDomElements();
+    });
+
+    it("repeat button destination", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, {
+            addEventListener: vi.fn(),
+        }, 'class_123', 1, domElements);
+        testSpy(view);
+        view.setRepeatDestination(1);
+        view.setPart(0);
+        view.setQuestion(true, 3)
+        view.showQuestion = vi.fn();
+        expect(view.repeatQuestionIndex).toBe(1);
+        view.repeat();
+        expect(view.showQuestion).toHaveBeenCalledWith(true, 1);
+    });
 });

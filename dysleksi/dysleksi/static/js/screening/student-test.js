@@ -51,7 +51,11 @@ export class StudentTestView extends EventTarget {
     showTestPartIntro() {
         this.domElements.showTestPartIntro()
         this.domElements.hideTestContainer()
-        this.domElements.setStartTestPartButtonListener(() => this.showFirstQuestion(false));
+        this.domElements.setStartTestPartButtonListener(
+            () => {
+                this.showFirstQuestion(this.canPractice())
+            }
+        );
         if (this.previousPart) {
             this.domElements.setTestPartIntroText(
                 this.previousPart.name + ' <span class="checkmark"><i class="ph-fill ph-check-fat"></i></span>'
@@ -65,7 +69,7 @@ export class StudentTestView extends EventTarget {
     startSummary() {
         console.log("Test started, showing summary");
         this.domElements.hideInstructions();
-        this.domElements.showSummary(this.test);
+        this.domElements.showSummary(this.test.parts);
         this.domElements.hideIntro();
 
         const buttonText = this.canPractice() ? "Start øveopgave" : "Start deltest";
@@ -76,7 +80,7 @@ export class StudentTestView extends EventTarget {
     endSummary() {
         console.log("Summary ended, showing first part");
         this.domElements.hideSummary();
-        this.showFirstQuestion(this.canPractice() ? true : false)
+        this.showFirstQuestion(this.canPractice())
     }
 
     canPractice() {
@@ -84,6 +88,7 @@ export class StudentTestView extends EventTarget {
     }
 
     showFirstQuestion(isPracticing) {
+        console.log("Showing first question", isPracticing ? "(practice)" : "(test)");
         this.domElements.showTestContainer()
         this.domElements.hideTestPartIntro()
 
@@ -133,6 +138,10 @@ export class StudentTestView extends EventTarget {
     }
 
     onPartComplete() {
+        if (this.partTimeoutId) {
+            clearTimeout(this.partTimeoutId);
+            this.partTimeoutId = null;
+        }
         this.dispatchEvent(new Event("part.complete", {
             test: this.test,
             part: this.currentPart
@@ -152,6 +161,7 @@ export class StudentTestView extends EventTarget {
         this.currentQuestionIndex = questionIndex;
         this.isPracticing = isPracticing;
         const questions = isPracticing ? this.currentPart.practice : this.currentPart.questions;
+        console.log("Showing question " + questionIndex + " of " + questions.length, "(practicing=",isPracticing,")");
         if (questionIndex >= questions.length) {
             //throw new Error("Cannot show question index " + index + ", only " + questions.length + " questions available.")
             return false;

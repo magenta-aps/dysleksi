@@ -1,12 +1,14 @@
 [
     {
         "image": "wordreading_2_dummy/dog.png",
+        "question_type": "multiple_choice",
         "correct": "hund",
         "wrong": ["kat", "ko", "hest"],
         "timeout": 10000
     },
     {
         "image": "wordreading_2_dummy/bike.png",
+        "question_type": "multiple_choice",
         "correct": "cykel",
         "wrong": ["bil", "bus", "tog"],
         "reminder": 5000

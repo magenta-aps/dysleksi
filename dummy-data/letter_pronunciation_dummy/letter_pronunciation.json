@@ -1,5 +1,5 @@
 [
-    {"text": "s", "correct": null, "wrong": []},
-    {"text": "v", "correct": null, "wrong": []},
-    {"text": "k", "correct": null, "wrong": []}
+    {"text": "s", "correct": null, "wrong": [], "question_type": "no_input_required"},
+    {"text": "v", "correct": null, "wrong": [], "question_type": "no_input_required"},
+    {"text": "k", "correct": null, "wrong": [], "question_type": "no_input_required"}
 ]
