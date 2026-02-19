@@ -1,5 +1,7 @@
 import { getWebSocket } from "../ws.js";
 
+let wakeLock = null;
+
 export function startSession(roomName) {
     const chatSocket = getWebSocket(roomName);
 
@@ -42,4 +44,24 @@ export function shuffleArray(array) {
         [arr[i], arr[j]] = [arr[j], arr[i]];
     }
     return arr;
+}
+
+export async function requestWakeLock() {
+  try {
+    wakeLock = await navigator.wakeLock.request('screen');
+    console.log('Screen wake lock active');
+    
+    wakeLock.addEventListener('release', () => {
+      console.log('Screen wake lock released');
+    });
+  } catch (err) {
+    console.error(`${err.name}, ${err.message}`);
+  }
+}
+
+export function releaseWakeLock() {
+  if (wakeLock) {
+    wakeLock.release();
+    wakeLock = null;
+  }
 }
