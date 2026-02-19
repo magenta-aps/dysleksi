@@ -145,16 +145,18 @@ class TestDomElements {
     }
 
     showElement(el) {
-        el.style.visibility = "visible";
-        if (el.style.display !== undefined) {
-            el.style.display = "";
+        if (el.dataset.hideDisplay === "true") {
+            el.style.display = "block";
+        } else {
+            el.style.visibility = "visible";
         }
     }
-
+    
     hideElement(el) {
-        el.style.visibility = "hidden";
-        if (el.style.display !== undefined) {
+        if (el.dataset.hideDisplay === "true") {
             el.style.display = "none";
+        } else {
+            el.style.visibility = "hidden";
         }
     }
     
