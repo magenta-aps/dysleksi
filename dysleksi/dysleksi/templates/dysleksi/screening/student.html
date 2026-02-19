@@ -72,13 +72,17 @@
 
     <div class="center-content">
         <div id="fade-overlay"></div>
-        <audio id="reminder-sound" src="{% static 'audio/447307__mabdog__ringtone-1.wav' %}" preload="auto"></audio>
+        <audio id="reminder-sound" src="{% static 'audio/reminder.wav' %}" preload="auto"></audio>
         <audio id="instructions-sound"></audio>
         <div id="question-challenge"></div>
         <div id="choices"></div>
-        <button id="next" class="btn next-btn" style="visibility: hidden;">
-            <i class="ph-fill ph-arrow-right"></i>
-        </button>
+        <div style="display: flex; justify-content: space-between;">
+            <button id="repeat" class="btn repeat-btn" style="visibility: hidden; display: none;">
+                <i class="ph ph-arrow-counter-clockwise"></i>
+            </button>
+            <button id="next" class="btn next-btn" style="visibility: hidden;">
+                <i class="ph-fill ph-arrow-right"></i>
+            </button>
     </div>
 </div>
 

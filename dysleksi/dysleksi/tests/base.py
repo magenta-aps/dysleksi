@@ -15,6 +15,7 @@ from dysleksi.models import (
     TEACHERS,
     Class,
     PossibleAnswer,
+    QuestionType,
     Student,
     Teacher,
     Test,
@@ -107,6 +108,21 @@ class DysleksiTest(TestCase):
             question=cls.question1,
             resource=cls.resource3,
             is_correct=False,
+        )
+        cls.question2 = TestQuestion.objects.create(
+            part=cls.part,
+            challenge=cls.resource2,
+            question_type=QuestionType.MULTIPLE_CHOICE,
+        )
+        cls.question3 = TestQuestion.objects.create(
+            part=cls.part,
+            challenge=None,
+            question_type=QuestionType.NO_INPUT_REQUIRED,
+        )
+        cls.question4 = TestQuestion.objects.create(
+            part=cls.part,
+            challenge=cls.resource4,
+            question_type=QuestionType.FREE_TEXT,
         )
 
         cls.klasse, _ = Class.objects.get_or_create(start_year=2025, letter="A")

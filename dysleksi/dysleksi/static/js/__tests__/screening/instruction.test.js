@@ -22,6 +22,8 @@ describe("InstructionSequenceRunner", () => {
 			fadeOut: vi.fn(),
 			highlight: vi.fn(),
 			toggleButtonSelected: vi.fn(),
+            setButtonAudioCallback: vi.fn(),
+            setText: vi.fn(),
 		};
 	
 		// use fake timers for sleep
@@ -33,14 +35,14 @@ describe("InstructionSequenceRunner", () => {
 	});
 	
 	it("getEl returns the correct element", () => {
-		runner = new InstructionSequenceRunner([], domElements);
+		runner = new InstructionSequenceRunner(null, [], domElements);
 		const el = runner.getEl("el1");
 		expect(el).not.toBeNull();
 		expect(el.id).toBe("el1");
 	});
 	
 	it("executeInstruction calls correct DOM method for each action", async () => {
-		runner = new InstructionSequenceRunner([], domElements);
+		runner = new InstructionSequenceRunner(null, [], domElements);
 	
 		const actions = [
 			{ action: "show", element: "el1" },
@@ -69,7 +71,7 @@ describe("InstructionSequenceRunner", () => {
 			{ action: "hide", element: "el2", delayAfter: 2000 },
 		];
 	
-		runner = new InstructionSequenceRunner(instrs, domElements);
+		runner = new InstructionSequenceRunner(null, instrs, domElements);
 	
 		const runPromise = runner.run();
 	
@@ -103,7 +105,7 @@ describe("InstructionSequenceRunner", () => {
 	
 		global.Audio = AudioSpy;
 	
-		runner = new InstructionSequenceRunner([], domElements);
+		runner = new InstructionSequenceRunner(null, [], domElements);
 		await runner.playSound("/sound.mp3");
 	
 		expect(playMock).toHaveBeenCalled();
@@ -128,7 +130,7 @@ describe("InstructionSequenceRunner", () => {
 			{ action: "hide", element: "el2", delayAfter: 1000 },
 		];
 	
-		runner = new InstructionSequenceRunner(instrs, domElements);
+		runner = new InstructionSequenceRunner(null, instrs, domElements);
 	
 		const runPromise = runner.run();
 	
@@ -163,6 +165,7 @@ describe("InstructionSequenceRunner", () => {
 		global.Audio = AudioSpy;
 	
 		runner = new InstructionSequenceRunner(
+            null,
 			[{ action: "playSound", url: "/sound.mp3" }],
 			domElements
 		);
@@ -187,7 +190,7 @@ describe("InstructionSequenceRunner", () => {
 			{ action: "hide", element: "el2", delayAfter: 2000 },
 		];
 	
-		runner = new InstructionSequenceRunner(instrs, domElements);
+		runner = new InstructionSequenceRunner(null, instrs, domElements);
 	
 		const runPromise = runner.run();
 	
@@ -201,7 +204,7 @@ describe("InstructionSequenceRunner", () => {
 	});
 
 	it("sleep() sets _currentSkipResolver and resolves when called", async () => {
-		runner = new InstructionSequenceRunner([], domElements);
+		runner = new InstructionSequenceRunner(null, [], domElements);
 	
 		let resolved = false;
 		const sleepPromise = runner.sleep(500).then(() => {
@@ -225,7 +228,7 @@ describe("InstructionSequenceRunner", () => {
 	});
 
 	it("sleep() returns immediately with Promise.resolve() if skipCurrent is true", async () => {
-		runner = new InstructionSequenceRunner([], domElements);
+		runner = new InstructionSequenceRunner(null, [], domElements);
 		runner.skipCurrent = true; // trigger the immediate return branch
 
 		let resolved = false;
@@ -242,7 +245,7 @@ describe("InstructionSequenceRunner", () => {
 
 
 	it("playSound() returns immediately with Promise.resolve() if skipCurrent is true", async () => {
-		runner = new InstructionSequenceRunner([], domElements);
+		runner = new InstructionSequenceRunner(null, [], domElements);
 		runner.skipCurrent = true; // trigger the immediate return branch
 	
 		let resolved = false;
@@ -259,7 +262,7 @@ describe("InstructionSequenceRunner", () => {
 
 
 	it("skipToEnd() resolves the current instruction immediately if _currentSkipResolver is set", async () => {
-		runner = new InstructionSequenceRunner([], domElements);
+		runner = new InstructionSequenceRunner(null, [], domElements);
 	
 		// Start a sleep so that _currentSkipResolver gets set
 		const sleepPromise = runner.sleep(1000);
@@ -275,4 +278,41 @@ describe("InstructionSequenceRunner", () => {
 		// After resolution, _currentSkipResolver should be cleared
 		expect(runner._currentSkipResolver).toBe(null);
 	});
+
+    it("set audio on button to be played once", async () => {
+        runner = new InstructionSequenceRunner(null, [], domElements);
+        const playSoundSpy = vi.spyOn(runner, "playSound");
+        runner.executeInstruction({action: "setButtonSoundOnce", element: "btn1", url: "/sound.mp3",});
+        expect(domElements.setButtonAudioCallback).toHaveBeenCalled();
+        const call = domElements.setButtonAudioCallback.mock.calls[0];
+        const assignedFunction = call[1];
+        assignedFunction();
+        expect(playSoundSpy).toHaveBeenCalledWith("/sound.mp3");
+    });
+
+    it("set audio on button to be played once (no url)", async () => {
+        runner = new InstructionSequenceRunner(null, [], domElements);
+        const playSoundSpy = vi.spyOn(runner, "playSound");
+        runner.executeInstruction({action: "setButtonSoundOnce", element: "btn1", url: null,});
+        expect(domElements.setButtonAudioCallback).toHaveBeenCalled();
+        const call = domElements.setButtonAudioCallback.mock.calls[0];
+        const assignedFunction = call[1];
+        assignedFunction();
+        expect(playSoundSpy).not.toHaveBeenCalled();
+    });
+
+    it("set repeatbutton destination", () => {
+        const view = {
+            "setRepeatDestination": vi.fn()
+        };
+        runner = new InstructionSequenceRunner(view, [], domElements);
+        runner.executeInstruction({action: "setRepeatButtonDestination", element: "btn1", data: "3"});
+        expect(view.setRepeatDestination).toHaveBeenCalledWith(3);
+    });
+
+    it("set element text", () => {
+        runner = new InstructionSequenceRunner(null, [], domElements);
+        runner.executeInstruction({action: "setText", element: "el1", data: "test"});
+        expect(domElements.setText).toHaveBeenCalledWith(document.getElementById("el1"), "test");
+    });
 });

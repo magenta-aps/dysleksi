@@ -11,6 +11,7 @@ export class GroupTestView extends StudentTestView {
     textAnswer;
     questionTimeoutId;
     partTimeoutId;
+    repeatQuestionIndex = null;
 
     constructor(test, chatSocket, roomName, assignmentId, domElements) {
         super(test, chatSocket, roomName, assignmentId, domElements);
@@ -19,6 +20,7 @@ export class GroupTestView extends StudentTestView {
     start() {
         super.start();
         this.domElements.setNextButtonListener(() => this.onQuestionComplete(this.currentQuestion));
+        this.domElements.setRepeatButtonListener(() => this.repeat())
     }
 
     // ---- Parts ----
@@ -51,12 +53,23 @@ export class GroupTestView extends StudentTestView {
         });
     }
 
+    setRepeatDestination(data) {
+        this.repeatQuestionIndex = data;
+    }
+
+    repeat() {
+        this.showQuestion(
+            this.isPracticing,
+            this.repeatQuestionIndex !== null ? this.repeatQuestionIndex : this.currentQuestionIndex
+        );
+    }
+
     // ---- Questions ----
     showQuestion(isPracticing, questionIndex) {
         const canShow = this.setQuestion(isPracticing, questionIndex);
         if (canShow) {
             console.log("---------------------------------------------")
-            console.log("Showing question " + this.currentPartIndex+"."+this.currentQuestionIndex);
+            console.log("Showing question " + this.currentPartIndex+"."+this.currentQuestionIndex + ", type:" + this.currentQuestion.type, this.currentQuestion);
 
             if (this.currentQuestion.instruction_sequence) {
                 this.domElements.setStudentHeader('<i class="ph ph-ear"></i>');
@@ -80,27 +93,29 @@ export class GroupTestView extends StudentTestView {
                 answers = shuffleArray(answers);
             }
 
+            if (this.currentQuestion.type === "multiple_choice"){
             this.answerButtons = []
             for (let answer of answers) {
-                if (this.currentQuestion.type === "multiple_choice"){
                     const button = this.domElements.showQuestionChoice(
                         answer,
                         () => {this.selectAnswer(answer)}
                     );
                     this.answerButtons.push({"button": button, "answer": answer});
-
-                } else if (this.currentQuestion.type === "free_text"){
+            }
+            } else if (this.currentQuestion.type === "free_text"){
                     this.input = this.domElements.showQuestionFreeText(
                         () => this.selectFreeText()
                     );
                 }
-            }
+
             if (this.currentQuestion.instruction_sequence){
                 console.log("---------------------------------------------")
-                console.log("Starting instruction sequence: ", this.instruction_sequence);
+                console.log("Starting instruction sequence: ", this.currentQuestion.instruction_sequence);
                 this.domElements.lockInput();
+                this.domElements.toggleBodyClass("show-instructions", true);
 
                 const instructionRunner = new InstructionSequenceRunner(
+                    this,
                     this.currentQuestion.instruction_sequence.instructions,
                     this.domElements
                 );
@@ -124,6 +139,7 @@ export class GroupTestView extends StudentTestView {
                     }
                 });
             } else {
+                this.domElements.toggleBodyClass("show-instructions", false);
                 if (Number(this.currentQuestion.timeout) > 1) {
                     this.questionTimeoutId = setTimeout(() => {
                         this.onQuestionComplete(this.currentQuestion, true);
@@ -161,7 +177,7 @@ export class GroupTestView extends StudentTestView {
                 return;
             }
             if (this.isPracticing) {
-                if (this.selectedAnswer.isCorrect) {
+                if (!outOfTime && this.selectedAnswer.isCorrect) {
                     if (this.isLast()) {
                         this.showTestPartIntro();
                     }
@@ -205,6 +221,11 @@ export class GroupTestView extends StudentTestView {
                 this.domElements.toggleNextButton(false);
                 this.domElements.clearQuestionChoices();
                 this.domElements.hideStudentHeader();
+
+                // start real test
+                this.isPracticing = false;
+                this.showFirstQuestion(false);
+
             } else {
                 // part complete
                 this.onPartComplete();
@@ -240,13 +261,13 @@ export class GroupTestView extends StudentTestView {
     answerIsCorrect() {
         if (this.textAnswer !== null) {
             const answer = this.currentQuestion.possibleAnswers[0];
-            console.log("Checking answer: '"+ this.textAnswer +"','"+ answer.resourceText+"'");
             return this.textAnswer === answer.resourceText;
         } else {
             return this.selectedAnswer.isCorrect;
         }
     }
     selectFreeText() {
+        clearTimeout(this.questionReminderId);
         const answer = this.input.textContent.trim();
         if (answer !== "") {
             this.textAnswer = answer;

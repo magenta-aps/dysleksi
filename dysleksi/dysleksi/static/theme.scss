@@ -88,6 +88,17 @@ h1, h2, h3, h4, h5, h6 {
 
 }
 
+body.show-instructions {
+  .btn-outline-primary {
+    &:disabled {
+      /* Inputs are disabled while rendering instructions,
+       but we should not set them in a faded color then */
+      border-color: $student-blue-dark !important;
+      background-color: white !important;
+    }
+  }
+}
+
 .erase-btn {
   background-color: $student-grey-light !important;
   color: black;
@@ -147,6 +158,17 @@ h1, h2, h3, h4, h5, h6 {
 
 }
 
+
+body.show-instructions {
+  .sound-btn {
+    &:disabled {
+      /* Inputs are disabled while rendering instructions,
+       but we should not set them in a faded color then */
+      background-color: $student-blue-dark !important;
+    }
+  }
+}
+
 @keyframes pulse-outline {
   0% {
     outline-offset: 0px;
@@ -187,6 +209,33 @@ h1, h2, h3, h4, h5, h6 {
     pointer-events: none; // prevents clicks
   }
 
+}
+
+body.show-instructions {
+  .next-btn {
+    &:disabled {
+      /* Inputs are disabled while rendering instructions,
+       but we should not set them in a faded color then */
+      background-color: $student-green !important;
+      border-color: var(--bs-btn-border-color) !important;
+    }
+  }
+}
+
+.repeat-btn {
+  background-color: $student-grey !important;
+  color: white;
+  font-size: 2rem;
+  padding: 0.5rem 2rem;
+  margin: 2rem auto;
+  display: flex;
+
+  align-items: center;
+  justify-content: center;
+
+  .ph {
+    font-size: 3rem;
+  }
 }
 
 
@@ -290,6 +339,10 @@ h1, h2, h3, h4, h5, h6 {
 
 .sound-btn.pulse {
   animation: pulse 1s infinite;
+}
+
+body.show-instructions .sound-btn.pulse {
+  animation: none;
 }
 
 .student-header {

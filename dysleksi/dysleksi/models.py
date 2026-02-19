@@ -39,6 +39,9 @@ class InstructionAction(TextChoices):
     PLAY_SOUND = "playSound"
     HIGHLIGHT = "highlight"
     SELECT = "select"
+    SET_TEXT = "setText"
+    SET_BUTTON_SOUND_ONCE = "setButtonSoundOnce"
+    SET_REPEAT_BUTTON_DESTINATION = "setRepeatButtonDestination"
 
 
 class QuestionType(TextChoices):
@@ -241,19 +244,6 @@ class Test(models.Model):
                     question_data = {
                         "id": question.id,
                         "question_type": question.question_type,
-                        "challenge_id": question.challenge.id,
-                        "challenge_name": question.challenge.name,
-                        "challenge_image_url": (
-                            question.challenge.image.url
-                            if question.challenge.image
-                            else None
-                        ),
-                        "challenge_sound_url": (
-                            question.challenge.sound.url
-                            if question.challenge.sound
-                            else None
-                        ),
-                        "challenge_text": question.challenge.text,
                         "possible_answers": [],
                         "instruction_sequence": (
                             question.instruction_sequence.to_json()
@@ -264,6 +254,24 @@ class Test(models.Model):
                         "reminder": question.reminder,
                         "timeout": question.timeout,
                     }
+                    if question.challenge:
+                        question_data.update(
+                            {
+                                "challenge_id": question.challenge.id,
+                                "challenge_name": question.challenge.name,
+                                "challenge_text": question.challenge.text,
+                                "challenge_image_url": None,
+                                "challenge_sound_url": None,
+                            }
+                        )
+                        if question.challenge.sound:
+                            question_data["challenge_sound_url"] = (
+                                question.challenge.sound.url
+                            )
+                        if question.challenge.image:
+                            question_data["challenge_image_url"] = (
+                                question.challenge.image.url
+                            )
 
                     for answer in question.possible_answers.all().order_by("id"):
                         answer_data = {
@@ -375,29 +383,23 @@ class TestPart(models.Model):
         return self.name
 
     def create_test_resources(self, questions_data, is_practice=False):
+
         for data in questions_data:
             # Challenge resource (image)
 
             test_resource_kwargs = {"name": "challenge"}
-            if "image" in data:
-                test_resource_kwargs["image"] = data["image"]
-            if "sound" in data:
-                test_resource_kwargs["sound"] = data["sound"]
-            if "text" in data:
-                test_resource_kwargs["text"] = data["text"]
-
-            challenge_resource, created = TestResource.objects.get_or_create(
-                **test_resource_kwargs
-            )
-
-            # Get or create question for this part + challenge
-            if data["correct"]:
-                if data["wrong"]:
-                    question_type = QuestionType.MULTIPLE_CHOICE
-                else:
-                    question_type = QuestionType.FREE_TEXT
+            test_resource_kwargs["image"] = data.get("image", None)
+            test_resource_kwargs["sound"] = data.get("sound", None)
+            test_resource_kwargs["text"] = data.get("text", None)
+            if "image" in data or "sound" in data or "text" in data:
+                challenge_resource, created = TestResource.objects.get_or_create(
+                    **test_resource_kwargs
+                )
             else:
-                question_type = QuestionType.NO_INPUT_REQUIRED
+                challenge_resource = None
+
+            question_type = data.get("question_type", QuestionType.NO_INPUT_REQUIRED)
+
             if "reminder" in data and not is_practice:
                 question_reminder = data["reminder"]
             else:
@@ -407,7 +409,7 @@ class TestPart(models.Model):
             else:
                 question_timeout = 0
 
-            question, created = TestQuestion.objects.get_or_create(
+            question = TestQuestion.objects.create(
                 part=self,
                 challenge=challenge_resource,
                 is_practice=is_practice,
@@ -420,7 +422,7 @@ class TestPart(models.Model):
                 question.create_instruction_sequence(data["instruction_sequence"])
 
             # Correct answer
-            if data["correct"]:
+            if data.get("correct"):
                 correct_resource, created = TestResource.objects.get_or_create(
                     name=data["correct"],
                     text=data["correct"],
@@ -433,17 +435,18 @@ class TestPart(models.Model):
                 )
 
             # Wrong answers
-            for wrong_text in data["wrong"]:
-                wrong_resource, created = TestResource.objects.get_or_create(
-                    name=wrong_text,
-                    text=wrong_text,
-                )
+            if data.get("wrong"):
+                for wrong_text in data["wrong"]:
+                    wrong_resource, created = TestResource.objects.get_or_create(
+                        name=wrong_text,
+                        text=wrong_text,
+                    )
 
-                PossibleAnswer.objects.get_or_create(
-                    question=question,
-                    resource=wrong_resource,
-                    defaults={"is_correct": False},
-                )
+                    PossibleAnswer.objects.get_or_create(
+                        question=question,
+                        resource=wrong_resource,
+                        defaults={"is_correct": False},
+                    )
 
 
 class TestQuestion(models.Model):
@@ -456,8 +459,8 @@ class TestQuestion(models.Model):
     challenge = models.ForeignKey(
         TestResource,
         on_delete=models.PROTECT,
-        blank=False,
-        null=False,
+        blank=True,
+        null=True,
     )
     is_practice = models.BooleanField(
         blank=False,
@@ -480,7 +483,9 @@ class TestQuestion(models.Model):
         for order, data in enumerate(instructions_data):
             resource = None
 
-            if "resource" in data:
+            if data.get("resource") is None:
+                resource = None
+            else:
                 resource, _ = TestResource.objects.get_or_create(
                     name=data["resource"], sound=data["resource"]
                 )
@@ -492,6 +497,7 @@ class TestQuestion(models.Model):
                     "action": data["action"],
                     "element": data.get("element"),
                     "resource": resource,
+                    "data": data.get("data"),
                     "delay_after": data.get("delayAfter", 0),
                 },
             )
@@ -544,6 +550,12 @@ class Instruction(models.Model):
         help_text="Used for playSound / show image",
     )
 
+    data = models.CharField(
+        max_length=255,
+        null=True,
+        blank=True,
+    )
+
     delay_after = models.IntegerField(
         default=0,
         help_text="Delay in milliseconds after this instruction",
@@ -576,6 +588,9 @@ class Instruction(models.Model):
 
         if self.resource and self.resource.url:
             data["url"] = self.resource.url
+
+        if self.data is not None:
+            data["data"] = self.data
 
         return data
 

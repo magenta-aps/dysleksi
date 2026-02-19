@@ -4,6 +4,7 @@
 import { GroupTestDomElements, IndividualTestDomElements } from "../../screening/dom.js";
 import { describe, it, expect, beforeEach, vi } from "vitest";
 
+import {spyAttributes} from "../utils.js";
 
 describe("GroupTestDomElements.showInstructions (sound only)", () => {
     let dom;
@@ -15,6 +16,7 @@ describe("GroupTestDomElements.showInstructions (sound only)", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
+      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -49,6 +51,7 @@ describe("GroupTestDomElements.showQuestionChallenge (sound only)", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
+      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -103,7 +106,7 @@ describe("GroupTestDomElements.showSummary (new structure)", () => {
                     <div id="summary-container"></div>
                 </div>
             </div>
-        `;
+    `;
 
         dom = new GroupTestDomElements();
 
@@ -120,7 +123,7 @@ describe("GroupTestDomElements.showSummary (new structure)", () => {
             ]
         };
     
-        dom.showSummary(test);
+        dom.showSummary(test.parts);
     
         expect(dom.testSummary.style.display).toBe("flex");
     
@@ -146,7 +149,7 @@ describe("GroupTestDomElements.showSummary (new structure)", () => {
 
     it("Handles an empty parts array", () => {
         const test = { parts: [] };
-        dom.showSummary(test);
+        dom.showSummary(test.parts);
 
         expect(dom.testSummary.style.display).toBe("flex");
         expect(dom.summaryContainer.children.length).toBe(0);
@@ -154,7 +157,7 @@ describe("GroupTestDomElements.showSummary (new structure)", () => {
 
     it("Handles a single part with no questions", () => {
         const test = { parts: [{ name: "Bogstavbenævnelse", questions: [] }] };
-        dom.showSummary(test);
+        dom.showSummary(test.parts);
     
         const block = dom.summaryContainer.querySelector(".summary-block");
         expect(block).not.toBeNull();
@@ -172,6 +175,7 @@ describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
+      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -244,6 +248,7 @@ describe("GroupTestDomElements constructor", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
+      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -265,6 +270,7 @@ describe("IndividualTestDomElements constructor", () => {
       <div id="audio-indicator" style="display: none"></div>
       <audio id="instructions-sound"></audio>
       <div id="instructions-text"></div>
+      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -315,6 +321,7 @@ describe("GroupTestDomElements DOM utilities", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
+      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -404,6 +411,12 @@ describe("GroupTestDomElements DOM utilities", () => {
     expect(nextBtn.disabled).toBe(false);
   });
 
+  it("setText inserts text into element", () => {
+      const element = document.createElement("div");
+      dom.setText(element, "test");
+      expect(element.textContent).toBe("test");
+  })
+
 });
 
 
@@ -419,6 +432,7 @@ describe("GroupTestDomElements.fadeScreenOverlay", () => {
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
+      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -449,18 +463,20 @@ describe("GroupTestDomElements.fadeScreenOverlay", () => {
   });
 });
 
-
-describe("_setButtonListener tests", () => {
-  let dom;
-  let button;
-
-  beforeEach(() => {
-    document.body.innerHTML = `
+describe("element ordering", () => {
+    let dom;
+    let container;
+    let el0;
+    let el1;
+    let el2;
+    beforeEach(() => {
+        document.body.innerHTML = `
       <audio id="instructions-sound"></audio>
       <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
       <button id="start-practice"></button>
       <button id="start-questions"></button>
+      <table id="summary-table"></table>
       <button id="end-summary"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
@@ -468,37 +484,148 @@ describe("_setButtonListener tests", () => {
       <button id="next"></button>
     `;
 
-    dom = new GroupTestDomElements();
-    button = document.createElement("button");
-    document.body.appendChild(button);
-  });
+        dom = new GroupTestDomElements();
+        spyAttributes(dom);
+        container = dom.questionChallengeEl;
 
-  it("adds a click listener", () => {
-    const listener = vi.fn();
-    const spy = vi.spyOn(button, "addEventListener");
+        el0 = document.createElement("div");
+        el0.id = "test-el0";
+        el1 = document.createElement("div");
+        el1.id = "test-el1";
+        el2 = document.createElement("div");
+        el2.id = "test-el2";
+    });
 
-    dom._setButtonListener(button, listener);
+    it("insert element first", () => {
+        dom._insert(container, el1, [], []);
+        dom._insert(container, el2, [el1], []);
+        dom._insert(container, el0, [], [el2, el1]);
 
-    expect(spy).toHaveBeenCalledWith("click", listener);
-    expect(button._clickHandler).toBe(listener);
-  });
+        expect(container.childNodes.item(0)).toBe(el0);
+        expect(container.childNodes.item(1)).toBe(el1);
+        expect(container.childNodes.item(2)).toBe(el2);
+    });
 
-  it("removes the old listener when replaced", () => {
-    const listener1 = vi.fn();
-    const listener2 = vi.fn();
+    it("insert element in the middle", () => {
+        dom._insert(container, el0, [], []);
+        dom._insert(container, el2, [el0], []);
+        dom._insert(container, el1, [el0], [el2]);
 
-    const removeSpy = vi.spyOn(button, "removeEventListener");
-    const addSpy = vi.spyOn(button, "addEventListener");
+        expect(container.childNodes.item(0)).toBe(el0);
+        expect(container.childNodes.item(1)).toBe(el1);
+        expect(container.childNodes.item(2)).toBe(el2);
+    });
 
-    dom._setButtonListener(button, listener1);
-    dom._setButtonListener(button, listener2);
+    it("insert element last", () => {
+        dom._insert(container, el0, [], []);
+        dom._insert(container, el1, [el0], []);
+        dom._insert(container, el2, [el0, el1], []);
 
-    expect(removeSpy).toHaveBeenCalledWith("click", listener1);
-    expect(addSpy).toHaveBeenCalledWith("click", listener2);
-    expect(button._clickHandler).toBe(listener2);
-  });
+        expect(container.childNodes.item(0)).toBe(el0);
+        expect(container.childNodes.item(1)).toBe(el1);
+        expect(container.childNodes.item(2)).toBe(el2);
+    });
+
+    it("insert element without regard to order", () => {
+        dom._insert(container, el0, [], []);
+        dom._insert(container, el1, [], []);
+        dom._insert(container, el2, [], []);
+
+        expect(container.childNodes.item(0)).toBe(el0);
+        expect(container.childNodes.item(1)).toBe(el1);
+        expect(container.childNodes.item(2)).toBe(el2);
+    });
+
+    it("insert element with wrong surroundings", () => {
+        const bsElement1 = document.createElement("div");
+        const bsElement2 = document.createElement("div");
+
+        dom._insert(container, el0, [], [bsElement1]);
+        dom._insert(container, el1, [bsElement1], [bsElement2]);
+        dom._insert(container, el2, [bsElement2], []);
+
+        expect(container.childNodes.item(0)).toBe(el0);
+        expect(container.childNodes.item(1)).toBe(el1);
+        expect(container.childNodes.item(2)).toBe(el2);
+    });
+})
+
+describe("_setButtonListener tests", () => {
+    let dom;
+    let button;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+      <audio id="instructions-sound"></audio>
+      <audio id="reminder-sound"></audio>
+      <div id="instructions-text"></div>
+      <button id="start-practice"></button>
+      <button id="start-questions"></button>
+      <table id="summary-table"></table>
+      <button id="end-summary"></button>
+      <div id="question-title"></div>
+      <div id="question-challenge"></div>
+      <div id="choices"></div>
+      <button id="next"></button>
+    `;
+
+        dom = new GroupTestDomElements();
+        spyAttributes(dom);
+        button = document.createElement("button");
+        document.body.appendChild(button);
+    });
+
+    it("adds a click listener", async () => {
+        const listener = vi.fn();
+        const spy = vi.spyOn(button, "addEventListener");
+        dom._setButtonListener(button, listener);
+        await button._clickHandler();
+        expect(listener).toHaveBeenCalled();
+    });
+
+    it("removes the old listener when replaced", async () => {
+        const listener1 = vi.fn();
+        const listener2 = vi.fn();
+
+        const addSpy = vi.spyOn(button, "addEventListener");
+
+        dom._setButtonListener(button, listener1);
+        dom._setButtonListener(button, listener2);
+
+        expect(addSpy).toHaveBeenCalledWith("click", button._clickHandler);
+        expect(button._listener).toBe(listener2);
+    });
+
+    it("sets repeat button listener", () => {
+        const listener = vi.fn();
+        dom.setRepeatButtonListener(listener);
+        expect(dom._setButtonListener).not.toHaveBeenCalled();
+        document.body.innerHTML += `<button id="repeat"></button>`;
+        dom = new GroupTestDomElements();
+        spyAttributes(dom);
+        dom.setRepeatButtonListener(listener);
+        expect(dom._setButtonListener).toHaveBeenCalledWith(dom.repeatBtn, listener);
+    });
+
+    it("sets audio callback", async () => {
+        const button = dom.nextBtn;
+        const url = "/sound.mp3";
+        const playSound = vi.fn();
+        dom.setButtonAudioCallback(
+            button,
+            async function () {
+                playSound(url);
+                dom.setButtonAudioCallback(button, null);
+            }
+        )
+        const listener = vi.fn();
+        dom._setButtonListener(button, listener);
+        await button._clickHandler();
+        expect(playSound).toHaveBeenCalledWith("/sound.mp3");
+        expect(listener).toHaveBeenCalled();
+        expect(button.audioCallback).toBe(null);
+    });
 });
-
 
 describe("GroupTestDomElements button animations", () => {
   let dom;
