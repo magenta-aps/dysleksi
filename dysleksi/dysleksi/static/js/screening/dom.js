@@ -288,6 +288,7 @@ class TestDomElements {
         let img = document.querySelector("#challenge-image");
         let textEl = document.querySelector("#challenge-text");
         let playBtn = document.querySelector("#challenge-sound-btn");
+        this.questionChallengeEl.style.opacity = 1
         if (imageUrl) {
             if (!img) {
                 img = document.createElement("img");
