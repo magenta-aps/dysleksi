@@ -1,3 +1,6 @@
+import { requestWakeLock } from "./utils.js";
+import { releaseWakeLock } from "./utils.js";
+
 export class StudentTestView extends EventTarget {
 
     chatSocket;
@@ -40,6 +43,7 @@ export class StudentTestView extends EventTarget {
     }
 
     start() {
+        requestWakeLock()
         this.setPart(0)
         this.showIntro();
     }
@@ -103,6 +107,7 @@ export class StudentTestView extends EventTarget {
 
     async onTestComplete(cancelled = false) {
         console.log("Test complete");
+        releaseWakeLock()
         this.domElements.hideInstructions();
         this.domElements.showQuestionChallenge();
 

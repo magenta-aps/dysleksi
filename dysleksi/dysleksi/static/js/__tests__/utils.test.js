@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {startSession} from "../screening/utils";
 import * as wsModule from "../ws.js";
 
@@ -70,4 +70,76 @@ describe('test startSession', () => {
     });
 
 
+});
+
+
+
+describe('wake lock utils', () => {
+    let mockWakeLockSentinel;
+
+    beforeEach(() => {
+        mockWakeLockSentinel = {
+            release: vi.fn(),           // sync now
+            addEventListener: vi.fn(),
+        };
+
+        global.navigator.wakeLock = {
+            request: vi.fn().mockResolvedValue(mockWakeLockSentinel),
+        };
+
+        vi.spyOn(console, 'log').mockImplementation(() => {});
+        vi.spyOn(console, 'error').mockImplementation(() => {});
+
+        vi.resetModules(); // important: reset module to clear module-level wakeLock
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it('should request a wake lock and log success', async () => {
+        const { requestWakeLock } = await import('../screening/utils');
+
+        await requestWakeLock();
+
+        expect(global.navigator.wakeLock.request).toHaveBeenCalledWith('screen');
+        expect(mockWakeLockSentinel.addEventListener).toHaveBeenCalledWith(
+            'release',
+            expect.any(Function)
+        );
+        expect(console.log).toHaveBeenCalledWith('Screen wake lock active');
+    });
+
+    it('should handle errors gracefully', async () => {
+        const err = new Error('Fail');
+        global.navigator.wakeLock.request.mockRejectedValue(err);
+
+        const { requestWakeLock } = await import('../screening/utils');
+
+        await requestWakeLock();
+
+        expect(console.error).toHaveBeenCalledWith('Error, Fail');
+    });
+
+    it('should release the wake lock if it exists', async () => {
+        const { requestWakeLock, releaseWakeLock } = await import('../screening/utils');
+
+        await requestWakeLock();
+        releaseWakeLock();
+
+        expect(mockWakeLockSentinel.release).toHaveBeenCalled();
+
+        // manually trigger release event to check console.log
+        mockWakeLockSentinel.addEventListener.mock.calls.forEach(([event, callback]) => {
+            if (event === 'release') callback();
+        });
+
+        expect(console.log).toHaveBeenCalledWith('Screen wake lock released');
+    });
+
+    it('should do nothing if wake lock is not set when releasing', async () => {
+        const { releaseWakeLock } = await import('../screening/utils');
+
+        expect(() => releaseWakeLock()).not.toThrow();
+    });
 });
