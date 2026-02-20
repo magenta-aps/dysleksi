@@ -155,15 +155,17 @@ export class GroupTestView extends StudentTestView {
             }
 
             this.questionDisplayedAt = document.timeline.currentTime;
-            this.send({
-                event: 'question.displayed',
-                partIndex: this.currentPartIndex,
-                partId: this.currentPart.id,
-                questionIndex: this.currentQuestionIndex,
-                questionId: this.currentQuestion.id,
-                displayedAt: this.questionDisplayedAt,
-                questionTitle: this.questionTitle(),
-            });
+            if (!this.isPracticing) {
+                this.send({
+                    event: 'question.displayed',
+                    partIndex: this.currentPartIndex,
+                    partId: this.currentPart.id,
+                    questionIndex: this.currentQuestionIndex,
+                    questionId: this.currentQuestion.id,
+                    displayedAt: this.questionDisplayedAt,
+                    questionTitle: this.questionTitle(),
+                });
+            }
         }
         return canShow;
     }
@@ -177,11 +179,13 @@ export class GroupTestView extends StudentTestView {
                 return;
             }
             if (this.isPracticing) {
-                if (!outOfTime && this.selectedAnswer.isCorrect) {
+                if (this.answerIsCorrect()) {
                     if (this.isLast()) {
                         this.showTestPartIntro();
                     }
                 } else {
+                    // Wrong answer
+                    this.domElements.makeButtonAngry("next");
                     return;
                 }
             } else {
