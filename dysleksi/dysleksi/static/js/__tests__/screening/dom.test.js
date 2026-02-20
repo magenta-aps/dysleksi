@@ -313,6 +313,7 @@ describe("IndividualTestDomElements DOM utilities", () => {
 describe("GroupTestDomElements DOM utilities", () => {
   let dom;
   let el;
+  let el2;
 
   beforeEach(() => {
     document.body.innerHTML = `
@@ -328,9 +329,11 @@ describe("GroupTestDomElements DOM utilities", () => {
       <div id="choices"></div>
       <button id="next"></button>
       <div id="test-el"></div>
+      <div id="test-el2" data-hide-display="true"></div>
     `;
     dom = new GroupTestDomElements();
     el = document.getElementById("test-el");
+    el2 = document.getElementById("test-el2");
   });
 
   it("showElement sets visibility to visible", () => {
@@ -342,6 +345,17 @@ describe("GroupTestDomElements DOM utilities", () => {
     dom.hideElement(el);
     expect(el.style.visibility).toBe("hidden");
   });
+
+  it("showElement sets display to block", () => {
+    dom.showElement(el2);
+    expect(el2.style.display).toBe("block");
+  });
+
+  it("hideElement sets display to none", () => {
+    dom.hideElement(el2);
+    expect(el2.style.display).toBe("none");
+  });
+
 
   it("fadeIn sets opacity to 1", async () => {
     el.style.opacity = "0.4";
