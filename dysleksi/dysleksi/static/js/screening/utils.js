@@ -23,7 +23,7 @@ export function startSession(roomName) {
     return chatSocket;
 }
 
-function refreshSession(roomName) {
+export function refreshSession(roomName) {
     const chatSocket = getWebSocket(roomName);
     if (chatSocket.readyState === WebSocket.OPEN) {
         chatSocket.send(JSON.stringify({
