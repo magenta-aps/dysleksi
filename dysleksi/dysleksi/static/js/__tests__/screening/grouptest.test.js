@@ -93,6 +93,28 @@ describe('GroupTestFlow', () => {
         expect(test.parts[0].practice.length).toBe(3);
     });
 
+    it('Test Structure loads with no practice', () => {
+        // Test that the instance with subinstances is correctly created from json
+        const data = structuredClone(groupTestData);
+        delete data.parts[0].practice;
+        delete data.parts[1].practice;
+        const test = new Test(data);
+        expect(test.name).toBe("Middle 2. grade");
+        expect(test.parts.length).toBe(2);
+        expect(test.parts[0].test).toBe(test);
+        expect(test.parts[0].id).toBe(5);
+        expect(test.parts[0].index).toBe(0);
+        expect(test.parts[0].name).toBe('Wordreading 2A (dummy)');
+        expect(test.parts[0].instructionsUrl).toBe(null);
+        expect(test.parts[0].intro).toBe('Vælg det rigtige ord, der passer til billedet.');
+        expect(test.parts[0].timeout).toBe(60);
+        expect(test.parts[0].partialScoreAfter).toBe(30);
+        expect(test.parts[0].questions.length).toBe(5);
+        expect(test.parts[0].questionIndex).toBe(0);
+        expect(test.parts[0].currentQuestion).toBe(null);
+        expect(test.parts[0].practice.length).toBe(0);
+    });
+
     it("Test complain when there are no parts", () => {
         const ws = getWebSocket('class_123');
         expect(

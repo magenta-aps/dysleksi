@@ -2,8 +2,9 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import {startSession} from "../screening/utils";
+import {startSession, refreshSession} from "../screening/utils";
 import * as wsModule from "../ws.js";
+import {getWebSocket} from "../ws.js";
 
 
 // Mock getWebSocket
@@ -69,9 +70,21 @@ describe('test startSession', () => {
 
     });
 
-
 });
 
+describe("refresh session", () => {
+    it("socket not opened", () => {
+        const socket = getWebSocket("room-2");
+        socket.readyState = WebSocket.CONNECTING;
+        refreshSession("room-2");
+        expect(socket.addEventListener).toHaveBeenCalled();
+        const call = socket.addEventListener.mock.calls[0];
+        expect(call[0]).toBe("open");
+        expect(typeof(call[1])).toBe("function");
+        expect(call[2]).toStrictEqual({ once: true });
+        //call[1](); // TODO: figure out what sendSessionMessage in refreshSession is supposed to do
+    });
+});
 
 
 describe('wake lock utils', () => {
