@@ -388,10 +388,11 @@ describe("GroupTestDomElements DOM utilities", () => {
     vi.useRealTimers();
   });
 
-  it("lockInput disables all choice buttons and next button", () => {
+  it("lockInput disables all choice buttons and next button, and sets readonly on all inputs", () => {
     const btn1 = document.createElement("button");
     const btn2 = document.createElement("button");
-    document.getElementById("choices").append(btn1, btn2);
+    const input = document.createElement("input");
+    document.getElementById("choices").append(btn1, btn2, input);
     const nextBtn = document.getElementById("next");
 
     dom.lockInput();
@@ -399,12 +400,14 @@ describe("GroupTestDomElements DOM utilities", () => {
     expect(btn1.style.pointerEvents).toBe("none");
     expect(btn2.style.pointerEvents).toBe("none");
     expect(nextBtn.style.pointerEvents).toBe("none");
+    expect(input.readOnly).toBe(true);
   });
 
   it("unlockInput enables all choice buttons and next button", () => {
     const btn1 = document.createElement("button");
     const btn2 = document.createElement("button");
-    document.getElementById("choices").append(btn1, btn2);
+    const input = document.createElement("input");
+    document.getElementById("choices").append(btn1, btn2, input);
     const nextBtn = document.getElementById("next");
 
     dom.lockInput(); // first lock
@@ -413,6 +416,7 @@ describe("GroupTestDomElements DOM utilities", () => {
     expect(btn1.style.pointerEvents).toBe("");
     expect(btn2.style.pointerEvents).toBe("");
     expect(nextBtn.style.pointerEvents).toBe("");
+    expect(input.readOnly).toBe(false);
   });
 
   it("disableNextButton/enableNextButton disable and enable next button", async () => {
