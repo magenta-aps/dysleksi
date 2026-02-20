@@ -93,20 +93,20 @@ export class GroupTestView extends StudentTestView {
                 answers = shuffleArray(answers);
             }
 
-            if (this.currentQuestion.type === "multiple_choice"){
-            this.answerButtons = []
-            for (let answer of answers) {
-                    const button = this.domElements.showQuestionChoice(
-                        answer,
-                        () => {this.selectAnswer(answer)}
-                    );
-                    this.answerButtons.push({"button": button, "answer": answer});
-            }
-            } else if (this.currentQuestion.type === "free_text"){
-                    this.input = this.domElements.showQuestionFreeText(
-                        () => this.selectFreeText()
-                    );
+            if (this.currentQuestion.type === "multiple_choice") {
+                this.answerButtons = []
+                for (let answer of answers) {
+                        const button = this.domElements.showQuestionChoice(
+                            answer,
+                            () => {this.selectAnswer(answer)}
+                        );
+                        this.answerButtons.push({"button": button, "answer": answer});
                 }
+            } else if (this.currentQuestion.type === "free_text"){
+                this.input = this.domElements.showQuestionFreeText(
+                    () => this.selectFreeText()
+                );
+            }
 
             if (this.currentQuestion.instruction_sequence){
                 console.log("---------------------------------------------")

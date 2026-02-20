@@ -228,6 +228,10 @@ class TestDomElements {
                 btn.tabIndex = 0;                  // restore tab focus
             }
         });
+        const inputs = document.querySelectorAll("input:not(.debug-input)");
+        inputs.forEach(input => {
+            input.readOnly = inputLocked;
+        });
         this.toggleBodyClass("input-locked", inputLocked);
     }
 
