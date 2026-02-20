@@ -43,6 +43,9 @@ class InstructionAction(TextChoices):
     SET_BUTTON_SOUND_ONCE = "setButtonSoundOnce"
     SET_REPEAT_BUTTON_DESTINATION = "setRepeatButtonDestination"
     CLICK_BUTTON = "clickButton"
+    SET_MARKER = "setMarker"
+    ADD_TEXT = "addText"
+    REMOVE_TEXT = "removeText"
 
 
 class QuestionType(TextChoices):

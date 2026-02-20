@@ -343,6 +343,7 @@
         "element": "free-text-i",
         "delayAfter": 750
       },
+
       // 6b.4b
       {
         "action": "fadeIn",
@@ -405,37 +406,22 @@
         "data": "sui",
         "delayAfter": 1000
       },
-// TODO: placér markøren midt i teksten
-      {
-        "action": "clickButton",
-        "element": "free-text-erase-btn",
-        "delayAfter": 400
-      },
-      {
-        "action": "clickButton",
-        "element": "free-text-erase-btn",
-        "delayAfter": 400
-      },
-      {
-        "action": "clickButton",
-        "element": "free-text-erase-btn",
-        "delayAfter": 400
-      },
 
+      {
+        "action": "setMarker",
+        "element": "free-text-field",
+        "data": "1",
+        "delayAfter": 1000
+      },
+      {
+        "action": "clickButton",
+        "element": "free-text-erase-btn",
+        "delayAfter": 1000
+      },
       {
         "action": "clickButton",
         "element": "free-text-t",
-        "delayAfter": 400
-      },
-      {
-        "action": "clickButton",
-        "element": "free-text-u",
-        "delayAfter": 400
-      },
-      {
-        "action": "clickButton",
-        "element": "free-text-i",
-        "delayAfter": 400
+        "delayAfter": 1000
       },
 
       // 6b.4e

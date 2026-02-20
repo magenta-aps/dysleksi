@@ -106,6 +106,7 @@ services:
       - default
 
   dysleksi-js-coverage:
+    # Coverage is available to browse at http://localhost:8143/vitest_coverage/
     container_name: dysleksi-js-coverage
     image: nginx:alpine
     volumes:

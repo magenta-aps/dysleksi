@@ -268,7 +268,7 @@ export class GroupTestView extends StudentTestView {
     }
     selectFreeText() {
         clearTimeout(this.questionReminderId);
-        const answer = this.input.textContent.trim();
+        const answer = this.input.value.trim();
         if (answer !== "") {
             this.textAnswer = answer;
             this.selectedAnswer = this.currentQuestion.possibleAnswers[0];

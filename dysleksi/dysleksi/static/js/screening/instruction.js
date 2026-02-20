@@ -120,6 +120,21 @@ export class InstructionSequenceRunner {
             case "setRepeatButtonDestination":
                 this.view.setRepeatDestination(parseInt(data));
                 break;
+
+            case "setMarker":
+                this.domElements.setMarker(this.getEl(element), parseInt(data));
+                break;
+
+            case "addText":
+                this.domElements.addText(this.getEl(element), data);
+                break;
+
+            case "removeText":
+                this.domElements.removeText(this.getEl(element), parseInt(data) || 1);
+                break;
+
+            default:
+                throw new Error("Unknown action: " + action);
         }
     }
 
