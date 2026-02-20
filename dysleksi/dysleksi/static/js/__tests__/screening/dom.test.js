@@ -426,10 +426,57 @@ describe("GroupTestDomElements DOM utilities", () => {
   });
 
   it("setText inserts text into element", () => {
-      const element = document.createElement("div");
-      dom.setText(element, "test");
-      expect(element.textContent).toBe("test");
-  })
+    const element = document.createElement("div");
+    dom.setText(element, "test");
+    expect(element.textContent).toBe("test");
+  });
+  it("setText inserts text into input element", () => {
+    const element = document.createElement("input");
+    dom.setText(element, "test");
+    expect(element.value).toBe("test");
+  });
+  it("addText adds text to input element at position", () => {
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+    input.type = "text";
+    input.value = "Test";
+    dom.setMarker(input, 2);
+    dom.addText(input, "123");
+    expect(input.value).toBe("Te123st");
+    expect(input.selectionStart).toBe(5);
+  });
+
+  it("removeText removes text from input element at position", () => {
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+    input.type = "text";
+    input.value = "Test";
+    dom.setMarker(input, 3);
+    dom.removeText(input, 2);
+    expect(input.value).toBe("Tt");
+    expect(input.selectionStart).toBe(1);
+  });
+
+  it("removeText removes only text until start is reached", () => {
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+    input.type = "text";
+    input.value = "Test";
+    dom.setMarker(input, 3);
+    dom.removeText(input, 4);
+    expect(input.value).toBe("t");
+    expect(input.selectionStart).toBe(0);
+  });
+  it("removeText defaults to one char", () => {
+    const input = document.createElement("input");
+    document.body.appendChild(input);
+    input.type = "text";
+    input.value = "Test";
+    dom.setMarker(input, 3);
+    dom.removeText(input);
+    expect(input.value).toBe("Tet");
+    expect(input.selectionStart).toBe(2);
+  });
 
 });
 

@@ -13,6 +13,7 @@ describe("InstructionSequenceRunner", () => {
 			<div id="el1"></div>
 			<div id="el2"></div>
 			<button id="btn1"></button>
+			<input type="text" id="input1" />
 		`;
 	
 		domElements = {
@@ -24,6 +25,9 @@ describe("InstructionSequenceRunner", () => {
 			toggleButtonSelected: vi.fn(),
             setButtonAudioCallback: vi.fn(),
             setText: vi.fn(),
+            setMarker: vi.fn(),
+            addText: vi.fn(),
+            removeText: vi.fn(),
 		};
 	
 		// use fake timers for sleep
@@ -64,6 +68,16 @@ describe("InstructionSequenceRunner", () => {
 		expect(domElements.highlight).toHaveBeenCalledWith(document.getElementById("el1"));
 		expect(domElements.toggleButtonSelected).toHaveBeenCalledWith(document.getElementById("btn1"), true);
 	});
+	
+    it("executeInstruction throws error on incorrect action", async () => {
+        try {
+            runner = new InstructionSequenceRunner(null, [], domElements);
+            await runner.executeInstruction({action: "foobar", element: "el1"});
+            vi.fail("Expected error to be thrown");
+        } catch (e) {
+            expect(e.message).toBe("Unknown action: foobar")
+        }
+    });
 	
 	it("run executes instructions with delays", async () => {
 		const instrs = [
@@ -327,4 +341,31 @@ describe("InstructionSequenceRunner", () => {
         expect(clickSpy).toHaveBeenCalledTimes(1);
     });
 
+    it("set marker in element text", () => {
+        runner = new InstructionSequenceRunner(null, [], domElements);
+        const element = document.getElementById("input1");
+        element.value = "Test";
+        runner.executeInstruction({action: "setMarker", element: "input1", data: "2"});
+        expect(domElements.setMarker).toHaveBeenCalledWith(element, 2);
+    });
+
+    it("add text in element", () => {
+        runner = new InstructionSequenceRunner(null, [], domElements);
+        const element = document.getElementById("input1");
+        element.value = "Test";
+        element.focus();
+        element.setSelectionRange(2, 2);
+        runner.executeInstruction({action: "addText", element: "input1", data: "foobar"});
+        expect(domElements.addText).toHaveBeenCalledWith(element, "foobar");
+    });
+
+    it("remove text in element", () => {
+        runner = new InstructionSequenceRunner(null, [], domElements);
+        const element = document.getElementById("input1");
+        element.value = "Test";
+        element.focus();
+        element.setSelectionRange(2, 2);
+        runner.executeInstruction({action: "removeText", element: "input1", data: "3"});
+        expect(domElements.removeText).toHaveBeenCalledWith(element, 3);
+    });
 });

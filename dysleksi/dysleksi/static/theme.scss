@@ -259,7 +259,6 @@ body.show-instructions {
 
 .display-field {
   background-color: white;
-  pointer-events: none; // makes it unclickable
   user-select: none;    // cannot select text
   min-height: 38px;
   display: flex;
@@ -270,6 +269,13 @@ body.show-instructions {
   height: 4rem;
   margin: 0.5rem;
   font-size: 2rem;
+  caret-animation: manual;
+
+  &:focus {
+    background-color: white;
+    border: var(--bs-border-width) solid var(--bs-border-color);
+    border-radius: var(--bs-border-radius);
+  }
 }
 
 

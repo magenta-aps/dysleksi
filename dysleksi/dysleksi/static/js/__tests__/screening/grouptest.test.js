@@ -479,7 +479,7 @@ describe('GroupTestFlow', () => {
         view.showQuestion(false, 0);
         expect(view.input).not.toBe(null);
         const question = view.currentQuestion;
-        view.input.textContent = "aput";
+        view.input.value = "aput";
         view.selectFreeText();
         view.onQuestionComplete(question);
         expect(view.send).toHaveBeenCalledWith({
@@ -512,7 +512,7 @@ describe('GroupTestFlow', () => {
         view.showQuestion(false, 0);
         expect(view.input).not.toBe(null);
         const question = view.currentQuestion;
-        view.input.textContent = "forkert";
+        view.input.value = "forkert";
         view.selectFreeText();
         view.onQuestionComplete(question);
         expect(view.send).toHaveBeenCalledWith({
@@ -545,7 +545,7 @@ describe('GroupTestFlow', () => {
         const part = view.currentPart;
         view.showQuestion(false, part.questions.length - 1);
         const question = view.currentQuestion;
-        view.input.textContent = "iki";
+        view.input.value = "iki";
         view.selectFreeText();
         view.onQuestionComplete(question);
 
@@ -619,13 +619,13 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
 
         // Click a letter button
         letterButtons[0].click(); // should append "a" to display
-        expect(displayField.textContent).toBe("a");
+        expect(displayField.value).toBe("a");
         expect(listenerMock).toHaveBeenCalledWith({ target: { value: "a" } });
         expect(eraseBtn.disabled).toBe(false);
 
         // Click erase button
         eraseBtn.click();
-        expect(displayField.textContent).toBe("");
+        expect(displayField.value).toBe("");
         expect(listenerMock).toHaveBeenCalledWith({ target: { value: "" } });
         expect(eraseBtn.disabled).toBe(true);
     });
@@ -640,12 +640,12 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
         letterButtons[0].click();
         letterButtons[1].click();
         letterButtons[2].click();
-        expect(displayField.textContent).toBe("aef"); // first row letters: a, e, f, g, i, j
+        expect(displayField.value).toBe("aef"); // first row letters: a, e, f, g, i, j
         expect(listenerMock).toHaveBeenCalledTimes(3);
 
         // Erase last letter
         eraseBtn.click();
-        expect(displayField.textContent).toBe("ae");
+        expect(displayField.value).toBe("ae");
     });
 
     it("returns the display field element", () => {

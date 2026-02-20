@@ -180,7 +180,33 @@ class TestDomElements {
     }
 
     setText(el, text) {
-        el.textContent = text;
+        if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
+            el.value = text;
+        } else {
+            el.textContent = text;
+        }
+    }
+
+    addText(el, text) {
+        const position = el.selectionStart;
+        el.value = el.value.slice(0, position) + text + el.value.slice(position);
+        this.setMarker(el,position + text.length);
+    }
+    removeText(el, count) {
+        if (count === undefined) {
+            count = 1;
+        }
+        const position = el.selectionStart;
+        if (count > position) {
+            count = position;
+        }
+        el.value = el.value.slice(0, position - count) + el.value.slice(position);
+        this.setMarker(el, position - count);
+    }
+
+    setMarker(el, position) {
+        el.focus();
+        el.setSelectionRange(position, position);
     }
 
     lockInput() {
@@ -362,7 +388,7 @@ class TestDomElements {
         // Shows a free text field, as well as a screen-keyboard
 
         function updateEraseBtnState() {
-            eraseBtn.disabled = displayField.textContent.length === 0;
+            eraseBtn.disabled = displayField.value.length === 0;
         }
 
         const wrapper = document.createElement("div");
@@ -381,9 +407,11 @@ class TestDomElements {
         textFieldWrapper.style.alignItems = "center";     
         textFieldWrapper.style.gap = "0.5rem";            
     
-        const displayField = document.createElement("div");
+        const displayField = document.createElement("input");
         displayField.className = "form-control display-field";
         displayField.id = "free-text-field";
+        displayField.type = "text";
+        displayField.inputMode = "none";
     
         // --- Erase button ---
         const eraseBtn = document.createElement("button");
@@ -393,9 +421,9 @@ class TestDomElements {
         updateEraseBtnState();
     
         eraseBtn.addEventListener("click", () => {
-            displayField.textContent = displayField.textContent.slice(0, -1);
+            this.removeText(displayField, 1);
             updateEraseBtnState();
-            listener({ target: { value: displayField.textContent } });
+            listener({ target: { value: displayField.value } });
             this.makeButtonGlow(eraseBtn.id)
         });
     
@@ -416,9 +444,12 @@ class TestDomElements {
                 btn.disabled = true;
                 btn.id = "free-text-" + letter;
                 btn.addEventListener("click", () => {
-                    displayField.textContent += letter;
+                    const position = displayField.selectionStart;
+                    this.addText(displayField, letter);
+                    //displayField.value = displayField.value.slice(0, position) + letter + displayField.value.slice(position);
+                    //this.setMarker(displayField,position + 1);
                     updateEraseBtnState();
-                    listener({ target: { value: displayField.textContent } });
+                    listener({ target: { value: displayField.value } });
                     this.makeButtonGlow(btn.id)
                 });
                 rowDiv.appendChild(btn);
