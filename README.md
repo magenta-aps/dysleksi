@@ -96,16 +96,13 @@ The project uses `django-channels` to synchronize events between teacher and stu
 Messages in the lobby and in the session-specific rooms take the form `{"event": "some.event", "id": 1234}`.
 
 ## Real data (wordreading 2)
-To load some real wordreading 2 data into the system:
+To load some real wordreading 2 data into the system, set `LOAD_REAL_WORDREADING_DATA`
+or `LOAD_REAL_WORDSPELLING_DATA` to True in your docker-compose.override.yml file:
 
-Add the zipped files from https://redmine.magenta.dk/documents/382 to 
-`file-data/wordreading_2`
-
-You can also run `extract_wordreading_2_images.py` from the `scripts` folder. This 
-generates the same files.
-
-Then run the following command to add the word-reading 2 subtest to the test named 
-`Middle 2. grade`
 ```
-docker exec dysleksi-web python manage.py import_test "Middle 2. grade" "/upload/wordreading_2/wordreading_2.json"
+services:
+  dysleksi-web:
+    environment:
+      - LOAD_REAL_WORDREADING_DATA=true
+      - LOAD_REAL_WORDSPELLING_DATA=true
 ```

@@ -15,6 +15,10 @@ from dysleksi.models import Test, TestType
 
 def copy_dummy_files():
     for item in Path(settings.DUMMY_DATA_DIR).iterdir():
+        dest = Path(settings.MEDIA_ROOT) / "dummy" / item.name
+        shutil.copytree(item, dest, dirs_exist_ok=True)
+
+    for item in Path(settings.REAL_DATA_DIR).iterdir():
         dest = Path(settings.MEDIA_ROOT) / item.name
         shutil.copytree(item, dest, dirs_exist_ok=True)
 
@@ -31,36 +35,59 @@ def create_group_test(
         test, created = Test.objects.get_or_create(name=name, test_type=TestType.GROUP)
 
         # A wordreading 2 test with practice run
+
+        if settings.LOAD_REAL_WORDREADING_DATA:  # type:ignore
+            wordreading_data_path = (
+                Path(settings.MEDIA_ROOT) / "wordreading_2/wordreading_2.json",
+            )
+            wordreading_test_name = "Ordlæsning 2A"
+        else:
+            wordreading_data_path = (
+                Path(settings.MEDIA_ROOT) / "dummy/wordreading_2/wordreading_2a.json",
+            )
+            wordreading_test_name = "Ordlæsning 2A (dummy)"
+
+        if settings.LOAD_REAL_WORDSPELLING_DATA:  # type:ignore
+            wordspelling_data_path = (
+                Path(settings.MEDIA_ROOT) / "wordspelling/wordspelling.json",
+            )
+            wordspelling_test_name = "Ordstavning"
+        else:
+            wordspelling_data_path = (
+                Path(settings.MEDIA_ROOT) / "dummy/wordspelling/wordspelling.json",
+            )
+            wordspelling_test_name = "Ordstavning (dummy)"
+
         call_command(
             "import_test",
             name,
-            "Ordlæsning 2A (dummy)",
-            Path(settings.MEDIA_ROOT) / "wordreading_2_dummy/wordreading_2a.json",
+            wordreading_test_name,
+            wordreading_data_path,
             "wordreading_2",
             practice_json_path=(
-                Path(settings.MEDIA_ROOT)
-                / "wordreading_2_dummy/wordreading_2a_practice.json"
+                Path(settings.MEDIA_ROOT) / "wordreading_2/wordreading_2a_practice.json"
             ),
         )
 
         # A wordreading 2 test without practice run
-        call_command(
-            "import_test",
-            name,
-            "Ordlæsning 2B (dummy)",
-            Path(settings.MEDIA_ROOT) / "wordreading_2_dummy/wordreading_2b.json",
-            "wordreading_2",
-        )
+        if not settings.LOAD_REAL_WORDREADING_DATA:  # type:ignore
+            call_command(
+                "import_test",
+                name,
+                "Ordlæsning 2B (dummy)",
+                Path(settings.MEDIA_ROOT) / "dummy/wordreading_2/wordreading_2b.json",
+                "wordreading_2",
+            )
 
         # A wordspelling test with practice run
         call_command(
             "import_test",
             name,
-            "Ordstavning (dummy)",
-            Path(settings.MEDIA_ROOT) / "wordspelling_dummy/wordspelling.json",
+            wordspelling_test_name,
+            wordspelling_data_path,
             "wordspelling",
             practice_json_path=Path(settings.MEDIA_ROOT)
-            / "wordspelling_dummy/wordspelling_practice.json",
+            / "wordspelling/wordspelling_practice.json",
         )
 
 
@@ -76,7 +103,7 @@ def create_individual_test():
         test_name,
         "Individuel deltest (dummy)",
         Path(settings.MEDIA_ROOT)
-        / "letter_pronunciation_dummy/letter_pronunciation.json",
+        / "dummy/letter_pronunciation/letter_pronunciation.json",
         "letter_pronunciation",
     )
 

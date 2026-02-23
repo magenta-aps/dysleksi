@@ -19,6 +19,7 @@ services:
       - ./mypy.ini:/mypy.ini:ro
       - ./file-data:/upload:rw
       - ./dummy-data:/dummy-data:rw
+      - ./real-data:/real-data:rw
       - idp-data:/app/idp:rw
       - staticfiles-data:/app/project/static/
     environment:
@@ -30,7 +31,10 @@ services:
       - CREATE_DUMMY_DATA=true
       - TEST=true
       - DUMMY_DATA_DIR=/dummy-data
+      - REAL_DATA_DIR=/real-data
       - ECHO_INTERFACE=https://localhost:8140
+      - LOAD_REAL_WORDREADING_DATA=false
+      - LOAD_REAL_WORDSPELLING_DATA=false
     networks:
       - default
       - database

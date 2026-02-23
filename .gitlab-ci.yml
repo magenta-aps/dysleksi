@@ -165,6 +165,7 @@ Lint Javascript:
     ENVIRONMENT: development
     ALLOWED_HOSTS: '["dysleksi-web", "localhost", "host.docker.internal"]'
     DUMMY_DATA_DIR: /builds/gronlandsprojekter/dysleksi/dummy-data
+    REAL_DATA_DIR: /builds/gronlandsprojekter/dysleksi/real-data
 
     # Local SAML configuration
     SAML_SP_ENTITY_ID: https://localhost:8443/mitid/saml/metadata/

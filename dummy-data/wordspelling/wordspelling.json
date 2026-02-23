@@ -1,0 +1,14 @@
+[
+  {
+    "question_type": "free_text",
+    "sound": "dummy/wordspelling/Opgave/aput.mp3",
+    "correct": "aput",
+    "reminder": 20000
+  },
+  {
+    "question_type": "free_text",
+    "sound": "dummy/wordspelling/Opgave/arsaq.mp3",
+    "correct": "arsaq",
+    "reminder": 20000
+  }
+]
