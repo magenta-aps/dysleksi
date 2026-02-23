@@ -66,15 +66,21 @@ class DysleksiTest(TestCase):
         cls.test, _ = Test.objects.get_or_create(
             name="Test1", test_type=TestType.INDIVIDUAL
         )
-        cls.group_test, _ = Test.objects.get_or_create(
-            name="Test2", test_type=TestType.GROUP
-        )
         cls.part, _ = TestPart.objects.get_or_create(
             name="TestPart1",
-            test=cls.test,
             timeout=60000,
             partial_score_after=30000,
         )
+        cls.test.parts.add(cls.part)
+        cls.group_test, _ = Test.objects.get_or_create(
+            name="Test2", test_type=TestType.GROUP
+        )
+        cls.group_test_part, _ = TestPart.objects.get_or_create(
+            name="GroupTestPart1",
+            timeout=60000,
+            partial_score_after=30000,
+        )
+        cls.group_test.parts.add(cls.group_test_part)
         cls.resource1, _ = TestResource.objects.get_or_create(
             name="TestResource1",
             text="TestOrd",

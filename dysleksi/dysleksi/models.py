@@ -363,11 +363,9 @@ class TestAssignment(models.Model):
 
 
 class TestPart(models.Model):
-    test = models.ForeignKey(
+    tests = models.ManyToManyField(
         Test,
-        on_delete=models.CASCADE,
         related_name="parts",
-        null=False,
     )
     name = models.CharField(max_length=255)
     image_url = models.CharField(
@@ -479,7 +477,7 @@ class TestQuestion(models.Model):
     reminder = models.PositiveIntegerField(blank=False, null=False, default=0)
 
     def __str__(self) -> str:
-        return f"{str(self.part)} / {str(self.part.test)} {self.pk}"
+        return f"{str(self.part)} / {self.pk}"
 
     def create_instruction_sequence(self, instructions_data):
         sequence, _ = InstructionSequence.objects.get_or_create(question=self)
@@ -801,7 +799,7 @@ class Message(models.Model):
         part_id = self.data.get("partId")
         if part_id is None:
             raise MissingIdException(f"No partId in message {self.uuid}")
-        return TestPart.objects.get(pk=part_id, test=self.assignment.test)
+        return TestPart.objects.get(pk=part_id)
 
     @cached_property
     def test_response(self):

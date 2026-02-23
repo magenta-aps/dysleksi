@@ -62,7 +62,7 @@ class ImportTestTest(TestCase):
         )
 
         # Fetch the created TestPart
-        word_reading_2_test = TestPart.objects.get(name="Ordlæsning 2", test=self.test)
+        word_reading_2_test = TestPart.objects.get(name="Ordlæsning 2", tests=self.test)
 
         # Assert we created all 5 questions
         self.assertEqual(word_reading_2_test.questions.count(), 5)
@@ -101,7 +101,7 @@ class ImportTestTest(TestCase):
 
         # Fetch the created TestPart
         word_reading_2_test = TestPart.objects.get(
-            name="Bogstavsbenævnelse", test=self.test
+            name="Bogstavsbenævnelse", tests=self.test
         )
 
         # Assert we created all 4 questions

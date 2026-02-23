@@ -11,7 +11,6 @@ def create_wordreading_2_test(
     test, questions_data, practice_questions_data=None, name="Ordlæsning 2"
 ):
     part, created = TestPart.objects.get_or_create(
-        test=test,
         name=name,
         defaults={
             "timeout": 60000,  # 60 seconds
@@ -21,6 +20,7 @@ def create_wordreading_2_test(
             "image_url": "/static/images/wordreading.png",
         },
     )
+    test.parts.add(part)
     part.create_test_resources(questions_data, False)
     if practice_questions_data:
         part.create_test_resources(practice_questions_data, True)
@@ -30,7 +30,6 @@ def create_wordspelling_test(
     test, questions_data, practice_questions_data=None, name="Ordstavning"
 ):
     part, created = TestPart.objects.get_or_create(
-        test=test,
         name=name,
         defaults={
             "timeout": 60000,
@@ -39,6 +38,7 @@ def create_wordspelling_test(
             "image_url": "/static/images/wordspelling.png",
         },
     )
+    test.parts.add(part)
     part.create_test_resources(questions_data, False)
     if practice_questions_data:
         part.create_test_resources(practice_questions_data, True)
@@ -48,7 +48,6 @@ def create_letter_pronunciation_test(
     test, questions_data, practice_questions_data=None, name="Ordbenævnelse"
 ):
     part, created = TestPart.objects.get_or_create(
-        test=test,
         name=name,
         defaults={
             "timeout": 0,
@@ -57,6 +56,7 @@ def create_letter_pronunciation_test(
             "image_url": "/static/images/letter_pronunciation.png",
         },
     )
+    test.parts.add(part)
     part.create_test_resources(questions_data, False)
     if practice_questions_data:
         part.create_test_resources(practice_questions_data, True)

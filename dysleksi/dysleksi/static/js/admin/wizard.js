@@ -53,7 +53,9 @@ export class Wizard {
         }
 
         // Hook events for all form fields on wizard
-        this.#fields = this.domElem.querySelectorAll('form input, form select');
+        this.#fields = this.domElem.querySelectorAll(
+            "form input:not([type='hidden']), form select"
+        );
         for (const wizardField of this.#fields) {
             wizardField.addEventListener('change', (evt) => this.#validateFields(evt));
         }
@@ -176,28 +178,60 @@ export class Wizard {
         }
 
         // Update summary table (only visible on last step)
+        const summaryState = {};
         for (const field of this.#fields) {
-            const summaryField = this.domElem.querySelector("[data-id='" + field.id + "']");
+            const summaryField = this.domElem.querySelector("[data-id='" + field.name + "']");
             if (summaryField !== null) {
-                summaryField.innerHTML = this.#getSummaryValue(field);
+                const summaryValue = this.#getSummaryValue(field, summaryState);
+                if (summaryValue !== null) {
+                    summaryField.innerText = summaryValue;
+                } else if (field.name in summaryState) {
+                    summaryField.innerText = summaryState[field.name];
+                }
             }
         }
     }
 
-    #getSummaryValue(field) {
+    #getSummaryValue(field, summaryState) {
+        const type = field.type.toLowerCase();
+
+        // Don't use form field value if form field is currently hidden
+        if (field.closest('div.d-none')) {
+            return '';  // clear any previous value
+        }
+
         if (field.tagName.toLowerCase() === 'select') {
             return field.options[field.selectedIndex].label;
         }
 
-        if ((field.type.toLowerCase() === 'datetime-local') && (field.value !== '')) {
+        if (type === 'text' && field.value !== '') {
+            return field.value;
+        }
+
+        if (type === 'radio' && field.checked) {
+            // Use text from accompanying `<label>` element
+            return field.nextElementSibling.innerText;
+        }
+
+        if (type === 'checkbox' && field.checked) {
+            // Accumulate texts from all chosen checkbox labels
+            const text = field.nextElementSibling.innerText;
+            if (field.name in summaryState) {
+                summaryState[field.name] += ', ' + text;
+            } else {
+                summaryState[field.name] = text;
+            }
+        }
+
+        if (type === 'datetime-local' && field.value !== '') {
             const datetimeFormatter = new Intl.DateTimeFormat(
                 document.documentElement.lang || 'da',
-                {dateStyle: 'full', timeStyle: 'short'},
+                { dateStyle: 'full', timeStyle: 'short' },
             )
             return datetimeFormatter.format(new Date(field.value));
         }
 
-        return field.value || '-';
+        return null;  // indicate no value found; no DOM update needed
     }
 
     #getShowHideHandler(type) {
@@ -217,12 +251,15 @@ export class Wizard {
         const rules = toggle.split(';');
         for (const rule of rules) {
             const all = rule.split('=', 2);
-            const rhs = all[1].split(' ');
-            const hide = rhs[0] === 'hide';
-            const elems = this.domElem.querySelectorAll(rhs[1]);
-            if (all[0] === value) {
-                for (const elem of elems) {
-                    elem.classList.toggle('d-none', hide);
+            const specs = all[1].split(' ');
+            for (const spec of specs) {
+                const parts = spec.split(':');
+                const hide = parts[0] === 'hide';
+                const elems = this.domElem.querySelectorAll(parts[1]);
+                if (all[0] === value) {
+                    for (const elem of elems) {
+                        elem.classList.toggle('d-none', hide);
+                    }
                 }
             }
         }

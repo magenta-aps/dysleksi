@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-18 10:55-0200\n"
+"POT-Creation-Date: 2026-02-19 08:16-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,6 +16,19 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: dysleksi/forms.py
+msgid "Vælg testtype"
+msgstr ""
+
+#: dysleksi/forms.py dysleksi/tables.py
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
+msgid "Test"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Deltest"
+msgstr ""
 
 #: dysleksi/forms.py
 msgid "Vælg tidsrummet for testen"
@@ -29,13 +42,11 @@ msgstr ""
 msgid "Planlæg"
 msgstr ""
 
-#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Start"
 msgstr ""
 
-#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Slut"
 msgstr ""
 
@@ -45,6 +56,10 @@ msgstr ""
 
 #: dysleksi/forms.py
 msgid "Vælg test"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Vælg deltests"
 msgstr ""
 
 #: dysleksi/forms.py
@@ -103,12 +118,6 @@ msgstr ""
 msgid "Type"
 msgstr ""
 
-#: dysleksi/tables.py
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
-msgid "Test"
-msgstr ""
-
 #: dysleksi/templates/dysleksi/admin/base.html
 #: dysleksi/templates/dysleksi/admin/modals/base.html
 msgid "Luk"
@@ -138,72 +147,59 @@ msgstr ""
 msgid "Søg"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/list.html
 msgid "Tildel gruppetest"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Deltagere og test"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Tid"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Bekræft"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Tilføj sluttidspunkt"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Fjern sluttidspunkt"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Bekræft følgende opsætning"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Deltagere"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Testtype"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Tilbage"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Næste"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Bekræft og tildel test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/list.html
 msgid "Tildel individuel test"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
-msgid "Deltager og test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/base.html

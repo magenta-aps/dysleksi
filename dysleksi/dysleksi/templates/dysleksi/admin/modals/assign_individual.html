@@ -1,99 +1,16 @@
-{% extends 'dysleksi/admin/modals/base.html' %}
+{% extends 'dysleksi/admin/modals/assign_base.html' %}
 {% load i18n %}
 {% load django_bootstrap5 %}
 
-{% block modal_classes %}wizard{% endblock %}
-
 {% block modal_title %}{% translate 'Tildel individuel test' %}{% endblock %}
 
-{% block modal_progress_bar %}
-<ul class="modal-progress list-group list-group-horizontal">
-    <li data-step="1" class="list-group-item col-4">
-        <span>1</span>
-        {% translate 'Deltager og test' %}
-    </li>
-    <li data-step="2" class="list-group-item col-4 disabled">
-        <span>2</span>
-        {% translate 'Tid' %}
-    </li>
-    <li data-step="3" class="list-group-item col-4 disabled">
-        <span>3</span>
-        {% translate 'Bekræft' %}
-    </li>
-</ul>
+{% block post_url %}
+{% url 'dysleksi:start_individual_room' %}
 {% endblock %}
 
-{% block modal_body %}
-<form method="post" action="{% url 'dysleksi:start_individual_room' %}">
-    {% csrf_token %}
-    <fieldset data-step="1">
-        {% bootstrap_field form.student %}
-        {% bootstrap_field form.test %}
-    </fieldset>
-    <fieldset data-step="2" class="d-none">
-        {% bootstrap_field form.is_immediate field_class="d-flex" %}
-        <div class="row d-none start-datetime">
-            <div class="col-8">
-                {% bootstrap_field form.start_datetime layout="horizontal" %}
-            </div>
-            <div class="col-4 add-end-button">
-                <button class="btn" data-show="end-datetime" data-hide="add-end-button">
-                    <i class="ph ph-plus me-1"></i>
-                    {% translate 'Tilføj sluttidspunkt' %}
-                </button>
-            </div>
-        </div>
-        <div class="row d-none end-datetime">
-            <div class="col-8">
-                {% bootstrap_field form.end_datetime layout="horizontal" %}
-            </div>
-            <div class="col-4">
-                <button class="btn" data-show="add-end-button" data-hide="end-datetime">
-                    <i class="ph ph-x me-1"></i>
-                    {% translate 'Fjern sluttidspunkt' %}
-                </button>
-            </div>
-        </div>
-    </fieldset>
-    <fieldset data-step="3" class="d-none">
-        <b>{% translate 'Bekræft følgende opsætning' %}</b>
-        <div class="summary">
-            <table class="w-100">
-                <tr>
-                    <td>{% translate 'Deltagere' %}</td>
-                    <td data-id="{{ form.klasse.id_for_label }}">-</td>
-                </tr>
-                <tr>
-                    <td>{% translate 'Testtype' %}</td>
-                    <td>-</td>
-                </tr>
-                <tr>
-                    <td>{% translate 'Test' %}</td>
-                    <td data-id="{{ form.test.id_for_label }}"></td>
-                </tr>
-                <tr>
-                    <td>{% translate 'Tid' %}</td>
-                    <td>
-                        <table>
-                            <tr>
-                                <td>{% translate 'Start' %}</td>
-                                <td data-id="{{ form.start_datetime.id_for_label }}"></td>
-                            </tr>
-                            <tr>
-                                <td>{% translate 'Slut' %}</td>
-                                <td data-id="{{ form.end_datetime.id_for_label }}"></td>
-                            </tr>
-                        </table>
-                    </td>
-                </tr>
-            </table>
-        </div>
-    </fieldset>
-</form>
-{% endblock %}
-
-{% block modal_footer %}
-<button type="button" disabled class="btn btn-secondary-outline me-auto prev-btn disabled">{% translate 'Tilbage' %}</button>
-<button type="button" disabled class="btn btn-secondary next-btn disabled">{% translate 'Næste' %}</button>
-<button type="button" hidden class="btn btn-secondary confirm-btn">{% translate 'Bekræft og tildel test' %}</button>
+{% block modal_step_1 %}
+{% bootstrap_field form.student %}
+{% bootstrap_field form.is_test_part field_class="d-flex" %}
+{% bootstrap_field form.test wrapper_class="mb-3 test-choice" %}
+{% bootstrap_field form.test_parts wrapper_class="mb-3 d-none test-part-choice" %}
 {% endblock %}

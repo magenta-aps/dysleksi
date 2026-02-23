@@ -1,9 +1,16 @@
 from django import forms
-from django.forms import ModelChoiceField, widgets
+from django.forms import ModelChoiceField, ModelMultipleChoiceField, widgets
 from django.utils.translation import gettext_lazy as _
 from dynamic_forms import DynamicField, DynamicFormMixin
 
-from dysleksi.models import PlannedDateTime, Student, Test, TestAssignment, TestType
+from dysleksi.models import (
+    PlannedDateTime,
+    Student,
+    Test,
+    TestAssignment,
+    TestPart,
+    TestType,
+)
 
 
 class HTML5DateWidget(widgets.Input):
@@ -17,14 +24,26 @@ class StartRoomForm(forms.ModelForm):
         fields = ("test",)
         model = TestAssignment
 
+    is_test_part = forms.BooleanField(
+        initial="test",
+        label=_("Vælg testtype"),
+        widget=forms.RadioSelect(
+            choices=[("test", _("Test")), ("part", _("Deltest"))],
+            attrs={
+                "data-toggle": "test=hide:.test-part-choice show:.test-choice;"
+                "part=show:.test-part-choice hide:.test-choice",
+            },
+        ),
+    )
+
     is_immediate = forms.BooleanField(
         initial="y",
         label=_("Vælg tidsrummet for testen"),
         widget=forms.RadioSelect(
             choices=[("y", _("Start nu")), ("n", _("Planlæg"))],
             attrs={
-                "data-toggle": "y=hide .row.start-datetime,.row.end-datetime;"
-                "n=show .row.start-datetime,div.add-end-button"
+                "data-toggle": "y=hide:.row.start-datetime,.row.end-datetime;"
+                "n=show:.row.start-datetime,div.add-end-button",
             },
         ),
     )
@@ -98,6 +117,17 @@ class StartIndividualRoomForm(DynamicFormMixin, StartRoomForm):
         ModelChoiceField,
         label=_("Vælg test"),
         queryset=Test.objects.filter(test_type=TestType.INDIVIDUAL),
+        required=lambda form: form.data.get("test_parts") is None,
+    )
+
+    test_parts = DynamicField(
+        ModelMultipleChoiceField,
+        label=_("Vælg deltests"),
+        widget=forms.CheckboxSelectMultiple(),
+        queryset=(
+            TestPart.objects.filter(tests__test_type=TestType.INDIVIDUAL).distinct()
+        ),
+        required=lambda form: form.data.get("test") is None,
     )
 
 
@@ -119,4 +149,13 @@ class StartClassRoomForm(DynamicFormMixin, StartRoomForm):
         ModelChoiceField,
         label=_("Vælg test"),
         queryset=Test.objects.filter(test_type=TestType.GROUP),
+        required=lambda form: form.data.get("test_parts") is None,
+    )
+
+    test_parts = DynamicField(
+        ModelMultipleChoiceField,
+        label=_("Vælg deltests"),
+        widget=forms.CheckboxSelectMultiple(),
+        queryset=TestPart.objects.filter(tests__test_type=TestType.GROUP).distinct(),
+        required=lambda form: form.data.get("test") is None,
     )
