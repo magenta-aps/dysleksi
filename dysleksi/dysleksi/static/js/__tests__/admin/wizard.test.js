@@ -19,7 +19,7 @@ const mockDoc = `
                 </select>
                 <button data-show="example1">
                 <button data-hide="example2">
-                <div data-toggle="yes=show div.example1;no=hide div.example2">
+                <div data-toggle="yes=show:div.example1;no=hide:div.example2">
                     <input type="radio" name="toggle" id="toggle" value="yes" />
                     <input type="radio" name="toggle" id="toggle" value="no" />
                 </div>
@@ -31,13 +31,33 @@ const mockDoc = `
             <fieldset data-step="2">
                 <input type="text" name="bar" id="bar" />
                 <input type="datetime-local" name="baz" id="baz" />
-                <input type="number" name="quux" id="quux" />                
+                <input type="number" name="quux" id="quux" /><!-- unused by summary -->
+                <div>
+                    <input type="checkbox" name="checkbox" id="checkbox1" value="1" checked />
+                    <label for="checkbox1">Checkbox 1</label>
+                    <input type="checkbox" name="checkbox" id="checkbox2" value="2" />
+                    <label for="checkbox2">Checkbox 2</label>
+                    <input type="checkbox" name="checkbox" id="checkbox3" value="3" checked />
+                    <label for="checkbox3">Checkbox 3</label>
+                </div>
+                <div>
+                    <input type="radio" name="radio" id="radio1" checked />
+                    <label for="radio1">Radio 1</label>
+                    <input type="radio" name="radio" id="radio2" />
+                    <label for="radio2">Radio 2</label>
+                </div>
+                <div class="d-none">
+                    <input type="text" name="hidden" id="hidden" />
+                </div>
             </fieldset>
             <fieldset data-step="3" class="d-none">
                 <div class="summary">
                     <span data-id="foo"></span>
                     <span data-id="bar"></span>
                     <span data-id="baz"></span>
+                    <span data-id="checkbox"></span>
+                    <span data-id="radio"></span>
+                    <span data-id="hidden"></span>
                 </div>
             </fieldset>
         </form>
@@ -182,11 +202,11 @@ describe("Wizard", () => {
         wizard.gotoStep(3);
         // Assert
         const selectDisplay = wizard.domElem.querySelector("[data-id='foo']");
-        expect(selectDisplay.innerHTML).toBe("ABC");
+        expect(selectDisplay.innerText).toBe("ABC");
         const textDisplay = wizard.domElem.querySelector("[data-id='bar']");
-        expect(textDisplay.innerHTML).toBe("DEF");
+        expect(textDisplay.innerText).toBe("DEF");
         const datetimeDisplay = wizard.domElem.querySelector("[data-id='baz']");
-        expect(datetimeDisplay.innerHTML).toBe("torsdag den 1. januar 2026 kl. 12.00");
+        expect(datetimeDisplay.innerText).toBe("torsdag den 1. januar 2026 kl. 12.00");
     });
 
     it("submits a form", () => {

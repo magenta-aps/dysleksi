@@ -3,7 +3,9 @@
 # SPDX-License-Identifier: MPL-2.0
 from typing import Any
 
+from django.db import transaction
 from django.db.models import Case, Count, F, Value, When
+from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, TemplateView
@@ -11,7 +13,15 @@ from django_tables2 import SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
 
 from dysleksi.forms import StartClassRoomForm, StartIndividualRoomForm
-from dysleksi.models import TEACHERS, Class, Student, Test, TestAssignment, User
+from dysleksi.models import (
+    TEACHERS,
+    Class,
+    Student,
+    Test,
+    TestAssignment,
+    TestType,
+    User,
+)
 from dysleksi.tables import ClassTable, StudentTable, TestAssignmentTable
 
 
@@ -163,6 +173,7 @@ class StartAssignmentView(CreateView):
     template_name = "dysleksi/lobby/start_room.html"
     model = TestAssignment
     http_method_names = ["post"]
+    test_type: TestType | None = None  # overridden in subclasses
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -175,13 +186,40 @@ class StartAssignmentView(CreateView):
         else:
             return reverse("dysleksi:room", kwargs={"pk": self.object.pk})
 
+    def form_valid(self, form):
+        if form.cleaned_data["test_parts"]:
+            self.object = self.create_test_from_test_parts(form)
+            return HttpResponseRedirect(self.get_success_url())
+        else:
+            return super().form_valid(form)
+
+    @transaction.atomic
+    def create_test_from_test_parts(self, form) -> TestAssignment:
+        # Create test
+        test = Test.objects.create(
+            name=", ".join(
+                str(test_part) for test_part in form.cleaned_data["test_parts"]
+            ),
+            test_type=self.test_type,  # type: ignore
+        )
+        # Add the selected test parts
+        for test_part in form.cleaned_data["test_parts"]:
+            test.parts.add(test_part)
+        # Create test assignment for this test/test parts
+        test_assignment = form.save(commit=False)
+        test_assignment.test = test
+        test_assignment.save()
+        return test_assignment
+
 
 class StartIndividualAssignmentView(StartAssignmentView):
     form_class = StartIndividualRoomForm
+    test_type = TestType.INDIVIDUAL
 
 
 class StartGroupAssignmentView(StartAssignmentView):
     form_class = StartClassRoomForm
+    test_type = TestType.GROUP
 
 
 class AdminRootView(GroupRequiredMixin, TemplateView):

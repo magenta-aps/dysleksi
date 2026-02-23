@@ -284,14 +284,15 @@ class TestTestResource(DysleksiTest):
 class TestTestQuestion(DysleksiTest):
     def test_str(self):
         question = TestQuestion.objects.create(part=self.part, challenge=self.resource1)
-        quest_str = f"{str(question.part)} / {str(question.part.test)} {question.pk}"
+        quest_str = f"{str(question.part)} / {question.pk}"
         self.assertEqual(quest_str, str(question))
 
     def test_create(self):
         question = TestQuestion.objects.create(part=self.part, challenge=self.resource1)
+        test = question.part.tests.first()
         self.assertEqual(question.part, self.part)
         self.assertEqual(question.challenge, self.resource1)
-        self.assertEqual(question.part.test.name, "Test1")
+        self.assertEqual(test.name, "Test1")
         answer1 = PossibleAnswer.objects.create(
             question=question, resource=self.resource2, is_correct=True
         )

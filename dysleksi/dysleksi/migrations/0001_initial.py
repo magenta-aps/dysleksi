@@ -172,7 +172,7 @@ class Migration(migrations.Migration):
                 ('timeout', models.PositiveIntegerField()),
                 ('partial_score_after', models.PositiveIntegerField()),
                 ('reminder', models.PositiveIntegerField(default=0)),
-                ('test', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='parts', to='dysleksi.test')),
+                ('tests', models.ManyToManyField(related_name='parts', to='dysleksi.test')),
             ],
         ),
         migrations.CreateModel(
