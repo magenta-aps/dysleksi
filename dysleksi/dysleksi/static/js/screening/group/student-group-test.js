@@ -141,11 +141,19 @@ export class GroupTestView extends StudentTestView {
             } else {
                 this.domElements.toggleBodyClass("show-instructions", false);
                 if (Number(this.currentQuestion.timeout) > 1) {
+                    if (this.questionTimeoutId) {
+                        clearTimeout(this.questionTimeoutId);
+                        this.questionTimeoutId = null;
+                    }
                     this.questionTimeoutId = setTimeout(() => {
                         this.onQuestionComplete(this.currentQuestion, true);
                     }, this.currentQuestion.timeout);
                 }
                 if (Number(this.currentQuestion.reminder) > 1) {
+                    if (this.questionReminderId) {
+                        clearTimeout(this.questionReminderId);
+                        this.questionReminderId = null;
+                    }
                     this.questionReminderId = setTimeout(() => {
                         this.domElements.reminderSoundEl.currentTime = 0;
                         this.domElements.reminderSoundEl.play();
@@ -178,19 +186,19 @@ export class GroupTestView extends StudentTestView {
                 alert("Vælg et svar, før du går videre.");
                 return;
             }
+
+            if (this.questionReminderId) {
+                clearTimeout(this.questionReminderId);
+                this.questionReminderId = null;
+            }
+
             if (this.isPracticing) {
-                if (this.answerIsCorrect()) {
-                    if (this.isLast()) {
-                        this.showTestPartIntro();
-                    }
-                } else {
+                if (!this.answerIsCorrect()) {
                     // Wrong answer
                     this.domElements.makeButtonAngry("next");
                     return;
                 }
             } else {
-                clearTimeout(this.questionTimeoutId);
-                clearTimeout(this.questionReminderId);
                 let messageText = `Elev har gennemført spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1}`
                 if (outOfTime) {
                     messageText = `Elev besvarede ikke spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1} indenfor tidsfristen`
@@ -215,6 +223,11 @@ export class GroupTestView extends StudentTestView {
             }
         }
 
+        if (this.questionTimeoutId) {
+            clearTimeout(this.questionTimeoutId);
+            this.questionTimeoutId = null;
+        }
+
         if (this.showNextQuestion()) {
             // Next question is being shown
         } else {
@@ -235,10 +248,6 @@ export class GroupTestView extends StudentTestView {
                 this.onPartComplete();
             }
         }
-    }
-
-    questionsCount() {
-        return this.isPracticing ? this.currentPart.practice.length : this.currentPart.questions.length;
     }
 
     selectAnswer(answer) {
@@ -278,10 +287,6 @@ export class GroupTestView extends StudentTestView {
             this.selectedAnswer = this.currentQuestion.possibleAnswers[0];
         }
         this.domElements.toggleNextButton(answer.length >= 2);
-    }
-
-    isLast() {
-        return this.currentQuestionIndex === this.questionsCount() - 1;
     }
 
 }

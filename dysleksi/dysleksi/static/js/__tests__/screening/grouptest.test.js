@@ -348,8 +348,7 @@ describe('GroupTestFlow', () => {
         const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
         testSpy(view);
         view.setPart(0)
-        
-        const part = view.currentPart;
+
         view.showFirstQuestion(false);
         const question = view.currentQuestion;
         const secondAnswer = question.possibleAnswers[1]
@@ -375,8 +374,10 @@ describe('GroupTestFlow', () => {
         view.showFirstQuestion(false);
         const question = view.currentQuestion;
         const secondAnswer = question.possibleAnswers[1]
+        view.questionReminderId = 1;
         view.selectAnswer(secondAnswer);
         view.onQuestionComplete(question);
+        expect(view.questionReminderId).toBe(null);
 
         expect(view.send).toHaveBeenCalledWith({
             uuid: expect.any(String),
