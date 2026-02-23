@@ -31,9 +31,6 @@ export function refreshSession(roomName) {
             event: "session.in_progress",
             roomUrl: window.location.href.replace(window.location.origin, "")
         }));
-    } else {
-        // queue the message until the socket opens
-        chatSocket.addEventListener("open", () => sendSessionMessage(chatSocket), { once: true });
     }
 }
 
