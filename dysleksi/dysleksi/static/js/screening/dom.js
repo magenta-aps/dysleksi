@@ -519,7 +519,6 @@ export class GroupTestDomElements extends TestDomElements {
         const text = answer.resourceText;
         const sound = answer.resourceSoundUrl;
         const imageUrl = answer.resourceImageUrl;
-        console.log("showQuestionChoice", text, sound, imageUrl);
         const btn = document.createElement("button");
         if (text) {
             btn.textContent = text;
