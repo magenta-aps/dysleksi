@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-19 08:16-0200\n"
+"POT-Creation-Date: 2026-02-20 12:09-0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -125,6 +125,7 @@ msgid "Luk"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/base.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/list.html
 msgid "Tests"
 msgstr ""
@@ -211,6 +212,38 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/table_columns/student_actions.html
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
 msgid "Åbn"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Pause"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Afslut test"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Markér svar som:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Korrekt"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Forkert"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Sprunget over"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Skriv evt. bemærkning"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Næste opgave"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/base.html

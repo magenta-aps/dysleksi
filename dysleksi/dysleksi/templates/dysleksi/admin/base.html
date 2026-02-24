@@ -22,7 +22,7 @@
         <div class="offcanvas-body">
             <nav class="navbar">
                 <div class="navbar-nav">
-                    <a href="{% url 'dysleksi:test_assignment_list' %}" class="nav-link mb-3 {% if current_view == 'dysleksi:test_assignment_list' %}active{% endif %}">
+                    <a href="{% url 'dysleksi:test_assignment_list' %}" class="nav-link mb-3 {% if current_view == 'dysleksi:test_assignment_list' or current_view == 'dysleksi:room' %}active{% endif %}">
                         <i class="ph-fill ph-notebook fs-5"></i>
                         <span>{% translate "Tests" %}</span>
                     </a>

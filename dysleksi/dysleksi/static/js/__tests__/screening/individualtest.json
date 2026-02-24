@@ -23,7 +23,7 @@
         },
         {
           "id": 2,
-          "question_type": "free_text",
+          "question_type": "no_input_required",
           "challenge_id": 31,
           "challenge_name": "challenge",
           "challenge_image_url": null,
