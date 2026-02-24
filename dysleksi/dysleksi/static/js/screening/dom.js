@@ -133,9 +133,8 @@ class TestDomElements {
         this.testPartIntro.style.display = "flex";
     }
 
-    setEndSummaryButtonListener(listener, text) {
+    setEndSummaryButtonListener(listener) {
         this.endSummaryButton = this._setButtonListener(this.endSummaryButton, listener);
-        this.endSummaryButton.innerHTML = text;
     }
     setStartSummaryButtonListener(listener) {
         this.startSummaryButton = this._setButtonListener(this.startSummaryButton, listener);
@@ -364,7 +363,6 @@ class TestDomElements {
             if (!playBtn) {
                 playBtn = document.createElement("button");
                 playBtn.id = "challenge-sound-btn";
-                playBtn.innerHTML = '<i class="ph-fill ph-speaker-simple-high"></i>';
                 playBtn.className = "btn sound-btn";
                 this._insert(this.questionChallengeEl, playBtn, [img, textEl], null);
             }

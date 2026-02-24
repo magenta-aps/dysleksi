@@ -122,43 +122,6 @@ body.show-instructions {
   }
 }
 
-.sound-btn {
-  background-color: $student-blue-dark !important;
-  color: white;
-  font-size: 3rem !important;
-  padding: 0.8rem 2rem;
-  margin: 2rem auto;
-  display: flex;
-  border-radius: 50px;
-
-  align-items: center;
-  justify-content: center;
-
-  &:hover,
-  &:focus,
-  &:focus-visible,
-  &:active {
-    color: white !important;
-    background-color: $student-blue-darkest !important;
-  }
-
-  &.playing {
-    background-color: $student-blue-darkest !important;
-    outline: 10px solid $student-blue-light !important;
-    outline-offset: 0px;
-    animation: pulse-outline 1s ease-in-out infinite alternate;
-  }
-
-  &:disabled {
-    background-color: $student-grey-light !important;
-    cursor: default;
-    color: white !important;
-    pointer-events: none;
-  }
-
-}
-
-
 body.show-instructions {
   .sound-btn {
     &:disabled {
@@ -181,63 +144,70 @@ body.show-instructions {
   }
 }
 
-.next-btn {
-  background-color: $student-green !important;
-  color: white;
-  font-size: 2rem;
-  padding: 0.5rem 2rem;
-  margin: 2rem auto;
+.svg-btn {
+  background-repeat: no-repeat;
+  background-size: contain;
+  padding: 0;
+  margin: 1rem;
+  transition: opacity 0.2s ease-in-out;
+
+  &:disabled {
+    cursor: default;
+    pointer-events: none; // prevents clicks
+    opacity: 0.5;
+    border: 0 none;
+  }
+  &:active {
+    border: 0 none;
+  }
+  &:focus {
+    border: 0 none;
+  }
+}
+
+.sound-btn {
+  @extend .svg-btn;
+  background-image: url("images/Knap-hoer-lyd.svg");
+  width: 7.5rem;
+  height: 5rem;
   display: flex;
 
   align-items: center;
   justify-content: center;
 
-  .ph {
-    font-size: 3rem;
+  &.playing {
+    background-image: url("images/Knap-hoer-lyd-aktiv.svg");
+    animation: pulse-outline 1s ease-in-out infinite alternate;
   }
-
-  &:hover {
-    background-color: $student-green-dark !important;
-    color: white;
-  }
-
-  &:disabled {
-    background-color: $student-grey-light !important;
-    border-color: $student-grey !important;
-    color: white;
-    cursor: default;
-    pointer-events: none; // prevents clicks
-  }
-
 }
 
-body.show-instructions {
-  .next-btn {
-    &:disabled {
-      /* Inputs are disabled while rendering instructions,
-       but we should not set them in a faded color then */
-      background-color: $student-green !important;
-      border-color: var(--bs-btn-border-color) !important;
-    }
-  }
+.start-btn {
+  @extend .svg-btn;
+  background-image: url("images/Knap-start.svg");
+  width: 8rem;
+  height: 8rem;
+}
+
+.start-part-btn {
+  @extend .svg-btn;
+  background-image: url("images/Knap-start-deltest.svg");
+  width: 10rem;
+  height: 5rem;
+}
+
+.next-btn {
+  @extend .svg-btn;
+  background-image: url("images/Knap-naeste-opgave.svg");
+  width: 10rem;
+  height: 5rem;
 }
 
 .repeat-btn {
-  background-color: $student-grey !important;
-  color: white;
-  font-size: 2rem;
-  padding: 0.5rem 2rem;
-  margin: 2rem auto;
-  display: flex;
-
-  align-items: center;
-  justify-content: center;
-
-  .ph {
-    font-size: 3rem;
-  }
+  @extend .svg-btn;
+  background-image: url("images/Knap-gentag-instruktion.svg");
+  width: 8rem;
+  height: 5rem;
 }
-
 
 .letter-btn {
     font-size: 2rem !important;

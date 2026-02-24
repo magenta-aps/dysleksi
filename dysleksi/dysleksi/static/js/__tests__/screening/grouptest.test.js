@@ -141,10 +141,7 @@ describe('GroupTestFlow', () => {
         view.startSummary();
     
         expect(domElements.showSummary).toHaveBeenCalled();
-        expect(domElements.setEndSummaryButtonListener).toHaveBeenCalledWith(
-            expect.any(Function),
-            "Start øveopgave"
-        );
+        expect(domElements.setEndSummaryButtonListener).toHaveBeenCalledWith(expect.any(Function));
 
         domElements.endSummaryButton.click();
         expect(view.endSummary).toHaveBeenCalled();
@@ -165,10 +162,7 @@ describe('GroupTestFlow', () => {
         view.startSummary();
     
         expect(domElements.showSummary).toHaveBeenCalled();
-        expect(domElements.setEndSummaryButtonListener).toHaveBeenCalledWith(
-            expect.any(Function),
-            "Start deltest"
-        );
+        expect(domElements.setEndSummaryButtonListener).toHaveBeenCalledWith(expect.any(Function));
     });
 
 
