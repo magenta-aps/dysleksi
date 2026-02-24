@@ -62,3 +62,21 @@ export function releaseWakeLock() {
     wakeLock = null;
   }
 }
+
+let audioContext;
+
+export function unlockAudioOnGesture() {
+    if (!audioContext) {
+        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+
+    if (audioContext.state === 'suspended') {
+        const resume = () => {
+            audioContext.resume();
+            document.removeEventListener('click', resume);
+        };
+        document.addEventListener('click', resume, { once: true });
+    }
+
+    return audioContext;
+}

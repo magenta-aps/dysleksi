@@ -1,5 +1,6 @@
 import { requestWakeLock } from "./utils.js";
 import { releaseWakeLock } from "./utils.js";
+import { unlockAudioOnGesture } from './utils.js';
 
 export class StudentTestView extends EventTarget {
 
@@ -24,6 +25,7 @@ export class StudentTestView extends EventTarget {
         this.chatSocket.addEventListener("message", (e) => {
             this.onChatMessage(JSON.parse(e.data));
         });
+        this.audioContext = unlockAudioOnGesture();
     }
 
     questionTitle() {

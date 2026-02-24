@@ -8,6 +8,8 @@ import { GroupTestDomElements } from "../../screening/dom.js";
 import { Test } from "../../screening/model.js";
 import { GroupTestView } from "../../screening/group/student-group-test.js";
 import {spyAttributes} from "../utils.js";
+import * as utils from "../../screening/utils.js";
+
 
 describe('GroupTestFlow', () => {
     let originalWebSocket;
@@ -67,6 +69,7 @@ describe('GroupTestFlow', () => {
         }
 
         global.ws = getWebSocket('class_123');
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue({});
     });
 
     afterEach(() => {
