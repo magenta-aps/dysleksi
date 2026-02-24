@@ -144,18 +144,22 @@ class TestDomElements {
     }
 
     showElement(el) {
-        if (el.dataset.hideDisplay === "true") {
-            el.style.display = "block";
-        } else {
-            el.style.visibility = "visible";
+        if (el) {
+            if (el.dataset.hideDisplay === "true") {
+                el.style.display = "block";
+            } else {
+                el.style.visibility = "visible";
+            }
         }
     }
     
     hideElement(el) {
-        if (el.dataset.hideDisplay === "true") {
-            el.style.display = "none";
-        } else {
-            el.style.visibility = "hidden";
+        if (el) {
+            if (el.dataset.hideDisplay === "true") {
+                el.style.display = "none";
+            } else {
+                el.style.visibility = "hidden";
+            }
         }
     }
     
@@ -503,6 +507,13 @@ export class GroupTestDomElements extends TestDomElements {
         this._setButtonListener(this.nextBtn, listener);
     }
 
+    toggleRepeatButton(show) {
+        if (show) {
+            this.showElement(this.repeatBtn);
+        } else {
+            this.hideElement(this.repeatBtn);
+        }
+    }
     setRepeatButtonListener(listener) {
         if (this.repeatBtn) {
             this._setButtonListener(this.repeatBtn, listener);

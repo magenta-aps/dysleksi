@@ -59,7 +59,8 @@ export class StudentTestView extends EventTarget {
         this.domElements.hideTestContainer()
         this.domElements.setStartTestPartButtonListener(
             () => {
-                this.showFirstQuestion(this.canPractice())
+                this.isPracticing = this.canPractice();
+                this.showFirstQuestion();
             }
         );
         if (this.previousPart) {
@@ -83,20 +84,21 @@ export class StudentTestView extends EventTarget {
     endSummary() {
         console.log("Summary ended, showing first part");
         this.domElements.hideSummary();
-        this.showFirstQuestion(this.canPractice())
+        this.isPracticing = this.canPractice();
+        this.showFirstQuestion();
     }
 
     canPractice() {
         return this.currentPart.practice.length > 0;
     }
 
-    showFirstQuestion(isPracticing) {
-        console.log("Showing first question", isPracticing ? "(practice)" : "(test)");
-        this.domElements.showTestContainer()
-        this.domElements.hideTestPartIntro()
+    showFirstQuestion() {
+        console.log("Showing first question", this.isPracticing ? "(practice)" : "(test)");
+        this.domElements.showTestContainer();
+        this.domElements.hideTestPartIntro();
 
-        const result = this.showQuestion(isPracticing, 0);
-        if (!isPracticing && Number(this.currentPart.timeout) > 1) {
+        const result = this.showQuestion(this.isPracticing, 0);
+        if (!this.isPracticing && Number(this.currentPart.timeout) > 1) {
             this.partTimeoutId = setTimeout(() => {
                 this.onPartTimeout();
             }, this.currentPart.timeout);
@@ -165,7 +167,6 @@ export class StudentTestView extends EventTarget {
         this.currentQuestionIndex = questionIndex;
         this.isPracticing = isPracticing;
         const questions = isPracticing ? this.currentPart.practice : this.currentPart.questions;
-        console.log("Showing question " + questionIndex + " of " + questions.length, "(practicing=",isPracticing,")");
         if (questionIndex >= questions.length) {
             //throw new Error("Cannot show question index " + index + ", only " + questions.length + " questions available.")
             return false;
