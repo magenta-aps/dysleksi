@@ -591,6 +591,28 @@ describe('GroupTestFlow', () => {
 
     });
 
+    it("next button on pause after practice", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.setPart(0)
+        view.currentQuestionIndex = null;
+        view.next();
+        expect(view.currentQuestionIndex).toBe(0);
+        expect(view.isPracticing).toBe(false);
+        expect(view.showFirstQuestion).toHaveBeenCalled();
+    })
+
+    it("next button on normal question answer", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        testSpy(view);
+        view.setPart(0)
+        view.setQuestion(true, 0)
+        view.next();
+        expect(view.onQuestionComplete).toHaveBeenCalled();
+    })
+
 });
 
 

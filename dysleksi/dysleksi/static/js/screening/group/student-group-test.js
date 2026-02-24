@@ -19,8 +19,8 @@ export class GroupTestView extends StudentTestView {
 
     start() {
         super.start();
-        this.domElements.setNextButtonListener(() => this.onQuestionComplete(this.currentQuestion));
-        this.domElements.setRepeatButtonListener(() => this.repeat())
+        this.domElements.setNextButtonListener(() => this.next());
+        this.domElements.setRepeatButtonListener(() => this.repeat());
     }
 
     // ---- Parts ----
@@ -69,7 +69,7 @@ export class GroupTestView extends StudentTestView {
         const canShow = this.setQuestion(isPracticing, questionIndex);
         if (canShow) {
             console.log("---------------------------------------------")
-            console.log("Showing question " + this.currentPartIndex+"."+this.currentQuestionIndex + ", type:" + this.currentQuestion.type, this.currentQuestion);
+            console.log("Showing question " + this.currentPartIndex+"."+this.currentQuestionIndex, "(practicing=",isPracticing,")", "type:", this.currentQuestion.type, this.currentQuestion);
 
             if (this.currentQuestion.instruction_sequence) {
                 this.domElements.setStudentHeader('<i class="ph ph-ear"></i>');
@@ -79,6 +79,7 @@ export class GroupTestView extends StudentTestView {
                 this.domElements.hideStudentHeader();
             }
 
+            this.domElements.toggleRepeatButton(false);
             this.domElements.toggleNextButton(false);
             this.domElements.clearQuestionChoices();
             this.domElements.showQuestionChallenge(
@@ -179,6 +180,15 @@ export class GroupTestView extends StudentTestView {
         return canShow;
     }
 
+    next() {
+        if (this.currentQuestionIndex === null) {
+            this.currentQuestionIndex = 0;
+            this.showFirstQuestion();
+        } else {
+            this.onQuestionComplete(this.currentQuestion);
+        }
+    }
+
     onQuestionComplete(question, outOfTime = false) {
         const questionAnsweredAt = document.timeline.currentTime;
 
@@ -236,13 +246,16 @@ export class GroupTestView extends StudentTestView {
             if (this.isPracticing) {
                 // finished practicing
                 this.domElements.showQuestionChallenge();
-                this.domElements.toggleNextButton(false);
                 this.domElements.clearQuestionChoices();
                 this.domElements.hideStudentHeader();
 
-                // start real test
+                // Show repeat and next buttons
+                this.domElements.toggleRepeatButton(true);
+                this.domElements.toggleNextButton(true);
+
+                // prepare to start real test. next() will pick up on this and start the real test.
+                this.currentQuestionIndex = null;
                 this.isPracticing = false;
-                this.showFirstQuestion(false);
 
             } else {
                 // part complete

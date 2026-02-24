@@ -327,6 +327,7 @@ describe("GroupTestDomElements DOM utilities", () => {
       <div id="question-title"></div>
       <div id="question-challenge"></div>
       <div id="choices"></div>
+      <button id="repeat" data-hide-display="true"></button>
       <button id="next"></button>
       <div id="test-el"></div>
       <div id="test-el2" data-hide-display="true"></div>
@@ -345,6 +346,9 @@ describe("GroupTestDomElements DOM utilities", () => {
     dom.hideElement(el);
     expect(el.style.visibility).toBe("hidden");
   });
+  it("hideElement with null arg does not break", () => {
+    dom.hideElement(null);
+  });
 
   it("showElement sets display to block", () => {
     dom.showElement(el2);
@@ -354,6 +358,18 @@ describe("GroupTestDomElements DOM utilities", () => {
   it("hideElement sets display to none", () => {
     dom.hideElement(el2);
     expect(el2.style.display).toBe("none");
+  });
+  it("showElement with null arg does not break", () => {
+    dom.hideElement(null);
+  });
+
+  it("toggleRepeatButton hides button", () => {
+    dom.toggleRepeatButton(false);
+    expect(dom.repeatBtn.style.display).toBe("none");
+  });
+  it("toggleRepeatButton shows button", () => {
+    dom.toggleRepeatButton(true);
+    expect(dom.repeatBtn.style.display).toBe("block");
   });
 
 
