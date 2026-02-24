@@ -117,7 +117,8 @@ export class GroupTestView extends StudentTestView {
                 const instructionRunner = new InstructionSequenceRunner(
                     this,
                     this.currentQuestion.instruction_sequence.instructions,
-                    this.domElements
+                    this.domElements,
+                    this.audioContext
                 );
 
                 if (this.domElements.skipInstructionButton) {

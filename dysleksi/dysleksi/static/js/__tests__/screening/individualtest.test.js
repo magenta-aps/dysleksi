@@ -9,6 +9,7 @@ import { IndividualTestDomElements } from "../../screening/dom.js";
 import { Test } from "../../screening/model.js";
 import {StudentTestView} from "../../screening/student-test.js";
 import {spyAttributes} from "../utils.js";
+import * as utils from "../../screening/utils.js";
 
 describe("IndividualTestFlow", () => {
     let originalWebSocket;
@@ -58,6 +59,8 @@ describe("IndividualTestFlow", () => {
             start: vi.fn(),
             stop: vi.fn(),
         };
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue({});
+
 
     });
 

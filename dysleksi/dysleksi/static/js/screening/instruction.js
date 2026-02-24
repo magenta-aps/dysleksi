@@ -1,16 +1,14 @@
 export class InstructionSequenceRunner {
 
-    constructor(view, instructions, domElements) {
+    constructor(view, instructions, domElements, audioContext) {
         this.view = view;
         this.instructions = instructions;
         this.domElements = domElements;
+        this.audioContext = audioContext;
         this.skipCurrent = false;
         this.skipAll = false;
         this._currentSkipResolver = null;
 
-        // Reuse one audio element (better for iOS Safari)
-        this._audio = new Audio();
-        this._audio.preload = "auto";
     }
 
     getEl(id) {
@@ -137,45 +135,45 @@ export class InstructionSequenceRunner {
                 throw new Error("Unknown action: " + action);
         }
     }
-
-    playSound(url) {
-        if (this.skipCurrent) return Promise.resolve();
-
-        return new Promise(resolve => {
-            const audio = this._audio;
     
-            // Stop anything currently playing
-            audio.pause();
+    async playSound(url) {
+        if (this.skipCurrent) return;
     
-            // Reset and set new source
-            audio.currentTime = 0;
-            audio.src = url;
+        const context = this.audioContext;
     
-            const cleanup = () => {
-                audio.removeEventListener("ended", onEnd);
-                audio.removeEventListener("error", onEnd);
-            };
+        try {
+            // Fetch audio data
+            const response = await fetch(url);
+            const arrayBuffer = await response.arrayBuffer();
+            const audioBuffer = await context.decodeAudioData(arrayBuffer);
     
-            const onEnd = () => {
-                cleanup();
-                resolve();
-            };
+            const source = context.createBufferSource();
+            source.buffer = audioBuffer;
+            source.connect(context.destination);
     
-            audio.addEventListener("ended", onEnd);
-            audio.addEventListener("error", onEnd);
-
-            audio.play()
-
-            // Make skipping instant
+            let resolved = false;
+    
+            // Setup skip resolver
             this._currentSkipResolver = () => {
-                cleanup();
-                audio.pause();
-                audio.currentTime = audio.duration;
-                resolve();
+                if (!resolved) {
+                    source.stop();
+                    resolved = true;
+                }
             };
-        }).finally(() => {
+    
+            source.start();
+    
+            // Wait until finished or skipped
+            await new Promise((resolve) => {
+                source.onended = () => {
+                    if (!resolved) resolved = true;
+                    resolve();
+                };
+            });
+    
+        } finally {
             this._currentSkipResolver = null;
-        });
+        }
     }
 
     // Skip ONLY the current instruction

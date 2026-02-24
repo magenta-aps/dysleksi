@@ -141,3 +141,110 @@ describe('wake lock utils', () => {
         expect(() => releaseWakeLock()).not.toThrow();
     });
 });
+
+
+describe('unlockAudioOnGesture', () => {
+    let originalAudioContext;
+    let lastAudioContextInstance;
+    let utils;
+
+    beforeEach(async () => {
+        // Save original
+        originalAudioContext = global.AudioContext;
+
+        // Mock AudioContext class
+        class MockAudioContext {
+            constructor() {
+                this.state = 'suspended';
+                this.resume = vi.fn().mockResolvedValue();
+                lastAudioContextInstance = this;
+            }
+        }
+        global.AudioContext = MockAudioContext;
+
+        // Reset module to clear module-level audioContext variable
+        vi.resetModules();
+        lastAudioContextInstance = null;
+        utils = await import('../screening/utils');
+    });
+
+    afterEach(() => {
+        global.AudioContext = originalAudioContext;
+        document.body.innerHTML = '';
+        vi.restoreAllMocks();
+    });
+
+    it('should create a new AudioContext if none exists', () => {
+        const context = utils.unlockAudioOnGesture();
+        expect(context).toBe(lastAudioContextInstance);
+        expect(lastAudioContextInstance).toBeDefined();
+        expect(lastAudioContextInstance.state).toBe('suspended');
+    });
+
+    it('should resume suspended AudioContext on first click', async () => {
+        utils.unlockAudioOnGesture();
+
+        const clickEvent = new Event('click');
+        document.dispatchEvent(clickEvent);
+
+        // Wait for promise resolution
+        await Promise.resolve();
+        expect(lastAudioContextInstance.resume).toHaveBeenCalled();
+    });
+
+    it('should remove click listener after first resume', async () => {
+        const removeSpy = vi.spyOn(document, 'removeEventListener');
+
+        utils.unlockAudioOnGesture();
+
+        const clickEvent = new Event('click');
+        document.dispatchEvent(clickEvent);
+
+        await Promise.resolve();
+        expect(removeSpy).toHaveBeenCalledWith('click', expect.any(Function));
+    });
+
+    it('should return the same AudioContext on multiple calls', () => {
+        const ctx1 = utils.unlockAudioOnGesture();
+        const ctx2 = utils.unlockAudioOnGesture();
+        expect(ctx1).toBe(ctx2);
+    });
+
+    it('should not add click listener if context is running', () => {
+        utils.unlockAudioOnGesture();
+        lastAudioContextInstance.state = 'running';
+        const addSpy = vi.spyOn(document, 'addEventListener');
+
+        utils.unlockAudioOnGesture();
+        expect(addSpy).not.toHaveBeenCalled();
+    });
+
+    it('should use window.webkitAudioContext if window.AudioContext is undefined', async () => {
+        // Remove AudioContext
+        global.AudioContext = undefined;
+    
+        // Mock webkitAudioContext
+        let lastWebkitInstance = null;
+        class MockWebkitAudioContext {
+            constructor() {
+                this.state = 'suspended';
+                this.resume = vi.fn().mockResolvedValue();
+                lastWebkitInstance = this;
+            }
+        }
+        global.webkitAudioContext = MockWebkitAudioContext;
+    
+        // Reset module to clear module-level audioContext variable
+        vi.resetModules();
+        const utilsWebkit = await import('../screening/utils');
+    
+        const context = utilsWebkit.unlockAudioOnGesture();
+        expect(context).toBe(lastWebkitInstance);
+        expect(lastWebkitInstance).toBeDefined();
+    
+        // Clean up
+        delete global.webkitAudioContext;
+    });
+
+
+});
