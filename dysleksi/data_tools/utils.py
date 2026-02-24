@@ -20,10 +20,11 @@ def create_wordreading_2_test(
             "image_url": "/static/images/wordreading.png",
         },
     )
+    if created:
+        part.create_test_resources(questions_data, False)
+        if practice_questions_data:
+            part.create_test_resources(practice_questions_data, True)
     test.parts.add(part)
-    part.create_test_resources(questions_data, False)
-    if practice_questions_data:
-        part.create_test_resources(practice_questions_data, True)
 
 
 def create_wordspelling_test(
@@ -38,10 +39,11 @@ def create_wordspelling_test(
             "image_url": "/static/images/wordspelling.png",
         },
     )
+    if created:
+        part.create_test_resources(questions_data, False)
+        if practice_questions_data:
+            part.create_test_resources(practice_questions_data, True)
     test.parts.add(part)
-    part.create_test_resources(questions_data, False)
-    if practice_questions_data:
-        part.create_test_resources(practice_questions_data, True)
 
 
 def create_letter_pronunciation_test(
@@ -56,7 +58,8 @@ def create_letter_pronunciation_test(
             "image_url": "/static/images/letter_pronunciation.png",
         },
     )
+    if created:  # pragma: no branch
+        part.create_test_resources(questions_data, False)
+        if practice_questions_data:
+            part.create_test_resources(practice_questions_data, True)
     test.parts.add(part)
-    part.create_test_resources(questions_data, False)
-    if practice_questions_data:
-        part.create_test_resources(practice_questions_data, True)

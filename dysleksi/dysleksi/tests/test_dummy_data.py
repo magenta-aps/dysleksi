@@ -43,8 +43,8 @@ class DummyDataTest(TestCase):
         word_reading_2_test = TestPart.objects.filter(name="Ordlæsning 2A").first()
         wordspelling_test = TestPart.objects.filter(name="Ordstavning").first()
 
-        self.assertEqual(word_reading_2_test.questions.count(), 4 * 104)
-        self.assertEqual(wordspelling_test.questions.count(), 4 * 25)
+        self.assertEqual(word_reading_2_test.questions.count(), 104)
+        self.assertEqual(wordspelling_test.questions.count(), 25)
 
     def test_dummy_user_creation(self):
         call_command("create_groups")
