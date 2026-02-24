@@ -183,9 +183,7 @@ describe("Startup teacher test", () => {
                 <h1 id="question-title"></h1>
                 <div id="question-challenge"></div>
                 <div id="choices"></div>
-                <button id="next" class="btn next-btn" style="display: none;">
-                    <i class="ph-fill ph-arrow-right"></i>
-                </button>
+                <button id="next" class="btn next-btn" style="display: none;"></button>
             </div>
         `;
         await start();

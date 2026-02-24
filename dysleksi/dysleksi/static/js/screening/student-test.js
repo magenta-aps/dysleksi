@@ -75,10 +75,7 @@ export class StudentTestView extends EventTarget {
         this.domElements.hideInstructions();
         this.domElements.showSummary(this.test.parts);
         this.domElements.hideIntro();
-
-        const buttonText = this.canPractice() ? "Start øveopgave" : "Start deltest";
-
-        this.domElements.setEndSummaryButtonListener(() => this.endSummary(), buttonText);
+        this.domElements.setEndSummaryButtonListener(() => this.endSummary());
     }
 
     endSummary() {

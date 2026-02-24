@@ -34,7 +34,7 @@
             Hej {{ name }} {{ last_name }}
             {% endblocktrans %}
         </h2>
-        <button class="btn next-btn" id="start-summary">Videre</button>
+        <button class="btn start-btn" id="start-summary"></button>
     </div>
 </div>
 
@@ -47,16 +47,14 @@
              class="smiley-image"
              id="testpart-intro-image">
 
-        <button class="btn next-btn" id="start-testpart">
-            <i class="ph-fill ph-play"></i>
-        </button>
+        <button class="btn start-part-btn" id="start-testpart"></button>
     </div>
 </div>
 
 <div id="test-summary" style="display: none" class="center-screen">
     <div class="center-content">
         <div id="summary-container"></div>
-        <button class="btn next-btn mt-5" id="end-summary">Start øveopgave</button>
+        <button class="btn mt-5 start-part-btn" id="end-summary"></button>
     </div>
 </div>
 
@@ -77,12 +75,8 @@
         <div id="question-challenge"></div>
         <div id="choices"></div>
         <div style="display: flex; justify-content: space-between;">
-            <button id="repeat" class="btn repeat-btn" data-hide-display="true" style="display: none;">
-                <i class="ph ph-arrow-counter-clockwise"></i>
-            </button>
-            <button id="next" class="btn next-btn" style="visibility: hidden;">
-                <i class="ph-fill ph-arrow-right"></i>
-            </button>
+            <button id="repeat" class="btn repeat-btn" data-hide-display="true" style="display: none;"></button>
+            <button id="next" class="btn next-btn" style="visibility: hidden;"></button>
         </div>
     </div>
 </div>
