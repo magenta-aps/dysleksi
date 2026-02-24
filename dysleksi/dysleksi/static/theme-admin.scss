@@ -1,11 +1,17 @@
 // "Design names"
+$black: #000000;
+$white: #ffffff;
 $other-grey-lightest: #f9f9f9;
 $other-grey-light: #efefef;
+$other-grey-light2: #d9d9d9;
 $other-grey-medium: #bbbbbb;
 $other-grey: #888888;
 $other-grey-dark: #545257;
-$black: #000000;
-$white: #ffffff;
+$other-red-light: #ffe0de;
+$other-red: #bd0900;
+$other-red-dark: #970700;
+$other-green-light: #d1ffd8;
+$other-green: #006a11;
 
 // Define our own constants
 $sidebar-navigation-min-width: 15rem;
@@ -13,9 +19,12 @@ $sidebar-navigation-med-width: 10vw;
 $sidebar-navigation-max-width: 20vw;
 
 // Map "design names" to known Bootstrap variables
-$body-bg: $other-grey-lightest;
-$primary: $other-grey-medium;
+$primary: $other-green;
+$secondary: $other-grey-medium;
+$warning: $other-red-light;
+$danger: $other-red;
 $btn-color: $white;
+$body-bg: $other-grey-lightest;
 $list-group-disabled-color: $other-grey-medium;
 
 // Reset other relevant Bootstrap variables
@@ -33,6 +42,9 @@ $form-check-input-indeterminate-border-color: $other-grey-medium;
 $form-check-input-checked-border-color: $black;
 $form-check-input-checked-color: $black;
 $form-select-border-radius: 1rem;
+$card-cap-bg: $other-grey-light2;
+$card-bg: $white;
+$card-border-width: 0px;
 
 @import "./vendor/scss/bootstrap";
 @import "./vendor/fonts/phosphor/regular/style.css";
@@ -48,6 +60,12 @@ $form-select-border-radius: 1rem;
   font-family: "Figtree Italic";
   font-weight: normal;
   src: url("./vendor/fonts/figtree/Figtree-Italic-VariableFont_wght.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Karinika";
+  font-weight: normal;
+  src: url("./fonts/Karinika-Regular.otf") format("opentype");
 }
 
 body {
@@ -193,11 +211,9 @@ i {
 }
 
 // Button styles
-.btn {
-  color: $black;
-}
-.btn-secondary {
-  color: $white;
+.btn-warning {
+  color: $other-red;
+  border-color: $other-red;
 }
 .btn-secondary-outline {
   color: $black;
@@ -206,6 +222,23 @@ i {
 .btn-secondary-outline:hover {
   border: 1px solid $other-grey;
 }
+.btn i.ph,
+.btn i.ph-fill {
+  line-height: var(--bs-body-line-height);
+}
+
+// Card styles
+.card {
+  box-shadow: 0 0 $spacer $other-grey-light;
+}
+.card .card-header span {
+  color: $other-grey-dark;
+}
+.card .card-header em {
+  text-transform: uppercase;
+  font-style: normal;
+  font-weight: bold;
+}
 
 // Form element styles
 .d-flex .form-check {
@@ -213,6 +246,9 @@ i {
 }
 input[type='datetime-local'] {
   border-radius: $spacer;
+}
+textarea.form-control {
+  resize: none;
 }
 
 // Table styles
@@ -334,4 +370,60 @@ ul.modal-progress li.list-group-item.disabled span {
 .summary table table td {
   padding: 0 0 0.25 * $spacer 0;
   width: 1% !important;
+}
+
+// Teacher UI
+.current-question {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  align-items: center;
+  justify-content: space-around;
+  border: 1px solid $other-grey;
+  border-radius: $spacer;
+}
+.current-question p {
+  font-family: "Karinika", "Figtree Normal", sans-serif;
+  font-size: 5rem;
+  line-height: 1;
+}
+.card .table {
+  margin: 0;
+}
+.card .table thead th {
+  background: $other-grey-light;
+  color: $other-grey-dark;
+}
+
+// Teacher UI for running individual tests
+div[data-role='teacher'][data-test-type='individual'] .d-flex #question-container {
+  flex: 1;
+}
+div[data-role='teacher'][data-test-type='individual'] .d-flex .actions {
+  flex: 4;
+  margin: 0 0 0 $spacer;
+}
+div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .buttons {
+  margin: 0 0 $spacer 0;
+}
+div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25 * $btn-padding-y $btn-padding-x;
+}
+div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn#correct.active {
+  background: $other-green-light;
+  color: $other-green;
+}
+div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn i.ph {
+  display: inline-block;
+}
+div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn i.ph-fill {
+  display: none;
+}
+div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn.active i.ph {
+  display: none;
+}
+div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn.active i.ph-fill {
+  display: inline-block;
 }

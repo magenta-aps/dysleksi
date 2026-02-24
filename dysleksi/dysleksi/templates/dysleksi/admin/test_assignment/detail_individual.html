@@ -1,0 +1,93 @@
+{% extends "dysleksi/admin/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dysleksi:test_assignment_list' %}">{% translate 'Tests' %}</a></li>
+<li class="breadcrumb-item active" aria-current="page">
+    {{ test_assignment.student.get_full_name }} - {{ test_assignment.test.name }}
+</li>
+{% endblock %}
+
+{% block inner_content %}
+<div data-role="teacher"
+     data-test-type="{{ test_type }}"
+     data-room-name="{{ room_name }}"
+     data-assignment-id="{{ object.pk }}">
+    <h5 class="mt-2 mb-4">{{ test_assignment.student.get_full_name }} - {{ test_assignment.test.name }}</h5>
+    <div class="card">
+        <div class="card-header d-flex align-items-center justify-content-between">
+            <span id="current-test-part-name" class="me-5"><em>Bogstavbenævnelse</em></span>
+            <span id="current-test-part-number" class="me-5">Deltest 1 af 3</span>
+            <span id="current-test-question-number" class="me-5">Opgave 1 af 38</span>
+            <div class="align-items-center ms-auto">
+                <span class="d-inline-flex align-items-baseline me-3">
+                    <i class="ph ph-clock"></i>
+                    <span id="total-elapsed-time">00:13:07</span>
+                </span>
+                <button id="pause" class="btn btn-warning">
+                    <i class="ph-fill ph-pause"></i>
+                    {% translate 'Pause' %}
+                </button>
+                <button id="cancelled" class="btn btn-danger">
+                    <i class="ph-fill ph-stop"></i>
+                    {% translate 'Afslut test' %}
+                </button>
+            </div>
+        </div>
+        <div class="card-body d-flex">
+            <div id="question-container">
+                <span id="question-title" class="d-none"></span>
+                <div id="question-content" class="current-question"></div>
+            </div>
+            <div class="actions">
+                <p class="fw-bold">{% translate 'Markér svar som:' %}</p>
+                <div class="buttons">
+                    <button id="correct" class="btn btn-outline-success disabled d-none">
+                        <i class="ph ph-circle fs-5"></i>
+                        <i class="ph-fill ph-check-circle fs-5"></i>
+                        {% translate 'Korrekt' %}
+                    </button>
+                    <button id="wrong" class="btn btn-outline-danger disabled d-none">
+                        <i class="ph ph-circle fs-5"></i>
+                        <i class="ph-fill ph-x-circle fs-5"></i>
+                        {% translate 'Forkert' %}
+                    </button>
+                    <button id="skipped" class="btn btn-outline-secondary disabled d-none">
+                        <i class="ph ph-circle fs-5"></i>
+                        <i class="ph-fill ph-minus-circle fs-5"></i>
+                        {% translate 'Sprunget over' %}
+                    </button>
+                </div>
+                <textarea id="note"
+                          class="form-control mb-3 d-none"
+                          rows="3"
+                          placeholder="{% translate 'Skriv evt. bemærkning' %}">
+                </textarea>
+                <button id="next" class="btn btn-secondary disabled">
+                    {% translate 'Næste opgave' %}
+                </button>
+            </div>
+        </div>
+        <table id="events" class="table">
+            <thead>
+                <tr>
+                    <th>Begivenhed</th>
+                    <th>Spørgsmål</th>
+                    <th>Svar</th>
+                    <th>Tid</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block js_module %}
+{{ block.super }}
+{{ test_contents|json_script:"test_contents" }}
+{{ assignment|json_script:"assignment" }}
+<script type="module" src="{% static 'js/screening/index.js' %}"></script>
+{% endblock %}

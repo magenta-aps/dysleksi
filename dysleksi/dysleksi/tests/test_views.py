@@ -6,7 +6,7 @@ from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.views import View
 
-from dysleksi.models import Student, Test, TestAssignment, User
+from dysleksi.models import Student, Test, TestAssignment, TestType, User
 from dysleksi.tests.base import DysleksiTest
 from dysleksi.views import (
     AssignmentView,
@@ -61,22 +61,23 @@ class TestAssignmentView(DysleksiTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-
-        cls.test = Test.objects.create(name="Middle 2. grade")
-        cls.test2 = Test.objects.create(name="Individual dummy test")
-
+        cls.test = Test.objects.create(name="Middle 2. grade", test_type=TestType.GROUP)
+        cls.test2 = Test.objects.create(
+            name="Individual dummy test",
+            test_type=TestType.INDIVIDUAL,
+        )
         cls.assignment1 = TestAssignment.objects.create(
             test=cls.test, teacher=cls.teacher, klasse=cls.klasse
         )
         cls.assignment2 = TestAssignment.objects.create(
-            test=cls.test, teacher=cls.teacher, student=cls.student
+            test=cls.test2, teacher=cls.teacher, student=cls.student
         )
 
     def test_get_template_names(self):
         cases: list[tuple[User, str | None, TestAssignment]] = [
             (
                 self.teacher,
-                "dysleksi/screening/teacher.html",
+                "dysleksi/admin/test_assignment/detail_individual.html",
                 "student_123",
                 self.assignment2,
             ),

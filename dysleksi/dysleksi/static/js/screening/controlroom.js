@@ -40,6 +40,7 @@ export class EventTable {
 export class ActionButtons {
     constructor(buttonSelector = 'button') {
         this.buttons = document.querySelectorAll(buttonSelector);
+        this.active = null;
     }
 
     disableButtons() {
@@ -49,15 +50,40 @@ export class ActionButtons {
     enableButtons() {
         this.buttons.forEach(el => el.classList.toggle('disabled', false));
     }
-    
+
     hideButtons() {
         this.buttons.forEach(el => el.classList.toggle('d-none', true));
     }
-    
+
     showButtons() {
         this.buttons.forEach(el => el.classList.toggle('d-none', false));
     }
-    
+
+    disableNextButton() {
+        this.nextButton().classList.toggle('disabled', true);
+    }
+
+    enableNextButton() {
+        this.nextButton().classList.toggle('disabled', false);
+    }
+
+    setActive(buttonId) {
+        this.active = buttonId;
+        this.#updateButtonActiveState(buttonId);
+        this.enableNextButton();
+    }
+
+    clearActive() {
+        // Update state
+        this.active = null;
+        this.#updateButtonActiveState(null);
+        this.disableNextButton();
+    }
+
+    getActive() {
+        return this.active;
+    }
+
     addClickListener(callback) {
         this.buttons.forEach(el => {
             el.addEventListener('click', callback);
@@ -81,6 +107,20 @@ export class ActionButtons {
         return this.buttonById('skipped');
     }
 
+    nextButton() {
+        return this.buttonById('next');
+    }
+
+    #updateButtonActiveState(buttonId) {
+        // Deactivate all relevant buttons
+        for (const btn of [this.correctButton(), this.wrongButton(), this.skipButton()]) {
+            btn.classList.toggle('active', false);
+        }
+        // Activate the specified button, if given
+        if (buttonId !== null) {
+            this.buttonById(buttonId).classList.toggle('active', true);
+        }
+    }
 }
 
 export class NoteField {
@@ -205,6 +245,9 @@ export class TeacherView {
                 this.setQuestionIndex(data.questionIndex);
                 if (data.event === 'question.displayed') {
                     this.buttons.enableButtons();
+                    if ((this.currentQuestion !== null) && (this.currentQuestion.type === "no_input_required")) {
+                        this.buttons.disableNextButton();
+                    }
                     this.showQuestion();
                 }
             }
@@ -216,40 +259,65 @@ export class TeacherView {
             const val = e.target.id;
             if (val === "cancelled") {
                 if (confirm("Er du sikker på at du vil afbryde testen")) {
-                    this.chatSocket.send(JSON.stringify({
-                        uuid: crypto.randomUUID(),
-                        event: 'test.cancelled',
-                        roomName: this.roomName,
-                        partIndex: this.partIndex,
-                        questionIndex: this.questionIndex,
-                        questionId: this.currentQuestion.id,
-                        partId: this.currentPart.id,
-                        assignmentId: this.assignmentId,
-                        note: this.noteField.getNote(),
-                    }));
+                    this.sendTestCancelled();
                     this.buttons.disableButtons();
                 }
             } else {
-                const correct = (val === "skipped") ? null : (val === "correct");
-                this.chatSocket.send(
-                    JSON.stringify({
-                        uuid: crypto.randomUUID(),
-                        event: 'question.feedback',
-                        roomName: this.roomName,
-                        partIndex: this.partIndex,
-                        questionIndex: this.questionIndex,
-                        questionId: this.currentQuestion.id,
-                        partId: this.currentPart.id,
-                        assignmentId: this.assignmentId,
-                        correct: correct, // true=correct, false=wrong, null=skipped
-                        note: this.noteField.getNote(),
-                    })
-                );
-                this.buttons.disableButtons();
-                this.noteField.clearNote();
-                this.hideQuestion();
+                if ((this.currentQuestion !== null) && (this.currentQuestion.type === "no_input_required")) {
+                    if (val === "next") {
+                        // Send feedback and go to next question
+                        this.sendQuestionFeedback(this.buttons.getActive());
+                        this.noteField.clearNote();
+                        this.buttons.clearActive();
+                        this.buttons.disableButtons();
+                    } else {
+                        // Delay sending feedback until teacher clicks 'Next' button
+                        this.buttons.setActive(val);
+                    }
+                } else {
+                    // Send feedback immediately
+                    this.sendQuestionFeedback(val);
+                    this.hideQuestion();
+                    this.noteField.clearNote();
+                    this.buttons.disableButtons();
+                }
             }
         });
+    }
+
+    sendTestCancelled() {
+        this.chatSocket.send(
+            JSON.stringify({
+                uuid: crypto.randomUUID(),
+                event: 'test.cancelled',
+                roomName: this.roomName,
+                partIndex: this.partIndex,
+                questionIndex: this.questionIndex,
+                questionId: this.currentQuestion.id,
+                partId: this.currentPart.id,
+                assignmentId: this.assignmentId,
+                note: this.noteField.getNote(),
+            })
+        );
+    }
+
+    sendQuestionFeedback(val) {
+        // Map `val` as follows: true=correct, false=wrong, null=skipped
+        const correct = (val === "skipped") ? null : (val === "correct");
+        this.chatSocket.send(
+            JSON.stringify({
+                uuid: crypto.randomUUID(),
+                event: 'question.feedback',
+                roomName: this.roomName,
+                partIndex: this.partIndex,
+                questionIndex: this.questionIndex,
+                questionId: this.currentQuestion.id,
+                partId: this.currentPart.id,
+                assignmentId: this.assignmentId,
+                correct: correct,
+                note: this.noteField.getNote(),
+            })
+        );
     }
 
     showQuestion() {

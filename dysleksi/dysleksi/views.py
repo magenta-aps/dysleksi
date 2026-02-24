@@ -62,6 +62,13 @@ class RootView(UserTypeMixin, TemplateView):
 class AssignmentView(UserTypeMixin, DetailView):
 
     model = TestAssignment
+    context_object_name = "test_assignment"
+
+    def get_template_names(self) -> list[str]:
+        if self.user.is_teacher:
+            if self.object.test.test_type == TestType.INDIVIDUAL:
+                return ["dysleksi/admin/test_assignment/detail_individual.html"]
+        return super().get_template_names()
 
     def get_template_prefix(self) -> str:
         if self.user.is_teacher or self.user.is_student:

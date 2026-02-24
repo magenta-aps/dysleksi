@@ -9,6 +9,93 @@ import {Test} from "../../screening/model";
 
 vi.mock("../../screening/utils.js");
 
+describe("ActionButtons", () => {
+    const mockDoc = `
+        <button id="correct"></button>
+        <button id="wrong"></button>
+        <button id="cancelled"></button>
+        <button id="skipped"></button>
+        <button id="next"></button>
+    `
+
+    const getInstance = () => {
+        return new ActionButtons();
+    }
+
+    const getButtons = (selector = "button") => {
+        return document.querySelector(selector);
+    }
+
+    beforeEach(() => {
+        document.body.innerHTML = mockDoc;
+    });
+
+    it("initializes", () => {
+        const instance = getInstance();
+        expect(instance.buttons).not.toBeNull();
+        expect(instance.active).toBeNull();
+    });
+
+    it("can enable and disable all buttons", () => {
+        const instance = getInstance();
+        const buttons = getButtons();
+        // Test initial state
+        expect(buttons.classList).not.include(["disabled"]);
+        // Test disabled state
+        instance.disableButtons();
+        expect(buttons.classList).include(["disabled"]);
+        // Test enabled state
+        instance.enableButtons();
+        expect(buttons.classList).not.include(["disabled"]);
+    });
+
+    it("can show and hide all buttons", () => {
+        const instance = getInstance();
+        const buttons = getButtons();
+        // Test initial state
+        expect(buttons.classList).not.include(["d-none"]);
+        // Test hidden state
+        instance.hideButtons();
+        expect(buttons.classList).include(["d-none"]);
+        // Test shown state
+        instance.showButtons();
+        expect(buttons.classList).not.include(["d-none"]);
+    });
+
+    it("can enable and disable the 'next' button", () => {
+        const instance = getInstance();
+        // Test initial state
+        expect(instance.nextButton().classList).not.to.include(["disabled"]);
+        // Test disabled state
+        instance.disableNextButton();
+        expect(instance.nextButton().classList).to.include(["disabled"]);
+        // Test enabled state
+        instance.enableNextButton();
+        expect(instance.nextButton().classList).not.to.include(["disabled"]);
+    });
+
+    it("can set the active button", () => {
+        const instance = getInstance();
+        const buttons = getButtons("#correct, #wrong, #skipped");
+        // Test initial state (no buttons are active)
+        expect(buttons.classList).not.to.include(["active"]);
+        // Set "skipped" button as active
+        instance.setActive("skipped");
+        expect(instance.getActive()).toBe("skipped");
+        expect(instance.skipButton().classList).to.include(["active"]);
+        expect(instance.correctButton().classList).not.to.include(["active"]);
+        expect(instance.wrongButton().classList).not.to.include(["active"]);
+    });
+
+    it("can clear the active button", () => {
+        const instance = getInstance();
+        const buttons = getButtons("#correct, #wrong, #skipped");
+        instance.setActive("correct");
+        instance.clearActive();
+        expect(buttons.classList).not.to.include(["active"]);
+    });
+});
+
 describe("TeacherView Test", () => {
     let socket;
     let table;
@@ -36,6 +123,7 @@ describe("TeacherView Test", () => {
                 <button id="wrong"></button>
                 <button id="cancelled"></button>
                 <button id="skipped"></button>
+                <button id="next"></button>
                 <textarea id="note" class="d-none"></textarea>
         `;
         table = new EventTable();
@@ -78,6 +166,39 @@ describe("TeacherView Test", () => {
         expect(btn.classList.contains("disabled")).toBe(false);
     });
 
+    it("disables 'next' button on 'question.displayed' (individual tests)", () => {
+        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
+
+        // get the message handler registered on the socket
+        const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+
+        // trigger first question.displayed event - question type is "free_text"
+        handler({
+            data: JSON.stringify({
+                event: "question.displayed",
+                partIndex: 0,
+                questionIndex: 0,
+                questionTitle: "Q1",
+                displayedAt: 1000,
+            }),
+        });
+
+        const btn = document.querySelector("button");
+        expect(btn.classList.contains("disabled")).toBe(false);
+
+        // trigger another question.displayed event - this time the question type is "no_input_required"
+        handler({
+            data: JSON.stringify({
+                event: "question.displayed",
+                partIndex: 0,
+                questionIndex: 1,
+                questionTitle: "Q2",
+                displayedAt: 2000,
+            }),
+        });
+
+        expect(buttons.nextButton().classList).to.include(["disabled"]);
+    });
 
     it("show question on question.displayed", () => {
         view = new TeacherView("room1", groupTest, 1, wsGetter, table, buttons, note, questionView);
@@ -145,6 +266,38 @@ describe("TeacherView Test", () => {
         expect(wrongButton.classList.contains("disabled")).toBe(true);
     });
 
+    it("delays sending feedback if question type is 'no_input_required'", () => {
+        vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
+
+        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
+
+        // Arrange: go directly to question 2 (which is type "no_input_required")
+        view.setPartIndex(0);
+        view.setQuestionIndex(1);
+
+        // Act: fill note and click "correct"
+        note.noteEl.value = "Test note";
+        buttons.correctButton().click();
+
+        // Assert: no socket message sent yet
+        expect(socket.send).not.toHaveBeenCalled();
+
+        // Act: click "next"
+        buttons.nextButton().click();
+
+        expect(socket.send).toHaveBeenCalledWith(JSON.stringify({
+            uuid: "UUID123",
+            event: "question.feedback",
+            roomName: "room1",
+            partIndex: 0,
+            questionIndex: 1,
+            questionId: 2,
+            partId: 1,
+            assignmentId: 1,
+            correct: true,
+            note: "Test note",
+        }));
+    });
 
     it("sends message and disables buttons on cancel click", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
