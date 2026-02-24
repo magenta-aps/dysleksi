@@ -104,7 +104,7 @@ services:
     command: >
       sh -c "
         npm ci &&
-        npx vitest run --coverage --coverage.provider=istanbul --coverage.include='/app/src/**/*.js' --coverage.reportsDirectory=/app/coverage/vitest_coverage --silent passed-only
+        npx vitest run --coverage --coverage.provider=istanbul --coverage.include='/app/src/**/*.js' --coverage.exclude='/app/src/__tests__/**/*.js' --coverage.reportsDirectory=/app/coverage/vitest_coverage --silent passed-only
       "
     networks:
       - default
