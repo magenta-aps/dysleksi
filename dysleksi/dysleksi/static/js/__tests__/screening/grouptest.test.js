@@ -862,3 +862,36 @@ describe("GroupTestDomElements - Repeatbutton", () => {
         expect(view.showQuestion).toHaveBeenCalledWith(true, 1);
     });
 });
+
+describe("compareTextAnswer", () => {
+
+    vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue({});
+    const view = new GroupTestView(
+        null,{addEventListener: vi.fn()},'class_123', 1, null
+    );
+
+    it("Ignores whitespace", () => {
+        expect(view.compareTextAnswer("ulu", "ulu")).toBe(true);
+        expect(view.compareTextAnswer("ulu ", "ulu")).toBe(true);
+        expect(view.compareTextAnswer("ul u", "ulu")).toBe(true);
+        expect(view.compareTextAnswer(" ulu", "ulu ")).toBe(true);
+        expect(view.compareTextAnswer("uulu", "ulu")).toBe(false);
+    });
+
+    it("Ignores case", () => {
+        expect(view.compareTextAnswer("Ulu", "ulu")).toBe(true);
+        expect(view.compareTextAnswer("uLu", "ulu")).toBe(true);
+    });
+
+    it("Ignores doubled consonants", () => {
+        expect(view.compareTextAnswer("ullu", "ulu")).toBe(true);
+        expect(view.compareTextAnswer("mattu", "matu")).toBe(true);
+        expect(view.compareTextAnswer("matu", "mattu")).toBe(true);
+        expect(view.compareTextAnswer("matttu", "matu")).toBe(false);
+    });
+
+    it("Ignores use of similar vowels", () => {
+        expect(view.compareTextAnswer("iq", "eq")).toBe(true);
+        expect(view.compareTextAnswer("ulu", "alu")).toBe(false);
+    });
+});
