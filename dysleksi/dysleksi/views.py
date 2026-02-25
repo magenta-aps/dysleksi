@@ -68,6 +68,9 @@ class AssignmentView(UserTypeMixin, DetailView):
         if self.user.is_teacher:
             if self.object.test.test_type == TestType.INDIVIDUAL:
                 return ["dysleksi/admin/test_assignment/detail_individual.html"]
+            else:
+                return ["dysleksi/admin/test_assignment/detail_group.html"]
+
         return super().get_template_names()
 
     def get_template_prefix(self) -> str:
@@ -84,12 +87,16 @@ class AssignmentView(UserTypeMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        test = Test.objects.get(pk=self.object.test_id)
+        assignment = self.object
+        test = Test.objects.get(pk=assignment.test_id)
         context["test_contents"] = test.to_json()
         context["room_name"] = self.room_name
         context["test_type"] = self.get_room_type()
         context["student"] = self.user
         context["room_type"] = self.get_room_type()
+        context["test_name"] = test.name
+        context["class_name"] = assignment.klasse_name
+
         return context
 
     def get_room_type(self) -> str:

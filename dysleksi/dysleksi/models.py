@@ -357,6 +357,13 @@ class TestAssignment(models.Model):
         null=True,
     )
 
+    @property
+    def klasse_name(self):
+        if self.klasse:
+            return self.klasse.name
+        else:
+            return self.student.klasse.name
+
     def __str__(self) -> str:
         assignee = self.student or self.klasse
         return f"{self.test.name}/{str(self.teacher)} ({str(assignee)})"

@@ -1,7 +1,7 @@
 import { shuffleArray } from "../utils.js";
 import { StudentTestView } from "../student-test.js";
 import { InstructionSequenceRunner } from "../instruction.js";
-
+import { calculateStudentProgress } from '../utils.js';
 
 export class GroupTestView extends StudentTestView {
 
@@ -13,8 +13,8 @@ export class GroupTestView extends StudentTestView {
     partTimeoutId;
     repeatQuestionIndex = null;
 
-    constructor(test, chatSocket, roomName, assignmentId, domElements) {
-        super(test, chatSocket, roomName, assignmentId, domElements);
+    constructor(test, chatSocket, roomName, assignmentId, domElements, student) {
+        super(test, chatSocket, roomName, assignmentId, domElements, student);
     }
 
     start() {
@@ -214,6 +214,7 @@ export class GroupTestView extends StudentTestView {
                     messageText = `Elev besvarede ikke spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1} indenfor tidsfristen`
                 }
                 const duration = questionAnsweredAt - this.questionDisplayedAt;
+                this.student.progress = calculateStudentProgress(this.test, this.currentPartIndex, this.currentQuestionIndex);
                 this.send({
                     event: "question.answered",
                     message: messageText,

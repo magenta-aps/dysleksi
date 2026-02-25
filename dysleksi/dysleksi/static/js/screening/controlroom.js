@@ -37,9 +37,92 @@ export class EventTable {
     }
 }
 
+export class GroupTestContainer {
+    constructor() {
+        this.container = document.querySelector(".group-test-body");
+    }
+
+    updateData(data) {
+        const student = data.student;
+
+        // Try to find existing card
+        let el = this.container.querySelector(`[data-student-id='${student.id}']`);
+
+        if (!el) {
+            // Create new card
+            el = document.createElement("div");
+            el.classList.add("student-card");
+            el.dataset.studentId = student.id;
+
+            // --- Top row wrapper (name + progress) ---
+            const topRow = document.createElement("div");
+            topRow.classList.add("student-top-row");
+            el.appendChild(topRow);
+
+            // Progress bar inside top row
+            const fill = document.createElement("div");
+            fill.classList.add("progress-fill");
+            topRow.appendChild(fill);
+
+            // Student name text inside top row
+            const text = document.createElement("span");
+            text.classList.add("student-text");
+            const lastInitial = student.lastName ? student.lastName[0].toUpperCase() : "";
+            text.textContent = `${student.firstName} ${lastInitial}.`;
+
+            topRow.appendChild(text);
+
+            // Folded area container (hidden initially)
+            const folded = document.createElement("div");
+            folded.classList.add("folded-area");
+            el.appendChild(folded);
+
+            // Show/hide folded area arrow
+            const arrow = document.createElement("span");
+            arrow.classList.add("foldout-arrow")
+            arrow.innerHTML = `<i class="ph-fill ph-caret-up"></i>`
+
+            topRow.appendChild(arrow);
+
+            // Click handler to toggle fold
+            el.addEventListener("click", (e) => {
+                // Prevent toggling if clicking inside folded area
+                if (e.target.classList.contains("folded-area")) return;
+
+                const isHidden = folded.style.display === "none" || folded.style.display === "";
+            
+                // Show or hide folded area
+                folded.style.display = isHidden ? "flex" : "none";
+                if (isHidden){
+                    arrow.innerHTML = `<i class="ph-fill ph-caret-down"></i>`
+                } else {
+                    arrow.innerHTML = `<i class="ph-fill ph-caret-up"></i>`
+                }
+            });
+
+            this.container.appendChild(el);
+        }
+
+        // Update progress
+        const fill = el.querySelector(".progress-fill");
+        fill.style.width = `${student.progress}%`;
+
+        // Handle correct/incorrect dots
+        if ("correct" in data) {
+            const folded = el.querySelector(".folded-area");
+
+            const dot = document.createElement("span");
+            dot.classList.add("dot");
+            dot.style.backgroundColor = data.correct ? "green" : "red";
+
+            folded.appendChild(dot);
+        }
+    }
+}
+
 export class ActionButtons {
     constructor(buttonSelector = 'button') {
-        this.buttons = document.querySelectorAll(buttonSelector);
+        this.buttons = [...document.querySelectorAll('#correct, #wrong, #cancelled, #skipped, #next')];
         this.active = null;
     }
 
@@ -202,12 +285,15 @@ export class TeacherView {
         this.currentQuestion = null;
 
         this.table = table || new EventTable();
+        this.groupTestContainer = new GroupTestContainer();
         this.buttons = buttons || new ActionButtons();
         this.noteField = noteField || new NoteField();
         this.questionView = questionView || new QuestionView();
+        this.filterButtons = document.querySelectorAll('.group-test-header .btn');
 
         this._initSocket();
         this._initButtonListeners();
+        this._initFilterButtonSelection();
     }
 
     validatePartIndex(partIndex) {
@@ -235,6 +321,10 @@ export class TeacherView {
     _initSocket() {
         this.chatSocket.addEventListener("message", (e) => {
             const data = JSON.parse(e.data);
+
+            if (["test.started", "question.answered"].includes(data.event)) {
+                this.groupTestContainer.updateData(data)
+            }
 
             if (["test.cancelled", "test.complete", "question.answered", "question.displayed"].includes(data.event)) {
                 this.table.updateTable(data);
@@ -329,4 +419,15 @@ export class TeacherView {
         this.questionView.showTitle('');
         this.questionView.showContent('');
     }
+
+    _initFilterButtonSelection() {
+        this.filterButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                this.filterButtons.forEach(b => b.classList.remove('selected'));
+                btn.classList.add('selected');
+            });
+        });
+    }
+
+
 }

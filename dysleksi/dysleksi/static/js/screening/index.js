@@ -1,5 +1,5 @@
 import { startSession } from "./utils.js";
-import { Test } from "./model.js";
+import { Test, Student } from "./model.js";
 
 export async function start() {
     const roleEl = document.querySelector("[data-role]");
@@ -14,6 +14,13 @@ export async function start() {
     const testContentsEl = document.getElementById("test_contents");
     const testContents = testContentsEl ? JSON.parse(testContentsEl.textContent) : null;
     const test = new Test(testContents);
+
+    const studentData = {}
+    studentData.firstName = roleEl.dataset.studentFirstName
+    studentData.lastName = roleEl.dataset.studentLastName
+    studentData.id = roleEl.dataset.studentId
+
+    const student = new Student(studentData);
 
     if (testType === "individual") {
         if (role === "student") {
@@ -34,7 +41,7 @@ export async function start() {
     }
 
     if (role === "student") {
-        initStudent(roomName, assignmentId, test, testType);
+        initStudent(roomName, assignmentId, test, student, testType );
     }
     if (role === "teacher") {
         initTeacher(roomName, assignmentId, test);

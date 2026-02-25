@@ -89,7 +89,7 @@ class TestAssignmentView(DysleksiTest):
             ),
             (
                 self.teacher,
-                "dysleksi/screening/teacher.html",
+                "dysleksi/admin/test_assignment/detail_group.html",
                 "class_123",
                 self.assignment1,
             ),

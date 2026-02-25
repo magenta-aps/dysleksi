@@ -1,0 +1,49 @@
+{% extends "dysleksi/admin/base.html" %}
+{% load i18n %}
+{% load static %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dysleksi:test_assignment_list' %}">{% translate 'Tests' %}</a></li>
+<li class="breadcrumb-item active" aria-current="page">
+    Klasse {{class_name}} - Screening {{ test_name }}
+</li>
+{% endblock %}
+
+{% block inner_content %}
+<div data-role="teacher"
+     data-test-type="{{ test_type }}"
+     data-room-name="{{ room_name }}"
+     data-assignment-id="{{ object.pk }}">
+    <h5 class="mt-2 mb-4">Klasse {{class_name}} - Screening {{ test_name }}</h5>
+    <div class="group-test-container">
+        <div class="group-test-header">
+            <button class="btn btn-outline-primary">Alle</button>
+            <button class="btn btn-outline-primary">I gang</button>
+            <button class="btn btn-outline-primary">Færdige</button>
+            <button class="btn btn-outline-primary">Mærket</button>
+            <button class="btn btn-outline-primary">Problemer/offline</button>
+        </div>
+
+        <div class="group-test-toolbar">
+          Tegnforklaring: 
+          <span class="dot green"></span> Korrekt
+          <span class="dot red"></span> Forkert
+          <span class="dot grey"></span> Mangler
+          <span class="dot blue"></span> Nuværende
+        </div>
+
+        <div class="group-test-divider"></div>
+
+        <div class="group-test-body">
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block js_module %}
+{{ block.super }}
+{{ test_contents|json_script:"test_contents" }}
+{{ assignment|json_script:"assignment" }}
+<script type="module" src="{% static 'js/screening/index.js' %}"></script>
+{% endblock %}
