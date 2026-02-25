@@ -163,7 +163,7 @@
       {
         // bogstaver
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.2b.wav",
+        "resource": "wordspelling/Instruktion/6b.2b.m4a",
         "delayAfter": 500
       },
 
