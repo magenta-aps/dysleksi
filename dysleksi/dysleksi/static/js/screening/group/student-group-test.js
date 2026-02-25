@@ -203,7 +203,7 @@ export class GroupTestView extends StudentTestView {
             }
 
             if (this.isPracticing) {
-                if (!this.answerIsCorrect()) {
+                if (!this.textAnswer && !this.answerIsCorrect()) {
                     // Wrong answer
                     this.domElements.makeButtonAngry("next");
                     return;
