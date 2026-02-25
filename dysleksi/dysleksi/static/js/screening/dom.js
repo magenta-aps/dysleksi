@@ -508,6 +508,15 @@ export class GroupTestDomElements extends TestDomElements {
         this.nextBtn.disabled = false;
     }
 
+    toggleQuestionDisplay(state) {
+        for (const el of [this.questionChallengeEl, this.choicesEl]) {
+            el.style.display = state;
+        }
+    }
+
+    setNextButtonClass(cls, state) {
+        this.nextBtn.classList.toggle(cls, state);
+    }
 
     setNextButtonListener(listener) {
         this._setButtonListener(this.nextBtn, listener);

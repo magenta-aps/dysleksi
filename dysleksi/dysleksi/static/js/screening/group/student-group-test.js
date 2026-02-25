@@ -81,6 +81,14 @@ export class GroupTestView extends StudentTestView {
 
             this.domElements.toggleRepeatButton(false);
             this.domElements.toggleNextButton(false);
+
+            // Show question challenge and choices
+            this.domElements.toggleQuestionDisplay("flex");
+
+            // Switch look of "next" button from round button to arrow button
+            this.domElements.setNextButtonClass("next-btn", true);
+            this.domElements.setNextButtonClass("start-btn", false);
+
             this.domElements.clearQuestionChoices();
             const domEls = this.domElements.showQuestionChallenge(
                 this.currentQuestion.challengeText,
@@ -139,6 +147,13 @@ export class GroupTestView extends StudentTestView {
                         this.domElements.skipInstructionButton.style.display="none";
                         this.domElements.skipAllInstructionsButton.style.display="none";
                     }
+
+                    // Hide question challenge and choices when instruction sequence is over
+                    this.domElements.toggleQuestionDisplay("none");
+
+                    // Switch look of "next" button from round button to arrow button
+                    this.domElements.setNextButtonClass("next-btn", false);
+                    this.domElements.setNextButtonClass("start-btn", true);
                 });
             } else {
                 this.domElements.toggleBodyClass("show-instructions", false);
