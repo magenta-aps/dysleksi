@@ -400,6 +400,20 @@ describe('GroupTestFlow', () => {
         expect(view.showQuestion).toHaveBeenCalledWith(false, 1);
     });
 
+    it("plays the challenge sound immediately on question display", () => {
+        // Arrange
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const spyShowQuestionChallenge = vi.spyOn(domElements, "showQuestionChallenge");
+        const spyConsoleLog = vi.spyOn(console, "log");
+        view.setPart(1);  // go to word spelling questions (which use sound challenges)
+        // Act
+        view.showQuestion(false, 1);
+        // Assert
+        expect(spyShowQuestionChallenge).toHaveReturnedWith({ textEl: null, img: null, playBtn: expect.anything() });
+        expect(console.log).toHaveBeenCalledWith("Playing challenge sound", view.currentQuestion.challengeSoundUrl);
+    });
+
     it("Answer practice question without selecting answer", () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 'class_123', 1, domElements);

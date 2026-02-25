@@ -388,6 +388,12 @@ class TestDomElements {
             if (playBtn) playBtn.remove();
             if (audio) audio.remove();
         }
+
+        return {
+            textEl: textEl,
+            img: img,
+            playBtn: playBtn,
+        }
     }
 
     showQuestionFreeText(listener) {
