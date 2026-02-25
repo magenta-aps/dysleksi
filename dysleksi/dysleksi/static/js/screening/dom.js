@@ -462,7 +462,7 @@ class TestDomElements {
             });
             buttonsWrapper.append(rowDiv);
         });
-        wrapper.insertBefore(buttonsWrapper, textFieldWrapper); // above display
+        wrapper.append(buttonsWrapper); // below display
     
         this.choicesEl.append(wrapper);
     
