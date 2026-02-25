@@ -382,8 +382,8 @@
           "id": 25,
           "challenge_id": 5,
           "challenge_name": "challenge",
-          "challenge_image_url": "wordspelling_dummy/aput.mp3",
-          "challenge_sound_url": null,
+          "challenge_image_url": null,
+          "challenge_sound_url": "wordspelling_dummy/aput.mp3",
           "challenge_text": null,
           "question_type": "free_text",
           "possible_answers": [
@@ -402,8 +402,8 @@
           "id": 27,
           "challenge_id": 6,
           "challenge_name": "challenge",
-          "challenge_image_url": "wordspelling_dummy/iki.mp3",
-          "challenge_sound_url": null,
+          "challenge_image_url": null,
+          "challenge_sound_url": "wordspelling_dummy/iki.mp3",
           "challenge_text": null,
           "question_type": "free_text",
           "possible_answers": [

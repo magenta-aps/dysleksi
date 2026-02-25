@@ -82,7 +82,7 @@ export class GroupTestView extends StudentTestView {
             this.domElements.toggleRepeatButton(false);
             this.domElements.toggleNextButton(false);
             this.domElements.clearQuestionChoices();
-            this.domElements.showQuestionChallenge(
+            const domEls = this.domElements.showQuestionChallenge(
                 this.currentQuestion.challengeText,
                 this.currentQuestion.challengeSoundUrl,
                 this.currentQuestion.challengeImageUrl
@@ -162,6 +162,14 @@ export class GroupTestView extends StudentTestView {
                     }, this.currentQuestion.reminder);
                 }
                 this.domElements.toggleNextButton(false);
+
+                // If question challenge has a sound, it also has a play button
+                // "Click" the play button to play the sound immediately, as well as
+                // performing the expected DOM updates.
+                if (this.currentQuestion.challengeSoundUrl && domEls.playBtn) {
+                    console.log("Playing challenge sound", this.currentQuestion.challengeSoundUrl);
+                    domEls.playBtn.click();
+                }
             }
 
             this.questionDisplayedAt = document.timeline.currentTime;
