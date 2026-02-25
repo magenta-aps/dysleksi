@@ -110,7 +110,8 @@ describe("IndividualTestFlow", () => {
         expect(domElements.showQuestionChallenge).toHaveBeenCalledWith(
             question.challengeText,
             question.challengeSoundUrl,
-            question.challengeImageUrl
+            question.challengeImageUrl,
+            expect.any(Object)
         );
         expect(view.send).toHaveBeenCalledWith({
             uuid: expect.any(String),
