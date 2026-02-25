@@ -157,7 +157,7 @@ body.show-instructions {
   background-repeat: no-repeat;
   background-size: contain;
   padding: 0;
-  margin: 1rem;
+  margin: 2.5 * $spacer 0 0 0;
   transition: opacity 0.2s ease-in-out;
 
   &:disabled {
@@ -277,7 +277,7 @@ body.show-instructions {
 
 #challenge-image {
   display: block;
-  margin: 1rem auto;
+  margin: 0 auto 2.5 * $spacer auto;
   height: 200px;
   object-fit: contain;
 }
