@@ -19,7 +19,7 @@ export class GroupTestView extends StudentTestView {
 
     start() {
         super.start();
-        this.domElements.setNextButtonListener(() => this.next());
+        this.domElements.setNextButtonListener(() => this.onQuestionComplete(this.currentQuestion, false));
         this.domElements.setRepeatButtonListener(() => this.repeat());
     }
 
@@ -180,15 +180,6 @@ export class GroupTestView extends StudentTestView {
         return canShow;
     }
 
-    next() {
-        if (this.currentQuestionIndex === null) {
-            this.currentQuestionIndex = 0;
-            this.showFirstQuestion();
-        } else {
-            this.onQuestionComplete(this.currentQuestion);
-        }
-    }
-
     onQuestionComplete(question, outOfTime = false) {
         const questionAnsweredAt = document.timeline.currentTime;
 
@@ -253,9 +244,9 @@ export class GroupTestView extends StudentTestView {
                 this.domElements.toggleRepeatButton(true);
                 this.domElements.toggleNextButton(true);
 
-                // prepare to start real test. next() will pick up on this and start the real test.
-                this.currentQuestionIndex = null;
                 this.isPracticing = false;
+                this.currentQuestionIndex = 0;
+                this.showFirstQuestion();
 
             } else {
                 // part complete

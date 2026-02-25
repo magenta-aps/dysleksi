@@ -354,7 +354,7 @@
                 "delayAfter": 750
             },
             {
-                // Nu skal du selv prøve øveropgaverne.
+                // Nu skal du selv prøve øveopgaverne.
                 "action": "playSound",
                 "resource": "wordreading_2/Instruktion/7b.5.wav",
                 "delayAfter": 750
@@ -383,5 +383,70 @@
         "image": "wordreading_2/Øveopgave/Mælk.png",
         "correct": "immuk",
         "wrong": ["imaq", "illu", "imeq"]
+    },
+    {
+        "question_type": "no_input_required",
+        "instruction_sequence": [
+
+            {
+                "action": "fadeOut",
+                "element": "next"
+            },
+            {
+                "action": "fadeOut",
+                "element": "repeat"
+            },
+            {
+                "action": "playSound",
+                "resource": "wordreading_2/Øveopgave/7d.2.wav"
+            },
+            {
+                "action": "setRepeatButtonDestination",
+                "data": 0
+            },
+            {
+                "action": "show",
+                "element": "repeat"
+            },
+            {
+                "action": "show",
+                "element": "next",
+                "delayAfter": 1
+            },
+            {
+                "action": "fadeIn",
+                "element": "next"
+            },
+            {
+                "action": "playSound",
+                "resource": "wordreading_2/Øveopgave/7d.2a.wav"
+            },
+            {
+                "action": "fadeIn",
+                "element": "repeat"
+            },
+            {
+                "action": "playSound",
+                "resource": "wordreading_2/Øveopgave/7d.2b.wav",
+                "delayAfter": 750
+            },
+            // 7d.3a
+            {
+                "action": "setButtonSoundOnce",
+                "element": "next",
+                "resource": "wordreading_2/Øveopgave/7d.3a.wav"
+            },
+
+            // 7d.3b
+            {
+                "action": "setButtonSoundOnce",
+                "element": "repeat",
+                "resource": "wordreading_2/Øveopgave/7d.3b.wav"
+            },
+            {
+                "action": "playSound",
+                "resource": "wordreading_2/Øveopgave/7d.3.wav"
+            }
+        ]
     }
 ]
