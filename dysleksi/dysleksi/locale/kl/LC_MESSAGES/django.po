@@ -124,6 +124,7 @@ msgid "Luk"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/base.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/list.html
 msgid "Tests"
