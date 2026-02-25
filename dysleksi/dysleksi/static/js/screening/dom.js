@@ -366,26 +366,12 @@ class TestDomElements {
                 isPlaying = true;
                 playBtn.classList.remove("pulse");
                 playBtn.classList.add("playing");
-    
-                // Fetch & decode audio
-                const response = await fetch(sound);
-                const arrayBuffer = await response.arrayBuffer();
-                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
-    
-                // Play
-                currentSource = audioContext.createBufferSource();
-                currentSource.buffer = audioBuffer;
-                currentSource.connect(audioContext.destination);
-                currentSource.start();
-    
-                // Wait until finished
-                await new Promise(resolve => {
-                    currentSource.onended = resolve;
-                });
+
+                await this.playSound(sound, currentSource, audioContext);
 
                 isPlaying = false;
                 playBtn.classList.remove("playing");
-    
+
                 const letterBtns = document.querySelectorAll(".letter-btn");
                 letterBtns.forEach(b => b.disabled = false);
             };
@@ -396,6 +382,24 @@ class TestDomElements {
             img: img,
             playBtn: playBtn,
         }
+    }
+
+    async playSound(sound, currentSource, audioContext) {
+        // Fetch & decode audio
+        const response = await fetch(sound);
+        const arrayBuffer = await response.arrayBuffer();
+        const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+
+        // Play
+        currentSource = audioContext.createBufferSource();
+        currentSource.buffer = audioBuffer;
+        currentSource.connect(audioContext.destination);
+        currentSource.start();
+
+        // Wait until finished
+        await new Promise(resolve => {
+            currentSource.onended = resolve;
+        });
     }
 
     showQuestionFreeText(listener) {
