@@ -335,11 +335,16 @@ body.show-instructions .sound-btn.pulse {
   width: 100%;
   background: $student-yellow-light;
   margin: 0;
-  padding: 1rem;
-  font-size: 2rem;
+  padding: 0.5 * $spacer;
+  font-size: 2.625 * $spacer;
+  line-height: 1;
   text-align: right;
   z-index: 9999;
   color: $student-yellow;
+
+  i.ph {
+    font-size: 2.625 * $spacer;
+  }
 }
 
 .center-screen {
