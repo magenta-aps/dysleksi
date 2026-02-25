@@ -292,6 +292,9 @@ export class GroupTestView extends StudentTestView {
             } else {
                 this.domElements.makeButtonAngry(this.selectedAnswer.buttonId)
                 this.domElements.disableNextButton()
+                // Play "you guessed wrong" sound snippet
+                let source = null;
+                this.domElements.playSound('/static/audio/7c.1a.wav', source, this.audioContext);
             }
         } else {
             this.domElements.makeButtonGlow(this.selectedAnswer.buttonId)
