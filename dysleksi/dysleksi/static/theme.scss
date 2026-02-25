@@ -233,7 +233,7 @@ body.show-instructions {
   display: flex;              // make buttons go side by side
   gap: 0.5rem;                // space between buttons
   margin-bottom: 0.5rem;      // space between rows
-  flex-wrap: wrap;            // wrap if too many buttons
+  flex-wrap: nowrap;          // fill out each row horizontally
 }
 
 .display-field {
