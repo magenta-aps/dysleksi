@@ -482,7 +482,7 @@
       {
         // Tryk grøn når du er klar.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.6.wav",
+        "resource": "wordspelling/Instruktion/9a.5.wav",
         "delayAfter": 0
       }
     ]
