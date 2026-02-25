@@ -279,7 +279,7 @@ export class GroupTestView extends StudentTestView {
     answerIsCorrect() {
         if (this.textAnswer !== null) {
             const answer = this.currentQuestion.possibleAnswers[0];
-            return this.textAnswer === answer.resourceText;
+            return this.compareTextAnswer(this.textAnswer, answer.resourceText);
         } else {
             return this.selectedAnswer.isCorrect;
         }
@@ -292,6 +292,25 @@ export class GroupTestView extends StudentTestView {
             this.selectedAnswer = this.currentQuestion.possibleAnswers[0];
         }
         this.domElements.toggleNextButton(answer.length >= 2);
+    }
+
+    regexWhitespaces = /\s+/g;
+
+    #preprocessTextAnswer(textAnswer) {
+        textAnswer = textAnswer.toLowerCase().replaceAll(this.regexWhitespaces, "");
+        const consonants = "bcdfghjklmnpqrstvwxz";
+        for (let c of consonants) {
+            textAnswer = textAnswer.replaceAll(c+c, c);
+        }
+        // TODO: Hvilke andre enslydende bogstaver skal tælle som værende "ens"
+        textAnswer = textAnswer.replaceAll("i", "e");
+        return textAnswer;
+    }
+
+    compareTextAnswer(userAnswer, correctAnswer) {
+        userAnswer = this.#preprocessTextAnswer(userAnswer);
+        correctAnswer = this.#preprocessTextAnswer(correctAnswer);
+        return userAnswer === correctAnswer;
     }
 
 }
