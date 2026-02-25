@@ -240,10 +240,10 @@ Javascript Unittest:
     - |
       npx vitest run \
         --coverage \
-        --coverage.thresholds.statements=91.49 \
-        --coverage.thresholds.branches=90.86 \
-        --coverage.thresholds.functions=89.13 \
-        --coverage.thresholds.lines=91.37 \
+        --coverage.thresholds.statements=91.47 \
+        --coverage.thresholds.branches=90.57 \
+        --coverage.thresholds.functions=89.09 \
+        --coverage.thresholds.lines=91.35 \
         --coverage.provider=istanbul \
         --coverage.include="dysleksi/static/js/**/*.js" \
         --coverage.exclude="dysleksi/static/js/__tests__/**/*.js" \

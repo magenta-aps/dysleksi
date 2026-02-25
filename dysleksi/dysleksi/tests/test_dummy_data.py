@@ -43,7 +43,7 @@ class DummyDataTest(TestCase):
         word_reading_2_test = TestPart.objects.filter(name="Ordlæsning 2A").first()
         wordspelling_test = TestPart.objects.filter(name="Ordstavning").first()
 
-        self.assertEqual(word_reading_2_test.questions.count(), 104)
+        self.assertEqual(word_reading_2_test.questions.count(), 105)
         self.assertEqual(wordspelling_test.questions.count(), 25)
 
     def test_dummy_user_creation(self):
