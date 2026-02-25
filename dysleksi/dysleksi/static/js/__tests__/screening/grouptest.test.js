@@ -9,6 +9,7 @@ import { Test } from "../../screening/model.js";
 import { GroupTestView } from "../../screening/group/student-group-test.js";
 import {spyAttributes} from "../utils.js";
 import * as utils from "../../screening/utils.js";
+import { Student } from "../../screening/model.js"; // wherever your Student class is defined
 
 
 describe('GroupTestFlow', () => {
@@ -61,7 +62,14 @@ describe('GroupTestFlow', () => {
 
         global.domElements = new GroupTestDomElements();
 
+        global.student = new Student({
+            id: 123,
+            firstName: "Test",
+            lastName: "Student",
+        });
+
         spyAttributes(global.domElements);
+        vi.spyOn(global.student, "progress", "set");
 
         global.testSpy = (test) => {
             // Apply spying to a test instance
@@ -137,7 +145,7 @@ describe('GroupTestFlow', () => {
     it("Render Summary when canPractice() = true", () => {
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
 
         view.start();
@@ -158,7 +166,7 @@ describe('GroupTestFlow', () => {
         testData.parts[0].practice = [];
 
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
     
         view.start();
@@ -171,7 +179,7 @@ describe('GroupTestFlow', () => {
 
     it("Render intro and startSummary", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
     
         const showIntroSpy = vi.spyOn(view, "showIntro");
         const startSummarySpy = vi.spyOn(view, "startSummary");
@@ -189,7 +197,7 @@ describe('GroupTestFlow', () => {
 
     it("Ends summary and displays practice question", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
         view.start();
         view.endSummary();
@@ -209,7 +217,7 @@ describe('GroupTestFlow', () => {
         testData.parts[0].practice = [];
 
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
         view.start();
         view.endSummary();
@@ -224,7 +232,7 @@ describe('GroupTestFlow', () => {
     it("Trigger for first question reminder", () => {
         vi.useFakeTimers();
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         test.parts[0].timeout = 0;
         test.parts[0].questions[0].reminder = 5000;
         // Mock audio play
@@ -243,7 +251,7 @@ describe('GroupTestFlow', () => {
     it("Let first question time out", () => {
         vi.useFakeTimers();
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         test.parts[0].timeout = 0;
         test.parts[0].questions[0].timeout = 10000;
         testSpy(view);
@@ -275,13 +283,14 @@ describe('GroupTestFlow', () => {
             roomName: 'class_123',
             correct: false,
             textAnswer: null,
+            student: expect.any(Object)
         });
     });
 
     it("Let first testpart time out on second question", () => {
         vi.useFakeTimers();
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         test.parts[0].timeout = 60000;
         testSpy(view);
         view.setPart(0)
@@ -316,6 +325,7 @@ describe('GroupTestFlow', () => {
                 roomName: 'class_123',
                 correct: false,
                 textAnswer: null,
+                student: expect.any(Object)
             });
         });
         expect(view.onQuestionComplete).not.toHaveBeenCalledWith(firstQuestion, true);
@@ -337,12 +347,13 @@ describe('GroupTestFlow', () => {
             roomName: 'class_123',
             correct: expect.toBeOneOf([null, true, false]),
             textAnswer: null,
+            student: expect.any(Object)
         });
     });
 
     it("Select second answer of first question", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
         view.setPart(0)
 
@@ -363,7 +374,7 @@ describe('GroupTestFlow', () => {
 
     it("Go to next question", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
         view.setPart(0)
         
@@ -394,6 +405,7 @@ describe('GroupTestFlow', () => {
             roomName: view.roomName,
             correct: false,
             textAnswer: null,
+            student: expect.any(Object)
         });
         expect(view.onQuestionComplete).toHaveBeenCalled();
         expect(view.showNextQuestion).toHaveBeenCalled();
@@ -416,7 +428,7 @@ describe('GroupTestFlow', () => {
 
     it("Answer practice question without selecting answer", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
         view.setPart(0)
         
@@ -430,7 +442,7 @@ describe('GroupTestFlow', () => {
 
     it("Answer practice question correctly", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
         view.setPart(0)
         
@@ -448,7 +460,7 @@ describe('GroupTestFlow', () => {
 
     it("Answer practice question incorrectly", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
         view.setPart(0)
         
@@ -466,7 +478,7 @@ describe('GroupTestFlow', () => {
 
     it("Answer last practice question in part", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
         view.setPart(0)
         
@@ -483,7 +495,7 @@ describe('GroupTestFlow', () => {
 
     it("Answer last question in part", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
         view.setPart(0)
         const part = view.currentPart;
@@ -505,7 +517,7 @@ describe('GroupTestFlow', () => {
 
     it("Answer freetext question correctly", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
         view.setPart(1);
         
@@ -534,12 +546,13 @@ describe('GroupTestFlow', () => {
             "roomName": "class_123",
             "textAnswer": "aput",
             "uuid": expect.any(String),
+            student: expect.any(Object)
         });
     });
 
     it("Answer freetext question incorrectly", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
         view.setPart(1);
         
@@ -567,12 +580,13 @@ describe('GroupTestFlow', () => {
             "roomName": "class_123",
             "textAnswer": "forkert",
             "uuid": expect.any(String),
+            student: expect.any(Object)
         });
     });
 
     it("Answer last question in last part", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
         const canShow = view.showPart(test.parts.length - 1);
         expect(canShow).toBe(true);
@@ -592,12 +606,13 @@ describe('GroupTestFlow', () => {
             assignmentId: 1,
             message: "Testen er afsluttet",
             roomName: view.roomName,
+            student: expect.any(Object)
         });
     });
 
     it("Show instructions", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
         view.showPart(0);
         view.showQuestion(true, 0);

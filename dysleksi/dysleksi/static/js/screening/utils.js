@@ -80,3 +80,28 @@ export function unlockAudioOnGesture() {
 
     return audioContext;
 }
+
+export function calculateStudentProgress(test, currentPartIndex, currentQuestionIndex) {
+    if (!test || !test.parts) return 0;
+
+    let totalQuestions = 0;
+    let questionsDone = 0;
+
+    test.parts.forEach((part, index) => {
+        const partMainCount = part.questions?.length || 0;
+
+        // Total questions only counts main questions
+        totalQuestions += partMainCount;
+
+        if (index < currentPartIndex) {
+            // All questions in previous parts are completed
+            questionsDone += partMainCount;
+        } else if (index === currentPartIndex) {
+            // For current part, count only questions up to current index
+            questionsDone += Math.min(currentQuestionIndex + 1, partMainCount);
+        }
+        // Questions in future parts are ignored
+    });
+
+    return totalQuestions > 0 ? (questionsDone / totalQuestions) * 100 : 0;
+}

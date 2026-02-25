@@ -5,6 +5,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import {startSession, refreshSession} from "../screening/utils";
 import * as wsModule from "../ws.js";
 import {getWebSocket} from "../ws.js";
+import { calculateStudentProgress } from '../screening/utils';
 
 
 // Mock getWebSocket
@@ -246,5 +247,62 @@ describe('unlockAudioOnGesture', () => {
         delete global.webkitAudioContext;
     });
 
+
+});
+
+
+describe('calculateStudentProgress', () => {
+
+    it('should return 0 if test is null or undefined', () => {
+        expect(calculateStudentProgress(null, 0, 0)).toBe(0);
+        expect(calculateStudentProgress(undefined, 0, 0)).toBe(0);
+    });
+
+    it('should return 0 if test.parts is empty', () => {
+        const test = { parts: [] };
+        expect(calculateStudentProgress(test, 0, 0)).toBe(0);
+    });
+
+    it('should return correct progress for a single part', () => {
+        const test = { parts: [{ questions: [1,2,3,4,5] }] };
+        expect(calculateStudentProgress(test, 0, 0)).toBeCloseTo(20); // 1/5
+        expect(calculateStudentProgress(test, 0, 2)).toBeCloseTo(60); // 3/5
+        expect(calculateStudentProgress(test, 0, 4)).toBeCloseTo(100); // 5/5
+    });
+
+    it('should return correct progress for multiple parts', () => {
+        const test = { parts: [
+            { questions: [1,2,3] },
+            { questions: [1,2,3,4] },
+            { questions: [1,2] },
+        ]};
+
+        // Part 0, question 1 (second question)
+        expect(calculateStudentProgress(test, 0, 1)).toBeCloseTo((2/9)*100);
+
+        // Part 1, question 2 (third question)
+        // Done questions = part0 all (3) + part1 first 3 = 6, total = 3+4+2=9
+        expect(calculateStudentProgress(test, 1, 2)).toBeCloseTo((6/9)*100);
+
+        // Last part, last question
+        expect(calculateStudentProgress(test, 2, 1)).toBeCloseTo(100);
+    });
+
+    it('should handle currentQuestionIndex larger than part questions', () => {
+        const test = { parts: [{ questions: [1,2,3] }] };
+        // currentQuestionIndex 5, only 3 questions in part
+        expect(calculateStudentProgress(test, 0, 5)).toBeCloseTo(100);
+    });
+
+    it('should ignore future parts', () => {
+        const test = { parts: [
+            { questions: [1,2] },
+            { questions: [1,2,3] },
+            { questions: [1,2] },
+        ]};
+        // Current part = 1, currentQuestionIndex = 1
+        // Done = part0 all (2) + current part first 2 = 4, total = 2+3+2=7
+        expect(calculateStudentProgress(test, 1, 1)).toBeCloseTo((4/7)*100);
+    });
 
 });

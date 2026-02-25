@@ -6,6 +6,7 @@ import {EventTable, ActionButtons, TeacherView, NoteField, QuestionView} from ".
 import * as groupTestData from './grouptest.json' with { type: 'json' }
 import * as individualTestData from './individualtest.json' with { type: 'json' }
 import {Test} from "../../screening/model";
+import { GroupTestContainer } from "../../screening/controlroom.js";
 
 vi.mock("../../screening/utils.js");
 
@@ -402,5 +403,216 @@ describe("TeacherView Test", () => {
 
         questionView.showContent(null, "/test/image.png");
         expect(container.innerHTML).toBe('<img id="challenge-image" src="/test/image.png">');
+    });
+});
+
+
+
+
+describe("GroupTestContainer", () => {
+    let container;
+    let instance;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div class="group-test-body"></div>
+        `;
+        container = document.querySelector(".group-test-body");
+        instance = new GroupTestContainer();
+    });
+
+    it("creates a new student card if it doesn't exist", () => {
+        const studentData = {
+            student: { id: 1, firstName: "Alice", lastName: "Smith", progress: 50 },
+        };
+
+        instance.updateData(studentData);
+
+        const card = container.querySelector(".student-card[data-student-id='1']");
+        expect(card).not.toBeNull();
+
+        const text = card.querySelector(".student-text").textContent;
+        expect(text).toBe("Alice S.");
+
+        const fill = card.querySelector(".progress-fill");
+        expect(fill.style.width).toBe("50%");
+
+        const folded = card.querySelector(".folded-area");
+        expect(folded).not.toBeNull();
+    });
+
+    it("updates an existing student card progress", () => {
+        const studentData = {
+            student: { id: 2, firstName: "Bob", lastName: "Jones", progress: 30 },
+        };
+        instance.updateData(studentData);
+
+        const updatedData = {
+            student: { id: 2, firstName: "Bob", lastName: "Jones", progress: 80 },
+        };
+        instance.updateData(updatedData);
+
+        const fill = container.querySelector(".student-card[data-student-id='2'] .progress-fill");
+        expect(fill.style.width).toBe("80%");
+    });
+
+    it("adds correct/incorrect dots inside folded area", () => {
+        const studentData = {
+            student: { id: 3, firstName: "Charlie", lastName: "Brown", progress: 70 },
+            correct: true
+        };
+        instance.updateData(studentData);
+
+        const folded = container.querySelector(".student-card[data-student-id='3'] .folded-area");
+        const dot = folded.querySelector(".dot");
+        expect(dot).not.toBeNull();
+        expect(dot.style.backgroundColor).toBe("green");
+
+        // Add an incorrect dot
+        const studentData2 = {
+            student: { id: 3, firstName: "Charlie", lastName: "Brown", progress: 70 },
+            correct: false
+        };
+        instance.updateData(studentData2);
+        const dots = folded.querySelectorAll(".dot");
+        expect(dots.length).toBe(2);
+        expect(dots[1].style.backgroundColor).toBe("red");
+    });
+
+    it("toggles folded area when card is clicked", () => {
+        const studentData = {
+            student: { id: 4, firstName: "Diana", lastName: "Prince", progress: 100 },
+        };
+        instance.updateData(studentData);
+    
+        const card = container.querySelector(".student-card[data-student-id='4']");
+        const folded = card.querySelector(".folded-area");
+        const arrowSpan = card.querySelector(".foldout-arrow");
+    
+        // Initially folded
+        expect(folded.style.display === "" || folded.style.display === "none").toBe(true);
+        const initialArrowHTML = arrowSpan.innerHTML;
+    
+        // Click to unfold
+        card.click();
+        expect(folded.style.display).toBe("flex");
+        expect(arrowSpan.innerHTML).not.toBe(initialArrowHTML);
+    
+        // Click to fold again
+        card.click();
+        expect(folded.style.display).toBe("none");
+        expect(arrowSpan.innerHTML).toBe(initialArrowHTML);
+    });
+});
+
+
+describe("TeacherView _initFilterButtonSelection", () => {
+    let view;
+    let socket;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div class="group-test-header">
+                <button class="btn" id="btn1">Filter 1</button>
+                <button class="btn" id="btn2">Filter 2</button>
+                <button class="btn" id="btn3">Filter 3</button>
+            </div>
+        `;
+
+        socket = {
+            addEventListener: vi.fn(),
+            send: vi.fn(),
+        };
+
+        const wsGetter = () => socket;
+
+        // Minimal test data
+        const testData = { parts: [] };
+
+        view = new TeacherView(
+            "room1",
+            testData,
+            1,
+            wsGetter,
+            new EventTable(),
+            new ActionButtons(),
+            new NoteField(),
+            new QuestionView()
+        );
+    });
+
+    it("adds click listeners to filter buttons and toggles selection", () => {
+        const buttons = document.querySelectorAll(".group-test-header .btn");
+
+        // Initially, no button has 'selected'
+        buttons.forEach(btn => {
+            expect(btn.classList.contains("selected")).toBe(false);
+        });
+
+        // Click first button
+        buttons[0].click();
+        expect(buttons[0].classList.contains("selected")).toBe(true);
+        expect(buttons[1].classList.contains("selected")).toBe(false);
+        expect(buttons[2].classList.contains("selected")).toBe(false);
+
+        // Click second button
+        buttons[1].click();
+        expect(buttons[1].classList.contains("selected")).toBe(true);
+        expect(buttons[0].classList.contains("selected")).toBe(false);
+        expect(buttons[2].classList.contains("selected")).toBe(false);
+
+        // Click third button
+        buttons[2].click();
+        expect(buttons[2].classList.contains("selected")).toBe(true);
+        expect(buttons[0].classList.contains("selected")).toBe(false);
+        expect(buttons[1].classList.contains("selected")).toBe(false);
+    });
+});
+
+
+describe("TeacherView socket 'test.started' handling", () => {
+    let socket;
+    let wsGetter;
+    let view;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div class="group-test-body"></div>
+        `;
+
+        socket = {
+            addEventListener: vi.fn(),
+            send: vi.fn(),
+        };
+
+        wsGetter = vi.fn().mockReturnValue(socket);
+
+        view = new TeacherView(
+            "room1",
+            { parts: [] }, // minimal test data
+            1,
+            wsGetter,
+            new EventTable(),
+            new ActionButtons(),
+            new NoteField(),
+            new QuestionView()
+        );
+    });
+
+    it("calls groupTestContainer.updateData when 'test.started' message is received", () => {
+        const spy = vi.spyOn(view.groupTestContainer, "updateData");
+
+        // get the message handler registered on the socket
+        const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+
+        // simulate 'test.started' message
+        const messageData = {
+            event: "test.started",
+            student: { id: 1, firstName: "Alice", lastName: "Smith", progress: 0 },
+        };
+
+        handler({ data: JSON.stringify(messageData) });
+
+        expect(spy).toHaveBeenCalledWith(messageData);
     });
 });

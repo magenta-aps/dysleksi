@@ -1,3 +1,16 @@
+export class Student {
+    id;
+    firstName;
+    lastName;
+
+    constructor(data) {
+        this.id = data.id
+        this.firstName = data.firstName
+        this.lastName = data.lastName
+        this.progress = 0
+    }
+}
+
 export class Test extends EventTarget {
 
     name;

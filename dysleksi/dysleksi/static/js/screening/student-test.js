@@ -2,12 +2,14 @@ import { requestWakeLock } from "./utils.js";
 import { releaseWakeLock } from "./utils.js";
 import { unlockAudioOnGesture } from './utils.js';
 
+
 export class StudentTestView extends EventTarget {
 
     chatSocket;
     roomName;
     assignmentId;
     domElements;
+    student;
 
     currentPart = null;
     previousPart = null;
@@ -15,13 +17,14 @@ export class StudentTestView extends EventTarget {
     currentQuestion = null;
     currentQuestionIndex = null;
 
-    constructor(test, chatSocket, roomName, assignmentId, domElements) {
+    constructor(test, chatSocket, roomName, assignmentId, domElements, student) {
         super();
         this.test = test;
         this.chatSocket = chatSocket;
         this.roomName = roomName;
         this.assignmentId = assignmentId;
         this.domElements = domElements;
+        this.student = student
         this.chatSocket.addEventListener("message", (e) => {
             this.onChatMessage(JSON.parse(e.data));
         });
@@ -36,6 +39,7 @@ export class StudentTestView extends EventTarget {
         data.roomName = this.roomName;
         data.assignmentId = this.assignmentId;
         data.uuid = crypto.randomUUID();
+        data.student = this.student;
         console.log("Chat: sending", data);
         this.chatSocket.send(JSON.stringify(data));
     }
@@ -48,6 +52,11 @@ export class StudentTestView extends EventTarget {
         requestWakeLock()
         this.setPart(0)
         this.showIntro();
+
+        this.send({
+            event: "test.started",
+            message: "Testen er startet",
+        });
     }
 
     showIntro() {
@@ -172,6 +181,7 @@ export class StudentTestView extends EventTarget {
             return false;
         }
         this.currentQuestion = questions[questionIndex];
+
         return true;
     }
 

@@ -7,11 +7,19 @@ $other-grey-light2: #d9d9d9;
 $other-grey-medium: #bbbbbb;
 $other-grey: #888888;
 $other-grey-dark: #545257;
+$other-grey-dark2: #cccccc;
 $other-red-light: #ffe0de;
 $other-red: #bd0900;
 $other-red-dark: #970700;
 $other-green-light: #d1ffd8;
 $other-green: #006a11;
+$other-blue: #f2f9ff;
+$other-blue-dark: #cbe0f3;
+
+$correct: #27c840;
+$wrong: #ff5f57;
+$missing: #5b5955;
+$current: #0088ff;
 
 // Define our own constants
 $sidebar-navigation-min-width: 15rem;
@@ -426,4 +434,154 @@ div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn.acti
 }
 div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn.active i.ph-fill {
   display: inline-block;
+}
+
+.group-test-container {
+  background: white;
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+  width: 100%;
+  margin: 4rem 0;
+  overflow: hidden;
+}
+
+.group-test-header {
+  background: $other-grey-light2;
+  height: 3rem;
+  display: flex;
+  padding: 0;
+}
+
+.group-test-header .btn {
+  flex: 1;
+  height: 100%;
+  border-radius: 0;
+  margin: 0;
+  border: 0;
+  border-right: 0px solid; // divider line
+  font-size: 1.2rem;
+  color: black;
+
+  &:hover,
+  &:focus {
+    background-color: $other-grey-dark2;
+    color: black;
+  }
+
+  &.selected {
+    background-color: $other-grey-dark2;
+    color: black;
+    border-bottom: 4px solid black; // black line only on selected
+  }
+}
+
+.group-test-header .btn:last-child {
+  border-right: 0;
+}
+
+.group-test-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  padding: 0.5rem 1.5rem;
+  background: transparent;
+}
+
+.dot {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 0.25rem;
+}
+
+.group-test-toolbar .green { background-color: $correct; }
+.group-test-toolbar .red   { background-color: $wrong; }
+.group-test-toolbar .grey  { background-color: $missing; }
+.group-test-toolbar .blue  { background-color: $current; }
+
+.group-test-body {
+  padding: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.group-test-divider {
+    height: 3px;
+    background-color: $other-grey-light2;
+    margin: 10px 1.5rem;
+}
+
+/* Student card */
+.student-card {
+    position: relative;
+    width: calc(25% - 1rem);
+    //background-color: $other-blue;
+    border: 1px solid $other-grey-light2;
+    border-radius: 16px;
+    box-sizing: border-box;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #000;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 0;
+    padding-bottom: 0;
+    overflow: hidden; // allow folded area to expand
+}
+
+/* Top row */
+.student-card .student-top-row {
+    background-color: $other-blue;
+    height: 3rem;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    padding-left: 1.5rem;
+    user-select: none;
+    cursor: pointer;
+}
+
+/* Progress bar inside top row */
+.student-card .progress-fill {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 0%;
+    height: 100%;
+    background-color: $other-blue-dark;
+    z-index: 0;
+    transition: width 0.5s ease;
+}
+
+/* Text inside top row */
+.student-card .student-text {
+    position: relative;
+    z-index: 1;
+}
+
+/* Folded area below */
+.student-card .folded-area {
+    display: none;
+    margin-top: 0.5rem;
+    gap: 0.25rem;
+    flex-wrap: wrap;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    padding: 1rem;
+    background-color: $white;
+}
+
+
+.foldout-arrow {
+  position: absolute;
+  right: 1rem;
+  color: $other-grey-medium;
+  font-size: 1.25rem;
 }
