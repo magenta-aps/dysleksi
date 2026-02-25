@@ -248,18 +248,18 @@ body.show-instructions {
   }
 }
 
-
 #choices {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  width: 100%;
+  width: 80vw;
   padding: 0;
   list-style: none;
   gap: 1rem;
 
   button {
+    flex: 1;  // all buttons in #choices have equal width
     padding: 1rem 3rem;
     border: 1px solid #ccc;
     border-radius: 0.5rem;
