@@ -77,7 +77,24 @@ describe('GroupTestFlow', () => {
         }
 
         global.ws = getWebSocket('class_123');
-        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue({});
+
+        global.fetch = vi.fn(async () => ({
+            arrayBuffer: async () => new ArrayBuffer(8), // dummy audio data
+        }));
+
+        const mockAudioContext = {
+                decodeAudioData: vi.fn().mockResolvedValue({}), // returns a dummy AudioBuffer
+                createBufferSource: vi.fn().mockReturnValue({
+                    connect: vi.fn(),
+                    start: vi.fn(),
+                    onended: null,
+                    buffer: null
+                }),
+                destination: {}
+            };
+    
+        // 2. Return this mock instead of an empty object
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(mockAudioContext);
     });
 
     afterEach(() => {
@@ -708,6 +725,9 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
 describe("GroupTestDomElements - showQuestionChallenge", () => {
     let domElements;
 
+    let mockAudioContext;
+    let mockSource;
+
     beforeEach(() => {
         document.body.innerHTML = `
             <div id="choices"></div>
@@ -722,41 +742,49 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
             <button id="next"></button>
         `;
         domElements = new GroupTestDomElements();
+
+        mockSource = {
+            connect: vi.fn(),
+            start: vi.fn(),
+            onended: null,
+        };
+    
+        mockAudioContext = {
+            decodeAudioData: vi.fn((arrayBuffer) => Promise.resolve({})), // fake AudioBuffer
+            createBufferSource: vi.fn(() => mockSource),
+            destination: {},
+        };
+
+		global.fetch = vi.fn(async () => ({
+		    arrayBuffer: async () => new ArrayBuffer(8), // dummy audio data
+		}));
+
     });
 
-    it("displays a question with sound correctly", () => {
+    it("displays a question with sound correctly", async () => {
         const soundUrl = "https://example.com/audio.mp3";
         const questionText = "Listen carefully";
 
-        domElements.showQuestionChallenge(null, soundUrl);
-
-        // Audio element should exist
-        const audioEl = document.getElementById("challenge-audio");
-        expect(audioEl).toBeInstanceOf(HTMLAudioElement);
-        expect(audioEl.src).toBe(soundUrl);
+        domElements.showQuestionChallenge(null, soundUrl, null, mockAudioContext);
 
         // Play button exists
         const playBtn = document.getElementById("challenge-sound-btn");
         expect(playBtn).toBeInstanceOf(HTMLButtonElement);
         expect(playBtn.classList.contains("pulse")).toBe(true);
 
-        // Mock audio play
-        audioEl.play = vi.fn();
-
         // Click play button
         playBtn.click();
 
         // Audio should be played and pulse removed
-        expect(audioEl.play).toHaveBeenCalled();
         expect(playBtn.classList.contains("pulse")).toBe(false);
     });
 
-    it("removes audio and play button if sound is removed", () => {
+    it("removes audio and play button if sound is removed", async () => {
         const soundUrl = "https://example.com/audio.mp3";
-        domElements.showQuestionChallenge(null, soundUrl);
+        domElements.showQuestionChallenge(null, soundUrl, null, mockAudioContext);
 
         // Now call again with no sound
-        domElements.showQuestionChallenge("Test", null);
+        domElements.showQuestionChallenge("Test", null, null, mockAudioContext);
 
         const audioEl = document.getElementById("challenge-audio");
         const playBtn = document.getElementById("challenge-sound-btn");
@@ -765,24 +793,11 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         expect(playBtn).toBeNull();
     });
 
-    it("replaces audio when a new audio URL is given", () => {
-        const firstSound = "https://example.com/audio.mp3";
-        const secondSound = "https://example.com/audio2.mp3";
 
-        domElements.showQuestionChallenge(null, firstSound, null);
-        let audioEl = document.getElementById("challenge-audio");
-        expect(audioEl.src).toBe(firstSound);
-
-        domElements.showQuestionChallenge(null, secondSound, null);
-        audioEl = document.getElementById("challenge-audio");
-        expect(audioEl.src).toBe(secondSound);
-    });
-
-
-    it("displays a question with an image correctly", () => {
+    it("displays a question with an image correctly", async () => {
         const imageUrl = "https://example.com/image.png";
 
-        domElements.showQuestionChallenge(null, null, imageUrl);
+        domElements.showQuestionChallenge(null, null, imageUrl, mockAudioContext);
 
         const challengeEl = document.getElementById("question-challenge");
 
@@ -792,25 +807,25 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         expect(imgEl.src).toBe(imageUrl);
 
         // Image element should be removed when called with text
-        domElements.showQuestionChallenge("foo", null, null);
+        domElements.showQuestionChallenge("foo", null, null, mockAudioContext);
         const removedImg = document.querySelector("#challenge-image");
         expect(removedImg).toBeNull();
     });
 
-    it("replaces image when a new image URL is given", () => {
+    it("replaces image when a new image URL is given", async () => {
         const firstImage = "https://example.com/first.png";
         const secondImage = "https://example.com/second.png";
 
-        domElements.showQuestionChallenge(null, null, firstImage);
+        domElements.showQuestionChallenge(null, null, firstImage, mockAudioContext);
         let imgEl = document.querySelector("#challenge-image");
         expect(imgEl.src).toBe(firstImage);
 
-        domElements.showQuestionChallenge(null, null, secondImage);
+        domElements.showQuestionChallenge(null, null, secondImage, mockAudioContext);
         imgEl = document.querySelector("#challenge-image");
         expect(imgEl.src).toBe(secondImage);
     });
 
-    it("enables all letter buttons when audio is played", () => {
+    it("enables all letter buttons when audio is played", async () => {
         // First, create some disabled letter buttons
         const letterBtn1 = document.createElement("button");
         letterBtn1.className = "letter-btn";
@@ -822,30 +837,34 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
     
         // Set up audio challenge
         const soundUrl = "https://example.com/audio.mp3";
-        domElements.showQuestionChallenge(null, soundUrl);
+        domElements.showQuestionChallenge(null, soundUrl, null, mockAudioContext);
     
         const audioEl = document.getElementById("challenge-audio");
         const playBtn = document.getElementById("challenge-sound-btn");
-    
-        audioEl.play = vi.fn();
-    
+
         // Before clicking, buttons are disabled
         expect(letterBtn1.disabled).toBe(true);
         expect(letterBtn2.disabled).toBe(true);
     
         // Click play
         playBtn.click();
-    
-        // Audio played
-        expect(audioEl.play).toHaveBeenCalled();
-    
+
+        await vi.waitFor(() => {
+            expect(mockAudioContext.createBufferSource).toHaveBeenCalled();
+        });
+
         // Buttons are still disabled before audio ends
         expect(letterBtn1.disabled).toBe(true);
         expect(letterBtn2.disabled).toBe(true);
     
         // Manually trigger audio.onended
-        audioEl.onended();
-    
+        mockSource.onended();
+        
+        // Let the handler finish
+        await vi.waitFor(() => {
+            expect(letterBtn1.disabled).toBe(false);
+        });
+
         // Buttons should now be enabled
         expect(letterBtn1.disabled).toBe(false);
         expect(letterBtn2.disabled).toBe(false);
@@ -853,6 +872,35 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         // Play button classes updated correctly
         expect(playBtn.classList.contains("playing")).toBe(false);
     });
+
+    it("blocks double-click", async () => {
+        // First, create some disabled letter buttons
+        const letterBtn1 = document.createElement("button");
+        letterBtn1.className = "letter-btn";
+        letterBtn1.disabled = true;
+        const letterBtn2 = document.createElement("button");
+        letterBtn2.className = "letter-btn";
+        letterBtn2.disabled = true;
+        document.body.append(letterBtn1, letterBtn2);
+    
+        // Set up audio challenge
+        const soundUrl = "https://example.com/audio.mp3";
+        domElements.showQuestionChallenge(null, soundUrl, null, mockAudioContext);
+    
+        const audioEl = document.getElementById("challenge-audio");
+        const playBtn = document.getElementById("challenge-sound-btn");
+
+        // Click play twice
+        playBtn.click();
+        playBtn.click();
+
+        await vi.waitFor(() => {
+            expect(mockAudioContext.createBufferSource).toHaveBeenCalledTimes(1);
+        });
+
+
+    });
+
 });
 
 describe("GroupTestDomElements - Repeatbutton", () => {

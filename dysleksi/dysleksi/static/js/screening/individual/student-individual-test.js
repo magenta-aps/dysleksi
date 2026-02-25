@@ -66,7 +66,8 @@ export class IndividualTestView extends StudentTestView {
             this.domElements.showQuestionChallenge(
                 this.currentQuestion.challengeText,
                 this.currentQuestion.challengeSoundUrl,
-                this.currentQuestion.challengeImageUrl
+                this.currentQuestion.challengeImageUrl,
+                this.audioContext
             );
 
             this.send({

@@ -316,7 +316,7 @@ class TestDomElements {
         parent.appendChild(child);
     }
 
-    showQuestionChallenge(text, sound, imageUrl) {
+    showQuestionChallenge(text, sound, imageUrl, audioContext) {
         if (!text && !sound && !imageUrl) {
             this.questionChallengeEl.innerHTML = "";
         }
@@ -350,43 +350,45 @@ class TestDomElements {
             }
         }
 
-        let audio = document.querySelector("#challenge-audio");
+        if (playBtn) playBtn.remove();
 
-        if (sound) {
-            if (!audio) {
-                audio = document.createElement("audio");
-                audio.id = "challenge-audio";
-                audio.preload = "none";
-                audio.style.display = "none"; // hidden audio element
-                document.body.appendChild(audio);
-            }
+        if (sound && audioContext) {
+            playBtn = document.createElement("button");
+            playBtn.id = "challenge-sound-btn";
+            playBtn.className = "btn sound-btn pulse";
+            this._insert(this.questionChallengeEl, playBtn, [img, textEl], null);
+    
+            let isPlaying = false;
+            let currentSource = null;
 
-            audio.src = sound;
-            audio.load();
-
-            if (!playBtn) {
-                playBtn = document.createElement("button");
-                playBtn.id = "challenge-sound-btn";
-                playBtn.className = "btn sound-btn";
-                this._insert(this.questionChallengeEl, playBtn, [img, textEl], null);
-            }
-            playBtn.classList.add("pulse");
-            playBtn.onclick = () => {
-                audio.currentTime = 0; // restart every time
-                audio.play();
+            playBtn.onclick = async () => {
+                if (isPlaying) return; // prevent double-clicks
+                isPlaying = true;
                 playBtn.classList.remove("pulse");
-                playBtn.classList.add('playing');
+                playBtn.classList.add("playing");
+    
+                // Fetch & decode audio
+                const response = await fetch(sound);
+                const arrayBuffer = await response.arrayBuffer();
+                const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
+    
+                // Play
+                currentSource = audioContext.createBufferSource();
+                currentSource.buffer = audioBuffer;
+                currentSource.connect(audioContext.destination);
+                currentSource.start();
+    
+                // Wait until finished
+                await new Promise(resolve => {
+                    currentSource.onended = resolve;
+                });
 
-                audio.onended = () => {
+                isPlaying = false;
+                playBtn.classList.remove("playing");
+    
                 const letterBtns = document.querySelectorAll(".letter-btn");
-                    playBtn.classList.remove('playing');
                 letterBtns.forEach(b => b.disabled = false);
-                };
-
             };
-        } else {
-            if (playBtn) playBtn.remove();
-            if (audio) audio.remove();
         }
 
         return {

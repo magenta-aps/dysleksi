@@ -33,7 +33,8 @@ export class GroupTestView extends StudentTestView {
             this.domElements.showQuestionChallenge(
                 this.challengeText,
                 this.challengeSoundUrl,
-                this.challengeImageUrl
+                this.challengeImageUrl,
+                this.audioContext
             );
         }
         return canShow;
@@ -93,7 +94,8 @@ export class GroupTestView extends StudentTestView {
             const domEls = this.domElements.showQuestionChallenge(
                 this.currentQuestion.challengeText,
                 this.currentQuestion.challengeSoundUrl,
-                this.currentQuestion.challengeImageUrl
+                this.currentQuestion.challengeImageUrl,
+                this.audioContext
             );
             this.selectedAnswer = null;
             this.textAnswer = null;

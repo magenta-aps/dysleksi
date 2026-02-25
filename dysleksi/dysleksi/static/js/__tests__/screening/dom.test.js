@@ -64,28 +64,6 @@ describe("GroupTestDomElements.showQuestionChallenge (sound only)", () => {
     vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(() => {});
   });
 
-  it("creates audio element and play button", () => {
-    dom.showQuestionChallenge(null, "/sound.mp3", null);
-    const audio = document.querySelector("#challenge-audio");
-    const playBtn = document.querySelector("#challenge-sound-btn");
-
-    expect(audio).not.toBeNull();
-    expect(audio.src).toContain("/sound.mp3");
-    expect(playBtn).not.toBeNull();
-  });
-
-  it("plays audio when button clicked", () => {
-    dom.showQuestionChallenge(null, "/sound.mp3", null);
-    const audio = document.querySelector("#challenge-audio");
-    const playBtn = document.querySelector("#challenge-sound-btn");
-
-    audio.currentTime = 5;
-    playBtn.click();
-
-    expect(audio.currentTime).toBe(0);
-    expect(audio.play).toHaveBeenCalledOnce();
-  });
-
   it("removes audio and button when sound is null", () => {
     dom.showQuestionChallenge(null, "/sound.mp3", null);
     dom.showQuestionChallenge(null, null, null);
