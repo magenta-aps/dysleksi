@@ -75,6 +75,8 @@ h1, h2, h3, h4, h5, h6 {
 
   &:hover, &:focus, &:active {
     background-color: $student-blue !important;
+    border-width: 2px !important;
+    padding: calc(1rem - 1px) calc(3rem - 1px) !important;
   }
   &.selected {
     background-color: $student-blue !important;
@@ -93,6 +95,7 @@ body.show-instructions {
     &:disabled {
       /* Inputs are disabled while rendering instructions,
        but we should not set them in a faded color then */
+      color: black !important;
       border-color: $student-blue-dark !important;
       background-color: white !important;
     }
@@ -128,6 +131,12 @@ body.show-instructions {
       /* Inputs are disabled while rendering instructions,
        but we should not set them in a faded color then */
       background-color: $student-blue-dark !important;
+    }
+  }
+  .letter-btn {
+    &:disabled {
+      color: black !important;
+      border-color: $student-grey !important;
     }
   }
 }
