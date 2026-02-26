@@ -22,6 +22,12 @@
                 "delayAfter": 500
             },
             {
+                // Ordlæsningen varer i 10minutter.
+                "action": "playSound",
+                "resource": "wordreading_2/Indledning/7a.4.wav",
+                "delayAfter": 500
+            },
+            {
                 // Først skal du øve dig på øveopgaverne, inden opgaverne starter.
                 "action": "playSound",
                 "resource": "wordreading_2/Indledning/7a.2.wav",
@@ -35,27 +41,25 @@
                 "delayAfter": 500
             },
             {
-                // Ordlæsningen varer i 10minutter.
-                "action": "playSound",
-                "resource": "wordreading_2/Indledning/7a.4.wav",
-                "delayAfter": 500
-            },
-            {
                 // Øveopgaverne er nu ved at starte. Først får du vist, hvad du skal
                 // gøre
                 "action": "playSound",
-                "resource": "wordreading_2/Indledning/7a.5.wav",
+                "resource": "wordreading_2/Indledning/6a.5.wav",
                 "delayAfter": 500
             },
             {
                 "action": "fadeOut",
-                "element": "challenge-image",
-                "delayAfter": 500
+                "element": "challenge-image"
             },
             {
-                "action": "show",
                 "element": "next",
-                "delayAfter": 0
+                "action": "show"
+            },
+            {
+                // Klik på den grønne pil, når du er klar.
+                "action": "playSound",
+                "resource": "wordreading_2/Indledning/9a.5.wav",
+                "delayAfter": 500
             }
         ]
     },
@@ -73,7 +77,7 @@
             {
                 // Lyt godt efter.
                 "action": "playSound",
-                "resource": "wordreading_2/Instruktion/7b.1_martha.mp3",
+                "resource": "wordreading_2/Instruktion/6b.1.wav",
                 "delayAfter": 750
             },
             {
@@ -362,7 +366,7 @@
             {
                 // Klik på den grønne pil, når du er klar.
                 "action": "playSound",
-                "resource": "wordreading_2/Øveopgave/7c.1.wav",
+                "resource": "wordreading_2/Indledning/9a.5.wav",
                 "delayAfter": 0
             },
             {
@@ -419,7 +423,7 @@
             },
             {
                 "action": "playSound",
-                "resource": "wordreading_2/Øveopgave/7d.2a.wav"
+                "resource": "wordreading_2/Øveopgave/9d.4a.wav"
             },
             {
                 "action": "fadeIn",
@@ -427,7 +431,7 @@
             },
             {
                 "action": "playSound",
-                "resource": "wordreading_2/Øveopgave/7d.2b.wav",
+                "resource": "wordreading_2/Øveopgave/9d.4b.wav",
                 "delayAfter": 750
             },
             // 7d.3a
