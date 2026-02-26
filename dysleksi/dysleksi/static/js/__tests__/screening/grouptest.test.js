@@ -972,3 +972,45 @@ describe("compareTextAnswer", () => {
         expect(view.compareTextAnswer("ulu", "alu")).toBe(false);
     });
 });
+
+describe("Update next button class", () => {
+
+    let domElements;
+    let view;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="choices"></div>
+            <audio id="instructions-sound"></audio>
+            <audio id="reminder-sound"></audio>
+            <div id="instructions-text"></div>
+            <button id="start-practice"></button>
+            <button id="start-questions"></button>
+            <table id="summary-table"></table>
+            <button id="end-summary"></button>
+            <div id="question-title"></div>
+            <div id="question-challenge"></div>
+            <button id="next"></button>
+        `
+        domElements = new GroupTestDomElements();
+        view = new GroupTestView(
+            groupTestData,{addEventListener: vi.fn()},'class_123', 1, domElements
+        );
+    });
+
+    it("Set button to round class on entry", () => {
+        view.setPart(0);
+        view.setQuestion(true, 0);
+        view.updateNextButtonClass();
+        expect(domElements.nextBtn.classList).toContain("start-btn");
+    });
+
+    it("Set button to round class on playing intro", () => {
+        view.setPart(0);
+        view.setQuestion(true, 1);
+        view.showingIntro = true;
+        view.updateNextButtonClass();
+        expect(domElements.nextBtn.classList).toContain("start-btn");
+    });
+
+});

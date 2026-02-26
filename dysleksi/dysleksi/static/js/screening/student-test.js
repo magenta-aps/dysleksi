@@ -16,6 +16,9 @@ export class StudentTestView extends EventTarget {
     currentPartIndex = null;
     currentQuestion = null;
     currentQuestionIndex = null;
+    showingIntro = false;
+    showingInstructions = false;
+    isPracticing = false;
 
     constructor(test, chatSocket, roomName, assignmentId, domElements, student) {
         super();
@@ -64,10 +67,12 @@ export class StudentTestView extends EventTarget {
     }
 
     showTestPartIntro() {
+        this.showingIntro = true;
         this.domElements.showTestPartIntro()
         this.domElements.hideTestContainer()
         this.domElements.setStartTestPartButtonListener(
             () => {
+                this.showingIntro = false;
                 this.isPracticing = this.canPractice();
                 this.showFirstQuestion();
             }
@@ -99,6 +104,48 @@ export class StudentTestView extends EventTarget {
 
     canPractice() {
         return this.currentPart.practice.length > 0;
+    }
+
+    updateNextButtonClass() {
+        // console.log(
+        //     "Updating next button class. " +
+        //     "isPracticing:",this.isPracticing,
+        //     ", currentQuestionIndex:",this.currentQuestionIndex,
+        //     ", practice.length:",this.currentPart.practice.length,
+        //     ", questions.length:",this.currentPart.questions.length
+        // );
+        if (this.isPracticing && this.currentPart.practice.length > 0) {
+
+            if (this.currentQuestionIndex === this.currentPart.practice.length - 1) {
+                // Sidste spørgsmål i øveopgave
+                this.domElements.setNextButtonClass("start-part-btn");  // Blå knap
+                return;
+            }
+
+            if (!this.currentQuestionIndex) {
+                // Første punkt i deltest
+                this.domElements.setNextButtonClass("start-btn"); // Rund knap
+                return;
+            }
+
+            if (this.showingIntro) {
+                // Viser introduktion
+                this.domElements.setNextButtonClass("start-btn"); // Rund knap
+                return;
+            }
+
+            if (
+                this.currentPart.practice.slice(0, this.currentQuestionIndex+1).every(q => !!q.instruction_sequence) &&
+                !this.currentPart.practice[this.currentQuestionIndex+1].instruction_sequence &&
+                !this.showingInstructions
+            ) {
+                // Dette og alle foregående spørgsmål har en instruktionssekvens. Næste spørgsmål har ikke. Vi er ikke p.t. i gang med at vise instruktioner
+                this.domElements.setNextButtonClass("start-btn"); // Rund knap
+                return;
+            }
+
+        }
+        this.domElements.setNextButtonClass("next-btn"); // Grøn knap
     }
 
     showFirstQuestion() {

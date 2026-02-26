@@ -5,7 +5,6 @@ import { calculateStudentProgress } from '../utils.js';
 
 export class GroupTestView extends StudentTestView {
 
-    isPracticing = false;
     questionDisplayedAt;
     selectedAnswer;
     textAnswer;
@@ -85,10 +84,7 @@ export class GroupTestView extends StudentTestView {
 
             // Show question challenge and choices
             this.domElements.toggleQuestionDisplay("flex");
-
-            // Switch look of "next" button from round button to arrow button
-            this.domElements.setNextButtonClass("next-btn", true);
-            this.domElements.setNextButtonClass("start-btn", false);
+            this.updateNextButtonClass();
 
             this.domElements.clearQuestionChoices();
             const domEls = this.domElements.showQuestionChallenge(
@@ -122,6 +118,8 @@ export class GroupTestView extends StudentTestView {
             if (this.currentQuestion.instruction_sequence){
                 console.log("---------------------------------------------")
                 console.log("Starting instruction sequence: ", this.currentQuestion.instruction_sequence);
+                this.showingInstructions = true;
+                this.updateNextButtonClass();
                 this.domElements.lockInput();
                 this.domElements.toggleBodyClass("show-instructions", true);
 
@@ -145,6 +143,7 @@ export class GroupTestView extends StudentTestView {
 
                 instructionRunner.run().then(() => {
                     this.domElements.unlockInput();
+                    this.showingInstructions = false;
                     if (this.domElements.skipInstructionButton) {
                         this.domElements.skipInstructionButton.style.display="none";
                         this.domElements.skipAllInstructionsButton.style.display="none";
@@ -153,9 +152,7 @@ export class GroupTestView extends StudentTestView {
                     // Hide question challenge and choices when instruction sequence is over
                     this.domElements.toggleQuestionDisplay("none");
 
-                    // Switch look of "next" button from round button to arrow button
-                    this.domElements.setNextButtonClass("next-btn", false);
-                    this.domElements.setNextButtonClass("start-btn", true);
+                    this.updateNextButtonClass();
                 });
             } else {
                 this.domElements.toggleBodyClass("show-instructions", false);
@@ -320,7 +317,7 @@ export class GroupTestView extends StudentTestView {
             this.textAnswer = answer;
             this.selectedAnswer = this.currentQuestion.possibleAnswers[0];
         }
-        this.domElements.toggleNextButton(answer.length >= 2);
+        this.domElements.toggleNextButton(this.showingInstructions || answer.length >= 2);
     }
 
     regexWhitespaces = /\s+/g;
