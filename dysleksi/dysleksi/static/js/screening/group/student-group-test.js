@@ -205,6 +205,9 @@ export class GroupTestView extends StudentTestView {
     onQuestionComplete(question, outOfTime = false) {
         const questionAnsweredAt = document.timeline.currentTime;
 
+        // Hide the image to avoid leaking into the next question
+        this.domElements.hideChallengeImage()
+
         if (!question.instruction_sequence) {
             if (!this.selectedAnswer && !this.textAnswer && !outOfTime) {
                 alert("Vælg et svar, før du går videre.");
