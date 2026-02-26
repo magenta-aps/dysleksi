@@ -47,7 +47,7 @@ def create_wordspelling_test(
 
 
 def create_letter_pronunciation_test(
-    test, questions_data, practice_questions_data=None, name="Ordbenævnelse"
+    test, questions_data, practice_questions_data=None, name="Bogstavbenævnelse"
 ):
     part, created = TestPart.objects.get_or_create(
         name=name,
