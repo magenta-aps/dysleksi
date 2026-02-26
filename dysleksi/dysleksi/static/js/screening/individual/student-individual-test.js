@@ -61,6 +61,7 @@ export class IndividualTestView extends StudentTestView {
     showQuestion(isPracticing, questionIndex) {
         const canShow = this.setQuestion(isPracticing, questionIndex);
         if (canShow) {
+            // TODO: [#68981] Refactor this code somewhere else
             console.log("---------------------------------------------")
             console.log("Showing question " + this.currentPartIndex + "." + this.currentQuestionIndex);
 
@@ -72,7 +73,6 @@ export class IndividualTestView extends StudentTestView {
                 this.domElements.hideStudentHeader();
             }
 
-            // TODO: [#68981] Refactor this code somewhere else
             if (this.currentQuestion.instruction_sequence){
                 console.log("---------------------------------------------")
                 console.log("Starting instruction sequence: ", this.currentQuestion.instruction_sequence);

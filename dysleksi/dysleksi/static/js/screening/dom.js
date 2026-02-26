@@ -4,6 +4,7 @@ class TestDomElements {
     studentHeaderEl;
     questionChallengeEl;
     endSummaryButton;
+    reminderSoundEl;
     summaryContainer;
     nextBtn;
 
@@ -17,6 +18,7 @@ class TestDomElements {
         this.summaryContainer = document.querySelector("#summary-container");
         this.nextBtn = document.querySelector("#next");
         this.overlay = document.getElementById("fade-overlay");
+        this.reminderSoundEl = document.querySelector("#reminder-sound");
         this.testIntro = document.querySelector("#test-intro");
         this.testPartIntro = document.querySelector("#testpart-intro");
         this.testPartIntroText = document.querySelector("#testpart-intro-text");
@@ -179,6 +181,7 @@ class TestDomElements {
         if (el) {
             if (el.dataset.hideDisplay === "true") {
                 el.style.display = "block";
+                el.style.visibility = "visible";
             } else {
                 el.style.visibility = "visible";
             }
@@ -532,12 +535,10 @@ class TestDomElements {
 
 export class GroupTestDomElements extends TestDomElements {
 
-    reminderSoundEl;
     choicesEl;
 
     constructor() {
         super();
-        this.reminderSoundEl = document.querySelector("#reminder-sound");
         this.choicesEl = document.querySelector("#choices");
     }
 
