@@ -55,17 +55,16 @@
       },
       {
         "action": "show",
-        "element": "challenge-text"
+        "element": "question-challenge"
       },
       {
         "action": "playSound",
         "resource": "letter_pronunciation/Instruktion/9b.1a.wav",
         "delayAfter": 500
       },
-      // TODO: Highlight-function doesn't work
       {
         "action": "highlight",
-        "element": "challenge-text"
+        "element": "question-challenge"
       },
       
       // 9b.1b
@@ -85,7 +84,7 @@
       // 9b.1d
       {
         "action": "fadeOut",
-        "element": "challenge-text"
+        "element": "question-challenge"
       },
       {
         "action": "playSound",
@@ -119,33 +118,33 @@
     "wrong": [],
     // TODO: Reminder lyd afspilles ikke
     "reminder": 5000,
-    "reminderSource": "letter_pronunciation/Øveopgave1/9c.4a.wav",
-    "instruction_sequence": [
-      // 9c
-      {
-        "action": "hide",
-        "element": "next"
-      },
-      {
-        "action": "fadeIn",
-        "element": "challenge-text"
-      },
-      // TODO: Implement setReminderSource
-      //{
-      //  "action": "setReminderSource",
-      //  "resource": "letter-pronunciation/Øveopgave2/9c.4a.wav"
-      //},
-      {
-        "action": "show",
-        "element": "question-challenge"
-      },
-      // TODO: Make next button in teacher view, or set "correct" button instead
-      {
-        "action": "setButtonSoundOnce",
-        "element": "next",
-        "resource": "letter_pronunciation/Øveopgave1/9c.4b.wav"
-      }
-    ]
+    "reminderSource": "letter_pronunciation/Øveopgave1/9c.4a.wav"
+   // "instruction_sequence": [
+   //   // 9c
+   //   {
+   //     "action": "hide",
+   //     "element": "next"
+   //   },
+   //   {
+   //     "action": "fadeIn",
+   //     "element": "challenge-text"
+   //   },
+   //   // TODO: Implement setReminderSource
+   //   //{
+   //   //  "action": "setReminderSource",
+   //   //  "resource": "letter-pronunciation/Øveopgave2/9c.4a.wav"
+   //   //},
+   //   {
+   //     "action": "show",
+   //     "element": "question-challenge"
+   //   },
+   //   // TODO: Make next button in teacher view, or set "correct" button instead
+   //   {
+   //     "action": "setButtonSoundOnce",
+   //     "element": "next",
+   //     "resource": "letter_pronunciation/Øveopgave1/9c.4b.wav"
+   //   }
+   // ]
   },
   {
     "question_type": "no_input_required",
@@ -153,21 +152,23 @@
     "correct": null,
     "wrong": [],
     "reminder": 5000,
-    "instruction_sequence": [
+    "reminderSource": "letter_pronunciation/Øveopgave1/9d.3.wav"
+    //"instruction_sequence": [
       // TODO: Implement setReminderSource
       //{
       //  "action": "setReminderSource",
       //  "resource": "letter-pronunciation/Øveopgave2/9d.2.wav"
       //},
+      // TODO: Hvad gør vi med denne her, hvis der ikke må være instruction_sequence?
       //{
       //  "action": "setButtonSoundOnce",
       //  "resource": "letter_pronunciation/Øveopgave1/9d.3.wav"
       //},
-      {
-        "action": "show",
-        "element": "question-challenge"
-      }
-    ]
+      //{
+      //  "action": "show",
+      //  "element": "question-challenge"
+      //}
+    //]
   },
   {
     "question_type": "no_input_required",
