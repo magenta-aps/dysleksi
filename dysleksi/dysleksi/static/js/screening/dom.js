@@ -4,7 +4,9 @@ class TestDomElements {
     studentHeaderEl;
     questionChallengeEl;
     endSummaryButton;
+    reminderSoundEl;
     summaryContainer;
+    nextBtn;
 
     constructor() {
         this.instructionsSoundEl = document.querySelector("#instructions-sound");
@@ -14,7 +16,9 @@ class TestDomElements {
         this.startSummaryButton = document.querySelector("#start-summary");
         this.startTestPartButton = document.querySelector("#start-testpart");
         this.summaryContainer = document.querySelector("#summary-container");
+        this.nextBtn = document.querySelector("#next");
         this.overlay = document.getElementById("fade-overlay");
+        this.reminderSoundEl = document.querySelector("#reminder-sound");
         this.testIntro = document.querySelector("#test-intro");
         this.testPartIntro = document.querySelector("#testpart-intro");
         this.testPartIntroText = document.querySelector("#testpart-intro-text");
@@ -23,6 +27,7 @@ class TestDomElements {
         this.testContainer = document.querySelector("#test-container");
         this.skipInstructionButton = document.querySelector("#skip-instruction");
         this.skipAllInstructionsButton = document.querySelector("#skip-all-instructions");
+        this.repeatBtn = document.querySelector("#repeat");
     }
 
     markButtonPress(buttonId, buttonClass) {
@@ -143,10 +148,40 @@ class TestDomElements {
         this.startTestPartButton = this._setButtonListener(this.startTestPartButton, listener);
     }
 
+    toggleNextButton(show) {
+        this.nextBtn.style.visibility = show ? "visible" : "hidden";
+    }
+
+    toggleRepeatButton(show) {
+        this.repeatBtn.style.visibility = show ? "visible" : "hidden";
+    }
+
+    disableNextButton() {
+        this.nextBtn.style.transition = ""
+        this.nextBtn.style.opacity = ""
+        this.nextBtn.disabled = true;
+    }
+    
+    enableNextButton() {
+        this.nextBtn.disabled = false;
+    }
+
+
+    setNextButtonListener(listener) {
+        this._setButtonListener(this.nextBtn, listener);
+    }
+
+    setRepeatButtonListener(listener) {
+        if (this.repeatBtn) {
+            this._setButtonListener(this.repeatBtn, listener);
+        }
+    }
+
     showElement(el) {
         if (el) {
             if (el.dataset.hideDisplay === "true") {
                 el.style.display = "block";
+                el.style.visibility = "visible";
             } else {
                 el.style.visibility = "visible";
             }
@@ -500,16 +535,11 @@ class TestDomElements {
 
 export class GroupTestDomElements extends TestDomElements {
 
-    reminderSoundEl;
     choicesEl;
-    nextBtn;
 
     constructor() {
         super();
-        this.reminderSoundEl = document.querySelector("#reminder-sound");
         this.choicesEl = document.querySelector("#choices");
-        this.nextBtn = document.querySelector("#next");
-        this.repeatBtn = document.querySelector("#repeat");
     }
 
     showInstructions(text, audio) {
@@ -525,7 +555,7 @@ export class GroupTestDomElements extends TestDomElements {
         this.nextBtn.style.opacity = ""
         this.nextBtn.disabled = true;
     }
-    
+
     enableNextButton() {
         this.nextBtn.disabled = false;
     }
@@ -556,6 +586,7 @@ export class GroupTestDomElements extends TestDomElements {
             this.hideElement(this.repeatBtn);
         }
     }
+
     setRepeatButtonListener(listener) {
         if (this.repeatBtn) {
             this._setButtonListener(this.repeatBtn, listener);

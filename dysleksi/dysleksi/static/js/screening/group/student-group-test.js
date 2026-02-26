@@ -10,7 +10,6 @@ export class GroupTestView extends StudentTestView {
     textAnswer;
     questionTimeoutId;
     partTimeoutId;
-    repeatQuestionIndex = null;
 
     constructor(test, chatSocket, roomName, assignmentId, domElements, student) {
         super(test, chatSocket, roomName, assignmentId, domElements, student);
@@ -19,7 +18,6 @@ export class GroupTestView extends StudentTestView {
     start() {
         super.start();
         this.domElements.setNextButtonListener(() => this.onQuestionComplete(this.currentQuestion, false));
-        this.domElements.setRepeatButtonListener(() => this.repeat());
     }
 
     // ---- Parts ----
@@ -51,17 +49,6 @@ export class GroupTestView extends StudentTestView {
         remainingQuestions.forEach((question) => {
             this.onQuestionComplete(question, true);
         });
-    }
-
-    setRepeatDestination(data) {
-        this.repeatQuestionIndex = data;
-    }
-
-    repeat() {
-        this.showQuestion(
-            this.isPracticing,
-            this.repeatQuestionIndex !== null ? this.repeatQuestionIndex : this.currentQuestionIndex
-        );
     }
 
     // ---- Questions ----
@@ -270,9 +257,8 @@ export class GroupTestView extends StudentTestView {
                 this.domElements.toggleRepeatButton(true);
                 this.domElements.toggleNextButton(true);
 
-                this.isPracticing = false;
                 this.currentQuestionIndex = 0;
-                this.showFirstQuestion();
+                this.showFirstQuestion(false);
 
             } else {
                 // part complete

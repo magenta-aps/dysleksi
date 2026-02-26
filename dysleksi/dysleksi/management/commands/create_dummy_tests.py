@@ -93,7 +93,7 @@ def create_group_test(
 
 def create_individual_test():
 
-    test_name = "Individuel test (dummy)"
+    test_name = "Bogstavbenævnelse (dummy)"
     test, created = Test.objects.get_or_create(
         name=test_name, test_type=TestType.INDIVIDUAL
     )
@@ -105,6 +105,10 @@ def create_individual_test():
         Path(settings.MEDIA_ROOT)
         / "dummy/letter_pronunciation/letter_pronunciation.json",
         "letter_pronunciation",
+        practice_json_path=(
+            Path(settings.MEDIA_ROOT)
+            / "letter_pronunciation/letter_pronunciation_practice.json"
+        ),
     )
 
 

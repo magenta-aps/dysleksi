@@ -24,6 +24,7 @@ export function initStudent(roomName, assignmentId, test) {
         }).then(() => {
             console.log("Audio recording setup complete");
             const view = new IndividualTestView(test, chatSocket, roomName, assignmentId, domElements, testMediaRecorder);
+
             view.addEventListener("test.complete", (evt) => {
                 // What to do when the test is completed?
                 chatSocket.close();

@@ -43,6 +43,8 @@ describe("IndividualTestFlow", () => {
             <audio id="instructions-sound"></audio>
             <button id="end-summary"></button>
             <div id="question-challenge"></div>
+            <button id="next"></button>
+            <button id="repeat"></button>
             <div id="choices"></div>
         `;
 
@@ -93,6 +95,7 @@ describe("IndividualTestFlow", () => {
             roomName: "student_1",
             questionIndex: 0,
             questionId: 1,
+            practice: false,
             partId: 1,
             assignmentId: 1,
             note: "Vi afbryder her",
@@ -120,6 +123,7 @@ describe("IndividualTestFlow", () => {
             partId: view.currentPart.id,
             questionIndex: view.currentQuestionIndex,
             questionId: view.currentQuestion.id,
+            practice: false,
             displayedAt: 0,
             questionTitle: "1/3 (Individuel deltest)",
             assignmentId: 1,
@@ -246,6 +250,7 @@ describe("IndividualTestFlow", () => {
             partId: view.currentPart.id,
             questionIndex: view.currentQuestionIndex,
             questionId: view.currentQuestion.id,
+            practice: false,
             questionTitle: "1/3 (Individuel deltest)",
             displayedAt: 10,
             answeredAt: 55,

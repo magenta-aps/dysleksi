@@ -16,9 +16,14 @@ export class StudentTestView extends EventTarget {
     currentPartIndex = null;
     currentQuestion = null;
     currentQuestionIndex = null;
-    showingIntro = false;
-    showingInstructions = false;
-    isPracticing = false;
+    showingIntro = false
+;
+    showingInstructions = false
+;
+    isPracticing = false
+;
+    repeatQuestionIndex = null
+;
 
     constructor(test, chatSocket, roomName, assignmentId, domElements, student) {
         super();
@@ -34,8 +39,12 @@ export class StudentTestView extends EventTarget {
         this.audioContext = unlockAudioOnGesture();
     }
 
-    questionTitle() {
-        return `${this.currentQuestionIndex + 1}/${this.currentPart.questions.length} (${this.currentPart.name})`;
+    questionTitle(practice = false) {
+        if (practice) {
+            return `${this.currentQuestionIndex + 1}/${this.currentPart.practice.length} (${this.currentPart.name}) - Instruktion`;
+        } else {
+            return `${this.currentQuestionIndex + 1}/${this.currentPart.questions.length} (${this.currentPart.name})`;
+        }
     }
 
     send(data) {
@@ -60,6 +69,7 @@ export class StudentTestView extends EventTarget {
             event: "test.started",
             message: "Testen er startet",
         });
+        this.domElements.setRepeatButtonListener(() => this.repeat());
     }
 
     showIntro() {
@@ -73,8 +83,7 @@ export class StudentTestView extends EventTarget {
         this.domElements.setStartTestPartButtonListener(
             () => {
                 this.showingIntro = false;
-                this.isPracticing = this.canPractice();
-                this.showFirstQuestion();
+                this.showFirstQuestion(this.canPractice());
             }
         );
         if (this.previousPart) {
@@ -98,8 +107,7 @@ export class StudentTestView extends EventTarget {
     endSummary() {
         console.log("Summary ended, showing first part");
         this.domElements.hideSummary();
-        this.isPracticing = this.canPractice();
-        this.showFirstQuestion();
+        this.showFirstQuestion(this.canPractice());
     }
 
     canPractice() {
@@ -148,7 +156,8 @@ export class StudentTestView extends EventTarget {
         this.domElements.setNextButtonClass("next-btn"); // Grøn knap
     }
 
-    showFirstQuestion() {
+    showFirstQuestion(isPracticing = false) {
+        this.isPracticing = isPracticing;
         console.log("Showing first question", this.isPracticing ? "(practice)" : "(test)");
         this.domElements.showTestContainer();
         this.domElements.hideTestPartIntro();
@@ -243,6 +252,17 @@ export class StudentTestView extends EventTarget {
             this.domElements.fadeScreenOverlay()
         }
         return canShow
+    }
+
+    setRepeatDestination(data) {
+        this.repeatQuestionIndex = data;
+    }
+
+    repeat() {
+        this.showQuestion(
+            this.isPracticing,
+            this.repeatQuestionIndex !== null ? this.repeatQuestionIndex : this.currentQuestionIndex
+        );
     }
 
 }
