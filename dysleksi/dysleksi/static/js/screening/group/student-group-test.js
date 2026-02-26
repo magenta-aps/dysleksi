@@ -257,9 +257,8 @@ export class GroupTestView extends StudentTestView {
                 this.domElements.toggleRepeatButton(true);
                 this.domElements.toggleNextButton(true);
 
-                this.isPracticing = false;
                 this.currentQuestionIndex = 0;
-                this.showFirstQuestion();
+                this.showFirstQuestion(false);
 
             } else {
                 // part complete

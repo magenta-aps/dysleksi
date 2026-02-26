@@ -83,8 +83,7 @@ export class StudentTestView extends EventTarget {
         this.domElements.setStartTestPartButtonListener(
             () => {
                 this.showingIntro = false;
-                this.isPracticing = this.canPractice();
-                this.showFirstQuestion();
+                this.showFirstQuestion(this.canPractice());
             }
         );
         if (this.previousPart) {
@@ -108,8 +107,7 @@ export class StudentTestView extends EventTarget {
     endSummary() {
         console.log("Summary ended, showing first part");
         this.domElements.hideSummary();
-        this.isPracticing = this.canPractice();
-        this.showFirstQuestion();
+        this.showFirstQuestion(this.canPractice());
     }
 
     canPractice() {
@@ -158,7 +156,7 @@ export class StudentTestView extends EventTarget {
         this.domElements.setNextButtonClass("next-btn"); // Grøn knap
     }
 
-    showFirstQuestion() {
+    showFirstQuestion(isPracticing = false) {
         this.isPracticing = isPracticing;
         console.log("Showing first question", this.isPracticing ? "(practice)" : "(test)");
         this.domElements.showTestContainer();
