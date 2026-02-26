@@ -250,6 +250,8 @@ describe("IndividualTestDomElements constructor", () => {
       <div id="instructions-text"></div>
       <table id="summary-table"></table>
       <button id="end-summary"></button>
+      <button id="next"></button>
+      <button id="repeat"></button>
       <div id="question-title"></div>
       <div id="question-challenge"></div>
     `;
