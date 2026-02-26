@@ -307,15 +307,23 @@ export class TeacherView {
         this.currentPart = this.test.parts[partIndex];
     }
 
-    validateQuestionIndex(questionIndex) {
-        if (questionIndex === null || questionIndex === undefined || questionIndex < 0 || questionIndex >= this.test.parts[this.partIndex].questions.length) {
+    validateQuestionIndex(questionIndex, practice) {
+        if (questionIndex === null || questionIndex === undefined || questionIndex < 0) {
+            throw new Error(`Invalid question index ${questionIndex}`)
+        } else if (!practice && questionIndex >= this.test.parts[this.partIndex].questions.length) {
+            throw new Error(`Invalid question index ${questionIndex}`)
+        } else if (practice && questionIndex >= this.test.parts[this.partIndex].practice.length) {
             throw new Error(`Invalid question index ${questionIndex}`)
         }
     }
-    setQuestionIndex(questionIndex) {
-        this.validateQuestionIndex(questionIndex);
+    setQuestionIndex(questionIndex, practice) {
+        this.validateQuestionIndex(questionIndex, practice);
         this.questionIndex = questionIndex;
-        this.currentQuestion = this.currentPart.questions[questionIndex];
+        if (practice) {
+            this.currentQuestion = this.currentPart.practice[questionIndex];
+        } else {
+            this.currentQuestion = this.currentPart.questions[questionIndex];
+        }
     }
 
     _initSocket() {
@@ -332,7 +340,7 @@ export class TeacherView {
 
             if (["question.answered", "question.displayed"].includes(data.event)) {
                 this.setPartIndex(data.partIndex);
-                this.setQuestionIndex(data.questionIndex);
+                this.setQuestionIndex(data.questionIndex, data.practice);
                 if (data.event === 'question.displayed') {
                     this.buttons.enableButtons();
                     if ((this.currentQuestion !== null) && (this.currentQuestion.type === "no_input_required")) {
