@@ -1,121 +1,121 @@
 [
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.1.wav",
+    "sound": "wordspelling/Opgave/6f.1.wav",
     "correct": "iki",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.2.wav",
+    "sound": "wordspelling/Opgave/6f.2.wav",
     "correct": "niu",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.3.wav",
+    "sound": "wordspelling/Opgave/6f.3.wav",
     "correct": "aja",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.4.wav",
+    "sound": "wordspelling/Opgave/6f.4.wav",
     "correct": "una",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.5.wav",
+    "sound": "wordspelling/Opgave/6f.5.wav",
     "correct": "siku",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.6.wav",
+    "sound": "wordspelling/Opgave/6f.6.wav",
     "correct": "aput",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.7.wav",
+    "sound": "wordspelling/Opgave/6f.7.wav",
     "correct": "kuuk",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.8.wav",
+    "sound": "wordspelling/Opgave/6f.8.wav",
     "correct": "appa",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.9.wav",
+    "sound": "wordspelling/Opgave/6f.9.wav",
     "correct": "nasaq",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.10.wav",
+    "sound": "wordspelling/Opgave/6f.10.wav",
     "correct": "tuttu",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.11.wav",
+    "sound": "wordspelling/Opgave/6f.11.wav",
     "correct": "arsaq",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.12.wav",
+    "sound": "wordspelling/Opgave/6f.12.wav",
     "correct": "puisi",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.13.wav",
+    "sound": "wordspelling/Opgave/6f.13.wav",
     "correct": "palasi",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.14.wav",
+    "sound": "wordspelling/Opgave/6f.14.wav",
     "correct": "kammak",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.15.wav",
+    "sound": "wordspelling/Opgave/6f.15.wav",
     "correct": "meeraq",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.16.wav",
+    "sound": "wordspelling/Opgave/6f.16.wav",
     "correct": "sorluk",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.17.wav",
+    "sound": "wordspelling/Opgave/6f.17.wav",
     "correct": "kiffaq",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.18.wav",
+    "sound": "wordspelling/Opgave/6f.18.wav",
     "correct": "siuteroq",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.19.wav",
+    "sound": "wordspelling/Opgave/6f.19.wav",
     "correct": "tinguaraq",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "wordspelling_dummy/Opgave/6f.20.wav",
+    "sound": "wordspelling/Opgave/6f.20.wav",
     "correct": "illaagutit",
     "reminder": 20000
   }
