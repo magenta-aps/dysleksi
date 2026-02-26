@@ -91,6 +91,10 @@
         "element": "choices"
       },
       {
+        "action": "show",
+        "element": "next"
+      },
+      {
         // Lyt godt efter
         "action": "playSound",
         "resource": "wordspelling/Instruktion/6b.1.wav",
@@ -113,6 +117,10 @@
       {
         "action": "fadeOut",
         "element": "question-challenge"
+      },
+      {
+        "action": "fadeOut",
+        "element": "next"
       },
       {
         // Her kan du se
@@ -201,10 +209,6 @@
       {
         "action": "fadeOut",
         "element": "free-text-field"
-      },
-      {
-        "action": "show",
-        "element": "next"
       },
       {
         "action": "fadeIn",
@@ -527,29 +531,27 @@
       },
       // 6d.2
       {
-        "action": "fadeOut",
-        "element": "next"
-      },
-      {
-        "action": "fadeOut",
-        "element": "repeat"
-      },
-      {
         // Øvelserne er færdige.
         "action": "playSound",
         "resource": "wordspelling/Instruktion/6d.2.wav",
-        "delayAfter": 500
+        "delayAfter": 1000
       },
 
       // 9d.4
       {
-        "action": "show",
+        "action": "showFaded",
         "element": "repeat"
       },
       {
-        "action": "show",
-        "element": "next",
-        "delayAfter": 1
+        "action": "showFaded",
+        "element": "next"
+      },
+
+      {
+        // Her kan du se to knapper.
+        "action": "playSound",
+        "resource": "wordspelling/Instruktion/9d.4.wav",
+        "delayAfter": 500
       },
 
       // 9d.4a
@@ -561,7 +563,7 @@
         // Hvis du har forstået, hvad du skal gøre,
         // skal du klikke på den blå. Så starte opgaverne.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.6.wav", // TODO: brug den rigtige fil
+        "resource": "wordspelling/Instruktion/9d.4a.wav",
         "delayAfter": 500
       },
 

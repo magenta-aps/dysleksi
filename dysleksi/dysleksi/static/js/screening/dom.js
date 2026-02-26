@@ -176,6 +176,14 @@ class TestDomElements {
             el.style.opacity = 0.4;
         });
     }
+
+    showFaded(el) {
+        el.style.transition = "none";
+        el.style.opacity = 0.4;
+        setTimeout(() => {
+            this.showElement(el);
+        }, 1);
+    }
     
     highlight(el) {
         el.classList.add("highlight");
@@ -430,6 +438,10 @@ class TestDomElements {
         displayField.id = "free-text-field";
         displayField.type = "text";
         displayField.inputMode = "none";
+
+        displayField.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+        }, false);
     
         // --- Erase button ---
         const eraseBtn = document.createElement("button");
@@ -462,10 +474,7 @@ class TestDomElements {
                 btn.disabled = true;
                 btn.id = "free-text-" + letter;
                 btn.addEventListener("click", () => {
-                    const position = displayField.selectionStart;
                     this.addText(displayField, letter);
-                    //displayField.value = displayField.value.slice(0, position) + letter + displayField.value.slice(position);
-                    //this.setMarker(displayField,position + 1);
                     updateEraseBtnState();
                     listener({ target: { value: displayField.value } });
                     this.makeButtonGlow(btn.id)
@@ -520,8 +529,13 @@ export class GroupTestDomElements extends TestDomElements {
         }
     }
 
-    setNextButtonClass(cls, state) {
-        this.nextBtn.classList.toggle(cls, state);
+    clearNextButtonClass() {
+        this.nextBtn.classList.remove("next-btn", "start-btn", "start-part-btn");
+    }
+
+    setNextButtonClass(cls) {
+        this.clearNextButtonClass();
+        this.nextBtn.classList.add(cls);
     }
 
     setNextButtonListener(listener) {

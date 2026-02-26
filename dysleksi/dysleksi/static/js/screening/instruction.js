@@ -80,6 +80,10 @@ export class InstructionSequenceRunner {
                 this.domElements.fadeOut(this.getEl(element));
                 break;
 
+            case "showFaded":
+                this.domElements.showFaded(this.getEl(element));
+                break;
+
             case "highlight":
                 this.domElements.highlight(this.getEl(element));
                 break;

@@ -36,6 +36,7 @@ class InstructionAction(TextChoices):
     HIDE = "hide"
     FADE_IN = "fadeIn"
     FADE_OUT = "fadeOut"
+    SHOW_FADED = "showFaded"
     PLAY_SOUND = "playSound"
     HIGHLIGHT = "highlight"
     SELECT = "select"
