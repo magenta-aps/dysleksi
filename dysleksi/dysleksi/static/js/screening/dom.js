@@ -300,6 +300,13 @@ class TestDomElements {
         this.testPartIntroImage.style.display = "flex";
     }
 
+    hideChallengeImage() {
+        const img = document.querySelector("#challenge-image");
+        if (img){
+            img.style.opacity=0
+        }
+    }
+
     _insert(parent, child, after, before) {
         // Given lists of elements that `child` should be inserted after and before,
         // insert `child` into `parent` in the correct place
