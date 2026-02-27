@@ -102,8 +102,8 @@ export class InstructionSequenceRunner {
 
             case "clickButton":
                 const el1 = this.getEl(element);
-                el1.focus();
                 el1.click();
+                el1.focus();
                 setTimeout(() => {
                     el1.blur();
                 }, 1000);
