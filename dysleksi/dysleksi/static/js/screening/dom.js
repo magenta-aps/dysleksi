@@ -166,6 +166,14 @@ class TestDomElements {
         this.nextBtn.disabled = false;
     }
 
+    clearNextButtonClass() {
+        this.nextBtn.classList.remove("next-btn", "start-btn", "start-part-btn");
+    }
+
+    setNextButtonClass(cls) {
+        this.clearNextButtonClass();
+        this.nextBtn.classList.add(cls);
+    }
 
     setNextButtonListener(listener) {
         this._setButtonListener(this.nextBtn, listener);
@@ -564,19 +572,6 @@ export class GroupTestDomElements extends TestDomElements {
         for (const el of [this.questionChallengeEl, this.choicesEl]) {
             el.style.display = state;
         }
-    }
-
-    clearNextButtonClass() {
-        this.nextBtn.classList.remove("next-btn", "start-btn", "start-part-btn");
-    }
-
-    setNextButtonClass(cls) {
-        this.clearNextButtonClass();
-        this.nextBtn.classList.add(cls);
-    }
-
-    setNextButtonListener(listener) {
-        this._setButtonListener(this.nextBtn, listener);
     }
 
     toggleRepeatButton(show) {
