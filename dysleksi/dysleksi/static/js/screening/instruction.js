@@ -101,20 +101,25 @@ export class InstructionSequenceRunner {
                 break;
 
             case "clickButton":
-                this.getEl(element).click();
+                const el1 = this.getEl(element);
+                el1.focus();
+                el1.click();
+                setTimeout(() => {
+                    el1.blur();
+                }, 1000);
                 break;
 
             case "setButtonSoundOnce":
                 const self = this;
-                const el = this.getEl(element);
+                const el2 = this.getEl(element);
                 const u = url;
                 this.domElements.setButtonAudioCallback(
-                    el,
+                    el2,
                     async function() {
                         if (u) {
                             await self.playSound(u);
                         }
-                        self.domElements.setButtonAudioCallback(el, null);
+                        self.domElements.setButtonAudioCallback(el2, null);
                     }
                 )
                 break;
