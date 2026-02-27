@@ -4,6 +4,10 @@ export class EventTable {
     }
 
     updateTable(data) {
+        if (this.eventsEl === null) {
+            return;
+        }
+
         const eventEl = document.createElement('tr');
 
         const typeEl = document.createElement('td');
@@ -43,6 +47,10 @@ export class GroupTestContainer {
     }
 
     updateData(data) {
+        if (this.container === null) {
+            return;
+        }
+
         const student = data.student;
 
         // Try to find existing card
