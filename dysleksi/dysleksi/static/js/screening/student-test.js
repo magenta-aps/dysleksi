@@ -204,10 +204,6 @@ export class StudentTestView extends EventTarget {
         return true;
     }
 
-    showPart(partIndex) {
-        return this.setPart(partIndex);
-    }
-
     onPartComplete() {
         if (this.partTimeoutId) {
             clearTimeout(this.partTimeoutId);
@@ -217,7 +213,10 @@ export class StudentTestView extends EventTarget {
             test: this.test,
             part: this.currentPart
         }));
-        if (this.showPart(this.currentPartIndex + 1)) {
+
+        const canShow = this.setPart(this.currentPartIndex + 1)
+
+        if (canShow) {
             console.log("Part complete, showing next part");
             this.showTestPartIntro()
         } else {

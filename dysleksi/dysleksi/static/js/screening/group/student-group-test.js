@@ -21,22 +21,6 @@ export class GroupTestView extends StudentTestView {
     }
 
     // ---- Parts ----
-
-    showPart(partIndex) {
-        const canShow = super.showPart(partIndex);
-        if (canShow) {
-            this.domElements.clearQuestionChoices();
-            this.domElements.toggleNextButton(false);
-            this.domElements.showQuestionChallenge(
-                this.challengeText,
-                this.challengeSoundUrl,
-                this.challengeImageUrl,
-                this.audioContext
-            );
-        }
-        return canShow;
-    }
-
     onPartComplete() {
         this.domElements.clearQuestionChoices();
         this.domElements.toggleNextButton(false);

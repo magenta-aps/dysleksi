@@ -524,7 +524,7 @@ describe('GroupTestFlow', () => {
 
         expect(view.onQuestionComplete).toHaveBeenCalled();
         expect(view.onPartComplete).toHaveBeenCalled();
-        expect(view.showPart).toHaveBeenCalledWith(1);
+        expect(view.setPart).toHaveBeenCalledWith(1);
 
         expect(view.showTestPartIntro).toHaveBeenCalled();
 
@@ -605,7 +605,7 @@ describe('GroupTestFlow', () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
-        const canShow = view.showPart(test.parts.length - 1);
+        const canShow = view.setPart(test.parts.length - 1);
         expect(canShow).toBe(true);
         const part = view.currentPart;
         view.showQuestion(false, part.questions.length - 1);
@@ -631,7 +631,7 @@ describe('GroupTestFlow', () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         testSpy(view);
-        view.showPart(0);
+        view.setPart(0);
         view.showQuestion(true, 0);
         expect(domElements.setStudentHeader).toHaveBeenCalledWith('<i class="ph ph-ear"></i>');
 
