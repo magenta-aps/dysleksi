@@ -25,7 +25,7 @@ export class IndividualTestView extends StudentTestView {
 
     async onTestComplete(cancelled = false) {
         if (this.mediaRecorder) {
-            this.domElements.toggleAudioIndicator(false);
+            //this.domElements.toggleAudioIndicator(false);
             await this.mediaRecorder.stop();
         }
         super.onTestComplete(cancelled);
@@ -138,7 +138,7 @@ export class IndividualTestView extends StudentTestView {
                 practice: this.isPracticing
             });
 
-            this.domElements.toggleAudioIndicator(true);
+            //this.domElements.toggleAudioIndicator(true);
             this.mediaRecorder.start();
         }
         return canShow;
