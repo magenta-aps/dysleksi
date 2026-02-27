@@ -41,8 +41,13 @@ describe("IndividualTestFlow", () => {
             <div id="audio-indicator" style="display: none"></div>
             <h1 id="student-header" class="student-header"></h1>
             <audio id="instructions-sound"></audio>
+            <audio id="reminder-sound"></audio>
             <button id="end-summary"></button>
             <div id="question-challenge"></div>
+            <div id="test-summary"></div>
+            <div id="test-container"></div>
+            <div id="testpart-intro"></div>
+            <div id="test-intro"></div>
             <button id="next"></button>
             <button id="repeat"></button>
             <div id="choices"></div>
@@ -131,6 +136,25 @@ describe("IndividualTestFlow", () => {
         })
         expect(mediaRecorder.start).toHaveBeenCalled();
 
+    });
+
+    it("Trigger for first question reminder", () => {
+        vi.useFakeTimers();
+        const test = new Test(individualTestData);
+        const view = new IndividualTestView(test, ws, 'student_1', 1, domElements, mediaRecorder);
+        test.parts[0].timeout = 0;
+        test.parts[0].questions[0].reminder = 5000;
+        // Mock audio play
+        view.domElements.reminderSoundEl.play = vi.fn();
+        testSpy(view);
+        view.setPart(0)
+        const part = view.currentPart;
+        view.showFirstQuestion(false);
+        const question = view.currentQuestion;
+        const firstQuestionTitle = view.questionTitle();
+
+        vi.runAllTimers();
+        expect(view.domElements.reminderSoundEl.play).toHaveBeenCalled();
     });
 
     it("question.feedback triggers teacherFeedback(correct)", () => {
