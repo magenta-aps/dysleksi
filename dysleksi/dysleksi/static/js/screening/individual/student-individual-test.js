@@ -32,19 +32,6 @@ export class IndividualTestView extends StudentTestView {
     }
 
     // ---- Parts ----
-
-    showPart(index) {
-        this.domElements.showQuestionChallenge();
-        const canShow = super.showPart(index);
-        if (canShow) {
-            console.log("Starting test part ", this.currentPart);
-            this.domElements.showInstructions(this.currentPart.intro, this.currentPart.instructionsUrl);
-            this.displayedAt = document.timeline.currentTime;
-            this.showQuestion(this.isPracticing, 0);
-        }
-        return canShow;
-    }
-
     onPartComplete() {
         this.answeredAt = document.timeline.currentTime;
         const duration = this.answeredAt - this.displayedAt;

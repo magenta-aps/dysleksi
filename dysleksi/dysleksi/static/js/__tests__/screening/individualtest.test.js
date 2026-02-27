@@ -107,7 +107,7 @@ describe("IndividualTestFlow", () => {
         const test = new Test(individualTestData);
         const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
         testSpy(view);
-        view.showPart(0);
+        view.setPart(0);
         view.showQuestion(false, 0);
         const question = view.currentQuestion;
         expect(domElements.showQuestionChallenge).toHaveBeenCalledWith(
@@ -139,7 +139,7 @@ describe("IndividualTestFlow", () => {
         testSpy(view);
     
         // Make sure part/question exists
-        view.showPart(0);
+        view.setPart(0);
         view.showQuestion(false, 0);
     
         view.onChatMessage({
@@ -161,7 +161,7 @@ describe("IndividualTestFlow", () => {
         const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
         testSpy(view);
     
-        view.showPart(0);
+        view.setPart(0);
         view.showQuestion(false, 0);
     
         // Ensure onQuestionComplete doesn't accidentally recurse into more logic for this test
@@ -172,36 +172,14 @@ describe("IndividualTestFlow", () => {
         expect(mediaRecorder.interval).toHaveBeenCalled();
         expect(view.recordedAudio).toBe("BASE64_AUDIO");
         expect(view.onQuestionComplete).toHaveBeenCalled();
-    });
-    
-    it("showPart shows instructions and shows first question", () => {
-        const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
-        testSpy(view);
-    
-        const ok = view.showPart(0);
-    
-        expect(ok).toBe(true);
-    
-        // It always shows the question challenge container first
-        expect(domElements.showQuestionChallenge).toHaveBeenCalled();
-    
-        // When it can show, it shows instructions for the part
-        expect(domElements.showInstructions).toHaveBeenCalledWith(
-            view.currentPart.intro,
-            view.currentPart.instructionsUrl
-        );
-    
-        // It also immediately shows first question
-        expect(view.showQuestion).toHaveBeenCalledWith(false, 0);
-    });
-    
+    });  
+
     it("onPartComplete sends part.complete with duration and then calls super.onPartComplete()", () => {
         const test = new Test(individualTestData);
         const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
         testSpy(view);
         const superSpy = vi.spyOn(StudentTestView.prototype, "onPartComplete");
-        view.showPart(0);
+        view.setPart(0);
     
         // Fake timestamps
         view.displayedAt = 100;
@@ -227,7 +205,7 @@ describe("IndividualTestFlow", () => {
         const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
         testSpy(view);
     
-        view.showPart(0);
+        view.setPart(0);
         view.showQuestion(false, 0);
     
         // Simulate question timing
@@ -265,7 +243,7 @@ describe("IndividualTestFlow", () => {
         const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
         testSpy(view);
     
-        view.showPart(0);
+        view.setPart(0);
         view.showQuestion(false, 0);
     
         // Force the 'next question exists' branch
@@ -286,7 +264,7 @@ describe("IndividualTestFlow", () => {
         const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
         testSpy(view);
     
-        view.showPart(0);
+        view.setPart(0);
         view.showQuestion(false, 0);
     
         // Force the 'no more questions' branch
