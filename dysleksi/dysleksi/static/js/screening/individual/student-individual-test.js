@@ -60,6 +60,8 @@ export class IndividualTestView extends StudentTestView {
                 this.domElements.hideStudentHeader();
             }
 
+            this.updateNextButtonClass();
+
             if (this.currentQuestion.instruction_sequence){
                 console.log("---------------------------------------------")
                 console.log("Starting instruction sequence: ", this.currentQuestion.instruction_sequence);
