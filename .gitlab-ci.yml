@@ -203,7 +203,7 @@ Python Unittest:
     - cd /app
     - coverage run manage.py test --parallel
     - coverage combine
-    - coverage report --show-missing --fail-under=99
+    - coverage report --show-missing --fail-under=100
     - coverage xml -o /app/coverage.xml
   coverage: '/^TOTAL.+?(\d+\%)$/'
   artifacts:
