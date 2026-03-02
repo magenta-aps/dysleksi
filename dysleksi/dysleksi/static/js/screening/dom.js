@@ -153,7 +153,11 @@ class TestDomElements {
     }
 
     toggleRepeatButton(show) {
-        this.repeatBtn.style.visibility = show ? "visible" : "hidden";
+        if (show) {
+            this.showElement(this.repeatBtn);
+        } else {
+            this.hideElement(this.repeatBtn);
+        }
     }
 
     disableNextButton() {
@@ -550,41 +554,10 @@ export class GroupTestDomElements extends TestDomElements {
         this.choicesEl = document.querySelector("#choices");
     }
 
-    showInstructions(text, audio) {
-        super.showInstructions(text, audio);
-    }
-
-    toggleNextButton(show) {
-        this.nextBtn.style.visibility = show ? "visible" : "hidden";
-    }
-
-    disableNextButton() {
-        this.nextBtn.style.transition = ""
-        this.nextBtn.style.opacity = ""
-        this.nextBtn.disabled = true;
-    }
-
-    enableNextButton() {
-        this.nextBtn.disabled = false;
-    }
 
     toggleQuestionDisplay(state) {
         for (const el of [this.questionChallengeEl, this.choicesEl]) {
             el.style.display = state;
-        }
-    }
-
-    toggleRepeatButton(show) {
-        if (show) {
-            this.showElement(this.repeatBtn);
-        } else {
-            this.hideElement(this.repeatBtn);
-        }
-    }
-
-    setRepeatButtonListener(listener) {
-        if (this.repeatBtn) {
-            this._setButtonListener(this.repeatBtn, listener);
         }
     }
 
