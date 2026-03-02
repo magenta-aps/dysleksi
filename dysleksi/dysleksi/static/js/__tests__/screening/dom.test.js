@@ -311,10 +311,46 @@ describe("GroupTestDomElements DOM utilities", () => {
       <button id="next"></button>
       <div id="test-el"></div>
       <div id="test-el2" data-hide-display="true"></div>
+      <div id="testpart-intro-image" style="display: flex;"></div>
     `;
     dom = new GroupTestDomElements();
     el = document.getElementById("test-el");
     el2 = document.getElementById("test-el2");
+  });
+
+  it("hideTestPartIntroImage sets display to none", () => {
+    dom.hideTestPartIntroImage();
+    expect(dom.testPartIntroImage.style.display).toBe("none");
+  });
+
+
+  it("showFaded sets initial opacity and calls showElement after timeout", () => {
+    vi.useFakeTimers();
+    
+    // Setup initial state
+    el.style.opacity = "1";
+    el.style.visibility = "hidden";
+    
+    // Spy on showElement to make sure it gets called
+    const showSpy = vi.spyOn(dom, "showElement");
+
+    dom.showFaded(el);
+
+    // 1. Check immediate effects
+    expect(el.style.transition).toBe("none");
+    expect(el.style.opacity).toBe("0.4");
+    
+    // showElement shouldn't have been called yet
+    expect(showSpy).not.toHaveBeenCalled();
+
+    // 2. Advance timers to trigger the setTimeout(..., 1)
+    vi.advanceTimersByTime(1);
+
+    // 3. Check final effects
+    expect(showSpy).toHaveBeenCalledWith(el);
+    expect(el.style.visibility).toBe("visible");
+
+    vi.useRealTimers();
   });
 
   it("showElement sets visibility to visible", () => {

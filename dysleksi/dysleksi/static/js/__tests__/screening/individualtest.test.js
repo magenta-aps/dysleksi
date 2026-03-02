@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import {IndividualTestView} from "../../screening/individual/student-individual-test.js";
 import * as individualTestData from "./individualtest.json" with { type: "json" }
 import { getWebSocket } from "../../ws";
@@ -10,6 +10,7 @@ import { Test } from "../../screening/model.js";
 import {StudentTestView} from "../../screening/student-test.js";
 import {spyAttributes} from "../utils.js";
 import * as utils from "../../screening/utils.js";
+import { InstructionSequenceRunner } from "../../screening/instruction.js";
 
 describe("IndividualTestFlow", () => {
     let originalWebSocket;
@@ -89,6 +90,60 @@ describe("IndividualTestFlow", () => {
         expect(test.parts[0].currentQuestion).toBe(null);
     });
 
+
+    it("should setup and show skip buttons during instruction sequence", async () => {
+        // 1. Setup DOM with skip buttons
+        document.body.innerHTML += `
+            <button id="skip-instruction" style="display:none"></button>
+            <button id="skip-all-instructions" style="display:none"></button>
+        `;
+    
+        // 2. Re-init domElements and spies
+        const localDomElements = new IndividualTestDomElements();
+        
+        let resolveSequence;
+        const sequencePromise = new Promise(resolve => { resolveSequence = resolve; });
+        
+        // Spy on prototype before instantiation
+        const runSpy = vi.spyOn(InstructionSequenceRunner.prototype, 'run')
+                         .mockReturnValue(sequencePromise);
+        const skipSpy = vi.spyOn(InstructionSequenceRunner.prototype, 'skip');
+        const skipAllSpy = vi.spyOn(InstructionSequenceRunner.prototype, 'skipToEnd');
+    
+        const test = new Test(individualTestData);
+        // Ensure the question at part 0, index 0 in your individualtest.json has an instruction_sequence
+        const view = new IndividualTestView(test, ws, "student_1", 1, localDomElements, mediaRecorder);
+        
+        // 3. Trigger question with instructions
+        view.setPart(0);
+        view.showQuestion(true, 0);
+    
+        // --- Assertions ---
+    
+        // Verify visibility
+        expect(localDomElements.skipInstructionButton.style.display).toBe("block");
+        expect(localDomElements.skipAllInstructionsButton.style.display).toBe("block");
+    
+        // Verify button clicks link to runner methods
+        localDomElements.skipInstructionButton.click();
+        expect(skipSpy).toHaveBeenCalled();
+    
+        localDomElements.skipAllInstructionsButton.click();
+        expect(skipAllSpy).toHaveBeenCalled();
+    
+        // 4. Resolve and verify cleanup
+        resolveSequence();
+        
+        await vi.waitFor(() => {
+            expect(localDomElements.skipInstructionButton.style.display).toBe("none");
+            expect(localDomElements.skipAllInstructionsButton.style.display).toBe("none");
+        });
+    
+        // Clean up spies
+        runSpy.mockRestore();
+        skipSpy.mockRestore();
+        skipAllSpy.mockRestore();
+    });
 
     it("cancel test", () => {
         const test = new Test(individualTestData);
@@ -353,4 +408,134 @@ describe("IndividualTestFlow", () => {
     });
 
 
+    it("should handle practice mode UI and flow correctly", () => {
+        const test = new Test(individualTestData);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        testSpy(view);
+        
+        view.setPart(0);
+        // 1. Force isPracticing to true
+        view.isPracticing = true; 
+
+        view.showQuestion(true, 1);
+    
+        expect(domElements.setStudentHeader).toHaveBeenCalledWith(expect.stringContaining("ph-pencil-line"));
+        
+        // Setup for completion check
+        view.displayedAt = 100;
+        view.answeredAt = 200;
+        
+        vi.spyOn(view, "showFirstQuestion").mockImplementation(() => {});
+        vi.spyOn(view, "showNextQuestion").mockReturnValue(false);
+    
+        view.onQuestionComplete();
+    
+        // Assert: Correct practice message and redirect
+        expect(view.send).toHaveBeenCalledWith(expect.objectContaining({
+            message: expect.stringContaining("øve-spørgsmål"),
+            practice: true
+        }));
+        expect(view.showFirstQuestion).toHaveBeenCalledWith(false);
+    });
+
+
+    it("should trigger automatic completion when question timeout is reached", () => {
+        vi.useFakeTimers();
+        const test = new Test(individualTestData);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        testSpy(view);
+    
+        view.setPart(0);
+        // Inject a specific timeout value
+        test.parts[0].questions[0].timeout = 5000;
+        test.parts[0].questions[0].instruction_sequence = null; // Ensure we hit the 'else' block
+    
+        const completeSpy = vi.spyOn(view, "onQuestionComplete").mockImplementation(() => {});
+    
+        view.showQuestion(false, 0);
+    
+        // Fast-forward time
+        vi.advanceTimersByTime(5000);
+    
+        expect(completeSpy).toHaveBeenCalledWith(expect.anything(), true);
+        vi.useRealTimers();
+    });
+
+    it("should play reminder sound when reminder interval is reached", () => {
+        vi.useFakeTimers();
+        const test = new Test(individualTestData);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        testSpy(view);
+    
+        // Mock audio element
+        view.domElements.reminderSoundEl = { 
+            play: vi.fn(), 
+            currentTime: 10 // Start with non-zero to test reset
+        };
+    
+        view.setPart(0);
+        test.parts[0].questions[0].reminder = 3000;
+        test.parts[0].questions[0].instruction_sequence = null;
+    
+        view.showQuestion(false, 0);
+    
+        vi.advanceTimersByTime(3000);
+    
+        expect(view.domElements.reminderSoundEl.currentTime).toBe(0);
+        expect(view.domElements.reminderSoundEl.play).toHaveBeenCalled();
+        vi.useRealTimers();
+    });
+
+});
+
+
+describe("Individual Test - Timer and Reminder Cleanup", () => {
+    let view;
+
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.spyOn(global, 'clearTimeout');
+
+        const test = new Test(individualTestData);
+        // Ensure the test data has values that trigger the timer logic
+        test.parts[0].questions[0].timeout = 5000;
+        test.parts[0].questions[0].reminder = 2000;
+        test.parts[0].questions[0].instruction_sequence = null; // Ensure we hit the timer block
+
+        view = new IndividualTestView(test, ws, 'student_1', 1, domElements, mediaRecorder);
+        testSpy(view);
+        view.setPart(0);
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+        vi.useRealTimers();
+    });
+
+    it("should clear existing questionTimeoutId when showQuestion is called", () => {
+        // 1. Manually set a "stray" timer ID
+        const fakeTimerId = 123;
+        view.questionTimeoutId = fakeTimerId;
+
+        // 2. Trigger showQuestion (which has internal logic to clear existing timers)
+        view.showQuestion(false, 0);
+
+        // 3. Assert that the old timer was cleared before the new one was set
+        expect(clearTimeout).toHaveBeenCalledWith(fakeTimerId);
+        // Ensure the ID was reset to null (or replaced by a new timer ID)
+        expect(view.questionTimeoutId).not.toBe(fakeTimerId);
+    });
+
+    it("should clear existing questionReminderId when showQuestion is called", () => {
+        // 1. Manually set a "stray" reminder ID
+        const fakeReminderId = 456;
+        view.questionReminderId = fakeReminderId;
+
+        // 2. Trigger showQuestion
+        view.showQuestion(false, 0);
+
+        // 3. Assert cleanup
+        expect(clearTimeout).toHaveBeenCalledWith(fakeReminderId);
+        expect(view.questionReminderId).not.toBe(fakeReminderId);
+    });
 });

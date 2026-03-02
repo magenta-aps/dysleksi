@@ -97,7 +97,7 @@ describe("ActionButtons", () => {
     });
 });
 
-describe("TeacherView Test", () => {
+describe("TeacherView", () => {
     let socket;
     let table;
     let buttons;
@@ -135,6 +135,51 @@ describe("TeacherView Test", () => {
 
     afterEach(() => {
         vi.restoreAllMocks();
+    });
+
+    it("throws an error when an out-of-bounds practice question index is received", () => {
+        // Initialize view with individualTest data
+        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
+    
+        // Get the message handler from the mock socket
+        const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+    
+        // We set practice: true, but provide an index (e.g., 99) that 
+        // exceeds the practice array length for part 0
+        const invalidPracticeIndex = 99;
+    
+        expect(() => {
+            handler({
+                data: JSON.stringify({
+                    event: "question.displayed",
+                    partIndex: 0,
+                    questionIndex: invalidPracticeIndex,
+                    practice: true
+                }),
+            });
+        }).toThrow(`Invalid question index ${invalidPracticeIndex}`);
+    });
+
+    it("sets the currentQuestion from the practice array when practice is true", () => {
+        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
+    
+        // 1. Set the part index so we have a context for questions
+        view.setPartIndex(0);
+    
+        // 2. Call setQuestionIndex with practice = true
+        // We assume individualTest.parts[0].practice[0] exists in your JSON
+        const practiceIndex = 0;
+        view.setQuestionIndex(practiceIndex, true);
+    
+        // 3. Assertions
+        const expectedPracticeQuestion = individualTest.parts[0].practice[practiceIndex];
+        
+        expect(view.questionIndex).toBe(practiceIndex);
+        expect(view.currentQuestion).toBe(expectedPracticeQuestion);
+        
+        // Verify it didn't accidentally take the standard question at that index
+        const standardQuestion = individualTest.parts[0].questions[practiceIndex];
+        expect(view.currentQuestion).not.toBe(standardQuestion);
     });
 
     it("initializes socket and button listeners", () => {
@@ -421,6 +466,27 @@ describe("GroupTestContainer", () => {
         instance = new GroupTestContainer();
     });
 
+    it("returns early and does not throw if container is null", () => {
+        // 1. Setup: Clear the body so document.querySelector(".group-test-body") returns null
+        document.body.innerHTML = ""; 
+    
+        // 2. Initialize: The constructor will set this.container to null
+        const nullInstance = new GroupTestContainer();
+        expect(nullInstance.container).toBeNull();
+    
+        const studentData = {
+            student: { id: 99, firstName: "Ghost", lastName: "User", progress: 0 },
+        };
+    
+        // 3. Act & Assert: Should return early without attempting to query or create elements
+        expect(() => {
+            nullInstance.updateData(studentData);
+        }).not.toThrow();
+    
+        // Verify no cards were accidentally created in the body
+        expect(document.querySelectorAll(".student-card").length).toBe(0);
+    });
+
     it("creates a new student card if it doesn't exist", () => {
         const studentData = {
             student: { id: 1, firstName: "Alice", lastName: "Smith", progress: 50 },
@@ -628,5 +694,117 @@ describe("TeacherView socket 'test.started' handling", () => {
         handler({ data: JSON.stringify(messageData) });
 
         expect(spy).toHaveBeenCalledWith(messageData);
+    });
+});
+
+
+describe("EventTable", () => {
+    let table;
+
+    beforeEach(() => {
+        // Set up a standard DOM for the table
+        document.body.innerHTML = `
+            <table id="events">
+                <tbody></tbody>
+            </table>
+        `;
+        table = new EventTable();
+    });
+
+    it("updates the table with data when element exists", () => {
+        table = new EventTable();
+        const data = {
+            event: "question.displayed",
+            questionTitle: "What is 2+2?",
+            displayedAt: "10:00:01"
+        };
+
+        table.updateTable(data);
+
+        const rows = document.querySelectorAll("#events tbody tr");
+        expect(rows.length).toBe(1);
+        expect(rows[0].cells[0].textContent).toBe("question.displayed");
+    });
+
+    it("returns early and does not throw if eventsEl is null", () => {
+        // 1. Setup: Clear the body so document.querySelector returns null
+        document.body.innerHTML = ""; 
+        
+        table = new EventTable();
+        
+        // 2. Verify state: eventsEl should be null
+        expect(table.eventsEl).toBeNull();
+
+        const data = {
+            event: "question.displayed",
+            questionTitle: "Title",
+            displayedAt: "10:00:00"
+        };
+
+        // 3. Act & Assert: This should not throw an error
+        expect(() => {
+            table.updateTable(data);
+        }).not.toThrow();
+    });
+
+
+    it("renders an audio player when recordingBase64 is present", () => {
+        const data = {
+            event: 'question.answered',
+            questionTitle: 'Oral Test',
+            recordingBase64: 'data:audio/wav;base64,UklGR...',
+            answeredAt: '12:00:00'
+        };
+
+        table.updateTable(data);
+
+        const answerCell = document.querySelector('td:nth-child(3)');
+        const audioEl = answerCell.querySelector('audio');
+        
+        expect(audioEl).not.toBeNull();
+        expect(audioEl.src).toBe(data.recordingBase64);
+        expect(audioEl.controls).toBe(true);
+    });
+
+    it("renders textAnswer when no audio is present", () => {
+        const data = {
+            event: 'question.answered',
+            questionTitle: 'Written Test',
+            textAnswer: 'This is my answer',
+            answeredAt: '12:00:05'
+        };
+
+        table.updateTable(data);
+
+        const answerCell = document.querySelector('td:nth-child(3)');
+        expect(answerCell.textContent).toBe('This is my answer');
+    });
+
+    it("renders choiceId when neither audio nor textAnswer is present", () => {
+        const data = {
+            event: 'question.answered',
+            questionTitle: 'Multiple Choice',
+            choiceId: 'option_a',
+            answeredAt: '12:00:10'
+        };
+
+        table.updateTable(data);
+
+        const answerCell = document.querySelector('td:nth-child(3)');
+        expect(answerCell.textContent).toBe('option_a');
+    });
+
+    it("uses answeredAt for the duration column when answered", () => {
+        const data = {
+            event: 'question.answered',
+            questionTitle: 'Timing Test',
+            answeredAt: 'TIMESTAMP_A',
+            displayedAt: 'TIMESTAMP_B'
+        };
+
+        table.updateTable(data);
+
+        const durationCell = document.querySelector('td:nth-child(4)');
+        expect(durationCell.textContent).toBe('TIMESTAMP_A');
     });
 });

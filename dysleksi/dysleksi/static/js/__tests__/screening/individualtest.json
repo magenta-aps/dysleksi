@@ -9,7 +9,43 @@
       "intro": "Dette er en dummy test",
       "timeout": 60,
       "partial_score_after": 30,
-      "practice": [],
+      "practice": [
+        {
+          "id": 0,
+          "question_type": "free_text",
+          "challenge_id": 30,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "s",
+          "possible_answers": [],
+          "instruction_sequence": {
+            "instructions": [
+              {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "challenge-image"
+              },
+              {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+              }
+            ]
+          }
+        },
+        {
+          "id": 1,
+          "question_type": "free_text",
+          "challenge_id": 30,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "s",
+          "possible_answers": []
+        }
+
+      ],
       "questions": [
         {
           "id": 1,
