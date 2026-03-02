@@ -18,7 +18,6 @@ export function initStudent(roomName, assignmentId, test) {
                 uuid: crypto.randomUUID(),
                 event: 'setup.error',
                 id: roomName,
-                index: testIndex,
                 error: err.toString(),
             }));
         }).then(() => {
