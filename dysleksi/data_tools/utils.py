@@ -13,8 +13,8 @@ def create_wordreading_2_test(
     part, created = TestPart.objects.get_or_create(
         name=name,
         defaults={
-            "timeout": 60000,  # 60 seconds
-            "partial_score_after": 30000,  # 30 seconds
+            "timeout": 600000,  # 600 seconds / 10 minutes
+            "partial_score_after": 300000,  # 300 seconds / 5 minutes
             "intro": _("Vælg det rigtige ord, der passer til billedet."),
             "reminder": 20000,  # 20 seconds
             "image_url": "/static/images/wordreading.png",
@@ -33,8 +33,8 @@ def create_wordspelling_test(
     part, created = TestPart.objects.get_or_create(
         name=name,
         defaults={
-            "timeout": 60000,
-            "partial_score_after": 30000,
+            "timeout": 0,  # no timeout
+            "partial_score_after": 0,  # no partial score (?)
             "intro": _("Stav ordet som du hører."),
             "image_url": "/static/images/wordspelling.png",
         },
