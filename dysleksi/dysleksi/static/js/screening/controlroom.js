@@ -76,7 +76,11 @@ export class GroupTestContainer {
             const text = document.createElement("span");
             text.classList.add("student-text");
             const lastInitial = student.lastName ? student.lastName[0].toUpperCase() : "";
-            text.textContent = `${student.firstName} ${lastInitial}.`;
+            if (lastInitial.length > 0){
+                text.textContent = `${student.firstName} ${lastInitial}.`;
+            } else {
+                text.textContent = `${student.firstName}`;
+            }
 
             topRow.appendChild(text);
 
