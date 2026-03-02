@@ -441,6 +441,20 @@ describe("GroupTestContainer", () => {
         expect(folded).not.toBeNull();
     });
 
+    it("handles missing last name", () => {
+        const studentData = {
+            student: { id: 1, firstName: "Alice", lastName: null, progress: 50 },
+        };
+
+        instance.updateData(studentData);
+
+        const card = container.querySelector(".student-card[data-student-id='1']");
+        const text = card.querySelector(".student-text").textContent;
+        expect(text).toBe("Alice");
+
+    });
+
+
     it("updates an existing student card progress", () => {
         const studentData = {
             student: { id: 2, firstName: "Bob", lastName: "Jones", progress: 30 },
