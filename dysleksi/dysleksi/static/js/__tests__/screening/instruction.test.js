@@ -43,6 +43,7 @@ describe("InstructionSequenceRunner", () => {
 			fadeOut: vi.fn(),
 			highlight: vi.fn(),
 			toggleButtonSelected: vi.fn(),
+			showFaded: vi.fn(),
             setButtonAudioCallback: vi.fn(),
             setText: vi.fn(),
             setMarker: vi.fn(),
@@ -81,6 +82,7 @@ describe("InstructionSequenceRunner", () => {
 			{ action: "fadeOut", element: "el1" },
 			{ action: "highlight", element: "el1" },
 			{ action: "select", element: "btn1" },
+			{ action: "showFaded", element: "btn1" },
 		];
 	
 		for (const instr of actions) {
@@ -93,6 +95,7 @@ describe("InstructionSequenceRunner", () => {
 		expect(domElements.fadeOut).toHaveBeenCalledWith(document.getElementById("el1"));
 		expect(domElements.highlight).toHaveBeenCalledWith(document.getElementById("el1"));
 		expect(domElements.toggleButtonSelected).toHaveBeenCalledWith(document.getElementById("btn1"), true);
+		expect(domElements.showFaded).toHaveBeenCalledWith(document.getElementById("btn1"));
 	});
 	
     it("executeInstruction throws error on incorrect action", async () => {
@@ -417,6 +420,25 @@ describe("InstructionSequenceRunner", () => {
         // Finalize the promise
         source.onended();
         await audioPromise;
+    });
+
+    it("executeInstruction with clickButton blurs the element after 1000ms", async () => {
+        runner = new InstructionSequenceRunner(null, [], domElements, fakeContext);
+    
+        const btn = document.getElementById("btn1");
+        // Spy on the blur method of the DOM element
+        const blurSpy = vi.spyOn(btn, "blur");
+    
+        await runner.executeInstruction({ action: "clickButton", element: "btn1" });
+    
+        // Initially, blur should NOT have been called
+        expect(blurSpy).not.toHaveBeenCalled();
+    
+        // Advance timers by 1000ms
+        vi.advanceTimersByTime(1000);
+    
+        // Now blur should have been called
+        expect(blurSpy).toHaveBeenCalledTimes(1);
     });
 
 });

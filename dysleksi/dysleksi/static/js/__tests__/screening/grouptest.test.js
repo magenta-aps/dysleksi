@@ -10,7 +10,7 @@ import { GroupTestView } from "../../screening/group/student-group-test.js";
 import {spyAttributes} from "../utils.js";
 import * as utils from "../../screening/utils.js";
 import { Student } from "../../screening/model.js"; // wherever your Student class is defined
-
+import { InstructionSequenceRunner } from "../../screening/instruction.js";
 
 describe('GroupTestFlow', () => {
     let originalWebSocket;
@@ -141,6 +141,134 @@ describe('GroupTestFlow', () => {
         expect(test.parts[0].questionIndex).toBe(0);
         expect(test.parts[0].currentQuestion).toBe(null);
         expect(test.parts[0].practice.length).toBe(0);
+    });
+
+    it("should hide the test part intro image when there is no previous part", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        testSpy(view);
+    
+        // 1. Ensure currentPart is set but previousPart remains null
+        view.setPart(0);
+        view.previousPart = null; 
+    
+        // 2. Trigger the method
+        view.showTestPartIntro();
+    
+        // 3. Assertions
+        // It should show the intro container...
+        expect(domElements.showTestPartIntro).toHaveBeenCalled();
+        // ...but specifically hide the "success/progress" image because it's the first part
+        expect(domElements.hideTestPartIntroImage).toHaveBeenCalled();
+        // Verify the "show" version was NOT called
+        expect(domElements.showTestPartIntroImage).not.toHaveBeenCalled();
+    });
+    
+    it("should show the test part intro image when moving from part 0 to part 1", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        testSpy(view);
+    
+        // 1. Set up transition state (previousPart exists)
+        view.setPart(0); // This sets currentPart
+        view.setPart(1); // This moves currentPart to previousPart
+    
+        // 2. Trigger the method
+        view.showTestPartIntro();
+    
+        // 3. Assertions
+        expect(domElements.showTestPartIntroImage).toHaveBeenCalled();
+        expect(domElements.setTestPartIntroText).toHaveBeenCalledWith(
+            expect.stringContaining(test.parts[0].name)
+        );
+        expect(domElements.hideTestPartIntroImage).not.toHaveBeenCalled();
+    });
+
+    it("should setup and show skip buttons when instruction sequence starts", async () => {
+        // 1. Add skip buttons to the DOM for this specific test
+        document.body.innerHTML += `
+            <button id="skip-instruction" style="display:none"></button>
+            <button id="skip-all-instructions" style="display:none"></button>
+        `;
+    
+        // 2. Re-initialize domElements to pick up the new buttons
+        const localDomElements = new GroupTestDomElements();
+        
+        // 3. Create a question with an instruction sequence
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, localDomElements, student);
+        
+        // Mock the InstructionSequenceRunner.run to return a promise we can control
+        // This prevents the "then" block from hiding buttons immediately
+        let resolveSequence;
+        const sequencePromise = new Promise(resolve => { resolveSequence = resolve; });
+        vi.spyOn(InstructionSequenceRunner.prototype, 'run').mockReturnValue(sequencePromise);
+        const skipSpy = vi.spyOn(InstructionSequenceRunner.prototype, 'skip');
+        const skipAllSpy = vi.spyOn(InstructionSequenceRunner.prototype, 'skipToEnd');
+    
+        // 4. Trigger showQuestion for a question that has instructions
+        // (Assuming Part 0, Question 0 in your JSON has instruction_sequence)
+        view.setPart(0);
+        view.showQuestion(true, 0);
+    
+        // --- Assertions ---
+    
+        // Verify buttons are made visible
+        expect(localDomElements.skipInstructionButton.style.display).toBe("block");
+        expect(localDomElements.skipAllInstructionsButton.style.display).toBe("block");
+    
+        // Verify clicking the buttons triggers the runner methods
+        localDomElements.skipInstructionButton.click();
+        expect(skipSpy).toHaveBeenCalled();
+    
+        localDomElements.skipAllInstructionsButton.click();
+        expect(skipAllSpy).toHaveBeenCalled();
+    
+        // 5. Complete the sequence and verify buttons are hidden again
+        resolveSequence();
+        
+        // Wait for the .then() microtask in GroupTestView
+        await vi.waitFor(() => {
+            expect(localDomElements.skipInstructionButton.style.display).toBe("none");
+            expect(localDomElements.skipAllInstructionsButton.style.display).toBe("none");
+        });
+    });
+
+    it("should handle free_text selection and update next button state", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        testSpy(view);
+        
+        // 1. Move to a part that has free_text questions (Part 1 in your JSON)
+        view.setPart(1);
+        
+        // 2. Show the question
+        // This executes: this.input = this.domElements.showQuestionFreeText(() => this.selectFreeText());
+        view.showQuestion(false, 0); 
+        
+        // 3. Clear previous calls to ensure clean assertions
+        domElements.toggleNextButton.mockClear();
+        
+        // 4. Simulate user typing "ab"
+        // In your DOM implementation, the listener is called on every letter update
+        view.input.value = "ab";
+        
+        // 5. Trigger the listener manually
+        // This simulates what happens when a letter button is clicked in showQuestionFreeText
+        const freeTextCall = domElements.showQuestionFreeText.mock.calls[0][0];
+        freeTextCall(); 
+    
+        // --- Assertions ---
+    
+        // verify selectFreeText logic:
+        // This.textAnswer should be updated because "ab" is not empty
+        expect(view.textAnswer).toBe("ab");
+        
+        // selectedAnswer should be set to the first possible answer (resource reference)
+        expect(view.selectedAnswer).toEqual(view.currentQuestion.possibleAnswers[0]);
+        
+        // toggleNextButton should be called with true (because length >= 2)
+        expect(domElements.toggleNextButton).toHaveBeenCalledWith(true);
     });
 
     it("Test complain when there are no parts", () => {
@@ -666,6 +794,31 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
         listenerMock = vi.fn();
     });
 
+
+    it("prevents default browser context menu on the display field", () => {
+        const displayField = domElements.showQuestionFreeText(listenerMock);
+
+        // 1. Create a real ContextMenu event
+        const event = new MouseEvent("contextmenu", {
+            bubbles: true,
+            cancelable: true,
+        });
+
+        // 2. Manually mock preventDefault on this specific event instance
+        // This ensures the spy works even if JSDOM's internal event handling is rigid
+        const preventDefaultSpy = vi.fn();
+        Object.defineProperty(event, 'preventDefault', {
+            value: preventDefaultSpy,
+            writable: true
+        });
+
+        // 3. Dispatch to the input field
+        displayField.dispatchEvent(event);
+
+        // 4. Verify the call
+        expect(preventDefaultSpy).toHaveBeenCalled();
+    });
+
     it("renders free text input with letters and erase button", () => {
         const displayField = domElements.showQuestionFreeText(listenerMock);
 
@@ -1011,6 +1164,199 @@ describe("Update next button class", () => {
         view.showingIntro = true;
         view.updateNextButtonClass();
         expect(domElements.nextBtn.classList).toContain("start-btn");
+    });
+
+});
+
+
+describe("Timer and Reminder Cleanup", () => {
+    let view;
+
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.spyOn(global, 'clearTimeout');
+
+        const mockAudioContextInstance = {
+            state: 'suspended',
+            resume: vi.fn().mockResolvedValue(),
+            decodeAudioData: vi.fn().mockResolvedValue({}),
+            createBufferSource: vi.fn().mockReturnValue({
+                connect: vi.fn(), start: vi.fn(), onended: null
+            }),
+            destination: {}
+        };
+
+        global.window.AudioContext = vi.fn(() => mockAudioContextInstance);
+        global.window.webkitAudioContext = vi.fn(() => mockAudioContextInstance);
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(mockAudioContextInstance);
+
+        const test = new Test(groupTestData);
+        view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        
+        // Use a part/question we know is multiple_choice to avoid free_text logic crashes
+        view.setPart(0); 
+        view.setQuestion(false, 0); 
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+        vi.useRealTimers();
+    });
+
+    it("should clear both timers when onQuestionComplete is called", () => {
+        view.questionTimeoutId = 123;
+        view.questionReminderId = 456;
+
+        // 1. Ensure we aren't practicing (avoids answerIsCorrect check in some paths)
+        view.isPracticing = false;
+        
+        // 2. Mock a multiple choice selection
+        // This prevents the code from falling back to textAnswer logic
+        view.selectedAnswer = { id: 1, isCorrect: true, buttonId: 'btn1' };
+        view.textAnswer = null; 
+
+        view.onQuestionComplete(view.currentQuestion);
+
+        expect(clearTimeout).toHaveBeenCalledWith(123);
+        expect(clearTimeout).toHaveBeenCalledWith(456);
+        expect(view.questionTimeoutId).toBeNull();
+        expect(view.questionReminderId).toBeNull();
+    });
+
+    it("should clear reminder specifically when user interacts via selectFreeText", () => {
+        view.questionReminderId = 777;
+        view.input = { value: "A" };
+
+        view.selectFreeText();
+
+        // This confirms the timer was actually stopped in the browser
+        expect(clearTimeout).toHaveBeenCalledWith(777);
+    });
+
+    it("should clear existing timers when a new question is displayed", () => {
+        view.questionTimeoutId = 111;
+        view.questionReminderId = 222;
+
+        // Mock current question to have a timeout/reminder so new ones are set
+        view.currentQuestion.timeout = 5000;
+        view.currentQuestion.reminder = 2000;
+
+        view.showQuestion(false, 0);
+
+        expect(clearTimeout).toHaveBeenCalledWith(111);
+        expect(clearTimeout).toHaveBeenCalledWith(222);
+    });
+});
+
+
+describe("StudentTestView - updateNextButtonClass", () => {
+    let view;
+
+    beforeEach(() => {
+        const test = new Test(groupTestData);
+        // Ensure part 0 has at least 2 practice questions for these tests
+        view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        testSpy(view);
+        view.setPart(0);
+    });
+
+    it("should set 'start-part-btn' (Blue) on the last practice question", () => {
+        view.isPracticing = true;
+        // Move to the index of the last practice question
+        const lastIndex = view.currentPart.practice.length - 1;
+        view.setQuestion(true, lastIndex);
+
+        view.updateNextButtonClass();
+
+        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("start-part-btn");
+    });
+
+    it("should set 'start-btn' (Round) on the very first practice question", () => {
+        view.isPracticing = true;
+        view.setQuestion(true, 0);
+        
+        // Ensure showingIntro is false to hit this specific block
+        view.showingIntro = false;
+
+        view.updateNextButtonClass();
+
+        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("start-btn");
+    });
+
+    it("should set 'start-btn' (Round) when showingIntro is true", () => {
+        view.isPracticing = true;
+        view.setQuestion(true, 1); // Middle question
+        view.showingIntro = true;
+
+        view.updateNextButtonClass();
+
+        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("start-btn");
+    });
+
+    it("should set 'start-btn' (Round) when transitioning from instructions to a normal question", () => {
+        view.isPracticing = true;
+        
+        // Setup: Current question has instructions, next one does NOT
+        view.currentPart.practice[0].instruction_sequence = { instructions: [] };
+        view.currentPart.practice[1].instruction_sequence = null;
+        
+        view.setQuestion(true, 0);
+        view.showingInstructions = false; // We just finished showing them
+
+        view.updateNextButtonClass();
+
+        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("start-btn");
+    });
+
+    it("should default to 'next-btn' (Green) for standard test questions", () => {
+        // Standard test mode (not practicing)
+        view.isPracticing = false;
+        view.setQuestion(false, 1);
+
+        view.updateNextButtonClass();
+
+        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("next-btn");
+    });
+
+    it("should set 'start-btn' via the instruction-to-task transition logic", () => {
+        view.isPracticing = true;
+        view.showingIntro = false;
+        view.showingInstructions = false;
+    
+        // We need at least 3 questions to avoid hitting the "First" or "Last" checks
+        view.currentPart.practice = [
+            { instruction_sequence: { instructions: [] } }, // Index 0 (Has instruction)
+            { instruction_sequence: { instructions: [] } }, // Index 1 (CURRENT - Has instruction)
+            { instruction_sequence: null },                 // Index 2 (NEXT - No instruction)
+            { instruction_sequence: null }                  // Index 3 (Buffer to not be "Last")
+        ];
+    
+        // Set to index 1
+        // 1. It's not index 0 (First check failed)
+        // 2. It's not index 3 (Last check failed)
+        // 3. practice.slice(0, 2) are all instructions (Every check passed)
+        // 4. practice[2] is NOT an instruction (Next check passed)
+        view.setQuestion(true, 1);
+    
+        view.updateNextButtonClass();
+    
+        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("start-btn");
+    });
+
+    it("should NOT set 'start-btn' if the next question also has instructions", () => {
+        view.isPracticing = true;
+        view.currentPart.practice = [
+            { instruction_sequence: {} }, 
+            { instruction_sequence: {} }, // Current
+            { instruction_sequence: {} }, // Next (This causes the block to fail)
+            { instruction_sequence: {} }
+        ];
+    
+        view.setQuestion(true, 1);
+        view.updateNextButtonClass();
+    
+        // Should fall through to the default class
+        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("next-btn");
     });
 
 });

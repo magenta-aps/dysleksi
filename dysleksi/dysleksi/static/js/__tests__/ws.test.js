@@ -6,22 +6,26 @@ describe('getWebSocket', () => {
   let mockSend;
 
   beforeEach(() => {
-    // Mock window.location correctly
     global.window = { location: { protocol: 'https:', host: 'example.com' } };
-
-    // Save original WebSocket
     originalWebSocket = global.WebSocket;
 
-    // Mock WebSocket as a class (constructor)
     mockSend = vi.fn();
+
+    // Define the class and its methods on the prototype
     global.WebSocket = class {
       constructor(url) {
         this.url = url;
+        this.readyState = 1; // 1 = OPEN
         this.send = mockSend;
-        this.close = vi.fn();
-        this.addEventListener = vi.fn();
       }
+      // Defining these here puts them on the prototype
+      close() {}
+      addEventListener() {}
     };
+
+    // Set the constants your code relies on
+    global.WebSocket.OPEN = 1;
+    global.WebSocket.CONNECTING = 0;
   });
 
   afterEach(() => {
@@ -40,5 +44,34 @@ describe('getWebSocket', () => {
     const ws = getWebSocket('abc');
 
     expect(ws.url).toBe('ws://example.com/ws/chat/abc/');
+  });
+
+  it('removes the socket from the cache when it closes', () => {
+    let closeCallback;
+
+    // 1. Spy on the prototype before calling the function
+    const addEventListenerSpy = vi.spyOn(global.WebSocket.prototype, 'addEventListener')
+      .mockImplementation((event, callback) => {
+        if (event === 'close') {
+          closeCallback = callback;
+        }
+      });
+
+    // 2. Create the first socket
+    const firstWs = getWebSocket('room-to-close');
+
+    // Verify the listener was actually attached
+    expect(addEventListenerSpy).toHaveBeenCalledWith('close', expect.any(Function));
+
+    // 3. Manually trigger the 'close' callback that was captured
+    if (closeCallback) closeCallback();
+
+    // 4. Call getWebSocket again for the same ID
+    const secondWs = getWebSocket('room-to-close');
+
+    // 5. Assert: They MUST be different objects now
+    expect(secondWs).not.toBe(firstWs);
+
+    addEventListenerSpy.mockRestore();
   });
 });
