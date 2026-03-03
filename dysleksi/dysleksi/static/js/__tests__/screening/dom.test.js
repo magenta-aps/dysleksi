@@ -38,6 +38,15 @@ describe("GroupTestDomElements.showInstructions (sound only)", () => {
         expect(sourceNode.src).toContain("/sound.mp3");
         expect(sourceNode.type).toBe("audio/mpeg");
     });
+
+    it("should NOT append a source element if audio is null", () => {
+        // Call with text but NO audio
+        dom.showInstructions("Read the text", null);
+        
+        // Assert that no source elements were added to the audio container
+        expect(dom.instructionsSoundEl.childNodes.length).toBe(0);
+    });
+
 });
 
 
@@ -768,4 +777,5 @@ describe("GroupTestDomElements button animations", () => {
 
     vi.useRealTimers();
   });
+
 });

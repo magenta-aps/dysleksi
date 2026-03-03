@@ -137,6 +137,77 @@ describe("TeacherView", () => {
         vi.restoreAllMocks();
     });
 
+    it("sends null for 'correct' when the skip button is clicked", () => {
+        vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID-SKIP");
+
+        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
+        view.setPartIndex(0);
+        view.setQuestionIndex(0);
+
+        // Click the skip button
+        const skipButton = buttons.skipButton();
+        skipButton.click();
+
+        expect(socket.send).toHaveBeenCalledWith(JSON.stringify({
+            uuid: "UUID-SKIP",
+            event: "question.feedback",
+            roomName: "room1",
+            partIndex: 0,
+            questionIndex: 0,
+            questionId: 1,
+            partId: 1,
+            assignmentId: 1,
+            correct: null, // This hits the 'null' branch of the ternary
+            note: "",
+        }));
+    });
+
+    it("updates indices but does not enable buttons when event is 'question.answered'", () => {
+        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
+    
+        // 1. Setup: Ensure buttons are currently disabled
+        buttons.disableButtons();
+        const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+    
+        // 2. Trigger 'question.answered'
+        // This hits the outer IF but fails the 'question.displayed' IF
+        handler({
+            data: JSON.stringify({
+                event: "question.answered",
+                partIndex: 0,
+                questionIndex: 0,
+                practice: false,
+                answeredAt: "10:00:05"
+            }),
+        });
+    
+        // 3. Assertions
+        // Indices should be updated
+        expect(view.partIndex).toBe(0);
+        expect(view.questionIndex).toBe(0);
+    
+        // Buttons should REMAIN disabled (because the 'question.displayed' block was skipped)
+        const btn = document.querySelector("#correct");
+        expect(btn.classList.contains("disabled")).toBe(true);
+    });
+
+    it("initializes default sub-views when optional arguments are omitted", () => {
+        // We only pass the required arguments: roomName, test, assignmentId, wsGetter
+        // The rest (table, buttons, noteField, questionView) will fall back to 'new' instances
+        const minimalView = new TeacherView("room1", individualTest, 1, wsGetter);
+
+        // Verify that the properties are instances of their respective classes
+        expect(minimalView.table).toBeInstanceOf(EventTable);
+        expect(minimalView.buttons).toBeInstanceOf(ActionButtons);
+        expect(minimalView.noteField).toBeInstanceOf(NoteField);
+        expect(minimalView.questionView).toBeInstanceOf(QuestionView);
+
+        // Verify that they attached to the DOM correctly
+        // (Since beforeEach sets up the HTML, these should find their elements)
+        expect(minimalView.table.eventsEl).not.toBeNull();
+        expect(minimalView.noteField.noteEl).not.toBeNull();
+    });
+
     it("throws an error when an out-of-bounds practice question index is received", () => {
         // Initialize view with individualTest data
         view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
@@ -464,6 +535,45 @@ describe("GroupTestContainer", () => {
         `;
         container = document.querySelector(".group-test-body");
         instance = new GroupTestContainer();
+    });
+
+    it("toggles folded area even when clicking on child elements (name text)", () => {
+        const studentData = {
+            student: { id: 5, firstName: "Eve", lastName: "Online", progress: 20 },
+        };
+        instance.updateData(studentData);
+    
+        const card = container.querySelector(".student-card[data-student-id='5']");
+        const folded = card.querySelector(".folded-area");
+        const nameSpan = card.querySelector(".student-text");
+
+        // Ensure it's hidden initially
+        folded.style.display = "none";
+
+        // Click on the span (target is NOT .folded-area, so it should NOT return early)
+        nameSpan.click();
+
+        expect(folded.style.display).toBe("flex");
+    });
+
+    it("does NOT toggle folded area when clicking directly on the folded area content", () => {
+        const studentData = {
+            student: { id: 6, firstName: "Frank", lastName: "Castle", progress: 10 },
+        };
+        instance.updateData(studentData);
+    
+        const card = container.querySelector(".student-card[data-student-id='6']");
+        const folded = card.querySelector(".folded-area");
+
+        // Force to 'none'
+        folded.style.display = "none";
+
+        // Click directly on the folded area
+        // This triggers the 'true' branch of the condition: if (e.target.classList.contains("folded-area")) return;
+        folded.click();
+
+        // It should still be 'none' because the function returned early
+        expect(folded.style.display).toBe("none");
     });
 
     it("returns early and does not throw if container is null", () => {

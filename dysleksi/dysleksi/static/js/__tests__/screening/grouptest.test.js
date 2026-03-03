@@ -143,6 +143,62 @@ describe('GroupTestFlow', () => {
         expect(test.parts[0].practice.length).toBe(0);
     });
 
+    it('should set the next button listener in start() and trigger onQuestionComplete', () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        
+        // Spy on onQuestionComplete to verify it gets called
+        const onCompleteSpy = vi.spyOn(view, 'onQuestionComplete').mockImplementation(() => {});
+        
+        // 1. Initialize view state
+        view.setPart(0);
+        view.showQuestion(false, 0); 
+        const currentQuestion = view.currentQuestion;
+
+        // 2. Call start()
+        view.start();
+
+        // 3. Verify the listener was registered on the DOM
+        expect(domElements.setNextButtonListener).toHaveBeenCalledWith(expect.any(Function));
+
+        // 4. Retrieve the actual function passed to the listener and execute it
+        // This simulates the user clicking the "Next" button
+        const registeredListener = domElements.setNextButtonListener.mock.calls[0][0];
+        registeredListener();
+
+        // 5. Assertions
+        expect(onCompleteSpy).toHaveBeenCalledWith(currentQuestion, false);
+    });
+
+    it('should set the repeat button listener in start() and trigger repeat', () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        
+        // Spy on onQuestionComplete to verify it gets called
+        const repeatSpy = vi.spyOn(view, 'repeat').mockImplementation(() => {});
+        
+        // 1. Initialize view state
+        view.setPart(0);
+        view.showQuestion(false, 0); 
+        const currentQuestion = view.currentQuestion;
+
+        // 2. Call start()
+        view.start();
+
+        // 3. Verify the listener was registered on the DOM
+        expect(domElements.setRepeatButtonListener).toHaveBeenCalledWith(expect.any(Function));
+
+        // 4. Retrieve the actual function passed to the listener and execute it
+        // This simulates the user clicking the "Next" button
+        const registeredListener = domElements.setRepeatButtonListener.mock.calls[0][0];
+        registeredListener();
+
+        // 5. Assertions
+        expect(repeatSpy).toHaveBeenCalled();
+    });
+
+
+
     it("should hide the test part intro image when there is no previous part", () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
@@ -351,8 +407,18 @@ describe('GroupTestFlow', () => {
 
         expect(view.currentQuestionIndex).toBe(0);
         expect(view.isPracticing).toBe(true);
-        expect(view.showFirstQuestion).toHaveBeenCalled();
+        expect(view.showFirstQuestion).toHaveBeenCalledWith(true);
     })
+
+    it("should use default parameter (false) when showFirstQuestion is called without arguments", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+
+        view.start();
+        view.showFirstQuestion();
+    
+        expect(view.isPracticing).toBe(false);
+    });
 
     it("Ends summary and displays first question", () => {
 
@@ -371,8 +437,9 @@ describe('GroupTestFlow', () => {
 
         expect(view.currentQuestionIndex).toBe(0);
         expect(view.isPracticing).toBe(false);
-        expect(view.showFirstQuestion).toHaveBeenCalled();
+        expect(view.showFirstQuestion).toHaveBeenCalledWith(false);
     })
+
 
     it("Trigger for first question reminder", () => {
         vi.useFakeTimers();
@@ -695,6 +762,21 @@ describe('GroupTestFlow', () => {
         });
     });
 
+    it("Answer freetext question with empty string", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        testSpy(view);
+        view.setPart(1);
+
+        view.showQuestion(false, 0);
+        expect(view.input).not.toBe(null);
+        const question = view.currentQuestion;
+        view.input.value = "";
+        view.selectFreeText();
+        expect(view.domElements.toggleNextButton).toHaveBeenCalledWith(false)
+    });
+
+
     it("Answer freetext question incorrectly", () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
@@ -753,6 +835,19 @@ describe('GroupTestFlow', () => {
             roomName: view.roomName,
             student: expect.any(Object)
         });
+    });
+
+    it("Answer question with instruction sequence", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        testSpy(view);
+        const canShow = view.setPart(0);
+        expect(canShow).toBe(true);
+        const part = view.currentPart;
+        view.showQuestion(true, 0);
+        const question = view.currentQuestion;
+        view.onQuestionComplete(question);
+        expect(view.showNextQuestion).toHaveBeenCalled();
     });
 
     it("Show instructions", () => {
@@ -1061,6 +1156,7 @@ describe("GroupTestDomElements - Repeatbutton", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+            <h1 id="student-header"></h1> <div id="choices"></div>
             <div id="choices"></div>
             <audio id="instructions-sound"></audio>
             <audio id="reminder-sound"></audio>
@@ -1091,6 +1187,28 @@ describe("GroupTestDomElements - Repeatbutton", () => {
         view.repeat();
         expect(view.showQuestion).toHaveBeenCalledWith(true, 1);
     });
+
+    it("should repeat the CURRENT question if no repeat destination is set", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        testSpy(view);
+        
+        view.setPart(0);
+        // Set to index 2 specifically
+        view.setQuestion(false, 2); 
+        
+        // Ensure repeatQuestionIndex is null (the default state)
+        view.repeatQuestionIndex = null;
+    
+        // Spy on showQuestion to see what index it gets called with
+        const showQuestionSpy = vi.spyOn(view, 'showQuestion');
+    
+        view.repeat();
+    
+        // It should fall back to currentQuestionIndex (2)
+        expect(showQuestionSpy).toHaveBeenCalledWith(false, 2);
+    });
+
 });
 
 describe("compareTextAnswer", () => {
@@ -1126,47 +1244,6 @@ describe("compareTextAnswer", () => {
     });
 });
 
-describe("Update next button class", () => {
-
-    let domElements;
-    let view;
-
-    beforeEach(() => {
-        document.body.innerHTML = `
-            <div id="choices"></div>
-            <audio id="instructions-sound"></audio>
-            <audio id="reminder-sound"></audio>
-            <div id="instructions-text"></div>
-            <button id="start-practice"></button>
-            <button id="start-questions"></button>
-            <table id="summary-table"></table>
-            <button id="end-summary"></button>
-            <div id="question-title"></div>
-            <div id="question-challenge"></div>
-            <button id="next"></button>
-        `
-        domElements = new GroupTestDomElements();
-        view = new GroupTestView(
-            groupTestData,{addEventListener: vi.fn()},'class_123', 1, domElements
-        );
-    });
-
-    it("Set button to round class on entry", () => {
-        view.setPart(0);
-        view.setQuestion(true, 0);
-        view.updateNextButtonClass();
-        expect(domElements.nextBtn.classList).toContain("start-btn");
-    });
-
-    it("Set button to round class on playing intro", () => {
-        view.setPart(0);
-        view.setQuestion(true, 1);
-        view.showingIntro = true;
-        view.updateNextButtonClass();
-        expect(domElements.nextBtn.classList).toContain("start-btn");
-    });
-
-});
 
 
 describe("Timer and Reminder Cleanup", () => {
@@ -1259,6 +1336,22 @@ describe("StudentTestView - updateNextButtonClass", () => {
         testSpy(view);
         view.setPart(0);
     });
+
+    it("Set button to round class on entry", () => {
+        view.setPart(0);
+        view.setQuestion(true, 0);
+        view.updateNextButtonClass();
+        expect(domElements.nextBtn.classList).toContain("start-btn");
+    });
+
+    it("Set button to round class on playing intro", () => {
+        view.setPart(0);
+        view.setQuestion(true, 1);
+        view.showingIntro = true;
+        view.updateNextButtonClass();
+        expect(domElements.nextBtn.classList).toContain("start-btn");
+    });
+
 
     it("should set 'start-part-btn' (Blue) on the last practice question", () => {
         view.isPracticing = true;

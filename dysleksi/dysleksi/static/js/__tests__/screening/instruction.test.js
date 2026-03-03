@@ -441,4 +441,18 @@ describe("InstructionSequenceRunner", () => {
         expect(blurSpy).toHaveBeenCalledTimes(1);
     });
 
+    it("remove text in element uses default value of 1 when data is missing or invalid", () => {
+        runner = new InstructionSequenceRunner(null, [], domElements, fakeContext);
+        const element = document.getElementById("input1");
+        element.value = "Test";
+        
+        // Test with missing data (undefined)
+        runner.executeInstruction({ action: "removeText", element: "input1" });
+        expect(domElements.removeText).toHaveBeenLastCalledWith(element, 1);
+    
+        // Test with empty string data
+        runner.executeInstruction({ action: "removeText", element: "input1", data: "" });
+        expect(domElements.removeText).toHaveBeenLastCalledWith(element, 1);
+    });
+
 });
