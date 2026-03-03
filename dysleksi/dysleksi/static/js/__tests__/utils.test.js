@@ -71,6 +71,38 @@ describe('test startSession', () => {
 
     });
 
+    it('should not refresh session is student is not ready', () => {
+        vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
+
+        const roomName = "room-3";
+        let chatSocket = startSession(roomName);
+        expect(chatSocket.addEventListener).toHaveBeenCalled();
+
+        chatSocket.__trigger(
+            "message",
+            {"data": JSON.stringify({"event": "student.sleeping"})}
+        );
+        expect(chatSocket.send).not.toHaveBeenCalled();
+
+    });
+
+    it('should not send session.in_progress if socket is not OPEN', () => {
+        const roomName = "room-closed";
+        const chatSocket = startSession(roomName);
+        
+        // Manually change the mock's readyState to CLOSED (or any value != 1)
+        chatSocket.readyState = WebSocket.CLOSED; 
+        
+        // Clear call history from the startSession call if any
+        chatSocket.send.mockClear();
+    
+        // Trigger the refresh
+        refreshSession(roomName);
+    
+        // Verify send was never called
+        expect(chatSocket.send).not.toHaveBeenCalled();
+    });
+
 });
 
 describe('wake lock utils', () => {
@@ -303,6 +335,29 @@ describe('calculateStudentProgress', () => {
         // Current part = 1, currentQuestionIndex = 1
         // Done = part0 all (2) + current part first 2 = 4, total = 2+3+2=7
         expect(calculateStudentProgress(test, 1, 1)).toBeCloseTo((4/7)*100);
+    });
+
+    it('should handle parts with missing questions property', () => {
+        const test = {
+            parts: [
+                { questions: [1, 2, 3] }, // 3 questions
+                { questions: undefined },   // 0 questions (hits the fallback)
+                { questions: [1, 2] }      // 2 questions
+            ]
+        };
+    
+        // Total questions should be 3 + 0 + 2 = 5
+        
+        // 1. Check progress at the very beginning
+        // (1 question done / 5 total)
+        expect(calculateStudentProgress(test, 0, 0)).toBeCloseTo(20);
+    
+        // 2. Check progress when current part is the one with undefined questions
+        // Done = Part 0 (3) + Part 1 (0) = 3 total done
+        expect(calculateStudentProgress(test, 1, 0)).toBeCloseTo(60);
+    
+        // 3. Check final progress
+        expect(calculateStudentProgress(test, 2, 1)).toBeCloseTo(100);
     });
 
 });

@@ -275,7 +275,7 @@ export class QuestionView {
                 txt.id = "challenge-text";
                 this.contentElement.append(txt);
             }
-            txt.textContent = contentText || "";
+            txt.textContent = contentText;
         } else {
             if (txt) {
                 txt.remove();

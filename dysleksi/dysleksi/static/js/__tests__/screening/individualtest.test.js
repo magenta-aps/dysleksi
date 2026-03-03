@@ -161,6 +161,34 @@ describe("IndividualTestFlow", () => {
             note: "Vi afbryder her",
         });
         expect(view.onTestComplete).toHaveBeenCalledWith(true);
+        expect(view.mediaRecorder.stop).toHaveBeenCalled();
+    });
+
+    it("cancel test without media recorder", () => {
+        const test = new Test(individualTestData);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        view.mediaRecorder = null
+        testSpy(view);
+        view.onChatMessage({
+            uuid: crypto.randomUUID(),
+            event: "test.cancelled",
+            roomName: "student_1",
+            questionIndex: 0,
+            questionId: 1,
+            practice: false,
+            partId: 1,
+            assignmentId: 1,
+            note: "Vi afbryder her",
+        });
+        expect(view.onTestComplete).toHaveBeenCalledWith(true);
+    });
+
+    it("show invalid question", () => {
+        const test = new Test(individualTestData);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        view.setPart(0);
+        const canShow = view.showQuestion(false, 999);
+        expect(canShow).toBe(false);
     });
 
     it("show question", () => {
@@ -484,6 +512,56 @@ describe("IndividualTestFlow", () => {
         expect(view.domElements.reminderSoundEl.currentTime).toBe(0);
         expect(view.domElements.reminderSoundEl.play).toHaveBeenCalled();
         vi.useRealTimers();
+    });
+
+    it("should wire up next button to complete question during instructions", () => {
+        const test = new Test(individualTestData);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        testSpy(view);
+        
+        // 1. Ensure the question has an instruction sequence to enter the specific block
+        const question = test.parts[0].questions[0];
+        question.instruction_sequence = { instructions: [] };
+        view.setPart(0);
+
+        // 2. Capture the callback passed to the DOM element
+        let capturedNextCallback;
+        domElements.setNextButtonListener.mockImplementation((cb) => {
+            capturedNextCallback = cb;
+        });
+
+        view.showQuestion(false, 0);
+
+        // 3. Spy on the target method
+        const completeSpy = vi.spyOn(view, "onQuestionComplete").mockImplementation(() => {});
+
+        // 4. Execute the captured callback and verify
+        capturedNextCallback();
+        expect(completeSpy).toHaveBeenCalledWith(question);
+    });
+
+    it("should wire up repeat button to repeat method during instructions", () => {
+        const test = new Test(individualTestData);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        testSpy(view);
+        
+        test.parts[0].questions[0].instruction_sequence = { instructions: [] };
+        view.setPart(0);
+
+        // 1. Capture the repeat callback
+        let capturedRepeatCallback;
+        domElements.setRepeatButtonListener.mockImplementation((cb) => {
+            capturedRepeatCallback = cb;
+        });
+
+        view.showQuestion(false, 0);
+
+        // 2. Spy on the repeat method (inherited from StudentTestView)
+        const repeatSpy = vi.spyOn(view, "repeat").mockImplementation(() => {});
+
+        // 3. Execute and verify
+        capturedRepeatCallback();
+        expect(repeatSpy).toHaveBeenCalled();
     });
 
 });

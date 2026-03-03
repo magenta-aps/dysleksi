@@ -155,5 +155,20 @@ describe('TestMediaRecorder', () => {
         expect(result).toBe('data:audio/webm;base64,mockdata');
         expect(recorder.recording.length).toBe(0);
     });
+
+    it('should NOT call mediaRecorder.start if the state is NOT inactive', async () => {
+        await recorder.setup();
+        
+        // Set state to something other than 'inactive'
+        mockMediaRecorderInstance.state = 'recording';
+        
+        recorder.start();
+        
+        // Assert that start was NOT called in this invocation
+        // (Note: it might have been called during setup depending on your logic, 
+        // so we check that it wasn't called with the interval again here)
+        expect(mockMediaRecorderInstance.start).not.toHaveBeenCalled();
+    });
+
 });
 
