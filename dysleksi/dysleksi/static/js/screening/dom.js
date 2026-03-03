@@ -436,6 +436,9 @@ class TestDomElements {
 
                 const letterBtns = document.querySelectorAll(".letter-btn");
                 letterBtns.forEach(b => b.disabled = false);
+
+                const displayField = document.querySelector(".display-field");
+                displayField.disabled = false;
             };
         }
 
@@ -492,6 +495,7 @@ class TestDomElements {
         displayField.id = "free-text-field";
         displayField.type = "text";
         displayField.inputMode = "none";
+        displayField.disabled = true;
 
         displayField.addEventListener('contextmenu', (e) => {
             e.preventDefault();
