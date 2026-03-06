@@ -42,6 +42,13 @@ services:
       - "8140:8443"
     depends_on:
       - dysleksi-db
+    # We use `uvicorn` (and not stock `gunicorn`) as the websocket features
+    # rely on `uvicorn` and `django-channels`.
+    # In local dev env, run `uvicorn` binary directly, as it supports using the
+    # `--reload` option for live code reload during development.
+    # Also, use a self-signed certificate (`--ssl-certfile=/ssl/web/cert.pem`,
+    # `--ssl-keyfile=/ssl/web/key.pem`) to serve on HTTPS, as audio recording
+    # in a browser context requires HTTPS connections in any case.
     command: uvicorn project.asgi:application --host 0.0.0.0 --port 8443 --reload --ssl-certfile=/ssl/web/cert.pem --ssl-keyfile=/ssl/web/key.pem
 
   dysleksi-db:

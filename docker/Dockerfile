@@ -70,4 +70,9 @@ RUN set -a && \
 
 VOLUME /var/cache/idp
 
+# We use `uvicorn` (and not stock `gunicorn`) as the websocket features
+# rely on `uvicorn` and `django-channels`.
+# In production and test environments we run `gunicorn`, but specify the
+# worker type `uvicorn.workers.UvicornWorker`, This allows us to use
+# `uvicorn` features, and still integrate with `gunicorn`, Traefik, etc.
 CMD ["gunicorn","--bind","0.0.0.0:8000","project.asgi:application","-w","4","-k","uvicorn.workers.UvicornWorker","--timeout","120","--error-logfile","-","--capture-output"]
