@@ -1462,3 +1462,76 @@ describe("StudentTestView - updateNextButtonClass", () => {
     });
 
 });
+
+
+describe("GroupTestDomElements - FreeText Touch Interaction", () => {
+    let domElements;
+    let listenerMock;
+    let displayField;
+
+    beforeEach(() => {
+        // 1. Reset DOM
+        document.body.innerHTML = `<div id="choices"></div>`;
+        
+        // 2. Initialize Class & Mocks
+        domElements = new GroupTestDomElements();
+        listenerMock = vi.fn();
+
+        // 3. Common Element Setup
+        displayField = domElements.showQuestionFreeText(listenerMock);
+        document.body.appendChild(displayField);
+
+        // 4. Global Mocking (Ensure getComputedStyle exists in JSDOM)
+        if (typeof window.getComputedStyle !== 'function') {
+            window.getComputedStyle = vi.fn();
+        }
+
+        // 5. Default Layout Mocks (Can be overridden in specific tests)
+        vi.spyOn(displayField, 'getBoundingClientRect').mockReturnValue({
+            left: 50,
+            top: 50,
+            width: 300,
+            height: 50
+        });
+    });
+
+    afterEach(() => {
+        // Automatically restore all spies created via vi.spyOn
+        vi.restoreAllMocks();
+        // Clean up DOM to prevent memory leaks or ID collisions
+        document.body.innerHTML = '';
+    });
+
+    it("touchstart on display field calculates cursor index and sets focus", () => {
+        const getCursorIndexSpy = vi.spyOn(utils, 'getCursorIndex').mockReturnValue(5);
+        const styleSpy = vi.spyOn(window, 'getComputedStyle').mockReturnValue({ paddingLeft: '10px' });
+        const focusSpy = vi.spyOn(displayField, 'focus');
+        const selectionSpy = vi.spyOn(displayField, 'setSelectionRange');
+
+        const touchEvent = new Event('touchstart', { bubbles: true, cancelable: true });
+        Object.defineProperty(touchEvent, 'touches', {
+            value: [{ clientX: 120, clientY: 60 }] 
+        });
+
+        displayField.dispatchEvent(touchEvent);
+
+        expect(touchEvent.defaultPrevented).toBe(true);
+        expect(focusSpy).toHaveBeenCalled();
+        expect(getCursorIndexSpy).toHaveBeenCalledWith(displayField, 60); // 120 - 50 - 10
+        expect(selectionSpy).toHaveBeenCalledWith(5, 5);
+    });
+
+    it("defaults paddingLeft to 0 if getComputedStyle returns an invalid value", () => {
+        const getCursorIndexSpy = vi.spyOn(utils, 'getCursorIndex').mockReturnValue(0);
+        vi.spyOn(window, 'getComputedStyle').mockReturnValue({ paddingLeft: undefined });
+
+        const touchEvent = new Event('touchstart', { bubbles: true, cancelable: true });
+        Object.defineProperty(touchEvent, 'touches', {
+            value: [{ clientX: 100, clientY: 60 }]
+        });
+
+        displayField.dispatchEvent(touchEvent);
+
+        expect(getCursorIndexSpy).toHaveBeenCalledWith(displayField, 50); // 100 - 50 - 0
+    });
+});

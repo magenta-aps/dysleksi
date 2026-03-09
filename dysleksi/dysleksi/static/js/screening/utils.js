@@ -105,3 +105,42 @@ export function calculateStudentProgress(test, currentPartIndex, currentQuestion
 
     return totalQuestions > 0 ? (questionsDone / totalQuestions) * 100 : 0;
 }
+
+export function getCursorIndex(input, tapX) {
+    const text = input.value;
+    if (!text || tapX <= 0) return 0;
+
+    // Create a hidden span to measure text exactly as it appears in the input
+    const span = document.createElement('span');
+    const style = window.getComputedStyle(input);
+    
+    // Copy essential styles to ensure measurement matches exactly
+    span.style.font = style.font;
+    span.style.letterSpacing = style.letterSpacing;
+    span.style.whiteSpace = 'pre';
+    span.style.position = 'absolute';
+    span.style.visibility = 'hidden';
+    document.body.appendChild(span);
+
+    let index = 0;
+    let low = 0;
+    let high = text.length;
+
+    // Binary search for the closest character gap
+    while (low <= high) {
+        let mid = Math.floor((low + high) / 2);
+        span.textContent = text.substring(0, mid);
+        let width = span.getBoundingClientRect().width;
+
+        if (width < tapX) {
+            index = mid;
+            low = mid + 1;
+        } else {
+            high = mid - 1;
+        }
+    }
+    
+    // Clean up
+    document.body.removeChild(span);
+    return index;
+}

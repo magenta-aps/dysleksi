@@ -6,7 +6,7 @@ import {startSession, refreshSession} from "../screening/utils";
 import * as wsModule from "../ws.js";
 import {getWebSocket} from "../ws.js";
 import { calculateStudentProgress } from '../screening/utils';
-
+import { getCursorIndex } from '../screening/utils';
 
 // Mock getWebSocket
 vi.mock("../ws.js", () => ({
@@ -360,4 +360,89 @@ describe('calculateStudentProgress', () => {
         expect(calculateStudentProgress(test, 2, 1)).toBeCloseTo(100);
     });
 
+});
+
+
+describe('getCursorIndex', () => {
+    let input;
+
+    beforeEach(() => {
+        input = document.createElement('input');
+        input.value = "Hello World";
+        document.body.appendChild(input);
+
+        // Mock getComputedStyle to avoid errors
+        vi.spyOn(window, 'getComputedStyle').mockReturnValue({
+            font: '16px Arial',
+            letterSpacing: 'normal',
+            whiteSpace: 'pre'
+        });
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = '';
+        vi.restoreAllMocks();
+    });
+
+    it('should return 0 if input has no value', () => {
+        input.value = "";
+        const index = getCursorIndex(input, 50);
+        expect(index).toBe(0);
+    });
+
+    it('should return 0 if tapX is 0 or negative', () => {
+        const index = getCursorIndex(input, 0);
+        expect(index).toBe(0);
+    });
+
+    it('should find the correct index using binary search simulation', () => {
+        const originalCreateElement = document.createElement;
+        vi.spyOn(document, 'createElement').mockImplementation((tagName) => {
+            const el = originalCreateElement.call(document, tagName);
+            if (tagName === 'span') {
+                vi.spyOn(el, 'getBoundingClientRect').mockImplementation(() => ({
+                    // Simulate width = length of text * 10px
+                    width: el.textContent.length * 10,
+                    height: 20,
+                    top: 0, left: 0, bottom: 0, right: 0
+                }));
+            }
+            return el;
+        });
+
+        // "Hello" is 5 chars. If each char is 10px, 55px tap should land at index 5
+        // (the gap between 'o' and ' ')
+        const indexAtMid = getCursorIndex(input, 55);
+        expect(indexAtMid).toBe(5);
+
+        // A tap very far to the right should return the last index (text length)
+        const indexAtEnd = getCursorIndex(input, 500);
+        expect(indexAtEnd).toBe(11);
+    });
+
+    it('should clean up the temporary span from the DOM', () => {
+        const spyRemove = vi.spyOn(document.body, 'removeChild');
+        getCursorIndex(input, 20);
+        
+        // Ensure the span created for measurement was removed
+        expect(spyRemove).toHaveBeenCalledWith(expect.any(HTMLSpanElement));
+    });
+
+    it('should handle white space correctly (pre style)', () => {
+        input.value = "A B"; // Space at index 1
+        
+        const originalCreateElement = document.createElement;
+        vi.spyOn(document, 'createElement').mockImplementation((tagName) => {
+            const el = originalCreateElement.call(document, tagName);
+            if (tagName === 'span') {
+                vi.spyOn(el, 'getBoundingClientRect').mockImplementation(() => ({
+                    width: el.textContent.length * 10,
+                }));
+            }
+            return el;
+        });
+
+        const index = getCursorIndex(input, 15); // middle of the space
+        expect(index).toBe(1);
+    });
 });

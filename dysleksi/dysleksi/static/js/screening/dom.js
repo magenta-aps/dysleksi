@@ -1,3 +1,6 @@
+import { getCursorIndex } from './utils.js';
+
+
 class TestDomElements {
 
     instructionsSoundEl;
@@ -500,7 +503,26 @@ class TestDomElements {
         displayField.addEventListener('contextmenu', (e) => {
             e.preventDefault();
         }, false);
-    
+
+        displayField.addEventListener('touchstart', (e) => {
+            e.preventDefault(); // Kills the iPad menu before it can think
+            displayField.focus();
+
+            const touch = e.touches[0];
+            const rect = displayField.getBoundingClientRect();
+            
+            // Calculate the horizontal offset of the tap relative to the text start
+            const style = window.getComputedStyle(displayField);
+            const paddingLeft = parseFloat(style.paddingLeft) || 0;
+            const tapX = touch.clientX - rect.left - paddingLeft;
+        
+            // Find the character index
+            const pos = getCursorIndex(displayField, tapX);
+        
+            displayField.setSelectionRange(pos, pos);
+        }, { passive: false });
+        
+
         // --- Erase button ---
         const eraseBtn = document.createElement("button");
         eraseBtn.innerHTML = '<i class="ph-fill ph-backspace"></i>';
