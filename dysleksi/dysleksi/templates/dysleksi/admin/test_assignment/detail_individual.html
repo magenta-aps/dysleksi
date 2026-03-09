@@ -88,6 +88,7 @@
 {% block js_module %}
 {{ block.super }}
 {{ test_contents|json_script:"test_contents" }}
+{{ static_files|json_script:"static_files" }}
 {{ assignment|json_script:"assignment" }}
 <script type="module" src="{% static 'js/screening/index.js' %}"></script>
 {% endblock %}

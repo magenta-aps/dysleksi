@@ -1,5 +1,5 @@
 import { getCursorIndex } from './utils.js';
-
+import { assetCache } from "./cache.js";
 
 class TestDomElements {
 
@@ -454,7 +454,7 @@ class TestDomElements {
 
     async playSound(sound, currentSource, audioContext) {
         // Fetch & decode audio
-        const response = await fetch(sound);
+        const response = await fetch(assetCache.fetch(sound));
         const arrayBuffer = await response.arrayBuffer();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 

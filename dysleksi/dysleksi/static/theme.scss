@@ -32,6 +32,24 @@ $body-bg: $student-grey-lightest;
 $primary: $student-blue;
 $secondary: $student-grey-light;
 
+$asset-manifest: (
+  "bg-sound-btn":          '/static/images/Knap-hoer-lyd.svg',
+  "bg-sound-btn-playing":  '/static/images/Knap-hoer-lyd-aktiv.svg',
+  "bg-start-btn":          '/static/images/Knap-start.svg',
+  "bg-start-part-btn":     '/static/images/Knap-start-deltest.svg',
+  "bg-next-btn":           '/static/images/Knap-naeste-opgave.svg',
+  "bg-repeat-btn":         '/static/images/Knap-gentag-instruktion.svg',
+  "bg-audio-bars":         '/static/images/audiobars.svg'
+);
+
+
+// 3. Generate the :root CSS variables so JS can access and modify them
+:root {
+  @each $name, $path in $asset-manifest {
+    --#{$name}: url('#{$path}');
+  }
+}
+
 @import "./vendor/scss/bootstrap";
 @import "./vendor/fonts/phosphor/regular/style.css";
 @import "./vendor/fonts/phosphor/fill/style.css";
@@ -186,7 +204,7 @@ body.show-instructions {
 
 .sound-btn {
   @extend .svg-btn;
-  background-image: url("images/Knap-hoer-lyd.svg");
+  background-image: var(--bg-sound-btn);
   width: 7.5rem;
   height: 5rem;
   display: flex;
@@ -195,35 +213,35 @@ body.show-instructions {
   justify-content: center;
 
   &.playing {
-    background-image: url("images/Knap-hoer-lyd-aktiv.svg");
+    background-image: var(--bg-sound-btn-playing);
     animation: pulse-outline 1s ease-in-out infinite alternate;
   }
 }
 
 .start-btn {
   @extend .svg-btn;
-  background-image: url("images/Knap-start.svg");
+  background-image: var(--bg-start-btn);
   width: 8rem;
   height: 8rem;
 }
 
 .start-part-btn {
   @extend .svg-btn;
-  background-image: url("images/Knap-start-deltest.svg");
+  background-image: var(--bg-start-part-btn);
   width: 10rem;
   height: 5rem;
 }
 
 .next-btn {
   @extend .svg-btn;
-  background-image: url("images/Knap-naeste-opgave.svg");
+  background-image: var(--bg-next-btn);
   width: 10rem;
   height: 5rem;
 }
 
 .repeat-btn {
   @extend .svg-btn;
-  background-image: url("images/Knap-gentag-instruktion.svg");
+  background-image: var(--bg-repeat-btn);
   width: 7.5rem;
   height: 5rem;
 }
@@ -424,7 +442,7 @@ body.show-instructions .sound-btn.pulse {
   width: 100%;
   height: 58px;
   background-color: #ccd9e6;
-  background-image: url("images/audiobars.svg");
+  background-image: var(--bg-audio-bars);
   background-repeat: no-repeat;
   background-position: calc(100% - 31px) center;
 }

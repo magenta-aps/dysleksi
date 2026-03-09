@@ -23,6 +23,7 @@ from dysleksi.models import (
     User,
 )
 from dysleksi.tables import ClassTable, StudentTable, TestAssignmentTable
+from dysleksi.utils import scan_static_files
 
 
 class UserTypeMixin(LoginRequiredMixin):
@@ -96,6 +97,7 @@ class AssignmentView(UserTypeMixin, DetailView):
         context["room_type"] = self.get_room_type()
         context["test_name"] = test.name
         context["class_name"] = assignment.klasse_name
+        context["static_files"] = scan_static_files()
 
         return context
 

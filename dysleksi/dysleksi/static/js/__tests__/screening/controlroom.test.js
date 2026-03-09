@@ -103,10 +103,10 @@ describe("TeacherView", () => {
     let buttons;
     let note;
     let questionView;
-    const groupTest = new Test(groupTestData);
-    const individualTest = new Test(individualTestData);
     let view;
     let wsGetter;
+    let groupTest;
+    let individualTest;
 
     beforeEach(() => {
         socket = {
@@ -131,6 +131,10 @@ describe("TeacherView", () => {
         buttons = new ActionButtons();
         note = new NoteField();
         questionView = new QuestionView();
+        vi.spyOn(Test.prototype, 'preload').mockResolvedValue(new Map());
+
+        groupTest = new Test(groupTestData);
+        individualTest = new Test(individualTestData);
     });
 
     afterEach(() => {
