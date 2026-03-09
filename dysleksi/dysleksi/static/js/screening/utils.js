@@ -144,3 +144,20 @@ export function getCursorIndex(input, tapX) {
     document.body.removeChild(span);
     return index;
 }
+
+export function preventDoubleTapZoom() {
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', (event) => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) {
+                // Check if the tap was on a button or an element inside a button
+                const isButton = event.target.closest('button, .btn, .svg-btn, .letter-btn');
+                
+                if (!isButton) {
+                    // It's a double tap on the background/empty field; block the zoom
+                    event.preventDefault();
+                }
+            }
+            lastTouchEnd = now;
+        }, { passive: false });
+    }

@@ -50,6 +50,16 @@ $secondary: $student-grey-light;
 
 body {
   font-family: "Karinika", "Helvetica", sans-serif;
+  touch-action: pan-x pan-y; // Prevent pinch-zoom
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: fixed; // Prevents the 'pull-to-refresh' and 'rubber-band' effect on iOS
 }
 
 i {
@@ -362,6 +372,8 @@ body.show-instructions .sound-btn.pulse {
 
   text-align: center;
   z-index: 1000;
+
+  overflow: hidden;
 }
 
 .center-content {

@@ -1,7 +1,7 @@
 import { requestWakeLock } from "./utils.js";
 import { releaseWakeLock } from "./utils.js";
 import { unlockAudioOnGesture } from './utils.js';
-
+import { preventDoubleTapZoom} from './utils.js';
 
 export class StudentTestView extends EventTarget {
 
@@ -27,6 +27,7 @@ export class StudentTestView extends EventTarget {
 
     constructor(test, chatSocket, roomName, assignmentId, domElements, student) {
         super();
+        preventDoubleTapZoom();
         this.test = test;
         this.chatSocket = chatSocket;
         this.roomName = roomName;
