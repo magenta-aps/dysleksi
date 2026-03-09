@@ -1073,7 +1073,7 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         expect(imgEl.src).toBe(secondImage);
     });
 
-    it("enables all letter buttons when audio is played", async () => {
+    it("enables all letter buttons and input field when audio is played", async () => {
         // First, create some disabled letter buttons
         const letterBtn1 = document.createElement("button");
         letterBtn1.className = "letter-btn";
@@ -1081,7 +1081,13 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         const letterBtn2 = document.createElement("button");
         letterBtn2.className = "letter-btn";
         letterBtn2.disabled = true;
-        document.body.append(letterBtn1, letterBtn2);
+
+        const inputField = document.createElement("input");
+        inputField.className = "display-field";
+        inputField.disabled = true;
+
+
+        document.body.append(letterBtn1, letterBtn2, inputField);
     
         // Set up audio challenge
         const soundUrl = "https://example.com/audio.mp3";
@@ -1093,7 +1099,8 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         // Before clicking, buttons are disabled
         expect(letterBtn1.disabled).toBe(true);
         expect(letterBtn2.disabled).toBe(true);
-    
+        expect(inputField.disabled).toBe(true);
+
         // Click play
         playBtn.click();
 
@@ -1104,7 +1111,8 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         // Buttons are still disabled before audio ends
         expect(letterBtn1.disabled).toBe(true);
         expect(letterBtn2.disabled).toBe(true);
-    
+        expect(inputField.disabled).toBe(true);
+
         // Manually trigger audio.onended
         mockSource.onended();
         
@@ -1116,6 +1124,7 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         // Buttons should now be enabled
         expect(letterBtn1.disabled).toBe(false);
         expect(letterBtn2.disabled).toBe(false);
+        expect(inputField.disabled).toBe(false);
 
         // Play button classes updated correctly
         expect(playBtn.classList.contains("playing")).toBe(false);
