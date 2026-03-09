@@ -2,64 +2,116 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
-anyio==4.12.1
-asgi-types==0.2.0
+# Dependencies that we use directly in this project, each with a written purpose for being here
+
+## Core Django & gunicorn
+Django==6.0.3
+django-stubs==5.2.7
+django-stubs-ext==5.2.9
+gunicorn==25.1.0
+
+## Postgres binding
+psycopg==3.3.3
+
+## Async packages, for handling websockets
+channels==4.3.2
+types-channels==4.3.0.20250822
+channels_redis==4.3.0
+uvicorn==0.41.0
+daphne==4.2.1
+
+## Serving static files
+whitenoise==6.12.0
+
+## Bootstrap-layout
+django-bootstrap5==26.2
+
+## Table layout
+django-tables2==2.7.5
+
+## CSP-enabling views
+django-csp==4.0
+django-csp-helpers==0.8.0
+
+## Compile SCSS to CSS
+django-libsass==0.9
+
+## Compress css & js
+django_compressor==4.6.0
+
+## Image field
+pillow==12.1.1
+
+## History on model instances
+django-simple-history==3.11.0
+
+## Dynamic forms (lets us use lambdas in form field attributes)
+django-forms-dynamic==1.0.0
+
+## SAML login
+gl-mitid==1.9.1
+django-session-timeout @ git+https://github.com/Lapeth/django-session-timeout@8e50dc6223164368be8c8e1754a90a2c6dca2dc2
+
+## Split django settings into relevant files, so each file contains related configuration
+django-split-settings==1.3.2
+
+## Avoid updating date field in translation files
+django-extended-makemessages==1.7.1
+
+## Redis cache backend
+django-redis==6.0.0
+
+
+# Used for testing & linting
+
+## Parses HTML and lets us query the DOM
+beautifulsoup4==4.14.2
+
+## Code coverage
+coverage==7.13.4
+
+## For specifying a given run time in tests (lets us define the return value of datetime.now etc.)
+freezegun==1.5.5
+
+## Code typing check
+mypy==1.7.0
+
+
+
+## TODO: Remove when TOTP code is gone
+django-otp==1.7.0
+django-two-factor-auth==1.18.1
+
+
+
+
+
+# Dependencies of dependencies, pinned to specific versions.
+
 asgiref==3.11.1
 attrs==25.4.0
 autobahn==25.12.2
 Automat==25.4.16
-beautifulsoup4==4.14.2
 cbor2==5.8.0
 certifi==2026.2.25
 cffi==2.0.0
-channels==4.3.2
-channels_redis==4.3.0
 charset-normalizer==3.4.4
 click==8.3.1
 constantly==23.10.4
-coverage==7.13.4
 cryptography==43.0.3
-daphne==4.2.1
 defusedxml==0.7.1
-Django==6.0.3
 django-appconf==1.2.0
-django-bootstrap5==26.2
-django-crispy-forms==2.6
-django-csp==4.0
-django-csp-helpers==0.8.0
-django-filter==25.2
-django-forms-dynamic==1.0.0
 django-formtools==2.5.1
-django-libsass==0.9
-django-otp==1.7.0
-django-phonenumber-field==8.3.0
-django-redis==6.0.0
-django-session-timeout @ git+https://github.com/Lapeth/django-session-timeout@8e50dc6223164368be8c8e1754a90a2c6dca2dc2
-django-simple-history==3.11.0
-django-split-settings==1.3.2
-django-sql-utils==0.7.0
-django-stubs==5.2.7
-django-stubs-ext==5.2.9
-django-tables2==2.7.5
-django-two-factor-auth==1.18.1
-django_compressor==4.6.0
+django-phonenumber-field==8.4.0
 elementpath==4.8.0
-freezegun==1.5.5
-gl-mitid==1.9.1
-gunicorn==25.1.0
 h11==0.16.0
-httptools==0.7.1
 hyperlink==21.0.0
 idna==3.11
 Incremental==24.11.0
 libsass==0.23.0
 msgpack==1.1.2
-mypy==1.7.0
 mypy_extensions==1.1.0
 packaging==26.0
-phonenumberslite==9.0.25
-pillow==12.1.1
-psycopg==3.3.3
 py-ubjson==0.16.1
 pyasn1==0.6.2
 pyasn1_modules==0.4.2
@@ -67,32 +119,22 @@ pycparser==3.0
 pyOpenSSL==24.2.1
 pysaml2==7.5.4
 python-dateutil==2.9.0.post0
-python-dotenv==1.2.2
-PyYAML==6.0.3
 qrcode==8.2
 rcssmin==1.2.2
 redis==7.3.0
 requests==2.32.5
+types-requests==2.32.4.20260107
 rjsmin==1.2.5
 service-identity==24.2.0
 six==1.17.0
 soupsieve==2.8.3
 sqlparse==0.5.5
-tblib==3.2.2
 Twisted==25.5.0
 txaio==25.12.2
-types-channels==4.3.0.20250822
-types-PyYAML==6.0.12.20250915
-types-requests==2.32.4.20260107
 typing_extensions==4.15.0
 ujson==5.11.0
 urllib3==2.6.3
-uvicorn==0.41.0
-uvloop==0.22.1
-watchfiles==1.1.1
-websockets==16.0
-whitenoise==6.12.0
 xmlschema==2.5.1
 xmltodict==1.0.4
 zope.interface==8.2
-django-extended-makemessages==1.7.1
+websockets==16.0
