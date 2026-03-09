@@ -6,6 +6,7 @@ import {startSession, refreshSession} from "../screening/utils";
 import * as wsModule from "../ws.js";
 import {getWebSocket} from "../ws.js";
 import { calculateStudentProgress } from '../screening/utils';
+import { preventDoubleTapZoom } from '../screening/utils';
 import { getCursorIndex } from '../screening/utils';
 
 // Mock getWebSocket
@@ -444,5 +445,93 @@ describe('getCursorIndex', () => {
 
         const index = getCursorIndex(input, 15); // middle of the space
         expect(index).toBe(1);
+    });
+});
+
+describe('preventDoubleTapZoom', () => {
+    let addEventListenerSpy;
+
+    beforeEach(() => {
+        document.body.innerHTML = '';
+        addEventListenerSpy = vi.spyOn(document, 'addEventListener');
+
+        preventDoubleTapZoom();
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    const triggerDoubleTap = (targetElement) => {
+        const event1 = new CustomEvent('touchend', { bubbles: true, cancelable: true });
+        const event2 = new CustomEvent('touchend', { bubbles: true, cancelable: true });
+        
+        // Define preventDefault mock on the second event
+        event2.preventDefault = vi.fn();
+
+        // Simulate the first tap
+        targetElement.dispatchEvent(event1);
+        
+        // Simulate the second tap immediately (within 300ms)
+        targetElement.dispatchEvent(event2);
+
+        return event2;
+    };
+
+    it('should block zoom when double-tapping on a non-button element (e.g., a div)', () => {
+        const div = document.createElement('div');
+        document.body.appendChild(div);
+
+        const secondEvent = triggerDoubleTap(div);
+
+        expect(secondEvent.preventDefault).toHaveBeenCalled();
+    });
+
+    it('should NOT block zoom when double-tapping on a button', () => {
+        const button = document.createElement('button');
+        button.innerText = "Click Me";
+        document.body.appendChild(button);
+
+        const secondEvent = triggerDoubleTap(button);
+
+        expect(secondEvent.preventDefault).not.toHaveBeenCalled();
+    });
+
+    it('should NOT block zoom when tapping an element inside a button (nested)', () => {
+        const button = document.createElement('button');
+        const span = document.createElement('span');
+        button.appendChild(span);
+        document.body.appendChild(button);
+
+        const secondEvent = triggerDoubleTap(span);
+
+        expect(secondEvent.preventDefault).not.toHaveBeenCalled();
+    });
+
+    it('should NOT block zoom when double-tapping on specialized button classes', () => {
+        const customBtn = document.createElement('div');
+        customBtn.className = 'letter-btn';
+        document.body.appendChild(customBtn);
+
+        const secondEvent = triggerDoubleTap(customBtn);
+
+        expect(secondEvent.preventDefault).not.toHaveBeenCalled();
+    });
+
+    it('should NOT block zoom if the taps are more than 300ms apart', async () => {
+        const div = document.createElement('div');
+        document.body.appendChild(div);
+
+        const event1 = new CustomEvent('touchend', { bubbles: true, cancelable: true });
+        div.dispatchEvent(event1);
+
+        // Wait 301ms
+        await new Promise(r => setTimeout(r, 301));
+
+        const event2 = new CustomEvent('touchend', { bubbles: true, cancelable: true });
+        event2.preventDefault = vi.fn();
+        div.dispatchEvent(event2);
+
+        expect(event2.preventDefault).not.toHaveBeenCalled();
     });
 });
