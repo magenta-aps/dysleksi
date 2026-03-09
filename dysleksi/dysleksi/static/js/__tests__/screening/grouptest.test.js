@@ -259,6 +259,7 @@ describe('GroupTestFlow', () => {
         let resolveSequence;
         const sequencePromise = new Promise(resolve => { resolveSequence = resolve; });
         vi.spyOn(InstructionSequenceRunner.prototype, 'run').mockReturnValue(sequencePromise);
+
         const skipSpy = vi.spyOn(InstructionSequenceRunner.prototype, 'skip');
         const skipAllSpy = vi.spyOn(InstructionSequenceRunner.prototype, 'skipToEnd');
     
@@ -457,7 +458,7 @@ describe('GroupTestFlow', () => {
         const firstQuestionTitle = view.questionTitle();
 
         vi.runAllTimers();
-        expect(view.domElements.reminderSoundEl.play).toHaveBeenCalled();
+        expect(view.domElements.playSound).toHaveBeenCalled();
     });
 
     it("Let first question time out", () => {
@@ -857,6 +858,7 @@ describe('GroupTestFlow', () => {
         view.setPart(0);
         view.showQuestion(true, 0);
         expect(domElements.setStudentHeader).toHaveBeenCalledWith('<i class="ph ph-ear"></i>');
+        expect(view.runInstructions).toHaveBeenCalledWith(true);
 
     });
 

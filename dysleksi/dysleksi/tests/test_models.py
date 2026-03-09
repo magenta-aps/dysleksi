@@ -170,7 +170,6 @@ class TestTestAssignment(DysleksiTest):
 
 
 class TestTestResponse(DysleksiTest):
-
     def test_str(self):
         test = Test.objects.create(name="Test")
         assignment = TestAssignment.objects.create(
@@ -345,6 +344,9 @@ class TestTest(DysleksiTest):
 
         self.assertEqual(question_model.challenge.name, question_json["challenge_name"])
         self.assertEqual(
+            question_model.reminder_source.url, question_json["reminderSource"]
+        )
+        self.assertEqual(
             (
                 question_model.challenge.image.url
                 if question_model.challenge.image
@@ -409,7 +411,6 @@ class TestTest(DysleksiTest):
 
 
 class TestMessage(DysleksiTest):
-
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -619,7 +620,6 @@ class TestMessage(DysleksiTest):
 
 
 class TestInstructionSequence(DysleksiTest):
-
     def test_str(self):
         seq = InstructionSequence.objects.create(question=self.question1)
 
@@ -662,9 +662,7 @@ class TestInstructionSequence(DysleksiTest):
 
 
 class TestInstruction(DysleksiTest):
-
     def test_str(self):
-
         seq = InstructionSequence.objects.create(question=self.question1)
 
         instr = Instruction.objects.create(

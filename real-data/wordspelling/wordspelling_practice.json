@@ -513,14 +513,16 @@
     "sound": "wordspelling/Øveopgave/ulu.wav",
     "question_type": "free_text",
     "correct": "ulu",
-    "reminder": 20000
+    "reminder": 20000,
+    "reminder_source": "wordspelling/Øveopgave/6c.2a.wav"
   },
   // 6d
   {
     "sound": "wordspelling/Øveopgave/matu.wav",
     "question_type": "free_text",
     "correct": "matu",
-    "reminder": 20000
+    "reminder": 20000,
+    "reminder_source": "wordspelling/Øveopgave/6c.2a.wav"
   },
   {
     "question_type": "no_input_required",

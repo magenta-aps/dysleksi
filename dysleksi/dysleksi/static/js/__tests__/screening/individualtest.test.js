@@ -228,7 +228,7 @@ describe("IndividualTestFlow", () => {
         test.parts[0].timeout = 0;
         test.parts[0].questions[0].reminder = 5000;
         // Mock audio play
-        view.domElements.reminderSoundEl.play = vi.fn();
+        view.domElements.playSound = vi.fn();
         testSpy(view);
         view.setPart(0)
         const part = view.currentPart;
@@ -237,7 +237,7 @@ describe("IndividualTestFlow", () => {
         const firstQuestionTitle = view.questionTitle();
 
         vi.runAllTimers();
-        expect(view.domElements.reminderSoundEl.play).toHaveBeenCalled();
+        expect(view.domElements.playSound).toHaveBeenCalled();
     });
 
     it("question.feedback triggers teacherFeedback(correct)", () => {
@@ -509,8 +509,7 @@ describe("IndividualTestFlow", () => {
     
         vi.advanceTimersByTime(3000);
     
-        expect(view.domElements.reminderSoundEl.currentTime).toBe(0);
-        expect(view.domElements.reminderSoundEl.play).toHaveBeenCalled();
+        expect(view.domElements.playSound).toHaveBeenCalled();
         vi.useRealTimers();
     });
 
@@ -563,6 +562,18 @@ describe("IndividualTestFlow", () => {
         capturedRepeatCallback();
         expect(repeatSpy).toHaveBeenCalled();
     });
+
+    it("Show instructions", () => {
+        const test = new Test(individualTestData);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        testSpy(view);
+        view.setPart(0);
+        view.showQuestion(true, 0);
+        expect(domElements.setStudentHeader).toHaveBeenCalledWith('<i class="ph ph-ear"></i>');
+        expect(view.runInstructions).toHaveBeenCalledWith(false);
+
+    });
+
 
 });
 

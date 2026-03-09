@@ -1,6 +1,5 @@
 import { shuffleArray } from "../utils.js";
 import { StudentTestView } from "../student-test.js";
-import { InstructionSequenceRunner } from "../instruction.js";
 import { calculateStudentProgress } from '../utils.js';
 
 export class GroupTestView extends StudentTestView {
@@ -42,14 +41,7 @@ export class GroupTestView extends StudentTestView {
             console.log("---------------------------------------------")
             console.log("Showing question " + this.currentPartIndex+"."+this.currentQuestionIndex, "(practicing=",isPracticing,")", "type:", this.currentQuestion.type, this.currentQuestion);
 
-            if (this.currentQuestion.instruction_sequence) {
-                this.domElements.setStudentHeader('<i class="ph ph-ear"></i>');
-            } else if (this.isPracticing) {
-                this.domElements.setStudentHeader('<i class="ph ph-pencil-line"></i>');
-            } else {
-                this.domElements.hideStudentHeader();
-            }
-
+            this.setStudentHeader();
             this.domElements.toggleRepeatButton(false);
             this.domElements.toggleNextButton(false);
 
@@ -87,66 +79,9 @@ export class GroupTestView extends StudentTestView {
             }
 
             if (this.currentQuestion.instruction_sequence){
-                console.log("---------------------------------------------")
-                console.log("Starting instruction sequence: ", this.currentQuestion.instruction_sequence);
-                this.showingInstructions = true;
-                this.updateNextButtonClass();
-                this.domElements.lockInput();
-                this.domElements.toggleBodyClass("show-instructions", true);
-
-                const instructionRunner = new InstructionSequenceRunner(
-                    this,
-                    this.currentQuestion.instruction_sequence.instructions,
-                    this.domElements,
-                    this.audioContext
-                );
-
-                if (this.domElements.skipInstructionButton) {
-                    this.domElements.skipInstructionButton.addEventListener("click", () => {
-                        instructionRunner.skip();
-                    });
-                    this.domElements.skipAllInstructionsButton.addEventListener("click", () => {
-                        instructionRunner.skipToEnd();
-                    });
-                    this.domElements.skipInstructionButton.style.display="block";
-                    this.domElements.skipAllInstructionsButton.style.display="block";
-                }
-
-                instructionRunner.run().then(() => {
-                    this.domElements.unlockInput();
-                    this.showingInstructions = false;
-                    if (this.domElements.skipInstructionButton) {
-                        this.domElements.skipInstructionButton.style.display="none";
-                        this.domElements.skipAllInstructionsButton.style.display="none";
-                    }
-
-                    // Hide question challenge and choices when instruction sequence is over
-                    this.domElements.toggleQuestionDisplay("none");
-
-                    this.updateNextButtonClass();
-                });
+                this.runInstructions(true);
             } else {
-                this.domElements.toggleBodyClass("show-instructions", false);
-                if (Number(this.currentQuestion.timeout) > 1) {
-                    if (this.questionTimeoutId) {
-                        clearTimeout(this.questionTimeoutId);
-                        this.questionTimeoutId = null;
-                    }
-                    this.questionTimeoutId = setTimeout(() => {
-                        this.onQuestionComplete(this.currentQuestion, true);
-                    }, this.currentQuestion.timeout);
-                }
-                if (Number(this.currentQuestion.reminder) > 1) {
-                    if (this.questionReminderId) {
-                        clearTimeout(this.questionReminderId);
-                        this.questionReminderId = null;
-                    }
-                    this.questionReminderId = setTimeout(() => {
-                        this.domElements.reminderSoundEl.currentTime = 0;
-                        this.domElements.reminderSoundEl.play();
-                    }, this.currentQuestion.reminder);
-                }
-                this.domElements.toggleNextButton(false);
+                this.setupNonPractice();
 
                 // If question challenge has a sound, it also has a play button
                 // "Click" the play button to play the sound immediately, as well as
@@ -156,7 +91,6 @@ export class GroupTestView extends StudentTestView {
                     domEls.playBtn.click();
                 }
             }
-
             this.questionDisplayedAt = document.timeline.currentTime;
             if (!this.isPracticing) {
                 this.send({

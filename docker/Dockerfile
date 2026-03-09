@@ -35,8 +35,11 @@ COPY ./docker/postgresql.gpg /etc/apt/trusted.gpg.d/postgresql.gpg
 RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list' && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-        gettext graphviz libxmlsec1-dev xmlsec1 libssl-dev libsasl2-dev postgresql-client-common postgresql-client-16 logrotate && \
-    apt-get clean && rm -rf /var/lib/apt/lists/*
+        gettext graphviz libxmlsec1-dev xmlsec1 libssl-dev libsasl2-dev postgresql-client-common postgresql-client-16 logrotate locales && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* && \
+    sed -i '/en_GB.UTF-8/s/^# //g' /etc/locale.gen && \
+    locale-gen en_GB.UTF-8 && \
+    update-locale LANG=en_GB.UTF-8
 
 COPY requirements.txt /app/requirements.txt
 COPY mypy.ini /app/mypy.ini
@@ -46,6 +49,9 @@ RUN pip install --no-cache-dir -r /app/requirements.txt
 
 ARG COMMIT_TAG
 ENV COMMIT_TAG=${COMMIT_TAG:-HEAD}
+ENV LANG=en_GB.UTF-8
+ENV LANGUAGE=en_GB:en
+ENV LC_ALL=en_GB.UTF-8
 
 COPY ./docker/entrypoint.sh /entrypoint.sh
 COPY --chown=dysleksi:dysleksi ./dysleksi /app

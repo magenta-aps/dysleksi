@@ -7,6 +7,7 @@ from base64 import b64decode
 from datetime import date
 from typing import Any, Dict, List
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
@@ -257,8 +258,13 @@ class Test(models.Model):
                             else None
                         ),
                         "reminder": question.reminder,
+                        "reminderSource": str(
+                            settings.REMINDER_FALLBACK  # type: ignore
+                        ),
                         "timeout": question.timeout,
                     }
+                    if question.reminder_source:
+                        question_data["reminderSource"] = question.reminder_source.url
                     if question.challenge:
                         question_data.update(
                             {
@@ -388,45 +394,48 @@ class TestPart(models.Model):
     timeout = models.PositiveIntegerField(blank=False, null=False)
     partial_score_after = models.PositiveIntegerField(blank=False, null=False)
     reminder = models.PositiveIntegerField(blank=False, null=False, default=0)
+    reminder_source = models.ForeignKey(
+        TestResource,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name="reminder_testpart",
+    )
 
     def __str__(self) -> str:
         return self.name
 
     def create_test_resources(self, questions_data, is_practice=False):
-
         for data in questions_data:
-            # Challenge resource (image)
+            # Initialize new dict to avoid carry-over from previous question
+            question = {"part": self, "is_practice": is_practice}
 
+            # Challenge resource (image)
             test_resource_kwargs = {"name": "challenge"}
             test_resource_kwargs["image"] = data.get("image", None)
             test_resource_kwargs["sound"] = data.get("sound", None)
             test_resource_kwargs["text"] = data.get("text", None)
             if "image" in data or "sound" in data or "text" in data:
-                challenge_resource, created = TestResource.objects.get_or_create(
+                question["challenge"], created = TestResource.objects.get_or_create(
                     **test_resource_kwargs
                 )
             else:
-                challenge_resource = None
+                question["challenge"] = None
 
-            question_type = data.get("question_type", QuestionType.NO_INPUT_REQUIRED)
-
-            if "reminder" in data and not is_practice:
-                question_reminder = data["reminder"]
-            else:
-                question_reminder = self.reminder
-            if "timeout" in data and not is_practice:
-                question_timeout = data["timeout"]
-            else:
-                question_timeout = 0
-
-            question = TestQuestion.objects.create(
-                part=self,
-                challenge=challenge_resource,
-                is_practice=is_practice,
-                question_type=question_type,
-                timeout=question_timeout,
-                reminder=question_reminder,
+            question["question_type"] = data.get(
+                "question_type", QuestionType.NO_INPUT_REQUIRED
             )
+            question["reminder"] = data.get("reminder", self.reminder)
+            question_reminder_source = data.get("reminder_source", self.reminder_source)
+            question["reminder_source"], _ = TestResource.objects.get_or_create(
+                name=question_reminder_source, sound=question_reminder_source
+            )
+            if "timeout" in data and not is_practice:
+                question["timeout"] = data["timeout"]
+            else:
+                question["timeout"] = 0
+
+            question = TestQuestion.objects.create(**question)
 
             if is_practice and "instruction_sequence" in data:
                 question.create_instruction_sequence(data["instruction_sequence"])
@@ -483,6 +492,13 @@ class TestQuestion(models.Model):
     )
     timeout = models.PositiveIntegerField(blank=False, null=False, default=0)
     reminder = models.PositiveIntegerField(blank=False, null=False, default=0)
+    reminder_source = models.ForeignKey(
+        TestResource,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name="reminder_testquestion",
+    )
 
     def __str__(self) -> str:
         return f"{str(self.part)} / {self.pk}"
