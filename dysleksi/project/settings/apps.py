@@ -19,12 +19,10 @@ INSTALLED_APPS = [
     "login",
     "django_mitid_auth",
     "compressor",
-    "crispy_forms",
     "csp_helpers",
     "two_factor",
     "django_bootstrap5",
     "django_tables2",
-    "django_filters",
     "mitid_test",
     "dysleksi",
 ]
