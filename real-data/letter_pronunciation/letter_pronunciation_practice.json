@@ -120,9 +120,8 @@
     "text": "C",
     "correct": null,
     "wrong": [],
-    // TODO: Reminder lyd afspilles ikke
     "reminder": 5000,
-    "reminderSource": "letter_pronunciation/Øveopgave1/9c.4a.wav"
+    "reminder_source": "letter_pronunciation/Øveopgave1/9c.4a.wav"
   },
   {
     "question_type": "no_input_required",
@@ -130,7 +129,7 @@
     "correct": null,
     "wrong": [],
     "reminder": 5000,
-    "reminderSource": "letter_pronunciation/Øveopgave1/9d.3.wav"
+    "reminder_source": "letter_pronunciation/Øveopgave2/9d.2.wav"
   },
   {
     "question_type": "no_input_required",

@@ -99,6 +99,7 @@ export class Question {
     domElements;
     instruction_sequence;
     reminder;
+    reminderSource;
     timeout;
 
     constructor(data, part, index) {
@@ -116,6 +117,7 @@ export class Question {
         this.possibleAnswers = data.possible_answers.map(dataItem => new answerClass(dataItem, this));
         this.instruction_sequence = data.instruction_sequence;
         this.reminder = data.reminder;
+        this.reminderSource = data.reminderSource;
         this.timeout = data.timeout;
     }
 

@@ -1,3 +1,4 @@
+import { InstructionSequenceRunner } from "./instruction.js";
 import { requestWakeLock } from "./utils.js";
 import { releaseWakeLock } from "./utils.js";
 import { unlockAudioOnGesture } from './utils.js';
@@ -265,4 +266,77 @@ export class StudentTestView extends EventTarget {
         );
     }
 
+    setStudentHeader() {
+        if (this.currentQuestion.instruction_sequence) {
+            this.domElements.setStudentHeader('<i class="ph ph-ear"></i>');
+        } else if (this.isPracticing) {
+            this.domElements.setStudentHeader('<i class="ph ph-pencil-line"></i>');
+        } else {
+            this.domElements.hideStudentHeader();
+        }
+    }
+
+    runInstructions(group) {
+        console.log("---------------------------------------------")
+        console.log("Starting instruction sequence: ", this.currentQuestion.instruction_sequence);
+        this.showingInstructions = true;
+        this.updateNextButtonClass();
+        this.domElements.lockInput();
+        this.domElements.toggleBodyClass("show-instructions", true);
+
+        const instructionRunner = new InstructionSequenceRunner(
+            this,
+            this.currentQuestion.instruction_sequence.instructions,
+            this.domElements,
+            this.audioContext
+        );
+
+        if (this.domElements.skipInstructionButton) {
+            this.domElements.skipInstructionButton.addEventListener("click", () => {
+                instructionRunner.skip();
+            });
+            this.domElements.skipAllInstructionsButton.addEventListener("click", () => {
+                instructionRunner.skipToEnd();
+            });
+            this.domElements.skipInstructionButton.style.display="block";
+            this.domElements.skipAllInstructionsButton.style.display="block";
+        }
+
+        instructionRunner.run().then(() => {
+            this.domElements.unlockInput();
+            if (this.domElements.skipInstructionButton) {
+                this.domElements.skipInstructionButton.style.display="none";
+                this.domElements.skipAllInstructionsButton.style.display="none";
+            }
+            this.updateNextButtonClass();
+            if (group) {
+                this.domElements.toggleQuestionDisplay("none");
+            }
+        });
+
+    }
+
+    setupNonPractice() {
+        this.domElements.toggleBodyClass("show-instructions", false);
+        if (Number(this.currentQuestion.timeout) > 1) {
+            if (this.questionTimeoutId) {
+                clearTimeout(this.questionTimeoutId);
+                this.questionTimeoutId = null;
+            }
+            this.questionTimeoutId = setTimeout(() => {
+                this.onQuestionComplete(this.currentQuestion, true);
+            }, this.currentQuestion.timeout);
+        }
+        if (Number(this.currentQuestion.reminder) > 1) {
+            if (this.questionReminderId) {
+                clearTimeout(this.questionReminderId);
+                this.questionReminderId = null;
+            }
+            this.questionReminderId = setTimeout(() => {
+                let currentSource = null;
+                this.domElements.playSound(this.currentQuestion.reminderSource, currentSource, this.audioContext);
+            }, this.currentQuestion.reminder);
+        }
+        this.domElements.toggleNextButton(false);
+    }
 }

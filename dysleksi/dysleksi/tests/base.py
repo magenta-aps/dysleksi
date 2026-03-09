@@ -103,6 +103,8 @@ class DysleksiTest(TestCase):
         cls.question1 = TestQuestion.objects.create(
             part=cls.part,
             challenge=cls.resource1,
+            reminder=5000,
+            reminder_source=cls.resource4,
         )
 
         cls.possible_correct_answer1 = PossibleAnswer.objects.create(

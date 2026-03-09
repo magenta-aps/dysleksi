@@ -4,12 +4,16 @@
 
 from django.utils.translation import gettext_lazy as _
 
-from dysleksi.models import TestPart
+from dysleksi.models import TestPart, TestResource
 
 
 def create_wordreading_2_test(
     test, questions_data, practice_questions_data=None, name="Ordlæsning 2"
 ):
+    reminder, created = TestResource.objects.get_or_create(
+        name="wordreading_2/Deltests/7e.1.wav",
+        sound="wordreading_2/Deltests/7e.1.wav",
+    )
     part, created = TestPart.objects.get_or_create(
         name=name,
         defaults={
@@ -18,6 +22,7 @@ def create_wordreading_2_test(
             "intro": _("Vælg det rigtige ord, der passer til billedet."),
             "reminder": 20000,  # 20 seconds
             "image_url": "/static/images/wordreading.png",
+            "reminder_source": reminder,
         },
     )
     if created:
@@ -30,6 +35,11 @@ def create_wordreading_2_test(
 def create_wordspelling_test(
     test, questions_data, practice_questions_data=None, name="Ordstavning"
 ):
+    reminder, created = TestResource.objects.get_or_create(
+        name="wordspelling/Øveopgave/6e.1.wav",
+        sound="wordspelling/Øveopgave/6e.1.wav",
+    )
+
     part, created = TestPart.objects.get_or_create(
         name=name,
         defaults={
@@ -37,6 +47,7 @@ def create_wordspelling_test(
             "partial_score_after": 0,  # no partial score (?)
             "intro": _("Stav ordet som du hører."),
             "image_url": "/static/images/wordspelling.png",
+            "reminder_source": reminder,
         },
     )
     if created:
@@ -49,6 +60,11 @@ def create_wordspelling_test(
 def create_letter_pronunciation_test(
     test, questions_data, practice_questions_data=None, name="Bogstavbenævnelse"
 ):
+    reminder, created = TestResource.objects.get_or_create(
+        name="letter_pronunciation/Deltests/9e.1.wav",
+        sound="letter_pronunciation/Deltests/9e.1.wav",
+    )
+
     part, created = TestPart.objects.get_or_create(
         name=name,
         defaults={
@@ -56,6 +72,7 @@ def create_letter_pronunciation_test(
             "partial_score_after": 30000,
             "intro": _("Sig bogstavet på skærmen højt"),
             "image_url": "/static/images/letter_pronunciation.png",
+            "reminder_source": reminder,
         },
     )
     if created:  # pragma: no branch
