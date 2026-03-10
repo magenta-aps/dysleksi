@@ -65,10 +65,10 @@ export class StudentCard {
 
     toggleFold(e) {
         if (e.target.closest(".folded-area")) return;
-        
+
         const isHidden = this.foldedArea.style.display === "none";
         this.foldedArea.style.display = isHidden ? "flex" : "none";
-        
+
         this.arrowIcon.className = isHidden
             ? "ph-fill ph-caret-down"
             : "ph-fill ph-caret-up";
@@ -76,7 +76,7 @@ export class StudentCard {
 
     update() {
         this.progressFill.style.width = `${this.student.progress}%`;
-        
+
         // Synchronize dots
         this.foldedArea.innerHTML = '';
         this.student.results.forEach(isCorrect => {
@@ -112,6 +112,7 @@ export class GroupTestContainer {
         }
 
         student.progress = studentData.progress;
+
         if ("correct" in data) {
             student.addResult(data.correct);
         }
@@ -229,10 +230,20 @@ export class QuestionView {
     containerElement;
     titleElement;
     contentElement;
-    constructor(containerSelector="#question-container", titleSelector = '#question-title', contentSelector = '#question-content') {
+    constructor(
+        containerSelector="#question-container",
+        titleSelector = '#question-title',
+        contentSelector = '#question-content',
+        partNameSelector = null,
+        partIndicatorSelector = null,
+        questionIndicatorSelector = null,
+    ) {
         this.containerElement = document.querySelector(containerSelector);
         this.titleElement = document.querySelector(titleSelector);
         this.contentElement = document.querySelector(contentSelector);
+        this.partName = document.querySelector(partNameSelector);
+        this.partIndicator = document.querySelector(partIndicatorSelector);
+        this.questionIndicator = document.querySelector(questionIndicatorSelector);
     }
 
     show() {
@@ -271,6 +282,24 @@ export class QuestionView {
             }
         }
     }
+
+    updatePartName(name) {
+        if (this.partName !== null) {
+            this.partName.innerText = name;
+        }
+    }
+
+    updatePartIndicator(text) {
+        if (this.partIndicator !== null) {
+            this.partIndicator.innerText = text;
+        }
+    }
+
+    updateQuestionIndicator(text) {
+        if (this.questionIndicator !== null) {
+            this.questionIndicator.innerText = text;
+        }
+    }
 }
 
 export class TeacherView {
@@ -306,6 +335,8 @@ export class TeacherView {
         this.validatePartIndex(partIndex);
         this.partIndex = partIndex;
         this.currentPart = this.test.parts[partIndex];
+        this.questionView.updatePartName(this.currentPart.name);
+        this.questionView.updatePartIndicator(`Deltest ${this.partIndex + 1} af ${this.test.parts.length}`);
     }
 
     validateQuestionIndex(questionIndex, practice) {
@@ -320,11 +351,55 @@ export class TeacherView {
     setQuestionIndex(questionIndex, practice) {
         this.validateQuestionIndex(questionIndex, practice);
         this.questionIndex = questionIndex;
+
+        let label;
+        let total;
+        let current;
+        const counts = this.getPracticeQuestionCounts();
+        const clamp = (number, min, max) => {
+            return Math.max(min, Math.min(number, max));
+        }
+
         if (practice) {
             this.currentQuestion = this.currentPart.practice[questionIndex];
+            const instructionSequence = this.currentQuestion.instruction_sequence;
+            if (instructionSequence !== null && instructionSequence !== undefined) {
+                label = "Instruktion";
+                total = counts.instructions;
+                current = clamp(
+                    this.questionIndex + counts.instructions - counts.nonInstructions, 1, total
+                );
+            } else {
+                label = "Øveopgave";
+                total = counts.nonInstructions;
+                current = clamp(
+                    this.questionIndex + counts.nonInstructions - counts.instructions, 1, total
+                );
+            }
         } else {
             this.currentQuestion = this.currentPart.questions[questionIndex];
+            label = "Opgave";
+            total = this.currentPart.questions.length;
+            current = this.questionIndex + 1;
         }
+
+        this.questionView.updateQuestionIndicator(`${label} ${current} af ${total}`);
+        this.questionView.updatePartName(this.currentPart.name);
+        this.questionView.updatePartIndicator(`Deltest ${this.partIndex + 1} af ${this.test.parts.length}`);
+    }
+
+    getPracticeQuestionCounts() {
+        let instructions = 0;
+        let nonInstructions = 0;
+        for (const practice of this.currentPart.practice) {
+            const instructionSequence = practice.instruction_sequence;
+            if (instructionSequence !== null && instructionSequence !== undefined) {
+                instructions++;
+            } else {
+                nonInstructions++;
+            }
+        }
+        return { instructions: instructions, nonInstructions: nonInstructions };
     }
 
     _initSocket() {

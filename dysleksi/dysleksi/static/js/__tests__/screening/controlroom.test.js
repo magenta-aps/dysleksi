@@ -115,17 +115,20 @@ describe("TeacherView", () => {
         };
         wsGetter = vi.fn().mockReturnValue(socket);
         document.body.innerHTML = `
-                <div id="question-container">
+            <div id="question-container">
                 <h1 id="question-title"></h1>
                 <div id="question-content"></div>
-                </div>
-                <table id="events"><tbody></tbody></table>
-                <button id="correct"></button>
-                <button id="wrong"></button>
-                <button id="cancelled"></button>
-                <button id="skipped"></button>
-                <button id="next"></button>
-                <textarea id="note" class="d-none"></textarea>
+                <div id="part-name"></div>
+                <div id="part-number"></div>
+                <div id="question-number"></div>
+            </div>
+            <table id="events"><tbody></tbody></table>
+            <button id="correct"></button>
+            <button id="wrong"></button>
+            <button id="cancelled"></button>
+            <button id="skipped"></button>
+            <button id="next"></button>
+            <textarea id="note" class="d-none"></textarea>
         `;
         table = new EventTable();
         buttons = new ActionButtons();
@@ -168,11 +171,11 @@ describe("TeacherView", () => {
 
     it("updates indices but does not enable buttons when event is 'question.answered'", () => {
         view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
-    
+
         // 1. Setup: Ensure buttons are currently disabled
         buttons.disableButtons();
         const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
-    
+
         // 2. Trigger 'question.answered'
         // This hits the outer IF but fails the 'question.displayed' IF
         handler({
@@ -184,12 +187,12 @@ describe("TeacherView", () => {
                 answeredAt: "10:00:05"
             }),
         });
-    
+
         // 3. Assertions
         // Indices should be updated
         expect(view.partIndex).toBe(0);
         expect(view.questionIndex).toBe(0);
-    
+
         // Buttons should REMAIN disabled (because the 'question.displayed' block was skipped)
         const btn = document.querySelector("#correct");
         expect(btn.classList.contains("disabled")).toBe(true);
@@ -215,14 +218,14 @@ describe("TeacherView", () => {
     it("throws an error when an out-of-bounds practice question index is received", () => {
         // Initialize view with individualTest data
         view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
-    
+
         // Get the message handler from the mock socket
         const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
-    
-        // We set practice: true, but provide an index (e.g., 99) that 
+
+        // We set practice: true, but provide an index (e.g., 99) that
         // exceeds the practice array length for part 0
         const invalidPracticeIndex = 99;
-    
+
         expect(() => {
             handler({
                 data: JSON.stringify({
@@ -237,24 +240,76 @@ describe("TeacherView", () => {
 
     it("sets the currentQuestion from the practice array when practice is true", () => {
         view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
-    
+
         // 1. Set the part index so we have a context for questions
         view.setPartIndex(0);
-    
+
         // 2. Call setQuestionIndex with practice = true
         // We assume individualTest.parts[0].practice[0] exists in your JSON
         const practiceIndex = 0;
         view.setQuestionIndex(practiceIndex, true);
-    
+
         // 3. Assertions
         const expectedPracticeQuestion = individualTest.parts[0].practice[practiceIndex];
-        
+
         expect(view.questionIndex).toBe(practiceIndex);
         expect(view.currentQuestion).toBe(expectedPracticeQuestion);
-        
+
         // Verify it didn't accidentally take the standard question at that index
         const standardQuestion = individualTest.parts[0].questions[practiceIndex];
         expect(view.currentQuestion).not.toBe(standardQuestion);
+    });
+
+    it("updates part name, part number and question number when question changes", () => {
+        // Arrange
+        const partName = document.getElementById("part-name");
+        const partNumber = document.getElementById("part-number");
+        const questionNumber = document.getElementById("question-number");
+        const thisQuestionView = new QuestionView(
+            "#question-container",
+            "#question-title",
+            "#question-content",
+            "#part-name",
+            "#part-number",
+            "#question-number",
+        );
+        view = new TeacherView(
+            "room1",
+            individualTest,
+            1,
+            wsGetter,
+            table,
+            buttons,
+            note,
+            thisQuestionView,
+        );
+
+        // Act: go to another part
+        view.setPartIndex(0);
+        // Assert
+        expect(partName.innerText).toBe(view.test.parts[0].name);
+        expect(partNumber.innerText).toBe("Deltest 1 af 1");
+
+        // Act: go to instruction question
+        view.setQuestionIndex(0, true);
+        // Assert
+        expect(partName.innerText).toBe(view.test.parts[0].name);
+        expect(partNumber.innerText).toBe("Deltest 1 af 1");
+        expect(questionNumber.innerText).toBe("Instruktion 1 af 1");
+
+        // Act: go to practice question
+        view.setQuestionIndex(1, true);
+        // Assert
+        expect(partName.innerText).toBe(view.test.parts[0].name);
+        expect(partNumber.innerText).toBe("Deltest 1 af 1");
+        expect(questionNumber.innerText).toBe("Øveopgave 1 af 1");
+
+        // Act: go to real question
+        view.setQuestionIndex(0, false);
+        // Assert
+        expect(partName.innerText).toBe(view.test.parts[0].name);
+        expect(partNumber.innerText).toBe("Deltest 1 af 1");
+        expect(questionNumber.innerText).toBe("Opgave 1 af 3");
     });
 
     it("initializes socket and button listeners", () => {
@@ -556,8 +611,8 @@ describe("GroupTestContainer", () => {
             student: { id: 5, firstName: "Eve", lastName: "Online", progress: 20 },
         };
         instance.updateData(studentData);
-    
-        const card = instance.cards.get(5)
+
+        const card = instance.cards.get(5);
         const folded = card.el.querySelector(".folded-area");
         const nameSpan = card.el.querySelector(".student-text");
 
@@ -575,8 +630,8 @@ describe("GroupTestContainer", () => {
             student: { id: 6, firstName: "Frank", lastName: "Castle", progress: 10 },
         };
         instance.updateData(studentData);
-    
-        const card = instance.cards.get(6)
+
+        const card = instance.cards.get(6);
         const folded = card.el.querySelector(".folded-area");
 
         // Force to 'none'
@@ -592,21 +647,21 @@ describe("GroupTestContainer", () => {
 
     it("returns early and does not throw if container is null", () => {
         // 1. Setup: Clear the body so document.querySelector(".group-test-body") returns null
-        document.body.innerHTML = ""; 
-    
+        document.body.innerHTML = "";
+
         // 2. Initialize: The constructor will set this.container to null
         const nullInstance = new GroupTestContainer();
         expect(nullInstance.container).toBeNull();
-    
+
         const studentData = {
             student: { id: 99, firstName: "Ghost", lastName: "User", progress: 0 },
         };
-    
+
         // 3. Act & Assert: Should return early without attempting to query or create elements
         expect(() => {
             nullInstance.updateData(studentData);
         }).not.toThrow();
-    
+
         // Verify no cards were accidentally created in the body
         expect(document.querySelectorAll(".student-card").length).toBe(0);
     });
@@ -691,20 +746,20 @@ describe("GroupTestContainer", () => {
             student: { id: 4, firstName: "Diana", lastName: "Prince", progress: 100 },
         };
         instance.updateData(studentData);
-    
-        const card = instance.cards.get(4)
+
+        const card = instance.cards.get(4);
         const folded = card.el.querySelector(".folded-area");
         const arrowSpan = card.el.querySelector(".foldout-arrow");
-    
+
         // Initially folded
         expect(folded.style.display === "" || folded.style.display === "none").toBe(true);
         const initialArrowHTML = arrowSpan.innerHTML;
-    
+
         // Click to unfold
         card.el.click();
         expect(folded.style.display).toBe("flex");
         expect(arrowSpan.innerHTML).not.toBe(initialArrowHTML);
-    
+
         // Click to fold again
         card.el.click();
         expect(folded.style.display).toBe("none");
@@ -869,10 +924,10 @@ describe("EventTable", () => {
 
     it("returns early and does not throw if eventsEl is null", () => {
         // 1. Setup: Clear the body so document.querySelector returns null
-        document.body.innerHTML = ""; 
-        
+        document.body.innerHTML = "";
+
         table = new EventTable();
-        
+
         // 2. Verify state: eventsEl should be null
         expect(table.eventsEl).toBeNull();
 
@@ -901,7 +956,7 @@ describe("EventTable", () => {
 
         const answerCell = document.querySelector('td:nth-child(3)');
         const audioEl = answerCell.querySelector('audio');
-        
+
         expect(audioEl).not.toBeNull();
         expect(audioEl.src).toBe(data.recordingBase64);
         expect(audioEl.controls).toBe(true);
