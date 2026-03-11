@@ -10,6 +10,20 @@
 {% endblock %}
 
 {% block inner_content %}
+
+<template id="student-card-template">
+    <div class="student-card">
+        <div class="student-top-row">
+            <div class="progress-fill" style="width: 0%"></div>
+            <span class="student-text"></span>
+            <span class="foldout-arrow">
+                <i class="ph-fill ph-caret-up"></i>
+            </span>
+        </div>
+        <div class="folded-area" style="display: none;"></div>
+    </div>
+</template>
+
 <div data-role="teacher"
      data-test-type="{{ test_type }}"
      data-room-name="{{ room_name }}"
