@@ -9,7 +9,7 @@ import * as individual_student from "../../screening/individual/student.js";
 import * as group_teacher from "../../screening/group/teacher.js";
 import * as group_student from "../../screening/group/student.js";
 import { start } from "../../screening";
-
+import { Test } from "../../screening/model.js";
 
 describe("Startup teacher test", () => {
     let socket;
@@ -31,6 +31,7 @@ describe("Startup teacher test", () => {
         initIndividualStudent = vi.spyOn(individual_student, "initStudent").mockImplementation(() => {});
         initGroupTeacher = vi.spyOn(group_teacher, "initTeacher").mockImplementation(() => {});
         initGroupStudent = vi.spyOn(group_student, "initStudent").mockImplementation(() => {});
+        vi.spyOn(Test.prototype, 'preload').mockResolvedValue(new Map());
     });
 
     afterEach(() => {

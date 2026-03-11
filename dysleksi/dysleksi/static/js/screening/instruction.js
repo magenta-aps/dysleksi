@@ -1,3 +1,5 @@
+import { assetCache } from "./cache.js";
+
 export class InstructionSequenceRunner {
 
     constructor(view, instructions, domElements, audioContext) {
@@ -59,7 +61,7 @@ export class InstructionSequenceRunner {
             "Executing",
             action,
             ...(element != null ? ["on element", element] : []),
-            ...(url != null ? ["with url", url] : []),
+            ...(url != null ? ["with url", assetCache.reverseFetch(url)] : []),
             ...(data != null ? ["with data", data] : []),
         );
 

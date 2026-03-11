@@ -1,3 +1,5 @@
+import { assetCache } from "./cache.js";
+
 export class Student {
     id;
     firstName;
@@ -29,12 +31,57 @@ export class Test extends EventTarget {
         if (this.parts.length === 0) {
             throw new Error("Test has no parts");
         }
+        this.preload()
     }
 
     getPartClass() {
         return TestPart;
     }
 
+    async preload() {
+        console.log("Starting Asset preloading...");
+
+        const staticFilesEl = document.getElementById("static_files");
+        const staticFiles = JSON.parse(staticFilesEl.textContent);
+        const tasks = [];
+
+        // Queue Static Files
+        staticFiles.forEach(url => {
+            tasks.push(assetCache.processStaticFile(url));
+        });
+
+        // Queue Test Content
+        for (const part of this.parts) {
+            tasks.push(assetCache.processTestObject(part, 'image'));
+            tasks.push(assetCache.processTestObject(part, 'instructionsUrl'));
+
+            const allQuestions = [...part.questions, ...part.practice];
+            for (const q of allQuestions) {
+                tasks.push(assetCache.processTestObject(q, 'challengeImageUrl'));
+                tasks.push(assetCache.processTestObject(q, 'challengeSoundUrl'));
+
+                for (const a of q.possibleAnswers) {
+                    tasks.push(assetCache.processTestObject(a, 'resourceImageUrl'));
+                    tasks.push(assetCache.processTestObject(a, 'resourceSoundUrl'));
+                }
+
+                for (const inst of q.instruction_sequence?.instructions || []) {
+                    tasks.push(assetCache.processTestObject(inst, 'url'));
+                }
+            }
+        }
+
+        // Execute all downloads in parallel
+        await Promise.all(tasks);
+
+        // Update variables and fonts with blob-urls
+        assetCache.applyCssVariables();
+        assetCache.applyCachedFonts();
+
+        console.log("Preloading successful.");
+
+        return assetCache.map;
+    }
 }
 
 

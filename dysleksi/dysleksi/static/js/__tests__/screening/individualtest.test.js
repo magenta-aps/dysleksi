@@ -68,6 +68,7 @@ describe("IndividualTestFlow", () => {
             stop: vi.fn(),
         };
         vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue({});
+        vi.spyOn(Test.prototype, 'preload').mockResolvedValue(new Map());
 
 
     });

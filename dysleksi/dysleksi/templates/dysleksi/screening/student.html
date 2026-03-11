@@ -6,6 +6,7 @@
 {{ block.super }}
 {{ test_contents|json_script:"test_contents" }}
 {{ assignment|json_script:"assignment" }}
+{{ static_files|json_script:"static_files" }}
 <script type="module" src="{% static 'js/screening/index.js' %}"></script>
 {% endblock %}
 

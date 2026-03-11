@@ -95,6 +95,8 @@ describe('GroupTestFlow', () => {
     
         // 2. Return this mock instead of an empty object
         vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(mockAudioContext);
+
+        vi.spyOn(Test.prototype, 'preload').mockResolvedValue(new Map());
     });
 
     afterEach(() => {
@@ -889,6 +891,7 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
 
         domElements = new GroupTestDomElements();
         listenerMock = vi.fn();
+        vi.spyOn(Test.prototype, 'preload').mockResolvedValue(new Map());
     });
 
 
@@ -1182,6 +1185,7 @@ describe("GroupTestDomElements - Repeatbutton", () => {
             <button id="repeat"></button>
         `;
         domElements = new GroupTestDomElements();
+        vi.spyOn(Test.prototype, 'preload').mockResolvedValue(new Map());
     });
 
     it("repeat button destination", () => {
