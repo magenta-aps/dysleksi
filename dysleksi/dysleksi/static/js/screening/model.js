@@ -6,11 +6,21 @@ export class Student {
     lastName;
 
     constructor(data) {
-        this.id = data.id
-        this.firstName = data.firstName
-        this.lastName = data.lastName
-        this.progress = 0
+        this.id = data.id;
+        this.firstName = data.firstName;
+        this.lastName = data.lastName;
+        this.progress = 0;
+        this.results = [];
     }
+    get displayName() {
+        const lastInitial = this.lastName ? ` ${this.lastName[0].toUpperCase()}.` : "";
+        return `${this.firstName}${lastInitial}`;
+    }
+
+    addResult(isCorrect) {
+        this.results.push(isCorrect);
+    }
+
 }
 
 export class Test extends EventTarget {

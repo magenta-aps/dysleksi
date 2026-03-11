@@ -1,3 +1,5 @@
+import { Student } from "./model.js";
+
 export class EventTable {
     constructor(tableSelector = 'table#events tbody') {
         this.eventsEl = document.querySelector(tableSelector);
@@ -41,96 +43,83 @@ export class EventTable {
     }
 }
 
+export class StudentCard {
+    constructor(student) {
+        this.student = student;
+        this.el = this._createMarkup();
+        this.foldedArea = this.el.querySelector(".folded-area");
+        this.progressFill = this.el.querySelector(".progress-fill");
+        this.nameText = this.el.querySelector(".student-text");
+        this.arrowIcon = this.el.querySelector(".foldout-arrow i");
+
+        // Initial setup
+        this.nameText.textContent = this.student.displayName;
+        this.el.addEventListener("click", (e) => this.toggleFold(e));
+    }
+
+    _createMarkup() {
+        const template = document.getElementById('student-card-template');
+        const clone = template.content.cloneNode(true);
+        return clone.querySelector('.student-card');
+    }
+
+    toggleFold(e) {
+        if (e.target.closest(".folded-area")) return;
+        
+        const isHidden = this.foldedArea.style.display === "none";
+        this.foldedArea.style.display = isHidden ? "flex" : "none";
+        
+        this.arrowIcon.className = isHidden
+            ? "ph-fill ph-caret-down"
+            : "ph-fill ph-caret-up";
+    }
+
+    update() {
+        this.progressFill.style.width = `${this.student.progress}%`;
+        
+        // Synchronize dots
+        this.foldedArea.innerHTML = '';
+        this.student.results.forEach(isCorrect => {
+            const dot = document.createElement("span");
+            dot.classList.add("dot");
+            dot.style.backgroundColor = isCorrect ? "green" : "red";
+            this.foldedArea.appendChild(dot);
+        });
+    }
+}
+
+
 export class GroupTestContainer {
     constructor() {
         this.container = document.querySelector(".group-test-body");
+        this.students = new Map();
+        this.cards = new Map();
     }
 
     updateData(data) {
-        if (this.container === null) {
-            return;
+        if (!this.container) return;
+
+        const studentData = data.student;
+        let student = this.students.get(studentData.id);
+
+        if (!student) {
+            student = new Student(studentData);
+            this.students.set(student.id, student);
+
+            const card = new StudentCard(student);
+            this.cards.set(student.id, card);
+            this.container.appendChild(card.el);
         }
 
-        const student = data.student;
-
-        // Try to find existing card
-        let el = this.container.querySelector(`[data-student-id='${student.id}']`);
-
-        if (!el) {
-            // Create new card
-            el = document.createElement("div");
-            el.classList.add("student-card");
-            el.dataset.studentId = student.id;
-
-            // --- Top row wrapper (name + progress) ---
-            const topRow = document.createElement("div");
-            topRow.classList.add("student-top-row");
-            el.appendChild(topRow);
-
-            // Progress bar inside top row
-            const fill = document.createElement("div");
-            fill.classList.add("progress-fill");
-            topRow.appendChild(fill);
-
-            // Student name text inside top row
-            const text = document.createElement("span");
-            text.classList.add("student-text");
-            const lastInitial = student.lastName ? student.lastName[0].toUpperCase() : "";
-            if (lastInitial.length > 0){
-                text.textContent = `${student.firstName} ${lastInitial}.`;
-            } else {
-                text.textContent = `${student.firstName}`;
-            }
-
-            topRow.appendChild(text);
-
-            // Folded area container (hidden initially)
-            const folded = document.createElement("div");
-            folded.classList.add("folded-area");
-            el.appendChild(folded);
-
-            // Show/hide folded area arrow
-            const arrow = document.createElement("span");
-            arrow.classList.add("foldout-arrow")
-            arrow.innerHTML = `<i class="ph-fill ph-caret-up"></i>`
-
-            topRow.appendChild(arrow);
-
-            // Click handler to toggle fold
-            el.addEventListener("click", (e) => {
-                // Prevent toggling if clicking inside folded area
-                if (e.target.classList.contains("folded-area")) return;
-
-                const isHidden = folded.style.display === "none" || folded.style.display === "";
-            
-                // Show or hide folded area
-                folded.style.display = isHidden ? "flex" : "none";
-                if (isHidden){
-                    arrow.innerHTML = `<i class="ph-fill ph-caret-down"></i>`
-                } else {
-                    arrow.innerHTML = `<i class="ph-fill ph-caret-up"></i>`
-                }
-            });
-
-            this.container.appendChild(el);
-        }
-
-        // Update progress
-        const fill = el.querySelector(".progress-fill");
-        fill.style.width = `${student.progress}%`;
-
-        // Handle correct/incorrect dots
+        student.progress = studentData.progress;
         if ("correct" in data) {
-            const folded = el.querySelector(".folded-area");
-
-            const dot = document.createElement("span");
-            dot.classList.add("dot");
-            dot.style.backgroundColor = data.correct ? "green" : "red";
-
-            folded.appendChild(dot);
+            student.addResult(data.correct);
         }
+
+        this.cards.get(student.id).update();
     }
 }
+
 
 export class ActionButtons {
     constructor(buttonSelector = 'button') {

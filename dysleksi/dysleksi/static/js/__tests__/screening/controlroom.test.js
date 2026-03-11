@@ -535,6 +535,19 @@ describe("GroupTestContainer", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+            <template id="student-card-template">
+                <div class="student-card">
+                    <div class="student-top-row">
+                        <div class="progress-fill" style="width: 0%"></div>
+                        <span class="student-text"></span>
+                        <span class="foldout-arrow">
+                            <i class="ph-fill ph-caret-up"></i>
+                        </span>
+                    </div>
+                    <div class="folded-area" style="display: none;"></div>
+                </div>
+            </template>
+
             <div class="group-test-body"></div>
         `;
         container = document.querySelector(".group-test-body");
@@ -547,9 +560,9 @@ describe("GroupTestContainer", () => {
         };
         instance.updateData(studentData);
     
-        const card = container.querySelector(".student-card[data-student-id='5']");
-        const folded = card.querySelector(".folded-area");
-        const nameSpan = card.querySelector(".student-text");
+        const card = instance.cards.get(5)
+        const folded = card.el.querySelector(".folded-area");
+        const nameSpan = card.el.querySelector(".student-text");
 
         // Ensure it's hidden initially
         folded.style.display = "none";
@@ -566,8 +579,8 @@ describe("GroupTestContainer", () => {
         };
         instance.updateData(studentData);
     
-        const card = container.querySelector(".student-card[data-student-id='6']");
-        const folded = card.querySelector(".folded-area");
+        const card = instance.cards.get(6)
+        const folded = card.el.querySelector(".folded-area");
 
         // Force to 'none'
         folded.style.display = "none";
@@ -608,16 +621,16 @@ describe("GroupTestContainer", () => {
 
         instance.updateData(studentData);
 
-        const card = container.querySelector(".student-card[data-student-id='1']");
+        const card = instance.cards.get(1)
         expect(card).not.toBeNull();
 
-        const text = card.querySelector(".student-text").textContent;
+        const text = card.el.querySelector(".student-text").textContent;
         expect(text).toBe("Alice S.");
 
-        const fill = card.querySelector(".progress-fill");
+        const fill = card.el.querySelector(".progress-fill");
         expect(fill.style.width).toBe("50%");
 
-        const folded = card.querySelector(".folded-area");
+        const folded = card.el.querySelector(".folded-area");
         expect(folded).not.toBeNull();
     });
 
@@ -628,8 +641,8 @@ describe("GroupTestContainer", () => {
 
         instance.updateData(studentData);
 
-        const card = container.querySelector(".student-card[data-student-id='1']");
-        const text = card.querySelector(".student-text").textContent;
+        const card = instance.cards.get(1)
+        const text = card.el.querySelector(".student-text").textContent;
         expect(text).toBe("Alice");
 
     });
@@ -646,7 +659,8 @@ describe("GroupTestContainer", () => {
         };
         instance.updateData(updatedData);
 
-        const fill = container.querySelector(".student-card[data-student-id='2'] .progress-fill");
+        const card = instance.cards.get(2)
+        const fill = card.el.querySelector(".progress-fill");
         expect(fill.style.width).toBe("80%");
     });
 
@@ -657,7 +671,9 @@ describe("GroupTestContainer", () => {
         };
         instance.updateData(studentData);
 
-        const folded = container.querySelector(".student-card[data-student-id='3'] .folded-area");
+
+        const card = instance.cards.get(3)
+        const folded = card.el.querySelector(".folded-area");
         const dot = folded.querySelector(".dot");
         expect(dot).not.toBeNull();
         expect(dot.style.backgroundColor).toBe("green");
@@ -679,21 +695,21 @@ describe("GroupTestContainer", () => {
         };
         instance.updateData(studentData);
     
-        const card = container.querySelector(".student-card[data-student-id='4']");
-        const folded = card.querySelector(".folded-area");
-        const arrowSpan = card.querySelector(".foldout-arrow");
+        const card = instance.cards.get(4)
+        const folded = card.el.querySelector(".folded-area");
+        const arrowSpan = card.el.querySelector(".foldout-arrow");
     
         // Initially folded
         expect(folded.style.display === "" || folded.style.display === "none").toBe(true);
         const initialArrowHTML = arrowSpan.innerHTML;
     
         // Click to unfold
-        card.click();
+        card.el.click();
         expect(folded.style.display).toBe("flex");
         expect(arrowSpan.innerHTML).not.toBe(initialArrowHTML);
     
         // Click to fold again
-        card.click();
+        card.el.click();
         expect(folded.style.display).toBe("none");
         expect(arrowSpan.innerHTML).toBe(initialArrowHTML);
     });
@@ -771,6 +787,20 @@ describe("TeacherView socket 'test.started' handling", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+
+            <template id="student-card-template">
+                <div class="student-card">
+                    <div class="student-top-row">
+                        <div class="progress-fill" style="width: 0%"></div>
+                        <span class="student-text"></span>
+                        <span class="foldout-arrow">
+                            <i class="ph-fill ph-caret-up"></i>
+                        </span>
+                    </div>
+                    <div class="folded-area" style="display: none;"></div>
+                </div>
+            </template>
+
             <div class="group-test-body"></div>
         `;
 
