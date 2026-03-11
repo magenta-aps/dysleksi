@@ -69,16 +69,6 @@ def create_group_test(
             ),
         )
 
-        # A wordreading 2 test without practice run
-        if not settings.LOAD_REAL_WORDREADING_DATA:  # type:ignore
-            call_command(
-                "import_test",
-                name,
-                "Ordlæsning 2B (dummy)",
-                Path(settings.MEDIA_ROOT) / "dummy/wordreading_2/wordreading_2b.json",
-                "wordreading_2",
-            )
-
         # A wordspelling test with practice run
         call_command(
             "import_test",

@@ -68,7 +68,7 @@
       {
         // Tryk grøn, når du er klar.
         "action": "playSound",
-        "resource": "wordspelling/Indledning/6a.6.wav",
+        "resource": "wordspelling/Indledning/9a.5.wav",
         "delayAfter": 500
       }
     ]
