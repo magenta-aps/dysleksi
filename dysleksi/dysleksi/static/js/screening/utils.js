@@ -161,3 +161,20 @@ export function preventDoubleTapZoom() {
             lastTouchEnd = now;
         }, { passive: false });
     }
+
+
+export async function serverOnline() {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+    try {
+        const response = await fetch('/ping?t=' + Date.now(), {
+            method: 'HEAD',
+            signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+        return response.ok; 
+    } catch (err) {
+        return false;
+    }
+}
