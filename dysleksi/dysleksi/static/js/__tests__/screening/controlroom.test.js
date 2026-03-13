@@ -322,7 +322,7 @@ describe("TeacherView", () => {
     });
 
     it("show question on question.displayed", () => {
-        view = new TeacherView("room1", groupTest, 1, wsGetter, table, buttons, note, questionView);
+        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
 
         questionView.show();
         expect(questionView.containerElement.classList.contains("d-none")).toBe(false)
@@ -339,10 +339,7 @@ describe("TeacherView", () => {
             }),
         });
 
-        expect(questionView.titleElement.textContent).toBe("1/5 (Wordreading 2A (dummy))");
-        expect(
-            questionView.contentElement.getElementsByTagName("img").item(0).attributes.getNamedItem("src").value
-        ).toBe("/media/wordreading_2_dummy/dog.png");
+        expect(questionView.titleElement.textContent).toBe("1/3 (Individuel deltest)");
 
         handler({
             data: JSON.stringify({
@@ -352,10 +349,7 @@ describe("TeacherView", () => {
             }),
         });
 
-        expect(questionView.titleElement.textContent).toBe("2/5 (Wordreading 2A (dummy))");
-        expect(
-            questionView.contentElement.getElementsByTagName("img").item(0).attributes.getNamedItem("src").value
-        ).toBe("/media/wordreading_2_dummy/bike.png");
+        expect(questionView.titleElement.textContent).toBe("2/3 (Individuel deltest)");
     });
 
     it("sends message and disables buttons on click", () => {
@@ -517,6 +511,9 @@ describe("TeacherView", () => {
 
         questionView.showContent("Test content", "/test/image.png");
         expect(container.innerHTML).toBe('<img id="challenge-image" src="/test/image.png"><p id="challenge-text">Test content</p>');
+
+        questionView.showContent("Test content", "/test/image2.png");
+        expect(container.innerHTML).toBe('<img id="challenge-image" src="/test/image2.png"><p id="challenge-text">Test content</p>');
 
         questionView.showContent("Test content");
         expect(container.innerHTML).toBe('<p id="challenge-text">Test content</p>');

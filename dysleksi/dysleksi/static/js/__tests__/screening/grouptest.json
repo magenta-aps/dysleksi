@@ -1,6 +1,7 @@
 {
   "id": 3,
   "name": "Middle 2. grade",
+  "test_type": "group",
   "parts": [
     {
       "id": 5,
