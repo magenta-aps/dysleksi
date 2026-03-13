@@ -7,7 +7,7 @@ import * as wsModule from "../ws.js";
 import {getWebSocket} from "../ws.js";
 import { calculateStudentProgress } from '../screening/utils';
 import { preventDoubleTapZoom } from '../screening/utils';
-import { getCursorIndex } from '../screening/utils';
+import { getCursorIndex, serverOnline } from '../screening/utils';
 
 // Mock getWebSocket
 vi.mock("../ws.js", () => ({
@@ -533,5 +533,71 @@ describe('preventDoubleTapZoom', () => {
         div.dispatchEvent(event2);
 
         expect(event2.preventDefault).not.toHaveBeenCalled();
+    });
+});
+
+
+describe("serverOnline", () => {
+    let dom;
+
+    beforeEach(() => {
+
+        // Clear all mocks and stubs
+        vi.stubGlobal('fetch', vi.fn());
+        vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+    });
+
+    it("returns true when the server responds with ok", async () => {
+        fetch.mockResolvedValue({ ok: true });
+
+        const result = await serverOnline();
+
+        expect(fetch).toHaveBeenCalledWith(
+            expect.stringContaining('/ping?t='),
+            expect.objectContaining({ method: 'HEAD' })
+        );
+        expect(result).toBe(true);
+    });
+
+    it("returns false when the server responds with an error (e.g., 500)", async () => {
+        fetch.mockResolvedValue({ ok: false });
+
+        const result = await serverOnline();
+
+        expect(result).toBe(false);
+    });
+
+    it("returns false when the fetch call throws an error (network down)", async () => {
+        fetch.mockRejectedValue(new Error("Network Error"));
+
+        const result = await serverOnline();
+
+        expect(result).toBe(false);
+    });
+
+    it("returns false and aborts the request when the timeout is reached", async () => {
+        fetch.mockImplementation((url, options) => {
+            return new Promise((_, reject) => {
+                if (options.signal) {
+                    options.signal.addEventListener('abort', () => {
+                        reject(new Error("Aborted"));
+                    });
+                }
+            });
+        });
+    
+        const reachabilityPromise = serverOnline();
+        await vi.advanceTimersByTimeAsync(3000);
+        const result = await reachabilityPromise;
+    
+        expect(result).toBe(false);
+
+        const fetchArgs = fetch.mock.calls[0][1];
+        expect(fetchArgs.signal.aborted).toBe(true);
     });
 });

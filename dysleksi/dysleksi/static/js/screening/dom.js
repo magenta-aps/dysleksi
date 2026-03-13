@@ -1,4 +1,4 @@
-import { getCursorIndex } from './utils.js';
+import { getCursorIndex, serverOnline } from './utils.js';
 import { assetCache } from "./cache.js";
 
 class TestDomElements {
@@ -24,6 +24,8 @@ class TestDomElements {
         this.reminderSoundEl = document.querySelector("#reminder-sound");
         this.testIntro = document.querySelector("#test-intro");
         this.testPartIntro = document.querySelector("#testpart-intro");
+        this.testExit = document.querySelector("#test-exit");
+        this.logOutButton = document.querySelector("#log-out");
         this.testPartIntroText = document.querySelector("#testpart-intro-text");
         this.testPartIntroImage = document.querySelector("#testpart-intro-image");
         this.testSummary = document.querySelector("#test-summary");
@@ -127,6 +129,18 @@ class TestDomElements {
 
     showTestContainer() {
         this.testContainer.style.display = "flex";
+    }
+
+    async showTestExit() {
+        this.testExit.style.display = "flex";
+        this._setButtonListener(this.logOutButton, () => {
+            window.location.href = "/logout";
+        });
+
+        const isOnline = await serverOnline();
+        if (!isOnline) {
+            this.logOutButton.style.visibility = "hidden"
+        }
     }
 
     hideIntro() {

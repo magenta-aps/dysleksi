@@ -25,9 +25,7 @@ export function initStudent(roomName, assignmentId, test) {
             const view = new IndividualTestView(test, chatSocket, roomName, assignmentId, domElements, testMediaRecorder);
 
             view.addEventListener("test.complete", (evt) => {
-                // What to do when the test is completed?
                 chatSocket.close();
-                document.location = "/exit";
             });
             view.start();
         });

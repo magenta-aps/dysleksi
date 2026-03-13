@@ -13,9 +13,7 @@ export function initStudent(roomName, assignmentId, test, student) {
             const view = new GroupTestView(test, chatSocket, roomName, assignmentId, domElements, student);
 
             view.addEventListener("test.complete", (evt) => {
-                // What to do when the test is completed?
                 chatSocket.close();
-                document.location = "/exit";
             });
             view.start()
         } catch (err) {

@@ -2,7 +2,8 @@
  * @vitest-environment jsdom
  */
 import { GroupTestDomElements, IndividualTestDomElements } from "../../screening/dom.js";
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import * as utils from '../../screening/utils.js';
 
 import {spyAttributes} from "../utils.js";
 
@@ -778,4 +779,69 @@ describe("GroupTestDomElements button animations", () => {
     vi.useRealTimers();
   });
 
+});
+
+
+describe("GroupTestDomElements.showTestExit", () => {
+    let dom;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="test-exit" style="display: none"></div>
+            <button id="log-out" style="visibility: visible"></button>
+            <audio id="instructions-sound"></audio>
+            <div id="student-header"></div>
+            <div id="question-challenge"></div>
+            <button id="end-summary"></button>
+            <div id="summary-container"></div>
+            <button id="next"></button>
+            <div id="fade-overlay"></div>
+            <div id="test-intro"></div>
+            <div id="testpart-intro"></div>
+            <div id="testpart-intro-text"></div>
+            <div id="testpart-intro-image"></div>
+            <div id="test-summary"></div>
+            <div id="test-container"></div>
+            <button id="repeat"></button>
+        `;
+        dom = new GroupTestDomElements();
+
+        const originalLocation = window.location;
+        delete window.location;
+        window.location = { ...originalLocation, href: "" };
+
+        vi.spyOn(dom, "_setButtonListener").mockImplementation((btn, listener) => {
+            btn._clickHandler = listener;
+            return btn;
+        });
+    });
+
+    it("should show exit container and keep logout visible when online", async () => {
+        const reachSpy = vi.spyOn(utils, "serverOnline").mockResolvedValue(true);
+
+        await dom.showTestExit();
+
+        expect(dom.testExit.style.display).toBe("flex");
+        expect(dom.logOutButton.style.visibility).not.toBe("hidden");
+        expect(reachSpy).toHaveBeenCalled();
+    });
+
+    it("should hide the logout button when the server is unreachable", async () => {
+        vi.spyOn(utils, "serverOnline").mockResolvedValue(false);
+
+        await dom.showTestExit();
+
+        expect(dom.testExit.style.display).toBe("flex");
+        expect(dom.logOutButton.style.visibility).toBe("hidden");
+    });
+
+    it("should redirect to /logout when clicked", async () => {
+        vi.spyOn(utils, "serverOnline").mockResolvedValue(true);
+
+        await dom.showTestExit();
+
+        dom.logOutButton._clickHandler();
+
+        expect(window.location.href).toBe("/logout");
+    });
 });

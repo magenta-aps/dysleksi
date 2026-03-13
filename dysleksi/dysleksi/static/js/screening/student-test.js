@@ -191,6 +191,8 @@ export class StudentTestView extends EventTarget {
         this.dispatchEvent(new Event("test.complete", {
             test: this.test
         }));
+        this.domElements.hideTestContainer()
+        this.domElements.showTestExit()
     }
 
     // ---- Parts ----
