@@ -17,7 +17,7 @@ psycopg==3.3.3
 channels==4.3.2
 types-channels==4.3.0.20250822
 channels_redis==4.3.0
-uvicorn==0.41.0
+uvicorn==0.42.0
 daphne==4.2.1
 
 ## Serving static files
