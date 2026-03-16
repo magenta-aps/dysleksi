@@ -26,6 +26,7 @@ export class Student {
 export class Test extends EventTarget {
 
     name;
+    testType;
     parts;
     currentPart;
     partIndex;
@@ -33,6 +34,7 @@ export class Test extends EventTarget {
     constructor(data) {
         super()
         this.name = data.name;
+        this.testType = data.test_type;
         this.partIndex = 0;
         this.currentPart = null;
         this.summary = data.summary;

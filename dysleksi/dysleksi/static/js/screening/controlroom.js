@@ -339,7 +339,7 @@ export class TeacherView {
                 this.table.updateTable(data);
             }
 
-            if (["question.answered", "question.displayed"].includes(data.event)) {
+            if (["question.answered", "question.displayed"].includes(data.event) && this.test.testType === 'individual' ) {
                 this.setPartIndex(data.partIndex);
                 this.setQuestionIndex(data.questionIndex, data.practice);
                 if (data.event === 'question.displayed') {

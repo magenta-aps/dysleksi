@@ -1,6 +1,7 @@
 {
   "id": 5,
   "name": "Individuel test",
+  "test_type": "individual",
   "parts": [
     {
       "id": 1,

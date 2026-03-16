@@ -224,6 +224,7 @@ class Test(models.Model):
         test_data: Dict[str, Any] = {
             "id": self.id,
             "name": self.name,
+            "test_type": self.test_type,
             "parts": [],
         }
 
