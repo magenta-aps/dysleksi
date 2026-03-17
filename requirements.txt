@@ -68,7 +68,7 @@ django-redis==6.0.0
 beautifulsoup4==4.14.2
 
 ## Code coverage
-coverage==7.13.4
+coverage==7.13.5
 
 ## For specifying a given run time in tests (lets us define the return value of datetime.now etc.)
 freezegun==1.5.5
