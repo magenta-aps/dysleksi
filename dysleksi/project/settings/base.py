@@ -44,6 +44,8 @@ CSRF_TRUSTED_ORIGINS = json.loads(os.environ.get("CSRF_TRUSTED_ORIGINS", "[]")) 
 AUTH_USER_MODEL = "dysleksi.User"
 
 MEDIA_ROOT = os.environ.get("MEDIA_ROOT", "/upload")
+RESOURCE_ROOT = MEDIA_ROOT + "/resources"
+INSTRUCTIONS_ROOT = MEDIA_ROOT + "/instructions"
 MEDIA_URL = "/media/"
 
 ROOT_URLCONF = "project.urls"

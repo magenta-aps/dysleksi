@@ -164,8 +164,8 @@ Lint Javascript:
     POSTGRES_HOST: dysleksi-db
     ENVIRONMENT: development
     ALLOWED_HOSTS: '["dysleksi-web", "localhost", "host.docker.internal"]'
-    DUMMY_DATA_DIR: /builds/gronlandsprojekter/dysleksi/dummy-data
-    REAL_DATA_DIR: /builds/gronlandsprojekter/dysleksi/real-data
+    DUMMY_DATA_DIR: /builds/gronlandsprojekter/dysleksi/file-data/dev-data/dummy-data
+    REAL_DATA_DIR: /builds/gronlandsprojekter/dysleksi/file-data/dev-data/real-data
 
     # Local SAML configuration
     SAML_SP_ENTITY_ID: https://localhost:8443/mitid/saml/metadata/
@@ -200,6 +200,11 @@ Lint Javascript:
 Python Unittest:
   <<: *test-default
   script:
+    - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/gronlandsprojekter/dysleksi-binaries.git
+    - mkdir -p ${CI_PROJECT_DIR}/file-data/dev-data
+    - mkdir -p ${CI_PROJECT_DIR}/file-data/instructions
+    - cp -r dysleksi-binaries/* ${CI_PROJECT_DIR}/file-data/dev-data/.
+    - cp -r ${CI_PROJECT_DIR}/instructions/* ${CI_PROJECT_DIR}/file-data/instructions/.
     - cd /app
     - coverage run manage.py test --parallel
     - coverage combine

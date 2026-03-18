@@ -1,6 +1,0 @@
-Iserasuaat License
-
-All rights reserved for the audio files in this project. 
-
-Copyright (c) 2026 Iserasuaat - see https://iserasuaat.gl/.
-You may not copy, distribute, or modify these files without permission, except for the purpose of 1) building the code, and 2) cloning this repository.
