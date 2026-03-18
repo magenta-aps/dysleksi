@@ -13,7 +13,8 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN mkdir /app && \
     mkdir -p /var/cache/idp && \
-    mkdir -p /upload && \
+    mkdir -p /upload/instructions && \
+    mkdir -p /upload/resources && \
     #gid/uid from salt
     groupadd -g 75200 -r dysleksi && \
     groupadd -g 75100 -r certificate_exporter && \
@@ -21,7 +22,7 @@ RUN mkdir /app && \
     chown -R dysleksi:dysleksi /var/cache/idp && \
     chown -R dysleksi:dysleksi /upload && \
     chmod a+w /var/cache/idp && \
-    chmod u+w /upload
+    chmod -R u+w /upload
 
 # supercronic
 RUN curl -fsSLO "$SUPERCRONIC_URL" && \

@@ -15,11 +15,11 @@ from dysleksi.models import Test, TestType
 
 def copy_dummy_files():
     for item in Path(settings.DUMMY_DATA_DIR).iterdir():
-        dest = Path(settings.MEDIA_ROOT) / "dummy" / item.name
+        dest = Path(settings.RESOURCE_ROOT) / "dummy-data" / item.name
         shutil.copytree(item, dest, dirs_exist_ok=True)
 
     for item in Path(settings.REAL_DATA_DIR).iterdir():
-        dest = Path(settings.MEDIA_ROOT) / item.name
+        dest = Path(settings.RESOURCE_ROOT) / "real-data" / item.name
         shutil.copytree(item, dest, dirs_exist_ok=True)
 
 
@@ -38,23 +38,27 @@ def create_group_test(
 
         if settings.LOAD_REAL_WORDREADING_DATA:  # type:ignore
             wordreading_data_path = (
-                Path(settings.MEDIA_ROOT) / "wordreading_2/wordreading_2.json",
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "real/wordreading_2/wordreading_2.json",
             )
             wordreading_test_name = "Ordlæsning 2A"
         else:
             wordreading_data_path = (
-                Path(settings.MEDIA_ROOT) / "dummy/wordreading_2/wordreading_2a.json",
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "dummy/wordreading_2/wordreading_2a.json",
             )
             wordreading_test_name = "Ordlæsning 2A (dummy)"
 
         if settings.LOAD_REAL_WORDSPELLING_DATA:  # type:ignore
             wordspelling_data_path = (
-                Path(settings.MEDIA_ROOT) / "wordspelling/wordspelling.json",
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "real/wordspelling/wordspelling.json",
             )
             wordspelling_test_name = "Ordstavning"
         else:
             wordspelling_data_path = (
-                Path(settings.MEDIA_ROOT) / "dummy/wordspelling/wordspelling.json",
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "dummy/wordspelling/wordspelling.json",
             )
             wordspelling_test_name = "Ordstavning (dummy)"
 
@@ -65,7 +69,8 @@ def create_group_test(
             wordreading_data_path,
             "wordreading_2",
             practice_json_path=(
-                Path(settings.MEDIA_ROOT) / "wordreading_2/wordreading_2a_practice.json"
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "real/wordreading_2/wordreading_2a_practice.json"
             ),
         )
 
@@ -76,8 +81,10 @@ def create_group_test(
             wordspelling_test_name,
             wordspelling_data_path,
             "wordspelling",
-            practice_json_path=Path(settings.MEDIA_ROOT)
-            / "wordspelling/wordspelling_practice.json",
+            practice_json_path=(
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "real/wordspelling/wordspelling_practice.json"
+            ),
         )
 
 
@@ -92,12 +99,12 @@ def create_individual_test():
         "import_test",
         test_name,
         "Individuel deltest (dummy)",
-        Path(settings.MEDIA_ROOT)
+        Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
         / "dummy/letter_pronunciation/letter_pronunciation.json",
         "letter_pronunciation",
         practice_json_path=(
-            Path(settings.MEDIA_ROOT)
-            / "letter_pronunciation/letter_pronunciation_practice.json"
+            Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+            / "real/letter_pronunciation/letter_pronunciation_practice.json"
         ),
     )
 
