@@ -11,8 +11,8 @@ def create_wordreading_2_test(
     test, questions_data, practice_questions_data=None, name="Ordlæsning 2"
 ):
     reminder, created = TestResource.objects.get_or_create(
-        name="wordreading_2/Deltests/7e.1.wav",
-        sound="wordreading_2/Deltests/7e.1.wav",
+        name="resources/wordreading_2/Deltests/7e.1.wav",
+        sound="resources/wordreading_2/Deltests/7e.1.wav",
     )
     part, created = TestPart.objects.get_or_create(
         name=name,
@@ -36,8 +36,8 @@ def create_wordspelling_test(
     test, questions_data, practice_questions_data=None, name="Ordstavning"
 ):
     reminder, created = TestResource.objects.get_or_create(
-        name="wordspelling/Øveopgave/6e.1.wav",
-        sound="wordspelling/Øveopgave/6e.1.wav",
+        name="resources/wordspelling/Øveopgave/6e.1.wav",
+        sound="resources/wordspelling/Øveopgave/6e.1.wav",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -61,8 +61,8 @@ def create_letter_pronunciation_test(
     test, questions_data, practice_questions_data=None, name="Bogstavbenævnelse"
 ):
     reminder, created = TestResource.objects.get_or_create(
-        name="letter_pronunciation/Deltests/9e.1.wav",
-        sound="letter_pronunciation/Deltests/9e.1.wav",
+        name="resources/letter_pronunciation/Deltests/9e.1.wav",
+        sound="resources/letter_pronunciation/Deltests/9e.1.wav",
     )
 
     part, created = TestPart.objects.get_or_create(

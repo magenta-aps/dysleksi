@@ -15,11 +15,11 @@ from dysleksi.models import Test, TestType
 
 def copy_dummy_files():
     for item in Path(settings.DUMMY_DATA_DIR).iterdir():
-        dest = Path(settings.RESOURCE_ROOT) / "dummy-data" / item.name
+        dest = Path(settings.RESOURCE_ROOT) / "dummy" / item.name
         shutil.copytree(item, dest, dirs_exist_ok=True)
 
     for item in Path(settings.REAL_DATA_DIR).iterdir():
-        dest = Path(settings.RESOURCE_ROOT) / "real-data" / item.name
+        dest = Path(settings.RESOURCE_ROOT) / item.name
         shutil.copytree(item, dest, dirs_exist_ok=True)
 
 

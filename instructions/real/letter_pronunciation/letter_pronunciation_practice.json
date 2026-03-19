@@ -6,28 +6,28 @@
       // 9a.1
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Indledning/9a.1.wav",
+        "resource": "resources/letter_pronunciation/Indledning/9a.1.wav",
         "delayAfter": 500
       },
 
       // 9a.2
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Indledning/9a.2.wav",
+        "resource": "resources/letter_pronunciation/Indledning/9a.2.wav",
         "delayAfter": 500
       },
 
       // 9a.3
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Indledning/9a.3.wav",
+        "resource": "resources/letter_pronunciation/Indledning/9a.3.wav",
         "delayAfter": 500
       },
 
       // 9a.4
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Indledning/9a.4.wav",
+        "resource": "resources/letter_pronunciation/Indledning/9a.4.wav",
         "delayAfter": 500
       },
 
@@ -39,7 +39,7 @@
       },
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Indledning/9a.5.wav",
+        "resource": "resources/letter_pronunciation/Indledning/9a.5.wav",
         "delayAfter": 500
       }
     ]
@@ -63,7 +63,7 @@
       },
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Instruktion/9b.1a.wav",
+        "resource": "resources/letter_pronunciation/Instruktion/9b.1a.wav",
         "delayAfter": 500
       },
       {
@@ -74,14 +74,14 @@
       // 9b.1b
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Instruktion/9b.1b.wav",
+        "resource": "resources/letter_pronunciation/Instruktion/9b.1b.wav",
         "delayAfter": 500
       },
 
       // 9b.1c
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Instruktion/9b.1c.wav",
+        "resource": "resources/letter_pronunciation/Instruktion/9b.1c.wav",
         "delayAfter": 500
       },
 
@@ -92,21 +92,21 @@
       },
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Instruktion/9b.1d.wav",
+        "resource": "resources/letter_pronunciation/Instruktion/9b.1d.wav",
         "delayAfter": 500
       },
 
       // 9b.2
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Instruktion/9b.2.wav",
+        "resource": "resources/letter_pronunciation/Instruktion/9b.2.wav",
         "delayAfter": 500
       },
 
       // 9b.3
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Instruktion/9b.3.wav",
+        "resource": "resources/letter_pronunciation/Instruktion/9b.3.wav",
         "delayAfter": 500
       },
       {
@@ -121,7 +121,7 @@
     "correct": null,
     "wrong": [],
     "reminder": 5000,
-    "reminder_source": "letter_pronunciation/Øveopgave1/9c.4a.wav"
+    "reminder_source": "resources/letter_pronunciation/Øveopgave1/9c.4a.wav"
   },
   {
     "question_type": "no_input_required",
@@ -129,7 +129,7 @@
     "correct": null,
     "wrong": [],
     "reminder": 5000,
-    "reminder_source": "letter_pronunciation/Øveopgave2/9d.2.wav"
+    "reminder_source": "resources/letter_pronunciation/Øveopgave2/9d.2.wav"
   },
   {
     "question_type": "no_input_required",
@@ -153,7 +153,7 @@
       },
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Øveopgave2/9d.4.wav",
+        "resource": "resources/letter_pronunciation/Øveopgave2/9d.4.wav",
         "delayAfter": 500
       },
       {
@@ -166,7 +166,7 @@
       },
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Øveopgave2/9d.4a.wav",
+        "resource": "resources/letter_pronunciation/Øveopgave2/9d.4a.wav",
         "delayAfter": 500
       },
       {
@@ -183,18 +183,18 @@
       },
       {
         "action": "playSound",
-        "resource": "letter_pronunciation/Øveopgave2/9d.4b.wav",
+        "resource": "resources/letter_pronunciation/Øveopgave2/9d.4b.wav",
         "delayAfter": 500
       },
       {
         "action": "setButtonSoundOnce",
         "element": "next",
-        "resource": "letter_pronunciation/Øveopgave2/9d.5a.wav"
+        "resource": "resources/letter_pronunciation/Øveopgave2/9d.5a.wav"
       },
       {
         "action": "setButtonSoundOnce",
         "element": "repeat",
-        "resource": "letter_pronunciation/Øveopgave2/9d.5b.wav"
+        "resource": "resources/letter_pronunciation/Øveopgave2/9d.5b.wav"
       }
     ]
   }
