@@ -6,7 +6,16 @@ The Dysleksi project facilitates screening tests for dyslexia, and is intended f
 
 ## Development
 
-To start the project, `up` the docker containers using compose:
+To start the project, clone/copy your repository of binary files into a neighbouring directory, such that the resulting filestructure is
+```bash
+dysleksi
+`-- dysleksi/*
+dysleksi-binaries
+|-- dysleksi-binaries/dummy-data
+`-- dysleksi-binaries/real-data
+```
+
+Then, `up` the docker containers using compose in the `dysleksi` directory:
 
 ```bash
 docker compose up -d
