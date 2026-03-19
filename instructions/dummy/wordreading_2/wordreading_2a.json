@@ -1,31 +1,31 @@
 [
     {
-        "image": "dummy/wordreading_2/Opgave/dog.png",
+        "image": "resources/dummy/wordreading_2/Opgave/dog.png",
         "question_type": "multiple_choice",
         "correct": "hund",
         "wrong": ["kat", "ko", "hest"]
     },
     {
         "question_type": "multiple_choice",
-        "image": "dummy/wordreading_2/Opgave/bike.png",
+        "image": "resources/dummy/wordreading_2/Opgave/bike.png",
         "correct": "cykel",
         "wrong": ["bil", "bus", "tog"],
         "timeout": 9000
     },
     {
         "question_type": "multiple_choice",
-        "image": "dummy/wordreading_2/Opgave/cat.png",
+        "image": "resources/dummy/wordreading_2/Opgave/cat.png",
         "correct": "kat",
         "wrong": ["hund", "mus", "fugl"]
     },
     {
-        "image": "dummy/wordreading_2/Opgave/house.png",
+        "image": "resources/dummy/wordreading_2/Opgave/house.png",
         "question_type": "multiple_choice",
         "correct": "hus",
         "wrong": ["bil", "træ", "vej"]
     },
     {
-        "image": "dummy/wordreading_2/Opgave/car.png",
+        "image": "resources/dummy/wordreading_2/Opgave/car.png",
         "question_type": "multiple_choice",
         "correct": "bil",
         "wrong": ["cykel", "tog", "bus"]

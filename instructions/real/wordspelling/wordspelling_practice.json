@@ -1,7 +1,7 @@
 [
   {
     // No input required
-    "image": "wordspelling/Indledning/Stavning.png",
+    "image": "resources/wordspelling/Indledning/Stavning.png",
     "question_type": "no_input_required",
     "instruction_sequence": [
       // 6a.1
@@ -20,7 +20,7 @@
       {
         // Ordstavning er nu ved at starte.
         "action": "playSound",
-        "resource": "wordspelling/Indledning/6a.1.wav",
+        "resource": "resources/wordspelling/Indledning/6a.1.wav",
         "delayAfter": 500
       },
 
@@ -28,7 +28,7 @@
       {
         // Først skal du øve dig på øveopgaverne, inden opgaverne starter.
         "action": "playSound",
-        "resource": "wordspelling/Indledning/6a.2.wav",
+        "resource": "resources/wordspelling/Indledning/6a.2.wav",
         "delayAfter": 500
       },
 
@@ -36,7 +36,7 @@
       {
         // Opgaverne starter først, når du er færdig med øveopgaverne.
         "action": "playSound",
-        "resource": "wordspelling/Indledning/6a.3.wav",
+        "resource": "resources/wordspelling/Indledning/6a.3.wav",
         "delayAfter": 500
       },
 
@@ -44,7 +44,7 @@
       {
         // Du vil få besked, når dine opgaver er færdige.
         "action": "playSound",
-        "resource": "wordspelling/Indledning/6a.4.wav",
+        "resource": "resources/wordspelling/Indledning/6a.4.wav",
         "delayAfter": 500
       },
 
@@ -52,7 +52,7 @@
       {
         // Først får du vist, hvad du skal gøre.
         "action": "playSound",
-        "resource": "wordspelling/Indledning/6a.5.wav",
+        "resource": "resources/wordspelling/Indledning/6a.5.wav",
         "delayAfter": 500
       },
 
@@ -68,13 +68,13 @@
       {
         // Tryk grøn, når du er klar.
         "action": "playSound",
-        "resource": "wordspelling/Indledning/9a.5.wav",
+        "resource": "resources/wordspelling/Indledning/9a.5.wav",
         "delayAfter": 500
       }
     ]
   },
   {
-    "sound": "wordspelling/Øveopgave/tui.mp3",
+    "sound": "resources/wordspelling/Øveopgave/tui.mp3",
     "question_type": "free_text",
     "instruction_sequence": [
       {
@@ -97,7 +97,7 @@
       {
         // Lyt godt efter
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.1.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.1.wav",
         "delayAfter": 500
       },
 
@@ -125,7 +125,7 @@
       {
         // Her kan du se
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.2.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.2.wav",
         "delayAfter": 500
       },
 
@@ -141,7 +141,7 @@
       {
         // Lydikon
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.2a.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.2a.wav",
         "delayAfter": 500
       },
 
@@ -161,7 +161,7 @@
       {
         // bogstaver
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.2b.m4a",
+        "resource": "resources/wordspelling/Instruktion/6b.2b.m4a",
         "delayAfter": 500
       },
 
@@ -181,7 +181,7 @@
       {
         // delete-knappen
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.2c.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.2c.wav",
         "delayAfter": 500
       },
 
@@ -201,7 +201,7 @@
       {
         // skrivefelt
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.2d.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.2d.wav",
         "delayAfter": 500
       },
 
@@ -221,7 +221,7 @@
       {
         // og pilen
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.2e.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.2e.wav",
         "delayAfter": 1000
       },
 
@@ -237,7 +237,7 @@
       {
         // Ordet, der skal skrives, vil blive angivet.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.3.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.3.wav",
         "delayAfter": 500
       },
 
@@ -257,7 +257,7 @@
       {
         // Du skal skrive ordet, der angives.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.3a.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.3a.wav",
         "delayAfter": 500
       },
 
@@ -281,7 +281,7 @@
       {
         // Når du har skrevet, går du videre til næste opgave ved at trykke på pilen.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.3b.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.3b.wav",
         "delayAfter": 500
       },
 
@@ -297,7 +297,7 @@
       {
         // Nu bliver der vist, hvad du skal gøre.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.4.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.4.wav",
         "delayAfter": 500
       },
 
@@ -319,7 +319,7 @@
       {
         // Ordet, der skal skrives er: Tui
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.4a.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.4a.wav",
         "delayAfter": 500
       },
       {
@@ -350,7 +350,7 @@
       {
         // Da ordet Tui er skrevet, trykkes der på pilen.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.4b.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.4b.wav",
         "delayAfter": 500
       },
 
@@ -370,7 +370,7 @@
       {
         // Det er sådan, du skal skrive/løse opgaverne.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.4c.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.4c.wav",
         "delayAfter": 1000
       },
 
@@ -391,7 +391,7 @@
         // Hvis du kommer til at skrive forkert, kan du ændre de skrevne.
         // Når du f.eks. vil skrive tui, men kommer til at skriv sui, gør du som vist.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.4d.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.4d.wav",
         "delayAfter": 500
       },
       {
@@ -454,7 +454,7 @@
         // Du må også gerne gætte, hvis du ikke kan finde ud af opgaven.
         // Men, du skal først skrive noget, for at kunne trykke på pilen.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.4e.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.4e.wav",
         "delayAfter": 500
       },
 
@@ -466,7 +466,7 @@
       {
         // Hvis du ikke hører ordet så godt, kan du høre det igen ved at trykke på lydikonet.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.4f.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.4f.wav",
         "delayAfter": 500
       },
       {
@@ -491,7 +491,7 @@
         // Nu skal du selv prøve øveopgaverne.
         // Kun ordet vil blive angivet.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6b.5.wav",
+        "resource": "resources/wordspelling/Instruktion/6b.5.wav",
         "delayAfter": 500
       },
 
@@ -503,26 +503,26 @@
       {
         // Tryk grøn når du er klar.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/9a.5.wav",
+        "resource": "resources/wordspelling/Instruktion/9a.5.wav",
         "delayAfter": 0
       }
     ]
   },
   // 6c
   {
-    "sound": "wordspelling/Øveopgave/ulu.wav",
+    "sound": "resources/wordspelling/Øveopgave/ulu.wav",
     "question_type": "free_text",
     "correct": "ulu",
     "reminder": 20000,
-    "reminder_source": "wordspelling/Øveopgave/6c.2a.wav"
+    "reminder_source": "resources/wordspelling/Øveopgave/6c.2a.wav"
   },
   // 6d
   {
-    "sound": "wordspelling/Øveopgave/matu.wav",
+    "sound": "resources/wordspelling/Øveopgave/matu.wav",
     "question_type": "free_text",
     "correct": "matu",
     "reminder": 20000,
-    "reminder_source": "wordspelling/Øveopgave/6c.2a.wav"
+    "reminder_source": "resources/wordspelling/Øveopgave/6c.2a.wav"
   },
   {
     "question_type": "no_input_required",
@@ -535,7 +535,7 @@
       {
         // Øvelserne er færdige.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6d.2.wav",
+        "resource": "resources/wordspelling/Instruktion/6d.2.wav",
         "delayAfter": 1000
       },
 
@@ -552,7 +552,7 @@
       {
         // Her kan du se to knapper.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/9d.4.wav",
+        "resource": "resources/wordspelling/Instruktion/9d.4.wav",
         "delayAfter": 500
       },
 
@@ -565,7 +565,7 @@
         // Hvis du har forstået, hvad du skal gøre,
         // skal du klikke på den blå. Så starte opgaverne.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/9d.4a.wav",
+        "resource": "resources/wordspelling/Instruktion/9d.4a.wav",
         "delayAfter": 500
       },
 
@@ -583,7 +583,7 @@
         // Men hvis du ikke har forstået, hvad du skal gøre,
         // skal du klikke på den grå. Så skal du øve dig igen.
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6d.2b.wav",
+        "resource": "resources/wordspelling/Instruktion/6d.2b.wav",
         "delayAfter": 500
       },
       {
@@ -604,7 +604,7 @@
       {
         // Vælg ikon (klik).
         "action": "playSound",
-        "resource": "wordspelling/Instruktion/6d.3.wav",
+        "resource": "resources/wordspelling/Instruktion/6d.3.wav",
         "delayAfter": 500
       },
 
@@ -612,14 +612,14 @@
       {
         "action": "setButtonSoundOnce",
         "element": "next",
-        "resource": "wordspelling/Instruktion/6d.3a.wav"
+        "resource": "resources/wordspelling/Instruktion/6d.3a.wav"
       },
 
       // 6d.3d
       {
         "action": "setButtonSoundOnce",
         "element": "repeat",
-        "resource": "wordspelling/Instruktion/6d.3d.wav"
+        "resource": "resources/wordspelling/Instruktion/6d.3d.wav"
       }
     ]
   }
