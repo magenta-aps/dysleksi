@@ -4,6 +4,7 @@ $white: #ffffff;
 $other-grey-lightest: #f9f9f9;
 $other-grey-light: #efefef;
 $other-grey-light2: #d9d9d9;
+$other-grey-light3: #e6ebef;
 $other-grey-medium: #bbbbbb;
 $other-grey: #888888;
 $other-grey-dark: #545257;
@@ -14,7 +15,10 @@ $other-red-dark: #970700;
 $other-green-light: #d1ffd8;
 $other-green: #006a11;
 $other-blue: #f2f9ff;
+$other-blue2: #87b8e3;
 $other-blue-dark: #cbe0f3;
+$other-blue-dark2: #9ec4dc;
+$other-blue-darkest: #34495e;
 
 $correct: #27c840;
 $wrong: #ff5f57;
@@ -489,17 +493,20 @@ div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn.acti
 }
 
 .dot {
-  width: 0.8rem;
-  height: 0.8rem;
+  width: 9.67px;
+  height: 9.67px;
   border-radius: 50%;
   display: inline-block;
-  margin-right: 0.25rem;
+  margin-right: 0;
+  background-color: $other-grey-light3;
+
+  &.correct { background-color: $correct; }
+  &.wrong   { background-color: $wrong; }
+  &.missing  { background-color: $missing; }
+  &.current  { background-color: $current; }
+  &.default  { background-color: $other-grey-light3; }
 }
 
-.group-test-toolbar .green { background-color: $correct; }
-.group-test-toolbar .red   { background-color: $wrong; }
-.group-test-toolbar .grey  { background-color: $missing; }
-.group-test-toolbar .blue  { background-color: $current; }
 
 .group-test-body {
   padding: 1.5rem;
@@ -515,15 +522,13 @@ div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn.acti
 }
 
 /* Student card */
+$border-radius-student-card: $spacer / 4 * 3;
 .student-card {
     position: relative;
     width: calc(25% - 1rem);
-    //background-color: $other-blue;
-    border: 1px solid $other-grey-light2;
-    border-radius: 16px;
+
     box-sizing: border-box;
-    font-weight: bold;
-    font-size: 1rem;
+    font-size: $spacer;
     color: #000;
 
     display: flex;
@@ -532,19 +537,30 @@ div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn.acti
     padding-top: 0;
     padding-bottom: 0;
     overflow: hidden; // allow folded area to expand
+
+    &.is-expanded {
+        .student-top-row {
+            // Flatten the bottom corners: Top-Left, Top-Right, Bottom-Right, Bottom-Left
+            border-radius:  $border-radius-student-card $border-radius-student-card 0 0;
+        }
+    }
+
 }
 
 /* Top row */
 .student-card .student-top-row {
     background-color: $other-blue;
-    height: 3rem;
+    height: $spacer * 2;
     position: relative;
     overflow: hidden;
     display: flex;
     align-items: center;
-    padding-left: 1.5rem;
+    padding-left: $spacer;
     user-select: none;
     cursor: pointer;
+    font-weight: bold;
+    border: 1px solid $other-blue-dark2;
+    border-radius: $border-radius-student-card;
 }
 
 /* Progress bar inside top row */
@@ -568,20 +584,90 @@ div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn.acti
 /* Folded area below */
 .student-card .folded-area {
     display: none;
-    margin-top: 0.5rem;
-    gap: 0.25rem;
-    flex-wrap: wrap;
+    margin-top: 0;
+    gap: $spacer / 4;
+    flex-direction: column;
+    align-items: flex-start;
     width: 100%;
     position: relative;
     z-index: 1;
-    padding: 1rem;
+    padding: $spacer;
     background-color: $white;
+    border: 1px solid $other-grey-light2;
+    border-top: none;
+    border-radius: 0 0 $border-radius-student-card $border-radius-student-card;
 }
 
 
 .foldout-arrow {
   position: absolute;
-  right: 1rem;
   color: $other-grey-medium;
-  font-size: 1.25rem;
+  font-size: 12px;
+}
+
+.student-card .part-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    font-size: 12px;
+    margin-bottom: $spacer;
+    color: $other-blue-darkest;
+
+    .nav-group-left {
+      display: flex;
+      align-items: center;
+      gap: $spacer / 8;
+    }
+
+    .ph-caret-right {
+      margin-left: auto;
+    }
+
+    .nav-arrow {
+      cursor: pointer;
+
+      &.disabled {
+        color: $other-grey-light3;
+        cursor: default;
+        pointer-events: none;
+      }
+    }
+}
+
+.student-card .dots-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacer / 4;
+    justify-content: flex-start;
+}
+
+.student-card .question-index {
+    font-size: 10px;
+    color: $other-blue-darkest;
+}
+
+.student-card .parts-progress {
+    display: flex;
+    gap: $spacer / 8;
+    width: 100%;
+    height: $spacer /3;
+    margin-bottom: $spacer;
+
+    .part-segment {
+        flex: 1;      // Ensures all parts are equal width
+        height: 100%;
+        border-radius: 2px;
+        transition: background-color 0.3s ease;
+
+        &.completed {
+            background-color: $other-blue2;
+        }
+        &.current {
+            background-color: $current;
+        }
+        &.future {
+            background-color: $other-grey-light3;
+        }
+    }
 }

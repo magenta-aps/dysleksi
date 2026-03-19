@@ -44,17 +44,42 @@ export class EventTable {
 }
 
 export class StudentCard {
-    constructor(student) {
+    constructor(student, test) {
         this.student = student;
+        this.testParts = test.parts;
         this.el = this._createMarkup();
         this.foldedArea = this.el.querySelector(".folded-area");
         this.progressFill = this.el.querySelector(".progress-fill");
+        this.partsProgress = this.el.querySelector(".parts-progress");
         this.nameText = this.el.querySelector(".student-text");
         this.arrowIcon = this.el.querySelector(".foldout-arrow i");
+        this.dotsContainer = this.el.querySelector(".dots-container");
+        this.partLabel = this.el.querySelector(".part-label");
+        this.partIndex = this.el.querySelector(".part-index");
+        this.questionIndex = this.el.querySelector(".question-index");
+        this.subTestLeftArrow = this.el.querySelector(".ph-caret-left")
+        this.subTestRightArrow = this.el.querySelector(".ph-caret-right")
+
+        this.currentViewPartIndex = 0;
 
         // Initial setup
         this.nameText.textContent = this.student.displayName;
+        this._initEventListeners();
+    }
+
+    _initEventListeners() {
+        // Toggle fold
         this.el.addEventListener("click", (e) => this.toggleFold(e));
+
+        // Navigation Arrows
+        this.subTestLeftArrow.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.changePart(-1);
+        });
+        this.subTestRightArrow.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.changePart(1);
+        });
     }
 
     _createMarkup() {
@@ -69,31 +94,92 @@ export class StudentCard {
         const isHidden = this.foldedArea.style.display === "none";
         this.foldedArea.style.display = isHidden ? "flex" : "none";
 
+        this.el.classList.toggle("is-expanded", isHidden);
+
         this.arrowIcon.className = isHidden
             ? "ph-fill ph-caret-down"
             : "ph-fill ph-caret-up";
     }
 
+    changePart(step) {
+        const newIndex = this.currentViewPartIndex + step;
+        this.currentViewPartIndex = newIndex;
+        this.update();
+    }
+
+    _renderPartsProgress() {
+        this.partsProgress.innerHTML = '';
+        
+        this.testParts.forEach((_, index) => {
+            const segment = document.createElement("div");
+            segment.classList.add("part-segment");
+
+            // Logic for segment colors
+            if (index < this.student.currentPartIndex) {
+                segment.classList.add("completed");
+            } else if (index === this.student.currentPartIndex) {
+                segment.classList.add("current");
+            } else {
+                segment.classList.add("future");
+            }
+
+            this.partsProgress.appendChild(segment);
+        });
+    }
+
     update() {
+        this._renderPartsProgress();
+        const isCurrentPart = (this.currentViewPartIndex === this.student.currentPartIndex);
         this.progressFill.style.width = `${this.student.progress}%`;
 
-        // Synchronize dots
-        this.foldedArea.innerHTML = '';
-        this.student.results.forEach(isCorrect => {
+        this.subTestLeftArrow.classList.toggle('disabled', this.currentViewPartIndex === 0);
+            
+        this.subTestRightArrow.classList.toggle('disabled',
+            this.currentViewPartIndex === this.testParts.length - 1
+        );
+
+        const part = this.testParts[this.currentViewPartIndex];
+        this.partLabel.textContent = part.name;
+        this.partIndex.textContent = `Deltest ${this.currentViewPartIndex+1}/${this.testParts.length}`
+        if (isCurrentPart) {
+            this.questionIndex.textContent = `Opgave ${this.student.currentQuestionIndex+1}/${part.questions.length}`
+        } else {
+            this.questionIndex.textContent = `Opgave -/${part.questions.length}`
+
+        }
+        // Render Dots
+        this.dotsContainer.innerHTML = '';
+        const results = this.student.resultsByPart[this.currentViewPartIndex] || [];
+        
+        // Total dots = total questions in this part
+        const totalQuestions = part.questions.length;
+
+        for (let i = 0; i < totalQuestions; i++) {
             const dot = document.createElement("span");
+            const isCurrentQuestion = (i === this.student.currentQuestionIndex);
             dot.classList.add("dot");
-            dot.style.backgroundColor = isCorrect ? "green" : "red";
-            this.foldedArea.appendChild(dot);
-        });
+
+            if (results[i] === true) {
+                dot.classList.add("correct");
+            } else if (results[i] === false) {
+                dot.classList.add("wrong");
+            } else if (isCurrentPart && isCurrentQuestion) {
+                dot.classList.add("current");
+            } else {
+                dot.classList.add("default");
+            }
+            this.dotsContainer.appendChild(dot);
+        }
     }
 }
 
 
 export class GroupTestContainer {
-    constructor() {
+    constructor(test) {
         this.container = document.querySelector(".group-test-body");
         this.students = new Map();
         this.cards = new Map();
+        this.test = test
     }
 
     updateData(data) {
@@ -106,16 +192,15 @@ export class GroupTestContainer {
             student = new Student(studentData);
             this.students.set(student.id, student);
 
-            const card = new StudentCard(student);
+            const card = new StudentCard(student, this.test);
             this.cards.set(student.id, card);
             this.container.appendChild(card.el);
         }
 
         student.progress = studentData.progress;
-
-        if ("correct" in data) {
-            student.addResult(data.correct);
-        }
+        student.currentPartIndex = studentData.currentPartIndex;
+        student.currentQuestionIndex = studentData.currentQuestionIndex;
+        student.resultsByPart = studentData.resultsByPart
 
         this.cards.get(student.id).update();
     }
@@ -315,7 +400,7 @@ export class TeacherView {
         this.currentQuestion = null;
 
         this.table = table || new EventTable();
-        this.groupTestContainer = new GroupTestContainer();
+        this.groupTestContainer = new GroupTestContainer(test);
         this.buttons = buttons || new ActionButtons();
         this.noteField = noteField || new NoteField();
         this.questionView = questionView || new QuestionView();
@@ -406,11 +491,11 @@ export class TeacherView {
         this.chatSocket.addEventListener("message", (e) => {
             const data = JSON.parse(e.data);
 
-            if (["test.started", "question.answered"].includes(data.event)) {
+            if (["test.started", "question.answered", "question.displayed"].includes(data.event) && this.test.testType === 'group') {
                 this.groupTestContainer.updateData(data)
             }
 
-            if (["test.cancelled", "test.complete", "question.answered", "question.displayed"].includes(data.event)) {
+            if (["test.cancelled", "test.complete", "question.answered", "question.displayed"].includes(data.event) && this.test.testType === 'individual') {
                 this.table.updateTable(data);
             }
 

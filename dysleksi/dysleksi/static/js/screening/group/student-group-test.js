@@ -137,6 +137,10 @@ export class GroupTestView extends StudentTestView {
                 }
                 const duration = questionAnsweredAt - this.questionDisplayedAt;
                 this.student.progress = calculateStudentProgress(this.test, this.currentPartIndex, this.currentQuestionIndex);
+
+                const correct = outOfTime ? false : this.answerIsCorrect()
+                this.student.addResult(this.currentPartIndex, correct);
+
                 this.send({
                     event: "question.answered",
                     message: messageText,
@@ -150,7 +154,7 @@ export class GroupTestView extends StudentTestView {
                     displayedAt: this.questionDisplayedAt,
                     answeredAt: questionAnsweredAt,
                     duration: duration,
-                    correct: outOfTime ? false : this.answerIsCorrect(),
+                    correct: correct,
                     textAnswer: this.textAnswer,
                 });
             }

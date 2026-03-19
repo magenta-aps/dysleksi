@@ -7,6 +7,9 @@ import * as groupTestData from './grouptest.json' with { type: 'json' }
 import * as individualTestData from './individualtest.json' with { type: 'json' }
 import {Test} from "../../screening/model";
 import { GroupTestContainer } from "../../screening/controlroom.js";
+import { StudentCard } from "../../screening/controlroom.js";
+import { Student } from "../../screening/model.js";
+
 
 vi.mock("../../screening/utils.js");
 
@@ -596,19 +599,41 @@ describe("GroupTestContainer", () => {
                             <i class="ph-fill ph-caret-up"></i>
                         </span>
                     </div>
-                    <div class="folded-area" style="display: none;"></div>
+                    <div class="folded-area" style="display: none;">
+                        <div class="parts-progress"></div>
+                        <div class="part-navigation">
+                            <div class="nav-group-left">
+                                <i class="ph ph-caret-left nav-arrow"></i>
+                                <span class="part-index"></span>
+                            </div>
+                            <i class="ph ph-caret-right nav-arrow"></i>
+                        </div>
+                        <span class="part-label"></span>
+                        <span class="question-index"></span>
+                        <div class="dots-container"></div>
+                    </div>
                 </div>
             </template>
+
 
             <div class="group-test-body"></div>
         `;
         container = document.querySelector(".group-test-body");
-        instance = new GroupTestContainer();
+
+        const test = { parts: [{
+            name: "part1",
+            questions: [{}]
+        }]};
+
+        instance = new GroupTestContainer(test);
     });
+
+
+
 
     it("toggles folded area even when clicking on child elements (name text)", () => {
         const studentData = {
-            student: { id: 5, firstName: "Eve", lastName: "Online", progress: 20 },
+            student: { id: 5, firstName: "Eve", lastName: "Online", progress: 20, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
         };
         instance.updateData(studentData);
 
@@ -627,7 +652,7 @@ describe("GroupTestContainer", () => {
 
     it("does NOT toggle folded area when clicking directly on the folded area content", () => {
         const studentData = {
-            student: { id: 6, firstName: "Frank", lastName: "Castle", progress: 10 },
+            student: { id: 6, firstName: "Frank", lastName: "Castle", progress: 10, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
         };
         instance.updateData(studentData);
 
@@ -654,7 +679,7 @@ describe("GroupTestContainer", () => {
         expect(nullInstance.container).toBeNull();
 
         const studentData = {
-            student: { id: 99, firstName: "Ghost", lastName: "User", progress: 0 },
+            student: { id: 99, firstName: "Ghost", lastName: "User", progress: 0, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
         };
 
         // 3. Act & Assert: Should return early without attempting to query or create elements
@@ -668,7 +693,7 @@ describe("GroupTestContainer", () => {
 
     it("creates a new student card if it doesn't exist", () => {
         const studentData = {
-            student: { id: 1, firstName: "Alice", lastName: "Smith", progress: 50 },
+            student: { id: 1, firstName: "Alice", lastName: "Smith", progress: 50, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
         };
 
         instance.updateData(studentData);
@@ -688,7 +713,7 @@ describe("GroupTestContainer", () => {
 
     it("handles missing last name", () => {
         const studentData = {
-            student: { id: 1, firstName: "Alice", lastName: null, progress: 50 },
+            student: { id: 1, firstName: "Alice", lastName: null, progress: 50, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
         };
 
         instance.updateData(studentData);
@@ -702,12 +727,12 @@ describe("GroupTestContainer", () => {
 
     it("updates an existing student card progress", () => {
         const studentData = {
-            student: { id: 2, firstName: "Bob", lastName: "Jones", progress: 30 },
+            student: { id: 2, firstName: "Bob", lastName: "Jones", progress: 30, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
         };
         instance.updateData(studentData);
 
         const updatedData = {
-            student: { id: 2, firstName: "Bob", lastName: "Jones", progress: 80 },
+            student: { id: 2, firstName: "Bob", lastName: "Jones", progress: 80, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
         };
         instance.updateData(updatedData);
 
@@ -716,34 +741,10 @@ describe("GroupTestContainer", () => {
         expect(fill.style.width).toBe("80%");
     });
 
-    it("adds correct/incorrect dots inside folded area", () => {
-        const studentData = {
-            student: { id: 3, firstName: "Charlie", lastName: "Brown", progress: 70 },
-            correct: true
-        };
-        instance.updateData(studentData);
-
-
-        const card = instance.cards.get(3)
-        const folded = card.el.querySelector(".folded-area");
-        const dot = folded.querySelector(".dot");
-        expect(dot).not.toBeNull();
-        expect(dot.style.backgroundColor).toBe("green");
-
-        // Add an incorrect dot
-        const studentData2 = {
-            student: { id: 3, firstName: "Charlie", lastName: "Brown", progress: 70 },
-            correct: false
-        };
-        instance.updateData(studentData2);
-        const dots = folded.querySelectorAll(".dot");
-        expect(dots.length).toBe(2);
-        expect(dots[1].style.backgroundColor).toBe("red");
-    });
 
     it("toggles folded area when card is clicked", () => {
         const studentData = {
-            student: { id: 4, firstName: "Diana", lastName: "Prince", progress: 100 },
+            student: { id: 4, firstName: "Diana", lastName: "Prince", progress: 100, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
         };
         instance.updateData(studentData);
 
@@ -849,7 +850,19 @@ describe("TeacherView socket 'test.started' handling", () => {
                             <i class="ph-fill ph-caret-up"></i>
                         </span>
                     </div>
-                    <div class="folded-area" style="display: none;"></div>
+                    <div class="folded-area">
+                        <div class="parts-progress"></div>
+                        <div class="part-navigation">
+                            <div class="nav-group-left">
+                                <i class="ph ph-caret-left nav-arrow"></i>
+                                <span class="part-index"></span>
+                            </div>
+                            <i class="ph ph-caret-right nav-arrow"></i>
+                        </div>
+                        <span class="part-label"></span>
+                        <span class="question-index"></span>
+                        <div class="dots-container"></div>
+                    </div>
                 </div>
             </template>
 
@@ -865,7 +878,12 @@ describe("TeacherView socket 'test.started' handling", () => {
 
         view = new TeacherView(
             "room1",
-            { parts: [] }, // minimal test data
+            {
+            testType: "group",
+            parts: [{
+                name: "part1",
+                questions: [{}]
+            }]}, // minimal test data
             1,
             wsGetter,
             new EventTable(),
@@ -884,7 +902,15 @@ describe("TeacherView socket 'test.started' handling", () => {
         // simulate 'test.started' message
         const messageData = {
             event: "test.started",
-            student: { id: 1, firstName: "Alice", lastName: "Smith", progress: 0 },
+            student: { 
+                id: 1, 
+                firstName: "Alice", 
+                lastName: "Smith", 
+                progress: 0,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {}
+            },
         };
 
         handler({ data: JSON.stringify(messageData) });
@@ -1002,5 +1028,137 @@ describe("EventTable", () => {
 
         const durationCell = document.querySelector('td:nth-child(4)');
         expect(durationCell.textContent).toBe('TIMESTAMP_A');
+    });
+});
+
+
+describe("StudentCard", () => {
+    let mockStudent;
+    let mockTest;
+    let template;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <template id="student-card-template">
+                <div class="student-card">
+                    <div class="student-top-row">
+                        <div class="progress-fill"></div>
+                        <span class="student-text"></span>
+                        <span class="foldout-arrow"><i class="ph-fill ph-caret-up"></i></span>
+                    </div>
+                    <div class="folded-area" style="display: none;">
+                        <div class="parts-progress"></div>
+                        <div class="part-navigation">
+                            <i class="ph-caret-left"></i>
+                            <span class="part-index"></span>
+                            <i class="ph-caret-right"></i>
+                        </div>
+                        <span class="part-label"></span>
+                        <span class="question-index"></span>
+                        <div class="dots-container"></div>
+                    </div>
+                </div>
+            </template>
+        `;
+
+        mockStudent = new Student({
+            id: 1,
+            firstName: "John",
+            lastName: "Doe"
+        });
+        
+        mockStudent.progress = 45;
+        mockStudent.currentPartIndex = 0;
+        mockStudent.currentQuestionIndex = 1;
+        mockStudent.resultsByPart = { 0: [true, false] };
+
+        mockTest = {
+            parts: [
+                { name: "wordreading", questions: [{}, {}, {}] },
+                { name: "wordspelling", questions: [{}, {}] }
+            ]
+        };
+    });
+
+    it("initializes with correct student name and progress", () => {
+        const card = new StudentCard(mockStudent, mockTest);
+        
+        expect(card.nameText.textContent).toBe("John D.");
+        card.update();
+        expect(card.progressFill.style.width).toBe("45%");
+    });
+
+    it("toggles the 'is-expanded' class and display style when clicked", () => {
+        const card = new StudentCard(mockStudent, mockTest);
+        
+        expect(card.foldedArea.style.display).toBe("none");
+        
+        card.el.click();
+        expect(card.foldedArea.style.display).toBe("flex");
+        expect(card.el.classList.contains("is-expanded")).toBe(true);
+        expect(card.arrowIcon.className).toBe("ph-fill ph-caret-down");
+
+        card.el.click();
+        expect(card.foldedArea.style.display).toBe("none");
+        expect(card.el.classList.contains("is-expanded")).toBe(false);
+    });
+
+    it("changes viewable part when navigation arrows are clicked", () => {
+        const card = new StudentCard(mockStudent, mockTest);
+        card.update();
+
+        expect(card.currentViewPartIndex).toBe(0);
+        expect(card.partLabel.textContent).toBe("wordreading");
+
+        card.subTestRightArrow.click();
+        expect(card.currentViewPartIndex).toBe(1);
+        expect(card.partLabel.textContent).toBe("wordspelling");
+
+        card.subTestLeftArrow.click();
+        expect(card.currentViewPartIndex).toBe(0);
+    });
+
+    it("renders the correct number of dots for the current part", () => {
+        const card = new StudentCard(mockStudent, mockTest);
+        card.update();
+
+        const dots = card.dotsContainer.querySelectorAll(".dot");
+        expect(dots.length).toBe(3);
+        
+        expect(dots[0].classList.contains("correct")).toBe(true);
+        expect(dots[1].classList.contains("wrong")).toBe(true);
+        expect(dots[2].classList.contains("default")).toBe(true);
+    });
+
+    it("disables navigation arrows at the boundaries", () => {
+        const card = new StudentCard(mockStudent, mockTest);
+        
+        card.update();
+        expect(card.subTestLeftArrow.classList.contains("disabled")).toBe(true);
+        expect(card.subTestRightArrow.classList.contains("disabled")).toBe(false);
+
+        card.changePart(1);
+        expect(card.subTestRightArrow.classList.contains("disabled")).toBe(true);
+        expect(card.subTestLeftArrow.classList.contains("disabled")).toBe(false);
+    });
+
+    it("renders part segments with correct completion classes", () => {
+        mockStudent.currentPartIndex = 1;
+        const card = new StudentCard(mockStudent, mockTest);
+        card.update();
+
+        const segments = card.partsProgress.querySelectorAll(".part-segment");
+        expect(segments.length).toBe(2);
+        
+        expect(segments[0].classList.contains("completed")).toBe(true);
+        expect(segments[1].classList.contains("current")).toBe(true);
+    });
+
+    it("shows '-' for question index when viewing a part the student hasn't reached yet", () => {
+        const card = new StudentCard(mockStudent, mockTest);
+        
+        card.changePart(1);
+        
+        expect(card.questionIndex.textContent).toContain("-/2");
     });
 });
