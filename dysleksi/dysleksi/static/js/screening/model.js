@@ -59,32 +59,33 @@ export class Test extends EventTarget {
 
         // Queue Static Files
         staticFiles.forEach(url => {
-            tasks.push(assetCache.processStaticFile(url));
+            tasks.push(() => assetCache.processStaticFile(url));
         });
 
         // Queue Test Content
         for (const part of this.parts) {
-            tasks.push(assetCache.processTestObject(part, 'image'));
-            tasks.push(assetCache.processTestObject(part, 'instructionsUrl'));
+            tasks.push(() => assetCache.processTestObject(part, 'image'));
+            tasks.push(() => assetCache.processTestObject(part, 'instructionsUrl'));
 
             const allQuestions = [...part.questions, ...part.practice];
             for (const q of allQuestions) {
-                tasks.push(assetCache.processTestObject(q, 'challengeImageUrl'));
-                tasks.push(assetCache.processTestObject(q, 'challengeSoundUrl'));
+                tasks.push(() => assetCache.processTestObject(q, 'challengeImageUrl'));
+                tasks.push(() => assetCache.processTestObject(q, 'challengeSoundUrl'));
 
                 for (const a of q.possibleAnswers) {
-                    tasks.push(assetCache.processTestObject(a, 'resourceImageUrl'));
-                    tasks.push(assetCache.processTestObject(a, 'resourceSoundUrl'));
+                    tasks.push(() => assetCache.processTestObject(a, 'resourceImageUrl'));
+                    tasks.push(() => assetCache.processTestObject(a, 'resourceSoundUrl'));
                 }
 
                 for (const inst of q.instruction_sequence?.instructions || []) {
-                    tasks.push(assetCache.processTestObject(inst, 'url'));
+                    tasks.push(() => assetCache.processTestObject(inst, 'url'));
                 }
             }
         }
 
         // Execute all downloads in parallel
-        await Promise.all(tasks);
+        const CONCURRENCY_LIMIT = 6;
+        await this.runWithLimit(tasks, CONCURRENCY_LIMIT);
 
         // Update variables and fonts with blob-urls
         assetCache.applyCssVariables();
@@ -93,6 +94,27 @@ export class Test extends EventTarget {
         console.log("Preloading successful.");
 
         return assetCache.map;
+    }
+
+    async runWithLimit(tasks, limit) {
+        const results = [];
+        const executing = new Set();
+    
+        for (const task of tasks) {
+            const promise = task();
+            results.push(promise);
+            executing.add(promise);
+    
+            // Clean up set when promise finishes
+            const cleanUp = () => executing.delete(promise);
+            promise.then(cleanUp).catch(cleanUp);
+    
+            // If we hit the limit, wait for the fastest one to finish
+            if (executing.size >= limit) {
+                await Promise.race(executing);
+            }
+        }
+        return Promise.all(results);
     }
 }
 
