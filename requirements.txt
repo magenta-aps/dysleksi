@@ -123,7 +123,7 @@ qrcode==8.2
 rcssmin==1.2.2
 redis==7.3.0
 requests==2.32.5
-types-requests==2.32.4.20260107
+types-requests==2.32.4.20260324
 rjsmin==1.2.5
 service-identity==24.2.0
 six==1.17.0
