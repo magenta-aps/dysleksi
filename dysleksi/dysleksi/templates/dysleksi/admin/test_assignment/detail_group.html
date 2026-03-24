@@ -20,7 +20,19 @@
                 <i class="ph-fill ph-caret-up"></i>
             </span>
         </div>
-        <div class="folded-area" style="display: none;"></div>
+        <div class="folded-area" style="display: none">
+            <div class="parts-progress"></div>
+            <div class="part-navigation">
+                <div class="nav-group-left">
+                    <i class="ph ph-caret-left nav-arrow"></i>
+                    <span class="part-index"></span>
+                </div>
+                <i class="ph ph-caret-right nav-arrow"></i>
+            </div>
+            <span class="part-label"></span>
+            <span class="question-index"></span>
+            <div class="dots-container"></div>
+        </div>
     </div>
 </template>
 
@@ -40,10 +52,10 @@
 
         <div class="group-test-toolbar">
           Tegnforklaring: 
-          <span class="dot green"></span> Korrekt
-          <span class="dot red"></span> Forkert
-          <span class="dot grey"></span> Mangler
-          <span class="dot blue"></span> Nuværende
+          <span class="dot correct"></span> Korrekt
+          <span class="dot wrong"></span> Forkert
+          <span class="dot missing"></span> Mangler
+          <span class="dot current"></span> Nuværende
         </div>
 
         <div class="group-test-divider"></div>

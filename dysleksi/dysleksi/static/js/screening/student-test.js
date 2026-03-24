@@ -241,6 +241,11 @@ export class StudentTestView extends EventTarget {
         }
         this.currentQuestion = questions[questionIndex];
 
+        if (this.student) {
+            this.student.currentQuestionIndex = this.currentQuestionIndex
+            this.student.currentPartIndex = this.currentPartIndex
+        }
+
         return true;
     }
 

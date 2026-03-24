@@ -10,15 +10,20 @@ export class Student {
         this.firstName = data.firstName;
         this.lastName = data.lastName;
         this.progress = 0;
-        this.results = [];
+        this.resultsByPart = {};
+        this.currentPartIndex = null;
+        this.currentQuestionIndex = null;
     }
     get displayName() {
         const lastInitial = this.lastName ? ` ${this.lastName[0].toUpperCase()}.` : "";
         return `${this.firstName}${lastInitial}`;
     }
 
-    addResult(isCorrect) {
-        this.results.push(isCorrect);
+    addResult(partIndex, isCorrect) {
+        if (!this.resultsByPart[partIndex]) {
+            this.resultsByPart[partIndex] = [];
+        }
+        this.resultsByPart[partIndex].push(isCorrect);
     }
 
 }
