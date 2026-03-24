@@ -115,3 +115,43 @@ services:
       - LOAD_REAL_WORDREADING_DATA=true
       - LOAD_REAL_WORDSPELLING_DATA=true
 ```
+
+## Keeping binaries up-to-date
+For the best-possible experience, it is important that the dysleksi-binaries repo is
+always up-to-date. You can automate this by writing a `post-merge` hook:
+
+```
+cd .git/hooks
+touch post-merge
+chmod +x post-merge
+```
+
+With the following contents:
+
+```
+#!/bin/bash
+
+BINARIES_REPO="../dysleksi-binaries"
+
+echo "--- Updating binaries repository ---"
+
+# Check if the directory exists
+if [ -d "$BINARIES_REPO" ]; then
+    # Move to the binaries directory
+    cd "$BINARIES_REPO" || exit
+
+    # Checkout master
+    git checkout master
+
+    # Pull the latest changes
+    git pull origin master
+    
+    echo "--- Binaries repository is now up to date ---"
+else
+    echo "Error: Directory $BINARIES_REPO not found."
+fi
+```
+
+This will checkout master on your `dysleksi-binaries` repository and perform at git-pull
+when you pull from the `dysleksi` repository. Now your dysleksi-binaries repository will
+always be up-to-date.
