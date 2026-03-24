@@ -3,6 +3,7 @@
  */
 import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import {IndividualTestView} from "../../screening/individual/student-individual-test.js";
+import { Student } from "../../screening/model.js";
 import * as individualTestData from "./individualtest.json" with { type: "json" }
 import { getWebSocket } from "../../ws";
 import { IndividualTestDomElements } from "../../screening/dom.js";
@@ -11,6 +12,23 @@ import {StudentTestView} from "../../screening/student-test.js";
 import {spyAttributes} from "../utils.js";
 import * as utils from "../../screening/utils.js";
 import { InstructionSequenceRunner } from "../../screening/instruction.js";
+
+const mockP2P = {
+    connect: vi.fn(),
+    send: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    studentSetup: vi.fn()
+};
+
+
+vi.mock("../../webRTC.js", () => {
+    return {
+        WebRTCChannel: vi.fn().mockImplementation(function() {
+            return mockP2P;
+        })
+    };
+});
 
 describe("IndividualTestFlow", () => {
     let originalWebSocket;
@@ -55,6 +73,7 @@ describe("IndividualTestFlow", () => {
         `;
 
         global.domElements = new IndividualTestDomElements();
+        global.student = new Student({"id":1})
         spyAttributes(global.domElements);
 
         global.testSpy = (test) => {
@@ -113,7 +132,7 @@ describe("IndividualTestFlow", () => {
     
         const test = new Test(individualTestData);
         // Ensure the question at part 0, index 0 in your individualtest.json has an instruction_sequence
-        const view = new IndividualTestView(test, ws, "student_1", 1, localDomElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, localDomElements, mediaRecorder, student);
         
         // 3. Trigger question with instructions
         view.setPart(0);
@@ -148,7 +167,7 @@ describe("IndividualTestFlow", () => {
 
     it("cancel test", () => {
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
         view.onChatMessage({
             uuid: crypto.randomUUID(),
@@ -167,7 +186,7 @@ describe("IndividualTestFlow", () => {
 
     it("cancel test without media recorder", () => {
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         view.mediaRecorder = null
         testSpy(view);
         view.onChatMessage({
@@ -186,7 +205,7 @@ describe("IndividualTestFlow", () => {
 
     it("show invalid question", () => {
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         view.setPart(0);
         const canShow = view.showQuestion(false, 999);
         expect(canShow).toBe(false);
@@ -194,7 +213,7 @@ describe("IndividualTestFlow", () => {
 
     it("show question", () => {
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
         view.setPart(0);
         view.showQuestion(false, 0);
@@ -207,6 +226,7 @@ describe("IndividualTestFlow", () => {
         );
         expect(view.send).toHaveBeenCalledWith({
             uuid: expect.any(String),
+            student: expect.any(Object),
             event: "question.displayed",
             partIndex: view.currentPartIndex,
             partId: view.currentPart.id,
@@ -225,7 +245,7 @@ describe("IndividualTestFlow", () => {
     it("Trigger for first question reminder", () => {
         vi.useFakeTimers();
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, 'student_1', 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, 'student_1', 1, domElements, mediaRecorder, student);
         test.parts[0].timeout = 0;
         test.parts[0].questions[0].reminder = 5000;
         // Mock audio play
@@ -243,7 +263,7 @@ describe("IndividualTestFlow", () => {
 
     it("question.feedback triggers teacherFeedback(correct)", () => {
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
     
         // Make sure part/question exists
@@ -265,8 +285,8 @@ describe("IndividualTestFlow", () => {
         const test = new Test(individualTestData);
     
         mediaRecorder.interval = vi.fn().mockResolvedValue("BASE64_AUDIO");
-    
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
     
         view.setPart(0);
@@ -284,7 +304,7 @@ describe("IndividualTestFlow", () => {
 
     it("onPartComplete sends part.complete with duration and then calls super.onPartComplete()", () => {
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
         const superSpy = vi.spyOn(StudentTestView.prototype, "onPartComplete");
         view.setPart(0);
@@ -297,6 +317,7 @@ describe("IndividualTestFlow", () => {
     
         expect(view.send).toHaveBeenCalledWith({
             uuid: expect.any(String),
+            student: expect.any(Object),
             event: "part.complete",
             partIndex: view.currentPartIndex,
             partId: view.currentPart.id,
@@ -310,7 +331,7 @@ describe("IndividualTestFlow", () => {
     
     it("onQuestionComplete sends question.answered including recordingBase64 and duration", () => {
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
     
         view.setPart(0);
@@ -328,6 +349,7 @@ describe("IndividualTestFlow", () => {
     
         expect(view.send).toHaveBeenCalledWith({
             uuid: expect.any(String),
+            student: expect.any(Object),
             event: "question.answered",
             message: "Elev har gennemført spørgsmål 1.1",
             choiceId: null,
@@ -348,7 +370,7 @@ describe("IndividualTestFlow", () => {
     
     it("onQuestionComplete shows next question when available", () => {
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
     
         view.setPart(0);
@@ -369,7 +391,7 @@ describe("IndividualTestFlow", () => {
     
     it("onQuestionComplete calls onPartComplete when no next question exists", () => {
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
     
         view.setPart(0);
@@ -392,8 +414,8 @@ describe("IndividualTestFlow", () => {
     
         const stopSpy = vi.fn().mockResolvedValue(undefined);
         mediaRecorder.stop = stopSpy;
-    
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
     
         // Spy on parent method to ensure it's called
@@ -410,28 +432,26 @@ describe("IndividualTestFlow", () => {
         const test = new Test(individualTestData);
     
         // Create a chatSocket stub where we can capture the message listener
-        let messageListener;
-        const chatSocket = {
-            addEventListener: vi.fn((eventName, cb) => {
-                if (eventName === "message") messageListener = cb;
-            }),
-            send: vi.fn(),
-        };
-    
+        let p2pListener;
+        mockP2P.addEventListener.mockImplementation((eventName, cb) => {
+            if (eventName === "message") p2pListener = cb;
+        });
+
         const view = new IndividualTestView(
             test,
-            chatSocket,
+            ws,
             "student_1",
             1,
             domElements,
-            mediaRecorder
+            mediaRecorder,
+            student
         );
     
         const onChatMessageSpy = vi.spyOn(view, "onChatMessage");
     
         // Trigger the registered websocket listener
         const payload = { event: "ping", roomName: "student_1" };
-        messageListener({ data: JSON.stringify(payload) });
+        p2pListener({ detail: payload });
     
         expect(onChatMessageSpy).toHaveBeenCalledWith(payload);
     });
@@ -439,7 +459,7 @@ describe("IndividualTestFlow", () => {
 
     it("should handle practice mode UI and flow correctly", () => {
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
         
         view.setPart(0);
@@ -471,7 +491,7 @@ describe("IndividualTestFlow", () => {
     it("should trigger automatic completion when question timeout is reached", () => {
         vi.useFakeTimers();
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
     
         view.setPart(0);
@@ -493,7 +513,7 @@ describe("IndividualTestFlow", () => {
     it("should play reminder sound when reminder interval is reached", () => {
         vi.useFakeTimers();
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
     
         // Mock audio element
@@ -516,7 +536,7 @@ describe("IndividualTestFlow", () => {
 
     it("should wire up next button to complete question during instructions", () => {
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
         
         // 1. Ensure the question has an instruction sequence to enter the specific block
@@ -542,7 +562,7 @@ describe("IndividualTestFlow", () => {
 
     it("should wire up repeat button to repeat method during instructions", () => {
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
         
         test.parts[0].questions[0].instruction_sequence = { instructions: [] };
@@ -566,7 +586,7 @@ describe("IndividualTestFlow", () => {
 
     it("Show instructions", () => {
         const test = new Test(individualTestData);
-        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder, student);
         testSpy(view);
         view.setPart(0);
         view.showQuestion(true, 0);
@@ -581,6 +601,7 @@ describe("IndividualTestFlow", () => {
 
 describe("Individual Test - Timer and Reminder Cleanup", () => {
     let view;
+    let student;
 
     beforeEach(() => {
         vi.useFakeTimers();
@@ -592,7 +613,9 @@ describe("Individual Test - Timer and Reminder Cleanup", () => {
         test.parts[0].questions[0].reminder = 2000;
         test.parts[0].questions[0].instruction_sequence = null; // Ensure we hit the timer block
 
-        view = new IndividualTestView(test, ws, 'student_1', 1, domElements, mediaRecorder);
+        student = new Student({"id":1})
+
+        view = new IndividualTestView(test, ws, 'student_1', 1, domElements, mediaRecorder, student);
         testSpy(view);
         view.setPart(0);
     });

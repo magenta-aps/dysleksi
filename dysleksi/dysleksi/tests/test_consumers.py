@@ -123,11 +123,9 @@ class TestChatConsumer(TestCase):
 
 class TestChatConsumerMessageIntegration(TransactionTestCase):
 
-    @classmethod
-    def setUpClass(cls):
-        super().setUpClass()
+    def setUp(self):
         Group.objects.get_or_create(name=STUDENTS)
-        cls.test_user = cls.create_student("TestUser")
+        self.test_user = self.create_student("TestUser")
 
     @classmethod
     def create_student(cls, username: str, **kwargs) -> Student:
@@ -152,6 +150,7 @@ class TestChatConsumerMessageIntegration(TransactionTestCase):
             "event": "question.answered",
             "message": "Elev har besvaret spørgsmål 1",
             "choiceId": 2,
+            "student": {"id": Student.objects.get(username="TestUser").id},
         }
 
     async def send_message(self, message: str, timeout: float = 2.0):

@@ -1,4 +1,7 @@
 import { Student } from "./model.js";
+import { WebRTCChannel } from "../webRTC.js"
+import { serverOnline } from './utils.js';
+
 
 export class EventTable {
     constructor(tableSelector = 'table#events tbody') {
@@ -391,7 +394,8 @@ export class TeacherView {
     constructor(roomName, test, assignmentId, wsGetter, table, buttons, noteField, questionView) {
         this.assignmentId = assignmentId;
         this.roomName = roomName;
-        this.chatSocket = wsGetter(roomName);
+        this.wsGetter = wsGetter
+        this.chatSocket = null;
         this.test = test;
 
         this.partIndex = null;
@@ -405,10 +409,15 @@ export class TeacherView {
         this.noteField = noteField || new NoteField();
         this.questionView = questionView || new QuestionView();
         this.filterButtons = document.querySelectorAll('.group-test-header .btn');
+        this.studentChannels = {};
+
+        const savedQueue = localStorage.getItem(`msg_queue_${this.roomName}`);
+        this.messageQueue = savedQueue ? JSON.parse(savedQueue) : [];
 
         this._initSocket();
         this._initButtonListeners();
         this._initFilterButtonSelection();
+        this._startSyncInterval();
     }
 
     validatePartIndex(partIndex) {
@@ -487,9 +496,9 @@ export class TeacherView {
         return { instructions: instructions, nonInstructions: nonInstructions };
     }
 
-    _initSocket() {
-        this.chatSocket.addEventListener("message", (e) => {
-            const data = JSON.parse(e.data);
+    _initP2PSocket(p2p) {
+        p2p.addEventListener("message", (e) => {
+            const data = e.detail;
 
             if (["test.started", "question.answered", "question.displayed"].includes(data.event) && this.test.testType === 'group') {
                 this.groupTestContainer.updateData(data)
@@ -510,7 +519,79 @@ export class TeacherView {
                     this.showQuestion();
                 }
             }
+            this.messageQueue.push(data);
+            this._persistQueue(); // Persistent save
         });
+
+    }
+
+    _initSocket() {
+        this.chatSocket = this.wsGetter(this.roomName);
+        this.chatSocket.addEventListener("message", (e) => {
+            const data = JSON.parse(e.data);
+
+            if (data.event === 'student.joined') {
+                console.log("Setting up webRTC channel for student", data.studentId)
+
+                if (this.studentChannels[data.studentId]) {
+                    console.log("Cleaning up old connection for student", data.studentId);
+                    this.studentChannels[data.studentId].peer.destroy();
+                }
+
+                const p2p = new WebRTCChannel();
+                this.studentChannels[data.studentId] = p2p;
+                this._initP2PSocket(p2p)
+
+                p2p.peer.on('open', () => {
+                    p2p.connect(data.webRTCId);
+                });
+            }
+        });
+    }
+
+
+    _persistQueue() {
+        localStorage.setItem(`msg_queue_${this.roomName}`, JSON.stringify(this.messageQueue));
+    }
+
+    _startSyncInterval() {
+        this._flushMessageQueue();
+        setInterval(() => {
+            this._flushMessageQueue();
+        }, 5000);
+    }
+
+    async _flushMessageQueue() {
+
+        if (this.chatSocket.readyState === WebSocket.CONNECTING) {
+            console.log("Socket is currently connecting... waiting.");
+            return;
+        }
+
+        if (this.chatSocket.readyState === WebSocket.CLOSED || this.chatSocket.readyState === WebSocket.CLOSING) {
+            console.log("Socket closed. Attempting to reconnect...");
+            this._initSocket();
+            return;
+        }
+
+        const isOnline = await serverOnline();
+
+        // Only attempt to send if the server is online and we have messages
+        if (this.messageQueue.length > 0 && isOnline && this.chatSocket.readyState === WebSocket.OPEN) {
+            console.log(`Syncing ${this.messageQueue.length} messages to server...`);
+
+            const queueToProcess = [...this.messageQueue];
+            
+            try {
+                for (const msg of queueToProcess) {
+                    this.chatSocket.send(JSON.stringify(msg));
+                }
+                this.messageQueue = [];
+                this._persistQueue(); 
+            } catch (err) {
+                console.error("Sync failed, keeping messages in storage:", err);
+            }
+        }
     }
 
     _initButtonListeners() {
@@ -545,38 +626,42 @@ export class TeacherView {
     }
 
     sendTestCancelled() {
-        this.chatSocket.send(
-            JSON.stringify({
-                uuid: crypto.randomUUID(),
-                event: 'test.cancelled',
-                roomName: this.roomName,
-                partIndex: this.partIndex,
-                questionIndex: this.questionIndex,
-                questionId: this.currentQuestion.id,
-                partId: this.currentPart.id,
-                assignmentId: this.assignmentId,
-                note: this.noteField.getNote(),
-            })
-        );
+        Object.values(this.studentChannels).forEach(channel => {
+            channel.send(
+                {
+                    uuid: crypto.randomUUID(),
+                    event: 'test.cancelled',
+                    roomName: this.roomName,
+                    partIndex: this.partIndex,
+                    questionIndex: this.questionIndex,
+                    questionId: this.currentQuestion.id,
+                    partId: this.currentPart.id,
+                    assignmentId: this.assignmentId,
+                    note: this.noteField.getNote(),
+                }
+            );
+        });
     }
 
     sendQuestionFeedback(val) {
         // Map `val` as follows: true=correct, false=wrong, null=skipped
         const correct = (val === "skipped") ? null : (val === "correct");
-        this.chatSocket.send(
-            JSON.stringify({
-                uuid: crypto.randomUUID(),
-                event: 'question.feedback',
-                roomName: this.roomName,
-                partIndex: this.partIndex,
-                questionIndex: this.questionIndex,
-                questionId: this.currentQuestion.id,
-                partId: this.currentPart.id,
-                assignmentId: this.assignmentId,
-                correct: correct,
-                note: this.noteField.getNote(),
-            })
-        );
+        Object.values(this.studentChannels).forEach(channel => {
+            channel.send(
+                {
+                    uuid: crypto.randomUUID(),
+                    event: 'question.feedback',
+                    roomName: this.roomName,
+                    partIndex: this.partIndex,
+                    questionIndex: this.questionIndex,
+                    questionId: this.currentQuestion.id,
+                    partId: this.currentPart.id,
+                    assignmentId: this.assignmentId,
+                    correct: correct,
+                    note: this.noteField.getNote(),
+                }
+            );
+        });
     }
 
     showQuestion() {

@@ -9,9 +9,31 @@ import {Test} from "../../screening/model";
 import { GroupTestContainer } from "../../screening/controlroom.js";
 import { StudentCard } from "../../screening/controlroom.js";
 import { Student } from "../../screening/model.js";
-
+import { WebRTCChannel } from "../../webRTC.js";
 
 vi.mock("../../screening/utils.js");
+
+
+
+vi.mock("../../webRTC.js", () => {
+    return {
+        WebRTCChannel: vi.fn().mockImplementation(function() {
+            const target = new EventTarget();
+            
+            this.addEventListener = target.addEventListener.bind(target);
+            this.removeEventListener = target.removeEventListener.bind(target);
+            this.dispatchEvent = target.dispatchEvent.bind(target);
+            
+            this.connect = vi.fn();
+            this.send = vi.fn();
+            this.peer = {
+                on: vi.fn(),
+                destroy: vi.fn()
+            };
+        })
+    };
+});
+
 
 describe("ActionButtons", () => {
     const mockDoc = `
@@ -100,7 +122,7 @@ describe("ActionButtons", () => {
     });
 });
 
-describe("TeacherView", () => {
+describe("Teacher Individual test View", () => {
     let socket;
     let table;
     let buttons;
@@ -110,8 +132,17 @@ describe("TeacherView", () => {
     let wsGetter;
     let groupTest;
     let individualTest;
+    let p2pHandler;
+    let p2pChannel;
+    const studentId = 123;
 
     beforeEach(() => {
+        global.localStorage = {
+            getItem: vi.fn(),
+            setItem: vi.fn(),
+            clear: vi.fn()
+        };
+
         socket = {
             addEventListener: vi.fn(),
             send: vi.fn(),
@@ -141,16 +172,24 @@ describe("TeacherView", () => {
 
         groupTest = new Test(groupTestData);
         individualTest = new Test(individualTestData);
+
+        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
+
+        const mainSocketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+        mainSocketHandler({
+            data: JSON.stringify({ event: 'student.joined', studentId })
+        });
+        p2pChannel = view.studentChannels[studentId];
     });
 
     afterEach(() => {
         vi.restoreAllMocks();
+        vi.unstubAllGlobals();
     });
 
     it("sends null for 'correct' when the skip button is clicked", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID-SKIP");
 
-        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
         view.setPartIndex(0);
         view.setQuestionIndex(0);
 
@@ -158,7 +197,7 @@ describe("TeacherView", () => {
         const skipButton = buttons.skipButton();
         skipButton.click();
 
-        expect(socket.send).toHaveBeenCalledWith(JSON.stringify({
+        expect(p2pChannel.send).toHaveBeenCalledWith({
             uuid: "UUID-SKIP",
             event: "question.feedback",
             roomName: "room1",
@@ -169,27 +208,24 @@ describe("TeacherView", () => {
             assignmentId: 1,
             correct: null, // This hits the 'null' branch of the ternary
             note: "",
-        }));
+        });
     });
 
     it("updates indices but does not enable buttons when event is 'question.answered'", () => {
-        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
 
         // 1. Setup: Ensure buttons are currently disabled
         buttons.disableButtons();
-        const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
 
         // 2. Trigger 'question.answered'
         // This hits the outer IF but fails the 'question.displayed' IF
-        handler({
-            data: JSON.stringify({
+        p2pChannel.dispatchEvent(new CustomEvent('message', {
+            detail: {
                 event: "question.answered",
                 partIndex: 0,
                 questionIndex: 0,
                 practice: false,
                 answeredAt: "10:00:05"
-            }),
-        });
+            }}));
 
         // 3. Assertions
         // Indices should be updated
@@ -219,30 +255,18 @@ describe("TeacherView", () => {
     });
 
     it("throws an error when an out-of-bounds practice question index is received", () => {
-        // Initialize view with individualTest data
-        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
-
-        // Get the message handler from the mock socket
-        const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
 
         // We set practice: true, but provide an index (e.g., 99) that
         // exceeds the practice array length for part 0
         const invalidPracticeIndex = 99;
+        view.setPartIndex(0);
 
         expect(() => {
-            handler({
-                data: JSON.stringify({
-                    event: "question.displayed",
-                    partIndex: 0,
-                    questionIndex: invalidPracticeIndex,
-                    practice: true
-                }),
-            });
+            view.setQuestionIndex(invalidPracticeIndex, true);
         }).toThrow(`Invalid question index ${invalidPracticeIndex}`);
     });
 
     it("sets the currentQuestion from the practice array when practice is true", () => {
-        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
 
         // 1. Set the part index so we have a context for questions
         view.setPartIndex(0);
@@ -316,7 +340,6 @@ describe("TeacherView", () => {
     });
 
     it("initializes socket and button listeners", () => {
-        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
         expect(wsGetter).toHaveBeenCalledWith("room1");
         expect(socket.addEventListener).toHaveBeenCalledWith(
             "message",
@@ -325,87 +348,72 @@ describe("TeacherView", () => {
     });
 
     it("enables buttons on question.displayed", () => {
-        view = new TeacherView("room1", groupTest, 1, wsGetter, table, buttons, note, questionView);
-
         // get the message handler registered on the socket
         const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
 
         // trigger a question.displayed event
-        handler({
-            data: JSON.stringify({
+        p2pChannel.dispatchEvent(new CustomEvent('message', {
+            detail: {
                 event: "question.displayed",
                 partIndex: 0,
                 questionIndex: 0,
                 questionTitle: "Q1",
                 displayedAt: 1000,
-            }),
-        });
+            }}));
 
         const btn = document.querySelector("button");
         expect(btn.classList.contains("disabled")).toBe(false);
     });
 
     it("disables 'next' button on 'question.displayed' (individual tests)", () => {
-        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
-
-        // get the message handler registered on the socket
-        const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
 
         // trigger first question.displayed event - question type is "free_text"
-        handler({
-            data: JSON.stringify({
+        p2pChannel.dispatchEvent(new CustomEvent('message', {
+            detail: {
                 event: "question.displayed",
                 partIndex: 0,
                 questionIndex: 0,
                 questionTitle: "Q1",
                 displayedAt: 1000,
-            }),
-        });
+        }}));
 
         const btn = document.querySelector("button");
         expect(btn.classList.contains("disabled")).toBe(false);
 
         // trigger another question.displayed event - this time the question type is "no_input_required"
-        handler({
-            data: JSON.stringify({
+        p2pChannel.dispatchEvent(new CustomEvent('message', {
+            detail: {
                 event: "question.displayed",
                 partIndex: 0,
                 questionIndex: 1,
                 questionTitle: "Q2",
                 displayedAt: 2000,
-            }),
-        });
+        }}));
 
         expect(buttons.nextButton().classList).to.include(["disabled"]);
     });
 
     it("show question on question.displayed", () => {
-        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
 
         questionView.show();
         expect(questionView.containerElement.classList.contains("d-none")).toBe(false)
 
-        // get the message handler registered on the socket
-        const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
-
         // trigger a question.displayed event
-        handler({
-            data: JSON.stringify({
+        p2pChannel.dispatchEvent(new CustomEvent('message', {
+            detail: {
                 event: "question.displayed",
                 partIndex: 0,
                 questionIndex: 0,
-            }),
-        });
+        }}));
 
         expect(questionView.titleElement.textContent).toBe("1/3 (Individuel deltest)");
 
-        handler({
-            data: JSON.stringify({
+        p2pChannel.dispatchEvent(new CustomEvent('message', {
+            detail: {
                 event: "question.displayed",
                 partIndex: 0,
                 questionIndex: 1,
-            }),
-        });
+        }}));
 
         expect(questionView.titleElement.textContent).toBe("2/3 (Individuel deltest)");
     });
@@ -413,7 +421,6 @@ describe("TeacherView", () => {
     it("sends message and disables buttons on click", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
 
-        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
         // Add data in note field
         note.noteEl.value = "Test note";
         view.setPartIndex(0);
@@ -423,7 +430,7 @@ describe("TeacherView", () => {
         const wrongButton = buttons.wrongButton();
         wrongButton.click();
 
-        expect(socket.send).toHaveBeenCalledWith(JSON.stringify({
+        expect(p2pChannel.send).toHaveBeenCalledWith({
             uuid: "UUID123",
             event: "question.feedback",
             roomName: "room1",
@@ -434,7 +441,7 @@ describe("TeacherView", () => {
             assignmentId: 1,
             correct: false,
             note: "Test note",
-        }));
+        });
 
         expect(wrongButton.classList.contains("disabled")).toBe(true);
     });
@@ -442,7 +449,6 @@ describe("TeacherView", () => {
     it("delays sending feedback if question type is 'no_input_required'", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
 
-        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
 
         // Arrange: go directly to question 2 (which is type "no_input_required")
         view.setPartIndex(0);
@@ -453,12 +459,12 @@ describe("TeacherView", () => {
         buttons.correctButton().click();
 
         // Assert: no socket message sent yet
-        expect(socket.send).not.toHaveBeenCalled();
+        expect(p2pChannel.send).not.toHaveBeenCalled();
 
         // Act: click "next"
         buttons.nextButton().click();
 
-        expect(socket.send).toHaveBeenCalledWith(JSON.stringify({
+        expect(p2pChannel.send).toHaveBeenCalledWith({
             uuid: "UUID123",
             event: "question.feedback",
             roomName: "room1",
@@ -469,13 +475,12 @@ describe("TeacherView", () => {
             assignmentId: 1,
             correct: true,
             note: "Test note",
-        }));
+        });
     });
 
     it("sends message and disables buttons on cancel click", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
 
-        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
         // Add data in note field
         note.noteEl.value = "Test note";
         view.setPartIndex(0);
@@ -485,7 +490,7 @@ describe("TeacherView", () => {
         const cancelButton = buttons.cancelButton();
         cancelButton.click();
 
-        const expectedContent = JSON.stringify({
+        const expectedContent = {
             uuid: "UUID123",
             event: "test.cancelled",
             roomName: "room1",
@@ -495,16 +500,15 @@ describe("TeacherView", () => {
             partId: 1,
             assignmentId: 1,
             note: "Test note",
-        });
+        };
 
         global.confirm = vi.fn().mockReturnValue(true);
         buttons.cancelButton().click();
-        expect(socket.send).toHaveBeenCalledWith(expectedContent);
+        expect(p2pChannel.send).toHaveBeenCalledWith(expectedContent);
         expect(buttons.cancelButton().classList.contains("disabled")).toBe(true);
     });
 
     it("raise error when incorrect partindex is received", () => {
-        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
 
         const invalidIndexes = [null, undefined, -1, individualTest.parts.length, individualTest.parts.length+1];
         for (const index of invalidIndexes) {
@@ -517,7 +521,6 @@ describe("TeacherView", () => {
     });
 
     it("raise error when incorrect questionindex is received", () => {
-        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
         view.setPartIndex(0);
 
         const invalidIndexes = [null, undefined, -1, individualTest.parts[0].questions.length, individualTest.parts[0].questions.length+1];
@@ -774,6 +777,12 @@ describe("TeacherView _initFilterButtonSelection", () => {
     let socket;
 
     beforeEach(() => {
+        global.localStorage = {
+            getItem: vi.fn(),
+            setItem: vi.fn(),
+            clear: vi.fn()
+        };
+
         document.body.innerHTML = `
             <div class="group-test-header">
                 <button class="btn" id="btn1">Filter 1</button>
@@ -803,6 +812,12 @@ describe("TeacherView _initFilterButtonSelection", () => {
             new QuestionView()
         );
     });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+        vi.unstubAllGlobals();
+    });
+
 
     it("adds click listeners to filter buttons and toggles selection", () => {
         const buttons = document.querySelectorAll(".group-test-header .btn");
@@ -837,8 +852,17 @@ describe("TeacherView socket 'test.started' handling", () => {
     let socket;
     let wsGetter;
     let view;
+    let p2pHandler;
+    let p2pChannel;
+    const studentId = 123;
 
     beforeEach(() => {
+        global.localStorage = {
+            getItem: vi.fn(),
+            setItem: vi.fn(),
+            clear: vi.fn()
+        };
+
         document.body.innerHTML = `
 
             <template id="student-card-template">
@@ -872,6 +896,7 @@ describe("TeacherView socket 'test.started' handling", () => {
         socket = {
             addEventListener: vi.fn(),
             send: vi.fn(),
+            readyState: 1,
         };
 
         wsGetter = vi.fn().mockReturnValue(socket);
@@ -891,13 +916,18 @@ describe("TeacherView socket 'test.started' handling", () => {
             new NoteField(),
             new QuestionView()
         );
+
+        const mainSocketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+        mainSocketHandler({
+            data: JSON.stringify({ event: 'student.joined', studentId: studentId })
+        });
+
+        p2pChannel = view.studentChannels[studentId];
+
     });
 
     it("calls groupTestContainer.updateData when 'test.started' message is received", () => {
         const spy = vi.spyOn(view.groupTestContainer, "updateData");
-
-        // get the message handler registered on the socket
-        const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
 
         // simulate 'test.started' message
         const messageData = {
@@ -913,7 +943,9 @@ describe("TeacherView socket 'test.started' handling", () => {
             },
         };
 
-        handler({ data: JSON.stringify(messageData) });
+        p2pChannel.dispatchEvent(new CustomEvent('message', {
+            detail: messageData 
+        }));
 
         expect(spy).toHaveBeenCalledWith(messageData);
     });
@@ -1160,5 +1192,270 @@ describe("StudentCard", () => {
         card.changePart(1);
         
         expect(card.questionIndex.textContent).toContain("-/2");
+    });
+});
+
+describe("TeacherView Sync Logic", () => {
+    let socket;
+    let wsGetter;
+    let view;
+    let serverOnlineMock;
+
+    beforeEach(async () => {
+        vi.useFakeTimers();
+
+        const utils = await import("../../screening/utils.js");
+        serverOnlineMock = vi.mocked(utils.serverOnline);
+
+        socket = {
+            addEventListener: vi.fn(),
+            send: vi.fn(),
+            readyState: 1, // OPEN
+        };
+        wsGetter = vi.fn().mockReturnValue(socket);
+
+        view = new TeacherView(
+            "room1",
+            { parts: [] },
+            1,
+            wsGetter,
+            new EventTable(),
+            new ActionButtons(),
+            new NoteField(),
+            new QuestionView()
+        );
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.clearAllMocks();
+    });
+
+    describe("_startSyncInterval", () => {
+        it("triggers _flushMessageQueue every 5 seconds", () => {
+            const flushSpy = vi.spyOn(view, "_flushMessageQueue");
+            
+            vi.advanceTimersByTime(5000);
+            expect(flushSpy).toHaveBeenCalledTimes(1);
+
+            vi.advanceTimersByTime(5000);
+            expect(flushSpy).toHaveBeenCalledTimes(2);
+        });
+    });
+
+    describe("_flushMessageQueue", () => {
+        it("does nothing if the queue is empty", async () => {
+            view.messageQueue = [];
+            serverOnlineMock.mockResolvedValue(true);
+
+            await view._flushMessageQueue();
+
+            expect(socket.send).not.toHaveBeenCalled();
+        });
+
+        it("sends all messages in queue and clears it when online", async () => {
+            // Setup queue
+            const msg1 = { event: "test", id: 1 };
+            const msg2 = { event: "test", id: 2 };
+            view.messageQueue = [msg1, msg2];
+            
+            serverOnlineMock.mockResolvedValue(true);
+            const persistSpy = vi.spyOn(view, "_persistQueue");
+
+            await view._flushMessageQueue();
+
+            // Verify WebSocket behavior
+            expect(socket.send).toHaveBeenCalledTimes(2);
+            expect(socket.send).toHaveBeenNthCalledWith(1, JSON.stringify(msg1));
+            expect(socket.send).toHaveBeenNthCalledWith(2, JSON.stringify(msg2));
+
+            // Verify queue state
+            expect(view.messageQueue.length).toBe(0);
+            expect(persistSpy).toHaveBeenCalled();
+        });
+
+        it("keeps messages in queue if server is offline", async () => {
+            view.messageQueue = [{ event: "test" }];
+            serverOnlineMock.mockResolvedValue(false);
+
+            await view._flushMessageQueue();
+
+            expect(socket.send).not.toHaveBeenCalled();
+            expect(view.messageQueue.length).toBe(1);
+        });
+
+        it("attempts to reconnect if socket is CLOSED", async () => {
+            socket.readyState = 3; // CLOSED
+            const initSpy = vi.spyOn(view, "_initSocket");
+
+            await view._flushMessageQueue();
+
+            expect(initSpy).toHaveBeenCalled();
+            expect(socket.send).not.toHaveBeenCalled();
+        });
+
+        it("waits if socket is CONNECTING", async () => {
+            socket.send.mockClear();
+            serverOnlineMock.mockClear();
+            socket.readyState = 0; // CONNECTING
+            
+            await view._flushMessageQueue();
+
+            expect(socket.send).not.toHaveBeenCalled();
+            expect(serverOnlineMock).not.toHaveBeenCalled();
+        });
+
+        it("keeps messages in storage if sending fails", async () => {
+            view.messageQueue = [{ event: "fail" }];
+            serverOnlineMock.mockResolvedValue(true);
+            
+            // Force an error on send
+            socket.send.mockImplementation(() => {
+                throw new Error("Network Error");
+            });
+
+            await view._flushMessageQueue();
+
+            // Queue should still contain the message
+            expect(view.messageQueue.length).toBe(1);
+        });
+    });
+});
+
+describe("TeacherView _initSocket", () => {
+    let socket;
+    let wsGetter;
+    let view;
+    const studentId = 88;
+
+    beforeEach(() => {
+        vi.clearAllMocks();
+
+        socket = {
+            addEventListener: vi.fn(),
+            send: vi.fn(),
+        };
+        wsGetter = vi.fn().mockReturnValue(socket);
+        
+        view = new TeacherView("room1", { parts: [] }, 1, wsGetter);
+    });
+
+    it("attaches the message listener to the WebSocket", () => {
+        expect(socket.addEventListener).toHaveBeenCalledWith("message", expect.any(Function));
+    });
+
+    it("instantiates a new channel when a student offer arrives for the first time", () => {
+        const socketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+
+        socketHandler({
+            data: JSON.stringify({ event: 'student.joined', studentId })
+        });
+
+        // Now WebRTCChannel is defined because of the import
+        expect(WebRTCChannel).toHaveBeenCalledTimes(1);
+        expect(view.studentChannels[studentId]).toBeDefined();
+    });
+
+    it("creates a new channel if a student re-joins", () => {
+        const socketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+
+        // First offer
+        socketHandler({ data: JSON.stringify({ event: 'student.joined', studentId }) });
+        const oldChannel = view.studentChannels[studentId]
+
+        // Second offer for same student
+        socketHandler({ data: JSON.stringify({ event: 'student.joined', studentId }) });
+        
+        expect(WebRTCChannel).toHaveBeenCalledTimes(2);
+        expect(oldChannel.peer.destroy).toHaveBeenCalled();
+    });
+
+    it("ignores WebSocket messages that are not student.joined", () => {
+        const socketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+
+        socketHandler({
+            data: JSON.stringify({ event: 'ping', studentId: 99 })
+        });
+
+        expect(WebRTCChannel).not.toHaveBeenCalled();
+    });
+
+    it("wires the P2P channel to the P2P message handler", () => {
+        const p2pSpy = vi.spyOn(view, "_initP2PSocket");
+        const socketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+
+        socketHandler({ data: JSON.stringify({ event: 'student.joined', studentId }) });
+
+        const newChannel = view.studentChannels[studentId];
+        expect(p2pSpy).toHaveBeenCalledWith(newChannel);
+    });
+
+    it("calls p2p.connect() when the peer connection opens", () => {
+        const socketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+    
+        socketHandler({
+            data: JSON.stringify({ event: 'student.joined', studentId: 123 })
+        });
+    
+        const p2p = view.studentChannels[123];
+    
+        const openHandler = p2p.peer.on.mock.calls.find(call => call[0] === 'open')[1];
+    
+        expect(openHandler).toBeDefined();
+        openHandler();
+    
+        expect(p2p.connect).toHaveBeenCalledTimes(1);
+    });
+
+});
+
+describe("TeacherView messageQueue initialization", () => {
+    let socket;
+    let wsGetter;
+    const roomName = "test-room";
+
+    beforeEach(() => {
+        socket = { addEventListener: vi.fn(), send: vi.fn() };
+        wsGetter = vi.fn().mockReturnValue(socket);
+        
+        // Ensure localStorage is clean before each test
+        vi.spyOn(Storage.prototype, 'getItem');
+    });
+
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    it("initializes an empty queue if localStorage is empty", () => {
+        // Path: savedQueue is null
+        vi.mocked(localStorage.getItem).mockReturnValue(null);
+
+        const view = new TeacherView(roomName, { parts: [] }, 1, wsGetter);
+
+        expect(view.messageQueue).toEqual([]);
+        expect(localStorage.getItem).toHaveBeenCalledWith(`msg_queue_${roomName}`);
+    });
+
+    it("restores the message queue if valid JSON exists in localStorage", () => {
+        // Path: savedQueue contains JSON
+        const mockQueue = [
+            { event: "question.answered", id: 1 },
+            { event: "question.displayed", id: 2 }
+        ];
+        vi.mocked(localStorage.getItem).mockReturnValue(JSON.stringify(mockQueue));
+
+        const view = new TeacherView(roomName, { parts: [] }, 1, wsGetter);
+
+        expect(view.messageQueue).toEqual(mockQueue);
+        expect(view.messageQueue.length).toBe(2);
+    });
+
+    it("crashes or handles gracefully if localStorage contains invalid JSON", () => {
+        // Edge Case: corrupted data
+        vi.mocked(localStorage.getItem).mockReturnValue("not-valid-json");
+
+        expect(() => {
+            new TeacherView(roomName, { parts: [] }, 1, wsGetter);
+        }).toThrow(); // JSON.parse will throw here
     });
 });

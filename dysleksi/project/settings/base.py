@@ -83,3 +83,6 @@ class XMLFilter(logging.Filter):
         if "Resource 'XMLSchema.xsd' is already loaded" in message:
             return False
         return True
+
+
+WEBRTC_PORT = os.environ.get("WEBRTC_PORT")

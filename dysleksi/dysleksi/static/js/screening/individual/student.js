@@ -4,7 +4,7 @@ import { TestMediaRecorder } from "../media.js"
 import { IndividualTestView } from "./student-individual-test.js";
 
 
-export function initStudent(roomName, assignmentId, test) {
+export function initStudent(roomName, assignmentId, test, student) {
     const chatSocket = getWebSocket(roomName);
     const domElements = new IndividualTestDomElements();
 
@@ -22,7 +22,7 @@ export function initStudent(roomName, assignmentId, test) {
             }));
         }).then(() => {
             console.log("Audio recording setup complete");
-            const view = new IndividualTestView(test, chatSocket, roomName, assignmentId, domElements, testMediaRecorder);
+            const view = new IndividualTestView(test, chatSocket, roomName, assignmentId, domElements, testMediaRecorder, student);
 
             view.addEventListener("test.complete", (evt) => {
                 chatSocket.close();

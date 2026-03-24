@@ -76,6 +76,8 @@ freezegun==1.5.5
 ## Code typing check
 mypy==1.7.0
 
+## test traceback for parallel tests
+tblib==3.2.2
 
 
 ## TODO: Remove when TOTP code is gone
