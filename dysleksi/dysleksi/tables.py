@@ -18,9 +18,8 @@ class ClassTable(Table):
         verbose_name=_("Klassetrin"),
     )
 
-    start_year = tables.Column(
-        accessor=A("start_year"),
-        verbose_name=_("Årgang"),
+    school_year = tables.Column(
+        verbose_name=_("Skoleår"),
     )
 
     number_of_students = tables.Column(

@@ -96,7 +96,7 @@ msgid "Klassetrin"
 msgstr ""
 
 #: dysleksi/tables.py
-msgid "Årgang"
+msgid "Skoleår"
 msgstr ""
 
 #: dysleksi/tables.py

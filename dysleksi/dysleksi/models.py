@@ -148,7 +148,7 @@ class ClassQuerySet(QuerySet):
     def current(self):
         today = date.today()
         return self.filter(
-            start_school_year=today.year if today.month >= 7 else today.year - 1
+            school_year_start=today.year if today.month >= 7 else today.year - 1
         )
 
 
@@ -156,19 +156,7 @@ class Class(models.Model):
 
     objects = ClassQuerySet.as_manager()
 
-    # Remove this when data has been migrated on server
-    start_year = models.PositiveSmallIntegerField(
-        null=False,
-        blank=False,
-    )
-    # Remove this when data has been migrated on server
-    letter = models.CharField(
-        max_length=1,
-        null=True,
-        blank=True,
-    )
-
-    start_school_year = models.PositiveSmallIntegerField(
+    school_year_start = models.PositiveSmallIntegerField(
         null=True,
         blank=False,
         default=None,
@@ -180,8 +168,12 @@ class Class(models.Model):
     )
 
     @cached_property
-    def end_school_year(self):
-        return self.start_school_year + 1
+    def school_year_end(self):
+        return self.school_year_start + 1
+
+    @cached_property
+    def school_year(self) -> str:
+        return f"{self.school_year_start} - {self.school_year_end}"
 
     name = models.CharField(max_length=10, null=False, blank=False, default="")
     teachers = models.ManyToManyField(

@@ -11,10 +11,12 @@ from django.core.exceptions import ValidationError
 from django.db import IntegrityError
 from django.db.models.fields.files import FieldFile
 from django.utils import timezone
+from freezegun import freeze_time
 
 from dysleksi.models import (
     STUDENTS,
     TEACHERS,
+    Class,
     Instruction,
     InstructionAction,
     InstructionSequence,
@@ -68,8 +70,16 @@ class TestClass(DysleksiTest):
         self.assertEqual(str(self.klasse), "1.A")
 
     def test_school_year(self):
-        self.assertEqual(self.klasse.start_school_year, 2025)
-        self.assertEqual(self.klasse.end_school_year, 2026)
+        self.assertEqual(self.klasse.school_year_start, 2025)
+        self.assertEqual(self.klasse.school_year_end, 2026)
+
+    def test_current(self):
+        with freeze_time("2025-12-01 00:00:00Z"):
+            self.assertIn(self.klasse, Class.objects.all().current())
+        with freeze_time("2026-06-01 00:00:00Z"):
+            self.assertIn(self.klasse, Class.objects.all().current())
+        with freeze_time("2026-12-01 00:00:00Z"):
+            self.assertNotIn(self.klasse, Class.objects.all().current())
 
 
 class TestPartResponse(DysleksiTest):
@@ -198,7 +208,7 @@ class TestTestResponse(DysleksiTest):
             teacher=self.teacher,
             klasse=self.klasse,
         )
-        klasse2 = self.create_class(2025, "1.B", 2025, "B")
+        klasse2 = self.create_class(2025, "1.B")
         student2 = self.create_student("TestStudent2", klasse=klasse2)
 
         with self.assertRaises(ValidationError) as cm:
