@@ -87,22 +87,32 @@ class Command(BaseCommand):
         student3.set_password("elev")
         student3.groups.add(student_group)
 
-        # Create classes
-        current_year = date.today().year
-        for start_year in range(current_year, current_year - 7, -1):
+        start_school_year = (
+            date.today().year if date.today().month < 7 else date.today().year - 1
+        )
+        for classnumber in range(0, 7):
             for letter in ("A", "B", "C"):
                 c, _ = Class.objects.get_or_create(
-                    start_year=start_year,
+                    start_school_year=start_school_year,
+                    name=f"{classnumber}.{letter}",
+                    # Remove when data has been migrated on server
+                    start_year=date.today().year - classnumber,
                     letter=letter,
                 )
                 c.teachers.set([teacher, teacher2])
 
         # Add students to classes
-        student.klasse = Class.objects.get(start_year=current_year - 2, letter="A")
+        student.klasse = Class.objects.get(
+            start_school_year=start_school_year, name="2.A"
+        )
         student.save()
 
-        student2.klasse = Class.objects.get(start_year=current_year, letter="B")
+        student2.klasse = Class.objects.get(
+            start_school_year=start_school_year, name="0.B"
+        )
         student2.save()
 
-        student3.klasse = Class.objects.get(start_year=current_year, letter="C")
+        student3.klasse = Class.objects.get(
+            start_school_year=start_school_year, name="0.C"
+        )
         student3.save()

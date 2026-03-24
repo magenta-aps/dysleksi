@@ -14,7 +14,7 @@ from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import TextChoices
+from django.db.models import QuerySet, TextChoices
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -144,35 +144,50 @@ def on_update_teacher(sender, instance: Teacher, created: bool, **kwargs):
         instance.groups.add(Group.objects.get(name=TEACHERS))
 
 
+class ClassQuerySet(QuerySet):
+    def current(self):
+        today = date.today()
+        return self.filter(
+            start_school_year=today.year if today.month >= 7 else today.year - 1
+        )
+
+
 class Class(models.Model):
+
+    objects = ClassQuerySet.as_manager()
+
+    # Remove this when data has been migrated on server
     start_year = models.PositiveSmallIntegerField(
         null=False,
         blank=False,
     )
+    # Remove this when data has been migrated on server
     letter = models.CharField(
         max_length=1,
         null=True,
         blank=True,
     )
+
+    start_school_year = models.PositiveSmallIntegerField(
+        null=True,
+        blank=False,
+        default=None,
+        verbose_name="Year that this class started",
+        # F.eks. en nuværende klasse i marts 2026 vil være
+        # årgang 2025 - 2026, dvs. dette felt er 2025
+        # Klasser lever ikke fra år til år; når et nyt skoleår starter,
+        # arbejder vi med nye klasser
+    )
+
+    @cached_property
+    def end_school_year(self):
+        return self.start_school_year + 1
+
+    name = models.CharField(max_length=10, null=False, blank=False, default="")
     teachers = models.ManyToManyField(
         Teacher,
         related_name="classes",
     )
-
-    @property
-    def number(self) -> int:
-        # Klassetrin beregnet udfra start_year
-        # Så en klasse der begynder i sommeren år X
-        # vil have nummer 1 indtil sommeren år X+1, nummer 2 indtil X+2 osv.
-        today = date.today()
-        years = today.year - self.start_year
-        if today.month >= 7:  # Skæringspunkt mellem juni og juli
-            years += 1
-        return years
-
-    @property
-    def name(self) -> str:
-        return f"{self.number}.{self.letter}"
 
     def __str__(self) -> str:
         return self.name

@@ -35,7 +35,7 @@ class DysleksiTest(TestCase):
         super().setUpTestData()
         Group.objects.get_or_create(name=TEACHERS)
         Group.objects.get_or_create(name=STUDENTS)
-        cls.klasse = cls.create_class(2025, "A")
+        cls.klasse = cls.create_class(2025, "1.A", 2025, "A")
         cls.student = cls.create_student(
             "TestStudent",
             cpr=1234567890,
@@ -133,7 +133,9 @@ class DysleksiTest(TestCase):
             question_type=QuestionType.FREE_TEXT,
         )
 
-        cls.klasse, _ = Class.objects.get_or_create(start_year=2025, letter="A")
+        cls.klasse, _ = Class.objects.get_or_create(
+            start_year=2025, letter="A", start_school_year=2025, name="1.A"
+        )
         cls.teacher.classes.add(cls.klasse)
         for student in ("elev1", "elev2"):
             cls.klasse.student_set.add(cls.create_student(student))
@@ -177,8 +179,12 @@ class DysleksiTest(TestCase):
         cls._temp_media.cleanup()
 
     @classmethod
-    def create_class(cls, start_year: int, letter: str) -> Class:
+    def create_class(
+        cls, start_school_year: int, name: str, start_year: int, letter: str
+    ) -> Class:
         klasse, _ = Class.objects.get_or_create(
+            start_school_year=start_school_year,
+            name=name,
             start_year=start_year,
             letter=letter,
         )
