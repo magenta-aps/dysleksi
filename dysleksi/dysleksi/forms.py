@@ -140,9 +140,7 @@ class StartClassRoomForm(DynamicFormMixin, StartRoomForm):
     klasse = DynamicField(
         ModelChoiceField,
         label=_("Vælg klasse"),
-        queryset=lambda form: form.teacher.classes.all().order_by(
-            "start_year", "letter"
-        ),
+        queryset=lambda form: form.teacher.classes.all().order_by("name"),
     )
 
     test = DynamicField(
