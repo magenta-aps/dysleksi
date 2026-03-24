@@ -118,6 +118,8 @@ class ClassListView(GroupRequiredMixin, SingleTableView):
         qs = super().get_queryset()
         # Only show classes belonging to the teacher viewing the page
         qs = qs.filter(teachers=self.user)
+        # Only classes in the current school year
+        qs = qs.current()
         # Add annotations used by `ClassTable`
         qs = qs.annotate(
             number_of_students=Count("student__pk", distinct=True),
