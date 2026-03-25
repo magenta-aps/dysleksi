@@ -44,7 +44,7 @@ export class TestMediaRecorder extends EventTarget {
     interval() {
         // Extract audio stored in this.recording as one base64 string
         return new Promise((resolve) => {
-            const listener = (evt) => {
+            const listener = () => {
                 this.removeEventListener("recording.updated", listener);
                 const recordingBlob = new Blob(this.recording, {
                     type: this.recording[0].type,

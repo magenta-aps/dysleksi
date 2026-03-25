@@ -5,7 +5,7 @@ import {
     GroupTestDomElements,
     IndividualTestDomElements,
 } from "../../screening/dom.js";
-import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import { describe, it, expect, beforeEach, vi } from "vitest";
 import * as utils from "../../screening/utils.js";
 
 import { spyAttributes } from "../utils.js";
@@ -687,7 +687,7 @@ describe("_setButtonListener tests", () => {
 
     it("adds a click listener", async () => {
         const listener = vi.fn();
-        const spy = vi.spyOn(button, "addEventListener");
+        vi.spyOn(button, "addEventListener");
         dom._setButtonListener(button, listener);
         await button._clickHandler();
         expect(listener).toHaveBeenCalled();

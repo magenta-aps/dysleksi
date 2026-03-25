@@ -133,9 +133,7 @@ describe("Teacher Individual test View", () => {
     let questionView;
     let view;
     let wsGetter;
-    let groupTest;
     let individualTest;
-    let p2pHandler;
     let p2pChannel;
     const studentId = 123;
 
@@ -173,7 +171,7 @@ describe("Teacher Individual test View", () => {
         questionView = new QuestionView();
         vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
 
-        groupTest = new Test(groupTestData);
+        new Test(groupTestData);
         individualTest = new Test(individualTestData);
 
         view = new TeacherView(
@@ -363,11 +361,6 @@ describe("Teacher Individual test View", () => {
     });
 
     it("enables buttons on question.displayed", () => {
-        // get the message handler registered on the socket
-        const handler = socket.addEventListener.mock.calls.find(
-            (c) => c[0] === "message",
-        )[1];
-
         // trigger a question.displayed event
         p2pChannel.dispatchEvent(
             new CustomEvent("message", {
@@ -549,7 +542,7 @@ describe("Teacher Individual test View", () => {
             try {
                 view.validatePartIndex(index);
                 assert.fail("Exception not raised for part index " + index);
-            } catch (e) {}
+            } catch {}
         }
     });
 
@@ -567,7 +560,7 @@ describe("Teacher Individual test View", () => {
             try {
                 view.validateQuestionIndex(index);
                 assert.fail("Exception not raised for question index " + index);
-            } catch (e) {}
+            } catch {}
         }
     });
 
@@ -639,7 +632,6 @@ describe("Teacher Individual test View", () => {
 });
 
 describe("GroupTestContainer", () => {
-    let container;
     let instance;
 
     beforeEach(() => {
@@ -672,7 +664,7 @@ describe("GroupTestContainer", () => {
 
             <div class="group-test-body"></div>
         `;
-        container = document.querySelector(".group-test-body");
+        document.querySelector(".group-test-body");
 
         const test = {
             parts: [
@@ -887,7 +879,6 @@ describe("GroupTestContainer", () => {
 });
 
 describe("TeacherView _initFilterButtonSelection", () => {
-    let view;
     let socket;
 
     beforeEach(() => {
@@ -915,7 +906,7 @@ describe("TeacherView _initFilterButtonSelection", () => {
         // Minimal test data
         const testData = { parts: [] };
 
-        view = new TeacherView(
+        new TeacherView(
             "room1",
             testData,
             1,
@@ -964,7 +955,6 @@ describe("TeacherView socket 'test.started' handling", () => {
     let socket;
     let wsGetter;
     let view;
-    let p2pHandler;
     let p2pChannel;
     const studentId = 123;
 
@@ -1182,7 +1172,6 @@ describe("EventTable", () => {
 describe("StudentCard", () => {
     let mockStudent;
     let mockTest;
-    let template;
 
     beforeEach(() => {
         document.body.innerHTML = `

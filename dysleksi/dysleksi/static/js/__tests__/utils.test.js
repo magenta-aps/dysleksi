@@ -4,7 +4,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 import { startSession, refreshSession } from "../screening/utils";
 import * as wsModule from "../ws.js";
-import { getWebSocket } from "../ws.js";
 import { calculateStudentProgress } from "../screening/utils";
 import { preventDoubleTapZoom } from "../screening/utils";
 import { getCursorIndex, serverOnline } from "../screening/utils";
@@ -20,7 +19,7 @@ vi.spyOn(wsModule, "getWebSocket").mockImplementation((roomName) => {
     const listeners = {};
 
     const socket = {
-        send: vi.fn((data) => {}),
+        send: vi.fn(() => {}),
         addEventListener: vi.fn((event, cb, options) => {
             listeners[event] = { cb, options };
         }),
@@ -447,11 +446,9 @@ describe("getCursorIndex", () => {
 });
 
 describe("preventDoubleTapZoom", () => {
-    let addEventListenerSpy;
-
     beforeEach(() => {
         document.body.innerHTML = "";
-        addEventListenerSpy = vi.spyOn(document, "addEventListener");
+        vi.spyOn(document, "addEventListener");
 
         preventDoubleTapZoom();
     });
@@ -535,8 +532,6 @@ describe("preventDoubleTapZoom", () => {
 });
 
 describe("serverOnline", () => {
-    let dom;
-
     beforeEach(() => {
         // Clear all mocks and stubs
         vi.stubGlobal("fetch", vi.fn());

@@ -127,7 +127,7 @@ export class Wizard {
         return true;
     }
 
-    #validateFields(evt) {
+    #validateFields() {
         this.#updateBtn(this.nextBtn, this.isFormStepCompleted() === false);
     }
 

@@ -43,7 +43,7 @@ let viewInstance;
 
 vi.mock("../../../screening/individual/student-individual-test.js", () => ({
     IndividualTestView: class {
-        constructor(...args) {
+        constructor() {
             viewInstance = this;
         }
         addEventListener = vi.fn();

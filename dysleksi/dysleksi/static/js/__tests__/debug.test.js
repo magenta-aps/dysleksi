@@ -107,7 +107,7 @@ describe("DebugConsole", () => {
 
         document.body.innerHTML = `<div id="logbox"></div>`;
         const lb = document.getElementById("logbox");
-        const consoleInstance = new DebugConsole();
+        new DebugConsole();
         expect(lb.style.display).not.toBe("none");
     });
 
@@ -135,7 +135,7 @@ describe("DebugConsole", () => {
 
     it("should auto-initialize if logbox exists", async () => {
         // Import AFTER creating the logbox
-        const module = await import("../debug.js"); // path to your debug.js
+        await import("../debug.js"); // path to your debug.js
         const firstLine = logbox.firstChild.textContent;
 
         expect(firstLine).toContain("Debug console attached");

@@ -46,8 +46,6 @@ import {
 import { getWebSocket } from "../../../ws.js";
 
 describe("initTeacher", () => {
-    let showButtonsSpy, noteShowSpy, questionShowSpy;
-
     beforeEach(() => {
         vi.clearAllMocks();
     });

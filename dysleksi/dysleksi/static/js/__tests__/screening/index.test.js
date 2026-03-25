@@ -13,7 +13,6 @@ import { Test } from "../../screening/model.js";
 
 describe("Startup teacher test", () => {
     let socket;
-    let wsGetter;
 
     let initIndividualTeacher;
     let initIndividualStudent;
@@ -25,7 +24,7 @@ describe("Startup teacher test", () => {
             addEventListener: vi.fn(),
             send: vi.fn(),
         };
-        wsGetter = vi.fn().mockReturnValue(socket);
+        vi.fn().mockReturnValue(socket);
 
         initIndividualTeacher = vi
             .spyOn(individual_teacher, "initTeacher")
@@ -75,7 +74,7 @@ describe("Startup teacher test", () => {
         try {
             await start();
             assert.fail("Exception not raised");
-        } catch (e) {}
+        } catch {}
 
         expect(initIndividualTeacher).not.toHaveBeenCalled();
         expect(initIndividualStudent).not.toHaveBeenCalled();
@@ -221,7 +220,7 @@ describe("Startup teacher test", () => {
         // just to ensure the line in index.js is executed.
         try {
             await start();
-        } catch (e) {
+        } catch {
             // We expect a crash later in 'new Test(null)',
             // but the line we want to cover has now been reached.
         }

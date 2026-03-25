@@ -206,7 +206,6 @@ describe("GroupTestFlow", () => {
         // 1. Initialize view state
         view.setPart(0);
         view.showQuestion(false, 0);
-        const currentQuestion = view.currentQuestion;
 
         // 2. Call start()
         view.start();
@@ -446,8 +445,6 @@ describe("GroupTestFlow", () => {
         view.start();
         view.endSummary();
 
-        const part = view.currentPart;
-
         expect(view.currentQuestionIndex).toBe(0);
         expect(view.isPracticing).toBe(true);
         expect(view.showFirstQuestion).toHaveBeenCalledWith(true);
@@ -475,8 +472,6 @@ describe("GroupTestFlow", () => {
         view.start();
         view.endSummary();
 
-        const part = view.currentPart;
-
         expect(view.currentQuestionIndex).toBe(0);
         expect(view.isPracticing).toBe(false);
         expect(view.showFirstQuestion).toHaveBeenCalledWith(false);
@@ -492,10 +487,7 @@ describe("GroupTestFlow", () => {
         view.domElements.reminderSoundEl.play = vi.fn();
         testSpy(view);
         view.setPart(0);
-        const part = view.currentPart;
         view.showFirstQuestion(false);
-        const question = view.currentQuestion;
-        const firstQuestionTitle = view.questionTitle();
 
         vi.runAllTimers();
         expect(view.domElements.playSound).toHaveBeenCalled();
@@ -673,7 +665,7 @@ describe("GroupTestFlow", () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         const spyShowQuestionChallenge = vi.spyOn(domElements, "showQuestionChallenge");
-        const spyConsoleLog = vi.spyOn(console, "log");
+        vi.spyOn(console, "log");
         view.setPart(1); // go to word spelling questions (which use sound challenges)
         // Act
         view.showQuestion(false, 1);
@@ -695,7 +687,6 @@ describe("GroupTestFlow", () => {
         testSpy(view);
         view.setPart(0);
 
-        const part = view.currentPart;
         view.showQuestion(true, 1);
         const question = view.currentQuestion;
         view.onQuestionComplete(question);
@@ -709,7 +700,6 @@ describe("GroupTestFlow", () => {
         testSpy(view);
         view.setPart(0);
 
-        const part = view.currentPart;
         view.showQuestion(true, 1);
         const question = view.currentQuestion;
         const correctAnswer = question.possibleAnswers.find((a) => a.isCorrect);
@@ -729,7 +719,6 @@ describe("GroupTestFlow", () => {
         testSpy(view);
         view.setPart(0);
 
-        const part = view.currentPart;
         view.showQuestion(true, 1);
         const question = view.currentQuestion;
         const incorrectAnswer = question.possibleAnswers.find((a) => !a.isCorrect);
@@ -749,7 +738,6 @@ describe("GroupTestFlow", () => {
         testSpy(view);
         view.setPart(0);
 
-        const part = view.currentPart;
         view.showQuestion(true, 2);
         const question = view.currentQuestion;
         const correctAnswer = question.possibleAnswers.find((a) => a.isCorrect);
@@ -788,7 +776,6 @@ describe("GroupTestFlow", () => {
         testSpy(view);
         view.setPart(1);
 
-        const part = view.currentPart;
         view.showQuestion(false, 0);
         expect(view.input).not.toBe(null);
         const question = view.currentQuestion;
@@ -825,7 +812,6 @@ describe("GroupTestFlow", () => {
 
         view.showQuestion(false, 0);
         expect(view.input).not.toBe(null);
-        const question = view.currentQuestion;
         view.input.value = "";
         view.selectFreeText();
         expect(view.domElements.toggleNextButton).toHaveBeenCalledWith(false);
@@ -897,7 +883,6 @@ describe("GroupTestFlow", () => {
         testSpy(view);
         const canShow = view.setPart(0);
         expect(canShow).toBe(true);
-        const part = view.currentPart;
         view.showQuestion(true, 0);
         const question = view.currentQuestion;
         view.onQuestionComplete(question);
@@ -1051,7 +1036,7 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         };
 
         mockAudioContext = {
-            decodeAudioData: vi.fn((arrayBuffer) => Promise.resolve({})), // fake AudioBuffer
+            decodeAudioData: vi.fn(() => Promise.resolve({})), // fake AudioBuffer
             createBufferSource: vi.fn(() => mockSource),
             destination: {},
         };
@@ -1063,7 +1048,6 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
 
     it("displays a question with sound correctly", async () => {
         const soundUrl = "https://example.com/audio.mp3";
-        const questionText = "Listen carefully";
 
         domElements.showQuestionChallenge(null, soundUrl, null, mockAudioContext);
 
@@ -1097,8 +1081,6 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         const imageUrl = "https://example.com/image.png";
 
         domElements.showQuestionChallenge(null, null, imageUrl, mockAudioContext);
-
-        const challengeEl = document.getElementById("question-challenge");
 
         // Image element should exist
         const imgEl = document.querySelector("#challenge-image");
@@ -1143,7 +1125,6 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         const soundUrl = "https://example.com/audio.mp3";
         domElements.showQuestionChallenge(null, soundUrl, null, mockAudioContext);
 
-        const audioEl = document.getElementById("challenge-audio");
         const playBtn = document.getElementById("challenge-sound-btn");
 
         // Before clicking, buttons are disabled
@@ -1194,7 +1175,6 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         const soundUrl = "https://example.com/audio.mp3";
         domElements.showQuestionChallenge(null, soundUrl, null, mockAudioContext);
 
-        const audioEl = document.getElementById("challenge-audio");
         const playBtn = document.getElementById("challenge-sound-btn");
 
         // Click play twice
@@ -1586,9 +1566,7 @@ describe("GroupTestDomElements - FreeText Touch Interaction", () => {
 
     it("touchstart on display field calculates cursor index and sets focus", () => {
         const getCursorIndexSpy = vi.spyOn(utils, "getCursorIndex").mockReturnValue(5);
-        const styleSpy = vi
-            .spyOn(window, "getComputedStyle")
-            .mockReturnValue({ paddingLeft: "10px" });
+        vi.spyOn(window, "getComputedStyle").mockReturnValue({ paddingLeft: "10px" });
         const focusSpy = vi.spyOn(displayField, "focus");
         const selectionSpy = vi.spyOn(displayField, "setSelectionRange");
 

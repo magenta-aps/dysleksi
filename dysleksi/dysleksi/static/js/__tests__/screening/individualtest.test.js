@@ -30,7 +30,6 @@ vi.mock("../../webRTC.js", () => {
 });
 
 describe("IndividualTestFlow", () => {
-    let originalWebSocket;
     let mockSend;
 
     beforeEach(() => {
@@ -40,9 +39,6 @@ describe("IndividualTestFlow", () => {
         global.document.timeline = {
             currentTime: 0,
         };
-
-        // Save original WebSocket
-        originalWebSocket = global.WebSocket;
 
         // Mock WebSocket as a class (constructor)
         mockSend = vi.fn();
@@ -215,7 +211,7 @@ describe("IndividualTestFlow", () => {
             mediaRecorder,
         );
         testSpy(view);
-        const superSpy = vi.spyOn(StudentTestView.prototype, "onPartComplete");
+        vi.spyOn(StudentTestView.prototype, "onPartComplete");
         view.setPart(1);
         view.onPartComplete();
         expect(view.onTestComplete).toHaveBeenCalled();
@@ -320,10 +316,7 @@ describe("IndividualTestFlow", () => {
         view.domElements.playSound = vi.fn();
         testSpy(view);
         view.setPart(0);
-        const part = view.currentPart;
         view.showFirstQuestion(false);
-        const question = view.currentQuestion;
-        const firstQuestionTitle = view.questionTitle();
 
         vi.runAllTimers();
         expect(view.domElements.playSound).toHaveBeenCalled();
