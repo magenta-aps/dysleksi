@@ -21,7 +21,7 @@ class DummyDataTest(TestCase):
                 ("Slut 2. klasse", TestType.GROUP),
                 ("Midt 3. klasse", TestType.GROUP),
                 ("Slut 3. klasse", TestType.GROUP),
-                ("Bogstavbenævnelse (dummy)", TestType.INDIVIDUAL),
+                ("Individuel test", TestType.INDIVIDUAL),
             ],
             ordered=False,
         )

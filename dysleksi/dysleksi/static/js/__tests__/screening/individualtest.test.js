@@ -69,7 +69,10 @@ describe("IndividualTestFlow", () => {
             <div id="test-intro"></div>
             <button id="next"></button>
             <button id="repeat"></button>
+            <button id="start-testpart"></button>
             <div id="choices"></div>
+            <h2 id="testpart-intro-text"> </h2>
+            <img id="testpart-intro-image">
         `;
 
         global.domElements = new IndividualTestDomElements();
@@ -96,7 +99,7 @@ describe("IndividualTestFlow", () => {
         // Test that the instance with subinstances is correctly created from json
         const test = new Test(individualTestData);
         expect(test.name).toBe("Individuel test");
-        expect(test.parts.length).toBe(1);
+        expect(test.parts.length).toBe(2);
         expect(test.parts[0].test).toBe(test);
         expect(test.parts[0].id).toBe(1);
         expect(test.parts[0].index).toBe(0);
@@ -183,6 +186,17 @@ describe("IndividualTestFlow", () => {
         expect(view.onTestComplete).toHaveBeenCalledWith(true);
         expect(view.mediaRecorder.stop).toHaveBeenCalled();
     });
+
+    it("complete test", () => {
+        const test = new Test(individualTestData);
+        const view = new IndividualTestView(test, ws, "student_1", 1, domElements, mediaRecorder);
+        testSpy(view);
+        const superSpy = vi.spyOn(StudentTestView.prototype, "onPartComplete");
+        view.setPart(1);
+        view.onPartComplete();
+        expect(view.onTestComplete).toHaveBeenCalled();
+    });
+
 
     it("cancel test without media recorder", () => {
         const test = new Test(individualTestData);
@@ -308,7 +322,9 @@ describe("IndividualTestFlow", () => {
         testSpy(view);
         const superSpy = vi.spyOn(StudentTestView.prototype, "onPartComplete");
         view.setPart(0);
-    
+        const partIndex= view.currentPartIndex;
+        const partId= view.currentPart.id;
+
         // Fake timestamps
         view.displayedAt = 100;
         document.timeline.currentTime = 175;
@@ -319,8 +335,8 @@ describe("IndividualTestFlow", () => {
             uuid: expect.any(String),
             student: expect.any(Object),
             event: "part.complete",
-            partIndex: view.currentPartIndex,
-            partId: view.currentPart.id,
+            partIndex: partIndex,
+            partId: partId,
             duration: 75,
             assignmentId: 1,
             roomName: "student_1",

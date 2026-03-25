@@ -315,27 +315,27 @@ describe("Teacher Individual test View", () => {
         view.setPartIndex(0);
         // Assert
         expect(partName.innerText).toBe(view.test.parts[0].name);
-        expect(partNumber.innerText).toBe("Deltest 1 af 1");
+        expect(partNumber.innerText).toBe("Deltest 1 af 2");
 
         // Act: go to instruction question
         view.setQuestionIndex(0, true);
         // Assert
         expect(partName.innerText).toBe(view.test.parts[0].name);
-        expect(partNumber.innerText).toBe("Deltest 1 af 1");
+        expect(partNumber.innerText).toBe("Deltest 1 af 2");
         expect(questionNumber.innerText).toBe("Instruktion 1 af 1");
 
         // Act: go to practice question
         view.setQuestionIndex(1, true);
         // Assert
         expect(partName.innerText).toBe(view.test.parts[0].name);
-        expect(partNumber.innerText).toBe("Deltest 1 af 1");
+        expect(partNumber.innerText).toBe("Deltest 1 af 2");
         expect(questionNumber.innerText).toBe("Øveopgave 1 af 1");
 
         // Act: go to real question
         view.setQuestionIndex(0, false);
         // Assert
         expect(partName.innerText).toBe(view.test.parts[0].name);
-        expect(partNumber.innerText).toBe("Deltest 1 af 1");
+        expect(partNumber.innerText).toBe("Deltest 1 af 2");
         expect(questionNumber.innerText).toBe("Opgave 1 af 3");
     });
 
@@ -571,16 +571,20 @@ describe("Teacher Individual test View", () => {
         const container = document.querySelector("#question-content");
 
         questionView.showContent("Test content", "/test/image.png");
-        expect(container.innerHTML).toBe('<img id="challenge-image" src="/test/image.png"><p id="challenge-text">Test content</p>');
+        expect(container.querySelector("#challenge-image").src).toContain("/test/image.png");
+        expect(container.querySelector("#challenge-text").textContent).toBe("Test content");
 
         questionView.showContent("Test content", "/test/image2.png");
-        expect(container.innerHTML).toBe('<img id="challenge-image" src="/test/image2.png"><p id="challenge-text">Test content</p>');
+        expect(container.querySelector("#challenge-image").src).toContain("/test/image2.png");
+        expect(container.querySelector("#challenge-text").textContent).toBe("Test content");
 
         questionView.showContent("Test content");
-        expect(container.innerHTML).toBe('<p id="challenge-text">Test content</p>');
+        expect(container.querySelector("#challenge-image")).toBeNull();
+        expect(container.querySelector("#challenge-text").textContent).toBe("Test content");
 
         questionView.showContent(null, "/test/image.png");
-        expect(container.innerHTML).toBe('<img id="challenge-image" src="/test/image.png">');
+        expect(container.querySelector("#challenge-image").src).toContain("/test/image.png");
+        expect(container.querySelector("#challenge-text")).toBeNull();
     });
 });
 

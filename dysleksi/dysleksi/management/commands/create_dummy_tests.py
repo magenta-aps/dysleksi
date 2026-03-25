@@ -90,7 +90,7 @@ def create_group_test(
 
 def create_individual_test():
 
-    test_name = "Bogstavbenævnelse (dummy)"
+    test_name = "Individuel test"
     test, created = Test.objects.get_or_create(
         name=test_name, test_type=TestType.INDIVIDUAL
     )
@@ -98,14 +98,32 @@ def create_individual_test():
     call_command(
         "import_test",
         test_name,
-        "Individuel deltest (dummy)",
+        "Bogstavbenævnelse (dummy)",
         Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
         / "dummy/letter_pronunciation/letter_pronunciation.json",
-        "letter_pronunciation",
+        "pronunciation",
         practice_json_path=(
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
             / "real/letter_pronunciation/letter_pronunciation_practice.json"
         ),
+    )
+
+    call_command(
+        "import_test",
+        test_name,
+        "Højtlæsning af ord (dummy)",
+        Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+        / "dummy/word_pronunciation/word_pronunciation.json",
+        "pronunciation",
+    )
+
+    call_command(
+        "import_test",
+        test_name,
+        "Højtlæsning af nonsensord (dummy)",
+        Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+        / "dummy/nonsense_word_pronunciation/nonsense_word_pronunciation.json",
+        "pronunciation",
     )
 
 
