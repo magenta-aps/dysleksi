@@ -20,5 +20,6 @@ def webrtc_settings(request):
     return {
         "WEBRTC_CONFIG": {
             "port": settings.WEBRTC_PORT,
+            "key": settings.WEBRTC_KEY,
         }
     }

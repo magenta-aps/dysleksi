@@ -86,3 +86,4 @@ class XMLFilter(logging.Filter):
 
 
 WEBRTC_PORT = os.environ.get("WEBRTC_PORT")
+WEBRTC_KEY = os.environ.get("WEBRTC_KEY")

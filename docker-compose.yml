@@ -158,10 +158,6 @@ services:
   peerjs-server:
     image: peerjs/peerjs-server
     container_name: peerjs-server
-    volumes:
-      - ./dev-environment/cert:/ssl:ro
-    environment:
-      - PORT=9000
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.peerjs.rule=Host(`dysleksi-web`) && PathPrefix(`/webrtc`)"
@@ -173,7 +169,7 @@ services:
     command: [
       "--port", "9000",
       "--path", "/webrtc",
-      "--key", "peerjs",
+      "--key", "dysleksi_dev",
     ]
     networks:
       - default
