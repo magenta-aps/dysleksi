@@ -74,28 +74,28 @@ describe("initStudent (Group)", () => {
         await openHandler();
 
         const handler = viewInstance.addEventListener.mock.calls.find(
-            call => call[0] === "test.complete"
+            (call) => call[0] === "test.complete",
         )[1];
-        
+
         handler();
         expect(mockClose).toHaveBeenCalled();
     });
 
     it("logs an error if GroupTestView construction fails", async () => {
         const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
-        
+
         // 1. Set the flag to true
         shouldThrowError = true;
 
         initStudent("room1", 42, {}, {});
-        
+
         // 2. Wait for the async socket handler to execute
         await openHandler();
 
         // 3. Verify the console error was called
         expect(consoleSpy).toHaveBeenCalledWith(
             "Cannot start test because audio setup failed:",
-            expect.any(Error)
+            expect.any(Error),
         );
 
         consoleSpy.mockRestore();

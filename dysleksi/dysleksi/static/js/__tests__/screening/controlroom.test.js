@@ -2,10 +2,16 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, beforeEach, afterEach, vi, assert } from "vitest";
-import {EventTable, ActionButtons, TeacherView, NoteField, QuestionView} from "../../screening/controlroom.js";
-import * as groupTestData from './grouptest.json' with { type: 'json' }
-import * as individualTestData from './individualtest.json' with { type: 'json' }
-import {Test} from "../../screening/model";
+import {
+    EventTable,
+    ActionButtons,
+    TeacherView,
+    NoteField,
+    QuestionView,
+} from "../../screening/controlroom.js";
+import * as groupTestData from "./grouptest.json" with { type: "json" };
+import * as individualTestData from "./individualtest.json" with { type: "json" };
+import { Test } from "../../screening/model";
 import { GroupTestContainer } from "../../screening/controlroom.js";
 import { StudentCard } from "../../screening/controlroom.js";
 import { Student } from "../../screening/model.js";
@@ -13,27 +19,24 @@ import { WebRTCChannel } from "../../webRTC.js";
 
 vi.mock("../../screening/utils.js");
 
-
-
 vi.mock("../../webRTC.js", () => {
     return {
-        WebRTCChannel: vi.fn().mockImplementation(function() {
+        WebRTCChannel: vi.fn().mockImplementation(function () {
             const target = new EventTarget();
-            
+
             this.addEventListener = target.addEventListener.bind(target);
             this.removeEventListener = target.removeEventListener.bind(target);
             this.dispatchEvent = target.dispatchEvent.bind(target);
-            
+
             this.connect = vi.fn();
             this.send = vi.fn();
             this.peer = {
                 on: vi.fn(),
-                destroy: vi.fn()
+                destroy: vi.fn(),
             };
-        })
+        }),
     };
 });
-
 
 describe("ActionButtons", () => {
     const mockDoc = `
@@ -42,15 +45,15 @@ describe("ActionButtons", () => {
         <button id="cancelled"></button>
         <button id="skipped"></button>
         <button id="next"></button>
-    `
+    `;
 
     const getInstance = () => {
         return new ActionButtons();
-    }
+    };
 
     const getButtons = (selector = "button") => {
         return document.querySelector(selector);
-    }
+    };
 
     beforeEach(() => {
         document.body.innerHTML = mockDoc;
@@ -140,7 +143,7 @@ describe("Teacher Individual test View", () => {
         global.localStorage = {
             getItem: vi.fn(),
             setItem: vi.fn(),
-            clear: vi.fn()
+            clear: vi.fn(),
         };
 
         socket = {
@@ -168,16 +171,27 @@ describe("Teacher Individual test View", () => {
         buttons = new ActionButtons();
         note = new NoteField();
         questionView = new QuestionView();
-        vi.spyOn(Test.prototype, 'preload').mockResolvedValue(new Map());
+        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
 
         groupTest = new Test(groupTestData);
         individualTest = new Test(individualTestData);
 
-        view = new TeacherView("room1", individualTest, 1, wsGetter, table, buttons, note, questionView);
+        view = new TeacherView(
+            "room1",
+            individualTest,
+            1,
+            wsGetter,
+            table,
+            buttons,
+            note,
+            questionView,
+        );
 
-        const mainSocketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+        const mainSocketHandler = socket.addEventListener.mock.calls.find(
+            (c) => c[0] === "message",
+        )[1];
         mainSocketHandler({
-            data: JSON.stringify({ event: 'student.joined', studentId })
+            data: JSON.stringify({ event: "student.joined", studentId }),
         });
         p2pChannel = view.studentChannels[studentId];
     });
@@ -212,20 +226,22 @@ describe("Teacher Individual test View", () => {
     });
 
     it("updates indices but does not enable buttons when event is 'question.answered'", () => {
-
         // 1. Setup: Ensure buttons are currently disabled
         buttons.disableButtons();
 
         // 2. Trigger 'question.answered'
         // This hits the outer IF but fails the 'question.displayed' IF
-        p2pChannel.dispatchEvent(new CustomEvent('message', {
-            detail: {
-                event: "question.answered",
-                partIndex: 0,
-                questionIndex: 0,
-                practice: false,
-                answeredAt: "10:00:05"
-            }}));
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "question.answered",
+                    partIndex: 0,
+                    questionIndex: 0,
+                    practice: false,
+                    answeredAt: "10:00:05",
+                },
+            }),
+        );
 
         // 3. Assertions
         // Indices should be updated
@@ -255,7 +271,6 @@ describe("Teacher Individual test View", () => {
     });
 
     it("throws an error when an out-of-bounds practice question index is received", () => {
-
         // We set practice: true, but provide an index (e.g., 99) that
         // exceeds the practice array length for part 0
         const invalidPracticeIndex = 99;
@@ -267,7 +282,6 @@ describe("Teacher Individual test View", () => {
     });
 
     it("sets the currentQuestion from the practice array when practice is true", () => {
-
         // 1. Set the part index so we have a context for questions
         view.setPartIndex(0);
 
@@ -277,7 +291,8 @@ describe("Teacher Individual test View", () => {
         view.setQuestionIndex(practiceIndex, true);
 
         // 3. Assertions
-        const expectedPracticeQuestion = individualTest.parts[0].practice[practiceIndex];
+        const expectedPracticeQuestion =
+            individualTest.parts[0].practice[practiceIndex];
 
         expect(view.questionIndex).toBe(practiceIndex);
         expect(view.currentQuestion).toBe(expectedPracticeQuestion);
@@ -343,77 +358,92 @@ describe("Teacher Individual test View", () => {
         expect(wsGetter).toHaveBeenCalledWith("room1");
         expect(socket.addEventListener).toHaveBeenCalledWith(
             "message",
-            expect.any(Function)
+            expect.any(Function),
         );
     });
 
     it("enables buttons on question.displayed", () => {
         // get the message handler registered on the socket
-        const handler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+        const handler = socket.addEventListener.mock.calls.find(
+            (c) => c[0] === "message",
+        )[1];
 
         // trigger a question.displayed event
-        p2pChannel.dispatchEvent(new CustomEvent('message', {
-            detail: {
-                event: "question.displayed",
-                partIndex: 0,
-                questionIndex: 0,
-                questionTitle: "Q1",
-                displayedAt: 1000,
-            }}));
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "question.displayed",
+                    partIndex: 0,
+                    questionIndex: 0,
+                    questionTitle: "Q1",
+                    displayedAt: 1000,
+                },
+            }),
+        );
 
         const btn = document.querySelector("button");
         expect(btn.classList.contains("disabled")).toBe(false);
     });
 
     it("disables 'next' button on 'question.displayed' (individual tests)", () => {
-
         // trigger first question.displayed event - question type is "free_text"
-        p2pChannel.dispatchEvent(new CustomEvent('message', {
-            detail: {
-                event: "question.displayed",
-                partIndex: 0,
-                questionIndex: 0,
-                questionTitle: "Q1",
-                displayedAt: 1000,
-        }}));
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "question.displayed",
+                    partIndex: 0,
+                    questionIndex: 0,
+                    questionTitle: "Q1",
+                    displayedAt: 1000,
+                },
+            }),
+        );
 
         const btn = document.querySelector("button");
         expect(btn.classList.contains("disabled")).toBe(false);
 
         // trigger another question.displayed event - this time the question type is "no_input_required"
-        p2pChannel.dispatchEvent(new CustomEvent('message', {
-            detail: {
-                event: "question.displayed",
-                partIndex: 0,
-                questionIndex: 1,
-                questionTitle: "Q2",
-                displayedAt: 2000,
-        }}));
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "question.displayed",
+                    partIndex: 0,
+                    questionIndex: 1,
+                    questionTitle: "Q2",
+                    displayedAt: 2000,
+                },
+            }),
+        );
 
         expect(buttons.nextButton().classList).to.include(["disabled"]);
     });
 
     it("show question on question.displayed", () => {
-
         questionView.show();
-        expect(questionView.containerElement.classList.contains("d-none")).toBe(false)
+        expect(questionView.containerElement.classList.contains("d-none")).toBe(false);
 
         // trigger a question.displayed event
-        p2pChannel.dispatchEvent(new CustomEvent('message', {
-            detail: {
-                event: "question.displayed",
-                partIndex: 0,
-                questionIndex: 0,
-        }}));
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "question.displayed",
+                    partIndex: 0,
+                    questionIndex: 0,
+                },
+            }),
+        );
 
         expect(questionView.titleElement.textContent).toBe("1/3 (Individuel deltest)");
 
-        p2pChannel.dispatchEvent(new CustomEvent('message', {
-            detail: {
-                event: "question.displayed",
-                partIndex: 0,
-                questionIndex: 1,
-        }}));
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "question.displayed",
+                    partIndex: 0,
+                    questionIndex: 1,
+                },
+            }),
+        );
 
         expect(questionView.titleElement.textContent).toBe("2/3 (Individuel deltest)");
     });
@@ -448,7 +478,6 @@ describe("Teacher Individual test View", () => {
 
     it("delays sending feedback if question type is 'no_input_required'", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
-
 
         // Arrange: go directly to question 2 (which is type "no_input_required")
         view.setPartIndex(0);
@@ -509,27 +538,36 @@ describe("Teacher Individual test View", () => {
     });
 
     it("raise error when incorrect partindex is received", () => {
-
-        const invalidIndexes = [null, undefined, -1, individualTest.parts.length, individualTest.parts.length+1];
+        const invalidIndexes = [
+            null,
+            undefined,
+            -1,
+            individualTest.parts.length,
+            individualTest.parts.length + 1,
+        ];
         for (const index of invalidIndexes) {
             try {
                 view.validatePartIndex(index);
                 assert.fail("Exception not raised for part index " + index);
-            } catch (e) {
-            }
+            } catch (e) {}
         }
     });
 
     it("raise error when incorrect questionindex is received", () => {
         view.setPartIndex(0);
 
-        const invalidIndexes = [null, undefined, -1, individualTest.parts[0].questions.length, individualTest.parts[0].questions.length+1];
+        const invalidIndexes = [
+            null,
+            undefined,
+            -1,
+            individualTest.parts[0].questions.length,
+            individualTest.parts[0].questions.length + 1,
+        ];
         for (const index of invalidIndexes) {
             try {
                 view.validateQuestionIndex(index);
                 assert.fail("Exception not raised for question index " + index);
-            } catch (e) {
-            }
+            } catch (e) {}
         }
     });
 
@@ -571,25 +609,34 @@ describe("Teacher Individual test View", () => {
         const container = document.querySelector("#question-content");
 
         questionView.showContent("Test content", "/test/image.png");
-        expect(container.querySelector("#challenge-image").src).toContain("/test/image.png");
-        expect(container.querySelector("#challenge-text").textContent).toBe("Test content");
+        expect(container.querySelector("#challenge-image").src).toContain(
+            "/test/image.png",
+        );
+        expect(container.querySelector("#challenge-text").textContent).toBe(
+            "Test content",
+        );
 
         questionView.showContent("Test content", "/test/image2.png");
-        expect(container.querySelector("#challenge-image").src).toContain("/test/image2.png");
-        expect(container.querySelector("#challenge-text").textContent).toBe("Test content");
+        expect(container.querySelector("#challenge-image").src).toContain(
+            "/test/image2.png",
+        );
+        expect(container.querySelector("#challenge-text").textContent).toBe(
+            "Test content",
+        );
 
         questionView.showContent("Test content");
         expect(container.querySelector("#challenge-image")).toBeNull();
-        expect(container.querySelector("#challenge-text").textContent).toBe("Test content");
+        expect(container.querySelector("#challenge-text").textContent).toBe(
+            "Test content",
+        );
 
         questionView.showContent(null, "/test/image.png");
-        expect(container.querySelector("#challenge-image").src).toContain("/test/image.png");
+        expect(container.querySelector("#challenge-image").src).toContain(
+            "/test/image.png",
+        );
         expect(container.querySelector("#challenge-text")).toBeNull();
     });
 });
-
-
-
 
 describe("GroupTestContainer", () => {
     let container;
@@ -627,20 +674,29 @@ describe("GroupTestContainer", () => {
         `;
         container = document.querySelector(".group-test-body");
 
-        const test = { parts: [{
-            name: "part1",
-            questions: [{}]
-        }]};
+        const test = {
+            parts: [
+                {
+                    name: "part1",
+                    questions: [{}],
+                },
+            ],
+        };
 
         instance = new GroupTestContainer(test);
     });
 
-
-
-
     it("toggles folded area even when clicking on child elements (name text)", () => {
         const studentData = {
-            student: { id: 5, firstName: "Eve", lastName: "Online", progress: 20, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
+            student: {
+                id: 5,
+                firstName: "Eve",
+                lastName: "Online",
+                progress: 20,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
         };
         instance.updateData(studentData);
 
@@ -659,7 +715,15 @@ describe("GroupTestContainer", () => {
 
     it("does NOT toggle folded area when clicking directly on the folded area content", () => {
         const studentData = {
-            student: { id: 6, firstName: "Frank", lastName: "Castle", progress: 10, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
+            student: {
+                id: 6,
+                firstName: "Frank",
+                lastName: "Castle",
+                progress: 10,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
         };
         instance.updateData(studentData);
 
@@ -686,7 +750,15 @@ describe("GroupTestContainer", () => {
         expect(nullInstance.container).toBeNull();
 
         const studentData = {
-            student: { id: 99, firstName: "Ghost", lastName: "User", progress: 0, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
+            student: {
+                id: 99,
+                firstName: "Ghost",
+                lastName: "User",
+                progress: 0,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
         };
 
         // 3. Act & Assert: Should return early without attempting to query or create elements
@@ -700,12 +772,20 @@ describe("GroupTestContainer", () => {
 
     it("creates a new student card if it doesn't exist", () => {
         const studentData = {
-            student: { id: 1, firstName: "Alice", lastName: "Smith", progress: 50, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
+            student: {
+                id: 1,
+                firstName: "Alice",
+                lastName: "Smith",
+                progress: 50,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
         };
 
         instance.updateData(studentData);
 
-        const card = instance.cards.get(1)
+        const card = instance.cards.get(1);
         expect(card).not.toBeNull();
 
         const text = card.el.querySelector(".student-text").textContent;
@@ -720,38 +800,67 @@ describe("GroupTestContainer", () => {
 
     it("handles missing last name", () => {
         const studentData = {
-            student: { id: 1, firstName: "Alice", lastName: null, progress: 50, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
+            student: {
+                id: 1,
+                firstName: "Alice",
+                lastName: null,
+                progress: 50,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
         };
 
         instance.updateData(studentData);
 
-        const card = instance.cards.get(1)
+        const card = instance.cards.get(1);
         const text = card.el.querySelector(".student-text").textContent;
         expect(text).toBe("Alice");
-
     });
-
 
     it("updates an existing student card progress", () => {
         const studentData = {
-            student: { id: 2, firstName: "Bob", lastName: "Jones", progress: 30, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
+            student: {
+                id: 2,
+                firstName: "Bob",
+                lastName: "Jones",
+                progress: 30,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
         };
         instance.updateData(studentData);
 
         const updatedData = {
-            student: { id: 2, firstName: "Bob", lastName: "Jones", progress: 80, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
+            student: {
+                id: 2,
+                firstName: "Bob",
+                lastName: "Jones",
+                progress: 80,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
         };
         instance.updateData(updatedData);
 
-        const card = instance.cards.get(2)
+        const card = instance.cards.get(2);
         const fill = card.el.querySelector(".progress-fill");
         expect(fill.style.width).toBe("80%");
     });
 
-
     it("toggles folded area when card is clicked", () => {
         const studentData = {
-            student: { id: 4, firstName: "Diana", lastName: "Prince", progress: 100, currentPartIndex: 0, currentQuestionIndex: 0, resultsByPart: {} },
+            student: {
+                id: 4,
+                firstName: "Diana",
+                lastName: "Prince",
+                progress: 100,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
         };
         instance.updateData(studentData);
 
@@ -760,7 +869,9 @@ describe("GroupTestContainer", () => {
         const arrowSpan = card.el.querySelector(".foldout-arrow");
 
         // Initially folded
-        expect(folded.style.display === "" || folded.style.display === "none").toBe(true);
+        expect(folded.style.display === "" || folded.style.display === "none").toBe(
+            true,
+        );
         const initialArrowHTML = arrowSpan.innerHTML;
 
         // Click to unfold
@@ -775,7 +886,6 @@ describe("GroupTestContainer", () => {
     });
 });
 
-
 describe("TeacherView _initFilterButtonSelection", () => {
     let view;
     let socket;
@@ -784,7 +894,7 @@ describe("TeacherView _initFilterButtonSelection", () => {
         global.localStorage = {
             getItem: vi.fn(),
             setItem: vi.fn(),
-            clear: vi.fn()
+            clear: vi.fn(),
         };
 
         document.body.innerHTML = `
@@ -813,7 +923,7 @@ describe("TeacherView _initFilterButtonSelection", () => {
             new EventTable(),
             new ActionButtons(),
             new NoteField(),
-            new QuestionView()
+            new QuestionView(),
         );
     });
 
@@ -822,12 +932,11 @@ describe("TeacherView _initFilterButtonSelection", () => {
         vi.unstubAllGlobals();
     });
 
-
     it("adds click listeners to filter buttons and toggles selection", () => {
         const buttons = document.querySelectorAll(".group-test-header .btn");
 
         // Initially, no button has 'selected'
-        buttons.forEach(btn => {
+        buttons.forEach((btn) => {
             expect(btn.classList.contains("selected")).toBe(false);
         });
 
@@ -851,7 +960,6 @@ describe("TeacherView _initFilterButtonSelection", () => {
     });
 });
 
-
 describe("TeacherView socket 'test.started' handling", () => {
     let socket;
     let wsGetter;
@@ -864,7 +972,7 @@ describe("TeacherView socket 'test.started' handling", () => {
         global.localStorage = {
             getItem: vi.fn(),
             setItem: vi.fn(),
-            clear: vi.fn()
+            clear: vi.fn(),
         };
 
         document.body.innerHTML = `
@@ -908,26 +1016,30 @@ describe("TeacherView socket 'test.started' handling", () => {
         view = new TeacherView(
             "room1",
             {
-            testType: "group",
-            parts: [{
-                name: "part1",
-                questions: [{}]
-            }]}, // minimal test data
+                testType: "group",
+                parts: [
+                    {
+                        name: "part1",
+                        questions: [{}],
+                    },
+                ],
+            }, // minimal test data
             1,
             wsGetter,
             new EventTable(),
             new ActionButtons(),
             new NoteField(),
-            new QuestionView()
+            new QuestionView(),
         );
 
-        const mainSocketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+        const mainSocketHandler = socket.addEventListener.mock.calls.find(
+            (c) => c[0] === "message",
+        )[1];
         mainSocketHandler({
-            data: JSON.stringify({ event: 'student.joined', studentId: studentId })
+            data: JSON.stringify({ event: "student.joined", studentId: studentId }),
         });
 
         p2pChannel = view.studentChannels[studentId];
-
     });
 
     it("calls groupTestContainer.updateData when 'test.started' message is received", () => {
@@ -936,25 +1048,26 @@ describe("TeacherView socket 'test.started' handling", () => {
         // simulate 'test.started' message
         const messageData = {
             event: "test.started",
-            student: { 
-                id: 1, 
-                firstName: "Alice", 
-                lastName: "Smith", 
+            student: {
+                id: 1,
+                firstName: "Alice",
+                lastName: "Smith",
                 progress: 0,
                 currentPartIndex: 0,
                 currentQuestionIndex: 0,
-                resultsByPart: {}
+                resultsByPart: {},
             },
         };
 
-        p2pChannel.dispatchEvent(new CustomEvent('message', {
-            detail: messageData 
-        }));
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: messageData,
+            }),
+        );
 
         expect(spy).toHaveBeenCalledWith(messageData);
     });
 });
-
 
 describe("EventTable", () => {
     let table;
@@ -974,7 +1087,7 @@ describe("EventTable", () => {
         const data = {
             event: "question.displayed",
             questionTitle: "What is 2+2?",
-            displayedAt: "10:00:01"
+            displayedAt: "10:00:01",
         };
 
         table.updateTable(data);
@@ -996,7 +1109,7 @@ describe("EventTable", () => {
         const data = {
             event: "question.displayed",
             questionTitle: "Title",
-            displayedAt: "10:00:00"
+            displayedAt: "10:00:00",
         };
 
         // 3. Act & Assert: This should not throw an error
@@ -1005,19 +1118,18 @@ describe("EventTable", () => {
         }).not.toThrow();
     });
 
-
     it("renders an audio player when recordingBase64 is present", () => {
         const data = {
-            event: 'question.answered',
-            questionTitle: 'Oral Test',
-            recordingBase64: 'data:audio/wav;base64,UklGR...',
-            answeredAt: '12:00:00'
+            event: "question.answered",
+            questionTitle: "Oral Test",
+            recordingBase64: "data:audio/wav;base64,UklGR...",
+            answeredAt: "12:00:00",
         };
 
         table.updateTable(data);
 
-        const answerCell = document.querySelector('td:nth-child(3)');
-        const audioEl = answerCell.querySelector('audio');
+        const answerCell = document.querySelector("td:nth-child(3)");
+        const audioEl = answerCell.querySelector("audio");
 
         expect(audioEl).not.toBeNull();
         expect(audioEl.src).toBe(data.recordingBase64);
@@ -1026,47 +1138,46 @@ describe("EventTable", () => {
 
     it("renders textAnswer when no audio is present", () => {
         const data = {
-            event: 'question.answered',
-            questionTitle: 'Written Test',
-            textAnswer: 'This is my answer',
-            answeredAt: '12:00:05'
+            event: "question.answered",
+            questionTitle: "Written Test",
+            textAnswer: "This is my answer",
+            answeredAt: "12:00:05",
         };
 
         table.updateTable(data);
 
-        const answerCell = document.querySelector('td:nth-child(3)');
-        expect(answerCell.textContent).toBe('This is my answer');
+        const answerCell = document.querySelector("td:nth-child(3)");
+        expect(answerCell.textContent).toBe("This is my answer");
     });
 
     it("renders choiceId when neither audio nor textAnswer is present", () => {
         const data = {
-            event: 'question.answered',
-            questionTitle: 'Multiple Choice',
-            choiceId: 'option_a',
-            answeredAt: '12:00:10'
+            event: "question.answered",
+            questionTitle: "Multiple Choice",
+            choiceId: "option_a",
+            answeredAt: "12:00:10",
         };
 
         table.updateTable(data);
 
-        const answerCell = document.querySelector('td:nth-child(3)');
-        expect(answerCell.textContent).toBe('option_a');
+        const answerCell = document.querySelector("td:nth-child(3)");
+        expect(answerCell.textContent).toBe("option_a");
     });
 
     it("uses answeredAt for the duration column when answered", () => {
         const data = {
-            event: 'question.answered',
-            questionTitle: 'Timing Test',
-            answeredAt: 'TIMESTAMP_A',
-            displayedAt: 'TIMESTAMP_B'
+            event: "question.answered",
+            questionTitle: "Timing Test",
+            answeredAt: "TIMESTAMP_A",
+            displayedAt: "TIMESTAMP_B",
         };
 
         table.updateTable(data);
 
-        const durationCell = document.querySelector('td:nth-child(4)');
-        expect(durationCell.textContent).toBe('TIMESTAMP_A');
+        const durationCell = document.querySelector("td:nth-child(4)");
+        expect(durationCell.textContent).toBe("TIMESTAMP_A");
     });
 });
-
 
 describe("StudentCard", () => {
     let mockStudent;
@@ -1100,9 +1211,9 @@ describe("StudentCard", () => {
         mockStudent = new Student({
             id: 1,
             firstName: "John",
-            lastName: "Doe"
+            lastName: "Doe",
         });
-        
+
         mockStudent.progress = 45;
         mockStudent.currentPartIndex = 0;
         mockStudent.currentQuestionIndex = 1;
@@ -1111,14 +1222,14 @@ describe("StudentCard", () => {
         mockTest = {
             parts: [
                 { name: "wordreading", questions: [{}, {}, {}] },
-                { name: "wordspelling", questions: [{}, {}] }
-            ]
+                { name: "wordspelling", questions: [{}, {}] },
+            ],
         };
     });
 
     it("initializes with correct student name and progress", () => {
         const card = new StudentCard(mockStudent, mockTest);
-        
+
         expect(card.nameText.textContent).toBe("John D.");
         card.update();
         expect(card.progressFill.style.width).toBe("45%");
@@ -1126,9 +1237,9 @@ describe("StudentCard", () => {
 
     it("toggles the 'is-expanded' class and display style when clicked", () => {
         const card = new StudentCard(mockStudent, mockTest);
-        
+
         expect(card.foldedArea.style.display).toBe("none");
-        
+
         card.el.click();
         expect(card.foldedArea.style.display).toBe("flex");
         expect(card.el.classList.contains("is-expanded")).toBe(true);
@@ -1160,7 +1271,7 @@ describe("StudentCard", () => {
 
         const dots = card.dotsContainer.querySelectorAll(".dot");
         expect(dots.length).toBe(3);
-        
+
         expect(dots[0].classList.contains("correct")).toBe(true);
         expect(dots[1].classList.contains("wrong")).toBe(true);
         expect(dots[2].classList.contains("default")).toBe(true);
@@ -1168,7 +1279,7 @@ describe("StudentCard", () => {
 
     it("disables navigation arrows at the boundaries", () => {
         const card = new StudentCard(mockStudent, mockTest);
-        
+
         card.update();
         expect(card.subTestLeftArrow.classList.contains("disabled")).toBe(true);
         expect(card.subTestRightArrow.classList.contains("disabled")).toBe(false);
@@ -1185,16 +1296,16 @@ describe("StudentCard", () => {
 
         const segments = card.partsProgress.querySelectorAll(".part-segment");
         expect(segments.length).toBe(2);
-        
+
         expect(segments[0].classList.contains("completed")).toBe(true);
         expect(segments[1].classList.contains("current")).toBe(true);
     });
 
     it("shows '-' for question index when viewing a part the student hasn't reached yet", () => {
         const card = new StudentCard(mockStudent, mockTest);
-        
+
         card.changePart(1);
-        
+
         expect(card.questionIndex.textContent).toContain("-/2");
     });
 });
@@ -1226,7 +1337,7 @@ describe("TeacherView Sync Logic", () => {
             new EventTable(),
             new ActionButtons(),
             new NoteField(),
-            new QuestionView()
+            new QuestionView(),
         );
     });
 
@@ -1238,7 +1349,7 @@ describe("TeacherView Sync Logic", () => {
     describe("_startSyncInterval", () => {
         it("triggers _flushMessageQueue every 5 seconds", () => {
             const flushSpy = vi.spyOn(view, "_flushMessageQueue");
-            
+
             vi.advanceTimersByTime(5000);
             expect(flushSpy).toHaveBeenCalledTimes(1);
 
@@ -1262,7 +1373,7 @@ describe("TeacherView Sync Logic", () => {
             const msg1 = { event: "test", id: 1 };
             const msg2 = { event: "test", id: 2 };
             view.messageQueue = [msg1, msg2];
-            
+
             serverOnlineMock.mockResolvedValue(true);
             const persistSpy = vi.spyOn(view, "_persistQueue");
 
@@ -1302,7 +1413,7 @@ describe("TeacherView Sync Logic", () => {
             socket.send.mockClear();
             serverOnlineMock.mockClear();
             socket.readyState = 0; // CONNECTING
-            
+
             await view._flushMessageQueue();
 
             expect(socket.send).not.toHaveBeenCalled();
@@ -1312,7 +1423,7 @@ describe("TeacherView Sync Logic", () => {
         it("keeps messages in storage if sending fails", async () => {
             view.messageQueue = [{ event: "fail" }];
             serverOnlineMock.mockResolvedValue(true);
-            
+
             // Force an error on send
             socket.send.mockImplementation(() => {
                 throw new Error("Network Error");
@@ -1340,19 +1451,24 @@ describe("TeacherView _initSocket", () => {
             send: vi.fn(),
         };
         wsGetter = vi.fn().mockReturnValue(socket);
-        
+
         view = new TeacherView("room1", { parts: [] }, 1, wsGetter);
     });
 
     it("attaches the message listener to the WebSocket", () => {
-        expect(socket.addEventListener).toHaveBeenCalledWith("message", expect.any(Function));
+        expect(socket.addEventListener).toHaveBeenCalledWith(
+            "message",
+            expect.any(Function),
+        );
     });
 
     it("instantiates a new channel when a student offer arrives for the first time", () => {
-        const socketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+        const socketHandler = socket.addEventListener.mock.calls.find(
+            (c) => c[0] === "message",
+        )[1];
 
         socketHandler({
-            data: JSON.stringify({ event: 'student.joined', studentId })
+            data: JSON.stringify({ event: "student.joined", studentId }),
         });
 
         // Now WebRTCChannel is defined because of the import
@@ -1361,24 +1477,28 @@ describe("TeacherView _initSocket", () => {
     });
 
     it("creates a new channel if a student re-joins", () => {
-        const socketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+        const socketHandler = socket.addEventListener.mock.calls.find(
+            (c) => c[0] === "message",
+        )[1];
 
         // First offer
-        socketHandler({ data: JSON.stringify({ event: 'student.joined', studentId }) });
-        const oldChannel = view.studentChannels[studentId]
+        socketHandler({ data: JSON.stringify({ event: "student.joined", studentId }) });
+        const oldChannel = view.studentChannels[studentId];
 
         // Second offer for same student
-        socketHandler({ data: JSON.stringify({ event: 'student.joined', studentId }) });
-        
+        socketHandler({ data: JSON.stringify({ event: "student.joined", studentId }) });
+
         expect(WebRTCChannel).toHaveBeenCalledTimes(2);
         expect(oldChannel.peer.destroy).toHaveBeenCalled();
     });
 
     it("ignores WebSocket messages that are not student.joined", () => {
-        const socketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+        const socketHandler = socket.addEventListener.mock.calls.find(
+            (c) => c[0] === "message",
+        )[1];
 
         socketHandler({
-            data: JSON.stringify({ event: 'ping', studentId: 99 })
+            data: JSON.stringify({ event: "ping", studentId: 99 }),
         });
 
         expect(WebRTCChannel).not.toHaveBeenCalled();
@@ -1386,31 +1506,36 @@ describe("TeacherView _initSocket", () => {
 
     it("wires the P2P channel to the P2P message handler", () => {
         const p2pSpy = vi.spyOn(view, "_initP2PSocket");
-        const socketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
+        const socketHandler = socket.addEventListener.mock.calls.find(
+            (c) => c[0] === "message",
+        )[1];
 
-        socketHandler({ data: JSON.stringify({ event: 'student.joined', studentId }) });
+        socketHandler({ data: JSON.stringify({ event: "student.joined", studentId }) });
 
         const newChannel = view.studentChannels[studentId];
         expect(p2pSpy).toHaveBeenCalledWith(newChannel);
     });
 
     it("calls p2p.connect() when the peer connection opens", () => {
-        const socketHandler = socket.addEventListener.mock.calls.find(c => c[0] === "message")[1];
-    
+        const socketHandler = socket.addEventListener.mock.calls.find(
+            (c) => c[0] === "message",
+        )[1];
+
         socketHandler({
-            data: JSON.stringify({ event: 'student.joined', studentId: 123 })
+            data: JSON.stringify({ event: "student.joined", studentId: 123 }),
         });
-    
+
         const p2p = view.studentChannels[123];
-    
-        const openHandler = p2p.peer.on.mock.calls.find(call => call[0] === 'open')[1];
-    
+
+        const openHandler = p2p.peer.on.mock.calls.find(
+            (call) => call[0] === "open",
+        )[1];
+
         expect(openHandler).toBeDefined();
         openHandler();
-    
+
         expect(p2p.connect).toHaveBeenCalledTimes(1);
     });
-
 });
 
 describe("TeacherView messageQueue initialization", () => {
@@ -1421,9 +1546,9 @@ describe("TeacherView messageQueue initialization", () => {
     beforeEach(() => {
         socket = { addEventListener: vi.fn(), send: vi.fn() };
         wsGetter = vi.fn().mockReturnValue(socket);
-        
+
         // Ensure localStorage is clean before each test
-        vi.spyOn(Storage.prototype, 'getItem');
+        vi.spyOn(Storage.prototype, "getItem");
     });
 
     afterEach(() => {
@@ -1444,7 +1569,7 @@ describe("TeacherView messageQueue initialization", () => {
         // Path: savedQueue contains JSON
         const mockQueue = [
             { event: "question.answered", id: 1 },
-            { event: "question.displayed", id: 2 }
+            { event: "question.displayed", id: 2 },
         ];
         vi.mocked(localStorage.getItem).mockReturnValue(JSON.stringify(mockQueue));
 

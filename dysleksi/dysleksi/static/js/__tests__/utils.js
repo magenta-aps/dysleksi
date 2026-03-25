@@ -1,7 +1,7 @@
-import { vi } from 'vitest';
+import { vi } from "vitest";
 
 const visited = new Set();
-export function spyAttributes(targetItem, omitkeys=[]) {
+export function spyAttributes(targetItem, omitkeys = []) {
     // Avoid infinite recursion caused by circular references
     if (visited.has(targetItem)) return;
     visited.add(targetItem);
@@ -14,15 +14,19 @@ export function spyAttributes(targetItem, omitkeys=[]) {
     let obj = targetItem;
     do {
         props.push(...Object.getOwnPropertyNames(obj));
-    } while (obj = Object.getPrototypeOf(obj));
+    } while ((obj = Object.getPrototypeOf(obj)));
 
     // Spy on all functions and list items
     for (let attributeName of props) {
         if (omitkeys.includes(attributeName)) continue;
         let attribute = targetItem[attributeName];
-        if (typeof(attribute) === "function") {
+        if (typeof attribute === "function") {
             vi.spyOn(targetItem, attributeName);
-        } else if (typeof(attribute) === "object" && attribute !== undefined && attribute !== null) {
+        } else if (
+            typeof attribute === "object" &&
+            attribute !== undefined &&
+            attribute !== null
+        ) {
             if (Array.isArray(attribute)) {
                 for (let i = 0; i < attribute.length; i++) {
                     spyAttributes(attribute[i], omitkeys);

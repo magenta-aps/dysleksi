@@ -5,13 +5,18 @@ export function getWebSocket(chatId) {
 
     // Reuse socket if exists and open/connecting
     const existingSocket = sockets[chatId];
-    if (existingSocket && 
-        (existingSocket.readyState === WebSocket.OPEN || existingSocket.readyState === WebSocket.CONNECTING)) {
+    if (
+        existingSocket &&
+        (existingSocket.readyState === WebSocket.OPEN ||
+            existingSocket.readyState === WebSocket.CONNECTING)
+    ) {
         return existingSocket;
     }
 
     // Otherwise create a new one
-    const newSocket = new WebSocket(`${protocol}://${window.location.host}/ws/chat/${chatId}/`);
+    const newSocket = new WebSocket(
+        `${protocol}://${window.location.host}/ws/chat/${chatId}/`,
+    );
     sockets[chatId] = newSocket;
 
     // Remove from cache when closed

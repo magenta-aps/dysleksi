@@ -1,4 +1,10 @@
-import {EventTable, ActionButtons, TeacherView, NoteField, QuestionView} from "../controlroom.js";
+import {
+    EventTable,
+    ActionButtons,
+    TeacherView,
+    NoteField,
+    QuestionView,
+} from "../controlroom.js";
 import { getWebSocket } from "../../ws.js";
 
 export function initTeacher(roomName, assignmentId, test) {
@@ -9,11 +15,11 @@ export function initTeacher(roomName, assignmentId, test) {
     const noteField = new NoteField();
     const questionView = new QuestionView(
         "#question-container",
-        '#question-title',
-        '#question-content',
-        '#current-test-part-name',
-        '#current-test-part-number',
-        '#current-test-question-number',
+        "#question-title",
+        "#question-content",
+        "#current-test-part-name",
+        "#current-test-part-number",
+        "#current-test-question-number",
     );
 
     buttons.showButtons();

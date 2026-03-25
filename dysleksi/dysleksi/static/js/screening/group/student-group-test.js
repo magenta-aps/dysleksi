@@ -1,9 +1,8 @@
 import { shuffleArray } from "../utils.js";
 import { StudentTestView } from "../student-test.js";
-import { calculateStudentProgress } from '../utils.js';
+import { calculateStudentProgress } from "../utils.js";
 
 export class GroupTestView extends StudentTestView {
-
     questionDisplayedAt;
     selectedAnswer;
     textAnswer;
@@ -16,7 +15,9 @@ export class GroupTestView extends StudentTestView {
 
     start() {
         super.start();
-        this.domElements.setNextButtonListener(() => this.onQuestionComplete(this.currentQuestion, false));
+        this.domElements.setNextButtonListener(() =>
+            this.onQuestionComplete(this.currentQuestion, false),
+        );
     }
 
     // ---- Parts ----
@@ -28,7 +29,9 @@ export class GroupTestView extends StudentTestView {
     }
 
     onPartTimeout() {
-        const remainingQuestions = this.currentPart.questions.slice(this.currentQuestionIndex);
+        const remainingQuestions = this.currentPart.questions.slice(
+            this.currentQuestionIndex,
+        );
         remainingQuestions.forEach((question) => {
             this.onQuestionComplete(question, true);
         });
@@ -38,8 +41,19 @@ export class GroupTestView extends StudentTestView {
     showQuestion(isPracticing, questionIndex) {
         const canShow = this.setQuestion(isPracticing, questionIndex);
         if (canShow) {
-            console.log("---------------------------------------------")
-            console.log("Showing question " + this.currentPartIndex+"."+this.currentQuestionIndex, "(practicing=",isPracticing,")", "type:", this.currentQuestion.type, this.currentQuestion);
+            console.log("---------------------------------------------");
+            console.log(
+                "Showing question " +
+                    this.currentPartIndex +
+                    "." +
+                    this.currentQuestionIndex,
+                "(practicing=",
+                isPracticing,
+                ")",
+                "type:",
+                this.currentQuestion.type,
+                this.currentQuestion,
+            );
 
             this.setStudentHeader();
             this.domElements.toggleRepeatButton(false);
@@ -54,7 +68,7 @@ export class GroupTestView extends StudentTestView {
                 this.currentQuestion.challengeText,
                 this.currentQuestion.challengeSoundUrl,
                 this.currentQuestion.challengeImageUrl,
-                this.audioContext
+                this.audioContext,
             );
             this.selectedAnswer = null;
             this.textAnswer = null;
@@ -64,21 +78,20 @@ export class GroupTestView extends StudentTestView {
             }
 
             if (this.currentQuestion.type === "multiple_choice") {
-                this.answerButtons = []
+                this.answerButtons = [];
                 for (let answer of answers) {
-                        const button = this.domElements.showQuestionChoice(
-                            answer,
-                            () => {this.selectAnswer(answer)}
-                        );
-                        this.answerButtons.push({"button": button, "answer": answer});
+                    const button = this.domElements.showQuestionChoice(answer, () => {
+                        this.selectAnswer(answer);
+                    });
+                    this.answerButtons.push({ button: button, answer: answer });
                 }
-            } else if (this.currentQuestion.type === "free_text"){
-                this.input = this.domElements.showQuestionFreeText(
-                    () => this.selectFreeText()
+            } else if (this.currentQuestion.type === "free_text") {
+                this.input = this.domElements.showQuestionFreeText(() =>
+                    this.selectFreeText(),
                 );
             }
 
-            if (this.currentQuestion.instruction_sequence){
+            if (this.currentQuestion.instruction_sequence) {
                 this.runInstructions(true);
             } else {
                 this.setupNonPractice();
@@ -87,14 +100,17 @@ export class GroupTestView extends StudentTestView {
                 // "Click" the play button to play the sound immediately, as well as
                 // performing the expected DOM updates.
                 if (this.currentQuestion.challengeSoundUrl && domEls.playBtn) {
-                    console.log("Playing challenge sound", this.currentQuestion.challengeSoundUrl);
+                    console.log(
+                        "Playing challenge sound",
+                        this.currentQuestion.challengeSoundUrl,
+                    );
                     domEls.playBtn.click();
                 }
             }
             this.questionDisplayedAt = document.timeline.currentTime;
             if (!this.isPracticing) {
                 this.send({
-                    event: 'question.displayed',
+                    event: "question.displayed",
                     partIndex: this.currentPartIndex,
                     partId: this.currentPart.id,
                     questionIndex: this.currentQuestionIndex,
@@ -111,7 +127,7 @@ export class GroupTestView extends StudentTestView {
         const questionAnsweredAt = document.timeline.currentTime;
 
         // Hide the image to avoid leaking into the next question
-        this.domElements.hideChallengeImage()
+        this.domElements.hideChallengeImage();
 
         if (!question.instruction_sequence) {
             if (!this.selectedAnswer && !this.textAnswer && !outOfTime) {
@@ -131,14 +147,18 @@ export class GroupTestView extends StudentTestView {
                     return;
                 }
             } else {
-                let messageText = `Elev har gennemført spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1}`
+                let messageText = `Elev har gennemført spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1}`;
                 if (outOfTime) {
-                    messageText = `Elev besvarede ikke spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1} indenfor tidsfristen`
+                    messageText = `Elev besvarede ikke spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1} indenfor tidsfristen`;
                 }
                 const duration = questionAnsweredAt - this.questionDisplayedAt;
-                this.student.progress = calculateStudentProgress(this.test, this.currentPartIndex, this.currentQuestionIndex);
+                this.student.progress = calculateStudentProgress(
+                    this.test,
+                    this.currentPartIndex,
+                    this.currentQuestionIndex,
+                );
 
-                const correct = outOfTime ? false : this.answerIsCorrect()
+                const correct = outOfTime ? false : this.answerIsCorrect();
                 this.student.addResult(this.currentPartIndex, correct);
 
                 this.send({
@@ -181,7 +201,6 @@ export class GroupTestView extends StudentTestView {
 
                 this.currentQuestionIndex = 0;
                 this.showFirstQuestion(false);
-
             } else {
                 // part complete
                 this.onPartComplete();
@@ -194,18 +213,22 @@ export class GroupTestView extends StudentTestView {
         this.domElements.toggleNextButton(true);
 
         if (this.isPracticing) {
-            if (this.selectedAnswer.isCorrect){
-                this.domElements.makeButtonHappy(this.selectedAnswer.buttonId)
-                this.domElements.enableNextButton()
+            if (this.selectedAnswer.isCorrect) {
+                this.domElements.makeButtonHappy(this.selectedAnswer.buttonId);
+                this.domElements.enableNextButton();
             } else {
-                this.domElements.makeButtonAngry(this.selectedAnswer.buttonId)
-                this.domElements.disableNextButton()
+                this.domElements.makeButtonAngry(this.selectedAnswer.buttonId);
+                this.domElements.disableNextButton();
                 // Play "you guessed wrong" sound snippet
                 let source = null;
-                this.domElements.playSound('/static/audio/7c.1a.wav', source, this.audioContext);
+                this.domElements.playSound(
+                    "/static/audio/7c.1a.wav",
+                    source,
+                    this.audioContext,
+                );
             }
         } else {
-            this.domElements.makeButtonGlow(this.selectedAnswer.buttonId)
+            this.domElements.makeButtonGlow(this.selectedAnswer.buttonId);
         }
 
         for (let a of this.answerButtons) {
@@ -228,7 +251,9 @@ export class GroupTestView extends StudentTestView {
             this.textAnswer = answer;
             this.selectedAnswer = this.currentQuestion.possibleAnswers[0];
         }
-        this.domElements.toggleNextButton(this.showingInstructions || answer.length >= 2);
+        this.domElements.toggleNextButton(
+            this.showingInstructions || answer.length >= 2,
+        );
     }
 
     regexWhitespaces = /\s+/g;
@@ -237,7 +262,7 @@ export class GroupTestView extends StudentTestView {
         textAnswer = textAnswer.toLowerCase().replaceAll(this.regexWhitespaces, "");
         const consonants = "bcdfghjklmnpqrstvwxz";
         for (let c of consonants) {
-            textAnswer = textAnswer.replaceAll(c+c, c);
+            textAnswer = textAnswer.replaceAll(c + c, c);
         }
         // TODO: Hvilke andre enslydende bogstaver skal tælle som værende "ens"
         textAnswer = textAnswer.replaceAll("i", "e");
@@ -249,5 +274,4 @@ export class GroupTestView extends StudentTestView {
         correctAnswer = this.#preprocessTextAnswer(correctAnswer);
         return userAnswer === correctAnswer;
     }
-
 }

@@ -5,13 +5,19 @@ let wakeLock = null;
 export function startSession(roomName) {
     const chatSocket = getWebSocket(roomName);
 
-    chatSocket.addEventListener("open", () => {
-        chatSocket.send(JSON.stringify({
-            uuid: crypto.randomUUID(),
-            event: "session.start",
-            roomUrl: window.location.href.replace(window.location.origin, "")
-        }));
-    }, { once: true });
+    chatSocket.addEventListener(
+        "open",
+        () => {
+            chatSocket.send(
+                JSON.stringify({
+                    uuid: crypto.randomUUID(),
+                    event: "session.start",
+                    roomUrl: window.location.href.replace(window.location.origin, ""),
+                }),
+            );
+        },
+        { once: true },
+    );
 
     chatSocket.addEventListener("message", (e) => {
         const data = JSON.parse(e.data);
@@ -26,11 +32,13 @@ export function startSession(roomName) {
 export function refreshSession(roomName) {
     const chatSocket = getWebSocket(roomName);
     if (chatSocket.readyState === WebSocket.OPEN) {
-        chatSocket.send(JSON.stringify({
-            uuid: crypto.randomUUID(),
-            event: "session.in_progress",
-            roomUrl: window.location.href.replace(window.location.origin, "")
-        }));
+        chatSocket.send(
+            JSON.stringify({
+                uuid: crypto.randomUUID(),
+                event: "session.in_progress",
+                roomUrl: window.location.href.replace(window.location.origin, ""),
+            }),
+        );
     }
 }
 
@@ -44,23 +52,23 @@ export function shuffleArray(array) {
 }
 
 export async function requestWakeLock() {
-  try {
-    wakeLock = await navigator.wakeLock.request('screen');
-    console.log('Screen wake lock active');
-    
-    wakeLock.addEventListener('release', () => {
-      console.log('Screen wake lock released');
-    });
-  } catch (err) {
-    console.error(`${err.name}, ${err.message}`);
-  }
+    try {
+        wakeLock = await navigator.wakeLock.request("screen");
+        console.log("Screen wake lock active");
+
+        wakeLock.addEventListener("release", () => {
+            console.log("Screen wake lock released");
+        });
+    } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
+    }
 }
 
 export function releaseWakeLock() {
-  if (wakeLock) {
-    wakeLock.release();
-    wakeLock = null;
-  }
+    if (wakeLock) {
+        wakeLock.release();
+        wakeLock = null;
+    }
 }
 
 let audioContext;
@@ -70,12 +78,12 @@ export function unlockAudioOnGesture() {
         audioContext = new (window.AudioContext || window.webkitAudioContext)();
     }
 
-    if (audioContext.state === 'suspended') {
+    if (audioContext.state === "suspended") {
         const resume = () => {
             audioContext.resume();
-            document.removeEventListener('click', resume);
+            document.removeEventListener("click", resume);
         };
-        document.addEventListener('click', resume, { once: true });
+        document.addEventListener("click", resume, { once: true });
     }
 
     return audioContext;
@@ -111,15 +119,15 @@ export function getCursorIndex(input, tapX) {
     if (!text || tapX <= 0) return 0;
 
     // Create a hidden span to measure text exactly as it appears in the input
-    const span = document.createElement('span');
+    const span = document.createElement("span");
     const style = window.getComputedStyle(input);
-    
+
     // Copy essential styles to ensure measurement matches exactly
     span.style.font = style.font;
     span.style.letterSpacing = style.letterSpacing;
-    span.style.whiteSpace = 'pre';
-    span.style.position = 'absolute';
-    span.style.visibility = 'hidden';
+    span.style.whiteSpace = "pre";
+    span.style.position = "absolute";
+    span.style.visibility = "hidden";
     document.body.appendChild(span);
 
     let index = 0;
@@ -139,41 +147,46 @@ export function getCursorIndex(input, tapX) {
             high = mid - 1;
         }
     }
-    
+
     // Clean up
     document.body.removeChild(span);
     return index;
 }
 
 export function preventDoubleTapZoom() {
-        let lastTouchEnd = 0;
-        document.addEventListener('touchend', (event) => {
+    let lastTouchEnd = 0;
+    document.addEventListener(
+        "touchend",
+        (event) => {
             const now = Date.now();
             if (now - lastTouchEnd <= 300) {
                 // Check if the tap was on a button or an element inside a button
-                const isButton = event.target.closest('button, .btn, .svg-btn, .letter-btn');
-                
+                const isButton = event.target.closest(
+                    "button, .btn, .svg-btn, .letter-btn",
+                );
+
                 if (!isButton) {
                     // It's a double tap on the background/empty field; block the zoom
                     event.preventDefault();
                 }
             }
             lastTouchEnd = now;
-        }, { passive: false });
-    }
-
+        },
+        { passive: false },
+    );
+}
 
 export async function serverOnline() {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
 
     try {
-        const response = await fetch('/ping?t=' + Date.now(), {
-            method: 'HEAD',
-            signal: controller.signal
+        const response = await fetch("/ping?t=" + Date.now(), {
+            method: "HEAD",
+            signal: controller.signal,
         });
         clearTimeout(timeoutId);
-        return response.ok; 
+        return response.ok;
     } catch (err) {
         return false;
     }

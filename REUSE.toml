@@ -11,6 +11,8 @@ path = [
     "docker-compose.override.template.yml",
     ".eslint/**",
     ".coveragerc",
+    ".oxfmtrc.json",
+    ".oxlintrc.json",
     ".gitlab-ci.yml",
     "mypy.ini",
     "requirements.txt",

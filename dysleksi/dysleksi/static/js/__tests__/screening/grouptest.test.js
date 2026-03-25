@@ -1,13 +1,13 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import * as groupTestData from './grouptest.json' with { type: 'json' }
+import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
+import * as groupTestData from "./grouptest.json" with { type: "json" };
 import { getWebSocket } from "../../ws";
 import { GroupTestDomElements } from "../../screening/dom.js";
 import { Test } from "../../screening/model.js";
 import { GroupTestView } from "../../screening/group/student-group-test.js";
-import {spyAttributes} from "../utils.js";
+import { spyAttributes } from "../utils.js";
 import * as utils from "../../screening/utils.js";
 import { Student } from "../../screening/model.js"; // wherever your Student class is defined
 import { InstructionSequenceRunner } from "../../screening/instruction.js";
@@ -20,28 +20,26 @@ const mockP2P = {
     studentSetup: vi.fn(),
 };
 
-
 vi.mock("../../webRTC.js", () => {
     return {
-        WebRTCChannel: vi.fn().mockImplementation(function() {
+        WebRTCChannel: vi.fn().mockImplementation(function () {
             return mockP2P;
-        })
+        }),
     };
 });
 
-
-describe('GroupTestFlow', () => {
+describe("GroupTestFlow", () => {
     let originalWebSocket;
     let mockSend;
 
     beforeEach(() => {
         // Mock window.location correctly
         global.window = {
-            location: { protocol: 'https:', host: 'example.com' }
+            location: { protocol: "https:", host: "example.com" },
         };
         global.document.timeline = {
-                currentTime: 0,
-        }
+            currentTime: 0,
+        };
         global.alert = vi.fn();
 
         // Save original WebSocket
@@ -92,29 +90,29 @@ describe('GroupTestFlow', () => {
         global.testSpy = (test) => {
             // Apply spying to a test instance
             spyAttributes(test, ["chatSocket", "domElements", "summary"]);
-        }
+        };
 
-        global.ws = getWebSocket('class_123');
+        global.ws = getWebSocket("class_123");
 
         global.fetch = vi.fn(async () => ({
             arrayBuffer: async () => new ArrayBuffer(8), // dummy audio data
         }));
 
         const mockAudioContext = {
-                decodeAudioData: vi.fn().mockResolvedValue({}), // returns a dummy AudioBuffer
-                createBufferSource: vi.fn().mockReturnValue({
-                    connect: vi.fn(),
-                    start: vi.fn(),
-                    onended: null,
-                    buffer: null
-                }),
-                destination: {}
-            };
-    
+            decodeAudioData: vi.fn().mockResolvedValue({}), // returns a dummy AudioBuffer
+            createBufferSource: vi.fn().mockReturnValue({
+                connect: vi.fn(),
+                start: vi.fn(),
+                onended: null,
+                buffer: null,
+            }),
+            destination: {},
+        };
+
         // 2. Return this mock instead of an empty object
         vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(mockAudioContext);
 
-        vi.spyOn(Test.prototype, 'preload').mockResolvedValue(new Map());
+        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
     });
 
     afterEach(() => {
@@ -122,7 +120,7 @@ describe('GroupTestFlow', () => {
         global.WebSocket = originalWebSocket;
     });
 
-    it('Test Structure loads', () => {
+    it("Test Structure loads", () => {
         // Test that the instance with subinstances is correctly created from json
         const test = new Test(groupTestData);
         expect(test.name).toBe("Middle 2. grade");
@@ -130,9 +128,11 @@ describe('GroupTestFlow', () => {
         expect(test.parts[0].test).toBe(test);
         expect(test.parts[0].id).toBe(5);
         expect(test.parts[0].index).toBe(0);
-        expect(test.parts[0].name).toBe('Wordreading 2A (dummy)');
+        expect(test.parts[0].name).toBe("Wordreading 2A (dummy)");
         expect(test.parts[0].instructionsUrl).toBe(null);
-        expect(test.parts[0].intro).toBe('Vælg det rigtige ord, der passer til billedet.');
+        expect(test.parts[0].intro).toBe(
+            "Vælg det rigtige ord, der passer til billedet.",
+        );
         expect(test.parts[0].timeout).toBe(60);
         expect(test.parts[0].partialScoreAfter).toBe(30);
         expect(test.parts[0].questions.length).toBe(5);
@@ -141,7 +141,7 @@ describe('GroupTestFlow', () => {
         expect(test.parts[0].practice.length).toBe(3);
     });
 
-    it('Test Structure loads with no practice', () => {
+    it("Test Structure loads with no practice", () => {
         // Test that the instance with subinstances is correctly created from json
         const data = structuredClone(groupTestData);
         delete data.parts[0].practice;
@@ -152,9 +152,11 @@ describe('GroupTestFlow', () => {
         expect(test.parts[0].test).toBe(test);
         expect(test.parts[0].id).toBe(5);
         expect(test.parts[0].index).toBe(0);
-        expect(test.parts[0].name).toBe('Wordreading 2A (dummy)');
+        expect(test.parts[0].name).toBe("Wordreading 2A (dummy)");
         expect(test.parts[0].instructionsUrl).toBe(null);
-        expect(test.parts[0].intro).toBe('Vælg det rigtige ord, der passer til billedet.');
+        expect(test.parts[0].intro).toBe(
+            "Vælg det rigtige ord, der passer til billedet.",
+        );
         expect(test.parts[0].timeout).toBe(60);
         expect(test.parts[0].partialScoreAfter).toBe(30);
         expect(test.parts[0].questions.length).toBe(5);
@@ -163,23 +165,27 @@ describe('GroupTestFlow', () => {
         expect(test.parts[0].practice.length).toBe(0);
     });
 
-    it('should set the next button listener in start() and trigger onQuestionComplete', () => {
+    it("should set the next button listener in start() and trigger onQuestionComplete", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
-        
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
+
         // Spy on onQuestionComplete to verify it gets called
-        const onCompleteSpy = vi.spyOn(view, 'onQuestionComplete').mockImplementation(() => {});
-        
+        const onCompleteSpy = vi
+            .spyOn(view, "onQuestionComplete")
+            .mockImplementation(() => {});
+
         // 1. Initialize view state
         view.setPart(0);
-        view.showQuestion(false, 0); 
+        view.showQuestion(false, 0);
         const currentQuestion = view.currentQuestion;
 
         // 2. Call start()
         view.start();
 
         // 3. Verify the listener was registered on the DOM
-        expect(domElements.setNextButtonListener).toHaveBeenCalledWith(expect.any(Function));
+        expect(domElements.setNextButtonListener).toHaveBeenCalledWith(
+            expect.any(Function),
+        );
 
         // 4. Retrieve the actual function passed to the listener and execute it
         // This simulates the user clicking the "Next" button
@@ -190,23 +196,25 @@ describe('GroupTestFlow', () => {
         expect(onCompleteSpy).toHaveBeenCalledWith(currentQuestion, false);
     });
 
-    it('should set the repeat button listener in start() and trigger repeat', () => {
+    it("should set the repeat button listener in start() and trigger repeat", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
-        
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
+
         // Spy on onQuestionComplete to verify it gets called
-        const repeatSpy = vi.spyOn(view, 'repeat').mockImplementation(() => {});
-        
+        const repeatSpy = vi.spyOn(view, "repeat").mockImplementation(() => {});
+
         // 1. Initialize view state
         view.setPart(0);
-        view.showQuestion(false, 0); 
+        view.showQuestion(false, 0);
         const currentQuestion = view.currentQuestion;
 
         // 2. Call start()
         view.start();
 
         // 3. Verify the listener was registered on the DOM
-        expect(domElements.setRepeatButtonListener).toHaveBeenCalledWith(expect.any(Function));
+        expect(domElements.setRepeatButtonListener).toHaveBeenCalledWith(
+            expect.any(Function),
+        );
 
         // 4. Retrieve the actual function passed to the listener and execute it
         // This simulates the user clicking the "Next" button
@@ -217,20 +225,18 @@ describe('GroupTestFlow', () => {
         expect(repeatSpy).toHaveBeenCalled();
     });
 
-
-
     it("should hide the test part intro image when there is no previous part", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
-    
+
         // 1. Ensure currentPart is set but previousPart remains null
         view.setPart(0);
-        view.previousPart = null; 
-    
+        view.previousPart = null;
+
         // 2. Trigger the method
         view.showTestPartIntro();
-    
+
         // 3. Assertions
         // It should show the intro container...
         expect(domElements.showTestPartIntro).toHaveBeenCalled();
@@ -239,23 +245,23 @@ describe('GroupTestFlow', () => {
         // Verify the "show" version was NOT called
         expect(domElements.showTestPartIntroImage).not.toHaveBeenCalled();
     });
-    
+
     it("should show the test part intro image when moving from part 0 to part 1", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
-    
+
         // 1. Set up transition state (previousPart exists)
         view.setPart(0); // This sets currentPart
         view.setPart(1); // This moves currentPart to previousPart
-    
+
         // 2. Trigger the method
         view.showTestPartIntro();
-    
+
         // 3. Assertions
         expect(domElements.showTestPartIntroImage).toHaveBeenCalled();
         expect(domElements.setTestPartIntroText).toHaveBeenCalledWith(
-            expect.stringContaining(test.parts[0].name)
+            expect.stringContaining(test.parts[0].name),
         );
         expect(domElements.hideTestPartIntroImage).not.toHaveBeenCalled();
     });
@@ -266,121 +272,136 @@ describe('GroupTestFlow', () => {
             <button id="skip-instruction" style="display:none"></button>
             <button id="skip-all-instructions" style="display:none"></button>
         `;
-    
+
         // 2. Re-initialize domElements to pick up the new buttons
         const localDomElements = new GroupTestDomElements();
-        
+
         // 3. Create a question with an instruction sequence
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, localDomElements, student);
-        
+        const view = new GroupTestView(
+            test,
+            ws,
+            "class_123",
+            1,
+            localDomElements,
+            student,
+        );
+
         // Mock the InstructionSequenceRunner.run to return a promise we can control
         // This prevents the "then" block from hiding buttons immediately
         let resolveSequence;
-        const sequencePromise = new Promise(resolve => { resolveSequence = resolve; });
-        vi.spyOn(InstructionSequenceRunner.prototype, 'run').mockReturnValue(sequencePromise);
+        const sequencePromise = new Promise((resolve) => {
+            resolveSequence = resolve;
+        });
+        vi.spyOn(InstructionSequenceRunner.prototype, "run").mockReturnValue(
+            sequencePromise,
+        );
 
-        const skipSpy = vi.spyOn(InstructionSequenceRunner.prototype, 'skip');
-        const skipAllSpy = vi.spyOn(InstructionSequenceRunner.prototype, 'skipToEnd');
-    
+        const skipSpy = vi.spyOn(InstructionSequenceRunner.prototype, "skip");
+        const skipAllSpy = vi.spyOn(InstructionSequenceRunner.prototype, "skipToEnd");
+
         // 4. Trigger showQuestion for a question that has instructions
         // (Assuming Part 0, Question 0 in your JSON has instruction_sequence)
         view.setPart(0);
         view.showQuestion(true, 0);
-    
+
         // --- Assertions ---
-    
+
         // Verify buttons are made visible
         expect(localDomElements.skipInstructionButton.style.display).toBe("block");
         expect(localDomElements.skipAllInstructionsButton.style.display).toBe("block");
-    
+
         // Verify clicking the buttons triggers the runner methods
         localDomElements.skipInstructionButton.click();
         expect(skipSpy).toHaveBeenCalled();
-    
+
         localDomElements.skipAllInstructionsButton.click();
         expect(skipAllSpy).toHaveBeenCalled();
-    
+
         // 5. Complete the sequence and verify buttons are hidden again
         resolveSequence();
-        
+
         // Wait for the .then() microtask in GroupTestView
         await vi.waitFor(() => {
             expect(localDomElements.skipInstructionButton.style.display).toBe("none");
-            expect(localDomElements.skipAllInstructionsButton.style.display).toBe("none");
+            expect(localDomElements.skipAllInstructionsButton.style.display).toBe(
+                "none",
+            );
         });
     });
 
     it("should handle free_text selection and update next button state", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
-        
+
         // 1. Move to a part that has free_text questions (Part 1 in your JSON)
         view.setPart(1);
-        
+
         // 2. Show the question
         // This executes: this.input = this.domElements.showQuestionFreeText(() => this.selectFreeText());
-        view.showQuestion(false, 0); 
-        
+        view.showQuestion(false, 0);
+
         // 3. Clear previous calls to ensure clean assertions
         domElements.toggleNextButton.mockClear();
-        
+
         // 4. Simulate user typing "ab"
         // In your DOM implementation, the listener is called on every letter update
         view.input.value = "ab";
-        
+
         // 5. Trigger the listener manually
         // This simulates what happens when a letter button is clicked in showQuestionFreeText
         const freeTextCall = domElements.showQuestionFreeText.mock.calls[0][0];
-        freeTextCall(); 
-    
+        freeTextCall();
+
         // --- Assertions ---
-    
+
         // verify selectFreeText logic:
         // This.textAnswer should be updated because "ab" is not empty
         expect(view.textAnswer).toBe("ab");
-        
+
         // selectedAnswer should be set to the first possible answer (resource reference)
         expect(view.selectedAnswer).toEqual(view.currentQuestion.possibleAnswers[0]);
-        
+
         // toggleNextButton should be called with true (because length >= 2)
         expect(domElements.toggleNextButton).toHaveBeenCalledWith(true);
     });
 
     it("Test complain when there are no parts", () => {
-        const ws = getWebSocket('class_123');
+        const ws = getWebSocket("class_123");
         expect(
-            () => new Test(
-                {
-                    "id": 1,
-                    "name": "Middle 2. grade",
-                    "parts": []
-                },
-                ws,
-                'class_123',
-                domElements
-            )
+            () =>
+                new Test(
+                    {
+                        id: 1,
+                        name: "Middle 2. grade",
+                        parts: [],
+                    },
+                    ws,
+                    "class_123",
+                    domElements,
+                ),
         ).toThrowError("Test has no parts");
     });
 
     it("Render Summary when canPractice() = true", () => {
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
 
         view.start();
         view.startSummary();
-    
+
         expect(domElements.showSummary).toHaveBeenCalled();
-        expect(domElements.setEndSummaryButtonListener).toHaveBeenCalledWith(expect.any(Function));
+        expect(domElements.setEndSummaryButtonListener).toHaveBeenCalledWith(
+            expect.any(Function),
+        );
 
         domElements.endSummaryButton.click();
         expect(view.endSummary).toHaveBeenCalled();
-
     });
-    
+
     it("Render Summary when canPractice() = false", () => {
         const testData = JSON.parse(JSON.stringify(groupTestData));
 
@@ -388,38 +409,39 @@ describe('GroupTestFlow', () => {
         testData.parts[0].practice = [];
 
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
-    
+
         view.start();
         view.startSummary();
-    
-        expect(domElements.showSummary).toHaveBeenCalled();
-        expect(domElements.setEndSummaryButtonListener).toHaveBeenCalledWith(expect.any(Function));
-    });
 
+        expect(domElements.showSummary).toHaveBeenCalled();
+        expect(domElements.setEndSummaryButtonListener).toHaveBeenCalledWith(
+            expect.any(Function),
+        );
+    });
 
     it("Render intro and startSummary", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
-    
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
+
         const showIntroSpy = vi.spyOn(view, "showIntro");
         const startSummarySpy = vi.spyOn(view, "startSummary");
-    
+
         view.start();
-    
+
         expect(view.currentPart).toBe(test.parts[0]);
         expect(showIntroSpy).toHaveBeenCalled();
-    
+
         // simulate user pressing the "start summary" button
         domElements.startSummaryButton.click();
-    
+
         expect(startSummarySpy).toHaveBeenCalled();
     });
 
     it("Ends summary and displays practice question", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
         view.start();
         view.endSummary();
@@ -429,27 +451,26 @@ describe('GroupTestFlow', () => {
         expect(view.currentQuestionIndex).toBe(0);
         expect(view.isPracticing).toBe(true);
         expect(view.showFirstQuestion).toHaveBeenCalledWith(true);
-    })
+    });
 
     it("should use default parameter (false) when showFirstQuestion is called without arguments", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
 
         view.start();
         view.showFirstQuestion();
-    
+
         expect(view.isPracticing).toBe(false);
     });
 
     it("Ends summary and displays first question", () => {
-
         const testData = JSON.parse(JSON.stringify(groupTestData));
 
         // Ensure first part has no practice questions
         testData.parts[0].practice = [];
 
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
         view.start();
         view.endSummary();
@@ -459,19 +480,18 @@ describe('GroupTestFlow', () => {
         expect(view.currentQuestionIndex).toBe(0);
         expect(view.isPracticing).toBe(false);
         expect(view.showFirstQuestion).toHaveBeenCalledWith(false);
-    })
-
+    });
 
     it("Trigger for first question reminder", () => {
         vi.useFakeTimers();
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         test.parts[0].timeout = 0;
         test.parts[0].questions[0].reminder = 5000;
         // Mock audio play
         view.domElements.reminderSoundEl.play = vi.fn();
         testSpy(view);
-        view.setPart(0)
+        view.setPart(0);
         const part = view.currentPart;
         view.showFirstQuestion(false);
         const question = view.currentQuestion;
@@ -484,12 +504,12 @@ describe('GroupTestFlow', () => {
     it("Let first question time out", () => {
         vi.useFakeTimers();
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         test.parts[0].timeout = 0;
         test.parts[0].questions[0].timeout = 10000;
         testSpy(view);
-        view.setPart(0)
-        
+        view.setPart(0);
+
         const part = view.currentPart;
         view.showFirstQuestion(false);
         const question = view.currentQuestion;
@@ -513,21 +533,21 @@ describe('GroupTestFlow', () => {
             displayedAt: 0,
             answeredAt: expect.any(Number),
             duration: expect.any(Number),
-            roomName: 'class_123',
+            roomName: "class_123",
             correct: false,
             textAnswer: null,
-            student: expect.any(Object)
+            student: expect.any(Object),
         });
     });
 
     it("Let first testpart time out on second question", () => {
         vi.useFakeTimers();
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         test.parts[0].timeout = 60000;
         testSpy(view);
-        view.setPart(0)
-        
+        view.setPart(0);
+
         const part = view.currentPart;
         view.showFirstQuestion(false);
         const firstQuestion = view.currentQuestion;
@@ -537,13 +557,13 @@ describe('GroupTestFlow', () => {
         const remainingQuestions = part.questions.slice(view.currentQuestionIndex);
 
         vi.runAllTimers();
-        
+
         remainingQuestions.forEach((question) => {
             expect(view.onQuestionComplete).toHaveBeenCalledWith(question, true);
             expect(view.send).toHaveBeenCalledWith({
                 uuid: expect.any(String),
                 event: "question.answered",
-                message: `Elev besvarede ikke spørgsmål 1.${question.index+1} indenfor tidsfristen`,
+                message: `Elev besvarede ikke spørgsmål 1.${question.index + 1} indenfor tidsfristen`,
                 choiceId: null,
                 recordingBase64: null,
                 assignmentId: 1,
@@ -551,14 +571,14 @@ describe('GroupTestFlow', () => {
                 partId: part.id,
                 questionIndex: question.index,
                 questionId: question.id,
-                questionTitle: `${question.index+1}/${part.questions.length} (${part.name})`,
+                questionTitle: `${question.index + 1}/${part.questions.length} (${part.name})`,
                 displayedAt: 0,
                 answeredAt: expect.any(Number),
                 duration: expect.any(Number),
-                roomName: 'class_123',
+                roomName: "class_123",
                 correct: false,
                 textAnswer: null,
-                student: expect.any(Object)
+                student: expect.any(Object),
             });
         });
         expect(view.onQuestionComplete).not.toHaveBeenCalledWith(firstQuestion, true);
@@ -577,44 +597,47 @@ describe('GroupTestFlow', () => {
             displayedAt: expect.any(Number),
             answeredAt: expect.any(Number),
             duration: expect.any(Number),
-            roomName: 'class_123',
+            roomName: "class_123",
             correct: expect.toBeOneOf([null, true, false]),
             textAnswer: null,
-            student: expect.any(Object)
+            student: expect.any(Object),
         });
     });
 
     it("Select second answer of first question", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
-        view.setPart(0)
+        view.setPart(0);
 
         view.showFirstQuestion(false);
         const question = view.currentQuestion;
-        const secondAnswer = question.possibleAnswers[1]
-        const answerButtonObj = view.answerButtons.find(a => a.answer === secondAnswer);
+        const secondAnswer = question.possibleAnswers[1];
+        const answerButtonObj = view.answerButtons.find(
+            (a) => a.answer === secondAnswer,
+        );
         answerButtonObj.button.click();
 
-        expect(view.selectedAnswer, secondAnswer)
+        expect(view.selectedAnswer, secondAnswer);
         expect(domElements.toggleNextButton).toHaveBeenLastCalledWith(true);
         for (let d of view.answerButtons) {
             expect(domElements.toggleButtonSelected).toHaveBeenCalledWith(
-                d["button"], d["answer"] === secondAnswer
+                d["button"],
+                d["answer"] === secondAnswer,
             );
         }
     });
 
     it("Go to next question", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
-        view.setPart(0)
-        
+        view.setPart(0);
+
         const part = view.currentPart;
         view.showFirstQuestion(false);
         const question = view.currentQuestion;
-        const secondAnswer = question.possibleAnswers[1]
+        const secondAnswer = question.possibleAnswers[1];
         view.questionReminderId = 1;
         view.selectAnswer(secondAnswer);
         view.onQuestionComplete(question);
@@ -638,7 +661,7 @@ describe('GroupTestFlow', () => {
             roomName: view.roomName,
             correct: false,
             textAnswer: null,
-            student: expect.any(Object)
+            student: expect.any(Object),
         });
         expect(view.onQuestionComplete).toHaveBeenCalled();
         expect(view.showNextQuestion).toHaveBeenCalled();
@@ -648,23 +671,30 @@ describe('GroupTestFlow', () => {
     it("plays the challenge sound immediately on question display", () => {
         // Arrange
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         const spyShowQuestionChallenge = vi.spyOn(domElements, "showQuestionChallenge");
         const spyConsoleLog = vi.spyOn(console, "log");
-        view.setPart(1);  // go to word spelling questions (which use sound challenges)
+        view.setPart(1); // go to word spelling questions (which use sound challenges)
         // Act
         view.showQuestion(false, 1);
         // Assert
-        expect(spyShowQuestionChallenge).toHaveReturnedWith({ textEl: null, img: null, playBtn: expect.anything() });
-        expect(console.log).toHaveBeenCalledWith("Playing challenge sound", view.currentQuestion.challengeSoundUrl);
+        expect(spyShowQuestionChallenge).toHaveReturnedWith({
+            textEl: null,
+            img: null,
+            playBtn: expect.anything(),
+        });
+        expect(console.log).toHaveBeenCalledWith(
+            "Playing challenge sound",
+            view.currentQuestion.challengeSoundUrl,
+        );
     });
 
     it("Answer practice question without selecting answer", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
-        view.setPart(0)
-        
+        view.setPart(0);
+
         const part = view.currentPart;
         view.showQuestion(true, 1);
         const question = view.currentQuestion;
@@ -675,15 +705,17 @@ describe('GroupTestFlow', () => {
 
     it("Answer practice question correctly", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
-        view.setPart(0)
-        
+        view.setPart(0);
+
         const part = view.currentPart;
         view.showQuestion(true, 1);
         const question = view.currentQuestion;
-        const correctAnswer = question.possibleAnswers.find(a => a.isCorrect);
-        const answerButtonObj = view.answerButtons.find(a => a.answer === correctAnswer);
+        const correctAnswer = question.possibleAnswers.find((a) => a.isCorrect);
+        const answerButtonObj = view.answerButtons.find(
+            (a) => a.answer === correctAnswer,
+        );
         answerButtonObj.button.click();
         view.onQuestionComplete(question);
 
@@ -693,15 +725,17 @@ describe('GroupTestFlow', () => {
 
     it("Answer practice question incorrectly", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
-        view.setPart(0)
-        
+        view.setPart(0);
+
         const part = view.currentPart;
         view.showQuestion(true, 1);
         const question = view.currentQuestion;
-        const incorrectAnswer = question.possibleAnswers.find(a => !a.isCorrect);
-        const answerButtonObj = view.answerButtons.find(a => a.answer === incorrectAnswer);
+        const incorrectAnswer = question.possibleAnswers.find((a) => !a.isCorrect);
+        const answerButtonObj = view.answerButtons.find(
+            (a) => a.answer === incorrectAnswer,
+        );
         answerButtonObj.button.click();
         view.onQuestionComplete(question);
 
@@ -711,14 +745,14 @@ describe('GroupTestFlow', () => {
 
     it("Answer last practice question in part", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
-        view.setPart(0)
-        
+        view.setPart(0);
+
         const part = view.currentPart;
         view.showQuestion(true, 2);
         const question = view.currentQuestion;
-        const correctAnswer = question.possibleAnswers.find(a => a.isCorrect);
+        const correctAnswer = question.possibleAnswers.find((a) => a.isCorrect);
         view.selectAnswer(correctAnswer);
         view.onQuestionComplete(question);
 
@@ -728,13 +762,13 @@ describe('GroupTestFlow', () => {
 
     it("Answer last question in part", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
-        view.setPart(0)
+        view.setPart(0);
         const part = view.currentPart;
         view.showQuestion(false, part.questions.length - 1);
         const question = view.currentQuestion;
-        const firstAnswer = question.possibleAnswers[0]
+        const firstAnswer = question.possibleAnswers[0];
         view.selectAnswer(firstAnswer);
         view.onQuestionComplete(question);
 
@@ -750,10 +784,10 @@ describe('GroupTestFlow', () => {
 
     it("Answer freetext question correctly", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
         view.setPart(1);
-        
+
         const part = view.currentPart;
         view.showQuestion(false, 0);
         expect(view.input).not.toBe(null);
@@ -762,30 +796,30 @@ describe('GroupTestFlow', () => {
         view.selectFreeText();
         view.onQuestionComplete(question);
         expect(view.send).toHaveBeenCalledWith({
-            "answeredAt": 0,
-            "assignmentId": 1,
-            "choiceId": 100,
-            "correct": true,
-            "displayedAt": 0,
-            "duration": 0,
-            "event": "question.answered",
-            "message": "Elev har gennemført spørgsmål 2.1",
-            "partId": 6,
-            "partIndex": 1,
-            "questionId": 25,
-            "questionIndex": 0,
-            "questionTitle": "1/2 (Wordspelling 2B (dummy))",
-            "recordingBase64": null,
-            "roomName": "class_123",
-            "textAnswer": "aput",
-            "uuid": expect.any(String),
-            student: expect.any(Object)
+            answeredAt: 0,
+            assignmentId: 1,
+            choiceId: 100,
+            correct: true,
+            displayedAt: 0,
+            duration: 0,
+            event: "question.answered",
+            message: "Elev har gennemført spørgsmål 2.1",
+            partId: 6,
+            partIndex: 1,
+            questionId: 25,
+            questionIndex: 0,
+            questionTitle: "1/2 (Wordspelling 2B (dummy))",
+            recordingBase64: null,
+            roomName: "class_123",
+            textAnswer: "aput",
+            uuid: expect.any(String),
+            student: expect.any(Object),
         });
     });
 
     it("Answer freetext question with empty string", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
         view.setPart(1);
 
@@ -794,16 +828,15 @@ describe('GroupTestFlow', () => {
         const question = view.currentQuestion;
         view.input.value = "";
         view.selectFreeText();
-        expect(view.domElements.toggleNextButton).toHaveBeenCalledWith(false)
+        expect(view.domElements.toggleNextButton).toHaveBeenCalledWith(false);
     });
-
 
     it("Answer freetext question incorrectly", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
         view.setPart(1);
-        
+
         view.showQuestion(false, 0);
         expect(view.input).not.toBe(null);
         const question = view.currentQuestion;
@@ -811,30 +844,30 @@ describe('GroupTestFlow', () => {
         view.selectFreeText();
         view.onQuestionComplete(question);
         expect(view.send).toHaveBeenCalledWith({
-            "answeredAt": 0,
-            "assignmentId": 1,
-            "choiceId": 100,
-            "correct": false,
-            "displayedAt": 0,
-            "duration": 0,
-            "event": "question.answered",
-            "message": "Elev har gennemført spørgsmål 2.1",
-            "partId": 6,
-            "partIndex": 1,
-            "questionId": 25,
-            "questionIndex": 0,
-            "questionTitle": "1/2 (Wordspelling 2B (dummy))",
-            "recordingBase64": null,
-            "roomName": "class_123",
-            "textAnswer": "forkert",
-            "uuid": expect.any(String),
-            student: expect.any(Object)
+            answeredAt: 0,
+            assignmentId: 1,
+            choiceId: 100,
+            correct: false,
+            displayedAt: 0,
+            duration: 0,
+            event: "question.answered",
+            message: "Elev har gennemført spørgsmål 2.1",
+            partId: 6,
+            partIndex: 1,
+            questionId: 25,
+            questionIndex: 0,
+            questionTitle: "1/2 (Wordspelling 2B (dummy))",
+            recordingBase64: null,
+            roomName: "class_123",
+            textAnswer: "forkert",
+            uuid: expect.any(String),
+            student: expect.any(Object),
         });
     });
 
     it("Answer last question in last part", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
         const canShow = view.setPart(test.parts.length - 1);
         expect(canShow).toBe(true);
@@ -854,13 +887,13 @@ describe('GroupTestFlow', () => {
             assignmentId: 1,
             message: "Testen er afsluttet",
             roomName: view.roomName,
-            student: expect.any(Object)
+            student: expect.any(Object),
         });
     });
 
     it("Answer question with instruction sequence", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
         const canShow = view.setPart(0);
         expect(canShow).toBe(true);
@@ -873,17 +906,16 @@ describe('GroupTestFlow', () => {
 
     it("Show instructions", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
         view.setPart(0);
         view.showQuestion(true, 0);
-        expect(domElements.setStudentHeader).toHaveBeenCalledWith('<i class="ph ph-ear"></i>');
+        expect(domElements.setStudentHeader).toHaveBeenCalledWith(
+            '<i class="ph ph-ear"></i>',
+        );
         expect(view.runInstructions).toHaveBeenCalledWith(true);
-
     });
-
 });
-
 
 describe("GroupTestDomElements - showQuestionFreeText", () => {
     let domElements;
@@ -909,9 +941,8 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
 
         domElements = new GroupTestDomElements();
         listenerMock = vi.fn();
-        vi.spyOn(Test.prototype, 'preload').mockResolvedValue(new Map());
+        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
     });
-
 
     it("prevents default browser context menu on the display field", () => {
         const displayField = domElements.showQuestionFreeText(listenerMock);
@@ -925,9 +956,9 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
         // 2. Manually mock preventDefault on this specific event instance
         // This ensures the spy works even if JSDOM's internal event handling is rigid
         const preventDefaultSpy = vi.fn();
-        Object.defineProperty(event, 'preventDefault', {
+        Object.defineProperty(event, "preventDefault", {
             value: preventDefaultSpy,
-            writable: true
+            writable: true,
         });
 
         // 3. Dispatch to the input field
@@ -946,7 +977,7 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
 
         // Letter buttons exist
         const letterButtons = document.querySelectorAll(".letter-btn");
-        letterButtons.forEach(b => b.disabled = false);
+        letterButtons.forEach((b) => (b.disabled = false));
         expect(letterButtons.length).toBe(18); // 3 rows * 6 letters
 
         // Erase button exists
@@ -973,7 +1004,7 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
         const eraseBtn = document.querySelector(".erase-btn");
 
         // Type "abc"
-        letterButtons.forEach(b => b.disabled = false);
+        letterButtons.forEach((b) => (b.disabled = false));
         letterButtons[0].click();
         letterButtons[1].click();
         letterButtons[2].click();
@@ -991,7 +1022,6 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
         expect(displayField.classList.contains("display-field")).toBe(true);
     });
 });
-
 
 describe("GroupTestDomElements - showQuestionChallenge", () => {
     let domElements;
@@ -1019,17 +1049,16 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
             start: vi.fn(),
             onended: null,
         };
-    
+
         mockAudioContext = {
             decodeAudioData: vi.fn((arrayBuffer) => Promise.resolve({})), // fake AudioBuffer
             createBufferSource: vi.fn(() => mockSource),
             destination: {},
         };
 
-		global.fetch = vi.fn(async () => ({
-		    arrayBuffer: async () => new ArrayBuffer(8), // dummy audio data
-		}));
-
+        global.fetch = vi.fn(async () => ({
+            arrayBuffer: async () => new ArrayBuffer(8), // dummy audio data
+        }));
     });
 
     it("displays a question with sound correctly", async () => {
@@ -1063,7 +1092,6 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         expect(audioEl).toBeNull();
         expect(playBtn).toBeNull();
     });
-
 
     it("displays a question with an image correctly", async () => {
         const imageUrl = "https://example.com/image.png";
@@ -1109,13 +1137,12 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         inputField.className = "display-field";
         inputField.disabled = true;
 
-
         document.body.append(letterBtn1, letterBtn2, inputField);
-    
+
         // Set up audio challenge
         const soundUrl = "https://example.com/audio.mp3";
         domElements.showQuestionChallenge(null, soundUrl, null, mockAudioContext);
-    
+
         const audioEl = document.getElementById("challenge-audio");
         const playBtn = document.getElementById("challenge-sound-btn");
 
@@ -1138,7 +1165,7 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
 
         // Manually trigger audio.onended
         mockSource.onended();
-        
+
         // Let the handler finish
         await vi.waitFor(() => {
             expect(letterBtn1.disabled).toBe(false);
@@ -1162,11 +1189,11 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         letterBtn2.className = "letter-btn";
         letterBtn2.disabled = true;
         document.body.append(letterBtn1, letterBtn2);
-    
+
         // Set up audio challenge
         const soundUrl = "https://example.com/audio.mp3";
         domElements.showQuestionChallenge(null, soundUrl, null, mockAudioContext);
-    
+
         const audioEl = document.getElementById("challenge-audio");
         const playBtn = document.getElementById("challenge-sound-btn");
 
@@ -1177,10 +1204,7 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         await vi.waitFor(() => {
             expect(mockAudioContext.createBufferSource).toHaveBeenCalledTimes(1);
         });
-
-
     });
-
 });
 
 describe("GroupTestDomElements - Repeatbutton", () => {
@@ -1204,7 +1228,7 @@ describe("GroupTestDomElements - Repeatbutton", () => {
             <button id="repeat"></button>
         `;
         domElements = new GroupTestDomElements();
-        vi.spyOn(Test.prototype, 'preload').mockResolvedValue(new Map());
+        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
 
         student = new Student({
             id: 123,
@@ -1215,14 +1239,21 @@ describe("GroupTestDomElements - Repeatbutton", () => {
 
     it("repeat button destination", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, {
-            addEventListener: vi.fn(),
-            send: vi.fn()
-        }, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(
+            test,
+            {
+                addEventListener: vi.fn(),
+                send: vi.fn(),
+            },
+            "class_123",
+            1,
+            domElements,
+            student,
+        );
         testSpy(view);
         view.setRepeatDestination(1);
         view.setPart(0);
-        view.setQuestion(true, 3)
+        view.setQuestion(true, 3);
         view.showQuestion = vi.fn();
         expect(view.repeatQuestionIndex).toBe(1);
         view.repeat();
@@ -1231,53 +1262,54 @@ describe("GroupTestDomElements - Repeatbutton", () => {
 
     it("should repeat the CURRENT question if no repeat destination is set", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
-        
+
         view.setPart(0);
         // Set to index 2 specifically
-        view.setQuestion(false, 2); 
-        
+        view.setQuestion(false, 2);
+
         // Ensure repeatQuestionIndex is null (the default state)
         view.repeatQuestionIndex = null;
-    
+
         // Spy on showQuestion to see what index it gets called with
-        const showQuestionSpy = vi.spyOn(view, 'showQuestion');
-    
+        const showQuestionSpy = vi.spyOn(view, "showQuestion");
+
         view.repeat();
-    
+
         // It should fall back to currentQuestionIndex (2)
         expect(showQuestionSpy).toHaveBeenCalledWith(false, 2);
     });
-
 });
 
 describe("compareTextAnswer", () => {
-
     let view;
 
     beforeEach(() => {
         vi.useFakeTimers();
-        vi.spyOn(global, 'clearTimeout');
+        vi.spyOn(global, "clearTimeout");
 
         const mockAudioContextInstance = {
-            state: 'suspended',
+            state: "suspended",
             resume: vi.fn().mockResolvedValue(),
             decodeAudioData: vi.fn().mockResolvedValue({}),
             createBufferSource: vi.fn().mockReturnValue({
-                connect: vi.fn(), start: vi.fn(), onended: null
+                connect: vi.fn(),
+                start: vi.fn(),
+                onended: null,
             }),
-            destination: {}
+            destination: {},
         };
 
         global.window.AudioContext = vi.fn(() => mockAudioContextInstance);
         global.window.webkitAudioContext = vi.fn(() => mockAudioContextInstance);
-        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(mockAudioContextInstance);
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
+            mockAudioContextInstance,
+        );
 
         const test = new Test(groupTestData);
-        view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
-    })
-
+        view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
+    });
 
     it("Ignores whitespace", () => {
         expect(view.compareTextAnswer("ulu", "ulu")).toBe(true);
@@ -1305,35 +1337,37 @@ describe("compareTextAnswer", () => {
     });
 });
 
-
-
 describe("Timer and Reminder Cleanup", () => {
     let view;
 
     beforeEach(() => {
         vi.useFakeTimers();
-        vi.spyOn(global, 'clearTimeout');
+        vi.spyOn(global, "clearTimeout");
 
         const mockAudioContextInstance = {
-            state: 'suspended',
+            state: "suspended",
             resume: vi.fn().mockResolvedValue(),
             decodeAudioData: vi.fn().mockResolvedValue({}),
             createBufferSource: vi.fn().mockReturnValue({
-                connect: vi.fn(), start: vi.fn(), onended: null
+                connect: vi.fn(),
+                start: vi.fn(),
+                onended: null,
             }),
-            destination: {}
+            destination: {},
         };
 
         global.window.AudioContext = vi.fn(() => mockAudioContextInstance);
         global.window.webkitAudioContext = vi.fn(() => mockAudioContextInstance);
-        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(mockAudioContextInstance);
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
+            mockAudioContextInstance,
+        );
 
         const test = new Test(groupTestData);
-        view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
-        
+        view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
+
         // Use a part/question we know is multiple_choice to avoid free_text logic crashes
-        view.setPart(0); 
-        view.setQuestion(false, 0); 
+        view.setPart(0);
+        view.setQuestion(false, 0);
     });
 
     afterEach(() => {
@@ -1347,11 +1381,11 @@ describe("Timer and Reminder Cleanup", () => {
 
         // 1. Ensure we aren't practicing (avoids answerIsCorrect check in some paths)
         view.isPracticing = false;
-        
+
         // 2. Mock a multiple choice selection
         // This prevents the code from falling back to textAnswer logic
-        view.selectedAnswer = { id: 1, isCorrect: true, buttonId: 'btn1' };
-        view.textAnswer = null; 
+        view.selectedAnswer = { id: 1, isCorrect: true, buttonId: "btn1" };
+        view.textAnswer = null;
 
         view.onQuestionComplete(view.currentQuestion);
 
@@ -1386,14 +1420,13 @@ describe("Timer and Reminder Cleanup", () => {
     });
 });
 
-
 describe("StudentTestView - updateNextButtonClass", () => {
     let view;
 
     beforeEach(() => {
         const test = new Test(groupTestData);
         // Ensure part 0 has at least 2 practice questions for these tests
-        view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+        view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
         view.setPart(0);
     });
@@ -1413,7 +1446,6 @@ describe("StudentTestView - updateNextButtonClass", () => {
         expect(domElements.nextBtn.classList).toContain("start-btn");
     });
 
-
     it("should set 'start-part-btn' (Blue) on the last practice question", () => {
         view.isPracticing = true;
         // Move to the index of the last practice question
@@ -1428,7 +1460,7 @@ describe("StudentTestView - updateNextButtonClass", () => {
     it("should set 'start-btn' (Round) on the very first practice question", () => {
         view.isPracticing = true;
         view.setQuestion(true, 0);
-        
+
         // Ensure showingIntro is false to hit this specific block
         view.showingIntro = false;
 
@@ -1449,11 +1481,11 @@ describe("StudentTestView - updateNextButtonClass", () => {
 
     it("should set 'start-btn' (Round) when transitioning from instructions to a normal question", () => {
         view.isPracticing = true;
-        
+
         // Setup: Current question has instructions, next one does NOT
         view.currentPart.practice[0].instruction_sequence = { instructions: [] };
         view.currentPart.practice[1].instruction_sequence = null;
-        
+
         view.setQuestion(true, 0);
         view.showingInstructions = false; // We just finished showing them
 
@@ -1476,45 +1508,43 @@ describe("StudentTestView - updateNextButtonClass", () => {
         view.isPracticing = true;
         view.showingIntro = false;
         view.showingInstructions = false;
-    
+
         // We need at least 3 questions to avoid hitting the "First" or "Last" checks
         view.currentPart.practice = [
             { instruction_sequence: { instructions: [] } }, // Index 0 (Has instruction)
             { instruction_sequence: { instructions: [] } }, // Index 1 (CURRENT - Has instruction)
-            { instruction_sequence: null },                 // Index 2 (NEXT - No instruction)
-            { instruction_sequence: null }                  // Index 3 (Buffer to not be "Last")
+            { instruction_sequence: null }, // Index 2 (NEXT - No instruction)
+            { instruction_sequence: null }, // Index 3 (Buffer to not be "Last")
         ];
-    
+
         // Set to index 1
         // 1. It's not index 0 (First check failed)
         // 2. It's not index 3 (Last check failed)
         // 3. practice.slice(0, 2) are all instructions (Every check passed)
         // 4. practice[2] is NOT an instruction (Next check passed)
         view.setQuestion(true, 1);
-    
+
         view.updateNextButtonClass();
-    
+
         expect(domElements.setNextButtonClass).toHaveBeenCalledWith("start-btn");
     });
 
     it("should NOT set 'start-btn' if the next question also has instructions", () => {
         view.isPracticing = true;
         view.currentPart.practice = [
-            { instruction_sequence: {} }, 
+            { instruction_sequence: {} },
             { instruction_sequence: {} }, // Current
             { instruction_sequence: {} }, // Next (This causes the block to fail)
-            { instruction_sequence: {} }
+            { instruction_sequence: {} },
         ];
-    
+
         view.setQuestion(true, 1);
         view.updateNextButtonClass();
-    
+
         // Should fall through to the default class
         expect(domElements.setNextButtonClass).toHaveBeenCalledWith("next-btn");
     });
-
 });
-
 
 describe("GroupTestDomElements - FreeText Touch Interaction", () => {
     let domElements;
@@ -1524,7 +1554,7 @@ describe("GroupTestDomElements - FreeText Touch Interaction", () => {
     beforeEach(() => {
         // 1. Reset DOM
         document.body.innerHTML = `<div id="choices"></div>`;
-        
+
         // 2. Initialize Class & Mocks
         domElements = new GroupTestDomElements();
         listenerMock = vi.fn();
@@ -1534,16 +1564,16 @@ describe("GroupTestDomElements - FreeText Touch Interaction", () => {
         document.body.appendChild(displayField);
 
         // 4. Global Mocking (Ensure getComputedStyle exists in JSDOM)
-        if (typeof window.getComputedStyle !== 'function') {
+        if (typeof window.getComputedStyle !== "function") {
             window.getComputedStyle = vi.fn();
         }
 
         // 5. Default Layout Mocks (Can be overridden in specific tests)
-        vi.spyOn(displayField, 'getBoundingClientRect').mockReturnValue({
+        vi.spyOn(displayField, "getBoundingClientRect").mockReturnValue({
             left: 50,
             top: 50,
             width: 300,
-            height: 50
+            height: 50,
         });
     });
 
@@ -1551,18 +1581,20 @@ describe("GroupTestDomElements - FreeText Touch Interaction", () => {
         // Automatically restore all spies created via vi.spyOn
         vi.restoreAllMocks();
         // Clean up DOM to prevent memory leaks or ID collisions
-        document.body.innerHTML = '';
+        document.body.innerHTML = "";
     });
 
     it("touchstart on display field calculates cursor index and sets focus", () => {
-        const getCursorIndexSpy = vi.spyOn(utils, 'getCursorIndex').mockReturnValue(5);
-        const styleSpy = vi.spyOn(window, 'getComputedStyle').mockReturnValue({ paddingLeft: '10px' });
-        const focusSpy = vi.spyOn(displayField, 'focus');
-        const selectionSpy = vi.spyOn(displayField, 'setSelectionRange');
+        const getCursorIndexSpy = vi.spyOn(utils, "getCursorIndex").mockReturnValue(5);
+        const styleSpy = vi
+            .spyOn(window, "getComputedStyle")
+            .mockReturnValue({ paddingLeft: "10px" });
+        const focusSpy = vi.spyOn(displayField, "focus");
+        const selectionSpy = vi.spyOn(displayField, "setSelectionRange");
 
-        const touchEvent = new Event('touchstart', { bubbles: true, cancelable: true });
-        Object.defineProperty(touchEvent, 'touches', {
-            value: [{ clientX: 120, clientY: 60 }] 
+        const touchEvent = new Event("touchstart", { bubbles: true, cancelable: true });
+        Object.defineProperty(touchEvent, "touches", {
+            value: [{ clientX: 120, clientY: 60 }],
         });
 
         displayField.dispatchEvent(touchEvent);
@@ -1574,12 +1606,14 @@ describe("GroupTestDomElements - FreeText Touch Interaction", () => {
     });
 
     it("defaults paddingLeft to 0 if getComputedStyle returns an invalid value", () => {
-        const getCursorIndexSpy = vi.spyOn(utils, 'getCursorIndex').mockReturnValue(0);
-        vi.spyOn(window, 'getComputedStyle').mockReturnValue({ paddingLeft: undefined });
+        const getCursorIndexSpy = vi.spyOn(utils, "getCursorIndex").mockReturnValue(0);
+        vi.spyOn(window, "getComputedStyle").mockReturnValue({
+            paddingLeft: undefined,
+        });
 
-        const touchEvent = new Event('touchstart', { bubbles: true, cancelable: true });
-        Object.defineProperty(touchEvent, 'touches', {
-            value: [{ clientX: 100, clientY: 60 }]
+        const touchEvent = new Event("touchstart", { bubbles: true, cancelable: true });
+        Object.defineProperty(touchEvent, "touches", {
+            value: [{ clientX: 100, clientY: 60 }],
         });
 
         displayField.dispatchEvent(touchEvent);

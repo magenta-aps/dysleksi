@@ -1,13 +1,11 @@
 import { InstructionSequenceRunner } from "./instruction.js";
 import { requestWakeLock } from "./utils.js";
 import { releaseWakeLock } from "./utils.js";
-import { unlockAudioOnGesture } from './utils.js';
-import { preventDoubleTapZoom} from './utils.js';
-import { WebRTCChannel } from "../webRTC.js"
-
+import { unlockAudioOnGesture } from "./utils.js";
+import { preventDoubleTapZoom } from "./utils.js";
+import { WebRTCChannel } from "../webRTC.js";
 
 export class StudentTestView extends EventTarget {
-
     chatSocket;
     roomName;
     assignmentId;
@@ -19,25 +17,21 @@ export class StudentTestView extends EventTarget {
     currentPartIndex = null;
     currentQuestion = null;
     currentQuestionIndex = null;
-    showingIntro = false
-;
-    showingInstructions = false
-;
-    isPracticing = false
-;
-    repeatQuestionIndex = null
-;
+    showingIntro = false;
+    showingInstructions = false;
+    isPracticing = false;
+    repeatQuestionIndex = null;
 
     constructor(test, chatSocket, roomName, assignmentId, domElements, student) {
         super();
         preventDoubleTapZoom();
         this.test = test;
         this.p2p = new WebRTCChannel();
-        this.p2p.studentSetup(chatSocket, student)
+        this.p2p.studentSetup(chatSocket, student);
         this.roomName = roomName;
         this.assignmentId = assignmentId;
         this.domElements = domElements;
-        this.student = student
+        this.student = student;
         this.p2p.addEventListener("message", (e) => {
             this.onChatMessage(e.detail);
         });
@@ -66,8 +60,8 @@ export class StudentTestView extends EventTarget {
     }
 
     start() {
-        requestWakeLock()
-        this.setPart(0)
+        requestWakeLock();
+        this.setPart(0);
         this.showIntro();
 
         this.send({
@@ -83,21 +77,20 @@ export class StudentTestView extends EventTarget {
 
     showTestPartIntro() {
         this.showingIntro = true;
-        this.domElements.showTestPartIntro()
-        this.domElements.hideTestContainer()
-        this.domElements.setStartTestPartButtonListener(
-            () => {
-                this.showingIntro = false;
-                this.showFirstQuestion(this.canPractice());
-            }
-        );
+        this.domElements.showTestPartIntro();
+        this.domElements.hideTestContainer();
+        this.domElements.setStartTestPartButtonListener(() => {
+            this.showingIntro = false;
+            this.showFirstQuestion(this.canPractice());
+        });
         if (this.previousPart) {
             this.domElements.setTestPartIntroText(
-                this.previousPart.name + ' <span class="checkmark"><i class="ph-fill ph-check-fat"></i></span>'
-            )
-            this.domElements.showTestPartIntroImage()
+                this.previousPart.name +
+                    ' <span class="checkmark"><i class="ph-fill ph-check-fat"></i></span>',
+            );
+            this.domElements.showTestPartIntroImage();
         } else {
-            this.domElements.hideTestPartIntroImage()
+            this.domElements.hideTestPartIntroImage();
         }
     }
 
@@ -128,10 +121,9 @@ export class StudentTestView extends EventTarget {
         //     ", questions.length:",this.currentPart.questions.length
         // );
         if (this.isPracticing && this.currentPart.practice.length > 0) {
-
             if (this.currentQuestionIndex === this.currentPart.practice.length - 1) {
                 // Sidste spørgsmål i øveopgave
-                this.domElements.setNextButtonClass("start-part-btn");  // Blå knap
+                this.domElements.setNextButtonClass("start-part-btn"); // Blå knap
                 return;
             }
 
@@ -148,22 +140,27 @@ export class StudentTestView extends EventTarget {
             }
 
             if (
-                this.currentPart.practice.slice(0, this.currentQuestionIndex+1).every(q => !!q.instruction_sequence) &&
-                !this.currentPart.practice[this.currentQuestionIndex+1].instruction_sequence &&
+                this.currentPart.practice
+                    .slice(0, this.currentQuestionIndex + 1)
+                    .every((q) => !!q.instruction_sequence) &&
+                !this.currentPart.practice[this.currentQuestionIndex + 1]
+                    .instruction_sequence &&
                 !this.showingInstructions
             ) {
                 // Dette og alle foregående spørgsmål har en instruktionssekvens. Næste spørgsmål har ikke. Vi er ikke p.t. i gang med at vise instruktioner
                 this.domElements.setNextButtonClass("start-btn"); // Rund knap
                 return;
             }
-
         }
         this.domElements.setNextButtonClass("next-btn"); // Grøn knap
     }
 
     showFirstQuestion(isPracticing = false) {
         this.isPracticing = isPracticing;
-        console.log("Showing first question", this.isPracticing ? "(practice)" : "(test)");
+        console.log(
+            "Showing first question",
+            this.isPracticing ? "(practice)" : "(test)",
+        );
         this.domElements.showTestContainer();
         this.domElements.hideTestPartIntro();
 
@@ -178,7 +175,7 @@ export class StudentTestView extends EventTarget {
 
     async onTestComplete(cancelled = false) {
         console.log("Test complete");
-        releaseWakeLock()
+        releaseWakeLock();
         this.domElements.hideInstructions();
         this.domElements.showQuestionChallenge();
 
@@ -191,11 +188,13 @@ export class StudentTestView extends EventTarget {
             });
         }
 
-        this.dispatchEvent(new Event("test.complete", {
-            test: this.test
-        }));
-        this.domElements.hideTestContainer()
-        this.domElements.showTestExit()
+        this.dispatchEvent(
+            new Event("test.complete", {
+                test: this.test,
+            }),
+        );
+        this.domElements.hideTestContainer();
+        this.domElements.showTestExit();
     }
 
     // ---- Parts ----
@@ -206,7 +205,7 @@ export class StudentTestView extends EventTarget {
             return false;
         }
         this.currentPartIndex = index;
-        this.previousPart = this.currentPart
+        this.previousPart = this.currentPart;
         this.currentPart = this.test.parts[index];
         return true;
     }
@@ -216,16 +215,18 @@ export class StudentTestView extends EventTarget {
             clearTimeout(this.partTimeoutId);
             this.partTimeoutId = null;
         }
-        this.dispatchEvent(new Event("part.complete", {
-            test: this.test,
-            part: this.currentPart
-        }));
+        this.dispatchEvent(
+            new Event("part.complete", {
+                test: this.test,
+                part: this.currentPart,
+            }),
+        );
 
-        const canShow = this.setPart(this.currentPartIndex + 1)
+        const canShow = this.setPart(this.currentPartIndex + 1);
 
         if (canShow) {
             console.log("Part complete, showing next part");
-            this.showTestPartIntro()
+            this.showTestPartIntro();
         } else {
             console.log("Part complete, no more parts");
             this.onTestComplete();
@@ -237,30 +238,31 @@ export class StudentTestView extends EventTarget {
     setQuestion(isPracticing, questionIndex) {
         this.currentQuestionIndex = questionIndex;
         this.isPracticing = isPracticing;
-        const questions = isPracticing ? this.currentPart.practice : this.currentPart.questions;
+        const questions = isPracticing
+            ? this.currentPart.practice
+            : this.currentPart.questions;
         if (questionIndex >= questions.length) {
             //throw new Error("Cannot show question index " + index + ", only " + questions.length + " questions available.")
             return false;
         }
         this.currentQuestion = questions[questionIndex];
 
-        this.student.currentQuestionIndex = this.currentQuestionIndex
-        this.student.currentPartIndex = this.currentPartIndex
+        this.student.currentQuestionIndex = this.currentQuestionIndex;
+        this.student.currentPartIndex = this.currentPartIndex;
 
         return true;
     }
 
     showNextQuestion() {
-
-        const canShow =  this.showQuestion(
+        const canShow = this.showQuestion(
             this.isPracticing,
-            this.currentQuestionIndex + 1
+            this.currentQuestionIndex + 1,
         );
 
         if (canShow) {
-            this.domElements.fadeScreenOverlay()
+            this.domElements.fadeScreenOverlay();
         }
-        return canShow
+        return canShow;
     }
 
     setRepeatDestination(data) {
@@ -270,7 +272,9 @@ export class StudentTestView extends EventTarget {
     repeat() {
         this.showQuestion(
             this.isPracticing,
-            this.repeatQuestionIndex !== null ? this.repeatQuestionIndex : this.currentQuestionIndex
+            this.repeatQuestionIndex !== null
+                ? this.repeatQuestionIndex
+                : this.currentQuestionIndex,
         );
     }
 
@@ -285,8 +289,11 @@ export class StudentTestView extends EventTarget {
     }
 
     runInstructions(group) {
-        console.log("---------------------------------------------")
-        console.log("Starting instruction sequence: ", this.currentQuestion.instruction_sequence);
+        console.log("---------------------------------------------");
+        console.log(
+            "Starting instruction sequence: ",
+            this.currentQuestion.instruction_sequence,
+        );
         this.showingInstructions = true;
         this.updateNextButtonClass();
         this.domElements.lockInput();
@@ -296,7 +303,7 @@ export class StudentTestView extends EventTarget {
             this,
             this.currentQuestion.instruction_sequence.instructions,
             this.domElements,
-            this.audioContext
+            this.audioContext,
         );
 
         if (this.domElements.skipInstructionButton) {
@@ -306,22 +313,21 @@ export class StudentTestView extends EventTarget {
             this.domElements.skipAllInstructionsButton.addEventListener("click", () => {
                 instructionRunner.skipToEnd();
             });
-            this.domElements.skipInstructionButton.style.display="block";
-            this.domElements.skipAllInstructionsButton.style.display="block";
+            this.domElements.skipInstructionButton.style.display = "block";
+            this.domElements.skipAllInstructionsButton.style.display = "block";
         }
 
         instructionRunner.run().then(() => {
             this.domElements.unlockInput();
             if (this.domElements.skipInstructionButton) {
-                this.domElements.skipInstructionButton.style.display="none";
-                this.domElements.skipAllInstructionsButton.style.display="none";
+                this.domElements.skipInstructionButton.style.display = "none";
+                this.domElements.skipAllInstructionsButton.style.display = "none";
             }
             this.updateNextButtonClass();
             if (group) {
                 this.domElements.toggleQuestionDisplay("none");
             }
         });
-
     }
 
     setupNonPractice() {
@@ -342,7 +348,11 @@ export class StudentTestView extends EventTarget {
             }
             this.questionReminderId = setTimeout(() => {
                 let currentSource = null;
-                this.domElements.playSound(this.currentQuestion.reminderSource, currentSource, this.audioContext);
+                this.domElements.playSound(
+                    this.currentQuestion.reminderSource,
+                    currentSource,
+                    this.audioContext,
+                );
             }, this.currentQuestion.reminder);
         }
         this.domElements.toggleNextButton(false);

@@ -25,11 +25,9 @@ export class Student {
         }
         this.resultsByPart[partIndex].push(isCorrect);
     }
-
 }
 
 export class Test extends EventTarget {
-
     name;
     testType;
     parts;
@@ -37,18 +35,20 @@ export class Test extends EventTarget {
     partIndex;
 
     constructor(data) {
-        super()
+        super();
         this.name = data.name;
         this.testType = data.test_type;
         this.partIndex = 0;
         this.currentPart = null;
         this.summary = data.summary;
         const partClass = this.getPartClass();
-        this.parts = data.parts.map((dataItem, index) => new partClass(dataItem, this, index));
+        this.parts = data.parts.map(
+            (dataItem, index) => new partClass(dataItem, this, index),
+        );
         if (this.parts.length === 0) {
             throw new Error("Test has no parts");
         }
-        this.preload()
+        this.preload();
     }
 
     getPartClass() {
@@ -63,27 +63,31 @@ export class Test extends EventTarget {
         const tasks = [];
 
         // Queue Static Files
-        staticFiles.forEach(url => {
+        staticFiles.forEach((url) => {
             tasks.push(() => assetCache.processStaticFile(url));
         });
 
         // Queue Test Content
         for (const part of this.parts) {
-            tasks.push(() => assetCache.processTestObject(part, 'image'));
-            tasks.push(() => assetCache.processTestObject(part, 'instructionsUrl'));
+            tasks.push(() => assetCache.processTestObject(part, "image"));
+            tasks.push(() => assetCache.processTestObject(part, "instructionsUrl"));
 
             const allQuestions = [...part.questions, ...part.practice];
             for (const q of allQuestions) {
-                tasks.push(() => assetCache.processTestObject(q, 'challengeImageUrl'));
-                tasks.push(() => assetCache.processTestObject(q, 'challengeSoundUrl'));
+                tasks.push(() => assetCache.processTestObject(q, "challengeImageUrl"));
+                tasks.push(() => assetCache.processTestObject(q, "challengeSoundUrl"));
 
                 for (const a of q.possibleAnswers) {
-                    tasks.push(() => assetCache.processTestObject(a, 'resourceImageUrl'));
-                    tasks.push(() => assetCache.processTestObject(a, 'resourceSoundUrl'));
+                    tasks.push(() =>
+                        assetCache.processTestObject(a, "resourceImageUrl"),
+                    );
+                    tasks.push(() =>
+                        assetCache.processTestObject(a, "resourceSoundUrl"),
+                    );
                 }
 
                 for (const inst of q.instruction_sequence?.instructions || []) {
-                    tasks.push(() => assetCache.processTestObject(inst, 'url'));
+                    tasks.push(() => assetCache.processTestObject(inst, "url"));
                 }
             }
         }
@@ -104,16 +108,16 @@ export class Test extends EventTarget {
     async runWithLimit(tasks, limit) {
         const results = [];
         const executing = new Set();
-    
+
         for (const task of tasks) {
             const promise = task();
             results.push(promise);
             executing.add(promise);
-    
+
             // Clean up set when promise finishes
             const cleanUp = () => executing.delete(promise);
             promise.then(cleanUp).catch(cleanUp);
-    
+
             // If we hit the limit, wait for the fastest one to finish
             if (executing.size >= limit) {
                 await Promise.race(executing);
@@ -123,9 +127,7 @@ export class Test extends EventTarget {
     }
 }
 
-
 export class TestPart {
-
     test;
     id;
     index;
@@ -153,9 +155,13 @@ export class TestPart {
         this.questionIndex = 0;
         this.currentQuestion = null;
         const questionClass = this.getQuestionClass();
-        this.questions = data.questions.map((dataItem, index) => new questionClass(dataItem, this, index));
+        this.questions = data.questions.map(
+            (dataItem, index) => new questionClass(dataItem, this, index),
+        );
         if (data.practice !== undefined) {
-            this.practice = data.practice.map((dataItem, index) => new questionClass(dataItem, this, index));
+            this.practice = data.practice.map(
+                (dataItem, index) => new questionClass(dataItem, this, index),
+            );
         } else {
             this.practice = [];
         }
@@ -164,12 +170,9 @@ export class TestPart {
     getQuestionClass() {
         return Question;
     }
-
 }
 
-
 export class Question {
-
     part;
     id;
     type;
@@ -200,7 +203,9 @@ export class Question {
         this.challengeSoundUrl = data.challenge_sound_url;
         this.challengeText = data.challenge_text;
         const answerClass = this.getAnswerClass();
-        this.possibleAnswers = data.possible_answers.map(dataItem => new answerClass(dataItem, this));
+        this.possibleAnswers = data.possible_answers.map(
+            (dataItem) => new answerClass(dataItem, this),
+        );
         this.instruction_sequence = data.instruction_sequence;
         this.reminder = data.reminder;
         this.reminderSource = data.reminderSource;
@@ -210,12 +215,9 @@ export class Question {
     getAnswerClass() {
         return PossibleAnswer;
     }
-
 }
 
-
 export class PossibleAnswer {
-
     question;
     questionType;
     id;
@@ -242,5 +244,4 @@ export class PossibleAnswer {
         this.textAnswer = null;
         this.buttonId = "choice-" + this.resourceText;
     }
-
 }

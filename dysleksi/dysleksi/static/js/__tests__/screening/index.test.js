@@ -2,8 +2,8 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, beforeEach, afterEach, vi, assert } from "vitest";
-import * as individualTestData from './individualtest.json' with { type: 'json' }
-import * as groupTestData from './grouptest.json' with { type: 'json' }
+import * as individualTestData from "./individualtest.json" with { type: "json" };
+import * as groupTestData from "./grouptest.json" with { type: "json" };
 import * as individual_teacher from "../../screening/individual/teacher.js";
 import * as individual_student from "../../screening/individual/student.js";
 import * as group_teacher from "../../screening/group/teacher.js";
@@ -27,11 +27,19 @@ describe("Startup teacher test", () => {
         };
         wsGetter = vi.fn().mockReturnValue(socket);
 
-        initIndividualTeacher = vi.spyOn(individual_teacher, "initTeacher").mockImplementation(() => {});
-        initIndividualStudent = vi.spyOn(individual_student, "initStudent").mockImplementation(() => {});
-        initGroupTeacher = vi.spyOn(group_teacher, "initTeacher").mockImplementation(() => {});
-        initGroupStudent = vi.spyOn(group_student, "initStudent").mockImplementation(() => {});
-        vi.spyOn(Test.prototype, 'preload').mockResolvedValue(new Map());
+        initIndividualTeacher = vi
+            .spyOn(individual_teacher, "initTeacher")
+            .mockImplementation(() => {});
+        initIndividualStudent = vi
+            .spyOn(individual_student, "initStudent")
+            .mockImplementation(() => {});
+        initGroupTeacher = vi
+            .spyOn(group_teacher, "initTeacher")
+            .mockImplementation(() => {});
+        initGroupStudent = vi
+            .spyOn(group_student, "initStudent")
+            .mockImplementation(() => {});
+        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
     });
 
     afterEach(() => {
@@ -195,7 +203,6 @@ describe("Startup teacher test", () => {
         expect(initGroupStudent).toHaveBeenCalled();
     });
 
-
     it("should handle missing test_contents element by setting it to null", async () => {
         // 1. Setup DOM WITHOUT the #test_contents script tag
         document.body.innerHTML = `
@@ -207,20 +214,19 @@ describe("Startup teacher test", () => {
             >
                 </div>
         `;
-    
+
         // 2. Call start
-        // Note: This might throw an error further down if your Test class 
-        // constructor doesn't handle null, so we wrap it in a try/catch 
+        // Note: This might throw an error further down if your Test class
+        // constructor doesn't handle null, so we wrap it in a try/catch
         // just to ensure the line in index.js is executed.
         try {
             await start();
         } catch (e) {
-            // We expect a crash later in 'new Test(null)', 
+            // We expect a crash later in 'new Test(null)',
             // but the line we want to cover has now been reached.
         }
-    
+
         // 3. Verify the initialization didn't proceed correctly (optional)
         expect(initIndividualTeacher).not.toHaveBeenCalled();
     });
-
 });

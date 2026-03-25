@@ -6,5 +6,3 @@ initStudentLobby({
     individualRoomName: el.dataset.individualRoomName,
     classRoomName: el.dataset.classRoomName,
 });
-
-

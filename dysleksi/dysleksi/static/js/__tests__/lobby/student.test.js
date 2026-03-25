@@ -2,131 +2,130 @@ import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import { initStudentLobby } from "../../lobby/student.js";
 import * as wsModule from "../../ws.js";
 
-
 // Mock getWebSocket
 vi.mock("../ws.js", () => ({
-  getWebSocket: vi.fn(),
+    getWebSocket: vi.fn(),
 }));
 
 describe("initStudentLobby / initRedirectSocket", () => {
-  let sockets;
-  let originalLocation;
+    let sockets;
+    let originalLocation;
 
-  beforeEach(() => {
-    sockets = {};
+    beforeEach(() => {
+        sockets = {};
 
-    // Mock window.location so assignment works
-    originalLocation = global.window?.location;
-    global.window = {
-      location: "",
-    };
+        // Mock window.location so assignment works
+        originalLocation = global.window?.location;
+        global.window = {
+            location: "",
+        };
 
-    // Mock getWebSocket
-    vi.spyOn(wsModule, "getWebSocket").mockImplementation((assignment) => {
-      const listeners = {};
+        // Mock getWebSocket
+        vi.spyOn(wsModule, "getWebSocket").mockImplementation((assignment) => {
+            const listeners = {};
 
-      const socket = {
-        send: vi.fn(),
-        addEventListener: vi.fn((event, cb, options) => {
-          listeners[event] = { cb, options };
-        }),
-        __trigger(event, payload) {
-          listeners[event]?.cb(payload);
-        },
-      };
+            const socket = {
+                send: vi.fn(),
+                addEventListener: vi.fn((event, cb, options) => {
+                    listeners[event] = { cb, options };
+                }),
+                __trigger(event, payload) {
+                    listeners[event]?.cb(payload);
+                },
+            };
 
-      sockets[assignment] = socket;
-      return socket;
-    });
-  });
-
-  afterEach(() => {
-    vi.clearAllMocks();
-    global.window.location = originalLocation;
-  });
-
-  it("creates redirect sockets for both individual and class rooms", () => {
-    initStudentLobby({
-      individualRoomName: "individual-room",
-      classRoomName: "class-room",
+            sockets[assignment] = socket;
+            return socket;
+        });
     });
 
-    expect(wsModule.getWebSocket).toHaveBeenCalledTimes(2);
-    expect(wsModule.getWebSocket).toHaveBeenCalledWith("individual-room");
-    expect(wsModule.getWebSocket).toHaveBeenCalledWith("class-room");
-  });
-
-  it("sends student.ready once when socket opens", () => {
-    vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
-    initStudentLobby({
-      individualRoomName: "room-1",
-      classRoomName: "room-2",
+    afterEach(() => {
+        vi.clearAllMocks();
+        global.window.location = originalLocation;
     });
 
-    const socket = sockets["room-1"];
+    it("creates redirect sockets for both individual and class rooms", () => {
+        initStudentLobby({
+            individualRoomName: "individual-room",
+            classRoomName: "class-room",
+        });
 
-    socket.__trigger("open");
-
-    expect(socket.send).toHaveBeenCalledWith(
-      JSON.stringify({
-          "uuid": "UUID123",
-          event: "student.ready",
-          roomName: "room-1",
-      })
-    );
-  });
-
-  it("redirects on session.in_progress", () => {
-    initStudentLobby({
-      individualRoomName: "room-1",
-      classRoomName: "room-2",
+        expect(wsModule.getWebSocket).toHaveBeenCalledTimes(2);
+        expect(wsModule.getWebSocket).toHaveBeenCalledWith("individual-room");
+        expect(wsModule.getWebSocket).toHaveBeenCalledWith("class-room");
     });
 
-    const socket = sockets["room-1"];
+    it("sends student.ready once when socket opens", () => {
+        vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
+        initStudentLobby({
+            individualRoomName: "room-1",
+            classRoomName: "room-2",
+        });
 
-    socket.__trigger("message", {
-      data: JSON.stringify({
-        event: "session.in_progress",
-        roomUrl: "/rooms/room-1/",
-      }),
+        const socket = sockets["room-1"];
+
+        socket.__trigger("open");
+
+        expect(socket.send).toHaveBeenCalledWith(
+            JSON.stringify({
+                uuid: "UUID123",
+                event: "student.ready",
+                roomName: "room-1",
+            }),
+        );
     });
 
-    expect(window.location).toBe("/rooms/room-1/");
-  });
+    it("redirects on session.in_progress", () => {
+        initStudentLobby({
+            individualRoomName: "room-1",
+            classRoomName: "room-2",
+        });
 
-  it("redirects on session.start", () => {
-    initStudentLobby({
-      individualRoomName: "room-1",
-      classRoomName: "room-2",
+        const socket = sockets["room-1"];
+
+        socket.__trigger("message", {
+            data: JSON.stringify({
+                event: "session.in_progress",
+                roomUrl: "/rooms/room-1/",
+            }),
+        });
+
+        expect(window.location).toBe("/rooms/room-1/");
     });
 
-    const socket = sockets["room-2"];
+    it("redirects on session.start", () => {
+        initStudentLobby({
+            individualRoomName: "room-1",
+            classRoomName: "room-2",
+        });
 
-    socket.__trigger("message", {
-      data: JSON.stringify({
-        event: "session.start",
-        roomUrl: "/rooms/room-2/",
-      }),
+        const socket = sockets["room-2"];
+
+        socket.__trigger("message", {
+            data: JSON.stringify({
+                event: "session.start",
+                roomUrl: "/rooms/room-2/",
+            }),
+        });
+
+        expect(window.location).toBe("/rooms/room-2/");
     });
 
-    expect(window.location).toBe("/rooms/room-2/");
-  });
+    it("does not redirect on unrelated events", () => {
+        initStudentLobby({
+            individualRoomName: "room-1",
+            classRoomName: "room-2",
+        });
 
-  it("does not redirect on unrelated events", () => {
-    initStudentLobby({
-      individualRoomName: "room-1",
-      classRoomName: "room-2",
+        const socket = sockets["room-1"];
+
+        socket.__trigger("message", {
+            data: JSON.stringify({
+                event: "ping",
+                roomUrl: "/should-not-redirect/",
+            }),
+        });
+
+        expect(window.location).not.toBe("/should-not-redirect/");
     });
-
-    const socket = sockets["room-1"];
-
-    socket.__trigger("message", {
-      data: JSON.stringify({
-        event: "ping",
-        roomUrl: "/should-not-redirect/",
-      }),
-    });
-
-    expect(window.location).not.toBe("/should-not-redirect/");
-  });
 });

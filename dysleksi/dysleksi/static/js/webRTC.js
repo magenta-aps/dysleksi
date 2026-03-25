@@ -4,34 +4,35 @@ export class WebRTCChannel extends EventTarget {
         this.conn = null;
         this.messageQueue = []; // Store messages here if not connected
 
-        const configElement = document.getElementById('webrtc-config');
+        const configElement = document.getElementById("webrtc-config");
         const config = JSON.parse(configElement.textContent);
 
-        const currentHost = window.location.hostname
+        const currentHost = window.location.hostname;
 
         // See https://peerjs.com/ for details
         this.peer = new Peer(null, {
             host: currentHost,
             port: config.port,
-            path: '/webrtc',
+            path: "/webrtc",
             secure: true,
-            key: config.key
+            key: config.key,
         });
-
     }
 
     studentSetup(chatSocket, student) {
-        this.peer.on('connection', (connection) => {
+        this.peer.on("connection", (connection) => {
             this.conn = connection;
             this._setupConnectionEvents();
         });
 
         this.peer.on("open", (id) => {
-            chatSocket.send(JSON.stringify({
-                event: "student.joined",
-                studentId: student.id,
-                webRTCId: id
-            }))
+            chatSocket.send(
+                JSON.stringify({
+                    event: "student.joined",
+                    studentId: student.id,
+                    webRTCId: id,
+                }),
+            );
         });
     }
 
@@ -41,19 +42,19 @@ export class WebRTCChannel extends EventTarget {
     }
 
     _setupConnectionEvents() {
-        this.conn.on('open', () => {
+        this.conn.on("open", () => {
             // Send all messages that were waiting
             while (this.messageQueue.length > 0) {
                 const msg = this.messageQueue.shift();
-                console.log("Sending queued message: ", msg.event)
+                console.log("Sending queued message: ", msg.event);
                 this.conn.send(msg);
             }
 
-            this.dispatchEvent(new Event('open'));
+            this.dispatchEvent(new Event("open"));
         });
 
-        this.conn.on('data', (data) => {
-            this.dispatchEvent(new CustomEvent('message', { detail: data }));
+        this.conn.on("data", (data) => {
+            this.dispatchEvent(new CustomEvent("message", { detail: data }));
         });
     }
 

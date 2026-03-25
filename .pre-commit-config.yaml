@@ -34,3 +34,21 @@ repos:
       - id: commitizen
       - id: commitizen-branch
         stages: [ pre-push ]
+
+  - repo: https://github.com/oxc-project/mirrors-oxfmt
+    rev: v0.42.0
+    hooks:
+      - id: oxfmt
+        files: ^dysleksi/dysleksi/static/js/.*\.js$
+        additional_dependencies:
+          - "oxfmt@0.42.0"
+          - "@oxfmt/binding-linux-x64-gnu@0.42.0"
+
+  - repo: https://github.com/oxc-project/mirrors-oxlint
+    rev: v1.57.0
+    hooks:
+      - id: oxlint
+        verbose: true
+        additional_dependencies:
+          - "oxlint@1.57.0"
+          - "@oxlint/binding-linux-x64-gnu@1.57.0"
