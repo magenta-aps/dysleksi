@@ -14,10 +14,11 @@ $other-red: #bd0900;
 $other-red-dark: #970700;
 $other-green-light: #d1ffd8;
 $other-green: #006a11;
+$other-blue-lightest: #e9f5fb;
+$other-blue-light: #cde7f5;
 $other-blue: #f2f9ff;
 $other-blue2: #87b8e3;
-$other-blue-dark: #cbe0f3;
-$other-blue-dark2: #9ec4dc;
+$other-blue-dark: #9ec4dc;
 $other-blue-darkest: #34495e;
 
 $correct: #27c840;
@@ -549,8 +550,8 @@ $border-radius-student-card: $spacer / 4 * 3;
 
 /* Top row */
 .student-card .student-top-row {
-    background-color: $other-blue;
-    height: $spacer * 2;
+    background-color: $other-blue-lightest;
+    height: 46px;
     position: relative;
     overflow: hidden;
     display: flex;
@@ -559,7 +560,7 @@ $border-radius-student-card: $spacer / 4 * 3;
     user-select: none;
     cursor: pointer;
     font-weight: bold;
-    border: 1px solid $other-blue-dark2;
+    border: 1px solid $other-blue-dark;
     border-radius: $border-radius-student-card;
 }
 
@@ -570,7 +571,7 @@ $border-radius-student-card: $spacer / 4 * 3;
     top: 0;
     width: 0%;
     height: 100%;
-    background-color: $other-blue-dark;
+    background-color: $other-blue-light;
     z-index: 0;
     transition: width 0.5s ease;
 }
