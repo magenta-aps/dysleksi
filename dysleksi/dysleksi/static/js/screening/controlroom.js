@@ -213,7 +213,7 @@ export class GroupTestContainer {
 }
 
 export class ActionButtons {
-    constructor(buttonSelector = "button") {
+    constructor() {
         this.buttons = [
             ...document.querySelectorAll(
                 "#correct, #wrong, #cancelled, #skipped, #next",

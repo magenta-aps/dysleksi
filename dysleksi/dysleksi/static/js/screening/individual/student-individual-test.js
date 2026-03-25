@@ -1,5 +1,4 @@
 import { StudentTestView } from "../student-test.js";
-import { InstructionSequenceRunner } from "../instruction.js";
 
 export class IndividualTestView extends StudentTestView {
     mediaRecorder;
@@ -135,7 +134,7 @@ export class IndividualTestView extends StudentTestView {
         }
     }
 
-    async teacherFeedback(outcome) {
+    async teacherFeedback() {
         this.answeredAt = document.timeline.currentTime;
         this.recordedAudio = await this.mediaRecorder.interval();
         this.onQuestionComplete();

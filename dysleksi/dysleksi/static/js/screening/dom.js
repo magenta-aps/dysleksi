@@ -84,7 +84,7 @@ class TestDomElements {
         this.testSummary.style.display = "flex";
         console.log("showSummary", arguments);
 
-        parts.forEach((part, index) => {
+        parts.forEach((part) => {
             const block = document.createElement("div");
             block.classList.add("summary-block");
 
@@ -92,9 +92,6 @@ class TestDomElements {
             block.style.display = "flex";
             block.style.alignItems = "center"; // vertically center text and image
             block.style.justifyContent = "space-between"; // ensures image stays on the right
-
-            const numQuestions = part.questions.length;
-            const partNumber = index + 1;
 
             // Normal part name text
             const nameText = document.createTextNode(part.name + " ");
@@ -630,7 +627,7 @@ export class GroupTestDomElements extends TestDomElements {
 
     showQuestionChoice(answer, listener) {
         const text = answer.resourceText;
-        const sound = answer.resourceSoundUrl;
+        //const sound = answer.resourceSoundUrl;
         const imageUrl = answer.resourceImageUrl;
         const btn = document.createElement("button");
         if (text) {

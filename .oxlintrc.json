@@ -1,5 +1,6 @@
 {
   "rules": {
-    "eslint/no-unused-vars": "warn"
+    "eslint/no-unused-vars": "error",
+    "eslint/no-unused-expressions": "error"
   }
 }

@@ -11,7 +11,7 @@ function createFakeAudioContext() {
     const onendedMap = {};
 
     return {
-        decodeAudioData: vi.fn(async (arrayBuffer) => ({})), // returns dummy AudioBuffer
+        decodeAudioData: vi.fn(async () => ({})), // returns dummy AudioBuffer
         createBufferSource: vi.fn(() => ({
             start: startMock,
             stop: stopMock,

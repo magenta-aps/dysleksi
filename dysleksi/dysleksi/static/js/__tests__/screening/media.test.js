@@ -23,7 +23,7 @@ describe("TestMediaRecorder", () => {
 
         global.FileReader = vi.fn().mockImplementation(function () {
             this.addEventListener = vi.fn();
-            this.readAsDataURL = vi.fn((blob) => {
+            this.readAsDataURL = vi.fn(() => {
                 this.result = "data:audio/webm;base64,mockdata";
                 // Find the 'loadend' callback
                 const loadendCall = this.addEventListener.mock.calls.find(

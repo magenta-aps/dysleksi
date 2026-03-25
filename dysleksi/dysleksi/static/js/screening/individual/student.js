@@ -36,7 +36,7 @@ export function initStudent(roomName, assignmentId, test, student) {
                     student,
                 );
 
-                view.addEventListener("test.complete", (evt) => {
+                view.addEventListener("test.complete", () => {
                     chatSocket.close();
                 });
                 view.start();

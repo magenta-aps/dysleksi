@@ -187,7 +187,7 @@ export async function serverOnline() {
         });
         clearTimeout(timeoutId);
         return response.ok;
-    } catch (err) {
+    } catch {
         return false;
     }
 }
