@@ -15,7 +15,7 @@ export class WebRTCChannel extends EventTarget {
             port: config.port,
             path: '/webrtc',
             secure: true,
-            key: 'peerjs'
+            key: config.key
         });
 
     }
