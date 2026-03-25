@@ -423,6 +423,11 @@ class TestDomElements {
                 this._insert(this.questionChallengeEl, textEl, [img], [playBtn]);
             }
             textEl.innerHTML = text;
+            if (text.length === 1){
+                textEl.style.fontSize="120px"
+            } else {
+                textEl.style.fontSize="72px"
+            }
         } else {
             if (textEl) {
                 textEl.remove();

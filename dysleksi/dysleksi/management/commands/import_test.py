@@ -7,7 +7,7 @@ import re
 from pathlib import Path
 
 from data_tools.utils import (
-    create_letter_pronunciation_test,
+    create_pronunciation_test,
     create_wordreading_2_test,
     create_wordspelling_test,
 )
@@ -112,9 +112,9 @@ class Command(BaseCommand):
             create_wordspelling_test(
                 test, questions_data, practice_data, name=testpart_name
             )
-        elif test_type == "letter_pronunciation":
-            create_letter_pronunciation_test(
-                test, questions_data, practice_data, name=testpart_name
+        elif test_type == "pronunciation":
+            create_pronunciation_test(
+                test, questions_data, testpart_name, practice_data
             )
         else:
             raise ValueError("Test type is not valid")

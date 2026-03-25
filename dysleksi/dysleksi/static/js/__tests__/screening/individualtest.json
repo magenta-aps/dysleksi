@@ -79,6 +79,27 @@
           "possible_answers": []
         }
       ]
+    },
+    {
+      "id": 2,
+      "name": "Højtlæsning af ord",
+      "instructions_url": null,
+      "intro": "Dette er en dummy test",
+      "timeout": 60,
+      "partial_score_after": 30,
+      "practice": [],
+      "questions": [
+        {
+          "id": 1,
+          "question_type": "free_text",
+          "challenge_id": 30,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "meeqqat",
+          "possible_answers": []
+        }
+      ]
     }
   ],
   "summary": [

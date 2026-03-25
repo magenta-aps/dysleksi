@@ -57,9 +57,7 @@ def create_wordspelling_test(
     test.parts.add(part)
 
 
-def create_letter_pronunciation_test(
-    test, questions_data, practice_questions_data=None, name="Bogstavbenævnelse"
-):
+def create_pronunciation_test(test, questions_data, name, practice_questions_data=None):
     reminder, created = TestResource.objects.get_or_create(
         name="resources/letter_pronunciation/Deltests/9e.1.wav",
         sound="resources/letter_pronunciation/Deltests/9e.1.wav",

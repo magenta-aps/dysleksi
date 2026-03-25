@@ -364,6 +364,11 @@ export class QuestionView {
                 this.contentElement.append(txt);
             }
             txt.textContent = contentText;
+            if (contentText.length === 1){
+                txt.style.fontSize="72px"
+            } else {
+                txt.style.fontSize="40px"
+            }
         } else {
             if (txt) {
                 txt.remove();
