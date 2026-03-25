@@ -16,7 +16,7 @@ class Command(BaseCommand):
         student_group = Group.objects.get(name="Elever")
 
         # Create teacher who is in idp
-        teacher, _ = Teacher.objects.update_or_create(
+        teacher, created = Teacher.objects.update_or_create(
             username="0222222222",
             defaults={
                 "is_staff": False,
@@ -26,12 +26,13 @@ class Command(BaseCommand):
                 "cpr": "0222222222",
             },
         )
-        teacher.set_password("lærer")
-        teacher.groups.add(teacher_group)
-        teacher.save()
+        if created:
+            teacher.set_password("lærer")
+            teacher.groups.add(teacher_group)
+            teacher.save()
 
         # Create teacher who is not in idp (for easy-access on an ipad)
-        teacher2, _ = Teacher.objects.update_or_create(
+        teacher2, created = Teacher.objects.update_or_create(
             username="lærer",
             defaults={
                 "is_staff": False,
@@ -41,12 +42,13 @@ class Command(BaseCommand):
                 "cpr": "0222222223",
             },
         )
-        teacher2.set_password("lærer")
-        teacher2.groups.add(teacher_group)
-        teacher2.save()
+        if created:
+            teacher2.set_password("lærer")
+            teacher2.groups.add(teacher_group)
+            teacher2.save()
 
         # Create student who is in idp
-        student, _ = Student.objects.update_or_create(
+        student, created = Student.objects.update_or_create(
             username="0111111111",
             defaults={
                 "is_staff": False,
@@ -56,11 +58,12 @@ class Command(BaseCommand):
                 "cpr": "0111111111",
             },
         )
-        student.set_password("elev")
-        student.groups.add(student_group)
+        if created:
+            student.set_password("elev")
+            student.groups.add(student_group)
 
         # Create dummy student
-        student2, _ = Student.objects.update_or_create(
+        student2, created = Student.objects.update_or_create(
             username="0111111112",
             defaults={
                 "is_staff": False,
@@ -70,11 +73,12 @@ class Command(BaseCommand):
                 "cpr": "0111111112",
             },
         )
-        student2.set_password("elev2")
-        student2.groups.add(student_group)
+        if created:
+            student2.set_password("elev2")
+            student2.groups.add(student_group)
 
         # Create student who is not in idp (for easy-access on an ipad)
-        student3, _ = Student.objects.update_or_create(
+        student3, created = Student.objects.update_or_create(
             username="elev",
             defaults={
                 "is_staff": False,
@@ -84,8 +88,9 @@ class Command(BaseCommand):
                 "cpr": "0111111113",
             },
         )
-        student3.set_password("elev")
-        student3.groups.add(student_group)
+        if created:
+            student3.set_password("elev")
+            student3.groups.add(student_group)
 
         school_year_start = (
             date.today().year if date.today().month < 7 else date.today().year - 1

@@ -3,6 +3,8 @@ import { requestWakeLock } from "./utils.js";
 import { releaseWakeLock } from "./utils.js";
 import { unlockAudioOnGesture } from './utils.js';
 import { preventDoubleTapZoom} from './utils.js';
+import { WebRTCChannel } from "../webRTC.js"
+
 
 export class StudentTestView extends EventTarget {
 
@@ -30,13 +32,14 @@ export class StudentTestView extends EventTarget {
         super();
         preventDoubleTapZoom();
         this.test = test;
-        this.chatSocket = chatSocket;
+        this.p2p = new WebRTCChannel();
+        this.p2p.studentSetup(chatSocket, student)
         this.roomName = roomName;
         this.assignmentId = assignmentId;
         this.domElements = domElements;
         this.student = student
-        this.chatSocket.addEventListener("message", (e) => {
-            this.onChatMessage(JSON.parse(e.data));
+        this.p2p.addEventListener("message", (e) => {
+            this.onChatMessage(e.detail);
         });
         this.audioContext = unlockAudioOnGesture();
     }
@@ -55,7 +58,7 @@ export class StudentTestView extends EventTarget {
         data.uuid = crypto.randomUUID();
         data.student = this.student;
         console.log("Chat: sending", data);
-        this.chatSocket.send(JSON.stringify(data));
+        this.p2p.send(data);
     }
 
     onChatMessage(data) {
@@ -241,10 +244,8 @@ export class StudentTestView extends EventTarget {
         }
         this.currentQuestion = questions[questionIndex];
 
-        if (this.student) {
-            this.student.currentQuestionIndex = this.currentQuestionIndex
-            this.student.currentPartIndex = this.currentPartIndex
-        }
+        this.student.currentQuestionIndex = this.currentQuestionIndex
+        this.student.currentPartIndex = this.currentPartIndex
 
         return true;
     }

@@ -16,6 +16,7 @@ SPDX-License-Identifier: MPL-2.0
     <link rel="apple-touch-icon" sizes="180x180" href="{% static 'favicon/apple-touch-icon.png' %}">
     <link rel="icon" type="image/png" sizes="32x32" href="{% static 'favicon/favicon-32x32.png' %}">
     <link rel="icon" type="image/png" sizes="16x16" href="{% static 'favicon/favicon-16x16.png' %}">
+    <script src="/static/vendor/js/peerjs/peerjs.min.js"></script>
     {% block css %}
     {% compress css %}
     <link type="text/x-scss" href="{% static 'theme.scss' %}" rel="stylesheet" media="screen">
@@ -40,4 +41,5 @@ SPDX-License-Identifier: MPL-2.0
     <script type="module" src="{% static 'js/debug.js' %}"></script>
     {% endif %}
     <div id="fade-overlay"></div>
+    {{ WEBRTC_CONFIG|json_script:"webrtc-config" }}
 </body>

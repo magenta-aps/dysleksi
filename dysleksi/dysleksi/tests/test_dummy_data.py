@@ -53,3 +53,9 @@ class DummyDataTest(TestCase):
         self.assertTrue(
             Student.objects.filter(first_name="Elev", last_name="Elevsen").exists()
         )
+
+        amount_of_students = Student.objects.all().count()
+
+        # Validate that running dummy user creation twice does not crash the code
+        call_command("create_dummy_classes_and_users")
+        self.assertEqual(amount_of_students, Student.objects.all().count())

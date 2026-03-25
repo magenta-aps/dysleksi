@@ -6,7 +6,7 @@ from channels.exceptions import DenyConnection
 from channels.generic.websocket import JsonWebsocketConsumer
 from django.core.cache import caches
 
-from dysleksi.models import HandledEvent, Message
+from dysleksi.models import HandledEvent, Message, Student
 
 logger = logging.getLogger(__name__)
 cache = caches["chat"]  # As defined in settings/cache.py
@@ -75,7 +75,7 @@ class ChatConsumer(JsonWebsocketConsumer):
                 defaults={
                     "event": content["event"],
                     "data": content,
-                    "user": self.user,
+                    "user": Student.objects.get(id=content["student"]["id"]),
                 },
             )
             if created:

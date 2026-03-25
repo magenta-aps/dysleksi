@@ -23,9 +23,9 @@ docker compose up -d
 
 ## Usage hints
 
-In your browser, go to https://dysleksi-web:8140/ and log in using the credentials `lærer/lærer`.
+In your browser, go to https://dysleksi-web/ and log in using the credentials `lærer/lærer`.
 
-Now open a second browser in incognito mode, and go to https://dysleksi-web:8140/ there as well. Log in using the credentials `elev/elev`.
+Now open a second browser in incognito mode, and go to https://dysleksi-web/ there as well. Log in using the credentials `elev/elev`.
 
 In the "teacher window", you should see a list of students (with only one student.)
 
@@ -77,16 +77,23 @@ Now configure docker-compose.override.yml as follows:
 ```
 services:
   dysleksi-web:
+    labels:
+      - "traefik.http.routers.dysleksi.rule=Host(`dysleksi-web`) || Host(`<hostname>`)"
     environment:
       - TEST=false
       - ALLOWED_HOSTS=["<hostname>.local","dysleksi-web","localhost","host.docker.internal"]
       - LOGIN_BYPASS_ENABLED=True
+      - CSRF_TRUSTED_ORIGINS=["https://<hostname (lowercase)>.local","https://dysleksi-web"]
+  peerjs-server:
+    labels:
+      - "traefik.http.routers.peerjs.rule=(Host(`dysleksi-web`) && PathPrefix(`/webrtc`)) || (Host(`<hostname>`) && PathPrefix(`/webrtc`))"
+
 ```
 
 Where `<hostname>` should be replaced by your machine's hostname, which you obtained
 using the `hostname` command.
 
-Now you can visit `https://<hostname>.local:8140` on your ipad and log in with
+Now you can visit `https://<hostname>.local` on your ipad and log in with
 `elev:elev`. You can also bookmark the URL and add it to your home screen. If
 you decide to do so, make sure "open as web app" is disabled.
 

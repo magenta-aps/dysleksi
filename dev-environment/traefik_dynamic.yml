@@ -1,0 +1,10 @@
+tls:
+  certificates:
+    - certFile: /ssl/web/cert.pem
+      keyFile: /ssl/web/key.pem
+
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /ssl/web/cert.pem
+        keyFile: /ssl/web/key.pem

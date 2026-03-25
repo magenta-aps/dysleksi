@@ -12,6 +12,24 @@ import * as utils from "../../screening/utils.js";
 import { Student } from "../../screening/model.js"; // wherever your Student class is defined
 import { InstructionSequenceRunner } from "../../screening/instruction.js";
 
+const mockP2P = {
+    connect: vi.fn(),
+    send: vi.fn(),
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+    studentSetup: vi.fn(),
+};
+
+
+vi.mock("../../webRTC.js", () => {
+    return {
+        WebRTCChannel: vi.fn().mockImplementation(function() {
+            return mockP2P;
+        })
+    };
+});
+
+
 describe('GroupTestFlow', () => {
     let originalWebSocket;
     let mockSend;
@@ -630,7 +648,7 @@ describe('GroupTestFlow', () => {
     it("plays the challenge sound immediately on question display", () => {
         // Arrange
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 'class_123', 1, domElements);
+        const view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
         const spyShowQuestionChallenge = vi.spyOn(domElements, "showQuestionChallenge");
         const spyConsoleLog = vi.spyOn(console, "log");
         view.setPart(1);  // go to word spelling questions (which use sound challenges)
@@ -1167,6 +1185,7 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
 
 describe("GroupTestDomElements - Repeatbutton", () => {
     let domElements;
+    let student;
 
     beforeEach(() => {
         document.body.innerHTML = `
@@ -1186,13 +1205,20 @@ describe("GroupTestDomElements - Repeatbutton", () => {
         `;
         domElements = new GroupTestDomElements();
         vi.spyOn(Test.prototype, 'preload').mockResolvedValue(new Map());
+
+        student = new Student({
+            id: 123,
+            firstName: "Test",
+            lastName: "Student",
+        });
     });
 
     it("repeat button destination", () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, {
             addEventListener: vi.fn(),
-        }, 'class_123', 1, domElements);
+            send: vi.fn()
+        }, 'class_123', 1, domElements, student);
         testSpy(view);
         view.setRepeatDestination(1);
         view.setPart(0);
@@ -1228,10 +1254,30 @@ describe("GroupTestDomElements - Repeatbutton", () => {
 
 describe("compareTextAnswer", () => {
 
-    vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue({});
-    const view = new GroupTestView(
-        null,{addEventListener: vi.fn()},'class_123', 1, null
-    );
+    let view;
+
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.spyOn(global, 'clearTimeout');
+
+        const mockAudioContextInstance = {
+            state: 'suspended',
+            resume: vi.fn().mockResolvedValue(),
+            decodeAudioData: vi.fn().mockResolvedValue({}),
+            createBufferSource: vi.fn().mockReturnValue({
+                connect: vi.fn(), start: vi.fn(), onended: null
+            }),
+            destination: {}
+        };
+
+        global.window.AudioContext = vi.fn(() => mockAudioContextInstance);
+        global.window.webkitAudioContext = vi.fn(() => mockAudioContextInstance);
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(mockAudioContextInstance);
+
+        const test = new Test(groupTestData);
+        view = new GroupTestView(test, ws, 'class_123', 1, domElements, student);
+    })
+
 
     it("Ignores whitespace", () => {
         expect(view.compareTextAnswer("ulu", "ulu")).toBe(true);

@@ -14,3 +14,11 @@ def debug_context(request: HttpRequest):
         "show_debug_console": settings.SHOW_DEBUG_CONSOLE,  # type: ignore
         "show_test_debug_buttons": settings.DEBUG,  # type: ignore
     }
+
+
+def webrtc_settings(request):
+    return {
+        "WEBRTC_CONFIG": {
+            "port": settings.WEBRTC_PORT,
+        }
+    }
