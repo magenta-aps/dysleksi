@@ -1,8 +1,7 @@
-import { getCursorIndex, serverOnline } from './utils.js';
+import { getCursorIndex, serverOnline } from "./utils.js";
 import { assetCache } from "./cache.js";
 
 class TestDomElements {
-
     instructionsSoundEl;
     studentHeaderEl;
     questionChallengeEl;
@@ -31,7 +30,9 @@ class TestDomElements {
         this.testSummary = document.querySelector("#test-summary");
         this.testContainer = document.querySelector("#test-container");
         this.skipInstructionButton = document.querySelector("#skip-instruction");
-        this.skipAllInstructionsButton = document.querySelector("#skip-all-instructions");
+        this.skipAllInstructionsButton = document.querySelector(
+            "#skip-all-instructions",
+        );
         this.repeatBtn = document.querySelector("#repeat");
     }
 
@@ -50,24 +51,22 @@ class TestDomElements {
     }
 
     makeButtonAngry(buttonId) {
-        this.markButtonPress(buttonId, "angry-btn")
+        this.markButtonPress(buttonId, "angry-btn");
     }
 
     makeButtonHappy(buttonId) {
-        this.markButtonPress(buttonId, "happy-btn")
+        this.markButtonPress(buttonId, "happy-btn");
     }
 
     makeButtonGlow(buttonId) {
-        this.markButtonPress(buttonId, "pressed-btn")
+        this.markButtonPress(buttonId, "pressed-btn");
     }
 
-
     fadeScreenOverlay() {
-
         // Immediately hide all content on the screen
         this.overlay.style.transition = "none";
         this.overlay.style.opacity = 1;
-    
+
         // Fade content in gradually
         requestAnimationFrame(() => {
             setTimeout(() => {
@@ -76,7 +75,6 @@ class TestDomElements {
             }, 200); // Pause 200 miliseconds before starting the fade
         });
     }
-
 
     toggleBodyClass(className, show) {
         document.body.classList.toggle(className, show);
@@ -87,34 +85,34 @@ class TestDomElements {
         console.log("showSummary", arguments);
 
         parts.forEach((part, index) => {
-            const block = document.createElement('div');
-            block.classList.add('summary-block');
-    
+            const block = document.createElement("div");
+            block.classList.add("summary-block");
+
             // Make the block a flex container so we can push the image to the right
-            block.style.display = 'flex';
-            block.style.alignItems = 'center'; // vertically center text and image
-            block.style.justifyContent = 'space-between'; // ensures image stays on the right
-    
+            block.style.display = "flex";
+            block.style.alignItems = "center"; // vertically center text and image
+            block.style.justifyContent = "space-between"; // ensures image stays on the right
+
             const numQuestions = part.questions.length;
             const partNumber = index + 1;
-    
+
             // Normal part name text
-            const nameText = document.createTextNode(part.name + ' ');
+            const nameText = document.createTextNode(part.name + " ");
 
             // Container for text so the image is separate
-            const textContainer = document.createElement('div');
+            const textContainer = document.createElement("div");
             textContainer.appendChild(nameText);
-    
+
             // Create image element
-            const img = document.createElement('img');
+            const img = document.createElement("img");
             img.src = part.image;
             img.alt = "TestPart icon";
             img.style.height = "100%";
-    
+
             // Append text and image to block
             block.appendChild(textContainer);
             block.appendChild(img);
-    
+
             this.summaryContainer.appendChild(block);
         });
     }
@@ -139,7 +137,7 @@ class TestDomElements {
 
         const isOnline = await serverOnline();
         if (!isOnline) {
-            this.logOutButton.style.visibility = "hidden"
+            this.logOutButton.style.visibility = "hidden";
         }
     }
 
@@ -156,13 +154,22 @@ class TestDomElements {
     }
 
     setEndSummaryButtonListener(listener) {
-        this.endSummaryButton = this._setButtonListener(this.endSummaryButton, listener);
+        this.endSummaryButton = this._setButtonListener(
+            this.endSummaryButton,
+            listener,
+        );
     }
     setStartSummaryButtonListener(listener) {
-        this.startSummaryButton = this._setButtonListener(this.startSummaryButton, listener);
+        this.startSummaryButton = this._setButtonListener(
+            this.startSummaryButton,
+            listener,
+        );
     }
     setStartTestPartButtonListener(listener) {
-        this.startTestPartButton = this._setButtonListener(this.startTestPartButton, listener);
+        this.startTestPartButton = this._setButtonListener(
+            this.startTestPartButton,
+            listener,
+        );
     }
 
     toggleNextButton(show) {
@@ -178,11 +185,11 @@ class TestDomElements {
     }
 
     disableNextButton() {
-        this.nextBtn.style.transition = ""
-        this.nextBtn.style.opacity = ""
+        this.nextBtn.style.transition = "";
+        this.nextBtn.style.opacity = "";
         this.nextBtn.disabled = true;
     }
-    
+
     enableNextButton() {
         this.nextBtn.disabled = false;
     }
@@ -216,7 +223,7 @@ class TestDomElements {
             }
         }
     }
-    
+
     hideElement(el) {
         if (el) {
             if (el.dataset.hideDisplay === "true") {
@@ -226,14 +233,14 @@ class TestDomElements {
             }
         }
     }
-    
+
     fadeIn(el) {
         el.style.transition = "opacity 0.5s";
         requestAnimationFrame(() => {
             el.style.opacity = 1;
         });
     }
-    
+
     fadeOut(el) {
         el.style.transition = "opacity 0.5s";
         requestAnimationFrame(() => {
@@ -248,7 +255,7 @@ class TestDomElements {
             this.showElement(el);
         }, 1);
     }
-    
+
     highlight(el) {
         el.classList.add("highlight");
         setTimeout(() => el.classList.remove("highlight"), 1500);
@@ -265,7 +272,7 @@ class TestDomElements {
     addText(el, text) {
         const position = el.selectionStart;
         el.value = el.value.slice(0, position) + text + el.value.slice(position);
-        this.setMarker(el,position + text.length);
+        this.setMarker(el, position + text.length);
     }
     removeText(el, count) {
         if (count === undefined) {
@@ -287,24 +294,24 @@ class TestDomElements {
     lockInput() {
         this._updateInputState(true);
     }
-    
+
     unlockInput() {
         this._updateInputState(false);
     }
-    
+
     _updateInputState(inputLocked) {
         const buttons = document.querySelectorAll("button:not(.debug-button)");
-        buttons.forEach(btn => {
+        buttons.forEach((btn) => {
             if (inputLocked) {
-                btn.style.pointerEvents = "none";  // disables clicks
-                btn.tabIndex = -1;                 // skip focus in tabbing
+                btn.style.pointerEvents = "none"; // disables clicks
+                btn.tabIndex = -1; // skip focus in tabbing
             } else {
-                btn.style.pointerEvents = "";      // restore click
-                btn.tabIndex = 0;                  // restore tab focus
+                btn.style.pointerEvents = ""; // restore click
+                btn.tabIndex = 0; // restore tab focus
             }
         });
         const inputs = document.querySelectorAll("input:not(.debug-input)");
-        inputs.forEach(input => {
+        inputs.forEach((input) => {
             input.readOnly = inputLocked;
         });
         this.toggleBodyClass("input-locked", inputLocked);
@@ -323,7 +330,7 @@ class TestDomElements {
         this.studentHeaderEl.textContent = "";
         this.instructionsSoundEl.innerHTML = "";
     }
-    
+
     setButtonAudioCallback(button, audioCallback) {
         button.audioCallback = audioCallback;
     }
@@ -333,12 +340,12 @@ class TestDomElements {
             button.removeEventListener("click", button._clickHandler);
         }
         button._listener = listener;
-        button._clickHandler = async function() {
+        button._clickHandler = async function () {
             if (button.audioCallback) {
                 await button.audioCallback();
             }
             button._listener();
-        }
+        };
         button.addEventListener("click", button._clickHandler);
         return button;
     }
@@ -366,8 +373,8 @@ class TestDomElements {
 
     hideChallengeImage() {
         const img = document.querySelector("#challenge-image");
-        if (img){
-            img.style.opacity=0
+        if (img) {
+            img.style.opacity = 0;
         }
     }
 
@@ -376,7 +383,10 @@ class TestDomElements {
         // insert `child` into `parent` in the correct place
         const childrenList = Array.from(parent.children);
         if (after && after.length > 0) {
-            const afterIndexes = after.filter(a => a != null).map(a => childrenList.indexOf(a)).filter(i => i >= 0)
+            const afterIndexes = after
+                .filter((a) => a != null)
+                .map((a) => childrenList.indexOf(a))
+                .filter((i) => i >= 0);
             if (afterIndexes.length) {
                 let last = childrenList[Math.max(...afterIndexes)];
                 if (last && last.nextSibling) {
@@ -385,7 +395,10 @@ class TestDomElements {
                 }
             }
         } else if (before && before.length > 0) {
-            const beforeIndexes = before.filter(a => a != null).map(a => childrenList.indexOf(a)).filter(i => i >= 0);
+            const beforeIndexes = before
+                .filter((a) => a != null)
+                .map((a) => childrenList.indexOf(a))
+                .filter((i) => i >= 0);
             if (beforeIndexes.length) {
                 let first = childrenList[Math.min(...beforeIndexes)];
                 parent.insertBefore(child, first);
@@ -402,7 +415,7 @@ class TestDomElements {
         let img = document.querySelector("#challenge-image");
         let textEl = document.querySelector("#challenge-text");
         let playBtn = document.querySelector("#challenge-sound-btn");
-        this.questionChallengeEl.style.opacity = 1
+        this.questionChallengeEl.style.opacity = 1;
         if (imageUrl) {
             if (!img) {
                 img = document.createElement("img");
@@ -423,10 +436,10 @@ class TestDomElements {
                 this._insert(this.questionChallengeEl, textEl, [img], [playBtn]);
             }
             textEl.innerHTML = text;
-            if (text.length === 1){
-                textEl.style.fontSize="120px"
+            if (text.length === 1) {
+                textEl.style.fontSize = "120px";
             } else {
-                textEl.style.fontSize="72px"
+                textEl.style.fontSize = "72px";
             }
         } else {
             if (textEl) {
@@ -441,7 +454,7 @@ class TestDomElements {
             playBtn.id = "challenge-sound-btn";
             playBtn.className = "btn sound-btn pulse";
             this._insert(this.questionChallengeEl, playBtn, [img, textEl], null);
-    
+
             let isPlaying = false;
             let currentSource = null;
 
@@ -457,7 +470,7 @@ class TestDomElements {
                 playBtn.classList.remove("playing");
 
                 const letterBtns = document.querySelectorAll(".letter-btn");
-                letterBtns.forEach(b => b.disabled = false);
+                letterBtns.forEach((b) => (b.disabled = false));
 
                 const displayField = document.querySelector(".display-field");
                 displayField.disabled = false;
@@ -468,7 +481,7 @@ class TestDomElements {
             textEl: textEl,
             img: img,
             playBtn: playBtn,
-        }
+        };
     }
 
     async playSound(sound, currentSource, audioContext) {
@@ -484,7 +497,7 @@ class TestDomElements {
         currentSource.start();
 
         // Wait until finished
-        await new Promise(resolve => {
+        await new Promise((resolve) => {
             currentSource.onended = resolve;
         });
     }
@@ -498,20 +511,20 @@ class TestDomElements {
 
         const wrapper = document.createElement("div");
         wrapper.className = "mb-3";
-    
+
         // --- Button rows ---
         const buttonRows = [
             ["a", "e", "f", "g", "i", "j"],
             ["k", "l", "m", "n", "o", "p"],
-            ["q", "r", "s", "t", "u", "v"]
+            ["q", "r", "s", "t", "u", "v"],
         ];
-    
+
         // --- Display field (label-only feel) ---
         const textFieldWrapper = document.createElement("div");
-        textFieldWrapper.style.display = "flex";           
-        textFieldWrapper.style.alignItems = "center";     
-        textFieldWrapper.style.gap = "0.5rem";            
-    
+        textFieldWrapper.style.display = "flex";
+        textFieldWrapper.style.alignItems = "center";
+        textFieldWrapper.style.gap = "0.5rem";
+
         const displayField = document.createElement("input");
         displayField.className = "form-control display-field";
         displayField.id = "free-text-field";
@@ -519,28 +532,35 @@ class TestDomElements {
         displayField.inputMode = "none";
         displayField.disabled = true;
 
-        displayField.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-        }, false);
+        displayField.addEventListener(
+            "contextmenu",
+            (e) => {
+                e.preventDefault();
+            },
+            false,
+        );
 
-        displayField.addEventListener('touchstart', (e) => {
-            e.preventDefault(); // Kills the iPad menu before it can think
-            displayField.focus();
+        displayField.addEventListener(
+            "touchstart",
+            (e) => {
+                e.preventDefault(); // Kills the iPad menu before it can think
+                displayField.focus();
 
-            const touch = e.touches[0];
-            const rect = displayField.getBoundingClientRect();
-            
-            // Calculate the horizontal offset of the tap relative to the text start
-            const style = window.getComputedStyle(displayField);
-            const paddingLeft = parseFloat(style.paddingLeft) || 0;
-            const tapX = touch.clientX - rect.left - paddingLeft;
-        
-            // Find the character index
-            const pos = getCursorIndex(displayField, tapX);
-        
-            displayField.setSelectionRange(pos, pos);
-        }, { passive: false });
-        
+                const touch = e.touches[0];
+                const rect = displayField.getBoundingClientRect();
+
+                // Calculate the horizontal offset of the tap relative to the text start
+                const style = window.getComputedStyle(displayField);
+                const paddingLeft = parseFloat(style.paddingLeft) || 0;
+                const tapX = touch.clientX - rect.left - paddingLeft;
+
+                // Find the character index
+                const pos = getCursorIndex(displayField, tapX);
+
+                displayField.setSelectionRange(pos, pos);
+            },
+            { passive: false },
+        );
 
         // --- Erase button ---
         const eraseBtn = document.createElement("button");
@@ -548,24 +568,24 @@ class TestDomElements {
         eraseBtn.className = "btn erase-btn";
         eraseBtn.id = "free-text-erase-btn";
         updateEraseBtnState();
-    
+
         eraseBtn.addEventListener("click", () => {
             this.removeText(displayField, 1);
             updateEraseBtnState();
             listener({ target: { value: displayField.value } });
-            this.makeButtonGlow(eraseBtn.id)
+            this.makeButtonGlow(eraseBtn.id);
         });
-    
+
         textFieldWrapper.append(displayField, eraseBtn);
         wrapper.append(textFieldWrapper);
-    
+
         // --- Letter buttons ---
         const buttonsWrapper = document.createElement("div");
         buttonsWrapper.id = "free-text-buttons";
-        buttonRows.forEach(rowLetters => {
+        buttonRows.forEach((rowLetters) => {
             const rowDiv = document.createElement("div");
             rowDiv.className = "letter-row";
-            rowLetters.forEach(letter => {
+            rowLetters.forEach((letter) => {
                 const btn = document.createElement("button");
                 btn.type = "button";
                 btn.className = "btn btn-outline-primary letter-btn";
@@ -576,29 +596,27 @@ class TestDomElements {
                     this.addText(displayField, letter);
                     updateEraseBtnState();
                     listener({ target: { value: displayField.value } });
-                    this.makeButtonGlow(btn.id)
+                    this.makeButtonGlow(btn.id);
                 });
                 rowDiv.appendChild(btn);
             });
             buttonsWrapper.append(rowDiv);
         });
         wrapper.append(buttonsWrapper); // below display
-    
+
         this.choicesEl.append(wrapper);
-    
+
         return displayField;
     }
 }
 
 export class GroupTestDomElements extends TestDomElements {
-
     choicesEl;
 
     constructor() {
         super();
         this.choicesEl = document.querySelector("#choices");
     }
-
 
     toggleQuestionDisplay(state) {
         for (const el of [this.questionChallengeEl, this.choicesEl]) {
@@ -636,11 +654,9 @@ export class GroupTestDomElements extends TestDomElements {
     toggleButtonSelected(button, selected) {
         button.classList.toggle("selected", selected);
     }
-
 }
 
 export class IndividualTestDomElements extends TestDomElements {
-
     audioIndicatorEl;
 
     constructor(audioIndicatorSelector = "#audio-indicator") {
@@ -651,5 +667,4 @@ export class IndividualTestDomElements extends TestDomElements {
     toggleAudioIndicator(show) {
         this.audioIndicatorEl.style.display = show ? "block" : "none";
     }
-
 }

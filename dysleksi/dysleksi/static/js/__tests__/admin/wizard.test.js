@@ -70,7 +70,7 @@ const mockDoc = `
 describe("Wizard", () => {
     const getInstance = () => {
         return new Wizard(document.querySelector("div.modal.wizard"));
-    }
+    };
 
     beforeEach(() => {
         document.body.innerHTML = mockDoc;
@@ -177,7 +177,7 @@ describe("Wizard", () => {
         const select = document.querySelector("select");
         const nextBtn = document.querySelector("button.next-btn");
         select.value = "42";
-        select.dispatchEvent(new Event('change'));
+        select.dispatchEvent(new Event("change"));
         expect(wizard.isFormStepCompleted()).toBeTruthy();
         expect(nextBtn.disabled).toBeFalsy();
     });

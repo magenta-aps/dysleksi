@@ -12,8 +12,8 @@ vi.mock("../../screening/cache.js", () => ({
         processTestObject: vi.fn().mockResolvedValue(true),
         applyCssVariables: vi.fn(),
         applyCachedFonts: vi.fn(),
-        map: new Map([["test-url", "blob-url"]])
-    }
+        map: new Map([["test-url", "blob-url"]]),
+    },
 }));
 
 describe("Test.preload", () => {
@@ -33,25 +33,33 @@ describe("Test.preload", () => {
                         challenge_image_url: "q1.png",
                         challenge_sound_url: "q1.mp3",
                         possible_answers: [
-                            { id: 1, resource_image_url: "a1.png", resource_sound_url: "a1.mp3" }
+                            {
+                                id: 1,
+                                resource_image_url: "a1.png",
+                                resource_sound_url: "a1.mp3",
+                            },
                         ],
                         instruction_sequence: {
-                            instructions: [{ url: "step1.mp3" }]
-                        }
+                            instructions: [{ url: "step1.mp3" }],
+                        },
                     },
                     {
                         id: 102,
                         challenge_image_url: "q2.png",
                         challenge_sound_url: "q2.mp3",
                         possible_answers: [
-                            { id: 1, resource_image_url: "a2.png", resource_sound_url: "a2.mp3" }
+                            {
+                                id: 1,
+                                resource_image_url: "a2.png",
+                                resource_sound_url: "a2.mp3",
+                            },
                         ],
-                        instruction_sequence: {}
-                    }
+                        instruction_sequence: {},
+                    },
                 ],
-                practice: []
-            }
-        ]
+                practice: [],
+            },
+        ],
     };
 
     beforeEach(() => {
@@ -62,32 +70,27 @@ describe("Test.preload", () => {
         vi.clearAllMocks();
     });
 
-
     it("calls assetCache methods for all types of test content", async () => {
-
         testInstance = new Test(mockTestData);
         await testInstance.preload();
 
         expect(assetCache.processStaticFile).toHaveBeenCalledWith("/style.css");
-        
+
         expect(assetCache.processTestObject).toHaveBeenCalledWith(
-            expect.objectContaining({ name: "Part 1" }), 
-            'image'
+            expect.objectContaining({ name: "Part 1" }),
+            "image",
         );
 
         expect(assetCache.processTestObject).toHaveBeenCalledWith(
-            expect.objectContaining({ challengeImageUrl: "q1.png" }), 
-            'challengeImageUrl'
+            expect.objectContaining({ challengeImageUrl: "q1.png" }),
+            "challengeImageUrl",
         );
 
         expect(assetCache.processTestObject).toHaveBeenCalledWith(
-            expect.objectContaining({ resourceImageUrl: "a1.png" }), 
-            'resourceImageUrl'
+            expect.objectContaining({ resourceImageUrl: "a1.png" }),
+            "resourceImageUrl",
         );
         expect(assetCache.applyCssVariables).toHaveBeenCalled();
         expect(assetCache.applyCachedFonts).toHaveBeenCalled();
-
     });
-
-
 });

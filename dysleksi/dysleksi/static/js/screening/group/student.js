@@ -1,5 +1,5 @@
 import { getWebSocket } from "../../ws.js";
-import { GroupTestDomElements } from "../dom.js"
+import { GroupTestDomElements } from "../dom.js";
 import { GroupTestView } from "./student-group-test.js";
 
 export function initStudent(roomName, assignmentId, test, student) {
@@ -10,12 +10,19 @@ export function initStudent(roomName, assignmentId, test, student) {
     chatSocket.addEventListener("open", async () => {
         console.log("Socket open");
         try {
-            const view = new GroupTestView(test, chatSocket, roomName, assignmentId, domElements, student);
+            const view = new GroupTestView(
+                test,
+                chatSocket,
+                roomName,
+                assignmentId,
+                domElements,
+                student,
+            );
 
             view.addEventListener("test.complete", (evt) => {
                 chatSocket.close();
             });
-            view.start()
+            view.start();
         } catch (err) {
             console.error("Cannot start test because audio setup failed:", err);
         }

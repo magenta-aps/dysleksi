@@ -5,8 +5,8 @@ export async function start() {
     const roleEl = document.querySelector("[data-role]");
 
     const role = roleEl.dataset.role;
-    
-    const testType = roleEl.dataset.testType
+
+    const testType = roleEl.dataset.testType;
     let initStudent, initTeacher;
 
     const roomName = roleEl.dataset.roomName;
@@ -15,38 +15,38 @@ export async function start() {
     const testContents = testContentsEl ? JSON.parse(testContentsEl.textContent) : null;
     const test = new Test(testContents);
 
-    const studentData = {}
-    studentData.firstName = roleEl.dataset.studentFirstName
-    studentData.lastName = roleEl.dataset.studentLastName
-    studentData.id = roleEl.dataset.studentId
+    const studentData = {};
+    studentData.firstName = roleEl.dataset.studentFirstName;
+    studentData.lastName = roleEl.dataset.studentLastName;
+    studentData.id = roleEl.dataset.studentId;
 
     const student = new Student(studentData);
 
     if (testType === "individual") {
         if (role === "student") {
-            ({initStudent} = await import("./individual/student.js"));
+            ({ initStudent } = await import("./individual/student.js"));
         }
         if (role === "teacher") {
-            ({initTeacher} = await import("./individual/teacher.js"));
+            ({ initTeacher } = await import("./individual/teacher.js"));
         }
     } else if (testType === "group") {
         if (role === "student") {
-            ({initStudent} = await import("./group/student.js"));
+            ({ initStudent } = await import("./group/student.js"));
         }
         if (role === "teacher") {
-            ({initTeacher} = await import("./group/teacher.js"));
+            ({ initTeacher } = await import("./group/teacher.js"));
         }
     } else {
-        throw new Error("Invalid test type '"+testType+"'");
+        throw new Error("Invalid test type '" + testType + "'");
     }
 
     if (role === "student") {
-        initStudent(roomName, assignmentId, test, student, testType );
+        initStudent(roomName, assignmentId, test, student, testType);
     }
     if (role === "teacher") {
         initTeacher(roomName, assignmentId, test);
-        startSession(roomName); 
+        startSession(roomName);
     }
 }
 
-document.addEventListener('DOMContentLoaded', start);
+document.addEventListener("DOMContentLoaded", start);

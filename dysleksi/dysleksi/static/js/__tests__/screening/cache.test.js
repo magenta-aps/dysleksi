@@ -13,21 +13,23 @@ describe("AssetCache", () => {
         cache = new AssetCache();
 
         global.fetch = vi.fn().mockResolvedValue({
-            blob: vi.fn().mockResolvedValue(new Blob(["test"], { type: "image/png" }))
+            blob: vi.fn().mockResolvedValue(new Blob(["test"], { type: "image/png" })),
         });
 
         global.URL.createObjectURL = vi.fn().mockReturnValue(mockBlobUrl);
 
-        global.FontFace = vi.fn().mockImplementation(function(name, source, descriptors) {
-            this.name = name;
-            this.source = source;
-            this.descriptors = descriptors;
-            this.load = vi.fn().mockResolvedValue(this);
-        });
-        
-        Object.defineProperty(document, 'fonts', {
+        global.FontFace = vi
+            .fn()
+            .mockImplementation(function (name, source, descriptors) {
+                this.name = name;
+                this.source = source;
+                this.descriptors = descriptors;
+                this.load = vi.fn().mockResolvedValue(this);
+            });
+
+        Object.defineProperty(document, "fonts", {
             value: { add: vi.fn() },
-            configurable: true
+            configurable: true,
         });
     });
 
@@ -78,8 +80,6 @@ describe("AssetCache", () => {
             expect(global.fetch).toHaveBeenCalledWith(mockUrl);
             expect(cache.map.get(mockUrl)).toBe(mockBlobUrl);
         });
-
-
     });
 
     describe("processTestObject", () => {
@@ -100,71 +100,90 @@ describe("AssetCache", () => {
     describe("applyCssVariables", () => {
         it("updates :root CSS variables with cached blobs", () => {
             cache.map.set("/static/bg.png", mockBlobUrl);
-            
+
             const mockStyle = {
-                '--bg-image': 'url("/static/bg.png")',
-                getPropertyValue: (name) => name === '--bg-image' ? 'url("/static/bg.png")' : '',
-                0: '--bg-image',
+                "--bg-image": 'url("/static/bg.png")',
+                getPropertyValue: (name) =>
+                    name === "--bg-image" ? 'url("/static/bg.png")' : "",
+                0: "--bg-image",
                 length: 1,
-                [Symbol.iterator]: function* () { yield '--bg-image'; }
+                [Symbol.iterator]: function* () {
+                    yield "--bg-image";
+                },
             };
 
             const mockStyle2 = {
-                '--some-other-var': 'foo.png',
-                getPropertyValue: (name) => name === '--some-other-var' ? 'foo.png' : '',
-                0: '--some-other-var',
+                "--some-other-var": "foo.png",
+                getPropertyValue: (name) =>
+                    name === "--some-other-var" ? "foo.png" : "",
+                0: "--some-other-var",
                 length: 1,
-                [Symbol.iterator]: function* () { yield '--some-other-var'; }
+                [Symbol.iterator]: function* () {
+                    yield "--some-other-var";
+                },
             };
 
             const mockStyle3 = {
-                'some-other-var': 'foo.png',
-                getPropertyValue: (name) => name === 'some-other-var' ? 'foo.png' : '',
-                0: 'some-other-var',
+                "some-other-var": "foo.png",
+                getPropertyValue: (name) =>
+                    name === "some-other-var" ? "foo.png" : "",
+                0: "some-other-var",
                 length: 1,
-                [Symbol.iterator]: function* () { yield 'some-other-var'; }
+                [Symbol.iterator]: function* () {
+                    yield "some-other-var";
+                },
             };
-
 
             const mockSheet = {
-                cssRules: [{
-                    selectorText: ':root',
-                    style: mockStyle
-                },
-                {
-                    selectorText: ':root',
-                    style: mockStyle2
-                },
-                {
-                    selectorText: ':not_root',
-                    style: mockStyle2
-                },
-                {
-                    selectorText: ':root',
-                    style: mockStyle3
-                },
-
-                ]
+                cssRules: [
+                    {
+                        selectorText: ":root",
+                        style: mockStyle,
+                    },
+                    {
+                        selectorText: ":root",
+                        style: mockStyle2,
+                    },
+                    {
+                        selectorText: ":not_root",
+                        style: mockStyle2,
+                    },
+                    {
+                        selectorText: ":root",
+                        style: mockStyle3,
+                    },
+                ],
             };
 
-            Object.defineProperty(document, 'styleSheets', {
+            Object.defineProperty(document, "styleSheets", {
                 value: [mockSheet],
-                configurable: true
+                configurable: true,
             });
 
-            vi.spyOn(window, 'getComputedStyle').mockReturnValue({
-                getPropertyValue: (prop) => mockStyle.getPropertyValue(prop)
+            vi.spyOn(window, "getComputedStyle").mockReturnValue({
+                getPropertyValue: (prop) => mockStyle.getPropertyValue(prop),
             });
 
-            const setPropertySpy = vi.spyOn(document.documentElement.style, 'setProperty');
+            const setPropertySpy = vi.spyOn(
+                document.documentElement.style,
+                "setProperty",
+            );
 
             cache.applyCssVariables();
 
-            expect(setPropertySpy).toHaveBeenCalledWith('--bg-image', `url(${mockBlobUrl})`);
-            expect(setPropertySpy).not.toHaveBeenCalledWith('--plain-color', expect.any(String));
-            expect(setPropertySpy).not.toHaveBeenCalledWith('background-image', expect.any(String));
+            expect(setPropertySpy).toHaveBeenCalledWith(
+                "--bg-image",
+                `url(${mockBlobUrl})`,
+            );
+            expect(setPropertySpy).not.toHaveBeenCalledWith(
+                "--plain-color",
+                expect.any(String),
+            );
+            expect(setPropertySpy).not.toHaveBeenCalledWith(
+                "background-image",
+                expect.any(String),
+            );
             expect(setPropertySpy).toHaveBeenCalledTimes(1);
-
         });
     });
 
@@ -179,13 +198,13 @@ describe("AssetCache", () => {
             expect(global.FontFace).toHaveBeenCalledWith(
                 "OpenSans-Bold",
                 `url(${mockBlobUrl})`,
-                expect.objectContaining({ weight: "700" })
+                expect.objectContaining({ weight: "700" }),
             );
 
             expect(global.FontFace).toHaveBeenCalledWith(
                 "OpenSans-Italic",
                 `url(${mockBlobUrl})`,
-                expect.objectContaining({ weight: "400" })
+                expect.objectContaining({ weight: "400" }),
             );
 
             expect(document.fonts.add).toHaveBeenCalled();

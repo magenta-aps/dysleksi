@@ -1,14 +1,20 @@
 import { StudentTestView } from "../student-test.js";
 import { InstructionSequenceRunner } from "../instruction.js";
 
-
 export class IndividualTestView extends StudentTestView {
-
     mediaRecorder;
     recordedAudio;
     isPracticing = false;
 
-    constructor(test, chatSocket, roomName, assignmentId, domElements, mediaRecorder, student) {
+    constructor(
+        test,
+        chatSocket,
+        roomName,
+        assignmentId,
+        domElements,
+        mediaRecorder,
+        student,
+    ) {
         super(test, chatSocket, roomName, assignmentId, domElements, student);
         this.mediaRecorder = mediaRecorder;
     }
@@ -49,14 +55,21 @@ export class IndividualTestView extends StudentTestView {
         const canShow = this.setQuestion(isPracticing, questionIndex);
         if (canShow) {
             // TODO: [#68981] Refactor this code somewhere else
-            console.log("---------------------------------------------")
-            console.log("Showing question " + this.currentPartIndex + "." + this.currentQuestionIndex);
+            console.log("---------------------------------------------");
+            console.log(
+                "Showing question " +
+                    this.currentPartIndex +
+                    "." +
+                    this.currentQuestionIndex,
+            );
 
             this.setStudentHeader();
             this.updateNextButtonClass();
 
-            if (this.currentQuestion.instruction_sequence){
-                this.domElements.setNextButtonListener(() => this.onQuestionComplete(this.currentQuestion));
+            if (this.currentQuestion.instruction_sequence) {
+                this.domElements.setNextButtonListener(() =>
+                    this.onQuestionComplete(this.currentQuestion),
+                );
                 this.domElements.setRepeatButtonListener(() => this.repeat());
                 this.runInstructions(false);
             } else {
@@ -69,17 +82,17 @@ export class IndividualTestView extends StudentTestView {
                 this.currentQuestion.challengeText,
                 this.currentQuestion.challengeSoundUrl,
                 this.currentQuestion.challengeImageUrl,
-                this.audioContext
+                this.audioContext,
             );
             this.send({
-                event: 'question.displayed',
+                event: "question.displayed",
                 partIndex: this.currentPartIndex,
                 partId: this.currentPart.id,
                 questionIndex: this.currentQuestionIndex,
                 questionId: this.currentQuestion.id,
                 displayedAt: this.displayedAt,
                 questionTitle: this.questionTitle(this.isPracticing),
-                practice: this.isPracticing
+                practice: this.isPracticing,
             });
 
             //this.domElements.toggleAudioIndicator(true);
@@ -107,7 +120,7 @@ export class IndividualTestView extends StudentTestView {
             displayedAt: this.displayedAt,
             answeredAt: this.answeredAt,
             duration: duration,
-            practice: this.isPracticing
+            practice: this.isPracticing,
         });
         this.answeredAt = document.timeline.currentTime;
         if (this.showNextQuestion()) {
@@ -127,5 +140,4 @@ export class IndividualTestView extends StudentTestView {
         this.recordedAudio = await this.mediaRecorder.interval();
         this.onQuestionComplete();
     }
-
 }

@@ -1,7 +1,6 @@
 import { assetCache } from "./cache.js";
 
 export class InstructionSequenceRunner {
-
     constructor(view, instructions, domElements, audioContext) {
         this.view = view;
         this.instructions = instructions;
@@ -10,7 +9,6 @@ export class InstructionSequenceRunner {
         this.skipCurrent = false;
         this.skipAll = false;
         this._currentSkipResolver = null;
-
     }
 
     getEl(id) {
@@ -21,7 +19,14 @@ export class InstructionSequenceRunner {
         this.skipAll = false;
         for (let i = 0; i < this.instructions.length; i++) {
             const instruction = this.instructions[i];
-            console.log("Showing instruction step", i + 1, "of", this.instructions.length, ": ", instruction);
+            console.log(
+                "Showing instruction step",
+                i + 1,
+                "of",
+                this.instructions.length,
+                ": ",
+                instruction,
+            );
             if (!this.skipAll) this.skipCurrent = false;
             if (this.skipAll) this.skipCurrent = true;
 
@@ -42,7 +47,7 @@ export class InstructionSequenceRunner {
     sleep(ms) {
         if (this.skipCurrent) return Promise.resolve();
 
-        return new Promise(resolve => {
+        return new Promise((resolve) => {
             const timeout = setTimeout(resolve, ms);
 
             // Keep track of resolver for instant skip
@@ -115,15 +120,12 @@ export class InstructionSequenceRunner {
                 const self = this;
                 const el2 = this.getEl(element);
                 const u = url;
-                this.domElements.setButtonAudioCallback(
-                    el2,
-                    async function() {
-                        if (u) {
-                            await self.playSound(u);
-                        }
-                        self.domElements.setButtonAudioCallback(el2, null);
+                this.domElements.setButtonAudioCallback(el2, async function () {
+                    if (u) {
+                        await self.playSound(u);
                     }
-                )
+                    self.domElements.setButtonAudioCallback(el2, null);
+                });
                 break;
 
             case "setRepeatButtonDestination":
@@ -146,24 +148,24 @@ export class InstructionSequenceRunner {
                 throw new Error("Unknown action: " + action);
         }
     }
-    
+
     async playSound(url) {
         if (this.skipCurrent) return;
-    
+
         const context = this.audioContext;
-    
+
         try {
             // Fetch audio data
             const response = await fetch(url);
             const arrayBuffer = await response.arrayBuffer();
             const audioBuffer = await context.decodeAudioData(arrayBuffer);
-    
+
             const source = context.createBufferSource();
             source.buffer = audioBuffer;
             source.connect(context.destination);
-    
+
             let resolved = false;
-    
+
             // Setup skip resolver
             this._currentSkipResolver = () => {
                 if (!resolved) {
@@ -171,9 +173,9 @@ export class InstructionSequenceRunner {
                     resolved = true;
                 }
             };
-    
+
             source.start();
-    
+
             // Wait until finished or skipped
             await new Promise((resolve) => {
                 source.onended = () => {
@@ -181,7 +183,6 @@ export class InstructionSequenceRunner {
                     resolve();
                 };
             });
-    
         } finally {
             this._currentSkipResolver = null;
         }
@@ -199,5 +200,4 @@ export class InstructionSequenceRunner {
         this.skipCurrent = true;
         if (this._currentSkipResolver) this._currentSkipResolver();
     }
-
 }

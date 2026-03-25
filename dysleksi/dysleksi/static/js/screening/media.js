@@ -1,5 +1,4 @@
 export class TestMediaRecorder extends EventTarget {
-
     mediaRecorder;
     recording;
     recordingUpdateInterval;
@@ -13,12 +12,13 @@ export class TestMediaRecorder extends EventTarget {
     setup() {
         return new Promise((resolve, reject) => {
             if (!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)) {
-                const errMsg = 'getUserMedia not supported';
+                const errMsg = "getUserMedia not supported";
                 console.error(errMsg);
                 reject(errMsg);
             } else {
                 // TODO: denne metode bør kaldes fra et user-initieret event, f.eks. button click
-                navigator.mediaDevices.getUserMedia({audio: true})
+                navigator.mediaDevices
+                    .getUserMedia({ audio: true })
                     .then((stream) => {
                         this.mediaRecorder = new MediaRecorder(stream);
                         this.mediaRecorder.addEventListener("dataavailable", (evt) => {
@@ -46,17 +46,19 @@ export class TestMediaRecorder extends EventTarget {
         return new Promise((resolve) => {
             const listener = (evt) => {
                 this.removeEventListener("recording.updated", listener);
-                const recordingBlob = new Blob(this.recording, {type: this.recording[0].type});
+                const recordingBlob = new Blob(this.recording, {
+                    type: this.recording[0].type,
+                });
                 const reader = new FileReader();
                 reader.addEventListener("loadend", () => {
                     this.recording = [];
                     resolve(reader.result);
                 });
                 reader.readAsDataURL(recordingBlob);
-            }
+            };
             if (this.mediaRecorder.state === "recording") {
                 this.addEventListener("recording.updated", listener);
-                this.stop();  // Apparently calling requestData results in invalid data that cannot be played back, so stop and restart instead
+                this.stop(); // Apparently calling requestData results in invalid data that cannot be played back, so stop and restart instead
             }
             this.start();
         });

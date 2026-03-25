@@ -39,7 +39,7 @@ export class AssetCache {
 
     async processStaticFile(url) {
         // Creates a blob-url for a static URL and stores it in the cache
-        await this.fetchAndCache(url)
+        await this.fetchAndCache(url);
     }
 
     async applyCssVariables() {
@@ -49,9 +49,9 @@ export class AssetCache {
 
         for (const sheet of document.styleSheets) {
             for (const rule of sheet.cssRules) {
-                if (rule.selectorText === ':root' && rule.style) {
+                if (rule.selectorText === ":root" && rule.style) {
                     for (const prop of rule.style) {
-                        if (prop.startsWith('--')) {
+                        if (prop.startsWith("--")) {
                             variablesFound.add(prop);
                         }
                     }
@@ -59,17 +59,17 @@ export class AssetCache {
             }
         }
 
-        variablesFound.forEach(varName => {
+        variablesFound.forEach((varName) => {
             let rawValue = rootStyles.getPropertyValue(varName).trim();
-            
+
             // Extract the URL from url("...")
             const match = rawValue.match(/url\s*\(\s*['"]?([^'"]+)['"]?\s*\)/);
             if (match) {
                 const fullUrl = match[1];
-    
+
                 // Convert absolute URL to relative path (e.g., /static/...)
                 const path = new URL(fullUrl, window.location.origin).pathname;
-    
+
                 const blobUrl = this.map.get(path);
                 document.documentElement.style.setProperty(varName, `url(${blobUrl})`);
                 console.log(`Successfully mapped ${varName} -> ${path}`);
@@ -79,24 +79,22 @@ export class AssetCache {
 
     async applyCachedFonts() {
         for (let [originalPath, blobUrl] of this.map.entries()) {
-            if (originalPath.endsWith('.ttf')) {
+            if (originalPath.endsWith(".ttf")) {
                 // Derive a name from the path.
                 // For example: "/fonts/OpenSans-Bold.ttf" -> "OpenSans-Bold"
-                const fileName = originalPath.split('/').pop().split('.')[0];
-                
+                const fileName = originalPath.split("/").pop().split(".")[0];
+
                 const fontFace = new FontFace(fileName, `url(${blobUrl})`, {
-                    style: 'normal',
-                    weight: fileName.toLowerCase().includes('bold') ? '700' : '400'
+                    style: "normal",
+                    weight: fileName.toLowerCase().includes("bold") ? "700" : "400",
                 });
 
                 const loadedFace = await fontFace.load();
                 document.fonts.add(loadedFace);
                 console.log(`Loaded ${fileName} font.`);
-
             }
         }
     }
-
 }
 
 export const assetCache = new AssetCache();

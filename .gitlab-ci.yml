@@ -138,9 +138,11 @@ Lint REUSE compliance:
 
 Lint Javascript:
   extends: .lint-default
-  image: registry.gitlab.com/pipeline-components/eslint:latest
+  image: node:lts
   script:
-    - sh -c "cp .eslint/package.json package.json && npm install @eslint/js && eslint --config .eslint/eslint.config.js --color --stats dysleksi/dysleksi/static/dysleksi/*.js || rm package.json"
+    - npm install -g oxfmt oxlint
+    - oxfmt --check "dysleksi/dysleksi/static/js/**/*.js"
+    - oxlint --format=default "dysleksi/dysleksi/static/js"
 
 # Test stage
 ############

@@ -1,11 +1,14 @@
 /**
  * @vitest-environment jsdom
  */
-import { GroupTestDomElements, IndividualTestDomElements } from "../../screening/dom.js";
+import {
+    GroupTestDomElements,
+    IndividualTestDomElements,
+} from "../../screening/dom.js";
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import * as utils from '../../screening/utils.js';
+import * as utils from "../../screening/utils.js";
 
-import {spyAttributes} from "../utils.js";
+import { spyAttributes } from "../utils.js";
 
 describe("GroupTestDomElements.showInstructions (sound only)", () => {
     let dom;
@@ -26,8 +29,7 @@ describe("GroupTestDomElements.showInstructions (sound only)", () => {
     `;
 
         dom = new GroupTestDomElements();
-        vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(() => {
-        });
+        vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(() => {});
     });
 
     it("creates audio element and play button", () => {
@@ -43,19 +45,17 @@ describe("GroupTestDomElements.showInstructions (sound only)", () => {
     it("should NOT append a source element if audio is null", () => {
         // Call with text but NO audio
         dom.showInstructions("Read the text", null);
-        
+
         // Assert that no source elements were added to the audio container
         expect(dom.instructionsSoundEl.childNodes.length).toBe(0);
     });
-
 });
 
-
 describe("GroupTestDomElements.showQuestionChallenge (sound only)", () => {
-  let dom;
+    let dom;
 
-  beforeEach(() => {
-    document.body.innerHTML = `
+    beforeEach(() => {
+        document.body.innerHTML = `
       <audio id="instructions-sound"></audio>
       <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
@@ -69,20 +69,19 @@ describe("GroupTestDomElements.showQuestionChallenge (sound only)", () => {
       <button id="next"></button>
     `;
 
-    dom = new GroupTestDomElements();
+        dom = new GroupTestDomElements();
 
-    vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(() => {});
-  });
+        vi.spyOn(HTMLMediaElement.prototype, "play").mockImplementation(() => {});
+    });
 
-  it("removes audio and button when sound is null", () => {
-    dom.showQuestionChallenge(null, "/sound.mp3", null);
-    dom.showQuestionChallenge(null, null, null);
+    it("removes audio and button when sound is null", () => {
+        dom.showQuestionChallenge(null, "/sound.mp3", null);
+        dom.showQuestionChallenge(null, null, null);
 
-    expect(document.querySelector("#challenge-audio")).toBeNull();
-    expect(document.querySelector("#challenge-sound-btn")).toBeNull();
-  });
+        expect(document.querySelector("#challenge-audio")).toBeNull();
+        expect(document.querySelector("#challenge-sound-btn")).toBeNull();
+    });
 });
-
 
 describe("GroupTestDomElements.showSummary (new structure)", () => {
     let dom;
@@ -106,33 +105,42 @@ describe("GroupTestDomElements.showSummary (new structure)", () => {
         const test = {
             parts: [
                 { name: "Ordlæsning", questions: [1, 2], image: "/static/ol.png" },
-                { name: "Ordstavning", questions: [1], image: "/static/os.png" } ,
-                { name: "Bogstavbenævnelse", questions: [1, 2, 3], image: "/static/bb.png" }
-            ]
+                { name: "Ordstavning", questions: [1], image: "/static/os.png" },
+                {
+                    name: "Bogstavbenævnelse",
+                    questions: [1, 2, 3],
+                    image: "/static/bb.png",
+                },
+            ],
         };
-    
+
         dom.showSummary(test.parts);
-    
+
         expect(dom.testSummary.style.display).toBe("flex");
-    
+
         const blocks = dom.summaryContainer.querySelectorAll(".summary-block");
         expect(blocks.length).toBe(3);
-    
+
         // Check first block
         const firstBlock = blocks[0];
-        expect(firstBlock.childNodes[0].childNodes[0].textContent.trim()).toBe("Ordlæsning"); // the text node with part name
+        expect(firstBlock.childNodes[0].childNodes[0].textContent.trim()).toBe(
+            "Ordlæsning",
+        ); // the text node with part name
         expect(firstBlock.childNodes[1].src.endsWith("/static/ol.png")).toBe(true);
 
         // Second block
         const secondBlock = blocks[1];
-        expect(secondBlock.childNodes[0].childNodes[0].textContent.trim()).toBe("Ordstavning");
+        expect(secondBlock.childNodes[0].childNodes[0].textContent.trim()).toBe(
+            "Ordstavning",
+        );
         expect(secondBlock.childNodes[1].src.endsWith("/static/os.png")).toBe(true);
 
         // Third block
         const thirdBlock = blocks[2];
-        expect(thirdBlock.childNodes[0].childNodes[0].textContent.trim()).toBe("Bogstavbenævnelse");
+        expect(thirdBlock.childNodes[0].childNodes[0].textContent.trim()).toBe(
+            "Bogstavbenævnelse",
+        );
         expect(thirdBlock.childNodes[1].src.endsWith("/static/bb.png")).toBe(true);
-
     });
 
     it("Handles an empty parts array", () => {
@@ -146,10 +154,12 @@ describe("GroupTestDomElements.showSummary (new structure)", () => {
     it("Handles a single part with no questions", () => {
         const test = { parts: [{ name: "Bogstavbenævnelse", questions: [] }] };
         dom.showSummary(test.parts);
-    
+
         const block = dom.summaryContainer.querySelector(".summary-block");
         expect(block).not.toBeNull();
-        expect(block.childNodes[0].childNodes[0].textContent.trim()).toBe("Bogstavbenævnelse");
+        expect(block.childNodes[0].childNodes[0].textContent.trim()).toBe(
+            "Bogstavbenævnelse",
+        );
     });
 });
 
@@ -196,7 +206,9 @@ describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
     });
 
     it("Shows question choices", () => {
-        vi.spyOn(HTMLElement.prototype, "addEventListener").mockImplementation(() => {});
+        vi.spyOn(HTMLElement.prototype, "addEventListener").mockImplementation(
+            () => {},
+        );
         const listener = () => {};
 
         const answer1 = {
@@ -223,10 +235,8 @@ describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
         const button2 = dom.showQuestionChoice(answer2, listener);
         expect(button2.textContent).toBe("Option A");
         expect(button2.addEventListener).toHaveBeenCalledWith("click", listener);
-
-    })
+    });
 });
-
 
 describe("GroupTestDomElements constructor", () => {
     it("creates elements", () => {
@@ -249,8 +259,7 @@ describe("GroupTestDomElements constructor", () => {
         expect(dom.choicesEl).not.toBeNull();
         expect(dom.nextBtn).not.toBeNull();
     });
-
-})
+});
 
 describe("IndividualTestDomElements constructor", () => {
     it("creates elements", () => {
@@ -272,7 +281,7 @@ describe("IndividualTestDomElements constructor", () => {
         expect(dom.nextBtn).not.toBeNull();
         expect(dom.audioIndicatorEl).not.toBeNull();
     });
-})
+});
 
 describe("IndividualTestDomElements DOM utilities", () => {
     let dom;
@@ -296,17 +305,15 @@ describe("IndividualTestDomElements DOM utilities", () => {
         dom.toggleAudioIndicator(false);
         expect(dom.audioIndicatorEl.style.display).toBe("none");
     });
-})
-
-
+});
 
 describe("GroupTestDomElements DOM utilities", () => {
-  let dom;
-  let el;
-  let el2;
+    let dom;
+    let el;
+    let el2;
 
-  beforeEach(() => {
-    document.body.innerHTML = `
+    beforeEach(() => {
+        document.body.innerHTML = `
       <audio id="instructions-sound"></audio>
       <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
@@ -323,216 +330,212 @@ describe("GroupTestDomElements DOM utilities", () => {
       <div id="test-el2" data-hide-display="true"></div>
       <div id="testpart-intro-image" style="display: flex;"></div>
     `;
-    dom = new GroupTestDomElements();
-    el = document.getElementById("test-el");
-    el2 = document.getElementById("test-el2");
-  });
+        dom = new GroupTestDomElements();
+        el = document.getElementById("test-el");
+        el2 = document.getElementById("test-el2");
+    });
 
-  it("hideTestPartIntroImage sets display to none", () => {
-    dom.hideTestPartIntroImage();
-    expect(dom.testPartIntroImage.style.display).toBe("none");
-  });
+    it("hideTestPartIntroImage sets display to none", () => {
+        dom.hideTestPartIntroImage();
+        expect(dom.testPartIntroImage.style.display).toBe("none");
+    });
 
+    it("showFaded sets initial opacity and calls showElement after timeout", () => {
+        vi.useFakeTimers();
 
-  it("showFaded sets initial opacity and calls showElement after timeout", () => {
-    vi.useFakeTimers();
-    
-    // Setup initial state
-    el.style.opacity = "1";
-    el.style.visibility = "hidden";
-    
-    // Spy on showElement to make sure it gets called
-    const showSpy = vi.spyOn(dom, "showElement");
+        // Setup initial state
+        el.style.opacity = "1";
+        el.style.visibility = "hidden";
 
-    dom.showFaded(el);
+        // Spy on showElement to make sure it gets called
+        const showSpy = vi.spyOn(dom, "showElement");
 
-    // 1. Check immediate effects
-    expect(el.style.transition).toBe("none");
-    expect(el.style.opacity).toBe("0.4");
-    
-    // showElement shouldn't have been called yet
-    expect(showSpy).not.toHaveBeenCalled();
+        dom.showFaded(el);
 
-    // 2. Advance timers to trigger the setTimeout(..., 1)
-    vi.advanceTimersByTime(1);
+        // 1. Check immediate effects
+        expect(el.style.transition).toBe("none");
+        expect(el.style.opacity).toBe("0.4");
 
-    // 3. Check final effects
-    expect(showSpy).toHaveBeenCalledWith(el);
-    expect(el.style.visibility).toBe("visible");
+        // showElement shouldn't have been called yet
+        expect(showSpy).not.toHaveBeenCalled();
 
-    vi.useRealTimers();
-  });
+        // 2. Advance timers to trigger the setTimeout(..., 1)
+        vi.advanceTimersByTime(1);
 
-  it("showElement sets visibility to visible", () => {
-    dom.showElement(el);
-    expect(el.style.visibility).toBe("visible");
-  });
+        // 3. Check final effects
+        expect(showSpy).toHaveBeenCalledWith(el);
+        expect(el.style.visibility).toBe("visible");
 
-  it("hideElement sets visibility to none", () => {
-    dom.hideElement(el);
-    expect(el.style.visibility).toBe("hidden");
-  });
-  it("hideElement with null arg does not break", () => {
-    dom.hideElement(null);
-  });
+        vi.useRealTimers();
+    });
 
-  it("showElement sets display to block", () => {
-    dom.showElement(el2);
-    expect(el2.style.display).toBe("block");
-  });
+    it("showElement sets visibility to visible", () => {
+        dom.showElement(el);
+        expect(el.style.visibility).toBe("visible");
+    });
 
-  it("hideElement sets display to none", () => {
-    dom.hideElement(el2);
-    expect(el2.style.display).toBe("none");
-  });
-  it("showElement with null arg does not break", () => {
-    dom.hideElement(null);
-  });
+    it("hideElement sets visibility to none", () => {
+        dom.hideElement(el);
+        expect(el.style.visibility).toBe("hidden");
+    });
+    it("hideElement with null arg does not break", () => {
+        dom.hideElement(null);
+    });
 
-  it("toggleRepeatButton hides button", () => {
-    dom.toggleRepeatButton(false);
-    expect(dom.repeatBtn.style.display).toBe("none");
-  });
-  it("toggleRepeatButton shows button", () => {
-    dom.toggleRepeatButton(true);
-    expect(dom.repeatBtn.style.display).toBe("block");
-  });
+    it("showElement sets display to block", () => {
+        dom.showElement(el2);
+        expect(el2.style.display).toBe("block");
+    });
 
+    it("hideElement sets display to none", () => {
+        dom.hideElement(el2);
+        expect(el2.style.display).toBe("none");
+    });
+    it("showElement with null arg does not break", () => {
+        dom.hideElement(null);
+    });
 
-  it("fadeIn sets opacity to 1", async () => {
-    el.style.opacity = "0.4";
+    it("toggleRepeatButton hides button", () => {
+        dom.toggleRepeatButton(false);
+        expect(dom.repeatBtn.style.display).toBe("none");
+    });
+    it("toggleRepeatButton shows button", () => {
+        dom.toggleRepeatButton(true);
+        expect(dom.repeatBtn.style.display).toBe("block");
+    });
 
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    dom.fadeIn(el);
-    await new Promise(resolve => requestAnimationFrame(resolve));
+    it("fadeIn sets opacity to 1", async () => {
+        el.style.opacity = "0.4";
 
-    expect(el.style.opacity).toBe("1");
-    expect(el.style.transition).toContain("opacity");
-  });
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+        dom.fadeIn(el);
+        await new Promise((resolve) => requestAnimationFrame(resolve));
 
-  it("fadeOut sets opacity to 0.4", async () => {
-    el.style.opacity = "1";
+        expect(el.style.opacity).toBe("1");
+        expect(el.style.transition).toContain("opacity");
+    });
 
-    await new Promise(resolve => requestAnimationFrame(resolve));
-    dom.fadeOut(el);
-    await new Promise(resolve => requestAnimationFrame(resolve));
+    it("fadeOut sets opacity to 0.4", async () => {
+        el.style.opacity = "1";
 
-    expect(el.style.opacity).toBe("0.4");
-    expect(el.style.transition).toContain("opacity");
-  });
+        await new Promise((resolve) => requestAnimationFrame(resolve));
+        dom.fadeOut(el);
+        await new Promise((resolve) => requestAnimationFrame(resolve));
 
-  it("highlight adds highlight class temporarily", async () => {
-    vi.useFakeTimers();
-    dom.highlight(el);
-    expect(el.classList.contains("highlight")).toBe(true);
-    vi.advanceTimersByTime(1500);
-    expect(el.classList.contains("highlight")).toBe(false);
-    vi.useRealTimers();
-  });
+        expect(el.style.opacity).toBe("0.4");
+        expect(el.style.transition).toContain("opacity");
+    });
 
-  it("lockInput disables all choice buttons and next button, and sets readonly on all inputs", () => {
-    const btn1 = document.createElement("button");
-    const btn2 = document.createElement("button");
-    const input = document.createElement("input");
-    document.getElementById("choices").append(btn1, btn2, input);
-    const nextBtn = document.getElementById("next");
+    it("highlight adds highlight class temporarily", async () => {
+        vi.useFakeTimers();
+        dom.highlight(el);
+        expect(el.classList.contains("highlight")).toBe(true);
+        vi.advanceTimersByTime(1500);
+        expect(el.classList.contains("highlight")).toBe(false);
+        vi.useRealTimers();
+    });
 
-    dom.lockInput();
+    it("lockInput disables all choice buttons and next button, and sets readonly on all inputs", () => {
+        const btn1 = document.createElement("button");
+        const btn2 = document.createElement("button");
+        const input = document.createElement("input");
+        document.getElementById("choices").append(btn1, btn2, input);
+        const nextBtn = document.getElementById("next");
 
-    expect(btn1.style.pointerEvents).toBe("none");
-    expect(btn2.style.pointerEvents).toBe("none");
-    expect(nextBtn.style.pointerEvents).toBe("none");
-    expect(input.readOnly).toBe(true);
-  });
+        dom.lockInput();
 
-  it("unlockInput enables all choice buttons and next button", () => {
-    const btn1 = document.createElement("button");
-    const btn2 = document.createElement("button");
-    const input = document.createElement("input");
-    document.getElementById("choices").append(btn1, btn2, input);
-    const nextBtn = document.getElementById("next");
+        expect(btn1.style.pointerEvents).toBe("none");
+        expect(btn2.style.pointerEvents).toBe("none");
+        expect(nextBtn.style.pointerEvents).toBe("none");
+        expect(input.readOnly).toBe(true);
+    });
 
-    dom.lockInput(); // first lock
-    dom.unlockInput();
+    it("unlockInput enables all choice buttons and next button", () => {
+        const btn1 = document.createElement("button");
+        const btn2 = document.createElement("button");
+        const input = document.createElement("input");
+        document.getElementById("choices").append(btn1, btn2, input);
+        const nextBtn = document.getElementById("next");
 
-    expect(btn1.style.pointerEvents).toBe("");
-    expect(btn2.style.pointerEvents).toBe("");
-    expect(nextBtn.style.pointerEvents).toBe("");
-    expect(input.readOnly).toBe(false);
-  });
+        dom.lockInput(); // first lock
+        dom.unlockInput();
 
-  it("disableNextButton/enableNextButton disable and enable next button", async () => {
-    const nextBtn = document.getElementById("next");
+        expect(btn1.style.pointerEvents).toBe("");
+        expect(btn2.style.pointerEvents).toBe("");
+        expect(nextBtn.style.pointerEvents).toBe("");
+        expect(input.readOnly).toBe(false);
+    });
 
-    dom.disableNextButton();
-    expect(nextBtn.disabled).toBe(true);
+    it("disableNextButton/enableNextButton disable and enable next button", async () => {
+        const nextBtn = document.getElementById("next");
 
-    dom.enableNextButton();
-    expect(nextBtn.disabled).toBe(false);
-  });
+        dom.disableNextButton();
+        expect(nextBtn.disabled).toBe(true);
 
-  it("setText inserts text into element", () => {
-    const element = document.createElement("div");
-    dom.setText(element, "test");
-    expect(element.textContent).toBe("test");
-  });
-  it("setText inserts text into input element", () => {
-    const element = document.createElement("input");
-    dom.setText(element, "test");
-    expect(element.value).toBe("test");
-  });
-  it("addText adds text to input element at position", () => {
-    const input = document.createElement("input");
-    document.body.appendChild(input);
-    input.type = "text";
-    input.value = "Test";
-    dom.setMarker(input, 2);
-    dom.addText(input, "123");
-    expect(input.value).toBe("Te123st");
-    expect(input.selectionStart).toBe(5);
-  });
+        dom.enableNextButton();
+        expect(nextBtn.disabled).toBe(false);
+    });
 
-  it("removeText removes text from input element at position", () => {
-    const input = document.createElement("input");
-    document.body.appendChild(input);
-    input.type = "text";
-    input.value = "Test";
-    dom.setMarker(input, 3);
-    dom.removeText(input, 2);
-    expect(input.value).toBe("Tt");
-    expect(input.selectionStart).toBe(1);
-  });
+    it("setText inserts text into element", () => {
+        const element = document.createElement("div");
+        dom.setText(element, "test");
+        expect(element.textContent).toBe("test");
+    });
+    it("setText inserts text into input element", () => {
+        const element = document.createElement("input");
+        dom.setText(element, "test");
+        expect(element.value).toBe("test");
+    });
+    it("addText adds text to input element at position", () => {
+        const input = document.createElement("input");
+        document.body.appendChild(input);
+        input.type = "text";
+        input.value = "Test";
+        dom.setMarker(input, 2);
+        dom.addText(input, "123");
+        expect(input.value).toBe("Te123st");
+        expect(input.selectionStart).toBe(5);
+    });
 
-  it("removeText removes only text until start is reached", () => {
-    const input = document.createElement("input");
-    document.body.appendChild(input);
-    input.type = "text";
-    input.value = "Test";
-    dom.setMarker(input, 3);
-    dom.removeText(input, 4);
-    expect(input.value).toBe("t");
-    expect(input.selectionStart).toBe(0);
-  });
-  it("removeText defaults to one char", () => {
-    const input = document.createElement("input");
-    document.body.appendChild(input);
-    input.type = "text";
-    input.value = "Test";
-    dom.setMarker(input, 3);
-    dom.removeText(input);
-    expect(input.value).toBe("Tet");
-    expect(input.selectionStart).toBe(2);
-  });
+    it("removeText removes text from input element at position", () => {
+        const input = document.createElement("input");
+        document.body.appendChild(input);
+        input.type = "text";
+        input.value = "Test";
+        dom.setMarker(input, 3);
+        dom.removeText(input, 2);
+        expect(input.value).toBe("Tt");
+        expect(input.selectionStart).toBe(1);
+    });
 
+    it("removeText removes only text until start is reached", () => {
+        const input = document.createElement("input");
+        document.body.appendChild(input);
+        input.type = "text";
+        input.value = "Test";
+        dom.setMarker(input, 3);
+        dom.removeText(input, 4);
+        expect(input.value).toBe("t");
+        expect(input.selectionStart).toBe(0);
+    });
+    it("removeText defaults to one char", () => {
+        const input = document.createElement("input");
+        document.body.appendChild(input);
+        input.type = "text";
+        input.value = "Test";
+        dom.setMarker(input, 3);
+        dom.removeText(input);
+        expect(input.value).toBe("Tet");
+        expect(input.selectionStart).toBe(2);
+    });
 });
 
-
 describe("GroupTestDomElements.fadeScreenOverlay", () => {
-  let dom;
-  let overlay;
+    let dom;
+    let overlay;
 
-  beforeEach(() => {
-    document.body.innerHTML = `
+    beforeEach(() => {
+        document.body.innerHTML = `
       <div id="fade-overlay" style="opacity: 0;"></div>
       <audio id="instructions-sound"></audio>
       <audio id="reminder-sound"></audio>
@@ -547,27 +550,27 @@ describe("GroupTestDomElements.fadeScreenOverlay", () => {
       <button id="next"></button>
       <div id="test-el"></div>
     `;
-    dom = new GroupTestDomElements();
-    overlay = document.getElementById("fade-overlay");
-  });
+        dom = new GroupTestDomElements();
+        overlay = document.getElementById("fade-overlay");
+    });
 
-  it("fades overlay from opaque to transparent", () => {
-    vi.useFakeTimers();
+    it("fades overlay from opaque to transparent", () => {
+        vi.useFakeTimers();
 
-    vi.stubGlobal("requestAnimationFrame", (cb) => cb());
-    dom.fadeScreenOverlay();
+        vi.stubGlobal("requestAnimationFrame", (cb) => cb());
+        dom.fadeScreenOverlay();
 
-    expect(overlay.style.opacity).toBe("1");
-    expect(overlay.style.transition).toBe("none");
+        expect(overlay.style.opacity).toBe("1");
+        expect(overlay.style.transition).toBe("none");
 
-    vi.advanceTimersByTime(200);
+        vi.advanceTimersByTime(200);
 
-    expect(overlay.style.opacity).toBe("0");
-    expect(overlay.style.transition).toBe("opacity 200ms ease");
+        expect(overlay.style.opacity).toBe("0");
+        expect(overlay.style.transition).toBe("opacity 200ms ease");
 
-    vi.useRealTimers();
-    vi.unstubAllGlobals();
-  });
+        vi.useRealTimers();
+        vi.unstubAllGlobals();
+    });
 });
 
 describe("element ordering", () => {
@@ -655,7 +658,7 @@ describe("element ordering", () => {
         expect(container.childNodes.item(1)).toBe(el1);
         expect(container.childNodes.item(2)).toBe(el2);
     });
-})
+});
 
 describe("_setButtonListener tests", () => {
     let dom;
@@ -718,13 +721,10 @@ describe("_setButtonListener tests", () => {
         const button = dom.nextBtn;
         const url = "/sound.mp3";
         const playSound = vi.fn();
-        dom.setButtonAudioCallback(
-            button,
-            async function () {
-                playSound(url);
-                dom.setButtonAudioCallback(button, null);
-            }
-        )
+        dom.setButtonAudioCallback(button, async function () {
+            playSound(url);
+            dom.setButtonAudioCallback(button, null);
+        });
         const listener = vi.fn();
         dom._setButtonListener(button, listener);
         await button._clickHandler();
@@ -735,52 +735,50 @@ describe("_setButtonListener tests", () => {
 });
 
 describe("GroupTestDomElements button animations", () => {
-  let dom;
-  let btn;
+    let dom;
+    let btn;
 
-  beforeEach(() => {
-    document.body.innerHTML = `<button id="test-btn"></button>`;
-    dom = new GroupTestDomElements();
-    btn = document.getElementById("test-btn");
-  });
+    beforeEach(() => {
+        document.body.innerHTML = `<button id="test-btn"></button>`;
+        dom = new GroupTestDomElements();
+        btn = document.getElementById("test-btn");
+    });
 
-  it("makeButtonHappy adds and removes happy-btn class", () => {
-    vi.useFakeTimers();
+    it("makeButtonHappy adds and removes happy-btn class", () => {
+        vi.useFakeTimers();
 
-    const addSpy = vi.spyOn(btn.classList, "add");
-    const removeSpy = vi.spyOn(btn.classList, "remove");
+        const addSpy = vi.spyOn(btn.classList, "add");
+        const removeSpy = vi.spyOn(btn.classList, "remove");
 
-    dom.makeButtonHappy("test-btn");
+        dom.makeButtonHappy("test-btn");
 
-    expect(removeSpy).toHaveBeenCalledWith("happy-btn");
-    expect(addSpy).toHaveBeenCalledWith("happy-btn");
+        expect(removeSpy).toHaveBeenCalledWith("happy-btn");
+        expect(addSpy).toHaveBeenCalledWith("happy-btn");
 
-    vi.advanceTimersByTime(650);
+        vi.advanceTimersByTime(650);
 
-    expect(removeSpy).toHaveBeenCalledWith("happy-btn");
-    vi.useRealTimers();
-  });
+        expect(removeSpy).toHaveBeenCalledWith("happy-btn");
+        vi.useRealTimers();
+    });
 
-  it("makeButtonAngry adds and removes angry-btn class", () => {
-    vi.useFakeTimers();
+    it("makeButtonAngry adds and removes angry-btn class", () => {
+        vi.useFakeTimers();
 
-    const addSpy = vi.spyOn(btn.classList, "add");
-    const removeSpy = vi.spyOn(btn.classList, "remove");
+        const addSpy = vi.spyOn(btn.classList, "add");
+        const removeSpy = vi.spyOn(btn.classList, "remove");
 
-    dom.makeButtonAngry("test-btn");
+        dom.makeButtonAngry("test-btn");
 
-    expect(removeSpy).toHaveBeenCalledWith("angry-btn");
-    expect(addSpy).toHaveBeenCalledWith("angry-btn");
+        expect(removeSpy).toHaveBeenCalledWith("angry-btn");
+        expect(addSpy).toHaveBeenCalledWith("angry-btn");
 
-    vi.advanceTimersByTime(650);
+        vi.advanceTimersByTime(650);
 
-    expect(removeSpy).toHaveBeenCalledWith("angry-btn");
+        expect(removeSpy).toHaveBeenCalledWith("angry-btn");
 
-    vi.useRealTimers();
-  });
-
+        vi.useRealTimers();
+    });
 });
-
 
 describe("GroupTestDomElements.showTestExit", () => {
     let dom;

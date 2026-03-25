@@ -1,10 +1,9 @@
 import { Student } from "./model.js";
-import { WebRTCChannel } from "../webRTC.js"
-import { serverOnline } from './utils.js';
-
+import { WebRTCChannel } from "../webRTC.js";
+import { serverOnline } from "./utils.js";
 
 export class EventTable {
-    constructor(tableSelector = 'table#events tbody') {
+    constructor(tableSelector = "table#events tbody") {
         this.eventsEl = document.querySelector(tableSelector);
     }
 
@@ -13,34 +12,35 @@ export class EventTable {
             return;
         }
 
-        const eventEl = document.createElement('tr');
+        const eventEl = document.createElement("tr");
 
-        const typeEl = document.createElement('td');
-        const questionEl = document.createElement('td');
-        const answerEl = document.createElement('td');
-        const durationEl = document.createElement('td');
+        const typeEl = document.createElement("td");
+        const questionEl = document.createElement("td");
+        const answerEl = document.createElement("td");
+        const durationEl = document.createElement("td");
 
         eventEl.append(typeEl, questionEl, answerEl, durationEl);
 
         typeEl.textContent = data.event;
         questionEl.textContent = data.questionTitle;
 
-        if (data.event === 'question.answered') {
+        if (data.event === "question.answered") {
             if (data.recordingBase64) {
-                const audioEl = document.createElement('audio');
+                const audioEl = document.createElement("audio");
                 audioEl.controls = true;
                 audioEl.src = data.recordingBase64;
                 answerEl.append(audioEl);
-            } else if (data.textAnswer){
+            } else if (data.textAnswer) {
                 answerEl.textContent = data.textAnswer;
             } else {
                 answerEl.textContent = data.choiceId || "";
             }
         } else {
-            answerEl.textContent = '-';
+            answerEl.textContent = "-";
         }
 
-        durationEl.textContent = data.event === 'question.answered' ? data.answeredAt : data.displayedAt;
+        durationEl.textContent =
+            data.event === "question.answered" ? data.answeredAt : data.displayedAt;
 
         this.eventsEl.prepend(eventEl);
     }
@@ -60,8 +60,8 @@ export class StudentCard {
         this.partLabel = this.el.querySelector(".part-label");
         this.partIndex = this.el.querySelector(".part-index");
         this.questionIndex = this.el.querySelector(".question-index");
-        this.subTestLeftArrow = this.el.querySelector(".ph-caret-left")
-        this.subTestRightArrow = this.el.querySelector(".ph-caret-right")
+        this.subTestLeftArrow = this.el.querySelector(".ph-caret-left");
+        this.subTestRightArrow = this.el.querySelector(".ph-caret-right");
 
         this.currentViewPartIndex = 0;
 
@@ -86,9 +86,9 @@ export class StudentCard {
     }
 
     _createMarkup() {
-        const template = document.getElementById('student-card-template');
+        const template = document.getElementById("student-card-template");
         const clone = template.content.cloneNode(true);
-        return clone.querySelector('.student-card');
+        return clone.querySelector(".student-card");
     }
 
     toggleFold(e) {
@@ -111,8 +111,8 @@ export class StudentCard {
     }
 
     _renderPartsProgress() {
-        this.partsProgress.innerHTML = '';
-        
+        this.partsProgress.innerHTML = "";
+
         this.testParts.forEach((_, index) => {
             const segment = document.createElement("div");
             segment.classList.add("part-segment");
@@ -132,34 +132,38 @@ export class StudentCard {
 
     update() {
         this._renderPartsProgress();
-        const isCurrentPart = (this.currentViewPartIndex === this.student.currentPartIndex);
+        const isCurrentPart =
+            this.currentViewPartIndex === this.student.currentPartIndex;
         this.progressFill.style.width = `${this.student.progress}%`;
 
-        this.subTestLeftArrow.classList.toggle('disabled', this.currentViewPartIndex === 0);
-            
-        this.subTestRightArrow.classList.toggle('disabled',
-            this.currentViewPartIndex === this.testParts.length - 1
+        this.subTestLeftArrow.classList.toggle(
+            "disabled",
+            this.currentViewPartIndex === 0,
+        );
+
+        this.subTestRightArrow.classList.toggle(
+            "disabled",
+            this.currentViewPartIndex === this.testParts.length - 1,
         );
 
         const part = this.testParts[this.currentViewPartIndex];
         this.partLabel.textContent = part.name;
-        this.partIndex.textContent = `Deltest ${this.currentViewPartIndex+1}/${this.testParts.length}`
+        this.partIndex.textContent = `Deltest ${this.currentViewPartIndex + 1}/${this.testParts.length}`;
         if (isCurrentPart) {
-            this.questionIndex.textContent = `Opgave ${this.student.currentQuestionIndex+1}/${part.questions.length}`
+            this.questionIndex.textContent = `Opgave ${this.student.currentQuestionIndex + 1}/${part.questions.length}`;
         } else {
-            this.questionIndex.textContent = `Opgave -/${part.questions.length}`
-
+            this.questionIndex.textContent = `Opgave -/${part.questions.length}`;
         }
         // Render Dots
-        this.dotsContainer.innerHTML = '';
+        this.dotsContainer.innerHTML = "";
         const results = this.student.resultsByPart[this.currentViewPartIndex] || [];
-        
+
         // Total dots = total questions in this part
         const totalQuestions = part.questions.length;
 
         for (let i = 0; i < totalQuestions; i++) {
             const dot = document.createElement("span");
-            const isCurrentQuestion = (i === this.student.currentQuestionIndex);
+            const isCurrentQuestion = i === this.student.currentQuestionIndex;
             dot.classList.add("dot");
 
             if (results[i] === true) {
@@ -176,13 +180,12 @@ export class StudentCard {
     }
 }
 
-
 export class GroupTestContainer {
     constructor(test) {
         this.container = document.querySelector(".group-test-body");
         this.students = new Map();
         this.cards = new Map();
-        this.test = test
+        this.test = test;
     }
 
     updateData(data) {
@@ -203,41 +206,44 @@ export class GroupTestContainer {
         student.progress = studentData.progress;
         student.currentPartIndex = studentData.currentPartIndex;
         student.currentQuestionIndex = studentData.currentQuestionIndex;
-        student.resultsByPart = studentData.resultsByPart
+        student.resultsByPart = studentData.resultsByPart;
 
         this.cards.get(student.id).update();
     }
 }
 
-
 export class ActionButtons {
-    constructor(buttonSelector = 'button') {
-        this.buttons = [...document.querySelectorAll('#correct, #wrong, #cancelled, #skipped, #next')];
+    constructor(buttonSelector = "button") {
+        this.buttons = [
+            ...document.querySelectorAll(
+                "#correct, #wrong, #cancelled, #skipped, #next",
+            ),
+        ];
         this.active = null;
     }
 
     disableButtons() {
-        this.buttons.forEach(el => el.classList.toggle('disabled', true));
+        this.buttons.forEach((el) => el.classList.toggle("disabled", true));
     }
 
     enableButtons() {
-        this.buttons.forEach(el => el.classList.toggle('disabled', false));
+        this.buttons.forEach((el) => el.classList.toggle("disabled", false));
     }
 
     hideButtons() {
-        this.buttons.forEach(el => el.classList.toggle('d-none', true));
+        this.buttons.forEach((el) => el.classList.toggle("d-none", true));
     }
 
     showButtons() {
-        this.buttons.forEach(el => el.classList.toggle('d-none', false));
+        this.buttons.forEach((el) => el.classList.toggle("d-none", false));
     }
 
     disableNextButton() {
-        this.nextButton().classList.toggle('disabled', true);
+        this.nextButton().classList.toggle("disabled", true);
     }
 
     enableNextButton() {
-        this.nextButton().classList.toggle('disabled', false);
+        this.nextButton().classList.toggle("disabled", false);
     }
 
     setActive(buttonId) {
@@ -258,46 +264,50 @@ export class ActionButtons {
     }
 
     addClickListener(callback) {
-        this.buttons.forEach(el => {
-            el.addEventListener('click', callback);
+        this.buttons.forEach((el) => {
+            el.addEventListener("click", callback);
         });
     }
 
     buttonById(id) {
-        return this.buttons.values().find(b => b.id === id);
+        return this.buttons.values().find((b) => b.id === id);
     }
 
     correctButton() {
-        return this.buttonById('correct');
+        return this.buttonById("correct");
     }
     wrongButton() {
-        return this.buttonById('wrong');
+        return this.buttonById("wrong");
     }
     cancelButton() {
-        return this.buttonById('cancelled');
+        return this.buttonById("cancelled");
     }
     skipButton() {
-        return this.buttonById('skipped');
+        return this.buttonById("skipped");
     }
 
     nextButton() {
-        return this.buttonById('next');
+        return this.buttonById("next");
     }
 
     #updateButtonActiveState(buttonId) {
         // Deactivate all relevant buttons
-        for (const btn of [this.correctButton(), this.wrongButton(), this.skipButton()]) {
-            btn.classList.toggle('active', false);
+        for (const btn of [
+            this.correctButton(),
+            this.wrongButton(),
+            this.skipButton(),
+        ]) {
+            btn.classList.toggle("active", false);
         }
         // Activate the specified button, if given
         if (buttonId !== null) {
-            this.buttonById(buttonId).classList.toggle('active', true);
+            this.buttonById(buttonId).classList.toggle("active", true);
         }
     }
 }
 
 export class NoteField {
-    constructor(noteSelector = 'textarea#note') {
+    constructor(noteSelector = "textarea#note") {
         this.noteEl = document.querySelector(noteSelector);
     }
 
@@ -306,11 +316,11 @@ export class NoteField {
     }
 
     clearNote() {
-        this.noteEl.value = '';
+        this.noteEl.value = "";
     }
 
     show() {
-        this.noteEl.classList.toggle('d-none', false);
+        this.noteEl.classList.toggle("d-none", false);
     }
 }
 
@@ -319,9 +329,9 @@ export class QuestionView {
     titleElement;
     contentElement;
     constructor(
-        containerSelector="#question-container",
-        titleSelector = '#question-title',
-        contentSelector = '#question-content',
+        containerSelector = "#question-container",
+        titleSelector = "#question-title",
+        contentSelector = "#question-content",
         partNameSelector = null,
         partIndicatorSelector = null,
         questionIndicatorSelector = null,
@@ -335,7 +345,7 @@ export class QuestionView {
     }
 
     show() {
-        this.containerElement.classList.toggle('d-none', false);
+        this.containerElement.classList.toggle("d-none", false);
     }
 
     showTitle(titleText) {
@@ -364,10 +374,10 @@ export class QuestionView {
                 this.contentElement.append(txt);
             }
             txt.textContent = contentText;
-            if (contentText.length === 1){
-                txt.style.fontSize="72px"
+            if (contentText.length === 1) {
+                txt.style.fontSize = "72px";
             } else {
-                txt.style.fontSize="40px"
+                txt.style.fontSize = "40px";
             }
         } else {
             if (txt) {
@@ -396,10 +406,19 @@ export class QuestionView {
 }
 
 export class TeacherView {
-    constructor(roomName, test, assignmentId, wsGetter, table, buttons, noteField, questionView) {
+    constructor(
+        roomName,
+        test,
+        assignmentId,
+        wsGetter,
+        table,
+        buttons,
+        noteField,
+        questionView,
+    ) {
         this.assignmentId = assignmentId;
         this.roomName = roomName;
-        this.wsGetter = wsGetter
+        this.wsGetter = wsGetter;
         this.chatSocket = null;
         this.test = test;
 
@@ -413,7 +432,7 @@ export class TeacherView {
         this.buttons = buttons || new ActionButtons();
         this.noteField = noteField || new NoteField();
         this.questionView = questionView || new QuestionView();
-        this.filterButtons = document.querySelectorAll('.group-test-header .btn');
+        this.filterButtons = document.querySelectorAll(".group-test-header .btn");
         this.studentChannels = {};
 
         const savedQueue = localStorage.getItem(`msg_queue_${this.roomName}`);
@@ -426,7 +445,12 @@ export class TeacherView {
     }
 
     validatePartIndex(partIndex) {
-        if (partIndex === null || partIndex === undefined || partIndex < 0 || partIndex >= this.test.parts.length) {
+        if (
+            partIndex === null ||
+            partIndex === undefined ||
+            partIndex < 0 ||
+            partIndex >= this.test.parts.length
+        ) {
             throw new Error(`Invalid part index ${partIndex}`);
         }
     }
@@ -435,16 +459,28 @@ export class TeacherView {
         this.partIndex = partIndex;
         this.currentPart = this.test.parts[partIndex];
         this.questionView.updatePartName(this.currentPart.name);
-        this.questionView.updatePartIndicator(`Deltest ${this.partIndex + 1} af ${this.test.parts.length}`);
+        this.questionView.updatePartIndicator(
+            `Deltest ${this.partIndex + 1} af ${this.test.parts.length}`,
+        );
     }
 
     validateQuestionIndex(questionIndex, practice) {
-        if (questionIndex === null || questionIndex === undefined || questionIndex < 0) {
-            throw new Error(`Invalid question index ${questionIndex}`)
-        } else if (!practice && questionIndex >= this.test.parts[this.partIndex].questions.length) {
-            throw new Error(`Invalid question index ${questionIndex}`)
-        } else if (practice && questionIndex >= this.test.parts[this.partIndex].practice.length) {
-            throw new Error(`Invalid question index ${questionIndex}`)
+        if (
+            questionIndex === null ||
+            questionIndex === undefined ||
+            questionIndex < 0
+        ) {
+            throw new Error(`Invalid question index ${questionIndex}`);
+        } else if (
+            !practice &&
+            questionIndex >= this.test.parts[this.partIndex].questions.length
+        ) {
+            throw new Error(`Invalid question index ${questionIndex}`);
+        } else if (
+            practice &&
+            questionIndex >= this.test.parts[this.partIndex].practice.length
+        ) {
+            throw new Error(`Invalid question index ${questionIndex}`);
         }
     }
     setQuestionIndex(questionIndex, practice) {
@@ -457,7 +493,7 @@ export class TeacherView {
         const counts = this.getPracticeQuestionCounts();
         const clamp = (number, min, max) => {
             return Math.max(min, Math.min(number, max));
-        }
+        };
 
         if (practice) {
             this.currentQuestion = this.currentPart.practice[questionIndex];
@@ -466,13 +502,17 @@ export class TeacherView {
                 label = "Instruktion";
                 total = counts.instructions;
                 current = clamp(
-                    this.questionIndex + counts.instructions - counts.nonInstructions, 1, total
+                    this.questionIndex + counts.instructions - counts.nonInstructions,
+                    1,
+                    total,
                 );
             } else {
                 label = "Øveopgave";
                 total = counts.nonInstructions;
                 current = clamp(
-                    this.questionIndex + counts.nonInstructions - counts.instructions, 1, total
+                    this.questionIndex + counts.nonInstructions - counts.instructions,
+                    1,
+                    total,
                 );
             }
         } else {
@@ -484,7 +524,9 @@ export class TeacherView {
 
         this.questionView.updateQuestionIndicator(`${label} ${current} af ${total}`);
         this.questionView.updatePartName(this.currentPart.name);
-        this.questionView.updatePartIndicator(`Deltest ${this.partIndex + 1} af ${this.test.parts.length}`);
+        this.questionView.updatePartIndicator(
+            `Deltest ${this.partIndex + 1} af ${this.test.parts.length}`,
+        );
     }
 
     getPracticeQuestionCounts() {
@@ -505,20 +547,39 @@ export class TeacherView {
         p2p.addEventListener("message", (e) => {
             const data = e.detail;
 
-            if (["test.started", "question.answered", "question.displayed"].includes(data.event) && this.test.testType === 'group') {
-                this.groupTestContainer.updateData(data)
+            if (
+                ["test.started", "question.answered", "question.displayed"].includes(
+                    data.event,
+                ) &&
+                this.test.testType === "group"
+            ) {
+                this.groupTestContainer.updateData(data);
             }
 
-            if (["test.cancelled", "test.complete", "question.answered", "question.displayed"].includes(data.event) && this.test.testType === 'individual') {
+            if (
+                [
+                    "test.cancelled",
+                    "test.complete",
+                    "question.answered",
+                    "question.displayed",
+                ].includes(data.event) &&
+                this.test.testType === "individual"
+            ) {
                 this.table.updateTable(data);
             }
 
-            if (["question.answered", "question.displayed"].includes(data.event) && this.test.testType === 'individual' ) {
+            if (
+                ["question.answered", "question.displayed"].includes(data.event) &&
+                this.test.testType === "individual"
+            ) {
                 this.setPartIndex(data.partIndex);
                 this.setQuestionIndex(data.questionIndex, data.practice);
-                if (data.event === 'question.displayed') {
+                if (data.event === "question.displayed") {
                     this.buttons.enableButtons();
-                    if ((this.currentQuestion !== null) && (this.currentQuestion.type === "no_input_required")) {
+                    if (
+                        this.currentQuestion !== null &&
+                        this.currentQuestion.type === "no_input_required"
+                    ) {
                         this.buttons.disableNextButton();
                     }
                     this.showQuestion();
@@ -527,7 +588,6 @@ export class TeacherView {
             this.messageQueue.push(data);
             this._persistQueue(); // Persistent save
         });
-
     }
 
     _initSocket() {
@@ -535,28 +595,33 @@ export class TeacherView {
         this.chatSocket.addEventListener("message", (e) => {
             const data = JSON.parse(e.data);
 
-            if (data.event === 'student.joined') {
-                console.log("Setting up webRTC channel for student", data.studentId)
+            if (data.event === "student.joined") {
+                console.log("Setting up webRTC channel for student", data.studentId);
 
                 if (this.studentChannels[data.studentId]) {
-                    console.log("Cleaning up old connection for student", data.studentId);
+                    console.log(
+                        "Cleaning up old connection for student",
+                        data.studentId,
+                    );
                     this.studentChannels[data.studentId].peer.destroy();
                 }
 
                 const p2p = new WebRTCChannel();
                 this.studentChannels[data.studentId] = p2p;
-                this._initP2PSocket(p2p)
+                this._initP2PSocket(p2p);
 
-                p2p.peer.on('open', () => {
+                p2p.peer.on("open", () => {
                     p2p.connect(data.webRTCId);
                 });
             }
         });
     }
 
-
     _persistQueue() {
-        localStorage.setItem(`msg_queue_${this.roomName}`, JSON.stringify(this.messageQueue));
+        localStorage.setItem(
+            `msg_queue_${this.roomName}`,
+            JSON.stringify(this.messageQueue),
+        );
     }
 
     _startSyncInterval() {
@@ -567,13 +632,15 @@ export class TeacherView {
     }
 
     async _flushMessageQueue() {
-
         if (this.chatSocket.readyState === WebSocket.CONNECTING) {
             console.log("Socket is currently connecting... waiting.");
             return;
         }
 
-        if (this.chatSocket.readyState === WebSocket.CLOSED || this.chatSocket.readyState === WebSocket.CLOSING) {
+        if (
+            this.chatSocket.readyState === WebSocket.CLOSED ||
+            this.chatSocket.readyState === WebSocket.CLOSING
+        ) {
             console.log("Socket closed. Attempting to reconnect...");
             this._initSocket();
             return;
@@ -582,17 +649,21 @@ export class TeacherView {
         const isOnline = await serverOnline();
 
         // Only attempt to send if the server is online and we have messages
-        if (this.messageQueue.length > 0 && isOnline && this.chatSocket.readyState === WebSocket.OPEN) {
+        if (
+            this.messageQueue.length > 0 &&
+            isOnline &&
+            this.chatSocket.readyState === WebSocket.OPEN
+        ) {
             console.log(`Syncing ${this.messageQueue.length} messages to server...`);
 
             const queueToProcess = [...this.messageQueue];
-            
+
             try {
                 for (const msg of queueToProcess) {
                     this.chatSocket.send(JSON.stringify(msg));
                 }
                 this.messageQueue = [];
-                this._persistQueue(); 
+                this._persistQueue();
             } catch (err) {
                 console.error("Sync failed, keeping messages in storage:", err);
             }
@@ -608,7 +679,10 @@ export class TeacherView {
                     this.buttons.disableButtons();
                 }
             } else {
-                if ((this.currentQuestion !== null) && (this.currentQuestion.type === "no_input_required")) {
+                if (
+                    this.currentQuestion !== null &&
+                    this.currentQuestion.type === "no_input_required"
+                ) {
                     if (val === "next") {
                         // Send feedback and go to next question
                         this.sendQuestionFeedback(this.buttons.getActive());
@@ -631,62 +705,61 @@ export class TeacherView {
     }
 
     sendTestCancelled() {
-        Object.values(this.studentChannels).forEach(channel => {
-            channel.send(
-                {
-                    uuid: crypto.randomUUID(),
-                    event: 'test.cancelled',
-                    roomName: this.roomName,
-                    partIndex: this.partIndex,
-                    questionIndex: this.questionIndex,
-                    questionId: this.currentQuestion.id,
-                    partId: this.currentPart.id,
-                    assignmentId: this.assignmentId,
-                    note: this.noteField.getNote(),
-                }
-            );
+        Object.values(this.studentChannels).forEach((channel) => {
+            channel.send({
+                uuid: crypto.randomUUID(),
+                event: "test.cancelled",
+                roomName: this.roomName,
+                partIndex: this.partIndex,
+                questionIndex: this.questionIndex,
+                questionId: this.currentQuestion.id,
+                partId: this.currentPart.id,
+                assignmentId: this.assignmentId,
+                note: this.noteField.getNote(),
+            });
         });
     }
 
     sendQuestionFeedback(val) {
         // Map `val` as follows: true=correct, false=wrong, null=skipped
-        const correct = (val === "skipped") ? null : (val === "correct");
-        Object.values(this.studentChannels).forEach(channel => {
-            channel.send(
-                {
-                    uuid: crypto.randomUUID(),
-                    event: 'question.feedback',
-                    roomName: this.roomName,
-                    partIndex: this.partIndex,
-                    questionIndex: this.questionIndex,
-                    questionId: this.currentQuestion.id,
-                    partId: this.currentPart.id,
-                    assignmentId: this.assignmentId,
-                    correct: correct,
-                    note: this.noteField.getNote(),
-                }
-            );
-        });
-    }
-
-    showQuestion() {
-        this.questionView.showTitle(`${this.questionIndex + 1}/${this.currentPart.questions.length} (${this.currentPart.name})`);
-        this.questionView.showContent(this.currentQuestion.challengeText, this.currentQuestion.challengeImageUrl);
-    }
-
-    hideQuestion() {
-        this.questionView.showTitle('');
-        this.questionView.showContent('');
-    }
-
-    _initFilterButtonSelection() {
-        this.filterButtons.forEach(btn => {
-            btn.addEventListener('click', () => {
-                this.filterButtons.forEach(b => b.classList.remove('selected'));
-                btn.classList.add('selected');
+        const correct = val === "skipped" ? null : val === "correct";
+        Object.values(this.studentChannels).forEach((channel) => {
+            channel.send({
+                uuid: crypto.randomUUID(),
+                event: "question.feedback",
+                roomName: this.roomName,
+                partIndex: this.partIndex,
+                questionIndex: this.questionIndex,
+                questionId: this.currentQuestion.id,
+                partId: this.currentPart.id,
+                assignmentId: this.assignmentId,
+                correct: correct,
+                note: this.noteField.getNote(),
             });
         });
     }
 
+    showQuestion() {
+        this.questionView.showTitle(
+            `${this.questionIndex + 1}/${this.currentPart.questions.length} (${this.currentPart.name})`,
+        );
+        this.questionView.showContent(
+            this.currentQuestion.challengeText,
+            this.currentQuestion.challengeImageUrl,
+        );
+    }
 
+    hideQuestion() {
+        this.questionView.showTitle("");
+        this.questionView.showContent("");
+    }
+
+    _initFilterButtonSelection() {
+        this.filterButtons.forEach((btn) => {
+            btn.addEventListener("click", () => {
+                this.filterButtons.forEach((b) => b.classList.remove("selected"));
+                btn.classList.add("selected");
+            });
+        });
+    }
 }

@@ -31,8 +31,10 @@ const mockSetup = vi.fn();
 
 vi.mock("../../../screening/media.js", () => ({
     TestMediaRecorder: class {
-        constructor() { }
-        setup() { return mockSetup(); }
+        constructor() {}
+        setup() {
+            return mockSetup();
+        }
     },
 }));
 
@@ -54,17 +56,16 @@ import { initStudent } from "../../../screening/individual/student.js";
 
 describe("initStudent", () => {
     let originalLocation;
-    
+
     beforeEach(() => {
         vi.clearAllMocks();
         openHandler = undefined;
-    
-        vi.spyOn(globalThis.crypto, "randomUUID")
-            .mockReturnValue("uuid-123");
-    
+
+        vi.spyOn(globalThis.crypto, "randomUUID").mockReturnValue("uuid-123");
+
         // Save original
         originalLocation = window.location;
-    
+
         // Replace with mock object
         delete window.location;
         window.location = { href: "" };
@@ -108,7 +109,7 @@ describe("initStudent", () => {
                 event: "setup.error",
                 id: "room1",
                 error: "Error: mic failed",
-            })
+            }),
         );
 
         // View should still be constructed & started
