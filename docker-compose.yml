@@ -6,7 +6,7 @@ services:
   # Use traefik with a self-signed certificate to serve on HTTPS, as audio recording
   # in a browser context requires HTTPS connections in any case.
   traefik:
-    image: traefik:v3.0
+    image: traefik:v3.6
     container_name: dysleksi-traefik
     command:
       - "--api.insecure=true"
