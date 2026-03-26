@@ -405,6 +405,41 @@ export class QuestionView {
     }
 }
 
+export class ElapsedTimeView {
+    domElement;
+
+    constructor(selector) {
+        this.domElement = document.querySelector(selector);
+        this.running = false;
+        this.t1 = null;
+        this.interval = window.setInterval(() => {
+            this.update();
+        }, 1000);
+    }
+
+    start() {
+        this.running = true;
+        // On first call to `start`, set `t1` to current time
+        if (this.t1 === null) {
+            this.t1 = new Date();
+        }
+    }
+
+    stop() {
+        this.running = false;
+    }
+
+    update() {
+        if (this.running && this.t1 !== null) {
+            const delta = new Date(new Date() - this.t1);
+            const hours = String(delta.getHours() - 1).padStart(2, "0");
+            const minutes = String(delta.getMinutes()).padStart(2, "0");
+            const seconds = String(delta.getSeconds()).padStart(2, "0");
+            this.domElement.innerText = `${hours}:${minutes}:${seconds}`;
+        }
+    }
+}
+
 export class TeacherView {
     constructor(
         roomName,
@@ -415,6 +450,7 @@ export class TeacherView {
         buttons,
         noteField,
         questionView,
+        elapsedTimeView = null,
     ) {
         this.assignmentId = assignmentId;
         this.roomName = roomName;
@@ -432,6 +468,9 @@ export class TeacherView {
         this.buttons = buttons || new ActionButtons();
         this.noteField = noteField || new NoteField();
         this.questionView = questionView || new QuestionView();
+        this.elapsedTimeView = elapsedTimeView;
+
+        this.filterButtons = document.querySelectorAll(".group-test-header .btn");
         this.filterButtons = document.querySelectorAll(".group-test-header .btn");
         this.studentChannels = {};
 
@@ -584,7 +623,20 @@ export class TeacherView {
                     }
                     this.showQuestion();
                 }
+
+                // Update "elapsed time"
+                if (this.elapsedTimeView !== null && this.currentQuestion !== null) {
+                    if (!data.practice) {
+                        if (data.event === "question.displayed") {
+                            this.elapsedTimeView.start();
+                        }
+                        if (data.event === "question.answered") {
+                            this.elapsedTimeView.stop();
+                        }
+                    }
+                }
             }
+
             this.messageQueue.push(data);
             this._persistQueue(); // Persistent save
         });
