@@ -1,6 +1,7 @@
 import {
     EventTable,
     ActionButtons,
+    ElapsedTimeView,
     TeacherView,
     NoteField,
     QuestionView,
@@ -21,6 +22,7 @@ export function initTeacher(roomName, assignmentId, test) {
         "#current-test-part-number",
         "#current-test-question-number",
     );
+    const elapsedTimeView = new ElapsedTimeView("#total-elapsed-time");
 
     buttons.showButtons();
     noteField.show();
@@ -35,6 +37,8 @@ export function initTeacher(roomName, assignmentId, test) {
         buttons,
         noteField,
         questionView,
+        elapsedTimeView,
     );
+
     console.log("TeacherView created");
 }

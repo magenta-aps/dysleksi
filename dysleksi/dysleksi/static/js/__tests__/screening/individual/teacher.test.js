@@ -19,12 +19,15 @@ vi.mock("../../../screening/controlroom.js", () => {
         show() {}
     }
 
+    class ElapsedTimeView {}
+
     // TeacherView mock records constructor calls
     const TeacherView = vi.fn();
 
     return {
         EventTable,
         ActionButtons,
+        ElapsedTimeView,
         NoteField,
         QuestionView,
         TeacherView,
@@ -39,6 +42,7 @@ import { initTeacher } from "../../../screening/individual/teacher.js";
 import {
     EventTable,
     ActionButtons,
+    ElapsedTimeView,
     NoteField,
     QuestionView,
     TeacherView,
@@ -79,5 +83,6 @@ describe("initTeacher", () => {
         expect(args[5]).toBeInstanceOf(ActionButtons);
         expect(args[6]).toBeInstanceOf(NoteField);
         expect(args[7]).toBeInstanceOf(QuestionView);
+        expect(args[8]).toBeInstanceOf(ElapsedTimeView);
     });
 });
