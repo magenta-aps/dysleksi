@@ -28,12 +28,6 @@ fi
 echo 'creating groups'
 python manage.py create_groups
 
-if [ "${CREATE_DUMMY_USERS,,}" = true ]; then
-  echo 'creating test users'
-  python manage.py create_user admin admin --is_superuser
-fi
-
-
 if [ "${CREATE_DUMMY_DATA,,}" = true ]; then
   python manage.py create_dummy_classes_and_users
   python manage.py create_dummy_tests

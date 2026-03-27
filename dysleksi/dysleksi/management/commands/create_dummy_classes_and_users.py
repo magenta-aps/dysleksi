@@ -47,6 +47,22 @@ class Command(BaseCommand):
             teacher2.groups.add(teacher_group)
             teacher2.save()
 
+        # Create teacher who is also an admin (to access Django admin *and* teacher UI)
+        teacher3, created = Teacher.objects.update_or_create(
+            username="admin",
+            defaults={
+                "is_staff": True,
+                "is_superuser": True,
+                "first_name": "Admin",
+                "last_name": "Adminsen",
+                "cpr": "0222222224",
+            },
+        )
+        if created:
+            teacher3.set_password("admin")
+            teacher3.groups.add(teacher_group)
+            teacher3.save()
+
         # Create student who is in idp
         student, created = Student.objects.update_or_create(
             username="0111111111",
@@ -101,7 +117,7 @@ class Command(BaseCommand):
                     school_year_start=school_year_start,
                     name=f"{classnumber}.{letter}",
                 )
-                c.teachers.set([teacher, teacher2])
+                c.teachers.set([teacher, teacher2, teacher3])
 
         # Add students to classes
         student.klasse = Class.objects.get(

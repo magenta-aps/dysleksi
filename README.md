@@ -31,6 +31,12 @@ In the "teacher window", you should see a list of students (with only one studen
 
 To begin a screening session, click "Start individueltest" in the teacher window. The "student window" should now automatically switch to a screening session.
 
+## Accessing Django admin
+
+In your browser, go to https://dysleksi-web/django-admin/, and log in using the credentials `admin/admin`.
+
+The `admin` user is also a teacher, making it easy to edit data in the Django admin, and then trying out those changes in the teacher UI without switching users.
+
 ## Testing
 
 To run the tests run
