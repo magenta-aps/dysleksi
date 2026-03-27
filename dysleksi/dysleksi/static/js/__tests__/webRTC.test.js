@@ -55,7 +55,6 @@ describe("WebRTCChannel", () => {
             null,
             expect.objectContaining({
                 host: window.location.hostname,
-                port: 9000,
                 path: "/webrtc",
                 secure: true,
             }),

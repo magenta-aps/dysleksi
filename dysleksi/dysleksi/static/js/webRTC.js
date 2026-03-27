@@ -12,7 +12,6 @@ export class WebRTCChannel extends EventTarget {
         // See https://peerjs.com/ for details
         this.peer = new Peer(null, {
             host: currentHost,
-            port: config.port,
             path: "/webrtc",
             secure: true,
             key: config.key,
