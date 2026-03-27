@@ -62,6 +62,7 @@ describe("IndividualTestFlow", () => {
         };
 
         document.body.innerHTML = `
+            <div id="fade-overlay" style="opacity: 0;"></div>
             <div id="audio-indicator" style="display: none"></div>
             <h1 id="student-header" class="student-header"></h1>
             <audio id="instructions-sound"></audio>

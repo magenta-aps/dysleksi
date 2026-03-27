@@ -317,6 +317,8 @@ export class StudentTestView extends EventTarget {
             this.domElements.skipAllInstructionsButton.style.display = "block";
         }
 
+        this.domElements.fadeScreenOverlay();
+
         instructionRunner.run().then(() => {
             this.domElements.unlockInput();
             if (this.domElements.skipInstructionButton) {

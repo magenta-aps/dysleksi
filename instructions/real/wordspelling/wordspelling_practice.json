@@ -7,69 +7,62 @@
       // 6a.1
       {
         "action": "show",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
       {
         "action": "hide",
+        "delayAfter": 0,
         "element": "choices"
       },
       {
         "action": "hide",
+        "delayAfter": 0,
         "element": "next"
       },
       {
         // Ordstavning er nu ved at starte.
         "action": "playSound",
-        "resource": "resources/wordspelling/Indledning/6a.1.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Indledning/6a.1.wav"
       },
 
       // 6a.2
       {
         // Først skal du øve dig på øveopgaverne, inden opgaverne starter.
         "action": "playSound",
-        "resource": "resources/wordspelling/Indledning/6a.2.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Indledning/6a.2.wav"
       },
-
       // 6a.3
       {
         // Opgaverne starter først, når du er færdig med øveopgaverne.
         "action": "playSound",
-        "resource": "resources/wordspelling/Indledning/6a.3.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Indledning/6a.3.wav"
       },
-
       // 6a.4
       {
         // Du vil få besked, når dine opgaver er færdige.
         "action": "playSound",
-        "resource": "resources/wordspelling/Indledning/6a.4.wav",
-        "delayAfter": 500
+        "delayAfter": 1000,
+        "resource": "resources/wordspelling/Indledning/6a.5.wav"
       },
-
-      // 6a.5
-      {
-        // Først får du vist, hvad du skal gøre.
-        "action": "playSound",
-        "resource": "resources/wordspelling/Indledning/6a.5.wav",
-        "delayAfter": 500
-      },
-
-      // 9a.5
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
       {
         "action": "show",
+        "delayAfter": 0,
         "element": "next"
       },
       {
         // Tryk grøn, når du er klar.
         "action": "playSound",
-        "resource": "resources/wordspelling/Indledning/9a.5.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Indledning/9a.5.wav"
       }
     ]
   },
@@ -79,432 +72,461 @@
     "instruction_sequence": [
       {
         "action": "hide",
+        "delayAfter": 0,
         "element": "repeat"
       },
       // 6b.1
       {
         "action": "show",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
       {
         "action": "show",
+        "delayAfter": 0,
         "element": "choices"
       },
       {
         "action": "show",
+        "delayAfter": 1500,
         "element": "next"
       },
       {
         // Lyt godt efter
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.1.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.1.wav"
       },
-
       // 6b.2
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "free-text-field"
       },
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "free-text-erase-btn"
       },
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "free-text-buttons"
       },
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "next"
       },
       {
         // Her kan du se
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.2.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.2.wav"
       },
-
       // 6b.2a
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
       {
         "action": "highlight",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
       {
         // Lydikon
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.2a.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.2a.wav"
       },
-
       // 6b.2b
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "free-text-buttons"
       },
       {
         "action": "highlight",
+        "delayAfter": 0,
         "element": "free-text-buttons"
       },
       {
         // bogstaver
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.2b.m4a",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.2b.m4a"
       },
-
       // 6b.2c
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "free-text-buttons"
       },
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "free-text-erase-btn"
       },
       {
         "action": "highlight",
+        "delayAfter": 0,
         "element": "free-text-erase-btn"
       },
       {
         // delete-knappen
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.2c.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.2c.wav"
       },
-
       // 6b.2d
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "free-text-erase-btn"
       },
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "free-text-field"
       },
       {
         "action": "highlight",
+        "delayAfter": 0,
         "element": "free-text-field"
       },
       {
         // skrivefelt
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.2d.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.2d.wav"
       },
-
       // 6b.2e
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "free-text-field"
       },
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "next"
       },
       {
         "action": "highlight",
+        "delayAfter": 0,
         "element": "next"
       },
       {
         // og pilen
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.2e.wav",
-        "delayAfter": 1000
+        "delayAfter": 1000,
+        "resource": "resources/wordspelling/Instruktion/6b.2e.wav"
       },
-
       // 6b.3
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "next"
       },
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
       {
         // Ordet, der skal skrives, vil blive angivet.
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.3.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.3.wav"
       },
-
       // 6b.3a
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "free-text-field"
       },
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "free-text-buttons"
       },
       {
         // Du skal skrive ordet, der angives.
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.3a.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.3a.wav"
       },
-
       // 6b.3b
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "free-text-field"
       },
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "free-text-buttons"
       },
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "next"
       },
       {
         "action": "highlight",
+        "delayAfter": 0,
         "element": "next"
       },
       {
         // Når du har skrevet, går du videre til næste opgave ved at trykke på pilen.
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.3b.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.3b.wav"
       },
-
       // 6b.4
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "next"
       },
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
       {
         // Nu bliver der vist, hvad du skal gøre.
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.4.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.4.wav"
       },
-
       // 6b.4a
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "free-text-field"
       },
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "free-text-buttons"
       },
       // Tryk på knappen for at tastaturet enabler og lyden spiller
       {
         "action": "clickButton",
-        "element": "challenge-sound-btn",
-        "delayAfter": 1500
+        "delayAfter": 1500,
+        "element": "challenge-sound-btn"
       },
       {
         // Ordet, der skal skrives er: Tui
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.4a.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.4a.wav"
       },
       {
         "action": "clickButton",
-        "element": "free-text-t",
-        "delayAfter": 750
+        "delayAfter": 750,
+        "element": "free-text-t"
       },
       {
         "action": "clickButton",
-        "element": "free-text-u",
-        "delayAfter": 750
+        "delayAfter": 750,
+        "element": "free-text-u"
       },
       {
         "action": "clickButton",
-        "element": "free-text-i",
-        "delayAfter": 750
+        "delayAfter": 750,
+        "element": "free-text-i"
       },
-
       // 6b.4b
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "next"
       },
       {
         "action": "highlight",
+        "delayAfter": 0,
         "element": "next"
       },
       {
         // Da ordet Tui er skrevet, trykkes der på pilen.
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.4b.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.4b.wav"
       },
-
       // 6b.4c
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "free-text-field"
       },
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "free-text-buttons"
       },
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
       {
         // Det er sådan, du skal skrive/løse opgaverne.
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.4c.wav",
-        "delayAfter": 1000
+        "delayAfter": 1000,
+        "resource": "resources/wordspelling/Instruktion/6b.4c.wav"
       },
-
       // 6b.4d
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "free-text-field"
       },
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "free-text-buttons"
       },
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "free-text-erase-btn"
       },
       {
         // Hvis du kommer til at skrive forkert, kan du ændre de skrevne.
         // Når du f.eks. vil skrive tui, men kommer til at skriv sui, gør du som vist.
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.4d.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.4d.wav"
       },
       {
         "action": "clickButton",
-        "element": "free-text-erase-btn",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "element": "free-text-erase-btn"
       },
       {
         "action": "clickButton",
-        "element": "free-text-erase-btn",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "element": "free-text-erase-btn"
       },
       {
         "action": "clickButton",
-        "element": "free-text-erase-btn",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "element": "free-text-erase-btn"
       },
-
       {
         "action": "clickButton",
-        "element": "free-text-s",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "element": "free-text-s"
       },
-
       {
         "action": "clickButton",
-        "element": "free-text-u",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "element": "free-text-u"
       },
-
       {
         "action": "clickButton",
-        "element": "free-text-i",
-        "delayAfter": 1500
+        "delayAfter": 1500,
+        "element": "free-text-i"
       },
-
       {
         "action": "setMarker",
+        "delayAfter": 1000,
         "element": "free-text-field",
-        "data": "1",
-        "delayAfter": 1000
+        "data": "1"
       },
       {
         "action": "clickButton",
-        "element": "free-text-erase-btn",
-        "delayAfter": 1000
+        "delayAfter": 1000,
+        "element": "free-text-erase-btn"
       },
       {
         "action": "clickButton",
-        "element": "free-text-t",
-        "delayAfter": 1000
+        "delayAfter": 1000,
+        "element": "free-text-t"
       },
-
       // 6b.4e
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
       {
         // Du må også gerne gætte, hvis du ikke kan finde ud af opgaven.
         // Men, du skal først skrive noget, for at kunne trykke på pilen.
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.4e.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.4e.wav"
       },
-
       // 6b.4f
       {
         "action": "highlight",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
       {
         // Hvis du ikke hører ordet så godt, kan du høre det igen ved at trykke på lydikonet.
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.4f.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.4f.wav"
       },
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "question-challenge"
       },
-
       // 6b.5
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "free-text-field"
       },
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "free-text-buttons"
       },
       {
         "action": "fadeOut",
+        "delayAfter": 0,
         "element": "free-text-erase-btn"
       },
       {
         // Nu skal du selv prøve øveopgaverne.
         // Kun ordet vil blive angivet.
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/6b.5.wav",
-        "delayAfter": 500
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Instruktion/6b.5.wav"
       },
-
       // 9a.5
       {
         "action": "fadeIn",
+        "delayAfter": 0,
         "element": "next"
       },
       {
         // Tryk grøn når du er klar.
         "action": "playSound",
-        "resource": "resources/wordspelling/Instruktion/9a.5.wav",
-        "delayAfter": 0
+        "delayAfter": 0,
+        "resource": "resources/wordspelling/Instruktion/9a.5.wav"
       }
     ]
   },
