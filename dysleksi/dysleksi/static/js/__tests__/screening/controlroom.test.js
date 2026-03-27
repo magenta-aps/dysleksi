@@ -231,6 +231,17 @@ describe("Teacher Individual test View", () => {
                 <div id="part-number"></div>
                 <div id="question-number"></div>
             </div>
+            <template id="edit-result">
+                <div class="btn-group">
+                    <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#correct">Korrekt</a></li>
+                        <li><a class="dropdown-item" href="#wrong">Forkert</a></li>
+                        <li><a class="dropdown-item" href="#skipped">Sprunget over</a></li>
+                    </ul>
+                </div>
+            </template>
             <table id="events"><tbody></tbody></table>
             <button id="correct"></button>
             <button id="wrong"></button>
@@ -239,16 +250,20 @@ describe("Teacher Individual test View", () => {
             <button id="next"></button>
             <textarea id="note" class="d-none"></textarea>
         `;
-        table = new EventTable();
+
+        // Mock out asset preloader
+        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
+
+        // Load test data
+        new Test(groupTestData);
+        individualTest = new Test(individualTestData);
+
+        // Init UI components
+        table = new EventTable(individualTest);
         buttons = new ActionButtons();
         note = new NoteField();
         questionView = new QuestionView();
         elapsedTimeView = new ElapsedTimeView("#elapsed-time");
-
-        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
-
-        new Test(groupTestData);
-        individualTest = new Test(individualTestData);
 
         view = new TeacherView(
             "room1",
@@ -727,6 +742,33 @@ describe("Teacher Individual test View", () => {
         expect(buttons.cancelButton().classList.contains("disabled")).toBe(true);
     });
 
+    it("updates the event table when handling question feedback", () => {
+        // Arrange
+        view.setPartIndex(0);
+        view.setQuestionIndex(0);
+        const numRowsBefore = view.table.eventsEl.querySelectorAll("tbody tr").length;
+        // Act: send question feedback
+        view.sendQuestionFeedback("correct");
+        // Assert: new row is added to event table
+        const numRowsAfter = view.table.eventsEl.querySelectorAll("tbody tr").length;
+        expect(numRowsBefore).not.toBeUndefined();
+        expect(numRowsAfter).not.toBeUndefined();
+        expect(numRowsAfter).toEqual(numRowsBefore + 1);
+    });
+
+    it("does not update a non-existent event table when handling question feedback", () => {
+        // Arrange
+        view.setPartIndex(0);
+        view.setQuestionIndex(0);
+        // Arrange: remove event table component from view
+        view.table = null;
+        // Act: send question feedback
+        view.sendQuestionFeedback("correct");
+        // Assert: no rows were added to table DOM element
+        const rows = document.querySelector("table#events tbody");
+        expect(rows.childNodes.length).toBe(0);
+    });
+
     it("raise error when incorrect partindex is received", () => {
         const invalidIndexes = [
             null,
@@ -1108,7 +1150,7 @@ describe("TeacherView _initFilterButtonSelection", () => {
             testData,
             1,
             wsGetter,
-            new EventTable(),
+            new EventTable(testData),
             new ActionButtons(),
             new NoteField(),
             new QuestionView(),
@@ -1257,65 +1299,98 @@ describe("TeacherView socket 'test.started' handling", () => {
 });
 
 describe("EventTable", () => {
+    let individualTest;
     let table;
 
     beforeEach(() => {
         // Set up a standard DOM for the table
         document.body.innerHTML = `
+            <template id="edit-result">
+                <div class="btn-group">
+                    <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    </button>
+                    <ul class="dropdown-menu">
+                        <li><a class="dropdown-item" href="#correct">Korrekt</a></li>
+                        <li><a class="dropdown-item" href="#wrong">Forkert</a></li>
+                        <li><a class="dropdown-item" href="#skipped">Sprunget over</a></li>
+                    </ul>
+                </div>
+            </template>
             <table id="events">
                 <tbody></tbody>
             </table>
         `;
-        table = new EventTable();
+
+        // Mock out "preload" functionality
+        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
+
+        individualTest = new Test(individualTestData);
+        table = new EventTable(individualTest);
     });
 
-    it("updates the table with data when element exists", () => {
-        table = new EventTable();
+    it("stores answer when receiving `question.answered`", () => {
         const data = {
-            event: "question.displayed",
-            questionTitle: "What is 2+2?",
-            displayedAt: "10:00:01",
+            event: "question.answered",
+            partIndex: 0,
+            questionIndex: 0,
         };
-
         table.updateTable(data);
+        expect(table.prevAnswer).toEqual(data);
+    });
 
+    it("adds another row when receiving `question.feedback`", () => {
+        const data = {
+            event: "question.feedback",
+            partIndex: 0,
+            questionIndex: 0,
+        };
+        table.updateTable(data);
         const rows = document.querySelectorAll("#events tbody tr");
         expect(rows.length).toBe(1);
-        expect(rows[0].cells[0].textContent).toBe("question.displayed");
+        expect(rows[0].cells[0].textContent).not.toBeNull();
     });
 
     it("returns early and does not throw if eventsEl is null", () => {
         // 1. Setup: Clear the body so document.querySelector returns null
         document.body.innerHTML = "";
 
-        table = new EventTable();
+        table = new EventTable(individualTest);
 
         // 2. Verify state: eventsEl should be null
         expect(table.eventsEl).toBeNull();
 
-        const data = {
-            event: "question.displayed",
-            questionTitle: "Title",
-            displayedAt: "10:00:00",
-        };
-
         // 3. Act & Assert: This should not throw an error
+        expect(() => {
+            table.updateTable({ event: "question.feedback" });
+        }).not.toThrow();
+    });
+
+    it("only responds to relevant events", () => {
+        // Send irrelevant event
+        const data = { event: "irrelevant.event" };
         expect(() => {
             table.updateTable(data);
         }).not.toThrow();
     });
 
+    it("does not add table rows for practice questions", () => {
+        const data = { event: "question.feedback", practice: true };
+        table.updateTable(data);
+        const rows = table.eventsEl.querySelector("tbody tr");
+        expect(rows).toBeNull();
+    });
+
     it("renders an audio player when recordingBase64 is present", () => {
         const data = {
-            event: "question.answered",
-            questionTitle: "Oral Test",
             recordingBase64: "data:audio/wav;base64,UklGR...",
-            answeredAt: "12:00:00",
+            partIndex: 0,
+            questionIndex: 0,
         };
 
-        table.updateTable(data);
+        table.updateTable({ event: "question.answered", ...data });
+        table.updateTable({ event: "question.feedback", ...data });
 
-        const answerCell = document.querySelector("td:nth-child(3)");
+        const answerCell = document.querySelector("td.answer");
         const audioEl = answerCell.querySelector("audio");
 
         expect(audioEl).not.toBeNull();
@@ -1325,44 +1400,78 @@ describe("EventTable", () => {
 
     it("renders textAnswer when no audio is present", () => {
         const data = {
-            event: "question.answered",
-            questionTitle: "Written Test",
             textAnswer: "This is my answer",
-            answeredAt: "12:00:05",
+            partIndex: 0,
+            questionIndex: 0,
         };
 
-        table.updateTable(data);
+        table.updateTable({ event: "question.answered", ...data });
+        table.updateTable({ event: "question.feedback", ...data });
 
-        const answerCell = document.querySelector("td:nth-child(3)");
+        const answerCell = document.querySelector("td.answer");
         expect(answerCell.textContent).toBe("This is my answer");
     });
 
     it("renders choiceId when neither audio nor textAnswer is present", () => {
         const data = {
-            event: "question.answered",
-            questionTitle: "Multiple Choice",
             choiceId: "option_a",
-            answeredAt: "12:00:10",
+            partIndex: 0,
+            questionIndex: 0,
         };
 
-        table.updateTable(data);
+        table.updateTable({ event: "question.answered", ...data });
+        table.updateTable({ event: "question.feedback", ...data });
 
-        const answerCell = document.querySelector("td:nth-child(3)");
+        const answerCell = document.querySelector("td.answer");
         expect(answerCell.textContent).toBe("option_a");
     });
 
-    it("uses answeredAt for the duration column when answered", () => {
+    it("renders result and note cells when `question.feedback` event is received", () => {
         const data = {
-            event: "question.answered",
-            questionTitle: "Timing Test",
-            answeredAt: "TIMESTAMP_A",
-            displayedAt: "TIMESTAMP_B",
+            partIndex: 0,
+            questionIndex: 0,
+        };
+        const expectedLabels = [
+            { correct: true, label: "Korrekt", href: "#correct" },
+            { correct: false, label: "Forkert", href: "#wrong" },
+            { correct: null, label: "Sprunget over", href: "#skipped" },
+        ];
+
+        for (const item of expectedLabels) {
+            table.updateTable({ event: "question.answered", ...data });
+            table.updateTable({
+                event: "question.feedback",
+                correct: item.correct,
+                note: "Et notat",
+                ...data,
+            });
+
+            const button = document.querySelector("td.result button");
+            expect(button.textContent).toBe(item.label);
+            const noteInput = document.querySelector("td.note input[type='text']");
+            expect(noteInput.value).toBe("Et notat");
+
+            // Test that result can be revised by using the dropdown menu
+            const dropdownItem = document.querySelector(
+                `td.result a[href='${item.href}']`,
+            );
+            dropdownItem.dispatchEvent(new Event("click"));
+            expect(button.textContent).toBe(item.label);
+        }
+    });
+
+    it("renders question cells for non-practice questions", () => {
+        const data = {
+            partIndex: 0,
+            questionIndex: 0,
         };
 
-        table.updateTable(data);
+        table.updateTable({ event: "question.feedback", practice: false, ...data });
 
-        const durationCell = document.querySelector("td:nth-child(4)");
-        expect(durationCell.textContent).toBe("TIMESTAMP_A");
+        const numberEl = document.querySelector("td.question span:not(.challenge)");
+        expect(numberEl.textContent).toBe("1.");
+        const challengeEl = document.querySelector("td.question span.challenge");
+        expect(challengeEl.textContent).toBe("s");
     });
 });
 

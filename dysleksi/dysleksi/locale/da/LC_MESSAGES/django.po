@@ -28,6 +28,7 @@ msgid "Test"
 msgstr ""
 
 #: dysleksi/forms.py
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Deltest"
 msgstr ""
 
@@ -245,6 +246,22 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Næste opgave"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Opgave"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Resultat"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Lyd"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Bemærkning"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/base.html
