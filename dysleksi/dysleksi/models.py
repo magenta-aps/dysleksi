@@ -552,7 +552,10 @@ class InstructionSequence(models.Model):
         }
 
     def __str__(self) -> str:
-        return f"Practice sequence for question {self.question_id}"
+        return (
+            f"{self.question.part.name}: sequence {self.pk} "
+            f"(question {self.question_id})"
+        )
 
 
 class Instruction(models.Model):

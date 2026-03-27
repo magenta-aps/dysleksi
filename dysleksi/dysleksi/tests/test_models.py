@@ -619,7 +619,9 @@ class TestInstructionSequence(DysleksiTest):
         seq = InstructionSequence.objects.create(question=self.question1)
 
         self.assertEqual(
-            str(seq), f"Practice sequence for question {self.question1.id}"
+            str(seq),
+            f"{self.question1.part.name}: sequence {seq.pk} "
+            f"(question {self.question1.id})",
         )
 
     def test_to_json(self):
