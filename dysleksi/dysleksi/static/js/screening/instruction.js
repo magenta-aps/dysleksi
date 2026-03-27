@@ -19,7 +19,7 @@ export class InstructionSequenceRunner {
         this.skipAll = false;
         for (let i = 0; i < this.instructions.length; i++) {
             const instruction = this.instructions[i];
-            console.log(
+            console.info(
                 "Showing instruction step",
                 i + 1,
                 "of",
@@ -38,9 +38,9 @@ export class InstructionSequenceRunner {
             if (delay > 0) {
                 await this.sleep(delay);
             }
-            console.log("Instruction step complete");
+            console.debug("Instruction step complete");
         }
-        console.log("Instruction sequence complete");
+        console.debug("Instruction sequence complete");
     }
 
     // Sleep that can be skipped instantly

@@ -15,6 +15,7 @@ describe("GroupTestDomElements.showInstructions (sound only)", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+      <div id="fade-overlay" style="opacity: 0;"></div>
       <audio id="instructions-sound"></audio>
       <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
@@ -56,6 +57,7 @@ describe("GroupTestDomElements.showQuestionChallenge (sound only)", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+      <div id="fade-overlay" style="opacity: 0;"></div>
       <audio id="instructions-sound"></audio>
       <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
@@ -168,6 +170,7 @@ describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+      <div id="fade-overlay" style="opacity: 0;"></div>
       <audio id="instructions-sound"></audio>
       <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
@@ -241,6 +244,7 @@ describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
 describe("GroupTestDomElements constructor", () => {
     it("creates elements", () => {
         document.body.innerHTML = `
+      <div id="fade-overlay" style="opacity: 0;"></div>
       <audio id="instructions-sound"></audio>
       <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
@@ -264,6 +268,7 @@ describe("GroupTestDomElements constructor", () => {
 describe("IndividualTestDomElements constructor", () => {
     it("creates elements", () => {
         document.body.innerHTML = `
+      <div id="fade-overlay" style="opacity: 0;"></div>
       <div id="audio-indicator" style="display: none"></div>
       <audio id="instructions-sound"></audio>
       <div id="instructions-text"></div>
@@ -287,6 +292,7 @@ describe("IndividualTestDomElements DOM utilities", () => {
     let dom;
     beforeEach(() => {
         document.body.innerHTML = `
+      <div id="fade-overlay" style="opacity: 0;"></div>
       <div id="audio-indicator" style="display: none"></div>
       <audio id="instructions-sound"></audio>
       <div id="instructions-text"></div>
@@ -314,6 +320,7 @@ describe("GroupTestDomElements DOM utilities", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+      <div id="fade-overlay" style="opacity: 0;"></div>
       <audio id="instructions-sound"></audio>
       <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
@@ -430,7 +437,7 @@ describe("GroupTestDomElements DOM utilities", () => {
         vi.useFakeTimers();
         dom.highlight(el);
         expect(el.classList.contains("highlight")).toBe(true);
-        vi.advanceTimersByTime(1500);
+        vi.advanceTimersByTime(2000);
         expect(el.classList.contains("highlight")).toBe(false);
         vi.useRealTimers();
     });
@@ -566,7 +573,7 @@ describe("GroupTestDomElements.fadeScreenOverlay", () => {
         vi.advanceTimersByTime(200);
 
         expect(overlay.style.opacity).toBe("0");
-        expect(overlay.style.transition).toBe("opacity 200ms ease");
+        expect(overlay.style.transition).toBe("opacity 700ms ease");
 
         vi.useRealTimers();
         vi.unstubAllGlobals();
@@ -581,6 +588,7 @@ describe("element ordering", () => {
     let el2;
     beforeEach(() => {
         document.body.innerHTML = `
+      <div id="fade-overlay" style="opacity: 0;"></div>
       <audio id="instructions-sound"></audio>
       <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>
@@ -666,6 +674,7 @@ describe("_setButtonListener tests", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+      <div id="fade-overlay" style="opacity: 0;"></div>
       <audio id="instructions-sound"></audio>
       <audio id="reminder-sound"></audio>
       <div id="instructions-text"></div>

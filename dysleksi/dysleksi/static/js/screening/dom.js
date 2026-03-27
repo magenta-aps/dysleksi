@@ -70,7 +70,7 @@ class TestDomElements {
         // Fade content in gradually
         requestAnimationFrame(() => {
             setTimeout(() => {
-                this.overlay.style.transition = "opacity 200ms ease";
+                this.overlay.style.transition = "opacity 700ms ease";
                 this.overlay.style.opacity = 0;
             }, 200); // Pause 200 miliseconds before starting the fade
         });
@@ -232,14 +232,14 @@ class TestDomElements {
     }
 
     fadeIn(el) {
-        el.style.transition = "opacity 0.5s";
+        el.style.transition = "opacity 1s";
         requestAnimationFrame(() => {
             el.style.opacity = 1;
         });
     }
 
     fadeOut(el) {
-        el.style.transition = "opacity 0.5s";
+        el.style.transition = "opacity 1s";
         requestAnimationFrame(() => {
             el.style.opacity = 0.4;
         });
@@ -255,7 +255,7 @@ class TestDomElements {
 
     highlight(el) {
         el.classList.add("highlight");
-        setTimeout(() => el.classList.remove("highlight"), 1500);
+        setTimeout(() => el.classList.remove("highlight"), 2000);
     }
 
     setText(el, text) {

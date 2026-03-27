@@ -908,6 +908,7 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+            <div id="fade-overlay" style="opacity: 0;"></div>
             <div id="choices"></div>
             <audio id="instructions-sound"></audio>
             <audio id="reminder-sound"></audio>
@@ -1016,6 +1017,7 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+            <div id="fade-overlay" style="opacity: 0;"></div>
             <div id="choices"></div>
             <audio id="instructions-sound"></audio>
             <audio id="reminder-sound"></audio>
@@ -1193,6 +1195,7 @@ describe("GroupTestDomElements - Repeatbutton", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
+            <div id="fade-overlay" style="opacity: 0;"></div>
             <h1 id="student-header"></h1> <div id="choices"></div>
             <div id="choices"></div>
             <audio id="instructions-sound"></audio>
