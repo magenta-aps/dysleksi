@@ -3,46 +3,162 @@ import { WebRTCChannel } from "../webRTC.js";
 import { serverOnline } from "./utils.js";
 
 export class EventTable {
-    constructor(tableSelector = "table#events tbody") {
+    constructor(test, tableSelector = "table#events tbody") {
+        this.test = test;
         this.eventsEl = document.querySelector(tableSelector);
+        this.prevAnswer = null;
     }
 
     updateTable(data) {
         if (this.eventsEl === null) {
             return;
         }
-
-        const eventEl = document.createElement("tr");
-
-        const typeEl = document.createElement("td");
-        const questionEl = document.createElement("td");
-        const answerEl = document.createElement("td");
-        const durationEl = document.createElement("td");
-
-        eventEl.append(typeEl, questionEl, answerEl, durationEl);
-
-        typeEl.textContent = data.event;
-        questionEl.textContent = data.questionTitle;
-
+        if (
+            data.practice ||
+            !["question.answered", "question.feedback"].includes(data.event)
+        ) {
+            return;
+        }
         if (data.event === "question.answered") {
-            if (data.recordingBase64) {
-                const audioEl = document.createElement("audio");
-                audioEl.controls = true;
-                audioEl.src = data.recordingBase64;
-                answerEl.append(audioEl);
-            } else if (data.textAnswer) {
-                answerEl.textContent = data.textAnswer;
-            } else {
-                answerEl.textContent = data.choiceId || "";
-            }
-        } else {
-            answerEl.textContent = "-";
+            this.prevAnswer = data;
         }
 
-        durationEl.textContent =
-            data.event === "question.answered" ? data.answeredAt : data.displayedAt;
+        const part = this.test.parts[data.partIndex];
 
-        this.eventsEl.prepend(eventEl);
+        let rowEl;
+        let partNameEl;
+        let questionEl;
+        let resultEl;
+        let answerEl;
+        let noteEl;
+
+        if (data.event === "question.feedback") {
+            // Add new row to table
+            rowEl = document.createElement("tr");
+            partNameEl = this.createTd("part-name");
+            questionEl = this.createTd("question");
+            resultEl = this.createTd("result");
+            answerEl = this.createTd("answer");
+            noteEl = this.createTd("note");
+            rowEl.append(partNameEl, questionEl, resultEl, answerEl, noteEl);
+            this.eventsEl.prepend(rowEl);
+        } else {
+            // Modify existing row (created when handling `question.feedback` event)
+            try {
+                rowEl = this.eventsEl.querySelector("tbody tr:first-of-type");
+                partNameEl = rowEl.querySelector("td.part-name");
+                questionEl = rowEl.querySelector("td.question");
+                resultEl = rowEl.querySelector("td.result");
+                answerEl = rowEl.querySelector("td.answer");
+                noteEl = rowEl.querySelector("td.note");
+            } catch {
+                console.warn("no previous row found, doing nothing");
+                return;
+            }
+        }
+
+        // Update `part-name` cell
+        partNameEl.textContent = part.name;
+
+        // Update `question` cell
+        this.updateQuestionEl(questionEl, part.questions[data.questionIndex]);
+
+        // Update `result` cell (teacher's assessment)
+        if (data.event === "question.feedback" && data.correct !== undefined) {
+            const template = document.querySelector("template#edit-result");
+            const clone = document.importNode(template.content, true);
+            const button = clone.querySelector("button");
+            this.updateResultButtonState(button, data.correct);
+            const choices = clone.querySelectorAll("a.dropdown-item");
+            for (const choice of choices) {
+                choice.addEventListener("click", (evt) => {
+                    this.handleResultButtonChange(evt);
+                });
+            }
+            resultEl.append(clone);
+        }
+
+        // Update `answer` cell using data from previously received `question.answered` event
+        if (this.prevAnswer !== null) {
+            this.updateAnswerEl(answerEl, this.prevAnswer);
+            this.prevAnswer = null;
+        }
+
+        // Update `note` cell
+        const inputEl = this.getOrCreateEl(noteEl, "input");
+        inputEl.type = "text";
+        inputEl.classList.add("form-control");
+        if (data.event === "question.feedback" && data.note !== undefined) {
+            inputEl.value = data.note;
+        }
+    }
+
+    updateQuestionEl(questionEl, question) {
+        // Remove previous nodes in `questionEl`
+        questionEl.replaceChildren();
+        // Add number
+        const numberEl = document.createElement("span");
+        numberEl.textContent = `${question.index + 1}.`;
+        questionEl.append(numberEl);
+        // Add challenge
+        const challengeEl = document.createElement("span");
+        challengeEl.textContent = question.challengeText;
+        challengeEl.classList.add("challenge");
+        questionEl.append(challengeEl);
+    }
+
+    updateResultButtonState(button, state) {
+        button.textContent =
+            state === null ? "Sprunget over" : state ? "Korrekt" : "Forkert";
+        button.classList.add(
+            state === null ? "btn-secondary" : state ? "btn-success" : "btn-danger",
+        );
+    }
+
+    handleResultButtonChange(evt) {
+        evt.preventDefault();
+        const anchor = evt.target.href.match(/#\w+/)[0];
+        const state = anchor === "#skipped" ? null : anchor === "#correct";
+        const button =
+            evt.target.parentElement.parentElement.parentElement.querySelector(
+                "button",
+            );
+        button.classList.remove("btn-success", "btn-danger", "btn-secondary");
+        this.updateResultButtonState(button, state);
+    }
+
+    updateAnswerEl(answerEl, data) {
+        if (data.recordingBase64) {
+            answerEl.append(this.createAudioEl(data.recordingBase64));
+        } else if (data.textAnswer) {
+            answerEl.textContent = data.textAnswer;
+        } else {
+            answerEl.textContent = data.choiceId || "";
+        }
+    }
+
+    createAudioEl(recordingBase64) {
+        const audioEl = document.createElement("audio");
+        audioEl.controls = true;
+        audioEl.src = recordingBase64;
+        return audioEl;
+    }
+
+    createTd(cls) {
+        const td = document.createElement("td");
+        td.classList.add(cls);
+        return td;
+    }
+
+    getOrCreateEl(el, tag) {
+        const oldEl = el.querySelector(tag);
+        if (oldEl !== null) {
+            return oldEl;
+        } else {
+            const newEl = document.createElement(tag);
+            el.append(newEl);
+            return newEl;
+        }
     }
 }
 
@@ -462,6 +578,7 @@ export class TeacherView {
         this.questionIndex = null;
         this.currentPart = null;
         this.currentQuestion = null;
+        this.currentIsPractice = null;
 
         this.table = table || new EventTable();
         this.groupTestContainer = new GroupTestContainer(test);
@@ -524,6 +641,7 @@ export class TeacherView {
     }
     setQuestionIndex(questionIndex, practice) {
         this.validateQuestionIndex(questionIndex, practice);
+        this.currentIsPractice = practice;
         this.questionIndex = questionIndex;
 
         let label;
@@ -587,27 +705,6 @@ export class TeacherView {
             const data = e.detail;
 
             if (
-                ["test.started", "question.answered", "question.displayed"].includes(
-                    data.event,
-                ) &&
-                this.test.testType === "group"
-            ) {
-                this.groupTestContainer.updateData(data);
-            }
-
-            if (
-                [
-                    "test.cancelled",
-                    "test.complete",
-                    "question.answered",
-                    "question.displayed",
-                ].includes(data.event) &&
-                this.test.testType === "individual"
-            ) {
-                this.table.updateTable(data);
-            }
-
-            if (
                 ["question.answered", "question.displayed"].includes(data.event) &&
                 this.test.testType === "individual"
             ) {
@@ -635,6 +732,22 @@ export class TeacherView {
                         }
                     }
                 }
+            }
+
+            if (
+                ["test.started", "question.answered", "question.displayed"].includes(
+                    data.event,
+                ) &&
+                this.test.testType === "group"
+            ) {
+                this.groupTestContainer.updateData(data);
+            }
+
+            if (
+                ["question.answered", "question.feedback"].includes(data.event) &&
+                this.test.testType === "individual"
+            ) {
+                this.table.updateTable(data);
             }
 
             this.messageQueue.push(data);
@@ -775,20 +888,27 @@ export class TeacherView {
     sendQuestionFeedback(val) {
         // Map `val` as follows: true=correct, false=wrong, null=skipped
         const correct = val === "skipped" ? null : val === "correct";
+        const data = {
+            uuid: crypto.randomUUID(),
+            event: "question.feedback",
+            roomName: this.roomName,
+            partIndex: this.partIndex,
+            questionIndex: this.questionIndex,
+            questionId: this.currentQuestion.id,
+            partId: this.currentPart.id,
+            assignmentId: this.assignmentId,
+            correct: correct,
+            note: this.noteField.getNote(),
+            practice: this.currentIsPractice,
+        };
+        // Update student sessions
         Object.values(this.studentChannels).forEach((channel) => {
-            channel.send({
-                uuid: crypto.randomUUID(),
-                event: "question.feedback",
-                roomName: this.roomName,
-                partIndex: this.partIndex,
-                questionIndex: this.questionIndex,
-                questionId: this.currentQuestion.id,
-                partId: this.currentPart.id,
-                assignmentId: this.assignmentId,
-                correct: correct,
-                note: this.noteField.getNote(),
-            });
+            channel.send(data);
         });
+        // Update local UI
+        if (this.table !== null) {
+            this.table.updateTable(data);
+        }
     }
 
     showQuestion() {

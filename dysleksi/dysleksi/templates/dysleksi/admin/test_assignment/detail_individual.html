@@ -72,10 +72,11 @@
         <table id="events" class="table">
             <thead>
                 <tr>
-                    <th>Begivenhed</th>
-                    <th>Spørgsmål</th>
-                    <th>Svar</th>
-                    <th>Tid</th>
+                    <th>{% translate 'Deltest' %}</th>
+                    <th>{% translate 'Opgave' %}</th>
+                    <th>{% translate 'Resultat' %}</th>
+                    <th>{% translate 'Lyd' %}</th>
+                    <th>{% translate 'Bemærkning' %}</th>
                 </tr>
             </thead>
             <tbody>
@@ -83,6 +84,18 @@
         </table>
     </div>
 </div>
+
+<template id="edit-result">
+    <div class="btn-group">
+        <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#correct">{% translate 'Korrekt' %}</a></li>
+            <li><a class="dropdown-item" href="#wrong">{% translate 'Forkert' %}</a></li>
+            <li><a class="dropdown-item" href="#skipped">{% translate 'Sprunget over' %}</a></li>
+        </ul>
+    </div>
+</template>
 {% endblock %}
 
 {% block js_module %}

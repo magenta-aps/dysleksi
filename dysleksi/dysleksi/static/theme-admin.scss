@@ -407,6 +407,47 @@ ul.modal-progress li.list-group-item.disabled span {
   background: $other-grey-light;
   color: $other-grey-dark;
 }
+.card .table tbody span.challenge {
+  display: inline-block;
+  margin: 0 $spacer;
+  padding: 0.25 * $spacer 0.67 * $spacer;
+  border: 1px solid $other-grey-light2;
+  border-radius: 0.5 * $spacer;
+  text-align: center;
+  font-family: "Karinika", "Figtree Normal", sans-serif;
+  font-size: 1.25 * $spacer;
+}
+button.dropdown-toggle {
+  padding: 0.25 * $spacer 0.5 * $spacer;
+  border: none;
+  font-size: 0.75 * $spacer;
+  font-weight: bold;
+  text-transform: uppercase;
+
+  // "Correct"
+  &.btn-success {
+    background: $other-green-light;
+    color: $other-green;
+  }
+
+  // "Wrong"
+  &.btn-danger {
+    background: $other-red-light;
+    color: $other-red;
+  }
+
+  // "Skipped
+  &.btn-secondary {
+    background: $other-grey-light2;
+    color: $other-grey-dark;
+  }
+}
+td.note input {
+  display: inline-block;
+}
+td.note input:focus {
+  width: 90%;
+}
 
 // Teacher UI for running individual tests
 div[data-role='teacher'][data-test-type='individual'] .d-flex #question-container {
@@ -441,6 +482,7 @@ div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn.acti
   display: inline-block;
 }
 
+// Teacher UI for running group tests
 .group-test-container {
   background: white;
   border-radius: 1.5rem;

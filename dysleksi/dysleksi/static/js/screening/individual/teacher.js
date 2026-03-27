@@ -11,7 +11,7 @@ import { getWebSocket } from "../../ws.js";
 export function initTeacher(roomName, assignmentId, test) {
     console.log("called initTeacher");
 
-    const table = new EventTable();
+    const table = new EventTable(test);
     const buttons = new ActionButtons();
     const noteField = new NoteField();
     const questionView = new QuestionView(
