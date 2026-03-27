@@ -15,6 +15,7 @@ RUN mkdir /app && \
     mkdir -p /var/cache/idp && \
     mkdir -p /upload/instructions && \
     mkdir -p /upload/resources && \
+    mkdir -p /upload/resources/dummy && \
     #gid/uid from salt
     groupadd -g 75200 -r dysleksi && \
     groupadd -g 75100 -r certificate_exporter && \
