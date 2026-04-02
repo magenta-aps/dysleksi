@@ -65,7 +65,7 @@ django-redis==6.0.0
 # Used for testing & linting
 
 ## Parses HTML and lets us query the DOM
-beautifulsoup4==4.14.2
+beautifulsoup4==4.14.3
 
 ## Code coverage
 coverage==7.13.5
