@@ -6,6 +6,7 @@ SPDX-PackageSupplier = "Magenta ApS <info@magenta.dk>"
 path = [
     "dysleksi/**",
     "dev-environment/**",
+    "data/tabulex/selfsigned*",
     "docker/**",
     "docker-compose.yml",
     "docker-compose.override.template.yml",

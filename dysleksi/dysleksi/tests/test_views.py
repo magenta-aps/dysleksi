@@ -159,6 +159,14 @@ class TestClassListView(DysleksiTest):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
+    def test_schoolyear_ordering(self):
+        self.client.force_login(self.teacher)
+        response = self.client.get(self.url + "?sort=school_year")
+        self.assertQuerySetEqual(
+            response.context_data["object_list"],
+            self.teacher.classes.all().order_by("school_year_start"),
+        )
+
 
 class TestStudentListView(DysleksiTest):
 
@@ -172,7 +180,7 @@ class TestStudentListView(DysleksiTest):
 
     def test_teacher_view(self):
         view = self.setup_view(StudentListView, self.teacher)
-        expected_objs = Student.objects.filter(klasse__teachers=self.teacher)
+        expected_objs = Student.objects.filter(classes__teachers=self.teacher)
         self.assertQuerySetEqual(
             view.get_context_data()["object_list"], expected_objs, ordered=False
         )

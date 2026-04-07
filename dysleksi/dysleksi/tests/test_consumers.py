@@ -17,7 +17,7 @@ from django.core.cache import caches
 from django.db.models.signals import post_save
 from django.test import TestCase, TransactionTestCase
 
-from dysleksi.models import STUDENTS, Message, Student
+from dysleksi.models import STUDENTS, Institution, Message, Student
 from dysleksi.routing import websocket_urlpatterns
 
 
@@ -30,8 +30,14 @@ class TestChatConsumer(TestCase):
         cls.test_user = cls.create_student("TestUser")
 
     @classmethod
+    def create_school(cls, number: str, name: str):
+        school, _ = Institution.objects.get_or_create(number=number, name=name)
+        return school
+
+    @classmethod
     def create_student(cls, username: str, **kwargs) -> Student:
         student, _ = Student.objects.get_or_create(
+            institution=cls.create_school("abc", "TestSchool"),
             username=username,
             defaults=kwargs,
         )

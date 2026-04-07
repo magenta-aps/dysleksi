@@ -14,6 +14,7 @@ from dysleksi.models import (
     STUDENTS,
     TEACHERS,
     Class,
+    Institution,
     PossibleAnswer,
     QuestionType,
     Student,
@@ -35,6 +36,7 @@ class DysleksiTest(TestCase):
         super().setUpTestData()
         Group.objects.get_or_create(name=TEACHERS)
         Group.objects.get_or_create(name=STUDENTS)
+        cls.school = cls.create_school(number="test123", name="TestSkolen")
         cls.klasse = cls.create_class(2025, "1.A")
         cls.student = cls.create_student(
             "TestStudent",
@@ -46,7 +48,6 @@ class DysleksiTest(TestCase):
         cls.teacher = cls.create_teacher(
             "TestTeacher",
             cpr=2233445566,
-            school="TestSchool",
             first_name="Test",
             last_name="Lærer",
         )
@@ -177,16 +178,24 @@ class DysleksiTest(TestCase):
         cls._temp_media.cleanup()
 
     @classmethod
+    def create_school(cls, number: str, name: str):
+        school, _ = Institution.objects.get_or_create(number=number, name=name)
+        return school
+
+    @classmethod
     def create_class(cls, school_year_start: int, name: str) -> Class:
         klasse, _ = Class.objects.get_or_create(
+            institution=cls.school,
             school_year_start=school_year_start,
             name=name,
+            group_id=name,
         )
         return klasse
 
     @classmethod
     def create_teacher(cls, username: str, **kwargs) -> Teacher:
         teacher, _ = Teacher.objects.update_or_create(
+            institution=cls.school,
             username=username,
             defaults=kwargs,
         )
@@ -195,6 +204,7 @@ class DysleksiTest(TestCase):
     @classmethod
     def create_student(cls, username: str, **kwargs) -> Student:
         student, _ = Student.objects.update_or_create(
+            institution=cls.school,
             username=username,
             defaults=kwargs,
         )

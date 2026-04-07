@@ -189,6 +189,11 @@ Lint Javascript:
     CREATE_DUMMY_USERS: True
     BYPASS_2FA: 'True'
     MEDIA_ROOT: /builds/gronlandsprojekter/dysleksi/file-data
+    TABULEX_MOCK: false
+    TABULEX_DUMMY_DATA: /builds/gronlandsprojekter/dysleksi/file-data/tabulex/test.json
+    TABULEX_CLIENT_CERT: /builds/gronlandsprojekter/dysleksi/file-data/tabulex/selfsigned.crt
+    TABULEX_CLIENT_KEY: /builds/gronlandsprojekter/dysleksi/file-data/tabulex/selfsigned.key
+
 
   image: ${IMAGE_SHA}
   before_script:
@@ -204,8 +209,10 @@ Python Unittest:
   script:
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/gronlandsprojekter/dysleksi-binaries.git
     - mkdir -p ${CI_PROJECT_DIR}/file-data/dev-data
+    - mkdir -p ${CI_PROJECT_DIR}/file-data/tabulex
     - mkdir -p ${CI_PROJECT_DIR}/file-data/instructions
     - cp -r dysleksi-binaries/* ${CI_PROJECT_DIR}/file-data/dev-data/.
+    - cp -r data/tabulex/* ${CI_PROJECT_DIR}/file-data/tabulex/.
     - cp -r ${CI_PROJECT_DIR}/instructions/* ${CI_PROJECT_DIR}/file-data/instructions/.
     - cd /app
     - coverage run manage.py test --parallel

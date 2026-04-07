@@ -1,0 +1,609 @@
+{
+  "ImportSource": [
+    {
+      "sourceDateTime": "2024-09-20T12:18:04:+02:00",
+      "source": "testdata",
+      "schoolYear": "2025-2026"
+    }
+  ],
+  "Institution": {
+    "InstitutionNumber": "R00123",
+    "InstitutionName": "ET Skole - ændret",
+    "Group": [
+      {
+        "GroupId": "1.A",
+        "GroupName": "1.A",
+        "GroupType": "Hovedgruppe",
+        "GroupLevel": "1",
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "1.A Matematik",
+        "GroupName": "1.A Matematik",
+        "GroupType": "Hold",
+        "GroupLevel": null,
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "1.A Dansk",
+        "GroupName": "1.A Dansk",
+        "GroupType": "Hold",
+        "GroupLevel": null,
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "1.A Kalaallisut",
+        "GroupName": "1.A Kalaallisut",
+        "GroupType": "Hold",
+        "GroupLevel": null,
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "1.B",
+        "GroupName": "1.B",
+        "GroupType": "Hovedgruppe",
+        "GroupLevel": "1",
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "1.B Matematik",
+        "GroupName": "1.B Matematik",
+        "GroupType": "Hold",
+        "GroupLevel": null,
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "1.B Dansk",
+        "GroupName": "1.B Dansk",
+        "GroupType": "Hold",
+        "GroupLevel": null,
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "1.B Kalaallisut",
+        "GroupName": "1.B Kalaallisut",
+        "GroupType": "Hold",
+        "GroupLevel": null,
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "2.A",
+        "GroupName": "2.A",
+        "GroupType": "Hovedgruppe",
+        "GroupLevel": "2",
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "2.A Matematik",
+        "GroupName": "2.A Matematik",
+        "GroupType": "Hold",
+        "GroupLevel": null,
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "2.A Dansk",
+        "GroupName": "2.A Dansk",
+        "GroupType": "Hold",
+        "GroupLevel": null,
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "2.A Kalaallisut",
+        "GroupName": "2.A Kalaallisut",
+        "GroupType": "Hold",
+        "GroupLevel": null,
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "2.B",
+        "GroupName": "2.B",
+        "GroupType": "Hovedgruppe",
+        "GroupLevel": "2",
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "2.B Matematik",
+        "GroupName": "2.B Matematik",
+        "GroupType": "Hold",
+        "GroupLevel": null,
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "2.B Dansk",
+        "GroupName": "2.B Dansk",
+        "GroupType": "Hold",
+        "GroupLevel": null,
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      },
+      {
+        "GroupId": "2.B Kalaallisut",
+        "GroupName": "2.B Kalaallisut",
+        "GroupType": "Hold",
+        "GroupLevel": null,
+        "Line": null,
+        "FromDate": null,
+        "ToDate": null
+      }
+    ],
+    "InstitutionPerson": [
+      {
+        "Person": {
+          "FirstName": "Kasper",
+          "FamilyName": "Johansen",
+          "UserId": "1000000a01"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "1",
+          "Location": null,
+          "MainGroupId": "1.A",
+          "GroupId": [
+            "1.A Matematik",
+            "1.A Dansk",
+            "1.A Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Thomas",
+          "FamilyName": "Kristensen",
+          "UserId": "1000000a02"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "6",
+          "Location": null,
+          "MainGroupId": "1.A",
+          "GroupId": [
+            "1.A Matematik",
+            "1.A Dansk",
+            "1.A Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Camilla",
+          "FamilyName": "Sørensen",
+          "UserId": "1000000a03"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "6",
+          "Location": null,
+          "MainGroupId": "1.A",
+          "GroupId": [
+            "1.A Matematik",
+            "1.A Dansk",
+            "1.A Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Emma",
+          "FamilyName": "Madsen",
+          "UserId": "1000000a04"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "9",
+          "Location": null,
+          "MainGroupId": "1.A",
+          "GroupId": [
+            "1.A Matematik",
+            "1.A Dansk",
+            "1.A Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Christian",
+          "FamilyName": "Thomsen",
+          "UserId": "1000000a05"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "6",
+          "Location": null,
+          "MainGroupId": "1.B",
+          "GroupId": [
+            "1.B Matematik",
+            "1.B Dansk",
+            "1.B Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Louise",
+          "FamilyName": "Olesen",
+          "UserId": "1000000a06"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "6",
+          "Location": null,
+          "MainGroupId": "1.B",
+          "GroupId": [
+            "1.B Matematik",
+            "1.B Dansk",
+            "1.B Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Alias-fornavn",
+          "FamilyName": "Alias-efternavn",
+          "UserId": "1000000a07"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "6",
+          "Location": null,
+          "MainGroupId": "1.B",
+          "GroupId": [
+            "1.B Matematik",
+            "1.B Dansk",
+            "1.B Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Lars",
+          "FamilyName": "Pedersen",
+          "UserId": "1000000a08"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "3",
+          "Location": null,
+          "MainGroupId": "1.B",
+          "GroupId": [
+            "1.B Matematik",
+            "1.B Dansk",
+            "1.B Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Maria",
+          "FamilyName": "Poulsen",
+          "UserId": "1000000a09"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "3",
+          "Location": null,
+          "MainGroupId": "2.A",
+          "GroupId": [
+            "2.A Matematik",
+            "2.A Dansk",
+            "2.A Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Frederik",
+          "FamilyName": "Andersen",
+          "UserId": "1000000a10"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "3",
+          "Location": null,
+          "MainGroupId": "2.A",
+          "GroupId": [
+            "2.A Matematik",
+            "2.A Dansk",
+            "2.A Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Katrine",
+          "FamilyName": "Larsen",
+          "UserId": "1000000a11"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "3",
+          "Location": null,
+          "MainGroupId": "2.A",
+          "GroupId": [
+            "2.A Matematik",
+            "2.A Dansk",
+            "2.A Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Morten",
+          "FamilyName": "Jensen",
+          "UserId": "1000000a12"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "3",
+          "Location": null,
+          "MainGroupId": "2.A",
+          "GroupId": [
+            "2.A Matematik",
+            "2.A Dansk",
+            "2.A Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Anna",
+          "FamilyName": "Hansen",
+          "UserId": "1000000a13"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "3",
+          "Location": null,
+          "MainGroupId": "2.B",
+          "GroupId": [
+            "2.B Matematik",
+            "2.B Dansk",
+            "2.B Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Jesper",
+          "FamilyName": "Rasmussen",
+          "UserId": "1000000a14"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "6",
+          "Location": null,
+          "MainGroupId": "2.B",
+          "GroupId": [
+            "2.B Matematik",
+            "2.B Dansk",
+            "2.B Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Alias-fornavn",
+          "FamilyName": "Alias-efternavn",
+          "UserId": "1000000a15"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "6",
+          "Location": null,
+          "MainGroupId": "2.B",
+          "GroupId": [
+            "2.B Matematik",
+            "2.B Dansk",
+            "2.B Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Lars",
+          "FamilyName": "Hansen",
+          "UserId": "1000000a16"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "9",
+          "Location": null,
+          "MainGroupId": "2.B",
+          "GroupId": [
+            "2.B Matematik",
+            "2.B Dansk",
+            "2.B Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Sofie",
+          "FamilyName": "Nielsen",
+          "UserId": "1000000a17"
+        },
+        "Student": {
+          "Role": "Elev",
+          "StudentNumber": null,
+          "Level": "3",
+          "Location": null,
+          "MainGroupId": "2.B",
+          "GroupId": [
+            "2.B Matematik",
+            "2.B Dansk",
+            "2.B Kalaallisut"
+          ]
+        },
+        "Employee": null,
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Henrik",
+          "FamilyName": "Sørensen",
+          "UserId": "1000000a18"
+        },
+        "Student": null,
+        "Employee": {
+          "Role": [
+            "Lærer"
+          ],
+          "ShortName": "HS",
+          "Occupation": "Matematiklærer",
+          "Location": null,
+          "GroupId": [
+            "1.A Matematik",
+            "1.B Matematik",
+            "2.A Matematik",
+            "2.B Matematik"
+          ]
+        },
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Kirsten",
+          "FamilyName": "Larsen",
+          "UserId": "1000000a19"
+        },
+        "Student": null,
+        "Employee": {
+          "Role": [
+            "Lærer"
+          ],
+          "ShortName": "KL",
+          "Occupation": "Dansklærer",
+          "Location": null,
+          "GroupId": [
+            "1.A Dansk",
+            "1.B Dansk",
+            "2.A Dansk",
+            "2.B Dansk"
+          ]
+        },
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Larsine",
+          "FamilyName": "Chemnitz",
+          "UserId": "1000000a21"
+        },
+        "Student": null,
+        "Employee": {
+          "Role": [
+            "Lærer"
+          ],
+          "ShortName": "LJ",
+          "Occupation": "Grønlandsklærer",
+          "Location": null,
+          "GroupId": [
+            "1.A Kalaallisut",
+            "1.B Kalaallisut",
+            "2.A Kalaallisut",
+            "2.B Kalaallisut"
+          ]
+        },
+        "Extern": null,
+        "source": "testdata"
+      }
+    ]
+  },
+  "exportDateTime": "2026-03-24T00:00:00+01:00",
+  "accessLevel": "small"
+}
