@@ -116,7 +116,7 @@ class StartIndividualRoomForm(DynamicFormMixin, StartRoomForm):
     test = DynamicField(
         ModelChoiceField,
         label=_("Vælg test"),
-        queryset=Test.objects.filter(test_type=TestType.INDIVIDUAL),
+        queryset=Test.objects.filter(test_type=TestType.INDIVIDUAL, custom=False),
         required=lambda form: form.data.get("test_parts") is None,
     )
 
@@ -146,7 +146,7 @@ class StartClassRoomForm(DynamicFormMixin, StartRoomForm):
     test = DynamicField(
         ModelChoiceField,
         label=_("Vælg test"),
-        queryset=Test.objects.filter(test_type=TestType.GROUP),
+        queryset=Test.objects.filter(test_type=TestType.GROUP, custom=False),
         required=lambda form: form.data.get("test_parts") is None,
     )
 

@@ -219,6 +219,7 @@ class StartAssignmentView(CreateView):
                 str(test_part) for test_part in form.cleaned_data["test_parts"]
             ),
             test_type=self.test_type,  # type: ignore
+            custom=True,
         )
         # Add the selected test parts
         for test_part in form.cleaned_data["test_parts"]:
