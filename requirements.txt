@@ -31,7 +31,7 @@ django-tables2==2.7.5
 
 ## CSP-enabling views
 django-csp==4.0
-django-csp-helpers==1.0.3
+django-csp-helpers==1.0.4
 
 ## Compile SCSS to CSS
 django-libsass==0.9
