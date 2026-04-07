@@ -276,6 +276,10 @@ class Test(models.Model):
         default=TestType.INDIVIDUAL,
     )
 
+    custom = models.BooleanField(
+        default=False,
+    )
+
     def to_json(self) -> dict:
         """
         Serialize the Test with its parts, questions, and possible answers.
