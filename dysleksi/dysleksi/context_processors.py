@@ -16,6 +16,12 @@ def debug_context(request: HttpRequest):
     }
 
 
+def version_context(request: HttpRequest):
+    return {
+        "version": settings.VERSION,  # type: ignore
+    }
+
+
 def webrtc_settings(request):
     return {
         "WEBRTC_CONFIG": {

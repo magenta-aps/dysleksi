@@ -150,6 +150,10 @@ i {
       padding: $spacer;
       border-top: 1px solid $other-grey;
     }
+    .version {
+      color: $gray-400;
+      padding: $spacer;
+    }
   }
 
   .content {
