@@ -61,6 +61,13 @@ django-extended-makemessages==1.7.1
 ## Redis cache backend
 django-redis==6.0.0
 
+## Tabulex SOAP client
+zeep==4.3.2
+zeep[xmlsec]
+xmlsec
+## Load tabulex demo data from file
+dataclasses-json==0.6.7
+
 
 # Used for testing & linting
 

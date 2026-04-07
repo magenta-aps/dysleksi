@@ -17,4 +17,5 @@ include(
     "staticfiles.py",
     "bootstrap5.py",
     "channels.py",
+    "tabulex.py",
 )

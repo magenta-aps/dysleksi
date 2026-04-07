@@ -74,6 +74,11 @@ LOGGING: dict = {
             "level": "ERROR",
             "propagate": False,
         },
+        "zeep.transports": {
+            "level": "DEBUG",
+            "propagate": False,
+            "handlers": ["gunicorn"],
+        },
     },
 }
 

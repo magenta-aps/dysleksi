@@ -114,11 +114,29 @@ class User(AbstractUser):
         return self
 
 
+class Institution(models.Model):
+    name = models.CharField(
+        max_length=100,
+        db_index=True,
+    )
+    number = models.CharField(
+        max_length=10,
+        unique=True,
+        db_index=True,
+    )
+
+
 class Student(User):
     klasse = models.ForeignKey(
         "Class",
         on_delete=models.SET_NULL,
         null=True,
+    )
+    institution = models.ForeignKey(
+        Institution,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="students",
     )
 
     is_student = True
@@ -132,7 +150,12 @@ def on_update_student(sender, instance: Student, created: bool, **kwargs):
 
 
 class Teacher(User):
-    school = models.CharField(max_length=255, blank=True)
+    institution = models.ForeignKey(
+        Institution,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="teachers",
+    )
 
     is_student = False
     is_teacher = True
@@ -156,11 +179,28 @@ class Class(models.Model):
 
     objects = ClassQuerySet.as_manager()
 
+    institution = models.ForeignKey(
+        Institution,
+        null=True,
+        on_delete=models.CASCADE,
+        related_name="classes",
+    )
+
+    # Bruges til sync med Tabulex
+    # vi får id i inddata og skal opdatere det tilsvarende objekt i DB
+    group_id = models.CharField(
+        max_length=32,
+        null=False,
+        default="",
+        db_index=True,
+    )
+
     school_year_start = models.PositiveSmallIntegerField(
         null=True,
         blank=False,
         default=None,
         verbose_name="Year that this class started",
+        db_index=True,
         # F.eks. en nuværende klasse i marts 2026 vil være
         # årgang 2025 - 2026, dvs. dette felt er 2025
         # Klasser lever ikke fra år til år; når et nyt skoleår starter,
@@ -175,14 +215,27 @@ class Class(models.Model):
     def school_year(self) -> str:
         return f"{self.school_year_start} - {self.school_year_end}"
 
-    name = models.CharField(max_length=10, null=False, blank=False, default="")
+    name = models.CharField(max_length=32, null=False, blank=False, default="")
     teachers = models.ManyToManyField(
         Teacher,
         related_name="classes",
     )
 
+    students = models.ManyToManyField(
+        Student,
+        related_name="classes",
+    )
+
+    is_main = models.BooleanField(
+        default=False,
+    )
+
     def __str__(self) -> str:
         return self.name
+
+    class Meta:
+        # Tilsammen identificerer disse tre en klasse unikt
+        unique_together = ("institution", "group_id", "school_year_start")
 
 
 class TestResource(models.Model):

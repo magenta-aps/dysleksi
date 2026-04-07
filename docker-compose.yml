@@ -41,6 +41,7 @@ services:
       - ./dysleksi/:/app:rw
       - ./log/dysleksi.log:/log/dysleksi.log:rw
       - ./dev-environment/cert:/ssl:ro
+      - ./data:/data:ro
       - ./mypy.ini:/mypy.ini:ro
       - ./file-data:/upload:rw
       - ./instructions:/upload/instructions/:ro

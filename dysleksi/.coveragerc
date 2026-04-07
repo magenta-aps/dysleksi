@@ -21,5 +21,6 @@ omit =
     */management/commands/create_groups.py
     */management/commands/make_messages.py
     */management/commands/wait_for_db.py
+    */management/commands/test_wsdl.py
 parallel = true
 concurrency = multiprocessing

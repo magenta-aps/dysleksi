@@ -117,7 +117,7 @@ class ClassListView(GroupRequiredMixin, SingleTableView):
     def get_queryset(self):
         qs = super().get_queryset()
         # Only show classes belonging to the teacher viewing the page
-        qs = qs.filter(teachers=self.user)
+        qs = qs.filter(institution=self.user.institution, teachers=self.user)
         # Only classes in the current school year
         # qs = qs.current()
         # Add annotations used by `ClassTable`
@@ -136,7 +136,7 @@ class StudentListView(GroupRequiredMixin, SingleTableView):
     def get_queryset(self):
         qs = super().get_queryset()
         # Only show students belonging to the teacher viewing the page
-        qs = qs.filter(klasse__teachers=self.user)
+        qs = qs.filter(institution=self.user.institution, classes__teachers=self.user)
         return qs
 
 

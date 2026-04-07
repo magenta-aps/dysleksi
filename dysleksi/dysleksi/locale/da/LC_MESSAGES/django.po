@@ -93,7 +93,7 @@ msgid "Svar indtalt af testdeltageren"
 msgstr ""
 
 #: dysleksi/tables.py
-msgid "Klassetrin"
+msgid "Klasse"
 msgstr ""
 
 #: dysleksi/tables.py
@@ -114,6 +114,10 @@ msgstr ""
 
 #: dysleksi/tables.py
 msgid "Navn"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Klassetrin"
 msgstr ""
 
 #: dysleksi/tables.py

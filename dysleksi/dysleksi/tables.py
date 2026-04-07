@@ -1,5 +1,6 @@
 from typing import List
 
+from django.db.models import QuerySet
 from django.utils.translation import gettext_lazy as _
 from django_tables2 import A, Table, TemplateColumn, tables
 
@@ -15,15 +16,21 @@ class ClassTable(Table):
         linkify=False,
         accessor="name",
         orderable=False,
-        verbose_name=_("Klassetrin"),
+        verbose_name=_("Klasse"),
     )
 
     school_year = tables.Column(
         verbose_name=_("Skoleår"),
     )
 
+    def order_school_year(self, queryset: QuerySet[Class, Class], is_descending: bool):
+        return (
+            queryset.order_by(("-" if is_descending else "") + "school_year_start"),
+            True,
+        )
+
     number_of_students = tables.Column(
-        accessor=A("number_of_students"),
+        accessor=A("students__count"),
         orderable=False,
         verbose_name=_("Antal elever"),
     )
