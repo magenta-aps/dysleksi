@@ -56,7 +56,7 @@ django-session-timeout @ git+https://github.com/Lapeth/django-session-timeout@8e
 django-split-settings==1.3.2
 
 ## Avoid updating date field in translation files
-django-extended-makemessages==1.7.1
+django-extended-makemessages==1.8.0
 
 ## Redis cache backend
 django-redis==6.0.0
