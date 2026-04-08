@@ -105,7 +105,7 @@ cbor2==5.9.0
 certifi==2026.2.25
 cffi==2.0.0
 charset-normalizer==3.4.7
-click==8.3.1
+click==8.3.2
 constantly==23.10.4
 cryptography==43.0.3
 defusedxml==0.7.1
