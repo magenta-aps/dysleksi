@@ -94,86 +94,108 @@ i {
 .main {
   display: flex;
   flex-flow: row nowrap;
-}
-.main .content {
-  flex-grow: 10;
-  height: 100vh;
-  overflow: scroll;
-}
-.main .content .inner-content {
-  padding: $spacer;
-}
-// Primary navigation: links to each subsection of site
-.main .navigation {
-  display: flex;
-  flex-flow: column nowrap;
-  box-sizing: border-box;
-  overflow: clip;
-  width: $sidebar-navigation-max-width;
-  height: 100vh;
-  background: $other-grey-dark !important;
-}
-.main .navigation .offcanvas-header button {
-  color: $white;
-}
-.main .navigation .offcanvas-body {
-  display: flex;
-  flex-flow: column nowrap;
-  flex-grow: 1;
-  justify-content: space-between;
-}
-.main .navigation nav {
-  padding: $spacer;
-}
-.main .navigation div.navbar-nav {
-  flex-basis: 100%;
-}
-.main .navigation a.nav-link {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding: 0.5 * $spacer;
-  color: $white;
-}
-.main .navigation a.nav-link.active {
-  background: $other-grey-medium;
-  border-radius: $spacer;
-  color: $black;
-}
-.main .navigation a.nav-link i.ph-fill {
-  margin-right: 0.25 * $spacer;
-}
-.main .navigation .logo {
-  text-align: center;
-  color: $white;
-  padding: $spacer;
-  border-top: 1px solid $other-grey;
-}
-// Secondary navigation: breadcrumb, search field and user menu
-.main .content nav.navbar {
-  flex-flow: row nowrap;
-  justify-items: center;
-  background: $white;
-  padding: 0.5 * $spacer $spacer;
-  box-shadow: 0 0.25 * $spacer $spacer $other-grey-light;
-}
-.main .content nav.navbar .breadcrumb-item a {
-  color: $black;
-  text-decoration: none;
-}
-.main .content nav.navbar form .input-group .input-group-text {
-  border-radius: 5 * $spacer;
-  border-right: none;
-  background: transparent;
-}
-.main .content nav.navbar form .input-group .form-control {
-  border-radius: 5 * $spacer;
-  background: transparent;
-  border-left: none;
-  padding-left: 0;
-}
-.main .content nav.navbar form .input-group .form-control:focus {
-  box-shadow: none;
+
+
+  // Primary navigation: links to each subsection of site
+  .navigation {
+    display: flex;
+    flex-flow: column nowrap;
+    box-sizing: border-box;
+    overflow: clip;
+    width: $sidebar-navigation-max-width;
+    height: 100vh;
+    background: $other-grey-dark !important;
+
+
+    .offcanvas-header button {
+      color: $white;
+    }
+
+    .offcanvas-body {
+      display: flex;
+      flex-flow: column nowrap;
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
+    nav {
+      padding: $spacer;
+    }
+
+    div.navbar-nav {
+      flex-basis: 100%;
+    }
+
+    a.nav-link {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      padding: 0.5 * $spacer;
+      color: $white;
+
+      &.active {
+        background: $other-grey-medium;
+        border-radius: $spacer;
+        color: $black;
+      }
+
+      i.ph-fill {
+        margin-right: 0.25 * $spacer;
+      }
+    }
+
+    .logo {
+      text-align: center;
+      color: $white;
+      padding: $spacer;
+      border-top: 1px solid $other-grey;
+    }
+  }
+
+  .content {
+    flex-grow: 10;
+    height: 100vh;
+    overflow: scroll;
+
+    .inner-content {
+      padding: $spacer;
+    }
+
+    // Secondary navigation: breadcrumb, search field and user menu
+    nav.navbar {
+      flex-flow: row nowrap;
+      justify-items: center;
+      background: $white;
+      padding: 0.5 * $spacer $spacer;
+      box-shadow: 0 0.25 * $spacer $spacer $other-grey-light;
+
+      .breadcrumb-item a {
+        color: $black;
+        text-decoration: none;
+      }
+
+      form {
+        .input-group {
+          .input-group-text {
+            border-radius: 5 * $spacer;
+            border-right: none;
+            background: transparent;
+          }
+
+          .form-control {
+            border-radius: 5 * $spacer;
+            background: transparent;
+            border-left: none;
+            padding-left: 0;
+          }
+
+          .form-control:focus {
+            box-shadow: none;
+          }
+        }
+      }
+    }
+  }
 }
 
 @include media-breakpoint-down(lg) {
@@ -197,29 +219,35 @@ i {
   // Layout when sidebar navigation is collapsed
   .main {
     flex-direction: column;
-  }
-  .main #toggle-sidebar-nav {
-    box-sizing: border-box;
-    height: (1.5 * $spacer) + (2 * $btn-padding-y) + 0.2 * $spacer;
-    align-items: center;
-    color: $white;
-    background: $other-grey-dark;
-    border-radius: 0;
-  }
-  .main #toggle-sidebar-nav:active {
-    border-color: transparent;
-  }
-  .main .content {
-    flex: max-content;
-  }
-  .main .navigation {
-    min-width: $sidebar-navigation-min-width;
-  }
-  .main .navigation .offcanvas-header {
-    border-bottom: 1px solid $other-grey;
-  }
-  .main .navigation .offcanvas-header button {
-    border-color: transparent;
+
+    #toggle-sidebar-nav {
+      box-sizing: border-box;
+      height: (1.5 * $spacer) + (2 * $btn-padding-y) + 0.2 * $spacer;
+      align-items: center;
+      color: $white;
+      background: $other-grey-dark;
+      border-radius: 0;
+    }
+
+    #toggle-sidebar-nav:active {
+      border-color: transparent;
+    }
+
+    .content {
+      flex: max-content;
+    }
+
+    .navigation {
+      min-width: $sidebar-navigation-min-width;
+
+      .offcanvas-header {
+        border-bottom: 1px solid $other-grey;
+      }
+
+      .offcanvas-header button {
+        border-color: transparent;
+      }
+    }
   }
 }
 
@@ -243,14 +271,16 @@ i {
 // Card styles
 .card {
   box-shadow: 0 0 $spacer $other-grey-light;
-}
-.card .card-header span {
-  color: $other-grey-dark;
-}
-.card .card-header em {
-  text-transform: uppercase;
-  font-style: normal;
-  font-weight: bold;
+
+  .card-header span {
+    color: $other-grey-dark;
+  }
+
+  .card-header em {
+    text-transform: uppercase;
+    font-style: normal;
+    font-weight: bold;
+  }
 }
 
 // Form element styles
@@ -272,51 +302,62 @@ textarea.form-control {
   border-radius: $spacer;
   box-shadow: 0 0 $spacer $other-grey-light;
 }
-.table tr {
-  vertical-align: middle;
-}
-.table th {
-  white-space: nowrap;
-  width: 1%;
-  padding: $spacer $spacer 0.5 * $spacer $spacer;
-  background-color: $white;
-  text-transform: uppercase;
-}
-.table th a {
-  text-decoration: none;
-}
-.table th.orderable a::after {
-  font-family: "Phosphor-Fill";
-  content: "\e140";  // `caret-up-down`
-  color: $other-grey;
-  float: right;
-  vertical-align: bottom;
-}
-.table th.orderable.asc a::after {
-  font-family: "Phosphor-Fill";
-  content: "\e13c";  // `caret-up`
-}
-.table th.orderable.desc a::after {
-  font-family: "Phosphor-Fill";
-  content: "\e136";  // `caret-down`
-}
-.table td {
-  white-space: nowrap;
-  width: 1%;
-  padding: $spacer;
-  background-color: $white;
-  vertical-align: middle;
-}
-// Forces all table headers to be `black`
-.table > :not(caption) > * > th {
-  color: $black;
-}
-// ...and the headers that act as links (sorting)
-.table > :not(caption) > * > th > a {
-  color: $black;
-}
-table tbody > tr:last-child > td {
-  border-bottom: 0;
+.table {
+  tr {
+    vertical-align: middle;
+  }
+
+  th {
+    white-space: nowrap;
+    width: 1%;
+    padding: $spacer $spacer 0.5 * $spacer $spacer;
+    background-color: $white;
+    text-transform: uppercase;
+  }
+
+  th a {
+    text-decoration: none;
+  }
+
+  th.orderable a::after {
+    font-family: "Phosphor-Fill";
+    content: "\e140"; // `caret-up-down`
+    color: $other-grey;
+    float: right;
+    vertical-align: bottom;
+  }
+
+  th.orderable.asc a::after {
+    font-family: "Phosphor-Fill";
+    content: "\e13c"; // `caret-up`
+  }
+
+  th.orderable.desc a::after {
+    font-family: "Phosphor-Fill";
+    content: "\e136"; // `caret-down`
+  }
+
+  td {
+    white-space: nowrap;
+    width: 1%;
+    padding: $spacer;
+    background-color: $white;
+    vertical-align: middle;
+  }
+
+  // Forces all table headers to be `black`
+  > :not(caption) > * > th {
+    color: $black;
+  }
+
+  // ...and the headers that act as links (sorting)
+  > :not(caption) > * > th > a {
+    color: $black;
+  }
+
+  tbody > tr:last-child > td {
+    border-bottom: 0;
+  }
 }
 
 // Modal styles
@@ -328,62 +369,77 @@ table tbody > tr:last-child > td {
 }
 ul.modal-progress {
   background: $other-grey-light;
-}
-ul.modal-progress li.list-group-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: transparent;
-  border: none;
-}
-ul.modal-progress li.list-group-item:not(.disabled) {
-  cursor: pointer;
-}
-ul.modal-progress li.list-group-item span {
-  display: flex;
-  width: 2 * $spacer;
-  height: 2 * $spacer;
-  justify-content: space-around;
-  align-items: center;
-  background: $other-grey-dark;
-  color: $white;
-  border-radius: 5 * $spacer;
-}
-ul.modal-progress li.list-group-item.disabled span {
-  background: $other-grey-medium;
-  pointer-events: none;
+
+  li.list-group-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: transparent;
+    border: none;
+  }
+
+  li.list-group-item:not(.disabled) {
+    cursor: pointer;
+  }
+
+  li.list-group-item span {
+    display: flex;
+    width: 2 * $spacer;
+    height: 2 * $spacer;
+    justify-content: space-around;
+    align-items: center;
+    background: $other-grey-dark;
+    color: $white;
+    border-radius: 5 * $spacer;
+  }
+
+  li.list-group-item.disabled span {
+    background: $other-grey-medium;
+    pointer-events: none;
+  }
 }
 .summary {
   padding: $spacer;
   margin: $spacer 0;
   border: 1px solid $other-grey-medium;
   border-radius: $spacer;
+
+  table {
+    tr {
+      border: none;
+      border-bottom: 1px solid $other-grey-medium;
+    }
+
+    tr:last-of-type {
+      border-bottom: none;
+    }
+
+    td {
+      padding: 0.5 * $spacer 0;
+      vertical-align: top;
+      border: none;
+
+      &:first-of-type::after {
+        content: ':';
+      }
+
+      &:last-of-type {
+        width: 80%;
+      }
+    }
+
+    table {
+      tr {
+        border: none
+      }
+      td {
+        padding: 0 0 0.25 * $spacer 0;
+        width: 1% !important;
+      }
+    }
+  }
 }
-.summary table tr {
-  border: none;
-  border-bottom: 1px solid $other-grey-medium;
-}
-.summary table tr:last-of-type {
-  border-bottom: none;
-}
-.summary table td {
-  padding: 0.5 * $spacer 0;
-  vertical-align: top;
-  border: none;
-}
-.summary table td:first-of-type::after {
-  content: ':';
-}
-.summary table td:last-of-type {
-  width: 80%;
-}
-.summary table table tr {
-  border: none
-}
-.summary table table td {
-  padding: 0 0 0.25 * $spacer 0;
-  width: 1% !important;
-}
+
 
 // Teacher UI
 .current-question {
@@ -400,23 +456,28 @@ ul.modal-progress li.list-group-item.disabled span {
   font-size: 5rem;
   line-height: 1;
 }
-.card .table {
-  margin: 0;
+.card {
+  .table {
+    margin: 0;
+
+    thead th {
+      background: $other-grey-light;
+      color: $other-grey-dark;
+    }
+
+    tbody span.challenge {
+      display: inline-block;
+      margin: 0 $spacer;
+      padding: 0.25 * $spacer 0.67 * $spacer;
+      border: 1px solid $other-grey-light2;
+      border-radius: 0.5 * $spacer;
+      text-align: center;
+      font-family: "Karinika", "Figtree Normal", sans-serif;
+      font-size: 1.25 * $spacer;
+    }
+  }
 }
-.card .table thead th {
-  background: $other-grey-light;
-  color: $other-grey-dark;
-}
-.card .table tbody span.challenge {
-  display: inline-block;
-  margin: 0 $spacer;
-  padding: 0.25 * $spacer 0.67 * $spacer;
-  border: 1px solid $other-grey-light2;
-  border-radius: 0.5 * $spacer;
-  text-align: center;
-  font-family: "Karinika", "Figtree Normal", sans-serif;
-  font-size: 1.25 * $spacer;
-}
+
 button.dropdown-toggle {
   padding: 0.25 * $spacer 0.5 * $spacer;
   border: none;
@@ -442,45 +503,61 @@ button.dropdown-toggle {
     color: $other-grey-dark;
   }
 }
+
 td.note input {
   display: inline-block;
-}
-td.note input:focus {
-  width: 90%;
+
+  &:focus {
+    width: 90%;
+  }
 }
 
 // Teacher UI for running individual tests
-div[data-role='teacher'][data-test-type='individual'] .d-flex #question-container {
-  flex: 1;
+div[data-role='teacher'][data-test-type='individual'] {
+  .d-flex {
+    #question-container {
+      flex: 1;
+    }
+
+    .actions {
+      flex: 4;
+      margin: 0 0 0 $spacer;
+
+      .buttons {
+        margin: 0 0 $spacer 0;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25 * $btn-padding-y $btn-padding-x;
+
+        &#correct.active {
+          background: $other-green-light;
+          color: $other-green;
+        }
+
+        i.ph {
+          display: inline-block;
+        }
+
+        i.ph-fill {
+          display: none;
+        }
+
+        &.active {
+          i.ph {
+            display: none;
+          }
+          i.ph-fill {
+            display: inline-block;
+          }
+        }
+      }
+    }
+  }
 }
-div[data-role='teacher'][data-test-type='individual'] .d-flex .actions {
-  flex: 4;
-  margin: 0 0 0 $spacer;
-}
-div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .buttons {
-  margin: 0 0 $spacer 0;
-}
-div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25 * $btn-padding-y $btn-padding-x;
-}
-div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn#correct.active {
-  background: $other-green-light;
-  color: $other-green;
-}
-div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn i.ph {
-  display: inline-block;
-}
-div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn i.ph-fill {
-  display: none;
-}
-div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn.active i.ph {
-  display: none;
-}
-div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn.active i.ph-fill {
-  display: inline-block;
-}
+
 
 // Teacher UI for running group tests
 .group-test-container {
@@ -497,33 +574,33 @@ div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn.acti
   height: 3rem;
   display: flex;
   padding: 0;
-}
 
-.group-test-header .btn {
-  flex: 1;
-  height: 100%;
-  border-radius: 0;
-  margin: 0;
-  border: 0;
-  border-right: 0px solid; // divider line
-  font-size: 1.2rem;
-  color: black;
-
-  &:hover,
-  &:focus {
-    background-color: $other-grey-dark2;
+  .btn {
+    flex: 1;
+    height: 100%;
+    border-radius: 0;
+    margin: 0;
+    border: 0;
+    border-right: 0px solid; // divider line
+    font-size: 1.2rem;
     color: black;
-  }
 
-  &.selected {
-    background-color: $other-grey-dark2;
-    color: black;
-    border-bottom: 4px solid black; // black line only on selected
-  }
-}
+    &:hover,
+    &:focus {
+      background-color: $other-grey-dark2;
+      color: black;
+    }
 
-.group-test-header .btn:last-child {
-  border-right: 0;
+    &.selected {
+      background-color: $other-grey-dark2;
+      color: black;
+      border-bottom: 4px solid black; // black line only on selected
+    }
+
+    &:last-child {
+      border-right: 0;
+    }
+  }
 }
 
 .group-test-toolbar {
@@ -559,39 +636,38 @@ div[data-role='teacher'][data-test-type='individual'] .d-flex .actions .btn.acti
 }
 
 .group-test-divider {
-    height: 3px;
-    background-color: $other-grey-light2;
-    margin: 10px 1.5rem;
+  height: 3px;
+  background-color: $other-grey-light2;
+  margin: 10px 1.5rem;
 }
 
 /* Student card */
 $border-radius-student-card: $spacer / 4 * 3;
 .student-card {
-    position: relative;
-    width: calc(25% - 1rem);
+  position: relative;
+  width: calc(25% - 1rem);
 
-    box-sizing: border-box;
-    font-size: $spacer;
-    color: #000;
+  box-sizing: border-box;
+  font-size: $spacer;
+  color: #000;
 
-    display: flex;
-    flex-direction: column;
-    justify-content: flex-start;
-    padding-top: 0;
-    padding-bottom: 0;
-    overflow: hidden; // allow folded area to expand
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding-top: 0;
+  padding-bottom: 0;
+  overflow: hidden; // allow folded area to expand
 
-    &.is-expanded {
-        .student-top-row {
-            // Flatten the bottom corners: Top-Left, Top-Right, Bottom-Right, Bottom-Left
-            border-radius:  $border-radius-student-card $border-radius-student-card 0 0;
-        }
+  &.is-expanded {
+    .student-top-row {
+      // Flatten the bottom corners: Top-Left, Top-Right, Bottom-Right, Bottom-Left
+      border-radius: $border-radius-student-card $border-radius-student-card 0 0;
     }
+  }
 
-}
 
-/* Top row */
-.student-card .student-top-row {
+  /* Top row */
+  .student-top-row {
     background-color: $other-blue-lightest;
     height: 46px;
     position: relative;
@@ -604,10 +680,10 @@ $border-radius-student-card: $spacer / 4 * 3;
     font-weight: bold;
     border: 1px solid $other-blue-dark;
     border-radius: $border-radius-student-card;
-}
+  }
 
-/* Progress bar inside top row */
-.student-card .progress-fill {
+  /* Progress bar inside top row */
+  .progress-fill {
     position: absolute;
     left: 0;
     top: 0;
@@ -616,16 +692,16 @@ $border-radius-student-card: $spacer / 4 * 3;
     background-color: $other-blue-light;
     z-index: 0;
     transition: width 0.5s ease;
-}
+  }
 
-/* Text inside top row */
-.student-card .student-text {
+  /* Text inside top row */
+  .student-text {
     position: relative;
     z-index: 1;
-}
+  }
 
-/* Folded area below */
-.student-card .folded-area {
+  /* Folded area below */
+  .folded-area {
     display: none;
     margin-top: 0;
     gap: $spacer / 4;
@@ -639,16 +715,9 @@ $border-radius-student-card: $spacer / 4 * 3;
     border: 1px solid $other-grey-light2;
     border-top: none;
     border-radius: 0 0 $border-radius-student-card $border-radius-student-card;
-}
+  }
 
-
-.foldout-arrow {
-  position: absolute;
-  color: $other-grey-medium;
-  font-size: 12px;
-}
-
-.student-card .part-navigation {
+  .part-navigation {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -676,21 +745,21 @@ $border-radius-student-card: $spacer / 4 * 3;
         pointer-events: none;
       }
     }
-}
+  }
 
-.student-card .dots-container {
+  .dots-container {
     display: flex;
     flex-wrap: wrap;
     gap: $spacer / 4;
     justify-content: flex-start;
-}
+  }
 
-.student-card .question-index {
+  .question-index {
     font-size: 10px;
     color: $other-blue-darkest;
-}
+  }
 
-.student-card .parts-progress {
+  .parts-progress {
     display: flex;
     gap: $spacer / 8;
     width: 100%;
@@ -698,19 +767,28 @@ $border-radius-student-card: $spacer / 4 * 3;
     margin-bottom: $spacer;
 
     .part-segment {
-        flex: 1;      // Ensures all parts are equal width
-        height: 100%;
-        border-radius: 2px;
-        transition: background-color 0.3s ease;
+      flex: 1; // Ensures all parts are equal width
+      height: 100%;
+      border-radius: 2px;
+      transition: background-color 0.3s ease;
 
-        &.completed {
-            background-color: $other-blue2;
-        }
-        &.current {
-            background-color: $current;
-        }
-        &.future {
-            background-color: $other-grey-light3;
-        }
+      &.completed {
+        background-color: $other-blue2;
+      }
+
+      &.current {
+        background-color: $current;
+      }
+
+      &.future {
+        background-color: $other-grey-light3;
+      }
     }
+  }
+}
+
+.foldout-arrow {
+  position: absolute;
+  color: $other-grey-medium;
+  font-size: 12px;
 }
