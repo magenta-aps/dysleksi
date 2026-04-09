@@ -22,6 +22,10 @@ export async function start() {
 
     const student = new Student(studentData);
 
+    if (role === "student") {
+        student.initializeMockData(test);
+    }
+
     if (testType === "individual") {
         if (role === "student") {
             ({ initStudent } = await import("./individual/student.js"));

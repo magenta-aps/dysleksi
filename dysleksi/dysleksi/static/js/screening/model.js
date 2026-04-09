@@ -1,4 +1,5 @@
 import { assetCache } from "./cache.js";
+import { calculateStudentProgress } from "./utils.js";
 
 export class Student {
     id;
@@ -17,6 +18,47 @@ export class Student {
     get displayName() {
         const lastInitial = this.lastName ? ` ${this.lastName[0].toUpperCase()}.` : "";
         return `${this.firstName}${lastInitial}`;
+    }
+
+    initializeMockData(test) {
+        if (!this.firstName?.includes("Dummy")) return;
+
+        const parts = test.parts;
+        const isFinished = this.firstName.includes("Dummy0");
+
+        if (isFinished) {
+            this.currentPartIndex = parts.length - 1;
+            this.currentQuestionIndex =
+                parts[this.currentPartIndex].questions.length - 1;
+        } else {
+            this.currentPartIndex = Math.floor(Math.random() * parts.length);
+            const currentPart = parts[this.currentPartIndex];
+            this.currentQuestionIndex = Math.floor(
+                Math.random() * currentPart.questions.length,
+            );
+        }
+
+        for (let p = 0; p <= this.currentPartIndex; p++) {
+            const part = parts[p];
+            const limit =
+                isFinished || p < this.currentPartIndex
+                    ? part.questions.length
+                    : this.currentQuestionIndex;
+
+            for (let q = 0; q < limit; q++) {
+                this.addResult(p, Math.random() > 0.5);
+            }
+        }
+
+        if (isFinished) {
+            this.progress = 100;
+        } else {
+            this.progress = calculateStudentProgress(
+                test,
+                this.currentPartIndex,
+                this.currentQuestionIndex - 1,
+            );
+        }
     }
 
     addResult(partIndex, isCorrect) {

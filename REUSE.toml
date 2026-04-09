@@ -26,6 +26,7 @@ path = [
     "file-data/**",
     "instructions/**",
     "js_coverage/**",
+    "playwright/**",
 ]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2025 Magenta ApS <info@magenta.dk>"
