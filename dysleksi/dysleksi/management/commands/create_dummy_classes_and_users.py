@@ -108,6 +108,25 @@ class Command(BaseCommand):
             student3.set_password("elev")
             student3.groups.add(student_group)
 
+        # create some more students for group-test-testing
+        group_test_students = []
+        for student_id in range(4):
+
+            group_test_student, created = Student.objects.update_or_create(
+                username=f"elev{student_id}",
+                defaults={
+                    "is_staff": False,
+                    "is_superuser": False,
+                    "first_name": f"Dummy{student_id}",
+                    "last_name": f"Student{student_id}",
+                    "cpr": f"011111112{student_id}",
+                },
+            )
+            if created:
+                group_test_student.set_password(f"elev{student_id}")
+                group_test_student.groups.add(student_group)
+            group_test_students.append(group_test_student)
+
         school_year_start = (
             date.today().year if date.today().month < 7 else date.today().year - 1
         )
@@ -134,3 +153,9 @@ class Command(BaseCommand):
             school_year_start=school_year_start, name="0.C"
         )
         student3.save()
+
+        for group_test_student in group_test_students:
+            group_test_student.klasse = Class.objects.get(
+                school_year_start=school_year_start, name="0.C"
+            )
+            group_test_student.save()

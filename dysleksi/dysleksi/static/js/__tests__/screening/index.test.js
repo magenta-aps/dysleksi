@@ -9,7 +9,7 @@ import * as individual_student from "../../screening/individual/student.js";
 import * as group_teacher from "../../screening/group/teacher.js";
 import * as group_student from "../../screening/group/student.js";
 import { start } from "../../screening";
-import { Test } from "../../screening/model.js";
+import { Test, Student } from "../../screening/model.js";
 
 describe("Startup teacher test", () => {
     let socket;
@@ -18,6 +18,7 @@ describe("Startup teacher test", () => {
     let initIndividualStudent;
     let initGroupTeacher;
     let initGroupStudent;
+    let initMockDataSpy;
 
     beforeEach(() => {
         socket = {
@@ -39,6 +40,7 @@ describe("Startup teacher test", () => {
             .spyOn(group_student, "initStudent")
             .mockImplementation(() => {});
         vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
+        initMockDataSpy = vi.spyOn(Student.prototype, "initializeMockData");
     });
 
     afterEach(() => {
@@ -46,6 +48,7 @@ describe("Startup teacher test", () => {
         initIndividualStudent.mockReset();
         initGroupTeacher.mockReset();
         initGroupStudent.mockReset();
+        initMockDataSpy.mockRestore();
     });
 
     it("invalid test", async () => {
@@ -149,6 +152,8 @@ describe("Startup teacher test", () => {
             <div class="container" 
                 data-test-type="individual" 
                 data-role="student" 
+                data-student-first-name="Jack"
+                data-student-last-name="Wilshere"
                 data-room-name="room_1" 
                 data-assignment-id="1"
             >
@@ -177,6 +182,8 @@ describe("Startup teacher test", () => {
             <div class="container" 
                 data-test-type="group" 
                 data-role="student" 
+                data-student-first-name="Jack"
+                data-student-last-name="Wilshere"
                 data-room-name="room_1" 
                 data-assignment-id="1"
             >
@@ -200,6 +207,72 @@ describe("Startup teacher test", () => {
         expect(initIndividualStudent).not.toHaveBeenCalled();
         expect(initGroupTeacher).not.toHaveBeenCalled();
         expect(initGroupStudent).toHaveBeenCalled();
+    });
+
+    it("group dummy student test", async () => {
+        document.body.innerHTML = `
+            <div class="container" 
+                data-test-type="group" 
+                data-role="student" 
+                data-student-first-name="Dummy1"
+                data-student-last-name="Student"
+                data-room-name="room_1" 
+                data-assignment-id="1"
+            >
+                <script type="application/json" id="test_contents">
+                ${JSON.stringify(groupTestData)}
+                </script>
+                <h1 id="instructions-text"></h1>
+                <audio id="instructions-sound"></audio>
+                <button class="btn btn-primary" id="start-practice"></button>
+                <button class="btn btn-primary" id="start-questions"></button>
+                <button class="btn btn-primary" id="end-summary">Ok</button>
+                <h1 id="question-title"></h1>
+                <div id="question-challenge"></div>
+                <div id="choices"></div>
+                <button id="next" class="btn next-btn" style="display: none;"></button>
+            </div>
+        `;
+        await start();
+
+        expect(initIndividualTeacher).not.toHaveBeenCalled();
+        expect(initIndividualStudent).not.toHaveBeenCalled();
+        expect(initGroupTeacher).not.toHaveBeenCalled();
+        expect(initGroupStudent).toHaveBeenCalled();
+        expect(initMockDataSpy).toHaveBeenCalled();
+    });
+
+    it("group dummy0 student test", async () => {
+        document.body.innerHTML = `
+            <div class="container" 
+                data-test-type="group" 
+                data-role="student" 
+                data-student-first-name="Dummy0"
+                data-student-last-name="Student"
+                data-room-name="room_1" 
+                data-assignment-id="1"
+            >
+                <script type="application/json" id="test_contents">
+                ${JSON.stringify(groupTestData)}
+                </script>
+                <h1 id="instructions-text"></h1>
+                <audio id="instructions-sound"></audio>
+                <button class="btn btn-primary" id="start-practice"></button>
+                <button class="btn btn-primary" id="start-questions"></button>
+                <button class="btn btn-primary" id="end-summary">Ok</button>
+                <h1 id="question-title"></h1>
+                <div id="question-challenge"></div>
+                <div id="choices"></div>
+                <button id="next" class="btn next-btn" style="display: none;"></button>
+            </div>
+        `;
+        await start();
+
+        expect(initIndividualTeacher).not.toHaveBeenCalled();
+        expect(initIndividualStudent).not.toHaveBeenCalled();
+        expect(initGroupTeacher).not.toHaveBeenCalled();
+        expect(initGroupStudent).toHaveBeenCalled();
+        expect(initMockDataSpy).toHaveBeenCalled();
     });
 
     it("should handle missing test_contents element by setting it to null", async () => {

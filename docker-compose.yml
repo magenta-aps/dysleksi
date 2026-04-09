@@ -174,12 +174,75 @@ services:
     ]
     networks:
       - default
+
+  lobby-bots:
+    image: mcr.microsoft.com/playwright:v1.42.1-jammy
+    container_name: lobby-bots
+    volumes:
+      - ./playwright/lobby_mock.js:/app/lobby_mock.js:ro
+      - lobby-bots-modules:/app/node_modules
+    working_dir: /app
+    links:
+      - traefik:dysleksi-web
+    command: >
+      sh -c "
+        npm install playwright@1.42.1 &&
+        echo 'Waiting for dysleksi-web to be healthy (no 502)...' &&
+        until curl -k -s -f https://dysleksi-web/login?next=/ > /dev/null; do
+          sleep 2
+        done &&
+        echo 'dysleksi-web is healthy! Starting bots...' &&
+        node lobby_mock.js
+      "
+    networks:
+      - default
+
+  dysleksi-media-web:
+    container_name: dysleksi-media-web
+    image: halverneus/static-file-server:latest
+    environment:
+      - URL_PREFIX=/media
+    volumes:
+      - ./file-data:/web:ro
+      - ../dysleksi-binaries/real-data:/upload/resources
+      - ../dysleksi-binaries/dummy-data:/upload/resources/dummy
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dysleksi-media.rule=Host(`dysleksi-web`) && PathPrefix(`/media`)"
+      - "traefik.http.routers.dysleksi-media.entrypoints=websecure"
+      - "traefik.http.routers.dysleksi-media.tls=true"
+      - "traefik.http.routers.dysleksi-media.priority=20"
+      - "traefik.http.services.dysleksi-media.loadbalancer.server.port=8080"
+    restart: unless-stopped
+
+  dysleksi-static-web:
+    container_name: dysleksi-static-web
+    image: halverneus/static-file-server:latest
+    environment:
+      - URL_PREFIX=/static
+    volumes:
+      - staticfiles-data:/web:ro
+    networks:
+      - default
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.dysleksi-static.rule=Host(`dysleksi-web`) && PathPrefix(`/static`)"
+      - "traefik.http.routers.dysleksi-static.entrypoints=websecure"
+      - "traefik.http.routers.dysleksi-static.tls=true"
+      - "traefik.http.routers.dysleksi-static.priority=25"
+      - "traefik.http.services.dysleksi-static.loadbalancer.server.port=8080"
+    restart: unless-stopped
+
+
 volumes:
   postgres-data:
   file-data:
   idp-data:
   staticfiles-data:
   vitest-coverage:
+  lobby-bots-modules:
 
 networks:
   default:
