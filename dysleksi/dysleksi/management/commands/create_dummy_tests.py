@@ -26,17 +26,19 @@ def copy_dummy_files():
 def create_group_test(
     grade: Literal[1, 2, 3],
     period: Literal["midt", "slut"],
+    real=False,
 ):
 
     name = f"{period} {grade}. klasse".capitalize()
+
+    if not real:
+        name += " (dummy)"
 
     if grade >= 2:
 
         test, created = Test.objects.get_or_create(name=name, test_type=TestType.GROUP)
 
-        # A wordreading 2 test with practice run
-
-        if settings.LOAD_REAL_WORDREADING_DATA:  # type:ignore
+        if real:
             wordreading_data_path = (
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/wordreading_2/wordreading_2.json",
@@ -49,7 +51,7 @@ def create_group_test(
             )
             wordreading_test_name = "Ordlæsning 2A (dummy)"
 
-        if settings.LOAD_REAL_WORDSPELLING_DATA:  # type:ignore
+        if real:
             wordspelling_data_path = (
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/wordspelling/wordspelling.json",
@@ -88,19 +90,41 @@ def create_group_test(
         )
 
 
-def create_individual_test():
+def create_individual_test(real=False):
 
     test_name = "Individuel test"
+    if not real:
+        test_name += " (dummy)"
     test, created = Test.objects.get_or_create(
         name=test_name, test_type=TestType.INDIVIDUAL
     )
+
+    if real:
+        letter_pronunciation_data_path = (
+            Path(settings.INSTRUCTIONS_ROOT)
+            / "real/letter_pronunciation/letter_pronunciation.json"
+        )
+        word_pronunciation_data_path = None
+        nonsense_word_pronunciation_data_path = None
+    else:
+        letter_pronunciation_data_path = (
+            Path(settings.INSTRUCTIONS_ROOT)
+            / "dummy/letter_pronunciation/letter_pronunciation.json"
+        )
+        word_pronunciation_data_path = (
+            Path(settings.INSTRUCTIONS_ROOT)
+            / "dummy/word_pronunciation/word_pronunciation.json",
+        )
+        nonsense_word_pronunciation_data_path = (
+            Path(settings.INSTRUCTIONS_ROOT)
+            / "dummy/nonsense_word_pronunciation/nonsense_word_pronunciation.json"
+        )
 
     call_command(
         "import_test",
         test_name,
         "Bogstavbenævnelse (dummy)",
-        Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
-        / "dummy/letter_pronunciation/letter_pronunciation.json",
+        letter_pronunciation_data_path,
         "pronunciation",
         practice_json_path=(
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
@@ -108,23 +132,23 @@ def create_individual_test():
         ),
     )
 
-    call_command(
-        "import_test",
-        test_name,
-        "Højtlæsning af ord (dummy)",
-        Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
-        / "dummy/word_pronunciation/word_pronunciation.json",
-        "pronunciation",
-    )
+    if word_pronunciation_data_path:
+        call_command(
+            "import_test",
+            test_name,
+            "Højtlæsning af ord (dummy)",
+            word_pronunciation_data_path,
+            "pronunciation",
+        )
 
-    call_command(
-        "import_test",
-        test_name,
-        "Højtlæsning af nonsensord (dummy)",
-        Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
-        / "dummy/nonsense_word_pronunciation/nonsense_word_pronunciation.json",
-        "pronunciation",
-    )
+    if nonsense_word_pronunciation_data_path:
+        call_command(
+            "import_test",
+            test_name,
+            "Højtlæsning af nonsensord (dummy)",
+            nonsense_word_pronunciation_data_path,
+            "pronunciation",
+        )
 
 
 class Command(BaseCommand):
@@ -134,6 +158,8 @@ class Command(BaseCommand):
         copy_dummy_files()
         for grade in (1, 2, 3):
             for period in ("midt", "slut"):
-                create_group_test(grade, period)
+                create_group_test(grade, period, real=False)
+                create_group_test(grade, period, real=True)
 
-        create_individual_test()
+        create_individual_test(real=False)
+        create_individual_test(real=True)
