@@ -43,13 +43,20 @@ def create_group_test(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/wordreading_2/wordreading_2.json",
             )
+            wordreading_1_data_path = None
             wordreading_test_name = "Ordlæsning 2A"
+            wordreading_1_test_name = "Ordlæsning 1"
         else:
             wordreading_data_path = (
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "dummy/wordreading_2/wordreading_2a.json",
             )
+            wordreading_1_data_path = (
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "dummy/wordreading_1/wordreading_1.json",
+            )
             wordreading_test_name = "Ordlæsning 2A (dummy)"
+            wordreading_1_test_name = "Ordlæsning 1 (dummy)"
 
         if real:
             wordspelling_data_path = (
@@ -88,6 +95,15 @@ def create_group_test(
                 / "real/wordspelling/wordspelling_practice.json"
             ),
         )
+
+        if wordreading_1_data_path:
+            call_command(
+                "import_test",
+                name,
+                wordreading_1_test_name,
+                wordreading_1_data_path,
+                "wordreading_1",
+            )
 
 
 def create_individual_test(real=False):

@@ -637,9 +637,11 @@ export class GroupTestDomElements extends TestDomElements {
             const image = document.createElement("img");
             image.src = imageUrl;
             btn.append(image);
+            btn.className = "btn btn-outline-primary square-btn";
+        } else {
+            btn.className = "btn btn-outline-primary";
         }
-        // TODO: render sound and image
-        btn.className = "btn btn-outline-primary";
+        // TODO: render sound
         btn.id = answer.buttonId;
         this.choicesEl.append(btn);
         if (listener) {

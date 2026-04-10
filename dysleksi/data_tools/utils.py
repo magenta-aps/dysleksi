@@ -32,6 +32,33 @@ def create_wordreading_2_test(
     test.parts.add(part)
 
 
+def create_wordreading_1_test(
+    test, questions_data, practice_questions_data=None, name="Ordlæsning 1"
+):
+
+    # TODO: Add this sound to dysleksi-binaries when we receive it
+    reminder, created = TestResource.objects.get_or_create(
+        name="resources/wordreading_1/Deltests/5e.2.wav",
+        sound="resources/wordreading_1/Deltests/5e.2.wav",
+    )
+
+    part, created = TestPart.objects.get_or_create(
+        name=name,
+        defaults={
+            "timeout": 360000,  # 360 seconds / 6 minutes
+            "partial_score_after": 120000,  # 120 seconds / 2 minutes
+            "image_url": "/static/images/wordreading_1.png",
+            "reminder": 15000,  # 15 seconds
+            "reminder_source": reminder,
+        },
+    )
+    if created:
+        part.create_test_resources(questions_data, False)
+        if practice_questions_data:
+            part.create_test_resources(practice_questions_data, True)
+    test.parts.add(part)
+
+
 def create_wordspelling_test(
     test, questions_data, practice_questions_data=None, name="Ordstavning"
 ):

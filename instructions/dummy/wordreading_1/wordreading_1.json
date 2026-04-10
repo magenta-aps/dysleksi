@@ -1,0 +1,32 @@
+[
+    {
+        "text": "Hund",
+        "question_type": "multiple_choice",
+        "correct": "resources/dummy/wordreading_1/Opgave/dog.png",
+        "wrong": [
+            "resources/dummy/wordreading_1/Opgave/house.png",
+            "resources/dummy/wordreading_1/Opgave/car.png",
+            "resources/dummy/wordreading_1/Opgave/cat.png"
+        ]
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "Cykel",
+        "correct": "resources/dummy/wordreading_1/Opgave/bike.png",
+        "wrong": [
+            "resources/dummy/wordreading_1/Opgave/house.png",
+            "resources/dummy/wordreading_1/Opgave/car.png",
+            "resources/dummy/wordreading_1/Opgave/cat.png"
+        ]
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "Kat",
+        "correct": "resources/dummy/wordreading_1/Opgave/cat.png",
+        "wrong": [
+            "resources/dummy/wordreading_1/Opgave/house.png",
+            "resources/dummy/wordreading_1/Opgave/car.png",
+            "resources/dummy/wordreading_1/Opgave/dog.png"
+        ]
+    }
+]

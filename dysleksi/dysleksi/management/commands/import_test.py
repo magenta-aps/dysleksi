@@ -8,6 +8,7 @@ from pathlib import Path
 
 from data_tools.utils import (
     create_pronunciation_test,
+    create_wordreading_1_test,
     create_wordreading_2_test,
     create_wordspelling_test,
 )
@@ -106,6 +107,10 @@ class Command(BaseCommand):
         test = Test.objects.get(name=name)
         if test_type == "wordreading_2":
             create_wordreading_2_test(
+                test, questions_data, practice_data, name=testpart_name
+            )
+        elif test_type == "wordreading_1":
+            create_wordreading_1_test(
                 test, questions_data, practice_data, name=testpart_name
             )
         elif test_type == "wordspelling":
