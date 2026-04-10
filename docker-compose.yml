@@ -54,6 +54,13 @@ services:
       - "traefik.http.routers.dysleksi.entrypoints=websecure"
       - "traefik.http.routers.dysleksi.tls=true"
       - "traefik.http.routers.dysleksi.priority=1"
+      # Do not serve static/js and .scss files through the static-fileserver.
+      # This allows for on-the-fly reloading
+      - "traefik.http.routers.dysleksi-dev-assets.rule=Host(`dysleksi-web`) && (PathPrefix(`/static/js`) || Path(`/static/theme.scss`) || Path(`/static/theme-admin.scss`))"
+      - "traefik.http.routers.dysleksi-js.entrypoints=websecure"
+      - "traefik.http.routers.dysleksi-js.tls=true"
+      - "traefik.http.routers.dysleksi-js.priority=30" 
+      - "traefik.http.routers.dysleksi-js.service=dysleksi"
       - "traefik.http.services.dysleksi.loadbalancer.server.port=8000"
       - "traefik.http.services.dysleksi.loadbalancer.server.scheme=http"
     environment:
