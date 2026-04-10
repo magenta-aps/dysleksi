@@ -67,8 +67,6 @@ services:
       - DUMMY_DATA_DIR=/upload/dev-data/dummy-data
       - REAL_DATA_DIR=/upload/dev-data/real-data
       - ECHO_INTERFACE=https://dysleksi-web
-      - LOAD_REAL_WORDREADING_DATA=false
-      - LOAD_REAL_WORDSPELLING_DATA=false
     networks:
       - default
       - database

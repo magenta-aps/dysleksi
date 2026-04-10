@@ -117,17 +117,6 @@ The project uses `django-channels` to synchronize events between teacher and stu
 
 Messages in the lobby and in the session-specific rooms take the form `{"event": "some.event", "id": 1234}`.
 
-## Real data (wordreading 2)
-To load some real wordreading 2 data into the system, set `LOAD_REAL_WORDREADING_DATA`
-or `LOAD_REAL_WORDSPELLING_DATA` to True in your docker-compose.override.yml file:
-
-```
-services:
-  dysleksi-web:
-    environment:
-      - LOAD_REAL_WORDREADING_DATA=true
-      - LOAD_REAL_WORDSPELLING_DATA=true
-```
 
 ## Keeping binaries up-to-date
 For the best-possible experience, it is important that the dysleksi-binaries repo is
