@@ -106,6 +106,7 @@ def create_individual_test(real=False):
         )
         word_pronunciation_data_path = None
         nonsense_word_pronunciation_data_path = None
+        letter_pronunciation_test_name = "Bogstavbenævnelse"
     else:
         letter_pronunciation_data_path = (
             Path(settings.INSTRUCTIONS_ROOT)
@@ -119,11 +120,14 @@ def create_individual_test(real=False):
             Path(settings.INSTRUCTIONS_ROOT)
             / "dummy/nonsense_word_pronunciation/nonsense_word_pronunciation.json"
         )
+        letter_pronunciation_test_name = "Bogstavbenævnelse (dummy)"
+        word_pronunciation_test_name = "Højtlæsning af ord (dummy)"
+        nonsense_word_pronunciation_test_name = "Højtlæsning af nonsensord (dummy)"
 
     call_command(
         "import_test",
         test_name,
-        "Bogstavbenævnelse (dummy)",
+        letter_pronunciation_test_name,
         letter_pronunciation_data_path,
         "pronunciation",
         practice_json_path=(
@@ -136,7 +140,7 @@ def create_individual_test(real=False):
         call_command(
             "import_test",
             test_name,
-            "Højtlæsning af ord (dummy)",
+            word_pronunciation_test_name,
             word_pronunciation_data_path,
             "pronunciation",
         )
@@ -145,7 +149,7 @@ def create_individual_test(real=False):
         call_command(
             "import_test",
             test_name,
-            "Højtlæsning af nonsensord (dummy)",
+            nonsense_word_pronunciation_test_name,
             nonsense_word_pronunciation_data_path,
             "pronunciation",
         )
