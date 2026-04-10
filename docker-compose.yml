@@ -176,7 +176,7 @@ services:
       - default
 
   lobby-bots:
-    image: mcr.microsoft.com/playwright:v1.42.1-jammy
+    image: mcr.microsoft.com/playwright:v1.59.1-jammy
     container_name: lobby-bots
     volumes:
       - ./playwright/lobby_mock.js:/app/lobby_mock.js:ro
@@ -186,7 +186,7 @@ services:
       - traefik:dysleksi-web
     command: >
       sh -c "
-        npm install playwright@1.42.1 &&
+        npm install playwright@1.59.1 &&
         echo 'Waiting for dysleksi-web to be healthy (no 502)...' &&
         until curl -k -s -f https://dysleksi-web/login?next=/ > /dev/null; do
           sleep 2
