@@ -284,6 +284,6 @@ export class PossibleAnswer {
         this.resourceText = data.resource_text;
         this.isCorrect = data.is_correct;
         this.textAnswer = null;
-        this.buttonId = "choice-" + this.resourceText;
+        this.buttonId = "choice-" + this.resourceName;
     }
 }

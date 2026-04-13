@@ -2,6 +2,8 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 import logging
+import mimetypes
+import os
 import re
 from base64 import b64decode
 from datetime import date
@@ -507,9 +509,19 @@ class TestPart(models.Model):
 
             # Correct answer
             if data.get("correct"):
+                correct_answer = data["correct"]
+                test_resource_kwargs = {}
+
+                mime_type, _ = mimetypes.guess_type(correct_answer)
+                if mime_type and mime_type.startswith("image"):
+
+                    test_resource_kwargs["name"] = os.path.basename(correct_answer)
+                    test_resource_kwargs["image"] = correct_answer
+                else:
+                    test_resource_kwargs["name"] = correct_answer
+                    test_resource_kwargs["text"] = correct_answer
                 correct_resource, created = TestResource.objects.get_or_create(
-                    name=data["correct"],
-                    text=data["correct"],
+                    **test_resource_kwargs
                 )
 
                 PossibleAnswer.objects.get_or_create(
@@ -520,10 +532,20 @@ class TestPart(models.Model):
 
             # Wrong answers
             if data.get("wrong"):
-                for wrong_text in data["wrong"]:
+                for wrong_answer in data["wrong"]:
+
+                    test_resource_kwargs = {}
+
+                    mime_type, _ = mimetypes.guess_type(wrong_answer)
+                    if mime_type and mime_type.startswith("image"):
+                        test_resource_kwargs["name"] = os.path.basename(wrong_answer)
+                        test_resource_kwargs["image"] = wrong_answer
+                    else:
+                        test_resource_kwargs["name"] = wrong_answer
+                        test_resource_kwargs["text"] = wrong_answer
+
                     wrong_resource, created = TestResource.objects.get_or_create(
-                        name=wrong_text,
-                        text=wrong_text,
+                        **test_resource_kwargs
                     )
 
                     PossibleAnswer.objects.get_or_create(
