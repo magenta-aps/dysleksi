@@ -3,6 +3,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import * as groupTestData from "./grouptest.json" with { type: "json" };
+import * as letterSoundTestData from "./letter_sound_test.json" with { type: "json" };
 import { getWebSocket } from "../../ws";
 import { GroupTestDomElements } from "../../screening/dom.js";
 import { Test } from "../../screening/model.js";
@@ -118,6 +119,8 @@ describe("GroupTestFlow", () => {
     afterEach(() => {
         // Restore WebSocket
         global.WebSocket = originalWebSocket;
+        document.body.innerHTML = "";
+        vi.clearAllMocks();
     });
 
     it("Test Structure loads", () => {
@@ -1356,6 +1359,7 @@ describe("Timer and Reminder Cleanup", () => {
     afterEach(() => {
         vi.clearAllMocks();
         vi.useRealTimers();
+        document.body.innerHTML = "";
     });
 
     it("should clear both timers when onQuestionComplete is called", () => {
@@ -1565,6 +1569,7 @@ describe("GroupTestDomElements - FreeText Touch Interaction", () => {
         vi.restoreAllMocks();
         // Clean up DOM to prevent memory leaks or ID collisions
         document.body.innerHTML = "";
+        vi.clearAllMocks();
     });
 
     it("touchstart on display field calculates cursor index and sets focus", () => {
@@ -1600,5 +1605,129 @@ describe("GroupTestDomElements - FreeText Touch Interaction", () => {
         displayField.dispatchEvent(touchEvent);
 
         expect(getCursorIndexSpy).toHaveBeenCalledWith(displayField, 50); // 100 - 50 - 0
+    });
+});
+
+describe("LetterSoundTest", () => {
+    let originalWebSocket;
+    let mockSend;
+    let mockAudioContext;
+    let domElements;
+    let ws;
+    let student;
+
+    beforeEach(() => {
+        // Mock window.location correctly
+        global.window = {
+            location: { protocol: "https:", host: "example.com" },
+        };
+        global.document.timeline = {
+            currentTime: 0,
+        };
+        global.alert = vi.fn();
+
+        // Save original WebSocket
+        originalWebSocket = global.WebSocket;
+
+        // Mock WebSocket as a class (constructor)
+        mockSend = vi.fn();
+        global.WebSocket = class {
+            constructor(url) {
+                this.url = url;
+                this.send = mockSend;
+                this.close = vi.fn();
+                this.addEventListener = vi.fn();
+            }
+        };
+
+        document.body.innerHTML = `
+            <div id="fade-overlay"></div>
+            <h1 id="student-header" class="student-header"></h1>
+            <audio id="instructions-sound"></audio>
+            <audio id="reminder-sound"></audio>
+            <div id="summary-container"></div>
+            <button id="end-summary"></button>
+            <div id="question-challenge"></div>
+            <div id="choices"></div>
+            <button id="next"></button>
+            <button id="log-out"></button>
+            <div id="test-summary"></div>
+            <div id="test-exit"></div>
+            <div id="testpart-intro"></div>
+            <div id="test-intro"></div>
+            <div id="test-container"></div>
+            <button id="start-testpart"></button>
+            <button id="start-summary"></button>
+            <h2 id="testpart-intro-text"> </h2>
+            <img src="/foo" alt="img" id="testpart-intro-image">
+        `;
+
+        domElements = new GroupTestDomElements();
+
+        student = new Student({
+            id: 123,
+            firstName: "Test",
+            lastName: "Student",
+        });
+
+        spyAttributes(global.domElements);
+        vi.spyOn(global.student, "progress", "set");
+
+        ws = getWebSocket("class_123");
+
+        mockAudioContext = {
+            decodeAudioData: vi.fn().mockResolvedValue({}), // returns a dummy AudioBuffer
+            createBufferSource: vi.fn().mockReturnValue({
+                connect: vi.fn(),
+                start: vi.fn(),
+                onended: null,
+                buffer: null,
+            }),
+            destination: {},
+        };
+
+        // 2. Return this mock instead of an empty object
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(mockAudioContext);
+
+        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
+    });
+
+    afterEach(() => {
+        // Restore WebSocket
+        global.WebSocket = originalWebSocket;
+        document.body.innerHTML = "";
+        vi.clearAllMocks();
+    });
+
+    it("Increases font size on answerButton objects", async () => {
+        const test = new Test(letterSoundTestData);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
+        view.setPart(0);
+        view.showFirstQuestion(false);
+
+        const answerButtonObj = view.answerButtons[0];
+        expect(answerButtonObj.button.style.fontSize).toBe("72px");
+    });
+
+    it("Plays sound when button is clicked", async () => {
+        const test = new Test(letterSoundTestData);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
+        view.setPart(0);
+        view.showFirstQuestion(false);
+
+        const playBtn = document.getElementById("challenge-sound-btn");
+
+        playBtn.click();
+
+        await vi.waitFor(() => {
+            expect(mockAudioContext.createBufferSource).toHaveBeenCalled();
+        });
+
+        const mockSource = mockAudioContext.createBufferSource.mock.results[0].value;
+        mockSource.onended();
+
+        await vi.waitFor(() => {
+            expect(playBtn.classList.contains("playing")).toBe(false);
+        });
     });
 });

@@ -2,7 +2,11 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
-from data_tools.utils import create_wordreading_1_test, create_wordspelling_test
+from data_tools.utils import (
+    create_letter_sound_test,
+    create_wordreading_1_test,
+    create_wordspelling_test,
+)
 from django.test import TestCase
 
 from dysleksi.models import Test, TestResource
@@ -45,6 +49,15 @@ class UtilTest(TestCase):
             }
         ]
 
+        self.letter_sound_data = [
+            {
+                "sound": "resources/dummy/letter_sound/Opgave/a.mp3",
+                "question_type": "multiple_choice",
+                "correct": "a",
+                "wrong": ["b", "x", "d"],
+            },
+        ]
+
         self.test = Test.objects.create(name="test test")
 
     def test_create_wordspelling_test(self):
@@ -61,3 +74,12 @@ class UtilTest(TestCase):
             self.test, self.wordreading_1_data, self.wordreading_1_pratice_data
         )
         self.assertTrue(TestResource.objects.filter(text="Cykel").exists())
+
+    def test_create_letter_sound_test(self):
+        create_letter_sound_test(self.test, self.letter_sound_data)
+
+        self.assertTrue(
+            TestResource.objects.filter(
+                sound="resources/dummy/letter_sound/Opgave/a.mp3"
+            ).exists()
+        )

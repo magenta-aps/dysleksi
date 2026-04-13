@@ -470,7 +470,9 @@ class TestDomElements {
                 letterBtns.forEach((b) => (b.disabled = false));
 
                 const displayField = document.querySelector(".display-field");
-                displayField.disabled = false;
+                if (displayField) {
+                    displayField.disabled = false;
+                }
             };
         }
 
@@ -632,11 +634,19 @@ export class GroupTestDomElements extends TestDomElements {
         const btn = document.createElement("button");
         if (text) {
             btn.textContent = text;
+
+            if (text.length === 1) {
+                btn.style.fontSize = "72px";
+            } else {
+                btn.style.fontSize = "32px";
+            }
         }
         if (imageUrl) {
             const image = document.createElement("img");
             image.src = imageUrl;
             btn.append(image);
+            btn.className = "btn btn-outline-primary square-btn";
+        } else if (text.length === 1) {
             btn.className = "btn btn-outline-primary square-btn";
         } else {
             btn.className = "btn btn-outline-primary";
