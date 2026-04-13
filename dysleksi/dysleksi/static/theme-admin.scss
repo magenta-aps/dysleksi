@@ -1,49 +1,78 @@
-// "Design names"
-$black: #000000;
-$white: #ffffff;
-$other-grey-lightest: #f9f9f9;
-$other-grey-light: #efefef;
-$other-grey-light2: #d9d9d9;
-$other-grey-light3: #e6ebef;
-$other-grey-medium: #bbbbbb;
-$other-grey: #888888;
-$other-grey-dark: #545257;
-$other-grey-dark2: #cccccc;
-$other-red-light: #ffe0de;
-$other-red: #bd0900;
-$other-red-dark: #970700;
-$other-green-light: #d1ffd8;
-$other-green: #006a11;
-$other-blue-lightest: #e9f5fb;
-$other-blue-light: #cde7f5;
-$other-blue: #f2f9ff;
-$other-blue2: #87b8e3;
-$other-blue-dark: #9ec4dc;
-$other-blue-darkest: #34495e;
+// Design color palette
+$black: black;
+$white: white;
+$mono-white: #f7f9fb;
+$mono-gray-lightest: #e6ebef;
+$mono-gray-lighter: #d1dbe5;
+$mono-gray-light: #aab8c7;
+$mono-gray-normal: #91a2b2;
+$mono-gray-dark-1: #6b7c93;
+$mono-gray-dark-2: #586980;
+$mono-gray-dark-3: #34495e;
+$mono-gray-darker: #2d3a4d;
+$mono-gray-darkest: #1b2631;
+$blue-lightest: #d9e8f0;
+$blue-lighter-2: #cde7f5;
+$blue-lighter-1: #8eb5cd;
+$blue-light: #538eb4;
+$blue-normal: #2c739b;
+$blue-dark: #005a84;
+$blue-darker: #004769;
+$blue-darkest: #002c41;
+$green-lightest: #d3ffda;
+$green-lighter: #86e696;
+$green-light: #00cc22;
+$green-normal: #00a91b;
+$green-darker: #007112;
+$green-darkest: #00500d;
+$red-lightest: #ffd5d6;
+$red-lighter: #ef9194;
+$red-normal: #b31217;
+$red-darker: #7a0600;
+$red-darkest: #5f0400;
+$yellow-lightest: #fff8da;
+$yellow-lighter: #f6e59a;
+$yellow-normal: #e6c120;
+$yellow-darker: #9c7f00;
+$yellow-darkest: #675400;
+$orange-lightest: #ffeed8;
+$orange-lighter: #f6ce9a;
+$orange-normal: #e69020;
+$orange-darker: #985600;
+$orange-darkest: #643800;
+$bright-blue-lightest: #d6ecff;
+$bright-blue-lighter: #88bdeb;
+$bright-blue-normal: #007eeb;
+$bright-blue-darker: #005096;
+$bright-blue-darkest: #002c53;
+$bright-red-normal: #ff5459;
 
-$correct: #27c840;
-$wrong: #ff5f57;
-$missing: #5b5955;
-$current: #0088ff;
+// Map colors to answer categories
+$correct: $green-light;
+$wrong: $bright-red-normal;
+$missing: $mono-gray-dark-2;
+$current: $bright-blue-normal;
 
 // Define our own constants
 $sidebar-navigation-min-width: 15rem;
 $sidebar-navigation-med-width: 10vw;
 $sidebar-navigation-max-width: 20vw;
 
-// Map "design names" to known Bootstrap variables
-$primary: $other-green;
-$secondary: $other-grey-medium;
-$warning: $other-red-light;
-$danger: $other-red;
-$btn-color: $white;
-$body-bg: $other-grey-lightest;
-$list-group-disabled-color: $other-grey-medium;
+// Map design colors to Bootstrap variables
+$primary: $blue-dark;
+$secondary: $mono-gray-normal;
+$warning: $red-lightest;
+$danger: $red-normal;
+$btn-color: $mono-white;
+$body-bg: $mono-white;
+$input-bg: $white;
+$modal-content-bg: $white;
+$list-group-disabled-color: $mono-gray-light;
 
 // Reset other relevant Bootstrap variables
 $offcanvas-horizontal-width: $sidebar-navigation-max-width;
-$offcanvas-bg-color: $other-grey-light;
-$offcanvas-backdrop-bg: $other-grey-medium;
+$offcanvas-bg-color: $mono-gray-darker;
+$offcanvas-backdrop-bg: $mono-gray-light;
 $offcanvas-border-width: none;
 $offcanvas-padding-x: 0;
 $offcanvas-padding-y: 0;
@@ -51,12 +80,13 @@ $btn-border-radius: 5rem;
 $btn-disabled-opacity: 0.35;
 $breadcrumb-margin-bottom: 0;
 $breadcrumb-divider: '/';
-$form-check-input-indeterminate-border-color: $other-grey-medium;
-$form-check-input-checked-border-color: $black;
-$form-check-input-checked-color: $black;
+$form-check-input-indeterminate-border-color: $mono-gray-light;
+$form-check-input-checked-border-color: $blue-normal;
+$form-check-input-checked-color: $blue-normal;
+$form-check-input-checked-bg-color: transparent;
 $form-select-border-radius: 1rem;
-$card-cap-bg: $other-grey-light2;
-$card-bg: $white;
+$card-cap-bg: $mono-gray-lighter;
+$card-bg: $mono-white;
 $card-border-width: 0px;
 
 @import "./vendor/scss/bootstrap";
@@ -95,7 +125,6 @@ i {
   display: flex;
   flex-flow: row nowrap;
 
-
   // Primary navigation: links to each subsection of site
   .navigation {
     display: flex;
@@ -104,11 +133,10 @@ i {
     overflow: clip;
     width: $sidebar-navigation-max-width;
     height: 100vh;
-    background: $other-grey-dark !important;
-
+    background: $offcanvas-bg-color !important;
 
     .offcanvas-header button {
-      color: $white;
+      color: $mono-white;
     }
 
     .offcanvas-body {
@@ -131,15 +159,15 @@ i {
       flex-direction: row;
       align-items: center;
       padding: 0.5 * $spacer;
-      color: $white;
+      color: $mono-white;
 
       &.active {
-        background: $other-grey-medium;
+        background: $mono-gray-dark-2;
         border-radius: $spacer;
-        color: $black;
+        color: $mono-white;
       }
 
-      i.ph-fill {
+      i.ph, i.ph-fill {
         margin-right: 0.25 * $spacer;
       }
     }
@@ -148,7 +176,7 @@ i {
       text-align: center;
       color: $white;
       padding: $spacer;
-      border-top: 1px solid $other-grey;
+      border-top: 1px solid $mono-gray-dark-1;
     }
     .version {
       color: $gray-400;
@@ -171,7 +199,7 @@ i {
       justify-items: center;
       background: $white;
       padding: 0.5 * $spacer $spacer;
-      box-shadow: 0 0.25 * $spacer $spacer $other-grey-light;
+      box-shadow: 0 0.25 * $spacer $spacer $mono-gray-lightest;
 
       .breadcrumb-item a {
         color: $black;
@@ -229,7 +257,7 @@ i {
       height: (1.5 * $spacer) + (2 * $btn-padding-y) + 0.2 * $spacer;
       align-items: center;
       color: $white;
-      background: $other-grey-dark;
+      background: $mono-gray-dark-2;
       border-radius: 0;
     }
 
@@ -245,7 +273,7 @@ i {
       min-width: $sidebar-navigation-min-width;
 
       .offcanvas-header {
-        border-bottom: 1px solid $other-grey;
+        border-bottom: 1px solid $mono-gray-dark-2;
       }
 
       .offcanvas-header button {
@@ -257,15 +285,18 @@ i {
 
 // Button styles
 .btn-warning {
-  color: $other-red;
-  border-color: $other-red;
+  color: $yellow-darkest;
+  border-color: $yellow-normal;
 }
+.btn-outline-secondary,
 .btn-secondary-outline {
-  color: $black;
-  border-color: $other-grey-medium;
+  color: $blue-darkest;
+  border-color: $blue-normal;
 }
+.btn-outline-secondary:hover,
 .btn-secondary-outline:hover {
-  border: 1px solid $other-grey;
+  border: 1px solid $blue-normal;
+  background: $blue-lightest;
 }
 .btn i.ph,
 .btn i.ph-fill {
@@ -274,10 +305,10 @@ i {
 
 // Card styles
 .card {
-  box-shadow: 0 0 $spacer $other-grey-light;
+  box-shadow: 0 0 $spacer $mono-gray-lightest;
 
   .card-header span {
-    color: $other-grey-dark;
+    color: $mono-gray-dark-2;
   }
 
   .card-header em {
@@ -304,7 +335,7 @@ textarea.form-control {
   padding: $spacer;
   background-color: $white;
   border-radius: $spacer;
-  box-shadow: 0 0 $spacer $other-grey-light;
+  box-shadow: 0 0 $spacer $mono-gray-lightest;
 }
 .table {
   tr {
@@ -326,7 +357,7 @@ textarea.form-control {
   th.orderable a::after {
     font-family: "Phosphor-Fill";
     content: "\e140"; // `caret-up-down`
-    color: $other-grey;
+    color: $mono-gray-light;
     float: right;
     vertical-align: bottom;
   }
@@ -372,7 +403,7 @@ textarea.form-control {
   padding: $spacer;
 }
 ul.modal-progress {
-  background: $other-grey-light;
+  background: $mono-white;
 
   li.list-group-item {
     display: flex;
@@ -392,26 +423,26 @@ ul.modal-progress {
     height: 2 * $spacer;
     justify-content: space-around;
     align-items: center;
-    background: $other-grey-dark;
+    background: $mono-gray-dark-1;
     color: $white;
     border-radius: 5 * $spacer;
   }
 
   li.list-group-item.disabled span {
-    background: $other-grey-medium;
+    background: $mono-gray-lighter;
     pointer-events: none;
   }
 }
 .summary {
   padding: $spacer;
   margin: $spacer 0;
-  border: 1px solid $other-grey-medium;
+  border: 1px solid $mono-gray-lighter;
   border-radius: $spacer;
 
   table {
     tr {
       border: none;
-      border-bottom: 1px solid $other-grey-medium;
+      border-bottom: 1px solid $mono-gray-lighter;
     }
 
     tr:last-of-type {
@@ -444,7 +475,6 @@ ul.modal-progress {
   }
 }
 
-
 // Teacher UI
 .current-question {
   display: flex;
@@ -452,7 +482,7 @@ ul.modal-progress {
   height: 100%;
   align-items: center;
   justify-content: space-around;
-  border: 1px solid $other-grey;
+  border: 1px solid $mono-gray-dark-1;
   border-radius: $spacer;
 }
 .current-question p {
@@ -465,15 +495,15 @@ ul.modal-progress {
     margin: 0;
 
     thead th {
-      background: $other-grey-light;
-      color: $other-grey-dark;
+      background: $mono-gray-lightest;
+      color: $mono-gray-dark-2;
     }
 
     tbody span.challenge {
       display: inline-block;
       margin: 0 $spacer;
       padding: 0.25 * $spacer 0.67 * $spacer;
-      border: 1px solid $other-grey-light2;
+      border: 1px solid $mono-gray-lighter;
       border-radius: 0.5 * $spacer;
       text-align: center;
       font-family: "Karinika", "Figtree Normal", sans-serif;
@@ -491,20 +521,20 @@ button.dropdown-toggle {
 
   // "Correct"
   &.btn-success {
-    background: $other-green-light;
-    color: $other-green;
+    background: $green-lightest;
+    color: $green-darker;
   }
 
   // "Wrong"
   &.btn-danger {
-    background: $other-red-light;
-    color: $other-red;
+    background: $red-lightest;
+    color: $red-normal;
   }
 
   // "Skipped
   &.btn-secondary {
-    background: $other-grey-light2;
-    color: $other-grey-dark;
+    background: $white;
+    color: $mono-gray-dark-3;
   }
 }
 
@@ -537,8 +567,8 @@ div[data-role='teacher'][data-test-type='individual'] {
         padding: 0.25 * $btn-padding-y $btn-padding-x;
 
         &#correct.active {
-          background: $other-green-light;
-          color: $other-green;
+          background: $green-lightest;
+          color: $green-darker;
         }
 
         i.ph {
@@ -562,7 +592,6 @@ div[data-role='teacher'][data-test-type='individual'] {
   }
 }
 
-
 // Teacher UI for running group tests
 .group-test-container {
   background: white;
@@ -574,7 +603,7 @@ div[data-role='teacher'][data-test-type='individual'] {
 }
 
 .group-test-header {
-  background: $other-grey-light2;
+  background: $mono-gray-lightest;
   height: 3rem;
   display: flex;
   padding: 0;
@@ -591,14 +620,14 @@ div[data-role='teacher'][data-test-type='individual'] {
 
     &:hover,
     &:focus {
-      background-color: $other-grey-dark2;
+      background-color: $mono-gray-lighter;
       color: black;
     }
 
     &.selected {
-      background-color: $other-grey-dark2;
-      color: black;
-      border-bottom: 4px solid black; // black line only on selected
+      background-color: $mono-gray-light;
+      color: $black;
+      border-bottom: 4px solid $black; // black line only on selected
     }
 
     &:last-child {
@@ -622,15 +651,17 @@ div[data-role='teacher'][data-test-type='individual'] {
   border-radius: 50%;
   display: inline-block;
   margin-right: 0;
-  background-color: $other-grey-light3;
+  background-color: $mono-gray-lightest;
 
   &.correct { background-color: $correct; }
   &.wrong   { background-color: $wrong; }
-  &.missing  { background-color: $missing; }
-  &.current  { background-color: $current; }
-  &.default  { background-color: $other-grey-light3; }
+  &.missing { background-color: $missing; }
+  &.current,
+  &.default {
+    border: 1px solid $mono-gray-light;
+    background: transparent;
+  }
 }
-
 
 .group-test-body {
   padding: 1.5rem;
@@ -641,7 +672,7 @@ div[data-role='teacher'][data-test-type='individual'] {
 
 .group-test-divider {
   height: 3px;
-  background-color: $other-grey-light2;
+  background-color: $mono-gray-lighter;
   margin: 10px 1.5rem;
 }
 
@@ -653,7 +684,7 @@ $border-radius-student-card: $spacer / 4 * 3;
 
   box-sizing: border-box;
   font-size: $spacer;
-  color: #000;
+  color: $black;
 
   display: flex;
   flex-direction: column;
@@ -669,10 +700,9 @@ $border-radius-student-card: $spacer / 4 * 3;
     }
   }
 
-
   /* Top row */
   .student-top-row {
-    background-color: $other-blue-lightest;
+    background-color: $bright-blue-lightest;
     height: 46px;
     position: relative;
     overflow: hidden;
@@ -682,7 +712,7 @@ $border-radius-student-card: $spacer / 4 * 3;
     user-select: none;
     cursor: pointer;
     font-weight: bold;
-    border: 1px solid $other-blue-dark;
+    border: 1px solid $blue-lighter-1;
     border-radius: $border-radius-student-card;
     justify-content: space-between;
   }
@@ -694,7 +724,7 @@ $border-radius-student-card: $spacer / 4 * 3;
     top: 0;
     width: 0%;
     height: 100%;
-    background-color: $other-blue-light;
+    background-color: $bright-blue-lightest;
     z-index: 0;
     transition: width 0.5s ease;
   }
@@ -717,7 +747,7 @@ $border-radius-student-card: $spacer / 4 * 3;
     z-index: 1;
     padding: $spacer;
     background-color: $white;
-    border: 1px solid $other-grey-light2;
+    border: 1px solid $mono-gray-lighter;
     border-top: none;
     border-radius: 0 0 $border-radius-student-card $border-radius-student-card;
   }
@@ -729,7 +759,7 @@ $border-radius-student-card: $spacer / 4 * 3;
     width: 100%;
     font-size: 12px;
     margin-bottom: $spacer;
-    color: $other-blue-darkest;
+    color: $blue-darker;
 
     .nav-group-left {
       display: flex;
@@ -745,7 +775,7 @@ $border-radius-student-card: $spacer / 4 * 3;
       cursor: pointer;
 
       &.disabled {
-        color: $other-grey-light3;
+        color: $mono-gray-lightest;
         cursor: default;
         pointer-events: none;
       }
@@ -761,7 +791,7 @@ $border-radius-student-card: $spacer / 4 * 3;
 
   .question-index {
     font-size: 10px;
-    color: $other-blue-darkest;
+    color: $blue-darker;
   }
 
   .parts-progress {
@@ -778,7 +808,7 @@ $border-radius-student-card: $spacer / 4 * 3;
       transition: background-color 0.3s ease;
 
       &.completed {
-        background-color: $other-blue2;
+        background-color: $blue-lighter-1;
       }
 
       &.current {
@@ -786,7 +816,7 @@ $border-radius-student-card: $spacer / 4 * 3;
       }
 
       &.future {
-        background-color: $other-grey-light3;
+        background-color: $mono-gray-lightest;
       }
     }
   }
@@ -794,7 +824,7 @@ $border-radius-student-card: $spacer / 4 * 3;
 
 .foldout-arrow {
   position: relative;
-  color: $other-grey-medium;
+  color: $mono-gray-light;
   font-size: 12px;
   display: flex;
 }

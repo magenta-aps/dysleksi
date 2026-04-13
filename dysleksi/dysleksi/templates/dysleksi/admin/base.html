@@ -23,7 +23,7 @@
             <nav class="navbar">
                 <div class="navbar-nav">
                     <a href="{% url 'dysleksi:test_assignment_list' %}" class="nav-link mb-3 {% if current_view == 'dysleksi:test_assignment_list' or current_view == 'dysleksi:room' %}active{% endif %}">
-                        <i class="ph-fill ph-notebook fs-5"></i>
+                        <i class="ph ph-notebook fs-5"></i>
                         <span>{% translate "Tests" %}</span>
                     </a>
                     <a href="{% url 'dysleksi:class_list' %}" class="nav-link mb-3 {% if current_view == 'dysleksi:class_list' %}active{% endif %}">
@@ -31,7 +31,7 @@
                         <span>{% translate "Klasser" %}</span>
                     </a>
                     <a href="{% url 'dysleksi:student_list' %}" class="nav-link mb-3 {% if current_view == 'dysleksi:student_list' %}active{% endif %}">
-                        <i class="ph-fill ph-user-rectangle fs-5"></i>
+                        <i class="ph ph-user-rectangle fs-5"></i>
                         <span>{% translate "Elever" %}</span>
                     </a>
                 </div>
