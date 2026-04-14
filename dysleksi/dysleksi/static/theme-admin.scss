@@ -41,6 +41,7 @@ $orange-normal: #e69020;
 $orange-darker: #985600;
 $orange-darkest: #643800;
 $bright-blue-lightest: #d6ecff;
+$bright-blue-lightest-2: #e9f5fb;
 $bright-blue-lighter: #88bdeb;
 $bright-blue-normal: #007eeb;
 $bright-blue-darker: #005096;
@@ -741,7 +742,7 @@ $border-radius-student-card: $spacer / 4 * 3;
 
   /* Top row */
   .student-top-row {
-    background-color: $bright-blue-lightest;
+    background-color: $bright-blue-lightest-2;
     height: 46px;
     position: relative;
     overflow: hidden;
@@ -763,7 +764,7 @@ $border-radius-student-card: $spacer / 4 * 3;
     top: 0;
     width: 0%;
     height: 100%;
-    background-color: $bright-blue-lightest;
+    background-color: $blue-lighter-2;
     z-index: 0;
     transition: width 0.5s ease;
   }
