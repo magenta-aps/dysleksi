@@ -678,12 +678,13 @@ $border-radius-student-card: $spacer / 4 * 3;
     overflow: hidden;
     display: flex;
     align-items: center;
-    padding-left: $spacer;
+    padding: 0 $spacer;
     user-select: none;
     cursor: pointer;
     font-weight: bold;
     border: 1px solid $other-blue-dark;
     border-radius: $border-radius-student-card;
+    justify-content: space-between;
   }
 
   /* Progress bar inside top row */
@@ -792,7 +793,8 @@ $border-radius-student-card: $spacer / 4 * 3;
 }
 
 .foldout-arrow {
-  position: absolute;
+  position: relative;
   color: $other-grey-medium;
   font-size: 12px;
+  display: flex;
 }
