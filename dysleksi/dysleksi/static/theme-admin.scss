@@ -94,15 +94,18 @@ $card-border-width: 0px;
 @import "./vendor/fonts/phosphor/fill/style.css";
 
 @font-face {
-  font-family: "Figtree Normal";
-  font-weight: normal;
-  src: url("./vendor/fonts/figtree/Figtree-VariableFont_wght.ttf") format("truetype");
+  font-family: "DM Sans Regular";
+  src: url("./vendor/fonts/dmsans/DMSans-Regular.ttf") format("truetype");
 }
 
 @font-face {
-  font-family: "Figtree Italic";
-  font-weight: normal;
-  src: url("./vendor/fonts/figtree/Figtree-Italic-VariableFont_wght.ttf") format("truetype");
+  font-family: "DM Sans Medium";
+  src: url("./vendor/fonts/dmsans/DMSans-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "DM Sans SemiBold";
+  src: url("./vendor/fonts/dmsans/DMSans-SemiBold.ttf") format("truetype");
 }
 
 @font-face {
@@ -111,13 +114,35 @@ $card-border-width: 0px;
   src: url("./fonts/Karinika-Regular.otf") format("opentype");
 }
 
+// Default font sizes and colors
 body {
-  font-family: "Figtree Normal", "Helvetica", sans-serif;
+  font-family: "DM Sans Regular", "Helvetica", sans-serif;
+  font-size: 0.875 * $spacer;
 }
-
-i {
-  font-family: "Figtree Italic", "Helvetica", sans-serif;
-  font-style: normal; /* avoid "double italicization" */
+h1 {
+  font-family: "DM Sans Medium", "Helvetica", sans-serif;
+  font-size: 1.25 * $spacer;
+  color: $black;
+}
+h2 {
+  font-family: "DM Sans Medium", "Helvetica", sans-serif;
+  font-size: 1.125 * $spacer;
+  color: $black;
+}
+h3 {
+  font-family: "DM Sans SemiBold", "Helvetica", sans-serif;
+  font-size: $spacer;
+  color: $mono-gray-dark-3;
+}
+h4, th {
+  font-family: "DM Sans SemiBold", "Helvetica", sans-serif;
+  font-size: $spacer;
+  color: $mono-gray-dark-3;
+  text-transform: uppercase;
+}
+.btn {
+  font-family: "DM Sans Medium", "Helvetica", sans-serif;
+  font-size: $spacer;
 }
 
 // Layout when sidebar navigation is expanded to full size
@@ -380,14 +405,10 @@ textarea.form-control {
     vertical-align: middle;
   }
 
-  // Forces all table headers to be `black`
-  > :not(caption) > * > th {
-    color: $black;
-  }
-
-  // ...and the headers that act as links (sorting)
+  // Forces all table headers to design color
+  > :not(caption) > * > th,
   > :not(caption) > * > th > a {
-    color: $black;
+    color: $mono-gray-dark-3;
   }
 
   tbody > tr:last-child > td {
@@ -486,7 +507,7 @@ ul.modal-progress {
   border-radius: $spacer;
 }
 .current-question p {
-  font-family: "Karinika", "Figtree Normal", sans-serif;
+  font-family: "Karinika", "DM Sans Regular", sans-serif;
   font-size: 5rem;
   line-height: 1;
 }
@@ -506,7 +527,7 @@ ul.modal-progress {
       border: 1px solid $mono-gray-lighter;
       border-radius: 0.5 * $spacer;
       text-align: center;
-      font-family: "Karinika", "Figtree Normal", sans-serif;
+      font-family: "Karinika", "DM Sans Regular", sans-serif;
       font-size: 1.25 * $spacer;
     }
   }
