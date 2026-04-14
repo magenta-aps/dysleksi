@@ -44,8 +44,17 @@ def create_group_test(
                 / "real/wordreading_2/wordreading_2.json",
             )
             wordreading_1_data_path = None
+            wordspelling_data_path = (
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "real/wordspelling/wordspelling.json",
+            )
+            letter_sound_data_path = None
+
             wordreading_test_name = "Ordlæsning 2A"
             wordreading_1_test_name = "Ordlæsning 1"
+            wordspelling_test_name = "Ordstavning"
+            letter_sound_test_name = "Bogstavlyde"
+
         else:
             wordreading_data_path = (
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
@@ -55,21 +64,19 @@ def create_group_test(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "dummy/wordreading_1/wordreading_1.json",
             )
-            wordreading_test_name = "Ordlæsning 2A (dummy)"
-            wordreading_1_test_name = "Ordlæsning 1 (dummy)"
-
-        if real:
-            wordspelling_data_path = (
-                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
-                / "real/wordspelling/wordspelling.json",
-            )
-            wordspelling_test_name = "Ordstavning"
-        else:
             wordspelling_data_path = (
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "dummy/wordspelling/wordspelling.json",
             )
+            letter_sound_data_path = (
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "dummy/letter_sound/letter_sound.json",
+            )
+
+            wordreading_test_name = "Ordlæsning 2A (dummy)"
+            wordreading_1_test_name = "Ordlæsning 1 (dummy)"
             wordspelling_test_name = "Ordstavning (dummy)"
+            letter_sound_test_name = "Bogstavlyde (dummy)"
 
         call_command(
             "import_test",
@@ -103,6 +110,18 @@ def create_group_test(
                 wordreading_1_test_name,
                 wordreading_1_data_path,
                 "wordreading_1",
+            )
+        if letter_sound_data_path:
+            call_command(
+                "import_test",
+                name,
+                letter_sound_test_name,
+                letter_sound_data_path,
+                "letter_sound",
+                practice_json_path=(
+                    Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                    / "real/letter_sound/letter_sound_practice.json"
+                ),
             )
 
 

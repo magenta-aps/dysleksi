@@ -1,0 +1,378 @@
+[
+    {
+        "image": "resources/letter_sound/Indledning/ikon_for_bogstaver.png",
+        "question_type": "multiple_choice",
+        "correct": "",
+        "wrong": [],
+        "instruction_sequence": [
+            {
+                "action": "show",
+                "element": "challenge-image",
+                "delayAfter": 0
+            },
+            {
+                "action": "hide",
+                "element": "next",
+                "delayAfter": 500
+            },
+            {
+                // Opgaven om bogstavlyde er nu ved at starte.
+                "action": "playSound",
+                "resource": "resources/letter_sound/Indledning/1a.1.wav",
+                "delayAfter": 500
+            },
+            {
+                // Først skal du vises, hvordan du skal gøre.
+                "action": "playSound",
+                "resource": "resources/letter_sound/Indledning/1a.2.wav",
+                "delayAfter": 500
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "challenge-image"
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                // Tryk grøn, når du er klar.
+                "action": "playSound",
+                "resource": "resources/letter_sound/Indledning/1a.3.wav",
+                "delayAfter": 500
+            }
+        ]
+    },
+    {
+        "sound": "resources/letter_sound/Instruktion/1b.9.wav",
+        "question_type": "multiple_choice",
+        "correct": "c",
+        "wrong": ["j", "d", "g"],
+        "instruction_sequence": [
+            {
+                "action": "show",
+                "element": "next",
+                "delayAfter": 500
+            },
+            {
+                // Lyt godt efter.
+                "action": "playSound",
+                "resource": "resources/letter_sound/Instruktion/1b.1.wav",
+                "delayAfter": 750
+            },
+            {
+                "action": "fadeOut",
+                "element": "question-challenge",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-c",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-j",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-d",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-g",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "next",
+                "delayAfter": 0
+            },
+            {
+                // Se
+                "action": "playSound",
+                "resource": "resources/letter_sound/Instruktion/1b.2.wav",
+                "delayAfter": 750
+            },
+            {
+                // Her er bogstaverne, som kan vælges
+                "action": "playSound",
+                "resource": "resources/letter_sound/Instruktion/1b.3.wav",
+                "delayAfter": 750
+            },
+            {
+                "action": "fadeIn",
+                "element": "choice-j",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-j"
+            },
+            {
+                // j
+                "action": "playSound",
+                "resource": "resources/letter_sound/Instruktion/1b.4.wav",
+                "delayAfter": 750
+            },
+            {
+                "action": "fadeIn",
+                "element": "choice-d",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-d"
+            },
+            {
+                // d
+                "action": "playSound",
+                "resource": "resources/letter_sound/Instruktion/1b.5.wav",
+                "delayAfter": 750
+            },
+            {
+                "action": "fadeIn",
+                "element": "choice-c",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-c"
+            },
+            {
+                // c
+                "action": "playSound",
+                "resource": "resources/letter_sound/Instruktion/1b.6.wav",
+                "delayAfter": 750
+            },
+            {
+                "action": "fadeIn",
+                "element": "choice-g",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-g"
+            },
+            {
+                // Og g
+                "action": "playSound",
+                "resource": "resources/letter_sound/Instruktion/1b.7.wav",
+                "delayAfter": 750
+            },
+            {
+                // Du kommer til at høre bogstavlydene enkeltvis.
+                "action": "playSound",
+                "delayAfter": 1000,
+                "resource": "resources/letter_sound/Instruktion/1b.8.wav"
+            },
+            {
+                "action": "fadeIn",
+                "element": "question-challenge",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "element": "question-challenge",
+                "delayAfter": 0
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 1500,
+                "element": "challenge-sound-btn"
+            },
+            // Ikke implementeret:
+            // Elever kan ikke trykke på knapper under instruktionsforløb
+            //{
+                // Hvis du ikke hører bogstavlyden så godt, kan du høre det igen ved at
+                // trykke på lydikonet. Prøv at trykke.
+            //    "action": "playSound",
+            //    "delayAfter": 750,
+            //    "resource": "resources/letter_sound/Instruktion/1b.10.wav"
+            //},
+            {
+                // Du
+                "action": "playSound",
+                "delayAfter": 0,
+                "resource": "resources/letter_sound/Instruktion/1b.11.wav"
+            },
+            {
+                // Skal vælge bogstavet, der passer til lyden du hører.
+                "action": "playSound",
+                "delayAfter": 750,
+                "resource": "resources/letter_sound/Instruktion/1b.12.wav"
+            },
+            {
+                "action": "select",
+                "delayAfter": 0,
+                "element": "choice-c"
+            },
+
+            {
+                // Hvis du vælger forkert, kan du ændre dit valg. Du må også gerne
+                // gætte, hvis du ikke kan finde ud af opgaven
+                "action": "playSound",
+                "delayAfter": 750,
+                "resource": "resources/letter_sound/Instruktion/1b.13.wav"
+            },
+
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 0,
+                "element": "next"
+            },
+
+            {
+                // Når du har valgt, går du videre til næste opgave ved at trykke  på pilen.
+                "action": "playSound",
+                "delayAfter": 750,
+                "resource": "resources/letter_sound/Instruktion/1b.14.wav"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "question-challenge"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "choice-c"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "choice-j"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "choice-g"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "choice-d"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                // Det er sådan, du skal løse opgaverne.
+                "action": "playSound",
+                "delayAfter": 750,
+                "resource": "resources/letter_sound/Instruktion/1b.15.wav"
+            },
+            {
+                // Nu skal du selv prøve øveopgaverne.
+                "action": "playSound",
+                "delayAfter": 750,
+                "resource": "resources/letter_sound/Instruktion/1b.16.wav"
+            },
+            {
+                // Klik på den grønne pil, når du er klar.
+                "action": "playSound",
+                "delayAfter": 0,
+                "resource": "resources/letter_sound/Instruktion/1b.17.wav"
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 2000,
+                "element": "next"
+            }
+        ]
+    },
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/letter_sound/Bogstavlyde/1f.23.wav",
+        "correct": "o",
+        "wrong": ["q", "w", "t"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/letter_sound/Bogstavlyde/1f.21.wav",
+        "correct": "p",
+        "wrong": ["a", "w", "e"]
+    },
+    {
+        "question_type": "no_input_required",
+        "instruction_sequence": [
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "repeat"
+            },
+            // Se. To kasser (?)
+            {
+                "action": "playSound",
+                "delayAfter": 0,
+                "resource": "resources/letter_sound/Øveopgave 1 og 2/1d.1.wav"
+            },
+            {
+                "action": "setRepeatButtonDestination",
+                "delayAfter": 0,
+                "data": "0"
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "repeat"
+            },
+            {
+                "action": "show",
+                "delayAfter": 1,
+                "element": "next"
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // Hvis du har forstået, hvad du skal gøre, skal du klikke på blåikon for
+            // at starte opgaverne.
+            {
+                "action": "playSound",
+                "delayAfter": 0,
+                "resource": "resources/letter_sound/Øveopgave 1 og 2/1d.2.wav"
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 0,
+                "element": "repeat"
+            },
+            // Men, hvis du ikke har forstået hvad du skal gøre, skal du klikke på øret
+            // grå ikon for at lytte til instruktionen igen
+            {
+                "action": "playSound",
+                "delayAfter": 1250,
+                "resource": "resources/letter_sound/Øveopgave 1 og 2/1d.3.wav"
+            },
+            // Vælg ikon (klik).
+            {
+                "action": "setButtonSoundOnce",
+                "delayAfter": 0,
+                "resource": "resources/letter_sound/Øveopgave 1 og 2/1d.4.wav",
+                "element": "next"
+            }
+        ]
+    }
+]
