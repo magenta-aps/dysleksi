@@ -197,15 +197,21 @@ h4, th {
       }
     }
 
-    .logo {
-      text-align: center;
-      color: $white;
+    .about {
+      flex-direction: column;
       padding: $spacer;
       border-top: 1px solid $mono-gray-dark-1;
-    }
-    .version {
-      color: $gray-400;
-      padding: $spacer;
+
+      .logo {
+        min-height: 4 * $spacer;
+        margin: 0 0 $spacer 0;
+        background: url("./images/Nanoq_logo_hvid-outline.svg") no-repeat top left;
+        background-size: contain;
+      }
+
+      .version {
+        color: $mono-gray-light;
+      }
     }
   }
 
@@ -268,6 +274,18 @@ h4, th {
     justify-content: center;
   }
   .main .navigation:not(.show,.showing) a.nav-link span {
+    display: none;
+  }
+  .main .navigation:not(.show,.showing) .about {
+    padding: $spacer 0;
+  }
+  .main .navigation:not(.show,.showing) .logo {
+    min-height: 3 * $spacer;
+    margin: 0;
+    background: url("./images/Nanoq_logo_hvid-outline_favicon.svg") no-repeat top center;
+    background-size: contain;
+  }
+  .main .navigation:not(.show,.showing) .version {
     display: none;
   }
 }
