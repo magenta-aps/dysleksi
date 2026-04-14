@@ -29,34 +29,65 @@ vi.mock("../../webRTC.js", () => {
     };
 });
 
+const testSpy = (test) => {
+    spyAttributes(test, ["chatSocket", "domElements", "summary"]);
+};
+const createMockAudioContext = () => {
+    const mockSource = {
+        connect: vi.fn(),
+        start: vi.fn(),
+        stop: vi.fn(),
+        onended: null,
+        buffer: null,
+    };
+
+    const mockAudioContextInstance = {
+        state: "suspended",
+        resume: vi.fn().mockResolvedValue(),
+        decodeAudioData: vi.fn().mockResolvedValue({ duration: 1.0 }),
+        createBufferSource: vi.fn(() => mockSource),
+        destination: {},
+    };
+
+    return { mockAudioContextInstance, mockSource };
+};
+const { mockAudioContextInstance, mockSource } = createMockAudioContext();
+const student = new Student({
+    id: 123,
+    firstName: "Test",
+    lastName: "Student",
+});
+const ws = getWebSocket("class_123");
+const mockSend = vi.fn();
+
+global.WebSocket = class {
+    constructor(url) {
+        this.url = url;
+        this.send = mockSend;
+        this.close = vi.fn();
+        this.addEventListener = vi.fn();
+    }
+};
+
+// Mock window.location correctly
+global.window = {
+    location: { protocol: "https:", host: "example.com" },
+};
+global.document.timeline = {
+    currentTime: 0,
+};
+global.alert = vi.fn();
+
+global.fetch = vi.fn(async () => ({
+    arrayBuffer: async () => new ArrayBuffer(8), // dummy audio data
+}));
+global.window.AudioContext = vi.fn(() => mockAudioContextInstance);
+global.window.webkitAudioContext = vi.fn(() => mockAudioContextInstance);
+
 describe("GroupTestFlow", () => {
-    let originalWebSocket;
-    let mockSend;
+    let domElements;
 
     beforeEach(() => {
-        // Mock window.location correctly
-        global.window = {
-            location: { protocol: "https:", host: "example.com" },
-        };
-        global.document.timeline = {
-            currentTime: 0,
-        };
-        global.alert = vi.fn();
-
-        // Save original WebSocket
-        originalWebSocket = global.WebSocket;
-
-        // Mock WebSocket as a class (constructor)
-        mockSend = vi.fn();
-        global.WebSocket = class {
-            constructor(url) {
-                this.url = url;
-                this.send = mockSend;
-                this.close = vi.fn();
-                this.addEventListener = vi.fn();
-            }
-        };
-
         document.body.innerHTML = `
             <div id="fade-overlay"></div>
             <h1 id="student-header" class="student-header"></h1>
@@ -77,48 +108,18 @@ describe("GroupTestFlow", () => {
             <img src="/foo" alt="img" id="testpart-intro-image">
         `;
 
-        global.domElements = new GroupTestDomElements();
+        domElements = new GroupTestDomElements();
 
-        global.student = new Student({
-            id: 123,
-            firstName: "Test",
-            lastName: "Student",
-        });
+        spyAttributes(domElements);
+        vi.spyOn(student, "progress", "set");
 
-        spyAttributes(global.domElements);
-        vi.spyOn(global.student, "progress", "set");
-
-        global.testSpy = (test) => {
-            // Apply spying to a test instance
-            spyAttributes(test, ["chatSocket", "domElements", "summary"]);
-        };
-
-        global.ws = getWebSocket("class_123");
-
-        global.fetch = vi.fn(async () => ({
-            arrayBuffer: async () => new ArrayBuffer(8), // dummy audio data
-        }));
-
-        const mockAudioContext = {
-            decodeAudioData: vi.fn().mockResolvedValue({}), // returns a dummy AudioBuffer
-            createBufferSource: vi.fn().mockReturnValue({
-                connect: vi.fn(),
-                start: vi.fn(),
-                onended: null,
-                buffer: null,
-            }),
-            destination: {},
-        };
-
-        // 2. Return this mock instead of an empty object
-        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(mockAudioContext);
-
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
+            mockAudioContextInstance,
+        );
         vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
     });
 
     afterEach(() => {
-        // Restore WebSocket
-        global.WebSocket = originalWebSocket;
         document.body.innerHTML = "";
         vi.clearAllMocks();
     });
@@ -370,7 +371,6 @@ describe("GroupTestFlow", () => {
     });
 
     it("Test complain when there are no parts", () => {
-        const ws = getWebSocket("class_123");
         expect(
             () =>
                 new Test(
@@ -1016,7 +1016,6 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
     let domElements;
 
     let mockAudioContext;
-    let mockSource;
 
     beforeEach(() => {
         document.body.innerHTML = `
@@ -1034,21 +1033,12 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
         `;
         domElements = new GroupTestDomElements();
 
-        mockSource = {
-            connect: vi.fn(),
-            start: vi.fn(),
-            onended: null,
-        };
+        mockAudioContext = mockAudioContextInstance;
+    });
 
-        mockAudioContext = {
-            decodeAudioData: vi.fn(() => Promise.resolve({})), // fake AudioBuffer
-            createBufferSource: vi.fn(() => mockSource),
-            destination: {},
-        };
-
-        global.fetch = vi.fn(async () => ({
-            arrayBuffer: async () => new ArrayBuffer(8), // dummy audio data
-        }));
+    afterEach(() => {
+        document.body.innerHTML = "";
+        vi.clearAllMocks();
     });
 
     it("displays a question with sound correctly", async () => {
@@ -1194,7 +1184,6 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
 
 describe("GroupTestDomElements - Repeatbutton", () => {
     let domElements;
-    let student;
 
     beforeEach(() => {
         document.body.innerHTML = `
@@ -1215,12 +1204,6 @@ describe("GroupTestDomElements - Repeatbutton", () => {
         `;
         domElements = new GroupTestDomElements();
         vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
-
-        student = new Student({
-            id: 123,
-            firstName: "Test",
-            lastName: "Student",
-        });
     });
 
     it("repeat button destination", () => {
@@ -1270,30 +1253,18 @@ describe("GroupTestDomElements - Repeatbutton", () => {
 
 describe("compareTextAnswer", () => {
     let view;
+    let domElements;
 
     beforeEach(() => {
         vi.useFakeTimers();
         vi.spyOn(global, "clearTimeout");
 
-        const mockAudioContextInstance = {
-            state: "suspended",
-            resume: vi.fn().mockResolvedValue(),
-            decodeAudioData: vi.fn().mockResolvedValue({}),
-            createBufferSource: vi.fn().mockReturnValue({
-                connect: vi.fn(),
-                start: vi.fn(),
-                onended: null,
-            }),
-            destination: {},
-        };
-
-        global.window.AudioContext = vi.fn(() => mockAudioContextInstance);
-        global.window.webkitAudioContext = vi.fn(() => mockAudioContextInstance);
         vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
             mockAudioContextInstance,
         );
 
         const test = new Test(groupTestData);
+        domElements = new GroupTestDomElements();
         view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
     });
 
@@ -1325,30 +1296,39 @@ describe("compareTextAnswer", () => {
 
 describe("Timer and Reminder Cleanup", () => {
     let view;
+    let domElements;
 
     beforeEach(() => {
         vi.useFakeTimers();
         vi.spyOn(global, "clearTimeout");
 
-        const mockAudioContextInstance = {
-            state: "suspended",
-            resume: vi.fn().mockResolvedValue(),
-            decodeAudioData: vi.fn().mockResolvedValue({}),
-            createBufferSource: vi.fn().mockReturnValue({
-                connect: vi.fn(),
-                start: vi.fn(),
-                onended: null,
-            }),
-            destination: {},
-        };
+        document.body.innerHTML = `
+            <div id="fade-overlay"></div>
+            <h1 id="student-header" class="student-header"></h1>
+            <audio id="instructions-sound"></audio>
+            <audio id="reminder-sound"></audio>
+            <div id="summary-container"></div>
+            <button id="end-summary"></button>
+            <div id="question-challenge"></div>
+            <div id="choices"></div>
+            <button id="next"></button>
+            <div id="test-summary"></div>
+            <div id="testpart-intro"></div>
+            <div id="test-intro"></div>
+            <div id="test-container"></div>
+            <button id="start-testpart"></button>
+            <button id="start-summary"></button>
+            <h2 id="testpart-intro-text"> </h2>
+            <img src="/foo" alt="img" id="testpart-intro-image">
+        `;
 
-        global.window.AudioContext = vi.fn(() => mockAudioContextInstance);
-        global.window.webkitAudioContext = vi.fn(() => mockAudioContextInstance);
         vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
             mockAudioContextInstance,
         );
 
         const test = new Test(groupTestData);
+
+        domElements = new GroupTestDomElements();
         view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
 
         // Use a part/question we know is multiple_choice to avoid free_text logic crashes
@@ -1409,10 +1389,34 @@ describe("Timer and Reminder Cleanup", () => {
 
 describe("StudentTestView - updateNextButtonClass", () => {
     let view;
+    let domElements;
 
     beforeEach(() => {
         const test = new Test(groupTestData);
-        // Ensure part 0 has at least 2 practice questions for these tests
+
+        document.body.innerHTML = `
+            <div id="fade-overlay"></div>
+            <h1 id="student-header" class="student-header"></h1>
+            <audio id="instructions-sound"></audio>
+            <audio id="reminder-sound"></audio>
+            <div id="summary-container"></div>
+            <button id="end-summary"></button>
+            <div id="question-challenge"></div>
+            <div id="choices"></div>
+            <button id="next"></button>
+            <div id="test-summary"></div>
+            <div id="testpart-intro"></div>
+            <div id="test-intro"></div>
+            <div id="test-container"></div>
+            <button id="start-testpart"></button>
+            <button id="start-summary"></button>
+            <h2 id="testpart-intro-text"> </h2>
+            <img src="/foo" alt="img" id="testpart-intro-image">
+        `;
+
+        domElements = new GroupTestDomElements();
+        spyAttributes(domElements);
+
         view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
         view.setPart(0);
@@ -1609,37 +1613,9 @@ describe("GroupTestDomElements - FreeText Touch Interaction", () => {
 });
 
 describe("LetterSoundTest", () => {
-    let originalWebSocket;
-    let mockSend;
-    let mockAudioContext;
     let domElements;
-    let ws;
-    let student;
 
     beforeEach(() => {
-        // Mock window.location correctly
-        global.window = {
-            location: { protocol: "https:", host: "example.com" },
-        };
-        global.document.timeline = {
-            currentTime: 0,
-        };
-        global.alert = vi.fn();
-
-        // Save original WebSocket
-        originalWebSocket = global.WebSocket;
-
-        // Mock WebSocket as a class (constructor)
-        mockSend = vi.fn();
-        global.WebSocket = class {
-            constructor(url) {
-                this.url = url;
-                this.send = mockSend;
-                this.close = vi.fn();
-                this.addEventListener = vi.fn();
-            }
-        };
-
         document.body.innerHTML = `
             <div id="fade-overlay"></div>
             <h1 id="student-header" class="student-header"></h1>
@@ -1663,38 +1639,15 @@ describe("LetterSoundTest", () => {
         `;
 
         domElements = new GroupTestDomElements();
+        spyAttributes(domElements);
 
-        student = new Student({
-            id: 123,
-            firstName: "Test",
-            lastName: "Student",
-        });
-
-        spyAttributes(global.domElements);
-        vi.spyOn(global.student, "progress", "set");
-
-        ws = getWebSocket("class_123");
-
-        mockAudioContext = {
-            decodeAudioData: vi.fn().mockResolvedValue({}), // returns a dummy AudioBuffer
-            createBufferSource: vi.fn().mockReturnValue({
-                connect: vi.fn(),
-                start: vi.fn(),
-                onended: null,
-                buffer: null,
-            }),
-            destination: {},
-        };
-
-        // 2. Return this mock instead of an empty object
-        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(mockAudioContext);
-
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
+            mockAudioContextInstance,
+        );
         vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
     });
 
     afterEach(() => {
-        // Restore WebSocket
-        global.WebSocket = originalWebSocket;
         document.body.innerHTML = "";
         vi.clearAllMocks();
     });
@@ -1720,10 +1673,11 @@ describe("LetterSoundTest", () => {
         playBtn.click();
 
         await vi.waitFor(() => {
-            expect(mockAudioContext.createBufferSource).toHaveBeenCalled();
+            expect(mockAudioContextInstance.createBufferSource).toHaveBeenCalled();
         });
 
-        const mockSource = mockAudioContext.createBufferSource.mock.results[0].value;
+        const mockSource =
+            mockAudioContextInstance.createBufferSource.mock.results[0].value;
         mockSource.onended();
 
         await vi.waitFor(() => {
