@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 from data_tools.utils import (
+    create_fore_sound_test,
     create_letter_sound_test,
     create_wordreading_1_test,
     create_wordspelling_test,
@@ -57,6 +58,34 @@ class UtilTest(TestCase):
                 "wrong": ["b", "x", "d"],
             },
         ]
+        self.fore_sound_data = [
+            {
+                "sound": "resources/dummy/fore_sound/Opgave/a.mp3",
+                "question_type": "multiple_choice",
+                "correct": "resources/dummy/fore_sound/Opgave/abe.png",
+                "wrong": [
+                    "resources/dummy/fore_sound/Opgave/bjorn.png",
+                    "resources/dummy/fore_sound/Opgave/fugl.png",
+                    "resources/dummy/fore_sound/Opgave/kat.png",
+                ],
+            },
+        ]
+
+        self.fore_sound_practice_data = [
+            {
+                "sound": "resources/dummy/fore_sound/Opgave/a.mp3",
+                "question_type": "multiple_choice",
+                "correct": "resources/dummy/fore_sound/Opgave/abe.png",
+                "wrong": [
+                    "resources/dummy/fore_sound/Opgave/bjorn.png",
+                    "resources/dummy/fore_sound/Opgave/fugl.png",
+                    "resources/dummy/fore_sound/Opgave/kat.png",
+                ],
+                "instruction_sequence": [
+                    {"action": "show", "element": "challenge-text", "delayAfter": 0},
+                ],
+            },
+        ]
 
         self.test = Test.objects.create(name="test test")
 
@@ -81,5 +110,16 @@ class UtilTest(TestCase):
         self.assertTrue(
             TestResource.objects.filter(
                 sound="resources/dummy/letter_sound/Opgave/a.mp3"
+            ).exists()
+        )
+
+    def test_create_fore_sound_test(self):
+        create_fore_sound_test(
+            self.test, self.fore_sound_data, self.fore_sound_practice_data
+        )
+
+        self.assertTrue(
+            TestResource.objects.filter(
+                image="resources/dummy/fore_sound/Opgave/abe.png"
             ).exists()
         )

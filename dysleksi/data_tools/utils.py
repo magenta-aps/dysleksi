@@ -59,6 +59,33 @@ def create_wordreading_1_test(
     test.parts.add(part)
 
 
+def create_fore_sound_test(
+    test, questions_data, practice_questions_data=None, name="Forlyd"
+):
+
+    # TODO: Add this sound to dysleksi-binaries when we receive it
+    reminder, created = TestResource.objects.get_or_create(
+        name="resources/fore_sound/Deltests/xxx.wav",
+        sound="resources/fore_sound/Deltests/xxx.wav",
+    )
+
+    part, created = TestPart.objects.get_or_create(
+        name=name,
+        defaults={
+            "timeout": 360000,  # 360 seconds / 6 minutes
+            "partial_score_after": 120000,  # 120 seconds / 2 minutes
+            "image_url": "/static/images/fore_sound.png",
+            "reminder": 15000,  # 15 seconds
+            "reminder_source": reminder,
+        },
+    )
+    if created:
+        part.create_test_resources(questions_data, False)
+        if practice_questions_data:
+            part.create_test_resources(practice_questions_data, True)
+    test.parts.add(part)
+
+
 def create_letter_sound_test(
     test, questions_data, practice_questions_data=None, name="Bogstavlyde"
 ):
