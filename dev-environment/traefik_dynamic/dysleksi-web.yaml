@@ -1,0 +1,19 @@
+http:
+  routers:
+    dysleksi:
+      rule: '(Host(`dysleksi-web`)) || (Host(`{{ env "HOSTNAME" }}`))'
+      service: dysleksi
+      entryPoints:
+        - websecure
+      priority: 1
+    dysleksi-dev-assets:
+      rule: "(Host(`dysleksi-web`)) && (PathPrefix(`/static/js`)) || (Path(`/static/theme.scss`)) || (Path(`/static/theme-admin.scss`))"
+      entryPoints:
+        - websecure
+      priority: 30
+      service: dysleksi
+  services:
+    dysleksi:
+      loadBalancer:
+        servers:
+          - url: "http://dysleksi-web:8000"

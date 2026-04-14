@@ -1,0 +1,13 @@
+http:
+  routers:
+    dysleksi-static:
+      rule: "Host(`dysleksi-web`) && PathPrefix(`/static`)"
+      service: dysleksi-static
+      entryPoints:
+        - websecure
+      priority: 25
+  services:
+    dysleksi-static:
+      loadBalancer:
+        servers:
+          - url: "http://dysleksi-static-web:8080"

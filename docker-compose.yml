@@ -5,25 +5,19 @@ services:
 
   # Use traefik with a self-signed certificate to serve on HTTPS, as audio recording
   # in a browser context requires HTTPS connections in any case.
-  traefik:
+  dysleksi-traefik:
     image: traefik:v3.6
     container_name: dysleksi-traefik
-    command:
-      - "--api.insecure=true"
-      - "--providers.docker=true"
-      - "--providers.docker.exposedbydefault=false"
-      - "--entrypoints.websecure.address=:443"
-      - "--providers.file.filename=/etc/traefik/dynamic_conf.yml"
-      - "--entrypoints.websecure.http.tls=true"
-      - "--serverstransport.insecureskipverify=true"
-      - "--entrypoints.websecure.forwardedHeaders.insecure=true"
     ports:
       - "443:443"
       - "8080:8080" # Traefik Dashboard
+    environment:
+      - HOSTNAME=dysleksi-web
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./dev-environment/cert:/ssl:ro
-      - ./dev-environment/traefik_dynamic.yml:/etc/traefik/dynamic_conf.yml:ro
+      - ./dev-environment/traefik_static.yaml:/etc/traefik/traefik.yaml:ro
+      - ./dev-environment/traefik_dynamic/:/etc/traefik/dynamic/:ro
     networks:
       - default
       - database
@@ -43,26 +37,11 @@ services:
       - ./dev-environment/cert:/ssl:ro
       - ./data:/data:ro
       - ./mypy.ini:/mypy.ini:ro
-      - ./file-data:/upload:rw
+      #- ./file-data:/upload:rw
       - ./instructions:/upload/instructions/:ro
       - ../dysleksi-binaries/:/upload/dev-data/:ro
       - idp-data:/app/idp:rw
       - staticfiles-data:/app/project/static/
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dysleksi.rule=Host(`dysleksi-web`)"
-      - "traefik.http.routers.dysleksi.entrypoints=websecure"
-      - "traefik.http.routers.dysleksi.tls=true"
-      - "traefik.http.routers.dysleksi.priority=1"
-      # Do not serve static/js and .scss files through the static-fileserver.
-      # This allows for on-the-fly reloading
-      - "traefik.http.routers.dysleksi-dev-assets.rule=Host(`dysleksi-web`) && (PathPrefix(`/static/js`) || Path(`/static/theme.scss`) || Path(`/static/theme-admin.scss`))"
-      - "traefik.http.routers.dysleksi-js.entrypoints=websecure"
-      - "traefik.http.routers.dysleksi-js.tls=true"
-      - "traefik.http.routers.dysleksi-js.priority=30" 
-      - "traefik.http.routers.dysleksi-js.service=dysleksi"
-      - "traefik.http.services.dysleksi.loadbalancer.server.port=8000"
-      - "traefik.http.services.dysleksi.loadbalancer.server.scheme=http"
     environment:
       - PULL_IDP_METADATA=true
       - MAKE_MIGRATIONS=true
@@ -164,14 +143,6 @@ services:
   peerjs-server:
     image: peerjs/peerjs-server
     container_name: peerjs-server
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.peerjs.rule=Host(`dysleksi-web`) && PathPrefix(`/webrtc`)"
-      - "traefik.http.routers.peerjs.entrypoints=websecure"
-      - "traefik.http.routers.peerjs.tls=true"
-      - "traefik.http.routers.peerjs.priority=10"
-      - "traefik.http.services.peerjs.loadbalancer.server.port=9000"
-      - "traefik.http.services.peerjs.loadbalancer.server.scheme=http"
     command: [
       "--port", "9000",
       "--path", "/webrtc",
@@ -188,7 +159,7 @@ services:
       - lobby-bots-modules:/app/node_modules
     working_dir: /app
     links:
-      - traefik:dysleksi-web
+      - dysleksi-traefik:dysleksi-web
     command: >
       sh -c "
         npm install playwright@1.59.1 &&
@@ -213,13 +184,6 @@ services:
       - ../dysleksi-binaries/dummy-data:/upload/resources/dummy
     networks:
       - default
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dysleksi-media.rule=Host(`dysleksi-web`) && PathPrefix(`/media`)"
-      - "traefik.http.routers.dysleksi-media.entrypoints=websecure"
-      - "traefik.http.routers.dysleksi-media.tls=true"
-      - "traefik.http.routers.dysleksi-media.priority=20"
-      - "traefik.http.services.dysleksi-media.loadbalancer.server.port=8080"
     restart: unless-stopped
 
   dysleksi-static-web:
@@ -231,13 +195,6 @@ services:
       - staticfiles-data:/web:ro
     networks:
       - default
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.dysleksi-static.rule=Host(`dysleksi-web`) && PathPrefix(`/static`)"
-      - "traefik.http.routers.dysleksi-static.entrypoints=websecure"
-      - "traefik.http.routers.dysleksi-static.tls=true"
-      - "traefik.http.routers.dysleksi-static.priority=25"
-      - "traefik.http.services.dysleksi-static.loadbalancer.server.port=8080"
     restart: unless-stopped
 
 
