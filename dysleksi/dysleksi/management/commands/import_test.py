@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 
 from data_tools.utils import (
+    create_fore_sound_test,
     create_letter_sound_test,
     create_pronunciation_test,
     create_wordreading_1_test,
@@ -124,6 +125,10 @@ class Command(BaseCommand):
             )
         elif test_type == "letter_sound":
             create_letter_sound_test(
+                test, questions_data, practice_data, name=testpart_name
+            )
+        elif test_type == "fore_sound":
+            create_fore_sound_test(
                 test, questions_data, practice_data, name=testpart_name
             )
         else:
