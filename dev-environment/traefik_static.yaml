@@ -1,0 +1,36 @@
+api:
+  insecure: true
+
+serversTransport:
+  insecureSkipVerify: true
+
+entryPoints:
+  websecure:
+    address: ":443"
+    http:
+      tls:
+        {}
+    forwardedHeaders:
+      insecure: true
+
+providers:
+  file:
+    directory: "/etc/traefik/dynamic"
+    watch: true
+
+log:
+  level: "WARN"
+
+tls:
+  certificates:
+    - certFile: /ssl/web/cert.pem
+      keyFile: /ssl/web/key.pem
+
+  stores:
+    default:
+      defaultCertificate:
+        certFile: /ssl/web/cert.pem
+        keyFile: /ssl/web/key.pem
+
+accessLog:
+  format: common

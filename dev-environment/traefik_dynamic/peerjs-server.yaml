@@ -1,0 +1,13 @@
+http:
+  routers:
+    peerjs:
+      rule: '(Host(`dysleksi-web`) && PathPrefix(`/webrtc`)) || (Host(`{{ env "HOSTNAME" }}`) && PathPrefix(`/webrtc`))'
+      service: peerjs
+      entrypoints:
+        - websecure
+      priority: 10
+  services:
+    peerjs:
+      loadBalancer:
+        servers:
+          - url: "http://peerjs-server:9000"

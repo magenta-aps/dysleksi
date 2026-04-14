@@ -83,17 +83,14 @@ Now configure docker-compose.override.yml as follows:
 ```
 services:
   dysleksi-web:
-    labels:
-      - "traefik.http.routers.dysleksi.rule=Host(`dysleksi-web`) || Host(`<hostname>`)"
     environment:
       - TEST=false
       - ALLOWED_HOSTS=["<hostname>.local","dysleksi-web","localhost","host.docker.internal"]
       - LOGIN_BYPASS_ENABLED=True
       - CSRF_TRUSTED_ORIGINS=["https://<hostname (lowercase)>.local","https://dysleksi-web"]
-  peerjs-server:
-    labels:
-      - "traefik.http.routers.peerjs.rule=(Host(`dysleksi-web`) && PathPrefix(`/webrtc`)) || (Host(`<hostname>`) && PathPrefix(`/webrtc`))"
-
+  dysleksi-traefik:
+    environment:
+      - HOSTNAME=<hostname>
 ```
 
 Where `<hostname>` should be replaced by your machine's hostname, which you obtained

@@ -1,0 +1,13 @@
+http:
+  routers:
+    dysleksi-media:
+      rule: "(Host(`dysleksi-web`)) && (PathPrefix(`/media`))"
+      service: dysleksi-media
+      entryPoints:
+        - websecure
+      priority: 20
+  services:
+    dysleksi-media:
+      loadBalancer:
+        servers:
+          - url: "http://dysleksi-media-web:8080"
