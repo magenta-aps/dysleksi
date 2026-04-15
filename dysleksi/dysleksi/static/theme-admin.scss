@@ -49,10 +49,9 @@ $bright-blue-darkest: #002c53;
 $bright-red-normal: #ff5459;
 
 // Map colors to answer categories
-$correct: $green-light;
+$correct: $green-normal;
+$partially-correct: $yellow-normal;
 $wrong: $bright-red-normal;
-$missing: $mono-gray-dark-2;
-$current: $bright-blue-normal;
 
 // Define our own constants
 $sidebar-navigation-min-width: 15rem;
@@ -681,8 +680,9 @@ div[data-role='teacher'][data-test-type='individual'] {
   align-items: center;
   gap: 0.75rem;
   font-size: 0.9rem;
-  padding: 0.5rem 1.5rem;
+  padding: 24px;
   background: transparent;
+  justify-content: flex-end;
 }
 
 .dot {
@@ -695,8 +695,7 @@ div[data-role='teacher'][data-test-type='individual'] {
 
   &.correct { background-color: $correct; }
   &.wrong   { background-color: $wrong; }
-  &.missing { background-color: $missing; }
-  &.current,
+  &.partially-correct { background-color: $partially-correct; }
   &.default {
     border: 1px solid $mono-gray-light;
     background: transparent;
@@ -713,7 +712,7 @@ div[data-role='teacher'][data-test-type='individual'] {
 .group-test-divider {
   height: 3px;
   background-color: $mono-gray-lighter;
-  margin: 10px 1.5rem;
+  margin: 0 1.5rem 10px 1.5rem;
 }
 
 /* Student card */
@@ -852,7 +851,7 @@ $border-radius-student-card: $spacer / 4 * 3;
       }
 
       &.current {
-        background-color: $current;
+        background-color: $bright-blue-normal;
       }
 
       &.future {
