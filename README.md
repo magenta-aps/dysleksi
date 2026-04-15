@@ -90,7 +90,7 @@ services:
       - CSRF_TRUSTED_ORIGINS=["https://<hostname (lowercase)>.local","https://dysleksi-web"]
   dysleksi-traefik:
     environment:
-      - HOSTNAME=<hostname>
+      - HOSTNAME=<hostname (lowercase)>.local
 ```
 
 Where `<hostname>` should be replaced by your machine's hostname, which you obtained
