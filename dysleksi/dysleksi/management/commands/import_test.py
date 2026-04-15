@@ -9,6 +9,7 @@ from pathlib import Path
 from data_tools.utils import (
     create_fore_sound_test,
     create_letter_sound_test,
+    create_nonwordspelling_test,
     create_pronunciation_test,
     create_wordreading_1_test,
     create_wordreading_2_test,
@@ -117,6 +118,10 @@ class Command(BaseCommand):
             )
         elif test_type == "wordspelling":
             create_wordspelling_test(
+                test, questions_data, practice_data, name=testpart_name
+            )
+        elif test_type == "nonwordspelling":
+            create_nonwordspelling_test(
                 test, questions_data, practice_data, name=testpart_name
             )
         elif test_type == "pronunciation":
