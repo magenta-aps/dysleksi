@@ -42,6 +42,7 @@ services:
       - ../dysleksi-binaries/:/upload/dev-data/:ro
       - idp-data:/app/idp:rw
       - staticfiles-data:/app/project/static/
+      - mediafiles-data:/upload/
     environment:
       - PULL_IDP_METADATA=true
       - MAKE_MIGRATIONS=true
@@ -179,9 +180,7 @@ services:
     environment:
       - URL_PREFIX=/media
     volumes:
-      - ./file-data:/web:ro
-      - ../dysleksi-binaries/real-data:/upload/resources
-      - ../dysleksi-binaries/dummy-data:/upload/resources/dummy
+      - mediafiles-data:/web:ro
     networks:
       - default
     restart: unless-stopped
@@ -203,6 +202,7 @@ volumes:
   file-data:
   idp-data:
   staticfiles-data:
+  mediafiles-data:
   vitest-coverage:
   lobby-bots-modules:
 
