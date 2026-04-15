@@ -5,6 +5,7 @@
 from data_tools.utils import (
     create_fore_sound_test,
     create_letter_sound_test,
+    create_nonwordspelling_test,
     create_wordreading_1_test,
     create_wordspelling_test,
 )
@@ -20,6 +21,24 @@ class UtilTest(TestCase):
                 "sound": "wordspelling_dummy/iki.mp3",
                 "correct": "iki",
                 "wrong": [],
+            },
+        ]
+
+        self.nonwordspelling_data = [
+            {
+                "sound": "nonwordspelling_dummy/foo.mp3",
+                "correct": "foo",
+                "wrong": [],
+            },
+        ]
+        self.nonwordspelling_practice_data = [
+            {
+                "sound": "nonwordspelling_dummy/bar.mp3",
+                "correct": "bar",
+                "wrong": [],
+                "instruction_sequence": [
+                    {"action": "show", "element": "challenge-text", "delayAfter": 0},
+                ],
             },
         ]
 
@@ -96,6 +115,14 @@ class UtilTest(TestCase):
         create_wordspelling_test(self.test, self.wordspelling_data)
         self.assertTrue(
             TestResource.objects.filter(sound="wordspelling_dummy/iki.mp3").exists()
+        )
+
+    def test_create_nonwordspelling_test(self):
+        create_nonwordspelling_test(
+            self.test, self.nonwordspelling_data, self.nonwordspelling_practice_data
+        )
+        self.assertTrue(
+            TestResource.objects.filter(sound="nonwordspelling_dummy/foo.mp3").exists()
         )
 
     def test_create_wordreading_1_test_with_practice_data(self):

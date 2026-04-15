@@ -136,6 +136,32 @@ def create_wordspelling_test(
     test.parts.add(part)
 
 
+def create_nonwordspelling_test(
+    test, questions_data, practice_questions_data=None, name="Nonordstavning"
+):
+    # TODO: Add this sound to dysleksi-binaries when we receive it
+    reminder, created = TestResource.objects.get_or_create(
+        name="resources/nonwordspelling/Øveopgave/xx.x.wav",
+        sound="resources/nonwordspelling/Øveopgave/xx.x.wav",
+    )
+
+    part, created = TestPart.objects.get_or_create(
+        name=name,
+        defaults={
+            "timeout": 0,  # no timeout
+            "partial_score_after": 0,  # no partial score (?)
+            "intro": _("Stav ordet som du hører."),
+            "image_url": "/static/images/nonwordspelling.png",
+            "reminder_source": reminder,
+        },
+    )
+    if created:
+        part.create_test_resources(questions_data, False)
+        if practice_questions_data:
+            part.create_test_resources(practice_questions_data, True)
+    test.parts.add(part)
+
+
 def create_pronunciation_test(test, questions_data, name, practice_questions_data=None):
     reminder, created = TestResource.objects.get_or_create(
         name="resources/letter_pronunciation/Deltests/9e.1.wav",
