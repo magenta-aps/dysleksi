@@ -279,15 +279,12 @@ export class StudentCard {
 
         for (let i = 0; i < totalQuestions; i++) {
             const dot = document.createElement("span");
-            const isCurrentQuestion = i === this.student.currentQuestionIndex;
             dot.classList.add("dot");
 
             if (results[i] === true) {
                 dot.classList.add("correct");
             } else if (results[i] === false) {
                 dot.classList.add("wrong");
-            } else if (isCurrentPart && isCurrentQuestion) {
-                dot.classList.add("current");
             } else {
                 dot.classList.add("default");
             }

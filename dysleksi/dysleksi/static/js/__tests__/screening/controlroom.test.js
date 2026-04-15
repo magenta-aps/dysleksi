@@ -1593,7 +1593,6 @@ describe("StudentCard", () => {
         expect(segments.length).toBe(2);
 
         expect(segments[0].classList.contains("completed")).toBe(true);
-        expect(segments[1].classList.contains("current")).toBe(true);
     });
 
     it("shows '-' for question index when viewing a part the student hasn't reached yet", () => {
