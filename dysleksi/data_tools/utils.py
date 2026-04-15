@@ -36,10 +36,9 @@ def create_wordreading_1_test(
     test, questions_data, practice_questions_data=None, name="Ordlæsning 1"
 ):
 
-    # TODO: Add this sound to dysleksi-binaries when we receive it
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/wordreading_1/Deltests/5e.2.wav",
-        sound="resources/wordreading_1/Deltests/5e.2.wav",
+        name="resources/wordreading_1/Deltest/5e.2.wav",
+        sound="resources/wordreading_1/Deltest/5e.2.wav",
     )
 
     part, created = TestPart.objects.get_or_create(

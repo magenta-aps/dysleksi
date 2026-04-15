@@ -117,6 +117,10 @@ def create_group_test(
                 wordreading_1_test_name,
                 wordreading_1_data_path,
                 "wordreading_1",
+                practice_json_path=(
+                    Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                    / "real/wordreading_1/wordreading_1_practice.json"
+                ),
             )
         if letter_sound_data_path:
             call_command(

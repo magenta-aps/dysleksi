@@ -433,6 +433,7 @@ class TestDomElements {
                 this._insert(this.questionChallengeEl, textEl, [img], [playBtn]);
             }
             textEl.innerHTML = text;
+            textEl.style.opacity = 1;
             if (text.length === 1) {
                 textEl.style.fontSize = "120px";
             } else {

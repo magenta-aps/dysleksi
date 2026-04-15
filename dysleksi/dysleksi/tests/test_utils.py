@@ -98,10 +98,14 @@ class UtilTest(TestCase):
             TestResource.objects.filter(sound="wordspelling_dummy/iki.mp3").exists()
         )
 
-    def test_create_wordreading_1_test(self):
+    def test_create_wordreading_1_test_with_practice_data(self):
         create_wordreading_1_test(
             self.test, self.wordreading_1_data, self.wordreading_1_pratice_data
         )
+        self.assertTrue(TestResource.objects.filter(text="Cykel").exists())
+
+    def test_create_wordreading_1_test(self):
+        create_wordreading_1_test(self.test, self.wordreading_1_data)
         self.assertTrue(TestResource.objects.filter(text="Cykel").exists())
 
     def test_create_letter_sound_test(self):
