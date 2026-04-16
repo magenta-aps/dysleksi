@@ -1,0 +1,252 @@
+[
+  {
+    "text": "Ulu",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Kvindekniv.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Isbjørn.jpg",
+      "resources/wordreading_1/Opgave/Stjerne.jpg",
+      "resources/wordreading_1/Opgave/Træ.jpg"
+    ]
+  },
+  {
+    "text": "Iga",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Gryde.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Kande.jpg",
+      "resources/wordreading_1/Opgave/Skoletaske.jpg",
+      "resources/wordreading_1/Opgave/Vindue.jpg"
+    ]
+  },
+  {
+    "text": "Niu",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Ben.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Dreng.jpg",
+      "resources/wordreading_1/Opgave/Hue.jpg",
+      "resources/wordreading_1/Opgave/Radio.jpg"
+    ]
+  },
+  {
+    "text": "Siku",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Is.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Får.jpg",
+      "resources/wordreading_1/Opgave/Kage.jpg",
+      "resources/wordreading_1/Opgave/Sø.jpg"
+    ]
+  },
+  {
+    "text": "Oqaq",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Tunge.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Tand.jpg",
+      "resources/wordreading_1/Opgave/Træ.jpg",
+      "resources/wordreading_1/Opgave/Anker.jpg"
+    ]
+  },
+  {
+    "text": "Appa",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Alk.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Fisk.jpg",
+      "resources/wordreading_1/Opgave/Gryde.jpg",
+      "resources/wordreading_1/Opgave/Rensdyr.jpg"
+    ]
+  },
+  {
+    "text": "Illu",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Hus.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Stol.jpg",
+      "resources/wordreading_1/Opgave/Stjerne _blå_.jpg",
+      "resources/wordreading_1/Opgave/Æg.jpg"
+    ]
+  },
+  {
+    "text": "Savik",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Kniv.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Sol.jpg",
+      "resources/wordreading_1/Opgave/Tallerken.jpg",
+      "resources/wordreading_1/Opgave/Menneske.jpg"
+    ]
+  },
+  {
+    "text": "Tikeq",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Pegefinger.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Fly.jpg",
+      "resources/wordreading_1/Opgave/Hånd.jpg",
+      "resources/wordreading_1/Opgave/Kajak.jpg"
+    ]
+  },
+  {
+    "text": "Arsaq",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Bold.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Hue.jpg",
+      "resources/wordreading_1/Opgave/Biler.jpg",
+      "resources/wordreading_1/Opgave/Hval.jpg"
+    ]
+  },
+  {
+    "text": "Orpik",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Træ.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Reol.jpg",
+      "resources/wordreading_1/Opgave/Kirke.jpg",
+      "resources/wordreading_1/Opgave/Kniv.jpg"
+    ]
+  },
+  {
+    "text": "Tuttu",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Rensdyr.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Dør.jpg",
+      "resources/wordreading_1/Opgave/Bold.jpg",
+      "resources/wordreading_1/Opgave/Ravn.jpg"
+    ]
+  },
+  {
+    "text": "Immuk",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Mælk.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Ost.jpg",
+      "resources/wordreading_1/Opgave/Æble.jpg",
+      "resources/wordreading_1/Opgave/Banan.jpg"
+    ]
+  },
+  {
+    "text": "Assak",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Hånd.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Æg.jpg",
+      "resources/wordreading_1/Opgave/Alk.jpg",
+      "resources/wordreading_1/Opgave/Tand.jpg"
+    ]
+  },
+  {
+    "text": "Kaagi",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Kage.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Kamik.jpg",
+      "resources/wordreading_1/Opgave/Vindue.jpg",
+      "resources/wordreading_1/Opgave/Æble.jpg"
+    ]
+  },
+  {
+    "text": "Aaveq",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Hvalros.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Sæl.jpg",
+      "resources/wordreading_1/Opgave/Edderkop.jpg",
+      "resources/wordreading_1/Opgave/Blomst.jpg"
+    ]
+  },
+  {
+    "text": "Umiaq",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Konebåd.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Is.jpg",
+      "resources/wordreading_1/Opgave/Kvindekniv.jpg",
+      "resources/wordreading_1/Opgave/Fiskekutter.jpg"
+    ]
+  },
+  {
+    "text": "Akiseq",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Hovedpude.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Symaskine.jpg",
+      "resources/wordreading_1/Opgave/Fisk.jpg",
+      "resources/wordreading_1/Opgave/Saks.jpg"
+    ]
+  },
+  {
+    "text": "Aasiak",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Edderkop.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Fugl.jpg",
+      "resources/wordreading_1/Opgave/Cykel.jpg",
+      "resources/wordreading_1/Opgave/Vanter.jpg"
+    ]
+  },
+  {
+    "text": "Saagut",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Gardiner.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Undertrøje.jpg",
+      "resources/wordreading_1/Opgave/Kniv.jpg",
+      "resources/wordreading_1/Opgave/Ballong.jpg"
+    ]
+  },
+  {
+    "text": "Qorfik",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Potte.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Kat.jpg",
+      "resources/wordreading_1/Opgave/Badekar.jpg",
+      "resources/wordreading_1/Opgave/Anker.jpg"
+    ]
+  },
+  {
+    "text": "Kulloq",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Tommelfinger.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Gris.jpg",
+      "resources/wordreading_1/Opgave/Gummistøvler.jpg",
+      "resources/wordreading_1/Opgave/Arm.jpg"
+    ]
+  },
+  {
+    "text": "Atuagaq",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Bog.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Farver.jpg",
+      "resources/wordreading_1/Opgave/Håndklæde.jpg",
+      "resources/wordreading_1/Opgave/Sæl.jpg"
+    ]
+  },
+  {
+    "text": "Inuusaq",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Dukke.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Myg.jpg",
+      "resources/wordreading_1/Opgave/Bil.jpg",
+      "resources/wordreading_1/Opgave/Kajak.jpg"
+    ]
+  },
+  {
+    "text": "Aqisseq",
+    "question_type": "multiple_choice",
+    "correct": "resources/wordreading_1/Opgave/Rype.jpg",
+    "wrong": [
+      "resources/wordreading_1/Opgave/Politi.jpg",
+      "resources/wordreading_1/Opgave/Ravn.jpg",
+      "resources/wordreading_1/Opgave/Sok.jpg"
+    ]
+  }
+]

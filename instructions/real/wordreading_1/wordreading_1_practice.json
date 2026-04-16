@@ -48,13 +48,11 @@
     {
         "text": "Naasoq",
         "question_type": "multiple_choice",
-        // TODO: Replace with actual material
-        "correct": "resources/dummy/wordreading_1/Opgave/flower.png",
-        // TODO: Replace with actual material
+        "correct": "resources/wordreading_1/Opgave/Blomst.jpg",
         "wrong": [
-            "resources/dummy/wordreading_1/Opgave/police_officer.png",
-            "resources/dummy/wordreading_1/Opgave/teddy_bear.png",
-            "resources/dummy/wordreading_1/Opgave/milk.jpg"
+          "resources/wordreading_1/Opgave/Politi.jpg",
+          "resources/wordreading_1/Opgave/Bamse.jpg",
+          "resources/wordreading_1/Opgave/Mælk.jpg"
         ],
         "instruction_sequence": [
             {
@@ -75,22 +73,22 @@
             },
             {
                 "action": "fadeOut",
-                "element": "choice-flower.png",
+                "element": "choice-Blomst.jpg",
                 "delayAfter": 0
             },
             {
                 "action": "fadeOut",
-                "element": "choice-police_officer.png",
+                "element": "choice-Politi.jpg",
                 "delayAfter": 0
             },
             {
                 "action": "fadeOut",
-                "element": "choice-teddy_bear.png",
+                "element": "choice-Bamse.jpg",
                 "delayAfter": 0
             },
             {
                 "action": "fadeOut",
-                "element": "choice-milk.jpg",
+                "element": "choice-Mælk.jpg",
                 "delayAfter": 0
             },
             {
@@ -122,43 +120,43 @@
             },
             {
                 "action": "fadeIn",
-                "element": "choice-flower.png",
+                "element": "choice-Blomst.jpg",
                 "delayAfter": 0
             },
             {
                 "action": "fadeIn",
-                "element": "choice-police_officer.png",
+                "element": "choice-Politi.jpg",
                 "delayAfter": 0
             },
             {
                 "action": "fadeIn",
-                "element": "choice-teddy_bear.png",
+                "element": "choice-Bamse.jpg",
                 "delayAfter": 0
             },
             {
                 "action": "fadeIn",
-                "element": "choice-milk.jpg",
+                "element": "choice-Mælk.jpg",
                 "delayAfter": 0
             },
             {
                 "action": "highlight",
                 "delayAfter": 0,
-                "element": "choice-flower.png"
+                "element": "choice-Blomst.jpg"
             },
             {
                 "action": "highlight",
                 "delayAfter": 0,
-                "element": "choice-police_officer.png"
+                "element": "choice-Politi.jpg"
             },
             {
                 "action": "highlight",
                 "delayAfter": 0,
-                "element": "choice-teddy_bear.png"
+                "element": "choice-Bamse.jpg"
             },
             {
                 "action": "highlight",
                 "delayAfter": 0,
-                "element": "choice-milk.jpg"
+                "element": "choice-Mælk.jpg"
             },
             {
                 // Her er billederne/valgmuligheder:
@@ -190,22 +188,22 @@
             {
                 "action": "highlight",
                 "delayAfter": 0,
-                "element": "choice-flower.png"
+                "element": "choice-Blomst.jpg"
             },
             {
                 "action": "highlight",
                 "delayAfter": 0,
-                "element": "choice-police_officer.png"
+                "element": "choice-Politi.jpg"
             },
             {
                 "action": "highlight",
                 "delayAfter": 0,
-                "element": "choice-teddy_bear.png"
+                "element": "choice-Bamse.jpg"
             },
             {
                 "action": "highlight",
                 "delayAfter": 0,
-                "element": "choice-milk.jpg"
+                "element": "choice-Mælk.jpg"
             },
             {
                 // Vælger det billede, som passer til ordet.
@@ -216,7 +214,7 @@
             {
                 "action": "select",
                 "delayAfter": 750,
-                "element": "choice-flower.png"
+                "element": "choice-Blomst.jpg"
             },
 
             {
@@ -251,22 +249,22 @@
             {
                 "action": "fadeOut",
                 "delayAfter": 0,
-                "element": "choice-flower.png"
+                "element": "choice-Blomst.jpg"
             },
             {
                 "action": "fadeOut",
                 "delayAfter": 0,
-                "element": "choice-police_officer.png"
+                "element": "choice-Politi.jpg"
             },
             {
                 "action": "fadeOut",
                 "delayAfter": 0,
-                "element": "choice-teddy_bear.png"
+                "element": "choice-Bamse.jpg"
             },
             {
                 "action": "fadeOut",
                 "delayAfter": 0,
-                "element": "choice-milk.jpg"
+                "element": "choice-Mælk.jpg"
             },
             {
                 "action": "fadeOut",
@@ -299,26 +297,24 @@
         ]
     },
     {
-        "question_type": "multiple_choice",
-        // TODO: Erstat med rigtig materiale
-        "text": "Motorcykeli",
-        "correct": "resources/dummy/wordreading_1/Opgave/bike.png",
-        "wrong": [
-            "resources/dummy/wordreading_1/Opgave/house.png",
-            "resources/dummy/wordreading_1/Opgave/car.png",
-            "resources/dummy/wordreading_1/Opgave/cat.png"
-        ]
+      "text": "Isi",
+      "question_type": "multiple_choice",
+      "correct": "resources/wordreading_1/Opgave/Øje.jpg",
+      "wrong": [
+        "resources/wordreading_1/Opgave/Blod.jpg",
+        "resources/wordreading_1/Opgave/Hund.jpg",
+        "resources/wordreading_1/Opgave/Hus.jpg"
+      ]
     },
     {
-        "question_type": "multiple_choice",
-        // TODO: Erstat med rigtig materiale
-        "text": "Qitsuk",
-        "correct": "resources/dummy/wordreading_1/Opgave/cat.png",
-        "wrong": [
-            "resources/dummy/wordreading_1/Opgave/house.png",
-            "resources/dummy/wordreading_1/Opgave/car.png",
-            "resources/dummy/wordreading_1/Opgave/dog.png"
-        ]
+      "text": "Matu",
+      "question_type": "multiple_choice",
+      "correct": "resources/wordreading_1/Opgave/Dør.jpg",
+      "wrong": [
+        "resources/wordreading_1/Opgave/Bil.jpg",
+        "resources/wordreading_1/Opgave/Børn.jpg",
+        "resources/wordreading_1/Opgave/Gris.jpg"
+      ]
     },
     {
         "question_type": "no_input_required",
