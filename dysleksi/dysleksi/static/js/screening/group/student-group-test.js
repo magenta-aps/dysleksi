@@ -77,12 +77,26 @@ export class GroupTestView extends StudentTestView {
                 answers = shuffleArray(answers);
             }
 
-            if (this.currentQuestion.type === "multiple_choice") {
+            if (this.currentQuestion.type === "multiple_choice_with_display_field") {
+                this.domElements.multipleChoiceAnswerDisplay.style.display = "flex";
+                this.domElements.multipleChoiceAnswerDisplay.innerHTML = "";
+            } else {
+                this.domElements.multipleChoiceAnswerDisplay.style.display = "none";
+            }
+
+            if (
+                this.currentQuestion.type === "multiple_choice" ||
+                this.currentQuestion.type === "multiple_choice_with_display_field"
+            ) {
                 this.answerButtons = [];
                 for (let answer of answers) {
-                    const button = this.domElements.showQuestionChoice(answer, () => {
-                        this.selectAnswer(answer);
-                    });
+                    const button = this.domElements.showQuestionChoice(
+                        answer,
+                        () => {
+                            this.selectAnswer(answer);
+                        },
+                        answers.length,
+                    );
                     this.answerButtons.push({ button: button, answer: answer });
                 }
             } else if (this.currentQuestion.type === "free_text") {
@@ -234,6 +248,7 @@ export class GroupTestView extends StudentTestView {
         for (let a of this.answerButtons) {
             this.domElements.toggleButtonSelected(a["button"], a["answer"] === answer);
         }
+        this.domElements.multipleChoiceAnswerDisplay.innerHTML = answer.resourceText;
     }
 
     answerIsCorrect() {

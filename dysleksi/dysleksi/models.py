@@ -54,6 +54,7 @@ class InstructionAction(TextChoices):
 
 class QuestionType(TextChoices):
     MULTIPLE_CHOICE = "multiple_choice"
+    MULTIPLE_CHOICE_WITH_DISPLAY_FIELD = "multiple_choice_with_display_field"
     FREE_TEXT = "free_text"
     NO_INPUT_REQUIRED = "no_input_required"
 

@@ -53,6 +53,7 @@ def create_group_test(
             )
             nonwordspelling_data_path = None
             letter_sound_data_path = None
+            letter_name_data_path = None
             fore_sound_data_path = None
 
             wordreading_test_name = "Ordlæsning 2A"
@@ -60,6 +61,7 @@ def create_group_test(
             wordspelling_test_name = "Ordstavning"
             nonwordspelling_test_name = "Nonordstavning"
             letter_sound_test_name = "Bogstavlyde"
+            letter_name_test_name = "Bogstavnavne"
             fore_sound_test_name = "Forlyd"
 
         else:
@@ -83,6 +85,10 @@ def create_group_test(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "dummy/letter_sound/letter_sound.json",
             )
+            letter_name_data_path = (
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "dummy/letter_name/letter_name.json",
+            )
             fore_sound_data_path = (
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "dummy/fore_sound/fore_sound.json",
@@ -93,6 +99,7 @@ def create_group_test(
             wordspelling_test_name = "Ordstavning (dummy)"
             nonwordspelling_test_name = "Nonordstavning (dummy)"
             letter_sound_test_name = "Bogstavlyde (dummy)"
+            letter_name_test_name = "Bogstavnavne (dummy)"
             fore_sound_test_name = "Forlyd (dummy)"
 
         call_command(
@@ -142,6 +149,15 @@ def create_group_test(
                     Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                     / "real/letter_sound/letter_sound_practice.json"
                 ),
+            )
+
+        if letter_name_data_path:
+            call_command(
+                "import_test",
+                name,
+                letter_name_test_name,
+                letter_name_data_path,
+                "letter_name",
             )
 
         if fore_sound_data_path:

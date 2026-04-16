@@ -8,6 +8,7 @@ from pathlib import Path
 
 from data_tools.utils import (
     create_fore_sound_test,
+    create_letter_name_test,
     create_letter_sound_test,
     create_nonwordspelling_test,
     create_pronunciation_test,
@@ -130,6 +131,10 @@ class Command(BaseCommand):
             )
         elif test_type == "letter_sound":
             create_letter_sound_test(
+                test, questions_data, practice_data, name=testpart_name
+            )
+        elif test_type == "letter_name":
+            create_letter_name_test(
                 test, questions_data, practice_data, name=testpart_name
             )
         elif test_type == "fore_sound":
