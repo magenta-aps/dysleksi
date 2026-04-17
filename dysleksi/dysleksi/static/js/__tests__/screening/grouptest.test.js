@@ -4,6 +4,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import * as groupTestData from "./grouptest.json" with { type: "json" };
 import * as letterSoundTestData from "./letter_sound_test.json" with { type: "json" };
+import * as letterNameTestData from "./letter_name_test.json" with { type: "json" };
 import { getWebSocket } from "../../ws";
 import { GroupTestDomElements } from "../../screening/dom.js";
 import { Test } from "../../screening/model.js";
@@ -96,7 +97,9 @@ describe("GroupTestFlow", () => {
             <div id="summary-container"></div>
             <button id="end-summary"></button>
             <div id="question-challenge"></div>
-            <div id="choices"></div>
+            <div id="choices" class="multiple-choice-choices"></div>
+            <div id="choices-row-2" class="multiple-choice-choices"></div>
+            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
             <button id="next"></button>
             <div id="test-summary"></div>
             <div id="testpart-intro"></div>
@@ -912,7 +915,9 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
     beforeEach(() => {
         document.body.innerHTML = `
             <div id="fade-overlay" style="opacity: 0;"></div>
-            <div id="choices"></div>
+            <div id="choices" class="multiple-choice-choices"></div>
+            <div id="choices-row-2" class="multiple-choice-choices"></div>
+            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
             <audio id="instructions-sound"></audio>
             <audio id="reminder-sound"></audio>
             <div id="instructions-text"></div>
@@ -1020,7 +1025,9 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
     beforeEach(() => {
         document.body.innerHTML = `
             <div id="fade-overlay" style="opacity: 0;"></div>
-            <div id="choices"></div>
+            <div id="choices" class="multiple-choice-choices"></div>
+            <div id="choices-row-2" class="multiple-choice-choices"></div>
+            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
             <audio id="instructions-sound"></audio>
             <audio id="reminder-sound"></audio>
             <div id="instructions-text"></div>
@@ -1189,7 +1196,9 @@ describe("GroupTestDomElements - Repeatbutton", () => {
         document.body.innerHTML = `
             <div id="fade-overlay" style="opacity: 0;"></div>
             <h1 id="student-header"></h1> <div id="choices"></div>
-            <div id="choices"></div>
+            <div id="choices" class="multiple-choice-choices"></div>
+            <div id="choices-row-2" class="multiple-choice-choices"></div>
+            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
             <audio id="instructions-sound"></audio>
             <audio id="reminder-sound"></audio>
             <div id="instructions-text"></div>
@@ -1310,7 +1319,9 @@ describe("Timer and Reminder Cleanup", () => {
             <div id="summary-container"></div>
             <button id="end-summary"></button>
             <div id="question-challenge"></div>
-            <div id="choices"></div>
+            <div id="choices" class="multiple-choice-choices"></div>
+            <div id="choices-row-2" class="multiple-choice-choices"></div>
+            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
             <button id="next"></button>
             <div id="test-summary"></div>
             <div id="testpart-intro"></div>
@@ -1402,7 +1413,9 @@ describe("StudentTestView - updateNextButtonClass", () => {
             <div id="summary-container"></div>
             <button id="end-summary"></button>
             <div id="question-challenge"></div>
-            <div id="choices"></div>
+            <div id="choices" class="multiple-choice-choices"></div>
+            <div id="choices-row-2" class="multiple-choice-choices"></div>
+            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
             <button id="next"></button>
             <div id="test-summary"></div>
             <div id="testpart-intro"></div>
@@ -1544,7 +1557,11 @@ describe("GroupTestDomElements - FreeText Touch Interaction", () => {
 
     beforeEach(() => {
         // 1. Reset DOM
-        document.body.innerHTML = `<div id="choices"></div>`;
+        document.body.innerHTML = `
+                <div id="choices" class="multiple-choice-choices"></div>
+                <div id="choices-row-2" class="multiple-choice-choices"></div>
+                <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
+            `;
 
         // 2. Initialize Class & Mocks
         domElements = new GroupTestDomElements();
@@ -1624,7 +1641,9 @@ describe("LetterSoundTest", () => {
             <div id="summary-container"></div>
             <button id="end-summary"></button>
             <div id="question-challenge"></div>
-            <div id="choices"></div>
+            <div id="choices" class="multiple-choice-choices"></div>
+            <div id="choices-row-2" class="multiple-choice-choices"></div>
+            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
             <button id="next"></button>
             <button id="log-out"></button>
             <div id="test-summary"></div>
@@ -1683,5 +1702,65 @@ describe("LetterSoundTest", () => {
         await vi.waitFor(() => {
             expect(playBtn.classList.contains("playing")).toBe(false);
         });
+    });
+});
+
+describe("LetterNameTest", () => {
+    let domElements;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div id="fade-overlay"></div>
+            <h1 id="student-header" class="student-header"></h1>
+            <audio id="instructions-sound"></audio>
+            <audio id="reminder-sound"></audio>
+            <div id="summary-container"></div>
+            <button id="end-summary"></button>
+            <div id="question-challenge"></div>
+            <div id="choices" class="multiple-choice-choices"></div>
+            <div id="choices-row-2" class="multiple-choice-choices"></div>
+            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
+            <button id="next"></button>
+            <button id="log-out"></button>
+            <div id="test-summary"></div>
+            <div id="test-exit"></div>
+            <div id="testpart-intro"></div>
+            <div id="test-intro"></div>
+            <div id="test-container"></div>
+            <button id="start-testpart"></button>
+            <button id="start-summary"></button>
+            <h2 id="testpart-intro-text"> </h2>
+            <img src="/foo" alt="img" id="testpart-intro-image">
+        `;
+
+        domElements = new GroupTestDomElements();
+        spyAttributes(domElements);
+
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
+            mockAudioContextInstance,
+        );
+        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = "";
+        vi.clearAllMocks();
+    });
+
+    it("Updates display field when a button is pressed", async () => {
+        const test = new Test(letterNameTestData);
+        const view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
+        view.setPart(0);
+        view.showFirstQuestion(false);
+
+        const MultipleChoicedisplay = document.getElementById(
+            "multiple-choice-answer-display",
+        );
+        const answerButtonObj = view.answerButtons[0];
+
+        expect(MultipleChoicedisplay.innerHTML).toBe("");
+        expect(MultipleChoicedisplay.style.display).toBe("flex");
+        answerButtonObj.button.click();
+        expect(MultipleChoicedisplay.innerHTML).toBe(answerButtonObj.button.innerHTML);
     });
 });

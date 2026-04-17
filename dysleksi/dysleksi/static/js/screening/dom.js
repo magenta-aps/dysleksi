@@ -34,6 +34,9 @@ class TestDomElements {
             "#skip-all-instructions",
         );
         this.repeatBtn = document.querySelector("#repeat");
+        this.multipleChoiceAnswerDisplay = document.querySelector(
+            "#multiple-choice-answer-display",
+        );
     }
 
     markButtonPress(buttonId, buttonClass) {
@@ -616,6 +619,7 @@ export class GroupTestDomElements extends TestDomElements {
     constructor() {
         super();
         this.choicesEl = document.querySelector("#choices");
+        this.choicesElSecondRow = document.querySelector("#choices-row-2");
     }
 
     toggleQuestionDisplay(state) {
@@ -626,9 +630,10 @@ export class GroupTestDomElements extends TestDomElements {
 
     clearQuestionChoices() {
         this.choicesEl.innerHTML = "";
+        this.choicesElSecondRow.innerHTML = "";
     }
 
-    showQuestionChoice(answer, listener) {
+    showQuestionChoice(answer, listener, answerCount) {
         const text = answer.resourceText;
         //const sound = answer.resourceSoundUrl;
         const imageUrl = answer.resourceImageUrl;
@@ -637,7 +642,11 @@ export class GroupTestDomElements extends TestDomElements {
             btn.textContent = text;
 
             if (text.length === 1) {
-                btn.style.fontSize = "72px";
+                if (answerCount > 6) {
+                    btn.style.fontSize = "38px";
+                } else {
+                    btn.style.fontSize = "72px";
+                }
             } else {
                 btn.style.fontSize = "32px";
             }
@@ -648,13 +657,22 @@ export class GroupTestDomElements extends TestDomElements {
             btn.append(image);
             btn.className = "btn btn-outline-primary square-btn";
         } else if (text.length === 1) {
-            btn.className = "btn btn-outline-primary square-btn";
+            if (answerCount > 6) {
+                btn.className = "btn btn-outline-primary";
+            } else {
+                btn.className = "btn btn-outline-primary square-btn";
+            }
         } else {
             btn.className = "btn btn-outline-primary";
         }
         // TODO: render sound
         btn.id = answer.buttonId;
-        this.choicesEl.append(btn);
+        if (this.choicesEl.childElementCount < 6) {
+            this.choicesEl.append(btn);
+        } else {
+            btn.style.marginTop = "24px";
+            this.choicesElSecondRow.append(btn);
+        }
         if (listener) {
             btn.addEventListener("click", listener);
         }
