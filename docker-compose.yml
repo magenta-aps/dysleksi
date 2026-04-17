@@ -41,7 +41,9 @@ services:
       - ./instructions:/upload/instructions/:ro
       - ../dysleksi-binaries/:/upload/dev-data/:ro
       - idp-data:/app/idp:rw
-      - staticfiles-data:/static-copy/
+      # Note: Use /static/ instead of /static-copy/ to allow hot-reloading
+      # In a production environment we would use /static-copy/
+      - staticfiles-data:/static/
       - mediafiles-data:/upload/
     environment:
       - PULL_IDP_METADATA=true
