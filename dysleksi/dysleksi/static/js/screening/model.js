@@ -14,6 +14,8 @@ export class Student {
         this.resultsByPart = {};
         this.currentPartIndex = null;
         this.currentQuestionIndex = null;
+        this.problem = false;
+        this.marked = false;
     }
     get displayName() {
         const lastInitial = this.lastName ? ` ${this.lastName[0].toUpperCase()}.` : "";
@@ -58,6 +60,9 @@ export class Student {
                 this.currentPartIndex,
                 this.currentQuestionIndex - 1,
             );
+        }
+        if (this.firstName.includes("Dummy1")) {
+            this.problem = true;
         }
     }
 

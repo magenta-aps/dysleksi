@@ -223,15 +223,20 @@ export class StudentCard {
         this.el = this._createMarkup();
         this.foldedArea = this.el.querySelector(".folded-area");
         this.progressFill = this.el.querySelector(".progress-fill");
+        this.topRow = this.el.querySelector(".student-top-row");
         this.partsProgress = this.el.querySelector(".parts-progress");
         this.nameText = this.el.querySelector(".student-text");
-        this.arrowIcon = this.el.querySelector(".foldout-arrow i");
+        this.arrowIcon = this.el.querySelector("#foldout-arrow");
+        this.markBtn = this.el.querySelector(".mark-button");
+        this.markIcon = this.el.querySelector(".mark-button i");
+        this.statusIcon = this.el.querySelector(".status-icon i");
         this.dotsContainer = this.el.querySelector(".dots-container");
         this.partLabel = this.el.querySelector(".part-label");
         this.partIndex = this.el.querySelector(".part-index");
         this.questionIndex = this.el.querySelector(".question-index");
         this.subTestLeftArrow = this.el.querySelector(".ph-caret-left");
         this.subTestRightArrow = this.el.querySelector(".ph-caret-right");
+        this.markedStudentsCount = document.getElementById("marked-students-count");
 
         this.currentViewPartIndex = 0;
 
@@ -243,6 +248,22 @@ export class StudentCard {
     _initEventListeners() {
         // Toggle fold
         this.el.addEventListener("click", (e) => this.toggleFold(e));
+
+        // Mark Button Click
+        this.markBtn.addEventListener("click", (e) => {
+            e.stopPropagation();
+            this.student.marked = !this.student.marked;
+            this.update();
+
+            let markedStudents = parseInt(this.markedStudentsCount.innerHTML);
+
+            if (this.student.marked) {
+                markedStudents += 1;
+            } else {
+                markedStudents -= 1;
+            }
+            this.markedStudentsCount.innerHTML = markedStudents;
+        });
 
         // Navigation Arrows
         this.subTestLeftArrow.addEventListener("click", (e) => {
@@ -306,6 +327,26 @@ export class StudentCard {
             this.currentViewPartIndex === this.student.currentPartIndex;
         this.progressFill.style.width = `${this.student.progress}%`;
 
+        if (this.student.progress === 100) {
+            this.progressFill.classList.add("is-complete");
+            this.topRow.classList.add("is-complete");
+            this.statusIcon.style.display = "block";
+            this.statusIcon.className = "ph-fill ph-check-circle green";
+        } else if (this.student.problem) {
+            this.progressFill.classList.add("has-problem");
+            this.topRow.classList.add("has-problem");
+            this.statusIcon.style.display = "block";
+            this.statusIcon.className = "ph-fill ph-warning-circle red";
+        } else {
+            this.statusIcon.style.display = "none";
+        }
+
+        if (this.student.marked) {
+            this.markBtn.classList.add("is-marked");
+        } else {
+            this.markBtn.classList.remove("is-marked");
+        }
+
         this.subTestLeftArrow.classList.toggle(
             "disabled",
             this.currentViewPartIndex === 0,
@@ -353,11 +394,82 @@ export class GroupTestContainer {
         this.students = new Map();
         this.cards = new Map();
         this.test = test;
+        this.allStudentsCount = document.getElementById("all-students-count");
+        this.ongoingStudentsCount = document.getElementById("ongoing-students-count");
+        this.finishedStudentsCount = document.getElementById("finished-students-count");
+        this.problemStudentsCount = document.getElementById("problem-students-count");
+
+        this.allStudentsButton = document.getElementById("all-students-button");
+        this.ongoingStudentsButton = document.getElementById("ongoing-students-button");
+        this.finishedStudentsButton = document.getElementById(
+            "finished-students-button",
+        );
+        this.markedStudentsButton = document.getElementById("marked-students-button");
+        this.problemStudentsButton = document.getElementById("problem-students-button");
+
+        this.allStudentsButton.onclick = () => this.filterCards("all");
+        this.ongoingStudentsButton.onclick = () => this.filterCards("ongoing");
+        this.finishedStudentsButton.onclick = () => this.filterCards("finished");
+        this.markedStudentsButton.onclick = () => this.filterCards("marked");
+        this.problemStudentsButton.onclick = () => this.filterCards("problem");
+    }
+
+    filterCards(criteria) {
+        console.log(`Filtering by: ${criteria}`);
+
+        this.cards.forEach((card, studentId) => {
+            const student = this.students.get(studentId);
+            let shouldShow = false;
+
+            switch (criteria) {
+                case "all":
+                    shouldShow = true;
+                    break;
+                case "ongoing":
+                    shouldShow = student.progress < 100;
+                    break;
+                case "finished":
+                    shouldShow = student.progress === 100;
+                    break;
+                case "marked":
+                    shouldShow = !!student.marked;
+                    break;
+                case "problem":
+                    shouldShow = !!student.problem;
+                    break;
+            }
+
+            if (shouldShow) {
+                card.el.style.display = "flex";
+            } else {
+                card.el.style.display = "none";
+            }
+        });
+    }
+
+    updateCounts() {
+        let problemStudents = 0;
+        let finishedStudents = 0;
+        let ongoingStudents = 0;
+
+        this.students.forEach((student) => {
+            if (student.problem) {
+                problemStudents += 1;
+            }
+            if (student.progress == 100) {
+                finishedStudents += 1;
+            } else {
+                ongoingStudents += 1;
+            }
+        });
+
+        this.allStudentsCount.innerHTML = this.students.size;
+        this.problemStudentsCount.innerHTML = problemStudents;
+        this.finishedStudentsCount.innerHTML = finishedStudents;
+        this.ongoingStudentsCount.innerHTML = ongoingStudents;
     }
 
     updateData(data) {
-        if (!this.container) return;
-
         const studentData = data.student;
         let student = this.students.get(studentData.id);
 
@@ -371,11 +483,13 @@ export class GroupTestContainer {
         }
 
         student.progress = studentData.progress;
+        student.problem = studentData.problem;
         student.currentPartIndex = studentData.currentPartIndex;
         student.currentQuestionIndex = studentData.currentQuestionIndex;
         student.resultsByPart = studentData.resultsByPart;
 
         this.cards.get(student.id).update();
+        this.updateCounts();
     }
 }
 
@@ -635,7 +749,9 @@ export class TeacherView {
         this.currentIsPractice = null;
 
         this.table = table || new EventTable();
-        this.groupTestContainer = new GroupTestContainer(test);
+        if (this.test.testType === "group") {
+            this.groupTestContainer = new GroupTestContainer(test);
+        }
         this.buttons = buttons || new ActionButtons();
         this.noteField = noteField || new NoteField();
         this.questionView = questionView || new QuestionView();

@@ -16,9 +16,20 @@
         <div class="student-top-row">
             <div class="progress-fill" style="width: 0%"></div>
             <span class="student-text"></span>
-            <span class="foldout-arrow">
-                <i class="ph-fill ph-caret-up"></i>
-            </span>
+            <div class="student-controls">
+                <span class="status-icon">
+                    <i class="ph-fill ph-check-circle"></i>
+                </span>
+                <span class="student-control-button mark-button">
+                    <i class="ph-fill ph-flag-pennant"></i>
+                </span>
+                <span class="student-control-button">
+                    <i class="ph ph-dots-three"></i>
+                </span>
+                <span class="student-control-button">
+                    <i id="foldout-arrow" class="ph-fill ph-caret-up"></i>
+                </span>
+            </div>
         </div>
         <div class="folded-area" style="display: none">
             <div class="parts-progress"></div>
@@ -43,11 +54,28 @@
     <h5 class="mt-2 mb-4">Klasse {{class_name}} - Screening {{ test_name }}</h5>
     <div class="group-test-container">
         <div class="group-test-header">
-            <button class="btn btn-outline-primary">Alle</button>
-            <button class="btn btn-outline-primary">I gang</button>
-            <button class="btn btn-outline-primary">Færdige</button>
-            <button class="btn btn-outline-primary">Mærket</button>
-            <button class="btn btn-outline-primary">Problemer/offline</button>
+            <button id="all-students-button" class="btn btn-outline-primary">
+              Alle (<span id="all-students-count">0</span>)
+            </button>
+            
+            <button id="ongoing-students-button" class="btn btn-outline-primary">
+              I gang (<span id="ongoing-students-count">0</span>)
+            </button>
+            
+            <button id="finished-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-check-circle green"></i>
+              Færdige (<span id="finished-students-count">0</span>)
+            </button>
+            
+            <button id="marked-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-flag-pennant orange"></i>
+              Mærket (<span id="marked-students-count">0</span>)
+            </button>
+            
+            <button id="problem-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-warning-circle red"></i>
+              Problemer/offline (<span id="problem-students-count">0</span>)
+            </button>
         </div>
 
         <div class="group-test-toolbar">
