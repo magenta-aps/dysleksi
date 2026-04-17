@@ -12,6 +12,7 @@ MAKEMESSAGES=${MAKEMESSAGES:=false}
 PULL_IDP_METADATA=${PULL_IDP_METADATA:=false}
 CREATE_DUMMY_DATA=${CREATE_DUMMY_DATA:=false}
 CREATE_DUMMY_USERS=${CREATE_DUMMY_USERS:=false}
+STATICFILES_DESTINATION_DIR=${STATICFILES_DESTINATION_DIR:=""}
 
 python manage.py wait_for_db
 
@@ -57,6 +58,12 @@ fi
 
 if [ $ECHO_INTERFACE ]; then
   echo "Interface: $ECHO_INTERFACE"
+fi
+
+if [ -d $STATICFILES_DESTINATION_DIR ]; then
+  echo "Copying static files from image to volume"
+  # So that the dysleksi-static-web container can serve them
+  cp -r /static/* $STATICFILES_DESTINATION_DIR
 fi
 
 

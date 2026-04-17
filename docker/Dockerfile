@@ -16,14 +16,20 @@ RUN mkdir /app && \
     mkdir -p /upload/instructions && \
     mkdir -p /upload/resources && \
     mkdir -p /upload/resources/dummy && \
+    mkdir -p /static/ && \
+    mkdir -p /static-copy/ && \
     #gid/uid from salt
     groupadd -g 75200 -r dysleksi && \
     groupadd -g 75100 -r certificate_exporter && \
     useradd -u 75200 --no-log-init -r -g dysleksi -G certificate_exporter dysleksi && \
     chown -R dysleksi:dysleksi /var/cache/idp && \
     chown -R dysleksi:dysleksi /upload && \
+    chown -R dysleksi:dysleksi /static && \
+    chown -R dysleksi:dysleksi /static-copy && \
     chmod a+w /var/cache/idp && \
-    chmod -R u+w /upload
+    chmod -R u+w /upload && \
+    chmod -R u+rw /static && \
+    chmod -R u+w /static-copy
 
 # supercronic
 RUN curl -fsSLO "$SUPERCRONIC_URL" && \
