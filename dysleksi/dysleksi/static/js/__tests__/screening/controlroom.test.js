@@ -198,6 +198,28 @@ describe("ElapsedTimeView", () => {
     });
 });
 
+describe("NoteField", () => {
+    it("handles a present #note UI element", () => {
+        document.body.innerHTML = `<textarea id="note" class="d-none">Min note</textarea>`;
+        const noteField = new NoteField();
+        expect(noteField.noteEl).not.toBeNull();
+        expect(noteField.getNote()).toBe("Min note");
+        noteField.clearNote();
+        expect(noteField.getNote()).toBe("");
+        noteField.show();
+        expect(noteField.noteEl.classList).not.toContain("d-none");
+    });
+
+    it("handles a missing #note UI element", () => {
+        document.body.innerHTML = ``;
+        const noteField = new NoteField();
+        expect(noteField.noteEl).toBeNull();
+        expect(noteField.getNote()).toBeUndefined();
+        expect(noteField.clearNote()).toBeUndefined();
+        expect(noteField.show()).toBeUndefined();
+    });
+});
+
 describe("Teacher Individual test View", () => {
     let socket;
     let table;
@@ -243,11 +265,11 @@ describe("Teacher Individual test View", () => {
                 </div>
             </template>
             <table id="events"><tbody></tbody></table>
-            <button id="correct"></button>
-            <button id="wrong"></button>
-            <button id="cancelled"></button>
-            <button id="skipped"></button>
-            <button id="next"></button>
+            <button id="correct"><span>Korrekt</span></button>
+            <button id="wrong">Forkert</button>
+            <button id="cancelled">Afslut test</button>
+            <button id="skipped">Sprunget over</button>
+            <button id="next">Næste</button>
             <textarea id="note" class="d-none"></textarea>
         `;
 
@@ -868,6 +890,18 @@ describe("Teacher Individual test View", () => {
         );
         expect(container.querySelector("#challenge-text")).toBeNull();
     });
+
+    it("handles action button events inside 'span' elements", () => {
+        // Arrange
+        const spySendQuestionFeedback = vi.spyOn(view, "sendQuestionFeedback");
+        view.setPartIndex(0);
+        view.setQuestionIndex(0);
+        // Act: click on 'span' element inside button, rather than button itself
+        const span = document.querySelector("button#correct span");
+        span.dispatchEvent(new Event("click", { bubbles: true }));
+        // Assert
+        expect(spySendQuestionFeedback).toHaveBeenCalled();
+    });
 });
 
 describe("GroupTestContainer", () => {
@@ -1381,6 +1415,17 @@ describe("EventTable", () => {
     });
 
     it("renders an audio player when recordingBase64 is present", () => {
+        // Allow test to override `duration` of `audio` HTML element
+        Object.defineProperty(global.window.HTMLMediaElement.prototype, "duration", {
+            configurable: true,
+            get() {
+                return this._duration;
+            },
+            set(value) {
+                this._duration = value;
+            },
+        });
+
         const data = {
             recordingBase64: "data:audio/wav;base64,UklGR...",
             partIndex: 0,
@@ -1391,11 +1436,48 @@ describe("EventTable", () => {
         table.updateTable({ event: "question.feedback", ...data });
 
         const answerCell = document.querySelector("td.answer");
+        const uiEl = answerCell.querySelector("div.audio");
+        const playBtnEl = answerCell.querySelector("i.ph-play");
+        const durationEl = answerCell.querySelector("span");
         const audioEl = answerCell.querySelector("audio");
 
+        // Mock that our audio data has a valid duration
+        audioEl.duration = 42; // seconds
+
+        expect(uiEl).not.toBeNull();
+        expect(playBtnEl).not.toBeNull();
+        expect(durationEl).not.toBeNull();
         expect(audioEl).not.toBeNull();
+
+        // Test initial UI state
+        expect(uiEl.classList).not.toContain("playing");
         expect(audioEl.src).toBe(data.recordingBase64);
-        expect(audioEl.controls).toBe(true);
+        expect(audioEl.controls).toBeFalsy();
+
+        // Dispatch events that normally occur as soon as the audio data has loaded
+        audioEl.dispatchEvent(new Event("loadedmetadata"));
+        audioEl.dispatchEvent(new Event("canplay"));
+        // Test UI state after audio has loaded
+        expect(durationEl.innerText).toContain("00:42");
+
+        // Test UI state when playing
+        playBtnEl.dispatchEvent(new Event("click"));
+        expect(uiEl.classList).toContain("playing");
+
+        // Test UI state when audio is done playing
+        audioEl.dispatchEvent(new Event("ended"));
+        expect(uiEl.classList).not.toContain("playing");
+    });
+
+    it("updates the audio element duration after a timeout of 250ms", () => {
+        vi.useFakeTimers();
+
+        const spyUpdate = vi.spyOn(table, "updateAudioDuration");
+        table.createAudioEl("data:audio/wav;base64,UklGR...");
+        vi.advanceTimersByTime(250);
+        expect(spyUpdate).toHaveBeenCalled();
+
+        vi.useRealTimers();
     });
 
     it("renders textAnswer when no audio is present", () => {

@@ -221,11 +221,19 @@ msgid "Åbn"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Pause"
+msgid "Del"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Pause test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Afslut test"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Opgave"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
@@ -245,15 +253,11 @@ msgid "Sprunget over"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Skriv evt. bemærkning"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Næste opgave"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Opgave"
+msgid "Resultater"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html

@@ -2,6 +2,13 @@ import { Student } from "./model.js";
 import { WebRTCChannel } from "../webRTC.js";
 import { serverOnline } from "./utils.js";
 
+const formatDuration = (duration) => {
+    const hours = String(duration.getHours() - 1).padStart(2, "0");
+    const minutes = String(duration.getMinutes()).padStart(2, "0");
+    const seconds = String(duration.getSeconds()).padStart(2, "0");
+    return `${hours}:${minutes}:${seconds}`;
+};
+
 export class EventTable {
     constructor(test, tableSelector = "table#events tbody") {
         this.test = test;
@@ -138,10 +145,57 @@ export class EventTable {
     }
 
     createAudioEl(recordingBase64) {
+        const uiEl = document.createElement("div");
+        uiEl.classList.add("audio");
         const audioEl = document.createElement("audio");
-        audioEl.controls = true;
         audioEl.src = recordingBase64;
-        return audioEl;
+        audioEl.preload = "auto";
+        const playBtnEl = document.createElement("i");
+        playBtnEl.classList.add("ph-fill", "ph-play");
+        const durationEl = document.createElement("span");
+        durationEl.classList.add("ms-1");
+
+        uiEl.append(audioEl);
+        uiEl.append(playBtnEl);
+        uiEl.append(durationEl);
+
+        // Wait until audio is loaded before attaching "play" event handler
+        audioEl.addEventListener("canplay", (_evt) => {
+            playBtnEl.addEventListener("click", (_evt) => {
+                audioEl.play();
+                uiEl.classList.add("playing");
+                this.updateAudioDuration(audioEl, durationEl);
+            });
+        });
+
+        // Restore normal look once audio is done playing
+        audioEl.addEventListener("ended", (_evt) => {
+            uiEl.classList.remove("playing");
+        });
+
+        // Wait until metadata is loaded before displaying duration
+        audioEl.addEventListener("loadedmetadata", (_evt) => {
+            this.updateAudioDuration(audioEl, durationEl);
+        });
+
+        // Try again a little later, to make duration display more robust
+        setTimeout(() => {
+            this.updateAudioDuration(audioEl, durationEl);
+        }, 250);
+
+        return uiEl;
+    }
+
+    updateAudioDuration(audioEl, durationEl) {
+        const duration = audioEl.duration;
+        if (!isNaN(duration) && isFinite(duration)) {
+            durationEl.innerText = formatDuration(
+                // Convert duration in seconds to `Date` (specified in milliseconds)
+                new Date(duration * 1000),
+            );
+        } else {
+            durationEl.innerHTML = "--:--:--";
+        }
     }
 
     createTd(cls) {
@@ -425,15 +479,21 @@ export class NoteField {
     }
 
     getNote() {
-        return this.noteEl.value;
+        if (this.noteEl !== null) {
+            return this.noteEl.value;
+        }
     }
 
     clearNote() {
-        this.noteEl.value = "";
+        if (this.noteEl !== null) {
+            this.noteEl.value = "";
+        }
     }
 
     show() {
-        this.noteEl.classList.toggle("d-none", false);
+        if (this.noteEl !== null) {
+            this.noteEl.classList.toggle("d-none", false);
+        }
     }
 }
 
@@ -545,10 +605,7 @@ export class ElapsedTimeView {
     update() {
         if (this.running && this.t1 !== null) {
             const delta = new Date(new Date() - this.t1);
-            const hours = String(delta.getHours() - 1).padStart(2, "0");
-            const minutes = String(delta.getMinutes()).padStart(2, "0");
-            const seconds = String(delta.getSeconds()).padStart(2, "0");
-            this.domElement.innerText = `${hours}:${minutes}:${seconds}`;
+            this.domElement.innerText = formatDuration(delta);
         }
     }
 }
@@ -834,7 +891,7 @@ export class TeacherView {
 
     _initButtonListeners() {
         this.buttons.addClickListener((e) => {
-            const val = e.target.id;
+            const val = e.target.id || e.target.parentElement.id;
             if (val === "cancelled") {
                 if (confirm("Er du sikker på at du vil afbryde testen")) {
                     this.sendTestCancelled();
