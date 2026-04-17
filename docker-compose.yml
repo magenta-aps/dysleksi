@@ -41,7 +41,7 @@ services:
       - ./instructions:/upload/instructions/:ro
       - ../dysleksi-binaries/:/upload/dev-data/:ro
       - idp-data:/app/idp:rw
-      - staticfiles-data:/app/project/static/
+      - staticfiles-data:/static-copy/
       - mediafiles-data:/upload/
     environment:
       - PULL_IDP_METADATA=true
@@ -54,6 +54,7 @@ services:
       - DUMMY_DATA_DIR=/upload/dev-data/dummy-data
       - REAL_DATA_DIR=/upload/dev-data/real-data
       - ECHO_INTERFACE=https://dysleksi-web
+      - STATICFILES_DESTINATION_DIR=/static-copy
     networks:
       - default
       - database

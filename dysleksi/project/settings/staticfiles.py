@@ -1,10 +1,10 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
-from project.settings.base import BASE_DIR, TESTING
+from project.settings.base import TESTING
 
 STATIC_URL = "static/"
-STATIC_ROOT = BASE_DIR / "static"
+STATIC_ROOT = "/static"
 REMINDER_FALLBACK = "/" + STATIC_URL + "audio/447307__mabdog__ringtone-1.wav"
 
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
