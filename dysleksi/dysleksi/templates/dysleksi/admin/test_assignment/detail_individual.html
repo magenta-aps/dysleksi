@@ -14,22 +14,22 @@
      data-test-type="{{ test_type }}"
      data-room-name="{{ room_name }}"
      data-assignment-id="{{ object.pk }}">
-    <h5 class="mt-2 mb-4">{{ test_assignment.student.get_full_name }} - {{ test_assignment.test.name }}</h5>
+    <h2 class="mt-2 mb-4">{{ test_assignment.student.get_full_name }} - {{ test_assignment.test.name }}</h2>
     <div class="card">
         <div class="card-header d-flex align-items-center justify-content-between">
-            <span class="me-5"><em id="current-test-part-name"></em></span>
-            <span id="current-test-part-number" class="me-5"></span>
-            <span id="current-test-question-number" class="me-5"></span>
+            <span id="current-test-part-name" class="me-2 fw-bold">{% translate 'Deltest' %}</span>
+            <span class="divider">/</span>
+            <span id="current-test-part-number" class="ms-2">{% translate 'Del' %}</span>
             <div class="align-items-center ms-auto">
                 <span class="d-inline-flex align-items-baseline me-5">
                     <i class="ph ph-clock me-2"></i>
                     <span id="total-elapsed-time"></span>
                 </span>
-                <button id="pause" class="btn btn-warning">
+                <button id="pause" class="btn btn-outline-secondary me-2">
                     <i class="ph-fill ph-pause"></i>
-                    {% translate 'Pause' %}
+                    {% translate 'Pause test' %}
                 </button>
-                <button id="cancelled" class="btn btn-danger">
+                <button id="cancelled" class="btn btn-warning">
                     <i class="ph-fill ph-stop"></i>
                     {% translate 'Afslut test' %}
                 </button>
@@ -37,6 +37,7 @@
         </div>
         <div class="card-body d-flex">
             <div id="question-container">
+                <div id="current-test-question-number" class="mb-3 fw-bold">{% translate 'Opgave' %}</div>
                 <span id="question-title" class="d-none"></span>
                 <div id="question-content" class="current-question"></div>
             </div>
@@ -46,29 +47,28 @@
                     <button id="correct" class="btn btn-outline-success disabled d-none">
                         <i class="ph ph-circle fs-5"></i>
                         <i class="ph-fill ph-check-circle fs-5"></i>
-                        {% translate 'Korrekt' %}
+                        <span>{% translate 'Korrekt' %}</span>
                     </button>
                     <button id="wrong" class="btn btn-outline-danger disabled d-none">
                         <i class="ph ph-circle fs-5"></i>
                         <i class="ph-fill ph-x-circle fs-5"></i>
-                        {% translate 'Forkert' %}
+                        <span>{% translate 'Forkert' %}</span>
                     </button>
                     <button id="skipped" class="btn btn-outline-secondary disabled d-none">
                         <i class="ph ph-circle fs-5"></i>
                         <i class="ph-fill ph-minus-circle fs-5"></i>
-                        {% translate 'Sprunget over' %}
+                        <span>{% translate 'Sprunget over' %}</span>
                     </button>
                 </div>
-                <textarea id="note"
-                          class="form-control mb-3 d-none"
-                          rows="3"
-                          placeholder="{% translate 'Skriv evt. bemærkning' %}">
-                </textarea>
-                <button id="next" class="btn btn-secondary disabled">
+                <button id="next" class="btn btn-primary disabled">
                     {% translate 'Næste opgave' %}
                 </button>
             </div>
+            <div id="audio-indicator" class="d-flex"></div>
         </div>
+    </div>
+    <h3 class="mt-4 mb-3">{% translate 'Resultater' %}</h3>
+    <div class="table-container">
         <table id="events" class="table">
             <thead>
                 <tr>

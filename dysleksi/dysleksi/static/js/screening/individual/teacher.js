@@ -3,7 +3,6 @@ import {
     ActionButtons,
     ElapsedTimeView,
     TeacherView,
-    NoteField,
     QuestionView,
 } from "../controlroom.js";
 import { getWebSocket } from "../../ws.js";
@@ -13,7 +12,6 @@ export function initTeacher(roomName, assignmentId, test) {
 
     const table = new EventTable(test);
     const buttons = new ActionButtons();
-    const noteField = new NoteField();
     const questionView = new QuestionView(
         "#question-container",
         "#question-title",
@@ -25,7 +23,6 @@ export function initTeacher(roomName, assignmentId, test) {
     const elapsedTimeView = new ElapsedTimeView("#total-elapsed-time");
 
     buttons.showButtons();
-    noteField.show();
     questionView.show();
 
     new TeacherView(
@@ -35,7 +32,7 @@ export function initTeacher(roomName, assignmentId, test) {
         getWebSocket,
         table,
         buttons,
-        noteField,
+        null,
         questionView,
         elapsedTimeView,
     );

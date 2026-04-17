@@ -11,10 +11,6 @@ vi.mock("../../../screening/controlroom.js", () => {
         showButtons() {}
     }
 
-    class NoteField {
-        show() {}
-    }
-
     class QuestionView {
         show() {}
     }
@@ -28,7 +24,6 @@ vi.mock("../../../screening/controlroom.js", () => {
         EventTable,
         ActionButtons,
         ElapsedTimeView,
-        NoteField,
         QuestionView,
         TeacherView,
     };
@@ -43,19 +38,17 @@ import {
     EventTable,
     ActionButtons,
     ElapsedTimeView,
-    NoteField,
     QuestionView,
     TeacherView,
 } from "../../../screening/controlroom.js";
 import { getWebSocket } from "../../../ws.js";
 
 describe("initTeacher", () => {
-    let showButtonsSpy, noteShowSpy, questionShowSpy;
+    let showButtonsSpy, questionShowSpy;
 
     beforeEach(() => {
         vi.clearAllMocks();
         showButtonsSpy = vi.spyOn(ActionButtons.prototype, "showButtons");
-        noteShowSpy = vi.spyOn(NoteField.prototype, "show");
         questionShowSpy = vi.spyOn(QuestionView.prototype, "show");
     });
 
@@ -68,7 +61,6 @@ describe("initTeacher", () => {
 
         // Methods called
         expect(showButtonsSpy).toHaveBeenCalled();
-        expect(noteShowSpy).toHaveBeenCalled();
         expect(questionShowSpy).toHaveBeenCalled();
 
         // TeacherView constructor called
@@ -81,7 +73,7 @@ describe("initTeacher", () => {
         expect(args[3]).toBe(getWebSocket);
         expect(args[4]).toBeInstanceOf(EventTable);
         expect(args[5]).toBeInstanceOf(ActionButtons);
-        expect(args[6]).toBeInstanceOf(NoteField);
+        expect(args[6]).toBeNull();
         expect(args[7]).toBeInstanceOf(QuestionView);
         expect(args[8]).toBeInstanceOf(ElapsedTimeView);
     });

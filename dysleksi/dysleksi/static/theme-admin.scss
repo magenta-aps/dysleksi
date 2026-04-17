@@ -88,6 +88,7 @@ $form-select-border-radius: 1rem;
 $card-cap-bg: $mono-gray-lighter;
 $card-bg: $mono-white;
 $card-border-width: 0px;
+$card-border-radius: 0.75rem;
 
 @import "./vendor/scss/bootstrap";
 @import "./vendor/fonts/phosphor/regular/style.css";
@@ -328,37 +329,21 @@ h4, th {
 
 // Button styles
 .btn-warning {
-  color: $yellow-darkest;
-  border-color: $yellow-normal;
+  background: $red-lightest;
+  color: $red-normal;
+  border-color: $red-normal;
 }
-.btn-outline-secondary,
-.btn-secondary-outline {
+.btn-outline-secondary {
   color: $blue-darkest;
   border-color: $blue-normal;
 }
-.btn-outline-secondary:hover,
-.btn-secondary-outline:hover {
+.btn-outline-secondary:hover {
   border: 1px solid $blue-normal;
   background: $blue-lightest;
 }
 .btn i.ph,
 .btn i.ph-fill {
   line-height: var(--bs-body-line-height);
-}
-
-// Card styles
-.card {
-  box-shadow: 0 0 $spacer $mono-gray-lightest;
-
-  .card-header span {
-    color: $mono-gray-dark-2;
-  }
-
-  .card-header em {
-    text-transform: uppercase;
-    font-style: normal;
-    font-weight: bold;
-  }
 }
 
 // Form element styles
@@ -515,42 +500,6 @@ ul.modal-progress {
 }
 
 // Teacher UI
-.current-question {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  align-items: center;
-  justify-content: space-around;
-  border: 1px solid $mono-gray-dark-1;
-  border-radius: $spacer;
-}
-.current-question p {
-  font-family: "Karinika", "DM Sans Regular", sans-serif;
-  font-size: 5rem;
-  line-height: 1;
-}
-.card {
-  .table {
-    margin: 0;
-
-    thead th {
-      background: $mono-gray-lightest;
-      color: $mono-gray-dark-2;
-    }
-
-    tbody span.challenge {
-      display: inline-block;
-      margin: 0 $spacer;
-      padding: 0.25 * $spacer 0.67 * $spacer;
-      border: 1px solid $mono-gray-lighter;
-      border-radius: 0.5 * $spacer;
-      text-align: center;
-      font-family: "Karinika", "DM Sans Regular", sans-serif;
-      font-size: 1.25 * $spacer;
-    }
-  }
-}
-
 button.dropdown-toggle {
   padding: 0.25 * $spacer 0.5 * $spacer;
   border: none;
@@ -572,7 +521,7 @@ button.dropdown-toggle {
 
   // "Skipped
   &.btn-secondary {
-    background: $white;
+    background: $mono-gray-lightest;
     color: $mono-gray-dark-3;
   }
 }
@@ -587,45 +536,162 @@ td.note input {
 
 // Teacher UI for running individual tests
 div[data-role='teacher'][data-test-type='individual'] {
+  .card {
+    box-shadow: 0 0 $spacer $mono-gray-lightest;
+  }
+
+  .card-header {
+    background: $blue-lightest;
+    border: 1px solid $blue-lighter-1;
+
+    #current-test-part-name,
+    #current-test-part-number {
+      color: $mono-gray-dark-3;
+    }
+
+    .divider {
+      color: $mono-gray-light;
+    }
+  }
+
+  .card-body {
+    background: $white;
+    border: 1px solid $mono-gray-lighter;
+    border-radius: 0 0 var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius);
+  }
+
   .d-flex {
     #question-container {
       flex: 1;
+
+      .current-question {
+        display: flex;
+        width: 100%;
+        height: 11 * $spacer;
+        align-items: center;
+        justify-content: space-around;
+        background: $mono-white;
+        border: 1px solid $mono-gray-light;
+        border-radius: $spacer;
+      }
+
+      .current-question p {
+        font-family: "Karinika", "DM Sans Regular", sans-serif;
+        font-size: 5rem;
+        line-height: 1;
+      }
     }
 
     .actions {
-      flex: 4;
+      flex: 3;
       margin: 0 0 0 $spacer;
 
       .buttons {
         margin: 0 0 $spacer 0;
-      }
 
-      .btn {
-        display: inline-flex;
-        align-items: center;
-        padding: 0.25 * $btn-padding-y $btn-padding-x;
+        .btn {
+          display: flex;
+          align-content: center;
+          margin: 0 0 0.75 * $spacer 0;
+          padding: 0 0.5 * $spacer 0 0.25 * $spacer;
 
-        &#correct.active {
-          background: $green-lightest;
-          color: $green-darker;
-        }
-
-        i.ph {
-          display: inline-block;
-        }
-
-        i.ph-fill {
-          display: none;
-        }
-
-        &.active {
-          i.ph {
-            display: none;
+          span {
+            align-self: center;
           }
-          i.ph-fill {
+
+          &#correct.active {
+            background: $green-lightest;
+            color: $green-darker;
+          }
+
+          i.ph {
             display: inline-block;
           }
+
+          i.ph-fill {
+            display: none;
+          }
+
+          &.active {
+            i.ph {
+              display: none;
+            }
+            i.ph-fill {
+              display: inline-block;
+            }
+          }
         }
+      }
+    }
+  }
+
+  #audio-indicator {
+    flex: 1;
+    align-items: center;
+    height: 2 * $spacer;
+
+    div {
+      display: inline-flex;
+      align-items: flex-end;
+      background: transparent;
+      margin: 0 0.25 * $spacer 0 0;
+      height: 2 * $spacer;
+      width: 0.25 * $spacer;
+
+      &.visible {
+        background: $mono-gray-normal;
+      }
+    }
+  }
+
+  // Results table
+  .table-container {
+    padding: 0;
+    border: 1px solid $mono-gray-lighter;
+  }
+
+  .table {
+    margin: 0;
+
+    th {
+      font-size: 0.75 * $spacer;
+    }
+
+    tbody span.challenge {
+      display: inline-block;
+      margin: 0 0.5 * $spacer;
+      padding: 0.25 * $spacer 0.75 * $spacer;
+      background: $mono-white;
+      border: 1px solid $mono-gray-light;
+      border-radius: 0.25 * $spacer;
+      text-align: center;
+      font-family: "Karinika", "DM Sans Regular", sans-serif;
+      font-weight: bold;
+    }
+
+    tbody .audio {
+      display: inline-flex;
+      padding: 0.25 * $spacer $spacer 0.25 * $spacer 0.75 * $spacer;
+      background: $mono-gray-lightest;
+      color: $mono-gray-dark-3;
+      border-radius: $spacer;
+
+      // Play button
+      i.ph-play { color: $mono-gray-dark-3; }
+
+      // Duration
+      span {
+        font-size: 0.75 * $spacer;
+        color: $mono-gray-dark-1;
+      }
+
+      // "Playing" state (inverted colors)
+      &.playing {
+        background: $mono-gray-dark-3;
+        color: $mono-gray-lightest;
+
+        i.ph-play { color: $mono-gray-lightest }
+        span { color: $mono-gray-light }
       }
     }
   }
