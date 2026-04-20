@@ -298,15 +298,15 @@
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/letter_sound/Bogstavlyde/1f.23 - o.wav",
-        "correct": "o",
-        "wrong": ["q", "w", "t"]
+        "sound": "resources/letter_sound/Bogstavlyde/1f.2 - a.wav",
+        "correct": "a",
+        "wrong": ["c", "d", "g"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/letter_sound/Bogstavlyde/1f.21 - p.wav",
-        "correct": "p",
-        "wrong": ["a", "w", "e"]
+        "sound": "resources/letter_sound/Bogstavlyde/1f.24 - t[d].wav",
+        "correct": "t",
+        "wrong": ["c", "j", "g"]
     },
     {
         "question_type": "no_input_required",
