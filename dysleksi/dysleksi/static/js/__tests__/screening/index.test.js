@@ -209,7 +209,7 @@ describe("Startup teacher test", () => {
         expect(initGroupStudent).toHaveBeenCalled();
     });
 
-    it("group dummy student test", async () => {
+    it("group dummy1 student test", async () => {
         document.body.innerHTML = `
             <div class="container" 
                 data-test-type="group" 
@@ -240,6 +240,9 @@ describe("Startup teacher test", () => {
         expect(initGroupTeacher).not.toHaveBeenCalled();
         expect(initGroupStudent).toHaveBeenCalled();
         expect(initMockDataSpy).toHaveBeenCalled();
+
+        const studentArg = initGroupStudent.mock.calls[0][3];
+        expect(studentArg.problem).toBe(true);
     });
 
     it("group dummy0 student test", async () => {
@@ -273,6 +276,9 @@ describe("Startup teacher test", () => {
         expect(initGroupTeacher).not.toHaveBeenCalled();
         expect(initGroupStudent).toHaveBeenCalled();
         expect(initMockDataSpy).toHaveBeenCalled();
+
+        const studentArg = initGroupStudent.mock.calls[0][3];
+        expect(studentArg.progress).toBe(100);
     });
 
     it("should handle missing test_contents element by setting it to null", async () => {

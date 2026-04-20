@@ -29,6 +29,7 @@ $red-lightest: #ffd5d6;
 $red-lighter: #ef9194;
 $red-normal: #b31217;
 $red-darker: #7a0600;
+$red-darker-2: #B01117;
 $red-darkest: #5f0400;
 $yellow-lightest: #fff8da;
 $yellow-lighter: #f6e59a;
@@ -344,6 +345,17 @@ h4, th {
 .btn i.ph,
 .btn i.ph-fill {
   line-height: var(--bs-body-line-height);
+  margin-right: 8px;
+
+  &.orange {
+    color: $orange-normal;
+  }
+  &.red {
+    color: $red-darker-2;
+  }
+  &.green {
+    color: $green-darker;
+  }
 }
 
 // Form element styles
@@ -820,6 +832,56 @@ $border-radius-student-card: $spacer / 4 * 3;
     border: 1px solid $blue-lighter-1;
     border-radius: $border-radius-student-card;
     justify-content: space-between;
+
+    &.is-complete {
+      border: 1px solid $green-lighter;
+    }
+    &.has-problem {
+      border: 1px solid $mono-gray-light;
+    }
+
+    .student-controls {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        position: relative;
+        z-index: 2;
+    }
+
+    .status-icon {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      font-size: 18px;
+
+      i {
+        display: block;
+
+        &.green {
+          color: $green-darker !important;
+        }
+        &.red {
+          color: $red-darker-2 !important;
+        }
+      }
+    }
+
+    .student-control-button {
+      position: relative;
+      z-index: 2;
+      color: $mono-gray-dark-1;
+      font-size: 16px;
+      display: flex;
+      cursor: pointer;
+      transition: color 0.2s ease;
+
+      &.mark-button {
+        &.is-marked {
+          color: $orange-normal;
+        }
+      }
+    }
   }
 
   /* Progress bar inside top row */
@@ -832,6 +894,15 @@ $border-radius-student-card: $spacer / 4 * 3;
     background-color: $blue-lighter-2;
     z-index: 0;
     transition: width 0.5s ease;
+
+    &.is-complete {
+      background-color: $green-lightest;
+    }
+
+    &.has-problem {
+      background-color: $mono-gray-lighter;
+    }
+
   }
 
   /* Text inside top row */
@@ -927,9 +998,4 @@ $border-radius-student-card: $spacer / 4 * 3;
   }
 }
 
-.foldout-arrow {
-  position: relative;
-  color: $mono-gray-light;
-  font-size: 12px;
-  display: flex;
-}
+

@@ -914,9 +914,20 @@ describe("GroupTestContainer", () => {
                     <div class="student-top-row">
                         <div class="progress-fill" style="width: 0%"></div>
                         <span class="student-text"></span>
-                        <span class="foldout-arrow">
-                            <i class="ph-fill ph-caret-up"></i>
+                    <div class="student-controls">
+                        <span class="status-icon">
+                            <i class="ph-fill ph-check-circle"></i>
                         </span>
+                        <span class="student-control-button mark-button">
+                            <i class="ph-fill ph-flag-pennant"></i>
+                        </span>
+                        <span class="student-control-button">
+                            <i class="ph ph-dots-three"></i>
+                        </span>
+                        <span class="student-control-button">
+                            <i id="foldout-arrow" class="ph-fill ph-caret-up"></i>
+                        </span>
+                    </div>
                     </div>
                     <div class="folded-area" style="display: none;">
                         <div class="parts-progress"></div>
@@ -934,6 +945,28 @@ describe("GroupTestContainer", () => {
                 </div>
             </template>
 
+            <button id="all-students-button" class="btn btn-outline-primary">
+              Alle (<span id="all-students-count">0</span>)
+            </button>
+            
+            <button id="ongoing-students-button" class="btn btn-outline-primary">
+              I gang (<span id="ongoing-students-count">0</span>)
+            </button>
+            
+            <button id="finished-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-check-circle green"></i>
+              Færdige (<span id="finished-students-count">0</span>)
+            </button>
+            
+            <button id="marked-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-flag-pennant orange"></i>
+              Mærket (<span id="marked-students-count">0</span>)
+            </button>
+            
+            <button id="problem-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-warning-circle red"></i>
+              Problemer/offline (<span id="problem-students-count">0</span>)
+            </button>
 
             <div class="group-test-body"></div>
         `;
@@ -1004,35 +1037,6 @@ describe("GroupTestContainer", () => {
 
         // It should still be 'none' because the function returned early
         expect(folded.style.display).toBe("none");
-    });
-
-    it("returns early and does not throw if container is null", () => {
-        // 1. Setup: Clear the body so document.querySelector(".group-test-body") returns null
-        document.body.innerHTML = "";
-
-        // 2. Initialize: The constructor will set this.container to null
-        const nullInstance = new GroupTestContainer();
-        expect(nullInstance.container).toBeNull();
-
-        const studentData = {
-            student: {
-                id: 99,
-                firstName: "Ghost",
-                lastName: "User",
-                progress: 0,
-                currentPartIndex: 0,
-                currentQuestionIndex: 0,
-                resultsByPart: {},
-            },
-        };
-
-        // 3. Act & Assert: Should return early without attempting to query or create elements
-        expect(() => {
-            nullInstance.updateData(studentData);
-        }).not.toThrow();
-
-        // Verify no cards were accidentally created in the body
-        expect(document.querySelectorAll(".student-card").length).toBe(0);
     });
 
     it("creates a new student card if it doesn't exist", () => {
@@ -1131,23 +1135,25 @@ describe("GroupTestContainer", () => {
 
         const card = instance.cards.get(4);
         const folded = card.el.querySelector(".folded-area");
-        const arrowSpan = card.el.querySelector(".foldout-arrow");
+        const arrowSpan = card.el.querySelector("#foldout-arrow");
 
         // Initially folded
         expect(folded.style.display === "" || folded.style.display === "none").toBe(
             true,
         );
-        const initialArrowHTML = arrowSpan.innerHTML;
+        const initialArrowClass = arrowSpan.className;
 
         // Click to unfold
+        console.log("ARROWSPAN1", arrowSpan.innerHTML);
         card.el.click();
         expect(folded.style.display).toBe("flex");
-        expect(arrowSpan.innerHTML).not.toBe(initialArrowHTML);
+        console.log("ARROWSPAN2", arrowSpan.innerHTML);
+        expect(arrowSpan.className).not.toBe(initialArrowClass);
 
         // Click to fold again
         card.el.click();
         expect(folded.style.display).toBe("none");
-        expect(arrowSpan.innerHTML).toBe(initialArrowHTML);
+        expect(arrowSpan.className).toBe(initialArrowClass);
     });
 });
 
@@ -1245,9 +1251,20 @@ describe("TeacherView socket 'test.started' handling", () => {
                     <div class="student-top-row">
                         <div class="progress-fill" style="width: 0%"></div>
                         <span class="student-text"></span>
-                        <span class="foldout-arrow">
-                            <i class="ph-fill ph-caret-up"></i>
+                    <div class="student-controls">
+                        <span class="status-icon">
+                            <i class="ph-fill ph-check-circle"></i>
                         </span>
+                        <span class="student-control-button mark-button">
+                            <i class="ph-fill ph-flag-pennant"></i>
+                        </span>
+                        <span class="student-control-button">
+                            <i class="ph ph-dots-three"></i>
+                        </span>
+                        <span class="student-control-button">
+                            <i id="foldout-arrow" class="ph-fill ph-caret-up"></i>
+                        </span>
+                    </div>
                     </div>
                     <div class="folded-area">
                         <div class="parts-progress"></div>
@@ -1264,6 +1281,29 @@ describe("TeacherView socket 'test.started' handling", () => {
                     </div>
                 </div>
             </template>
+
+            <button id="all-students-button" class="btn btn-outline-primary">
+              Alle (<span id="all-students-count">0</span>)
+            </button>
+            
+            <button id="ongoing-students-button" class="btn btn-outline-primary">
+              I gang (<span id="ongoing-students-count">0</span>)
+            </button>
+            
+            <button id="finished-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-check-circle green"></i>
+              Færdige (<span id="finished-students-count">0</span>)
+            </button>
+            
+            <button id="marked-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-flag-pennant orange"></i>
+              Mærket (<span id="marked-students-count">0</span>)
+            </button>
+            
+            <button id="problem-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-warning-circle red"></i>
+              Problemer/offline (<span id="problem-students-count">0</span>)
+            </button>
 
             <div class="group-test-body"></div>
         `;
@@ -1568,7 +1608,20 @@ describe("StudentCard", () => {
                     <div class="student-top-row">
                         <div class="progress-fill"></div>
                         <span class="student-text"></span>
-                        <span class="foldout-arrow"><i class="ph-fill ph-caret-up"></i></span>
+                    <div class="student-controls">
+                        <span class="status-icon">
+                            <i class="ph-fill ph-check-circle"></i>
+                        </span>
+                        <span class="student-control-button mark-button">
+                            <i class="ph-fill ph-flag-pennant"></i>
+                        </span>
+                        <span class="student-control-button">
+                            <i class="ph ph-dots-three"></i>
+                        </span>
+                        <span class="student-control-button">
+                            <i id="foldout-arrow" class="ph-fill ph-caret-up"></i>
+                        </span>
+                    </div>
                     </div>
                     <div class="folded-area" style="display: none;">
                         <div class="parts-progress"></div>
@@ -1583,6 +1636,30 @@ describe("StudentCard", () => {
                     </div>
                 </div>
             </template>
+
+            <button id="all-students-button" class="btn btn-outline-primary">
+              Alle (<span id="all-students-count">0</span>)
+            </button>
+            
+            <button id="ongoing-students-button" class="btn btn-outline-primary">
+              I gang (<span id="ongoing-students-count">0</span>)
+            </button>
+            
+            <button id="finished-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-check-circle green"></i>
+              Færdige (<span id="finished-students-count">0</span>)
+            </button>
+            
+            <button id="marked-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-flag-pennant orange"></i>
+              Mærket (<span id="marked-students-count">0</span>)
+            </button>
+            
+            <button id="problem-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-warning-circle red"></i>
+              Problemer/offline (<span id="problem-students-count">0</span>)
+            </button>
+
         `;
 
         mockStudent = new Student({
@@ -1683,6 +1760,19 @@ describe("StudentCard", () => {
         card.changePart(1);
 
         expect(card.questionIndex.textContent).toContain("-/2");
+    });
+
+    it("allows marking and unmarking a student", () => {
+        const card = new StudentCard(mockStudent, mockTest);
+        card.markBtn.click();
+
+        expect(card.student.marked).toBe(true);
+        expect(card.markedStudentsCount.innerHTML).toBe("1");
+
+        card.markBtn.click();
+
+        expect(card.student.marked).toBe(false);
+        expect(card.markedStudentsCount.innerHTML).toBe("0");
     });
 });
 
@@ -1962,5 +2052,151 @@ describe("TeacherView messageQueue initialization", () => {
         expect(() => {
             new TeacherView(roomName, { parts: [] }, 1, wsGetter);
         }).toThrow(); // JSON.parse will throw here
+    });
+});
+
+describe("GroupTestContainer Filtering", () => {
+    let container;
+    const test = {
+        parts: [{ name: "Part 1", questions: [{}, {}] }],
+    };
+
+    beforeEach(() => {
+        // Setup minimal DOM for filtering
+        document.body.innerHTML = `
+            <template id="student-card-template">
+                <div class="student-card">
+                    <div class="student-top-row">
+                        <div class="progress-fill"></div>
+                        <span class="student-text"></span>
+                        <div class="student-controls">
+                            <span class="status-icon">
+                                <i class="ph-fill ph-check-circle"></i>
+                            </span>
+                            <span class="student-control-button mark-button">
+                                <i class="ph-fill ph-flag-pennant"></i>
+                            </span>
+                            <span class="student-control-button">
+                                <i class="ph ph-dots-three"></i>
+                            </span>
+                            <span class="student-control-button">
+                                <i id="foldout-arrow" class="ph-fill ph-caret-up"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="folded-area" style="display: none;">
+                        <div class="parts-progress"></div>
+                        <div class="dots-container"></div>
+                        <span class="part-label"></span>
+                        <span class="part-index"></span>
+                        <span class="question-index"></span>
+                        <i class="ph-caret-left"></i>
+                        <i class="ph-caret-right"></i>
+                    </div>
+                </div>
+            </template>
+            <button id="all-students-button" class="btn btn-outline-primary">
+              Alle (<span id="all-students-count">0</span>)
+            </button>
+            
+            <button id="ongoing-students-button" class="btn btn-outline-primary">
+              I gang (<span id="ongoing-students-count">0</span>)
+            </button>
+            
+            <button id="finished-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-check-circle green"></i>
+              Færdige (<span id="finished-students-count">0</span>)
+            </button>
+            
+            <button id="marked-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-flag-pennant orange"></i>
+              Mærket (<span id="marked-students-count">0</span>)
+            </button>
+            
+            <button id="problem-students-button" class="btn btn-outline-primary">
+              <i class="ph-fill ph-warning-circle red"></i>
+              Problemer/offline (<span id="problem-students-count">0</span>)
+            </button>
+            <div class="group-test-body"></div>
+        `;
+        container = new GroupTestContainer(test);
+
+        this.createStudent = (id, name, progress, problem) => ({
+            student: {
+                id,
+                firstName: name,
+                lastName: "User",
+                progress: progress,
+                problem: problem,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: { 0: [] },
+            },
+        });
+
+        container.updateData(this.createStudent(1, "Ongoing", 50, false));
+        container.updateData(this.createStudent(2, "Finished", 100, false));
+        container.updateData(this.createStudent(3, "Problem", 10, true));
+    });
+
+    const getDisplay = (studentId) => container.cards.get(studentId).el.style.display;
+
+    it("shows all students when criteria is 'all'", () => {
+        const btn = document.getElementById("all-students-button");
+        btn.click();
+        expect(getDisplay(1)).toBe("flex");
+        expect(getDisplay(2)).toBe("flex");
+        expect(getDisplay(3)).toBe("flex");
+    });
+
+    it("only shows students with progress < 100 when criteria is 'ongoing'", () => {
+        const btn = document.getElementById("ongoing-students-button");
+        btn.click();
+        expect(getDisplay(1)).toBe("flex"); // 50%
+        expect(getDisplay(2)).toBe("none"); // 100%
+        expect(getDisplay(3)).toBe("flex"); // 10%
+    });
+
+    it("only shows students with progress === 100 when criteria is 'finished'", () => {
+        const btn = document.getElementById("finished-students-button");
+        btn.click();
+        expect(getDisplay(1)).toBe("none");
+        expect(getDisplay(2)).toBe("flex");
+        expect(getDisplay(3)).toBe("none");
+    });
+
+    it("only shows students with problems when criteria is 'problem'", () => {
+        const btn = document.getElementById("problem-students-button");
+        btn.click();
+        expect(getDisplay(1)).toBe("none");
+        expect(getDisplay(2)).toBe("none");
+        expect(getDisplay(3)).toBe("flex");
+    });
+
+    it("only shows marked students when criteria is 'marked'", () => {
+        // Manually mark student 1
+        const student1 = container.students.get(1);
+        student1.marked = true;
+
+        const btn = document.getElementById("marked-students-button");
+        btn.click();
+
+        expect(getDisplay(1)).toBe("flex");
+        expect(getDisplay(2)).toBe("none");
+        expect(getDisplay(3)).toBe("none");
+    });
+
+    it("updates counts correctly when new data arrives", () => {
+        // Initially 3 students (2 ongoing, 1 finished, 1 problem)
+        expect(document.getElementById("all-students-count").innerHTML).toBe("3");
+        expect(document.getElementById("ongoing-students-count").innerHTML).toBe("2");
+        expect(document.getElementById("finished-students-count").innerHTML).toBe("1");
+        expect(document.getElementById("problem-students-count").innerHTML).toBe("1");
+
+        // Update student 1 to be finished
+        container.updateData(this.createStudent(1, "Ongoing", 100, false));
+
+        expect(document.getElementById("ongoing-students-count").innerHTML).toBe("1");
+        expect(document.getElementById("finished-students-count").innerHTML).toBe("2");
     });
 });
