@@ -1,5 +1,6 @@
 import json
 
+from adminsortable2.admin import SortableAdminBase, SortableTabularInline
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.safestring import mark_safe
@@ -31,8 +32,19 @@ class TestResourceAdmin(admin.ModelAdmin):
     search_fields = ["text"]
 
 
+class SoundPlayerMixin:
+    @admin.display(description="Lyd")
+    def sound(self, obj):
+        if getattr(obj, "resource", None) and obj.resource.sound:
+            return mark_safe(
+                f"<audio controls src='/media/{obj.resource.sound}' "
+                "style='height: 1.5rem'>"
+            )
+        return ""
+
+
 @admin.register(Instruction)
-class InstructionAdmin(admin.ModelAdmin):
+class InstructionAdmin(SoundPlayerMixin, admin.ModelAdmin):
     list_display = [
         "id",
         "sequence__id",
@@ -47,8 +59,8 @@ class InstructionAdmin(admin.ModelAdmin):
     list_editable = ["delay_after"]
     list_select_related = ["sequence__question__part", "resource"]
     search_fields = ["resource__name"]
-    ordering = ["sequence__question__part__name", "sequence", "order"]
     show_facets = admin.ShowFacets.ALWAYS
+    ordering = ["sequence__id", "order"]
 
     @admin.display(description="Deltest")
     def part(self, obj):
@@ -58,26 +70,21 @@ class InstructionAdmin(admin.ModelAdmin):
     def on(self, obj):
         return obj.resource.name if obj.resource else (obj.element or obj.data)
 
-    @admin.display(description="Lyd")
-    def sound(self, obj):
-        if getattr(obj, "resource", None) and obj.resource.sound:
-            return mark_safe(
-                f"<audio controls src='/media/{obj.resource.sound}' "
-                "style='height: 1.5rem'>"
-            )
-        return ""
 
-
-class InstructionInlineAdmin(admin.StackedInline):
+class InstructionInlineAdmin(SoundPlayerMixin, SortableTabularInline):
     model = Instruction
+    ordering = ["order"]
+    extra = 0
+    readonly_fields = ["sound"]
 
 
 @admin.register(InstructionSequence)
-class InstructionSequenceAdmin(admin.ModelAdmin):
+class InstructionSequenceAdmin(SortableAdminBase, admin.ModelAdmin):
     inlines = [InstructionInlineAdmin]
     list_display = ["id", "question__part__name", "instruction_count"]
     list_filter = ["question__part__name"]
     actions = ["export_json"]
+    ordering = ["id"]
 
     @admin.display(description="Antal instruktioner")
     def instruction_count(self, obj):

@@ -15,6 +15,7 @@ INSTALLED_APPS = [
     "django_otp.plugins.otp_static",
     "django_otp.plugins.otp_totp",
     "django_extended_makemessages",
+    "adminsortable2",
     "simple_history",
     "login",
     "django_mitid_auth",

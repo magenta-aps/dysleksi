@@ -68,6 +68,8 @@ xmlsec
 ## Load tabulex demo data from file
 dataclasses-json==0.6.7
 
+## Drag and drop to reorder objects in Django admin
+django-admin-sortable2
 
 # Used for testing & linting
 

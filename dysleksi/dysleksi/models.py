@@ -258,6 +258,7 @@ class TestResource(models.Model):
                 name="image_or_sound_or_text_must_be_set",
             )
         ]
+        ordering = ["name"]
 
     def __str__(self) -> str:
         return self.name
@@ -645,7 +646,12 @@ class Instruction(models.Model):
         related_name="instructions",
     )
 
-    order = models.PositiveSmallIntegerField()
+    order = models.PositiveSmallIntegerField(
+        default=0,
+        blank=False,
+        null=False,
+        db_index=True,
+    )
 
     action = models.CharField(
         max_length=32,
