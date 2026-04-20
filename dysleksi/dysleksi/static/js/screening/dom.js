@@ -439,6 +439,8 @@ class TestDomElements {
             textEl.style.opacity = 1;
             if (text.length === 1) {
                 textEl.style.fontSize = "120px";
+            } else if (text.includes(" ")) {
+                textEl.style.fontSize = "32px";
             } else {
                 textEl.style.fontSize = "72px";
             }
@@ -638,8 +640,21 @@ export class GroupTestDomElements extends TestDomElements {
         //const sound = answer.resourceSoundUrl;
         const imageUrl = answer.resourceImageUrl;
         const btn = document.createElement("button");
+        btn.className = "btn btn-outline-primary";
         if (text) {
-            btn.textContent = text;
+            if (text === "true") {
+                btn.innerHTML = '<i class="ph-fill ph-check-circle"></i>';
+                btn.classList.remove("btn-outline-primary");
+                btn.classList.add("btn-true-false");
+                btn.classList.add("true");
+            } else if (text === "false") {
+                btn.innerHTML = '<i class="ph-fill ph-x-circle"></i>';
+                btn.classList.remove("btn-outline-primary");
+                btn.classList.add("btn-true-false");
+                btn.classList.add("false");
+            } else {
+                btn.textContent = text;
+            }
 
             if (squareButton) {
                 btn.style.fontSize = "72px";
@@ -653,11 +668,9 @@ export class GroupTestDomElements extends TestDomElements {
             const image = document.createElement("img");
             image.src = imageUrl;
             btn.append(image);
-            btn.className = "btn btn-outline-primary square-btn";
+            btn.classList.add("square-btn");
         } else if (squareButton) {
-            btn.className = "btn btn-outline-primary square-btn";
-        } else {
-            btn.className = "btn btn-outline-primary";
+            btn.classList.add("square-btn");
         }
 
         // TODO: render sound

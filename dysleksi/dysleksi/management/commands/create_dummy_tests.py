@@ -58,6 +58,7 @@ def create_group_test(
             )
             letter_name_data_path = None
             fore_sound_data_path = None
+            sentence_reading_data_path = None
 
             wordreading_test_name = "Ordlæsning 2A"
             wordreading_1_test_name = "Ordlæsning 1"
@@ -66,6 +67,7 @@ def create_group_test(
             letter_sound_test_name = "Bogstavlyde"
             letter_name_test_name = "Bogstavnavne"
             fore_sound_test_name = "Forlyd"
+            sentence_reading_test_name = "Sætningslæsning"
 
         else:
             wordreading_data_path = (
@@ -96,6 +98,10 @@ def create_group_test(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "dummy/fore_sound/fore_sound.json",
             )
+            sentence_reading_data_path = (
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "dummy/sentence_reading/sentence_reading.json",
+            )
 
             wordreading_test_name = "Ordlæsning 2A (dummy)"
             wordreading_1_test_name = "Ordlæsning 1 (dummy)"
@@ -104,6 +110,7 @@ def create_group_test(
             letter_sound_test_name = "Bogstavlyde (dummy)"
             letter_name_test_name = "Bogstavnavne (dummy)"
             fore_sound_test_name = "Forlyd (dummy)"
+            sentence_reading_test_name = "Sætningslæsning (dummy)"
 
         call_command(
             "import_test",
@@ -178,6 +185,15 @@ def create_group_test(
                 nonwordspelling_test_name,
                 nonwordspelling_data_path,
                 "nonwordspelling",
+            )
+
+        if sentence_reading_data_path:
+            call_command(
+                "import_test",
+                name,
+                sentence_reading_test_name,
+                sentence_reading_data_path,
+                "sentence_reading",
             )
 
 

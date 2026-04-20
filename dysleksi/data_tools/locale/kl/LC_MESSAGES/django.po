@@ -28,3 +28,7 @@ msgstr ""
 #: data_tools/utils.py
 msgid "Sig bogstavet på skærmen højt"
 msgstr ""
+
+#: data_tools/utils.py
+msgid "Vurder, om sætningen passer til billedet."
+msgstr ""

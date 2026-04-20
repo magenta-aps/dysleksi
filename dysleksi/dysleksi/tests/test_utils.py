@@ -7,6 +7,7 @@ from data_tools.utils import (
     create_letter_name_test,
     create_letter_sound_test,
     create_nonwordspelling_test,
+    create_sentence_reading_test,
     create_wordreading_1_test,
     create_wordspelling_test,
 )
@@ -125,6 +126,29 @@ class UtilTest(TestCase):
             },
         ]
 
+        self.sentence_reading_data = [
+            {
+                "image": "resources/dummy/sentence_reading/Opgave/Blomst.jpg",
+                "text": "Jeg vokser i naturen",
+                "question_type": "multiple_choice",
+                "correct": "true",
+                "wrong": ["false"],
+            },
+        ]
+
+        self.sentence_reading_practice_data = [
+            {
+                "image": "resources/dummy/sentence_reading/Opgave/Blomst.jpg",
+                "text": "Jeg vokser i naturen",
+                "question_type": "multiple_choice",
+                "correct": "true",
+                "wrong": ["false"],
+                "instruction_sequence": [
+                    {"action": "show", "element": "challenge-text", "delayAfter": 0},
+                ],
+            },
+        ]
+
         self.test = Test.objects.create(name="test test")
 
     def test_create_wordspelling_test(self):
@@ -191,5 +215,25 @@ class UtilTest(TestCase):
         self.assertTrue(
             TestResource.objects.filter(
                 image="resources/dummy/fore_sound/Opgave/abe.png"
+            ).exists()
+        )
+
+    def test_create_sentence_reading_test(self):
+        create_sentence_reading_test(self.test, self.sentence_reading_data)
+
+        self.assertTrue(
+            TestResource.objects.filter(
+                image="resources/dummy/sentence_reading/Opgave/Blomst.jpg"
+            ).exists()
+        )
+
+    def test_create_sentence_reading_test_with_practice_data(self):
+        create_sentence_reading_test(
+            self.test, self.sentence_reading_data, self.sentence_reading_practice_data
+        )
+
+        self.assertTrue(
+            TestResource.objects.filter(
+                image="resources/dummy/sentence_reading/Opgave/Blomst.jpg"
             ).exists()
         )

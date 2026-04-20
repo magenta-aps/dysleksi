@@ -73,7 +73,19 @@ export class GroupTestView extends StudentTestView {
             this.selectedAnswer = null;
             this.textAnswer = null;
             let answers = this.currentQuestion.possibleAnswers;
-            if (!this.isPracticing) {
+            if (
+                answers.some((a) => a.resourceText.toLowerCase() === "true") &&
+                answers.some((a) => a.resourceText.toLowerCase() === "false")
+            ) {
+                // Order True/False such that False always appears first
+                const falseAnswer = answers.find(
+                    (a) => a.resourceText.toLowerCase() === "false",
+                );
+                const trueAnswer = answers.find(
+                    (a) => a.resourceText.toLowerCase() === "true",
+                );
+                answers = [falseAnswer, trueAnswer];
+            } else if (!this.isPracticing) {
                 answers = shuffleArray(answers);
             }
 
