@@ -298,13 +298,13 @@
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/letter_sound/Bogstavlyde/1f.23.wav",
+        "sound": "resources/letter_sound/Bogstavlyde/1f.23 - o.wav",
         "correct": "o",
         "wrong": ["q", "w", "t"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/letter_sound/Bogstavlyde/1f.21.wav",
+        "sound": "resources/letter_sound/Bogstavlyde/1f.21 - p.wav",
         "correct": "p",
         "wrong": ["a", "w", "e"]
     },
