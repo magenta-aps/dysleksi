@@ -633,7 +633,7 @@ export class GroupTestDomElements extends TestDomElements {
         this.choicesElSecondRow.innerHTML = "";
     }
 
-    showQuestionChoice(answer, listener, answerCount) {
+    showQuestionChoice(answer, listener, answerCount, squareButton = false) {
         const text = answer.resourceText;
         //const sound = answer.resourceSoundUrl;
         const imageUrl = answer.resourceImageUrl;
@@ -641,12 +641,10 @@ export class GroupTestDomElements extends TestDomElements {
         if (text) {
             btn.textContent = text;
 
-            if (text.length === 1) {
-                if (answerCount > 6) {
-                    btn.style.fontSize = "38px";
-                } else {
-                    btn.style.fontSize = "72px";
-                }
+            if (squareButton) {
+                btn.style.fontSize = "72px";
+            } else if (answerCount > 6) {
+                btn.style.fontSize = "38px";
             } else {
                 btn.style.fontSize = "32px";
             }
@@ -656,15 +654,12 @@ export class GroupTestDomElements extends TestDomElements {
             image.src = imageUrl;
             btn.append(image);
             btn.className = "btn btn-outline-primary square-btn";
-        } else if (text.length === 1) {
-            if (answerCount > 6) {
-                btn.className = "btn btn-outline-primary";
-            } else {
-                btn.className = "btn btn-outline-primary square-btn";
-            }
+        } else if (squareButton) {
+            btn.className = "btn btn-outline-primary square-btn";
         } else {
             btn.className = "btn btn-outline-primary";
         }
+
         // TODO: render sound
         btn.id = answer.buttonId;
         if (this.choicesEl.childElementCount < 6) {

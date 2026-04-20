@@ -96,6 +96,8 @@ export class GroupTestView extends StudentTestView {
                             this.selectAnswer(answer);
                         },
                         answers.length,
+                        answers.length < 6 &&
+                            answers.some((a) => a.resourceText.length === 1),
                     );
                     this.answerButtons.push({ button: button, answer: answer });
                 }
