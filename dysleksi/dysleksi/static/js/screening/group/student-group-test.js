@@ -74,16 +74,12 @@ export class GroupTestView extends StudentTestView {
             this.textAnswer = null;
             let answers = this.currentQuestion.possibleAnswers;
             if (
-                answers.some((a) => a.resourceText.toLowerCase() === "true") &&
-                answers.some((a) => a.resourceText.toLowerCase() === "false")
+                answers.some((a) => a.resourceText === "true") &&
+                answers.some((a) => a.resourceText === "false")
             ) {
                 // Order True/False such that False always appears first
-                const falseAnswer = answers.find(
-                    (a) => a.resourceText.toLowerCase() === "false",
-                );
-                const trueAnswer = answers.find(
-                    (a) => a.resourceText.toLowerCase() === "true",
-                );
+                const falseAnswer = answers.find((a) => a.resourceText === "false");
+                const trueAnswer = answers.find((a) => a.resourceText === "true");
                 answers = [falseAnswer, trueAnswer];
             } else if (!this.isPracticing) {
                 answers = shuffleArray(answers);
@@ -109,7 +105,7 @@ export class GroupTestView extends StudentTestView {
                         },
                         answers.length,
                         answers.length < 6 &&
-                            answers.some((a) => a.resourceText.length === 1),
+                            answers.some((a) => a.resourceText?.length === 1),
                     );
                     this.answerButtons.push({ button: button, answer: answer });
                 }
