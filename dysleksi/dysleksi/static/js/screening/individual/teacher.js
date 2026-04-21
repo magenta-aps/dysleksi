@@ -1,4 +1,5 @@
 import {
+    AudioIndicator,
     EventTable,
     ActionButtons,
     ElapsedTimeView,
@@ -21,6 +22,7 @@ export function initTeacher(roomName, assignmentId, test) {
         "#current-test-question-number",
     );
     const elapsedTimeView = new ElapsedTimeView("#total-elapsed-time");
+    const audioIndicator = new AudioIndicator("#audio-indicator");
 
     buttons.showButtons();
     questionView.show();
@@ -35,6 +37,7 @@ export function initTeacher(roomName, assignmentId, test) {
         null,
         questionView,
         elapsedTimeView,
+        audioIndicator,
     );
 
     console.log("TeacherView created");

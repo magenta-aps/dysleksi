@@ -9,6 +9,7 @@ import {
     NoteField,
     QuestionView,
     ElapsedTimeView,
+    AudioIndicator,
 } from "../../screening/controlroom.js";
 import * as groupTestData from "./grouptest.json" with { type: "json" };
 import * as individualTestData from "./individualtest.json" with { type: "json" };
@@ -220,6 +221,50 @@ describe("NoteField", () => {
     });
 });
 
+describe("AudioIndicator", () => {
+    const mockDoc = `<div id="audio-indicator"></div>`;
+
+    const getInstance = () => {
+        return new AudioIndicator();
+    };
+
+    beforeEach(() => {
+        document.body.innerHTML = mockDoc;
+    });
+
+    it("initializes", () => {
+        const audioIndicator = getInstance();
+        expect(audioIndicator.el).not.toBeNull();
+        expect(audioIndicator.bars).not.toBeNull();
+        expect(audioIndicator.bars.length).toBe(audioIndicator.numBars);
+        expect(audioIndicator.el.childNodes.length).toBe(audioIndicator.numBars);
+        expect(audioIndicator.req).toBeNull();
+    });
+
+    it("renders a single frame", () => {
+        const audioIndicator = getInstance();
+        const spyGetHeight = vi.spyOn(audioIndicator, "getHeight");
+        audioIndicator.render();
+        expect(spyGetHeight).toHaveBeenCalled();
+    });
+
+    it("can start", () => {
+        const audioIndicator = getInstance();
+        const spyRender = vi.spyOn(audioIndicator, "render");
+        audioIndicator.start();
+        expect(audioIndicator.req).not.toBeNull();
+        expect(spyRender).toHaveBeenCalled();
+    });
+
+    it("can stop", () => {
+        const audioIndicator = getInstance();
+        audioIndicator.start();
+        expect(audioIndicator.req).not.toBeNull();
+        audioIndicator.stop();
+        expect(audioIndicator.req).toBeNull();
+    });
+});
+
 describe("Teacher Individual test View", () => {
     let socket;
     let table;
@@ -227,6 +272,7 @@ describe("Teacher Individual test View", () => {
     let note;
     let questionView;
     let elapsedTimeView;
+    let audioIndicator;
     let view;
     let wsGetter;
     let individualTest;
@@ -244,7 +290,9 @@ describe("Teacher Individual test View", () => {
             addEventListener: vi.fn(),
             send: vi.fn(),
         };
+
         wsGetter = vi.fn().mockReturnValue(socket);
+
         document.body.innerHTML = `
             <div id="question-container">
                 <h1 id="question-title"></h1>
@@ -271,6 +319,7 @@ describe("Teacher Individual test View", () => {
             <button id="skipped">Sprunget over</button>
             <button id="next">Næste</button>
             <textarea id="note" class="d-none"></textarea>
+            <div id="audio-indicator"></div>
         `;
 
         // Mock out asset preloader
@@ -286,6 +335,7 @@ describe("Teacher Individual test View", () => {
         note = new NoteField();
         questionView = new QuestionView();
         elapsedTimeView = new ElapsedTimeView("#elapsed-time");
+        audioIndicator = new AudioIndicator("#audio-indicator");
 
         view = new TeacherView(
             "room1",
@@ -297,6 +347,7 @@ describe("Teacher Individual test View", () => {
             note,
             questionView,
             elapsedTimeView,
+            audioIndicator,
         );
 
         const mainSocketHandler = socket.addEventListener.mock.calls.find(
@@ -901,6 +952,59 @@ describe("Teacher Individual test View", () => {
         span.dispatchEvent(new Event("click", { bubbles: true }));
         // Assert
         expect(spySendQuestionFeedback).toHaveBeenCalled();
+    });
+
+    it("renders paused audio indicator when the test starts", () => {
+        // Arrange
+        const spyRender = vi.spyOn(audioIndicator, "render");
+        // Act: start test
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "test.started",
+                    partIndex: 0,
+                    questionIndex: 0,
+                },
+            }),
+        );
+        // Assert: audio indicator renders paused
+        expect(spyRender).toHaveBeenCalledWith(0);
+    });
+
+    it("runs animated audio indicator while the student answers", () => {
+        // Arrange
+        const spyStart = vi.spyOn(audioIndicator, "start");
+        // Act: display non-practice question
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "question.displayed",
+                    partIndex: 0,
+                    questionIndex: 0,
+                    practice: false,
+                },
+            }),
+        );
+        // Assert: audio indicator animation is started
+        expect(spyStart).toHaveBeenCalled();
+    });
+
+    it("stops animated audio indicator when the student has answered", () => {
+        // Arrange
+        const spyStop = vi.spyOn(audioIndicator, "stop");
+        // Act: answer non-practice question
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "question.answered",
+                    partIndex: 0,
+                    questionIndex: 0,
+                    practice: false,
+                },
+            }),
+        );
+        // Assert: audio indicator animation is started
+        expect(spyStop).toHaveBeenCalled();
     });
 });
 

@@ -9,6 +9,79 @@ const formatDuration = (duration) => {
     return `${hours}:${minutes}:${seconds}`;
 };
 
+export class AudioIndicator {
+    constructor(selector = "#audio-indicator") {
+        this.el = document.querySelector(selector);
+        this.numBars = 40;
+        this.req = null;
+        this.init();
+    }
+
+    init() {
+        let bars = [];
+        let heights = [];
+        this.el.innerHTML = "";
+        for (let i = 0; i < this.numBars; i++) {
+            // Add elements to DOM
+            const bar = document.createElement("div");
+            this.el.append(bar);
+            bars.push(bar);
+            // Initialize heights to random values
+            heights.push(Math.random());
+        }
+        this.bars = bars;
+        this.heights = heights;
+    }
+
+    render(_t) {
+        for (let i = 0; i < this.numBars; i++) {
+            const bar = this.bars[i];
+            const oldHeight = this.heights[i];
+            const newHeight = this.getHeight(oldHeight);
+            this.heights[i] = newHeight;
+            bar.classList.add("visible");
+            bar.style.height = `${newHeight * 2}rem`;
+        }
+    }
+
+    getHeight(oldHeight) {
+        // Calculate next (random) height
+        let delta = -0.5 + Math.random();
+        if (Math.abs(oldHeight + delta) > 1) {
+            delta = -delta;
+        }
+        let newHeight = oldHeight + delta;
+        // Smooth the new value
+        newHeight = oldHeight + 0.2 * (newHeight - oldHeight);
+        // Clamp value
+        return Math.min(Math.max(newHeight, 0.1), 1);
+    }
+
+    start() {
+        this.#cancel(); // Cancel any previous animation
+        this.#run();
+    }
+
+    stop() {
+        this.#cancel();
+    }
+
+    #cancel() {
+        if (this.req !== null) {
+            cancelAnimationFrame(this.req);
+            this.req = null;
+        }
+    }
+
+    #run() {
+        this.render();
+        this.req = requestAnimationFrame((t) => {
+            this.render(t);
+            this.#run();
+        });
+    }
+}
+
 export class EventTable {
     constructor(test, tableSelector = "table#events tbody") {
         this.test = test;
@@ -735,6 +808,7 @@ export class TeacherView {
         noteField,
         questionView,
         elapsedTimeView = null,
+        audioIndicator = null,
     ) {
         this.assignmentId = assignmentId;
         this.roomName = roomName;
@@ -756,8 +830,8 @@ export class TeacherView {
         this.noteField = noteField || new NoteField();
         this.questionView = questionView || new QuestionView();
         this.elapsedTimeView = elapsedTimeView;
+        this.audioIndicator = audioIndicator;
 
-        this.filterButtons = document.querySelectorAll(".group-test-header .btn");
         this.filterButtons = document.querySelectorAll(".group-test-header .btn");
         this.studentChannels = {};
 
@@ -918,6 +992,18 @@ export class TeacherView {
                 this.test.testType === "individual"
             ) {
                 this.table.updateTable(data);
+            }
+
+            if (this.test.testType === "individual" && this.audioIndicator !== null) {
+                if (data.event === "test.started") {
+                    this.audioIndicator.render(0); // Render initial (inanimate) state
+                }
+                if (data.event === "question.displayed" && !data.practice) {
+                    this.audioIndicator.start();
+                }
+                if (data.event === "question.answered" && !data.practice) {
+                    this.audioIndicator.stop();
+                }
             }
 
             this.messageQueue.push(data);
