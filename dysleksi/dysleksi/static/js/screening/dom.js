@@ -515,7 +515,6 @@ class TestDomElements {
         }
 
         const wrapper = document.createElement("div");
-        wrapper.className = "mb-3";
 
         // --- Button rows ---
         const buttonRows = [
@@ -528,7 +527,7 @@ class TestDomElements {
         const textFieldWrapper = document.createElement("div");
         textFieldWrapper.style.display = "flex";
         textFieldWrapper.style.alignItems = "center";
-        textFieldWrapper.style.gap = "0.5rem";
+        textFieldWrapper.style.gap = "20px";
 
         const displayField = document.createElement("input");
         displayField.className = "form-control display-field";
@@ -582,7 +581,6 @@ class TestDomElements {
         });
 
         textFieldWrapper.append(displayField, eraseBtn);
-        wrapper.append(textFieldWrapper);
 
         // --- Letter buttons ---
         const buttonsWrapper = document.createElement("div");
@@ -608,6 +606,7 @@ class TestDomElements {
             buttonsWrapper.append(rowDiv);
         });
         wrapper.append(buttonsWrapper); // below display
+        wrapper.append(textFieldWrapper);
 
         this.choicesEl.append(wrapper);
 
