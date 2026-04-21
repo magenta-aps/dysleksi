@@ -210,3 +210,29 @@ def create_pronunciation_test(test, questions_data, name, practice_questions_dat
         if practice_questions_data:
             part.create_test_resources(practice_questions_data, True)
     test.parts.add(part)
+
+
+def create_sentence_reading_test(
+    test, questions_data, practice_questions_data=None, name="Sætningslæsning"
+):
+    # TODO: Add this sound to dysleksi-binaries when we receive it
+    reminder, created = TestResource.objects.get_or_create(
+        name="resources/sentence_reading/Øveopgave/xx.x.wav",
+        sound="resources/sentence_reading/Øveopgave/xx.x.wav",
+    )
+
+    part, created = TestPart.objects.get_or_create(
+        name=name,
+        defaults={
+            "timeout": 8 * 60 * 1000,  # 8 minutes
+            "partial_score_after": 4 * 60 * 1000,  # 4 minutes
+            "intro": _("Vurder, om sætningen passer til billedet."),
+            "image_url": "/static/images/sentence_reading.png",
+            "reminder_source": reminder,
+        },
+    )
+    if created:
+        part.create_test_resources(questions_data, False)
+        if practice_questions_data:
+            part.create_test_resources(practice_questions_data, True)
+    test.parts.add(part)

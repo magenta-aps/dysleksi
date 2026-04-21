@@ -118,6 +118,47 @@ h1, h2, h3, h4, h5, h6 {
 
 }
 
+.btn-true-false {
+  color: black !important;
+  background-color: white !important;
+  border-width: 8px !important;
+  font-size: 1.1rem;
+  border-radius: 16px !important;
+  width: 200px !important;
+  flex: none !important;
+
+  &.true {
+    border-color: $student-green !important;
+    background-color: $student-green-lightest !important;
+    color: $student-green !important;
+
+    i {
+      color: $student-green;
+    }
+
+    &.selected {
+      background-color: $student-green-light !important;
+      outline: 2px solid;
+    }
+  }
+
+  &.false {
+    border-color: $student-red !important;
+    background-color: $student-red-lightest !important;
+    color: $student-red !important;
+
+    i {
+      color: $student-red;
+    }
+
+    &.selected {
+      background-color: $student-red-light !important;
+      outline: 2px solid;
+    }
+  }
+}
+
+
 body.show-instructions {
   .btn-outline-primary {
     &:disabled {
@@ -236,8 +277,8 @@ body.show-instructions {
 .next-btn {
   @extend .svg-btn;
   background-image: var(--bg-next-btn);
-  width: 10rem;
-  height: 5rem;
+  width: 180px;
+  height: 80px;
 }
 
 .repeat-btn {
@@ -340,14 +381,14 @@ body.show-instructions {
 
 #challenge-image {
   display: block;
-  margin: 0 auto 2.5 * $spacer auto;
-  height: 200px;
+  margin: 0 auto 0 auto;
+  height: 180px;
   object-fit: contain;
 }
 
 #challenge-text {
   display: block;
-  margin: 0 auto 64px auto;
+  margin: 0 auto 0 auto;
   
   background-color: #ffffff;
   border: 2px solid $student-grey-light;
@@ -434,7 +475,7 @@ body.show-instructions .sound-btn.pulse {
   top: 0;
   left: 0;
   width: 100vw;
-  height: 100vh;
+  height: 100dvh;
 
   display: flex;
   flex-direction: column;
@@ -600,4 +641,12 @@ body.show-instructions .sound-btn.pulse {
   font-size: 2.8rem;
   margin-left: 0.8rem;
   vertical-align: middle;
+}
+
+#question-challenge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 48px;
+    margin: 0 auto 48px auto;
 }

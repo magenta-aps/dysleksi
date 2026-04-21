@@ -12,6 +12,7 @@ from data_tools.utils import (
     create_letter_sound_test,
     create_nonwordspelling_test,
     create_pronunciation_test,
+    create_sentence_reading_test,
     create_wordreading_1_test,
     create_wordreading_2_test,
     create_wordspelling_test,
@@ -141,6 +142,11 @@ class Command(BaseCommand):
             create_fore_sound_test(
                 test, questions_data, practice_data, name=testpart_name
             )
+        elif test_type == "sentence_reading":
+            create_sentence_reading_test(
+                test, questions_data, practice_data, name=testpart_name
+            )
+
         else:
             raise ValueError("Test type is not valid")
 
