@@ -297,7 +297,7 @@ class Test(models.Model):
         }
 
         for part in self.parts.all().order_by("id"):
-            part_data = {
+            part_data: dict = {
                 "id": part.id,
                 "name": part.name,
                 "image": part.image_url,
@@ -316,7 +316,7 @@ class Test(models.Model):
                 (False, part.questions.filter(is_practice=False)),
             ):
                 for question in questions.order_by("id"):
-                    question_data = {
+                    question_data: dict[str, Any] = {
                         "id": question.id,
                         "question_type": question.question_type,
                         "possible_answers": [],
