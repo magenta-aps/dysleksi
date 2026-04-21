@@ -17,6 +17,8 @@ vi.mock("../../../screening/controlroom.js", () => {
 
     class ElapsedTimeView {}
 
+    class AudioIndicator {}
+
     // TeacherView mock records constructor calls
     const TeacherView = vi.fn();
 
@@ -25,6 +27,7 @@ vi.mock("../../../screening/controlroom.js", () => {
         ActionButtons,
         ElapsedTimeView,
         QuestionView,
+        AudioIndicator,
         TeacherView,
     };
 });
@@ -40,6 +43,7 @@ import {
     ElapsedTimeView,
     QuestionView,
     TeacherView,
+    AudioIndicator,
 } from "../../../screening/controlroom.js";
 import { getWebSocket } from "../../../ws.js";
 
@@ -76,5 +80,6 @@ describe("initTeacher", () => {
         expect(args[6]).toBeNull();
         expect(args[7]).toBeInstanceOf(QuestionView);
         expect(args[8]).toBeInstanceOf(ElapsedTimeView);
+        expect(args[9]).toBeInstanceOf(AudioIndicator);
     });
 });
