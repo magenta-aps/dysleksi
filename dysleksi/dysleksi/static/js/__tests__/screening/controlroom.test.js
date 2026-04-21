@@ -129,6 +129,7 @@ describe("ActionButtons", () => {
 
 describe("ElapsedTimeView", () => {
     const mockDoc = `<div id="elapsed-time"></div>`;
+    let instance;
 
     const getInstance = () => {
         return new ElapsedTimeView("#elapsed-time");
@@ -137,15 +138,16 @@ describe("ElapsedTimeView", () => {
     beforeEach(() => {
         document.body.innerHTML = mockDoc;
         vi.useFakeTimers();
+        instance = getInstance();
     });
 
     afterEach(() => {
+        vi.clearAllTimers();
         vi.useRealTimers();
         vi.restoreAllMocks();
     });
 
     it("initializes", () => {
-        const instance = getInstance();
         expect(instance.domElement).not.toBeNull();
         expect(instance.running).toBeFalsy();
         expect(instance.t1).toBeNull();
@@ -153,7 +155,6 @@ describe("ElapsedTimeView", () => {
     });
 
     it("can start", () => {
-        const instance = getInstance();
         // Start from first stopped state: initializes `instance.t1`
         instance.stop();
         instance.start();
@@ -169,7 +170,6 @@ describe("ElapsedTimeView", () => {
     });
 
     it("can stop", () => {
-        const instance = getInstance();
         instance.start();
         instance.stop();
         expect(instance.running).toBeFalsy();
@@ -178,7 +178,6 @@ describe("ElapsedTimeView", () => {
     });
 
     it("updates its DOM element", () => {
-        const instance = getInstance();
         // Test update when timer is stopped
         instance.stop();
         instance.update();
@@ -190,7 +189,6 @@ describe("ElapsedTimeView", () => {
     });
 
     it("updates its DOM element on an interval", () => {
-        const instance = getInstance();
         const spyUpdate = vi.spyOn(instance, "update");
         // Let time pass
         vi.advanceTimersByTime(1000);
