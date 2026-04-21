@@ -24,7 +24,9 @@
                     <i class="ph-fill ph-flag-pennant"></i>
                 </span>
                 <span class="student-control-button">
-                    <i class="ph ph-dots-three"></i>
+                    {# Set opacity to zero because these dots don't do anything (yet) #}
+                    {# See https://redmine.magenta.dk/issues/69738 #}
+                    <i class="ph ph-dots-three" style="opacity: 0;"></i>
                 </span>
                 <span class="student-control-button">
                     <i id="foldout-arrow" class="ph-fill ph-caret-up"></i>
