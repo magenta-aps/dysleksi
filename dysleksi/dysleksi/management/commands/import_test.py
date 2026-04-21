@@ -77,16 +77,16 @@ class Command(BaseCommand):
             help="Path to the JSON file with questions",
         )
         parser.add_argument(
+            "test_type",
+            type=str,
+            help="Type of the test to create",
+        )
+        parser.add_argument(
             "practice_json_path",
             type=Path,
             nargs="?",
             default=None,
             help="Path to the JSON file with practice questions",
-        )
-        parser.add_argument(
-            "test_type",
-            type=str,
-            help="Type of the test to create",
         )
 
     def handle(self, *args, **options):
