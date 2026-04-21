@@ -420,7 +420,7 @@ class TestDomElements {
             if (!img) {
                 img = document.createElement("img");
                 img.id = "challenge-image";
-                this.questionChallengeEl.append(img);
+                this._insert(this.questionChallengeEl, img, null, [textEl]);
             }
             img.src = imageUrl;
             img.style.opacity = 1;
