@@ -6,7 +6,7 @@
 
 ## Core Django & gunicorn
 Django==6.0.4
-django-stubs==5.2.9
+django-stubs==6.0.3
 django-stubs-ext==6.0.3
 gunicorn==25.3.0
 
@@ -15,7 +15,7 @@ psycopg==3.3.3
 
 ## Async packages, for handling websockets
 channels==4.3.2
-types-channels==4.3.0.20260408
+types-channels==4.3.0.20260421
 channels_redis==4.3.0
 uvicorn==0.45.0
 daphne==4.2.1
