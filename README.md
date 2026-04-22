@@ -60,7 +60,7 @@ docker exec dysleksi-web bash -c 'coverage run manage.py test dysleksi.tests.tes
 To run type checks run:
 
 ```shell
-docker exec dysleksi-web mypy --config ../mypy.ini dysleksi/
+docker exec dysleksi-web mypy --config ../mypy.ini dysleksi/ --cache-dir=/dev/null
 ```
 
 ## Running a dev environment on an iPad
