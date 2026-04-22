@@ -18,7 +18,7 @@ from dysleksi.models import (
 
 class DummyDataTest(TestCase):
     def test_dummy_data_creation(self):
-        call_command("create_dummy_tests")
+        call_command("create_tests", dummy=True)
 
         # We expect exactly one "word reading 2" test part, which is reused/referenced
         # across the four available group tests ("Midt 2. klasse", "Slut 2. klasse",
@@ -30,7 +30,7 @@ class DummyDataTest(TestCase):
         self.assertEqual(word_reading_2_test_parts.count(), 1)
 
     def test_real_dummy_data_creation(self):
-        call_command("create_dummy_tests")
+        call_command("create_tests")
 
         word_reading_2_test = TestPart.objects.filter(name="Ordlæsning 2A").first()
         wordspelling_test = TestPart.objects.filter(name="Ordstavning").first()
@@ -55,7 +55,7 @@ class DummyDataTest(TestCase):
     def test_dummy_test_answers_creation(self):
         call_command("create_groups")
         call_command("create_dummy_classes_and_users")
-        call_command("create_dummy_tests", "--answer")
+        call_command("create_tests", "--answer")
         word_reading_2_test: TestPart = TestPart.objects.filter(
             name="Ordlæsning 2A"
         ).first()
@@ -80,7 +80,7 @@ class DummyDataTest(TestCase):
 
     def test_dummy_test_answers_creation_no_classes_or_students(self):
         call_command("create_groups")
-        call_command("create_dummy_tests", "--answer")
+        call_command("create_tests", "--answer")
         word_reading_2_test: TestPart = TestPart.objects.filter(
             name="Ordlæsning 2A"
         ).first()
@@ -96,7 +96,7 @@ class DummyDataTest(TestCase):
     def test_answer_test(self):
         call_command("create_groups")
         call_command("create_dummy_classes_and_users")
-        call_command("create_dummy_tests")
+        call_command("create_tests")
 
         pk = Test.objects.filter(test_type=TestType.GROUP).first().pk
         with patch("builtins.print") as mock_print:
