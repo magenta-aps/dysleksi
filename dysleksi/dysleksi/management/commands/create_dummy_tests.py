@@ -9,8 +9,9 @@ from typing import Literal
 from django.conf import settings
 from django.core.management import call_command
 from django.core.management.base import BaseCommand
+from django.db.models import Count
 
-from dysleksi.models import Test, TestType
+from dysleksi.models import Class, Student, Test, TestType
 
 
 def copy_dummy_files():
@@ -195,6 +196,7 @@ def create_group_test(
                 sentence_reading_data_path,
                 "sentence_reading",
             )
+        return test
 
 
 def create_individual_test(real=False):
@@ -260,17 +262,51 @@ def create_individual_test(real=False):
             nonsense_word_pronunciation_data_path,
             "pronunciation",
         )
+    return test
+
+
+def answer_test(test):
+    if test.test_type == TestType.GROUP:
+        klasse = (
+            Class.objects.annotate(students_count=Count("students"))
+            .filter(students_count__gt=0)
+            .order_by("?")
+            .first()
+        )
+        if klasse is not None:
+            call_command("answer_test", test.pk, **{"class": klasse.pk})
+    else:
+        student = Student.objects.all().order_by("?").first()
+        if student is not None:
+            call_command("answer_test", test.pk, student=student.pk)
 
 
 class Command(BaseCommand):
     help = "Create group tests for grades 1–3 (middle and end)"
 
+    def add_arguments(self, parser):
+        parser.add_argument(
+            "--answer",
+            action="store_true",
+            help="also create test answers",
+        )
+
     def handle(self, *args, **options):
         copy_dummy_files()
+        create_answers = options["answer"]
         for grade in (1, 2, 3):
             for period in ("midt", "slut"):
-                create_group_test(grade, period, real=False)
-                create_group_test(grade, period, real=True)
+                test = create_group_test(grade, period, real=False)
+                if create_answers and test is not None:
+                    answer_test(test)
+                test = create_group_test(grade, period, real=True)
+                if create_answers and test is not None:
+                    answer_test(test)
 
-        create_individual_test(real=False)
-        create_individual_test(real=True)
+        test = create_individual_test(real=False)
+        if create_answers and test is not None:
+            answer_test(test)
+
+        test = create_individual_test(real=True)
+        if create_answers and test is not None:
+            answer_test(test)
