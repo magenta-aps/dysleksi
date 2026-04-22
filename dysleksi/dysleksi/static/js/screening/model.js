@@ -181,7 +181,6 @@ export class TestPart {
     name;
     image;
     instructionsUrl;
-    intro;
     timeout;
     partialScoreAfter;
     questions;
@@ -196,7 +195,6 @@ export class TestPart {
         this.name = data.name;
         this.image = data.image;
         this.instructionsUrl = data.instructions_url;
-        this.intro = data.intro;
         this.timeout = data.timeout;
         this.partialScoreAfter = data.partial_score_after;
         this.questionIndex = 0;

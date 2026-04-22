@@ -7,7 +7,6 @@
       "id": 5,
       "name": "Wordreading 2A (dummy)",
       "instructions_url": null,
-      "intro": "Vælg det rigtige ord, der passer til billedet.",
       "timeout": 60,
       "partial_score_after": 30,
       "practice": [
@@ -372,7 +371,6 @@
       "id": 6,
       "name": "Wordspelling 2B (dummy)",
       "instructions_url": null,
-      "intro": "Skriv det rigtige ord, der passer til billedet.",
       "timeout": 60,
       "partial_score_after": 30,
       "practice": [

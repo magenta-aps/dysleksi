@@ -2,8 +2,6 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
-from django.utils.translation import gettext_lazy as _
-
 from dysleksi.models import TestPart, TestResource
 
 
@@ -19,7 +17,6 @@ def create_wordreading_2_test(
         defaults={
             "timeout": 600000,  # 600 seconds / 10 minutes
             "partial_score_after": 300000,  # 300 seconds / 5 minutes
-            "intro": _("Vælg det rigtige ord, der passer til billedet."),
             "reminder": 20000,  # 20 seconds
             "image_url": "/static/images/wordreading.png",
             "reminder_source": reminder,
@@ -151,7 +148,6 @@ def create_wordspelling_test(
         defaults={
             "timeout": 0,  # no timeout
             "partial_score_after": 0,  # no partial score (?)
-            "intro": _("Stav ordet som du hører."),
             "image_url": "/static/images/wordspelling.png",
             "reminder_source": reminder,
         },
@@ -177,7 +173,6 @@ def create_nonwordspelling_test(
         defaults={
             "timeout": 0,  # no timeout
             "partial_score_after": 0,  # no partial score (?)
-            "intro": _("Stav ordet som du hører."),
             "image_url": "/static/images/nonwordspelling.png",
             "reminder_source": reminder,
         },
@@ -200,7 +195,6 @@ def create_pronunciation_test(test, questions_data, name, practice_questions_dat
         defaults={
             "timeout": 0,
             "partial_score_after": 30000,
-            "intro": _("Sig bogstavet på skærmen højt"),
             "image_url": "/static/images/letter_pronunciation.png",
             "reminder_source": reminder,
         },
@@ -226,7 +220,6 @@ def create_sentence_reading_test(
         defaults={
             "timeout": 8 * 60 * 1000,  # 8 minutes
             "partial_score_after": 4 * 60 * 1000,  # 4 minutes
-            "intro": _("Vurder, om sætningen passer til billedet."),
             "image_url": "/static/images/sentence_reading.png",
             "reminder_source": reminder,
         },
