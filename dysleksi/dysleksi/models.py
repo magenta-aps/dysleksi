@@ -304,7 +304,6 @@ class Test(models.Model):
                 "instructions_url": (
                     part.instructions.url if part.instructions else None
                 ),
-                "intro": part.intro,
                 "timeout": part.timeout,
                 "partial_score_after": part.partial_score_after,
                 "practice": [],
@@ -459,7 +458,6 @@ class TestPart(models.Model):
     )
 
     instructions = models.FileField(upload_to="instructions", blank=True, null=True)
-    intro = models.TextField(blank=True, null=True)
     timeout = models.PositiveIntegerField(blank=False, null=False)
     partial_score_after = models.PositiveIntegerField(blank=False, null=False)
     reminder = models.PositiveIntegerField(blank=False, null=False, default=0)

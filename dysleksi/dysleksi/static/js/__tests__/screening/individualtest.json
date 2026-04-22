@@ -7,7 +7,6 @@
       "id": 1,
       "name": "Individuel deltest",
       "instructions_url": null,
-      "intro": "Dette er en dummy test",
       "timeout": 60,
       "partial_score_after": 30,
       "practice": [
@@ -84,7 +83,6 @@
       "id": 2,
       "name": "Højtlæsning af ord",
       "instructions_url": null,
-      "intro": "Dette er en dummy test",
       "timeout": 60,
       "partial_score_after": 30,
       "practice": [],

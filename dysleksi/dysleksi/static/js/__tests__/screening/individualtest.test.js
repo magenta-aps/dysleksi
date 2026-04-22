@@ -132,7 +132,6 @@ describe("IndividualTestFlow", () => {
         expect(test.parts[0].index).toBe(0);
         expect(test.parts[0].name).toBe("Individuel deltest");
         expect(test.parts[0].instructionsUrl).toBe(null);
-        expect(test.parts[0].intro).toBe("Dette er en dummy test");
         expect(test.parts[0].timeout).toBe(60);
         expect(test.parts[0].partialScoreAfter).toBe(30);
         expect(test.parts[0].questions.length).toBe(3);

@@ -328,7 +328,6 @@ class TestTest(DysleksiTest):
             part_model.instructions.url if part_model.instructions else None,
             part_json["instructions_url"],
         )
-        self.assertEqual(part_model.intro, part_json["intro"])
 
         # Test questions
         self.assertEqual(part_model.questions.count(), 4)

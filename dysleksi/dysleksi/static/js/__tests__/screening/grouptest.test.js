@@ -138,9 +138,6 @@ describe("GroupTestFlow", () => {
         expect(test.parts[0].index).toBe(0);
         expect(test.parts[0].name).toBe("Wordreading 2A (dummy)");
         expect(test.parts[0].instructionsUrl).toBe(null);
-        expect(test.parts[0].intro).toBe(
-            "Vælg det rigtige ord, der passer til billedet.",
-        );
         expect(test.parts[0].timeout).toBe(60);
         expect(test.parts[0].partialScoreAfter).toBe(30);
         expect(test.parts[0].questions.length).toBe(5);
@@ -162,9 +159,6 @@ describe("GroupTestFlow", () => {
         expect(test.parts[0].index).toBe(0);
         expect(test.parts[0].name).toBe("Wordreading 2A (dummy)");
         expect(test.parts[0].instructionsUrl).toBe(null);
-        expect(test.parts[0].intro).toBe(
-            "Vælg det rigtige ord, der passer til billedet.",
-        );
         expect(test.parts[0].timeout).toBe(60);
         expect(test.parts[0].partialScoreAfter).toBe(30);
         expect(test.parts[0].questions.length).toBe(5);
