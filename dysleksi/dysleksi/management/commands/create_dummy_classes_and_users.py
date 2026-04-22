@@ -107,6 +107,7 @@ class Command(BaseCommand):
         if created:
             student3.set_password("elev")
             student3.groups.add(student_group)
+            student3.save()
 
         # create some more students for group-test-testing
         group_test_students = []
@@ -125,6 +126,7 @@ class Command(BaseCommand):
             if created:
                 group_test_student.set_password(f"elev{student_id}")
                 group_test_student.groups.add(student_group)
+                group_test_student.save()
             group_test_students.append(group_test_student)
 
         school_year_start = (

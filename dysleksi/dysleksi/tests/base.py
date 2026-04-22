@@ -39,12 +39,9 @@ class DysleksiTest(TestCase):
         cls.school = cls.create_school(number="test123", name="TestSkolen")
         cls.klasse = cls.create_class(2025, "1.A")
         cls.student = cls.create_student(
-            "TestStudent",
-            cpr=1234567890,
-            first_name="Test",
-            last_name="Elev",
-            klasse=cls.klasse,
+            "TestStudent", cpr=1234567890, first_name="Test", last_name="Elev"
         )
+        cls.klasse.students.add(cls.student)
         cls.teacher = cls.create_teacher(
             "TestTeacher",
             cpr=2233445566,
@@ -137,7 +134,7 @@ class DysleksiTest(TestCase):
         cls.klasse, _ = Class.objects.get_or_create(school_year_start=2025, name="1.A")
         cls.teacher.classes.add(cls.klasse)
         for student in ("elev1", "elev2"):
-            cls.klasse.student_set.add(cls.create_student(student))
+            cls.klasse.students.add(cls.create_student(student))
 
         cls.test_assignment_student, _ = TestAssignment.objects.get_or_create(
             test=cls.test,  # individual test
@@ -151,7 +148,7 @@ class DysleksiTest(TestCase):
         )
         cls.test_response_class, _ = TestResponse.objects.get_or_create(
             assignment=cls.test_assignment_class,
-            student=cls.klasse.student_set.first(),
+            student=cls.klasse.students.first(),
         )
 
     @classmethod
