@@ -182,6 +182,7 @@ body.show-instructions {
   justify-content: center;
   margin: 0 0.5rem 0.5rem 0.5rem;
   font-size: 2.5rem !important;
+  margin: 0;
 
   &:disabled {
     color: white; // changes text/icon color when button is disabled
@@ -249,7 +250,7 @@ body.show-instructions {
   width: 7.5rem;
   height: 5rem;
   display: flex;
-  margin: 0 0 64px 0;
+  margin: 0;
 
   align-items: center;
   justify-content: center;
@@ -290,9 +291,8 @@ body.show-instructions {
 
 .letter-btn {
     font-size: 2rem !important;
-    margin: 0.5rem;
-    width: 5rem;
-    height: 4rem;
+    margin: 0;
+    height: 80px;
     text-align: center;
     display: inline-flex;
     align-items: center;
@@ -324,8 +324,8 @@ body.show-instructions {
 
 .letter-row {
   display: flex;              // make buttons go side by side
-  gap: 0.5rem;                // space between buttons
-  margin-bottom: 0.5rem;      // space between rows
+  gap: 20px;                  // space between buttons
+  margin-bottom: 24px;        // space between rows
   flex-wrap: nowrap;          // fill out each row horizontally
 }
 
@@ -649,4 +649,8 @@ body.show-instructions .sound-btn.pulse {
     align-items: center;
     gap: 48px;
     margin: 0 auto 48px auto;
+}
+
+#free-text-field {
+  margin: 0;
 }
