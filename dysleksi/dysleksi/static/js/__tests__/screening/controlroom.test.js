@@ -136,13 +136,18 @@ describe("ElapsedTimeView", () => {
     };
 
     beforeEach(() => {
-        document.body.innerHTML = mockDoc;
         vi.useFakeTimers();
+        document.body.innerHTML = mockDoc;
         instance = getInstance();
     });
 
     afterEach(() => {
         vi.clearAllTimers();
+
+        if (instance && instance.interval) {
+            clearInterval(instance.interval);
+        }
+
         vi.useRealTimers();
         vi.restoreAllMocks();
     });
@@ -278,6 +283,7 @@ describe("Teacher Individual test View", () => {
     const studentId = 123;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         global.localStorage = {
             getItem: vi.fn(),
             setItem: vi.fn(),
@@ -358,6 +364,8 @@ describe("Teacher Individual test View", () => {
     });
 
     afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
         vi.restoreAllMocks();
         vi.unstubAllGlobals();
     });
@@ -1263,6 +1271,7 @@ describe("TeacherView _initFilterButtonSelection", () => {
     let socket;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         global.localStorage = {
             getItem: vi.fn(),
             setItem: vi.fn(),
@@ -1300,6 +1309,8 @@ describe("TeacherView _initFilterButtonSelection", () => {
     });
 
     afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
         vi.restoreAllMocks();
         vi.unstubAllGlobals();
     });
@@ -1340,6 +1351,7 @@ describe("TeacherView socket 'test.started' handling", () => {
     const studentId = 123;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         global.localStorage = {
             getItem: vi.fn(),
             setItem: vi.fn(),
@@ -1445,6 +1457,13 @@ describe("TeacherView socket 'test.started' handling", () => {
         });
 
         p2pChannel = view.studentChannels[studentId];
+    });
+
+    afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
+        vi.restoreAllMocks();
+        vi.unstubAllGlobals();
     });
 
     it("calls groupTestContainer.updateData when 'test.started' message is received", () => {
@@ -1910,6 +1929,7 @@ describe("TeacherView Sync Logic", () => {
     });
 
     afterEach(() => {
+        vi.clearAllTimers();
         vi.useRealTimers();
         vi.clearAllMocks();
     });
@@ -2012,7 +2032,7 @@ describe("TeacherView _initSocket", () => {
     const studentId = 88;
 
     beforeEach(() => {
-        vi.clearAllMocks();
+        vi.useFakeTimers();
 
         socket = {
             addEventListener: vi.fn(),
@@ -2021,6 +2041,12 @@ describe("TeacherView _initSocket", () => {
         wsGetter = vi.fn().mockReturnValue(socket);
 
         view = new TeacherView("room1", { parts: [] }, 1, wsGetter);
+    });
+
+    afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
+        vi.clearAllMocks();
     });
 
     it("attaches the message listener to the WebSocket", () => {
@@ -2112,6 +2138,7 @@ describe("TeacherView messageQueue initialization", () => {
     const roomName = "test-room";
 
     beforeEach(() => {
+        vi.useFakeTimers();
         socket = { addEventListener: vi.fn(), send: vi.fn() };
         wsGetter = vi.fn().mockReturnValue(socket);
 
@@ -2120,7 +2147,9 @@ describe("TeacherView messageQueue initialization", () => {
     });
 
     afterEach(() => {
-        vi.restoreAllMocks();
+        vi.clearAllTimers();
+        vi.useRealTimers();
+        vi.clearAllMocks();
     });
 
     it("initializes an empty queue if localStorage is empty", () => {
