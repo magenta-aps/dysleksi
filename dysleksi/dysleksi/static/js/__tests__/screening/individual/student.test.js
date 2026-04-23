@@ -88,18 +88,12 @@ describe("initStudent", () => {
 
         // view was started
         expect(viewInstance.start).toHaveBeenCalled();
-
-        // simulate test.complete event
-        const handler = viewInstance.addEventListener.mock.calls[0][1];
-        handler();
-
-        expect(mockClose).toHaveBeenCalled();
     });
 
     it("covers setup error path", async () => {
         mockSetup.mockRejectedValueOnce(new Error("mic failed"));
 
-        initStudent("room1", 42, {});
+        initStudent(42, {});
 
         await openHandler();
 
@@ -107,7 +101,6 @@ describe("initStudent", () => {
             JSON.stringify({
                 uuid: "uuid-123",
                 event: "setup.error",
-                id: "room1",
                 error: "Error: mic failed",
             }),
         );

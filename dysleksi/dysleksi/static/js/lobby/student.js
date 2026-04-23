@@ -1,13 +1,15 @@
 import { getWebSocket } from "../ws.js";
 
-function initRedirectSocket(roomName) {
-    const chatSocket = getWebSocket(roomName);
+function initRedirectSocket(studentId) {
+    const chatSocket = getWebSocket();
 
     chatSocket.addEventListener("message", (e) => {
         const data = JSON.parse(e.data);
 
         if (["session.in_progress", "session.start"].includes(data.event)) {
-            window.location = data.roomUrl;
+            if (data.students.includes(studentId)) {
+                window.location = data.roomUrl;
+            }
         }
     });
 
@@ -18,7 +20,7 @@ function initRedirectSocket(roomName) {
                 JSON.stringify({
                     uuid: crypto.randomUUID(),
                     event: "student.ready",
-                    roomName: roomName,
+                    studentId: studentId,
                 }),
             );
         },
@@ -28,9 +30,6 @@ function initRedirectSocket(roomName) {
     return chatSocket;
 }
 
-export function initStudentLobby(config) {
-    const { individualRoomName, classRoomName } = config;
-
-    initRedirectSocket(individualRoomName);
-    initRedirectSocket(classRoomName);
+export function initStudentLobby(studentId) {
+    initRedirectSocket(studentId);
 }

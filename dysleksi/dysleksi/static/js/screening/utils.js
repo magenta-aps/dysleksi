@@ -2,8 +2,8 @@ import { getWebSocket } from "../ws.js";
 
 let wakeLock = null;
 
-export function startSession(roomName) {
-    const chatSocket = getWebSocket(roomName);
+export function startSession(studentIds) {
+    const chatSocket = getWebSocket();
 
     chatSocket.addEventListener(
         "open",
@@ -13,6 +13,7 @@ export function startSession(roomName) {
                     uuid: crypto.randomUUID(),
                     event: "session.start",
                     roomUrl: window.location.href.replace(window.location.origin, ""),
+                    students: studentIds,
                 }),
             );
         },
@@ -22,21 +23,22 @@ export function startSession(roomName) {
     chatSocket.addEventListener("message", (e) => {
         const data = JSON.parse(e.data);
         if (data.event === "student.ready") {
-            refreshSession(roomName);
+            refreshSession(studentIds);
         }
     });
 
     return chatSocket;
 }
 
-export function refreshSession(roomName) {
-    const chatSocket = getWebSocket(roomName);
+export function refreshSession(studentIds) {
+    const chatSocket = getWebSocket();
     if (chatSocket.readyState === WebSocket.OPEN) {
         chatSocket.send(
             JSON.stringify({
                 uuid: crypto.randomUUID(),
                 event: "session.in_progress",
                 roomUrl: window.location.href.replace(window.location.origin, ""),
+                students: studentIds,
             }),
         );
     }

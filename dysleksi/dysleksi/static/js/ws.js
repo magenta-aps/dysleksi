@@ -1,6 +1,7 @@
-const sockets = {};
+let sockets = {};
 
-export function getWebSocket(chatId) {
+export function getWebSocket() {
+    const chatId = "lobby";
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
 
     // Reuse socket if exists and open/connecting
@@ -25,4 +26,8 @@ export function getWebSocket(chatId) {
     });
 
     return newSocket;
+}
+
+export function resetSockets() {
+    sockets = {};
 }

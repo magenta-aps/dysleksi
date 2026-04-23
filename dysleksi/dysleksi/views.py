@@ -90,19 +90,17 @@ class AssignmentView(UserTypeMixin, DetailView):
             return "dysleksi/screening"
         raise ValueError("User is neither teacher nor student")
 
-    @property
-    def room_name(self):
-        if self.object.klasse is not None:
-            return f"class_{self.object.klasse_id}"
-        else:
-            return f"student_{self.object.student_id}"
-
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         assignment = self.object
         test = Test.objects.get(pk=assignment.test_id)
         context["test_contents"] = test.to_json()
-        context["room_name"] = self.room_name
+        if assignment.klasse:
+            context["student_ids"] = list(
+                assignment.klasse.students.values_list("id", flat=True)
+            )
+        else:
+            context["student_ids"] = [assignment.student.id]
         context["test_type"] = self.get_room_type()
         context["student"] = self.user
         context["room_type"] = self.get_room_type()

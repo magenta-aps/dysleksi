@@ -137,10 +137,17 @@ class Command(BaseCommand):
                 c, _ = Class.objects.get_or_create(
                     school_year_start=school_year_start,
                     name=f"{classnumber}.{letter}",
+                    is_main=True,
                 )
                 c.teachers.set([teacher, teacher2, teacher3])
 
         # Add students to classes
+
+        secondary_class, _ = Class.objects.get_or_create(
+            school_year_start=school_year_start, name="Dansk 1", is_main=False
+        )
+        secondary_class.teachers.set([teacher, teacher2, teacher3])
+
         klasse = Class.objects.get(school_year_start=school_year_start, name="2.A")
         klasse.students.add(student)
 
@@ -149,6 +156,7 @@ class Command(BaseCommand):
 
         klasse = Class.objects.get(school_year_start=school_year_start, name="0.C")
         klasse.students.add(student3)
+        secondary_class.students.add(student3)
 
         klasse = Class.objects.get(school_year_start=school_year_start, name="0.C")
         for group_test_student in group_test_students:

@@ -154,10 +154,6 @@ class Student(User):
     is_student = True
     is_teacher = False
 
-    @property
-    def klasse(self):
-        return self.classes.first()
-
 
 @receiver(post_save, sender=Student)
 def on_update_student(sender, instance: Student, created: bool, **kwargs):
@@ -452,8 +448,6 @@ class TestAssignment(models.Model):
     def klasse_name(self):
         if self.klasse:
             return self.klasse.name
-        else:
-            return self.student.klasse.name
 
     def __str__(self) -> str:
         assignee = self.student or self.klasse
@@ -842,11 +836,12 @@ class TestResponse(models.Model):
             if self.student != self.assignment.student:
                 raise ValidationError({"student": _("Student must match assignment.")})
         else:
-            if self.student.klasse != self.assignment.klasse:
+            if self.assignment.klasse not in self.student.classes.all():
+                class_pks = [c.pk for c in self.student.classes.all()]
                 raise ValidationError(
                     {
                         "student": _(
-                            f"Student class (pk={self.student.klasse.pk}) must match"
+                            f"Student classes (pk={class_pks}) must match"
                             + f" assignment class (pk={self.assignment.klasse.pk})."
                         )
                     }

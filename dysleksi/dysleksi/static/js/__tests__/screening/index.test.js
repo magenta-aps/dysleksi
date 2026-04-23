@@ -19,6 +19,8 @@ describe("Startup teacher test", () => {
     let initGroupTeacher;
     let initGroupStudent;
     let initMockDataSpy;
+    let groupStudentIds;
+    let individualStudentIds;
 
     beforeEach(() => {
         socket = {
@@ -41,6 +43,9 @@ describe("Startup teacher test", () => {
             .mockImplementation(() => {});
         vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
         initMockDataSpy = vi.spyOn(Student.prototype, "initializeMockData");
+
+        groupStudentIds = [1, 2];
+        individualStudentIds = [1];
     });
 
     afterEach(() => {
@@ -61,6 +66,9 @@ describe("Startup teacher test", () => {
             >
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(individualTestData)}
+                </script>
+                <script type="application/json" id="student_ids">
+                ${JSON.stringify(individualStudentIds)}
                 </script>
                 <div id="question-container">
                 <h1 id="question-title"></h1>
@@ -96,6 +104,9 @@ describe("Startup teacher test", () => {
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(individualTestData)}
                 </script>
+                <script type="application/json" id="student_ids">
+                ${JSON.stringify(individualStudentIds)}
+                </script>
                 <div id="question-container">
                 <h1 id="question-title"></h1>
                 <div id="question-content"></div>
@@ -126,6 +137,9 @@ describe("Startup teacher test", () => {
             >
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(groupTestData)}
+                </script>
+                <script type="application/json" id="student_ids">
+                ${JSON.stringify(groupStudentIds)}
                 </script>
                 <div id="question-container">
                 <h1 id="question-title"></h1>
@@ -160,6 +174,9 @@ describe("Startup teacher test", () => {
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(individualTestData)}
                 </script>
+                <script type="application/json" id="student_ids">
+                ${JSON.stringify(individualStudentIds)}
+                </script>
                 <h1 id="instructions-text"></h1>
                 <audio id="instructions-sound"></audio>
                 <h1 id="question-title"></h1>
@@ -189,6 +206,9 @@ describe("Startup teacher test", () => {
             >
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(groupTestData)}
+                </script>
+                <script type="application/json" id="student_ids">
+                ${JSON.stringify(groupStudentIds)}
                 </script>
                 <h1 id="instructions-text"></h1>
                 <audio id="instructions-sound"></audio>
@@ -222,41 +242,8 @@ describe("Startup teacher test", () => {
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(groupTestData)}
                 </script>
-                <h1 id="instructions-text"></h1>
-                <audio id="instructions-sound"></audio>
-                <button class="btn btn-primary" id="start-practice"></button>
-                <button class="btn btn-primary" id="start-questions"></button>
-                <button class="btn btn-primary" id="end-summary">Ok</button>
-                <h1 id="question-title"></h1>
-                <div id="question-challenge"></div>
-                <div id="choices"></div>
-                <button id="next" class="btn next-btn" style="display: none;"></button>
-            </div>
-        `;
-        await start();
-
-        expect(initIndividualTeacher).not.toHaveBeenCalled();
-        expect(initIndividualStudent).not.toHaveBeenCalled();
-        expect(initGroupTeacher).not.toHaveBeenCalled();
-        expect(initGroupStudent).toHaveBeenCalled();
-        expect(initMockDataSpy).toHaveBeenCalled();
-
-        const studentArg = initGroupStudent.mock.calls[0][3];
-        expect(studentArg.problem).toBe(true);
-    });
-
-    it("group dummy0 student test", async () => {
-        document.body.innerHTML = `
-            <div class="container" 
-                data-test-type="group" 
-                data-role="student" 
-                data-student-first-name="Dummy0"
-                data-student-last-name="Student"
-                data-room-name="room_1" 
-                data-assignment-id="1"
-            >
-                <script type="application/json" id="test_contents">
-                ${JSON.stringify(groupTestData)}
+                <script type="application/json" id="student_ids">
+                ${JSON.stringify(groupStudentIds)}
                 </script>
                 <h1 id="instructions-text"></h1>
                 <audio id="instructions-sound"></audio>
@@ -277,7 +264,46 @@ describe("Startup teacher test", () => {
         expect(initGroupStudent).toHaveBeenCalled();
         expect(initMockDataSpy).toHaveBeenCalled();
 
-        const studentArg = initGroupStudent.mock.calls[0][3];
+        const studentArg = initGroupStudent.mock.calls[0][2];
+        expect(studentArg.problem).toBe(true);
+    });
+
+    it("group dummy0 student test", async () => {
+        document.body.innerHTML = `
+            <div class="container" 
+                data-test-type="group" 
+                data-role="student" 
+                data-student-first-name="Dummy0"
+                data-student-last-name="Student"
+                data-student-id="1"
+                data-assignment-id="1"
+            >
+                <script type="application/json" id="test_contents">
+                ${JSON.stringify(groupTestData)}
+                </script>
+                <script type="application/json" id="student_ids">
+                ${JSON.stringify(groupStudentIds)}
+                </script>
+                <h1 id="instructions-text"></h1>
+                <audio id="instructions-sound"></audio>
+                <button class="btn btn-primary" id="start-practice"></button>
+                <button class="btn btn-primary" id="start-questions"></button>
+                <button class="btn btn-primary" id="end-summary">Ok</button>
+                <h1 id="question-title"></h1>
+                <div id="question-challenge"></div>
+                <div id="choices"></div>
+                <button id="next" class="btn next-btn" style="display: none;"></button>
+            </div>
+        `;
+        await start();
+
+        expect(initIndividualTeacher).not.toHaveBeenCalled();
+        expect(initIndividualStudent).not.toHaveBeenCalled();
+        expect(initGroupTeacher).not.toHaveBeenCalled();
+        expect(initGroupStudent).toHaveBeenCalled();
+        expect(initMockDataSpy).toHaveBeenCalled();
+
+        const studentArg = initGroupStudent.mock.calls[0][2];
         expect(studentArg.progress).toBe(100);
     });
 

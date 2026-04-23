@@ -3,8 +3,8 @@ import { IndividualTestDomElements } from "../dom.js";
 import { TestMediaRecorder } from "../media.js";
 import { IndividualTestView } from "./student-individual-test.js";
 
-export function initStudent(roomName, assignmentId, test, student) {
-    const chatSocket = getWebSocket(roomName);
+export function initStudent(assignmentId, test, student) {
+    const chatSocket = getWebSocket();
     const domElements = new IndividualTestDomElements();
 
     // Start when socket is ready
@@ -19,7 +19,6 @@ export function initStudent(roomName, assignmentId, test, student) {
                     JSON.stringify({
                         uuid: crypto.randomUUID(),
                         event: "setup.error",
-                        id: roomName,
                         error: err.toString(),
                     }),
                 );
@@ -29,16 +28,12 @@ export function initStudent(roomName, assignmentId, test, student) {
                 const view = new IndividualTestView(
                     test,
                     chatSocket,
-                    roomName,
                     assignmentId,
                     domElements,
                     testMediaRecorder,
                     student,
                 );
 
-                view.addEventListener("test.complete", () => {
-                    chatSocket.close();
-                });
                 view.start();
             });
     });

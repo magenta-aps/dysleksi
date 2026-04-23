@@ -5,16 +5,8 @@ export class IndividualTestView extends StudentTestView {
     recordedAudio;
     isPracticing = false;
 
-    constructor(
-        test,
-        chatSocket,
-        roomName,
-        assignmentId,
-        domElements,
-        mediaRecorder,
-        student,
-    ) {
-        super(test, chatSocket, roomName, assignmentId, domElements, student);
+    constructor(test, chatSocket, assignmentId, domElements, mediaRecorder, student) {
+        super(test, chatSocket, assignmentId, domElements, student);
         this.mediaRecorder = mediaRecorder;
     }
 

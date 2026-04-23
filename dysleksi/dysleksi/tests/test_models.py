@@ -229,7 +229,7 @@ class TestTestResponse(DysleksiTest):
             dict(exception),
             {
                 "student": [
-                    f"Student class (pk={klasse2.pk}) must match "
+                    f"Student classes (pk=[{klasse2.pk}]) must match "
                     f"assignment class (pk={self.klasse.pk})."
                 ]
             },

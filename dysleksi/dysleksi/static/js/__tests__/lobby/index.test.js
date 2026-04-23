@@ -22,8 +22,7 @@ describe("Index Entry Point", () => {
         // 2. Setup the DOM element with data attributes
         document.body.innerHTML = `
       <div 
-        data-individual-room-name="Alice-123" 
-        data-class-room-name="Biology-101"
+        data-student-id="1"
       ></div>
     `;
 
@@ -32,10 +31,7 @@ describe("Index Entry Point", () => {
         await import("../../lobby/index.js?t=" + Date.now());
 
         // 4. Assertions
-        expect(initStudentLobby).toHaveBeenCalledWith({
-            individualRoomName: "Alice-123",
-            classRoomName: "Biology-101",
-        });
+        expect(initStudentLobby).toHaveBeenCalledWith(1);
     });
 
     it("should throw or fail gracefully if the element is missing", async () => {

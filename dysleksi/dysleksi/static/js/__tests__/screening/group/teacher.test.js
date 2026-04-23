@@ -51,23 +51,21 @@ describe("initTeacher", () => {
     });
 
     it("should create all components, call methods, and create TeacherView", () => {
-        const roomName = "room1";
         const assignmentId = 42;
         const testObj = { id: 1 };
 
-        initTeacher(roomName, assignmentId, testObj);
+        initTeacher(assignmentId, testObj);
 
         // TeacherView constructor called
         expect(TeacherView).toHaveBeenCalledTimes(1);
 
         const args = TeacherView.mock.calls[0];
-        expect(args[0]).toBe(roomName);
-        expect(args[1]).toBe(testObj);
-        expect(args[2]).toBe(assignmentId);
-        expect(args[3]).toBe(getWebSocket);
-        expect(args[4]).toBeInstanceOf(EventTable);
-        expect(args[5]).toBeInstanceOf(ActionButtons);
-        expect(args[6]).toBeInstanceOf(NoteField);
-        expect(args[7]).toBeInstanceOf(QuestionView);
+        expect(args[0]).toBe(testObj);
+        expect(args[1]).toBe(assignmentId);
+        expect(args[2]).toBe(getWebSocket);
+        expect(args[3]).toBeInstanceOf(EventTable);
+        expect(args[4]).toBeInstanceOf(ActionButtons);
+        expect(args[5]).toBeInstanceOf(NoteField);
+        expect(args[6]).toBeInstanceOf(QuestionView);
     });
 });
