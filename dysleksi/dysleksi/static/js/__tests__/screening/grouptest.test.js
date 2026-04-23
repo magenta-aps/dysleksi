@@ -90,6 +90,7 @@ describe("GroupTestFlow", () => {
     let domElements;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         document.body.innerHTML = `
             <div id="fade-overlay"></div>
             <h1 id="student-header" class="student-header"></h1>
@@ -124,6 +125,8 @@ describe("GroupTestFlow", () => {
     });
 
     afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
         document.body.innerHTML = "";
         vi.clearAllMocks();
     });
@@ -908,6 +911,7 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
     let listenerMock;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         document.body.innerHTML = `
             <div id="fade-overlay" style="opacity: 0;"></div>
             <div id="choices" class="multiple-choice-choices"></div>
@@ -931,6 +935,13 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
         domElements = new GroupTestDomElements();
         listenerMock = vi.fn();
         vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
+    });
+
+    afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
+        document.body.innerHTML = "";
+        vi.clearAllMocks();
     });
 
     it("prevents default browser context menu on the display field", () => {
@@ -1018,6 +1029,7 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
     let mockAudioContext;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         document.body.innerHTML = `
             <div id="fade-overlay" style="opacity: 0;"></div>
             <div id="choices" class="multiple-choice-choices"></div>
@@ -1039,6 +1051,8 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
     });
 
     afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
         document.body.innerHTML = "";
         vi.clearAllMocks();
     });
@@ -1188,6 +1202,7 @@ describe("GroupTestDomElements - Repeatbutton", () => {
     let domElements;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         document.body.innerHTML = `
             <div id="fade-overlay" style="opacity: 0;"></div>
             <h1 id="student-header"></h1> <div id="choices"></div>
@@ -1208,6 +1223,13 @@ describe("GroupTestDomElements - Repeatbutton", () => {
         `;
         domElements = new GroupTestDomElements();
         vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
+    });
+
+    afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
+        document.body.innerHTML = "";
+        vi.clearAllMocks();
     });
 
     it("repeat button destination", () => {
@@ -1270,6 +1292,13 @@ describe("compareTextAnswer", () => {
         const test = new Test(groupTestData);
         domElements = new GroupTestDomElements();
         view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
+    });
+
+    afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
+        document.body.innerHTML = "";
+        vi.clearAllMocks();
     });
 
     it("Ignores whitespace", () => {
@@ -1344,6 +1373,7 @@ describe("Timer and Reminder Cleanup", () => {
 
     afterEach(() => {
         vi.clearAllMocks();
+        vi.clearAllTimers();
         vi.useRealTimers();
         document.body.innerHTML = "";
     });
@@ -1398,6 +1428,7 @@ describe("StudentTestView - updateNextButtonClass", () => {
     let domElements;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         const test = new Test(groupTestData);
 
         document.body.innerHTML = `
@@ -1428,6 +1459,13 @@ describe("StudentTestView - updateNextButtonClass", () => {
         view = new GroupTestView(test, ws, "class_123", 1, domElements, student);
         testSpy(view);
         view.setPart(0);
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+        vi.clearAllTimers();
+        vi.useRealTimers();
+        document.body.innerHTML = "";
     });
 
     it("Set button to round class on entry", () => {
@@ -1551,6 +1589,7 @@ describe("GroupTestDomElements - FreeText Touch Interaction", () => {
     let displayField;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         // 1. Reset DOM
         document.body.innerHTML = `
                 <div id="choices" class="multiple-choice-choices"></div>
@@ -1581,6 +1620,8 @@ describe("GroupTestDomElements - FreeText Touch Interaction", () => {
     });
 
     afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
         // Automatically restore all spies created via vi.spyOn
         vi.restoreAllMocks();
         // Clean up DOM to prevent memory leaks or ID collisions
@@ -1628,6 +1669,7 @@ describe("LetterSoundTest", () => {
     let domElements;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         document.body.innerHTML = `
             <div id="fade-overlay"></div>
             <h1 id="student-header" class="student-header"></h1>
@@ -1662,6 +1704,8 @@ describe("LetterSoundTest", () => {
     });
 
     afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
         document.body.innerHTML = "";
         vi.clearAllMocks();
     });
@@ -1704,6 +1748,7 @@ describe("LetterNameTest", () => {
     let domElements;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         document.body.innerHTML = `
             <div id="fade-overlay"></div>
             <h1 id="student-header" class="student-header"></h1>
@@ -1738,6 +1783,8 @@ describe("LetterNameTest", () => {
     });
 
     afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
         document.body.innerHTML = "";
         vi.clearAllMocks();
     });
@@ -1764,6 +1811,7 @@ describe("Sentence Reading Test", () => {
     let domElements;
 
     beforeEach(() => {
+        vi.useFakeTimers();
         document.body.innerHTML = `
             <div id="fade-overlay"></div>
             <h1 id="student-header" class="student-header"></h1>
@@ -1798,6 +1846,8 @@ describe("Sentence Reading Test", () => {
     });
 
     afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
         document.body.innerHTML = "";
         vi.clearAllMocks();
     });
