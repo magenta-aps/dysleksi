@@ -18,6 +18,9 @@ class TestDomElements {
         this.startSummaryButton = document.querySelector("#start-summary");
         this.startTestPartButton = document.querySelector("#start-testpart");
         this.summaryContainer = document.querySelector("#summary-container");
+        this.summaryScrollControls = document.querySelector("#summary-scroll-controls");
+        this.scrollSummaryUpArrow = document.getElementById("scroll-summary-up");
+        this.scrollSummaryDownArrow = document.getElementById("scroll-summary-down");
         this.nextBtn = document.querySelector("#next");
         this.overlay = document.getElementById("fade-overlay");
         this.reminderSoundEl = document.querySelector("#reminder-sound");
@@ -37,6 +40,36 @@ class TestDomElements {
         this.multipleChoiceAnswerDisplay = document.querySelector(
             "#multiple-choice-answer-display",
         );
+    }
+
+    updateSummaryArrows() {
+        const { scrollTop, scrollHeight, clientHeight } = this.summaryContainer;
+
+        const isAtTop = scrollTop <= 0;
+        const isAtBottom = scrollTop + clientHeight >= scrollHeight - 1;
+
+        if (isAtTop) {
+            this.scrollSummaryUpArrow.classList.add("disabled");
+        } else {
+            this.scrollSummaryUpArrow.classList.remove("disabled");
+        }
+
+        if (isAtBottom) {
+            this.scrollSummaryDownArrow.classList.add("disabled");
+        } else {
+            this.scrollSummaryDownArrow.classList.remove("disabled");
+        }
+
+        this.summaryContainer.classList.toggle("at-top", isAtTop);
+        this.summaryContainer.classList.toggle("at-bottom", isAtBottom);
+
+        if (scrollHeight <= clientHeight) {
+            this.summaryContainer.classList.add("no-mask");
+            this.summaryScrollControls.style.display = "none";
+        } else {
+            this.summaryContainer.classList.remove("no-mask");
+            this.summaryScrollControls.style.display = "flex";
+        }
     }
 
     markButtonPress(buttonId, buttonClass) {
@@ -114,6 +147,33 @@ class TestDomElements {
             block.appendChild(img);
 
             this.summaryContainer.appendChild(block);
+        });
+
+        const scrollAmount = 100;
+
+        this.scrollSummaryUpArrow.addEventListener("click", () => {
+            this.summaryContainer.scrollBy({
+                top: -scrollAmount,
+                behavior: "smooth",
+            });
+        });
+
+        this.scrollSummaryDownArrow.addEventListener("click", () => {
+            this.summaryContainer.scrollBy({
+                top: scrollAmount,
+                behavior: "smooth",
+            });
+        });
+
+        this.summaryContainer.addEventListener("scroll", () =>
+            this.updateSummaryArrows(),
+        );
+
+        // Update initial state
+        requestAnimationFrame(() => {
+            setTimeout(() => {
+                this.updateSummaryArrows();
+            }, 0);
         });
     }
 
