@@ -209,7 +209,8 @@ class TestTestResponse(DysleksiTest):
             klasse=self.klasse,
         )
         klasse2 = self.create_class(2025, "1.B")
-        student2 = self.create_student("TestStudent2", klasse=klasse2)
+        student2 = self.create_student("TestStudent2")
+        klasse2.students.add(student2)
 
         with self.assertRaises(ValidationError) as cm:
             response = TestResponse(

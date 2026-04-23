@@ -130,11 +130,6 @@ class Institution(models.Model):
 
 
 class Student(User):
-    klasse = models.ForeignKey(
-        "Class",
-        on_delete=models.SET_NULL,
-        null=True,
-    )
     institution = models.ForeignKey(
         Institution,
         null=True,
@@ -144,6 +139,10 @@ class Student(User):
 
     is_student = True
     is_teacher = False
+
+    @property
+    def klasse(self):
+        return self.classes.first()
 
 
 @receiver(post_save, sender=Student)

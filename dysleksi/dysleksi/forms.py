@@ -107,9 +107,10 @@ class StartIndividualRoomForm(DynamicFormMixin, StartRoomForm):
         StudentChoiceField,
         label=_("Vælg elev"),
         queryset=lambda form: Student.objects.filter(
-            klasse__in=form.teacher.classes.all()
+            classes__in=form.teacher.classes.all()
         )
-        .select_related("klasse")
+        .distinct()
+        .prefetch_related("classes")
         .order_by("first_name"),
     )
 

@@ -122,7 +122,7 @@ class ClassListView(GroupRequiredMixin, SingleTableView):
         # qs = qs.current()
         # Add annotations used by `ClassTable`
         qs = qs.annotate(
-            number_of_students=Count("student__pk", distinct=True),
+            number_of_students=Count("students", distinct=True),
         )
         return qs
 
@@ -154,11 +154,11 @@ class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
         qs = qs.annotate(
             number_of_students=Case(
                 When(
-                    student__isnull=True,
-                    then=Count("klasse__student__pk", distinct=True),
+                    student_id__isnull=True,
+                    then=Count("klasse__students", distinct=True),
                 ),
                 When(
-                    student__isnull=False,
+                    student__id__isnull=False,
                     then=Value(1),
                 ),
             ),
