@@ -19,6 +19,7 @@
           "challenge_sound_url": null,
           "challenge_text": null,
           "possible_answers": [],
+          "continue_when_instruction_is_complete": true,
           "instruction_sequence": {
             "instructions": [
               {
@@ -42,6 +43,7 @@
           "challenge_sound_url": null,
           "challenge_text": null,
           "question_type": "multiple_choice",
+          "continue_when_instruction_is_complete": true,
           "possible_answers": [
             {
               "id": 93,
@@ -126,7 +128,22 @@
               "resource_text": "hest",
               "is_correct": false
             }
-          ]
+          ],
+          "continue_when_instruction_is_complete": false,
+          "instruction_sequence": {
+            "instructions": [
+              {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "challenge-image"
+              },
+              {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+              }
+            ]
+          }
         }
       ],
       "questions": [

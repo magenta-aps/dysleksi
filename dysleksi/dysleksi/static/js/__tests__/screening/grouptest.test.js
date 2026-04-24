@@ -157,6 +157,11 @@ describe("GroupTestFlow", () => {
         expect(test.parts[0].questionIndex).toBe(0);
         expect(test.parts[0].currentQuestion).toBe(null);
         expect(test.parts[0].practice.length).toBe(3);
+        expect(test.parts[0].practice[0].continueWhenInstructionIsComplete).toBe(true);
+        expect(test.parts[0].practice[2].continueWhenInstructionIsComplete).toBe(false);
+        expect(test.parts[0].practice[2].instruction_sequence.instructions.length).toBe(
+            2,
+        );
     });
 
     it("Test Structure loads with no practice", () => {
@@ -912,7 +917,7 @@ describe("GroupTestFlow", () => {
         expect(domElements.setStudentHeader).toHaveBeenCalledWith(
             '<i class="ph ph-ear"></i>',
         );
-        expect(view.runInstructions).toHaveBeenCalledWith(true);
+        expect(view.runInstructions).toHaveBeenCalledWith(expect.any(Function));
     });
 });
 

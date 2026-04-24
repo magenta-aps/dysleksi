@@ -34,11 +34,11 @@ describe("InstructionSequenceRunner", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
-			<div id="el1"></div>
-			<div id="el2"></div>
-			<button id="btn1"></button>
-			<input type="text" id="input1" />
-		`;
+            <div id="el1"></div>
+            <div id="el2"></div>
+            <button id="btn1"></button>
+            <input type="text" id="input1" />
+        `;
 
         domElements = {
             showElement: vi.fn(),
@@ -53,6 +53,7 @@ describe("InstructionSequenceRunner", () => {
             setMarker: vi.fn(),
             addText: vi.fn(),
             removeText: vi.fn(),
+            setNextButtonClass: vi.fn(),
         };
         fakeContext = createFakeAudioContext();
 
@@ -87,6 +88,7 @@ describe("InstructionSequenceRunner", () => {
             { action: "highlight", element: "el1" },
             { action: "select", element: "btn1" },
             { action: "showFaded", element: "btn1" },
+            { action: "setNextButtonClass", data: "foo" },
         ];
 
         for (const instr of actions) {
@@ -113,6 +115,7 @@ describe("InstructionSequenceRunner", () => {
         expect(domElements.showFaded).toHaveBeenCalledWith(
             document.getElementById("btn1"),
         );
+        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("foo");
     });
 
     it("executeInstruction throws error on incorrect action", async () => {

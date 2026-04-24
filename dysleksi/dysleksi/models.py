@@ -46,6 +46,7 @@ class InstructionAction(TextChoices):
     SET_TEXT = "setText"
     SET_BUTTON_SOUND_ONCE = "setButtonSoundOnce"
     SET_REPEAT_BUTTON_DESTINATION = "setRepeatButtonDestination"
+    SET_NEXT_BUTTON_CLASS = "setNextButtonClass"
     CLICK_BUTTON = "clickButton"
     SET_MARKER = "setMarker"
     ADD_TEXT = "addText"
@@ -329,6 +330,9 @@ class Test(models.Model):
                             settings.REMINDER_FALLBACK  # type: ignore
                         ),
                         "timeout": question.timeout,
+                        "continue_when_instruction_is_complete": (
+                            question.continue_when_instruction_is_complete
+                        ),
                     }
                     if question.reminder_source:
                         question_data["reminderSource"] = question.reminder_source.url
@@ -500,6 +504,10 @@ class TestPart(models.Model):
                 question["timeout"] = data["timeout"]
             else:
                 question["timeout"] = 0
+            if "continue_when_instruction_is_complete" in data and is_practice:
+                question["continue_when_instruction_is_complete"] = data[
+                    "continue_when_instruction_is_complete"
+                ]
 
             question = TestQuestion.objects.create(**question)
 
@@ -585,6 +593,7 @@ class TestQuestion(models.Model):
         null=True,
         related_name="reminder_testquestion",
     )
+    continue_when_instruction_is_complete = models.BooleanField(default=True)
 
     def __str__(self) -> str:
         return f"{str(self.part)} / {self.pk}"

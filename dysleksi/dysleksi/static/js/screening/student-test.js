@@ -288,7 +288,7 @@ export class StudentTestView extends EventTarget {
         }
     }
 
-    runInstructions(group) {
+    runInstructions(onCompleted = () => {}) {
         console.log("---------------------------------------------");
         console.log(
             "Starting instruction sequence: ",
@@ -326,9 +326,7 @@ export class StudentTestView extends EventTarget {
                 this.domElements.skipAllInstructionsButton.style.display = "none";
             }
             this.updateNextButtonClass();
-            if (group) {
-                this.domElements.toggleQuestionDisplay("none");
-            }
+            onCompleted();
         });
     }
 

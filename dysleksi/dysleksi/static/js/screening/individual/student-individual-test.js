@@ -70,7 +70,7 @@ export class IndividualTestView extends StudentTestView {
                     this.onQuestionComplete(this.currentQuestion),
                 );
                 this.domElements.setRepeatButtonListener(() => this.repeat());
-                this.runInstructions(false);
+                this.runInstructions();
             } else {
                 this.setupNonPractice();
                 this.domElements.toggleRepeatButton(false);

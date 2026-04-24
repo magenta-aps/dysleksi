@@ -13,55 +13,35 @@
             {
                 "action": "hide",
                 "element": "next",
-                "delayAfter": 500
+                "delayAfter": 750
             },
             {
-                // Ordlæsning er nu ved at starte.
+                // "Ordlæsning er nu ved at starte"
                 "action": "playSound",
                 "resource": "resources/wordreading_2/Indledning/7a.1.wav",
-                "delayAfter": 500
+                "delayAfter": 250
             },
             {
-                // Ordlæsningen varer i 10minutter.
-                "action": "playSound",
-                "resource": "resources/wordreading_2/Indledning/7a.4.wav",
-                "delayAfter": 500
-            },
-            {
-                // Først skal du øve dig på øveopgaverne, inden opgaverne starter.
+                // "Øveopgaverne er nu ved at starte. Først får du vist, hvad du skal gøre"
                 "action": "playSound",
                 "resource": "resources/wordreading_2/Indledning/7a.2.wav",
                 "delayAfter": 500
             },
             {
-                // Du vil få besked, hvis du vælger forkert under øveopgaverne. Når
-                // deltesten starter, vil du ikke få besked.
-                "action": "playSound",
-                "resource": "resources/wordreading_2/Indledning/7a.3.wav",
-                "delayAfter": 500
-            },
-            {
-                // Øveopgaverne er nu ved at starte. Først får du vist, hvad du skal
-                // gøre
-                "action": "playSound",
-                "resource": "resources/wordreading_2/Indledning/6a.5.wav",
-                "delayAfter": 500
-            },
-            {
                 "action": "fadeOut",
-                "delayAfter": 0,
-                "element": "challenge-image"
+                "element": "challenge-image",
+                "delayAfter": 1000
             },
             {
                 "action": "show",
-                "delayAfter": 0,
-                "element": "next"
+                "element": "next",
+                "delayAfter": 250
             },
             {
-                // Klik på den grønne pil, når du er klar.
+                // "Piareeruit qorsuk tooruk"
                 "action": "playSound",
-                "resource": "resources/wordreading_2/Indledning/9a.5.wav",
-                "delayAfter": 500
+                "resource": "resources/wordreading_2/Indledning/7a.3.wav",
+                "delayAfter": 1250
             }
         ]
     },
@@ -74,287 +54,242 @@
             {
                 "action": "show",
                 "element": "next",
-                "delayAfter": 500
-            },
-            {
-                // Lyt godt efter.
-                "action": "playSound",
-                "resource": "resources/wordreading_2/Instruktion/6b.1.wav",
                 "delayAfter": 750
             },
             {
-                "action": "fadeOut",
-                "element": "challenge-image",
-                "delayAfter": 0
+                // "Lyt godt efter"
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Instruktion/7b.1.wav",
+                "delayAfter": 750
             },
             {
-                "action": "fadeOut",
-                "element": "choice-isi",
-                "delayAfter": 0
-            },
-            {
-                "action": "fadeOut",
-                "element": "choice-isigak",
-                "delayAfter": 0
-            },
-            {
-                "action": "fadeOut",
-                "element": "choice-illu",
-                "delayAfter": 0
-            },
-            {
-                "action": "fadeOut",
-                "element": "choice-immuk",
-                "delayAfter": 0
-            },
-            {
-                "action": "fadeOut",
-                "element": "next",
-                "delayAfter": 0
-            },
-            {
-                // Her kan du se
+                // "Se"
                 "action": "playSound",
                 "resource": "resources/wordreading_2/Instruktion/7b.2.wav",
                 "delayAfter": 750
             },
-            {
-                "action": "fadeIn",
-                "element": "challenge-image",
-                "delayAfter": 0
-            },
+
             {
                 "action": "highlight",
                 "element": "challenge-image",
                 "delayAfter": 0
             },
             {
-                // En tegning
+                // "Her er et øje" / "Aana isi"
                 "action": "playSound",
-                "resource": "resources/wordreading_2/Instruktion/7b.2a.wav",
+                "resource": "resources/wordreading_2/Instruktion/7b.3.wav",
+                "delayAfter": 1250
+            },
+
+            {
+                // "Her er ordene, der skal læses"
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Instruktion/7b.4.wav",
                 "delayAfter": 750
             },
+
             {
-                "action": "fadeIn",
-                "element": "choice-isi",
-                "delayAfter": 0
-            },
-            {
-                "action": "fadeIn",
+                "action": "highlight",
                 "element": "choice-isigak",
                 "delayAfter": 0
             },
             {
-                "action": "fadeIn",
+                // "isigak"
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Instruktion/7b.5.wav",
+                "delayAfter": 1000
+            },
+            {
+                "action": "highlight",
                 "element": "choice-illu",
                 "delayAfter": 0
             },
             {
-                "action": "fadeIn",
+                // "illu"
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Instruktion/7b.6.wav",
+                "delayAfter": 1000
+            },
+            {
+                "action": "highlight",
+                "element": "choice-isi",
+                "delayAfter": 0
+            },
+            {
+                // "isi"
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Instruktion/7b.7.wav",
+                "delayAfter": 1000
+            },
+            {
+                "action": "highlight",
                 "element": "choice-immuk",
                 "delayAfter": 0
             },
             {
-                "action": "highlight",
-                "delayAfter": 500,
-                "element": "choice-isi"
-            },
-            {
-                "action": "highlight",
-                "delayAfter": 500,
-                "element": "choice-isigak"
-            },
-            {
-                "action": "highlight",
-                "delayAfter": 500,
-                "element": "choice-illu"
-            },
-            {
-                "action": "highlight",
-                "delayAfter": 500,
-                "element": "choice-immuk"
-            },
-            {
-                // Ordene
+                // "aamma immuk"
                 "action": "playSound",
-                "delayAfter": 750,
-                "resource": "resources/wordreading_2/Instruktion/7b.2b.wav"
+                "resource": "resources/wordreading_2/Instruktion/7b.8.wav",
+                "delayAfter": 1250
+            },
+
+            {
+                // "Du"
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Instruktion/7b.9.wav",
+                "delayAfter": 0
             },
             {
-                "action": "fadeIn",
-                "element": "next",
+                // "Skal læse ordene stille og ..."
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Instruktion/7b.10.wav",
                 "delayAfter": 0
             },
             {
                 "action": "highlight",
-                "element": "next",
-                "delayAfter": 0
-            },
-            {
-                // Og pilen.
-                "action": "playSound",
-                "delayAfter": 750,
-                "resource": "resources/wordreading_2/Instruktion/7b.2c.wav"
-            },
-            {
-                // Du
-                "action": "playSound",
-                "delayAfter": 750,
-                "resource": "resources/wordreading_2/Instruktion/7b.3.wav"
+                "element": "choice-isi",
+                "delayAfter": 500
             },
             {
                 "action": "highlight",
-                "delayAfter": 0,
-                "element": "choice-isi"
+                "element": "choice-isigak",
+                "delayAfter": 500
             },
             {
                 "action": "highlight",
-                "delayAfter": 0,
-                "element": "choice-isigak"
+                "element": "choice-illu",
+                "delayAfter": 500
             },
             {
                 "action": "highlight",
-                "delayAfter": 0,
-                "element": "choice-illu"
+                "element": "choice-immuk",
+                "delayAfter": 500
             },
             {
-                "action": "highlight",
-                "delayAfter": 0,
-                "element": "choice-immuk"
-            },
-            {
-                // Skal læse ordene stille og,
+                // "... vælge det ord, som passer til tegningen" / "Oqaaseq assimut [...]"
                 "action": "playSound",
-                "delayAfter": 0,
-                "resource": "resources/wordreading_2/Instruktion/7b.3a.wav"
+                "resource": "resources/wordreading_2/Instruktion/7b.11.wav",
+                "delayAfter": 1250
             },
+
             {
+                // "Hvis du vælger forkert, kan du ændre dit valg [...]" / "Kukkusooruit [...]"
+                // (lang lydfil)
                 "action": "playSound",
-                "delayAfter": 0,
-                "resource": "resources/wordreading_2/Instruktion/7b.3b.wav"
+                "resource": "resources/wordreading_2/Instruktion/7b.12.wav",
+                "delayAfter": 1250
             },
-            {
-                // Vælge det ord, som passer til tegningen.
-                "action": "playSound",
-                "delayAfter": 250,
-                "resource": "resources/wordreading_2/Instruktion/7b.3c1.wav"
-            },
-            {
-                "action": "highlight",
-                "delayAfter": 250,
-                "element": "next"
-            },
-            {
-                // Når du har valgt, går du videre til næste opgave ved at trykke
-                // på pilen.
-                "action": "playSound",
-                "delayAfter": 0,
-                "resource": "resources/wordreading_2/Instruktion/7b.3c2.wav"
-            },
-            {
-                // Hvis du vælger forkert, kan du ændre dit valg, inden du trykker
-                // på pilen. Du må også gerne gætte, hvis du ikke kan finde ud af
-                // opgaven.
-                "action": "playSound",
-                "delayAfter": 250,
-                "resource": "resources/wordreading_2/Instruktion/7b.3d.wav"
-            },
-            {
-                // Se
-                "action": "playSound",
-                "delayAfter": 250,
-                "resource": "resources/wordreading_2/Instruktion/7b.4.wav"
-            },
-            {
-                "action": "highlight",
-                "delayAfter": 0,
-                "element": "challenge-image"
-            },
-            {
-                // Her er et øje.
-                "action": "playSound",
-                "delayAfter": 250,
-                "resource": "resources/wordreading_2/Instruktion/7b.4a.wav"
-            },
+
             {
                 "action": "select",
-                "delayAfter": 0,
-                "element": "choice-isi"
+                "element": "choice-isi",
+                "delayAfter": 0
             },
+            {
+                // "Når du har valgt ..." / "Toqqaareeraangavit"
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Instruktion/7b.13.wav",
+                "delayAfter": 250
+            },
+
             {
                 "action": "highlight",
-                "delayAfter": 0,
-                "element": "choice-isi"
+                "element": "next",
+                "delayAfter": 0
             },
             {
-                // Ordet, der passer til tegningen, er isi, og det vælges derfor.
+                // "... går du videre til næste opgave ved at trykke på pilen" / "tikkuut toorlugu [...]"
                 "action": "playSound",
-                "delayAfter": 250,
-                "resource": "resources/wordreading_2/Instruktion/7b.4b.wav"
+                "resource": "resources/wordreading_2/Instruktion/7b.14.wav",
+                "delayAfter": 1250
+            },
+
+            // Opgaven (alle elementer) fader ud
+            {
+                "action": "fadeOut",
+                "element": "challenge-image",
+                "delayAfter": 0
             },
             {
-                "action": "highlight",
-                "delayAfter": 0,
-                "element": "next"
+                "action": "fadeOut",
+                "element": "choice-isi",
+                "delayAfter": 0
             },
             {
-                // Og derefter trykkes der på pilen.
+                "action": "fadeOut",
+                "element": "choice-isigak",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-illu",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "choice-immuk",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeOut",
+                "element": "next",
+                "delayAfter": 0
+            },
+            {
+                // "Det er sådan, du skal løse opgaverne" / "Tassa taamatut [...]"
                 "action": "playSound",
-                "delayAfter": 250,
-                "resource": "resources/wordreading_2/Instruktion/7b.4c.wav"
+                "resource": "resources/wordreading_2/Instruktion/7b.15.wav",
+                "delayAfter": 500
             },
             {
-                "action": "fadeOut",
-                "delayAfter": 0,
-                "element": "challenge-image"
-            },
-            {
-                "action": "fadeOut",
-                "delayAfter": 0,
-                "element": "choice-isi"
-            },
-            {
-                "action": "fadeOut",
-                "delayAfter": 0,
-                "element": "choice-isigak"
-            },
-            {
-                "action": "fadeOut",
-                "delayAfter": 0,
-                "element": "choice-illu"
-            },
-            {
-                "action": "fadeOut",
-                "delayAfter": 0,
-                "element": "choice-immuk"
-            },
-            {
-                "action": "fadeOut",
-                "delayAfter": 0,
-                "element": "next"
-            },
-            {
-                // Det er sådan, du skal løse opgaverne.
+                // "Nu skal du selv prøve øveopgaverne" / "Massakkut [...]"
                 "action": "playSound",
-                "delayAfter": 750,
-                "resource": "resources/wordreading_2/Instruktion/7b.4d.wav"
+                "resource": "resources/wordreading_2/Instruktion/7b.16.wav",
+                "delayAfter": 1250
+            },
+
+            // Skjul alle opgave-elementer
+            {
+                "action": "hide",
+                "element": "challenge-image",
+                "delayAfter": 0
             },
             {
-                // Nu skal du selv prøve øveopgaverne.
-                "action": "playSound",
-                "delayAfter": 750,
-                "resource": "resources/wordreading_2/Instruktion/7b.5.wav"
+                "action": "hide",
+                "element": "choice-isi",
+                "delayAfter": 0
             },
             {
-                // Klik på den grønne pil, når du er klar.
-                "action": "playSound",
-                "delayAfter": 0,
-                "resource": "resources/wordreading_2/Indledning/9a.5.wav"
+                "action": "hide",
+                "element": "choice-isigak",
+                "delayAfter": 0
+            },
+            {
+                "action": "hide",
+                "element": "choice-illu",
+                "delayAfter": 0
+            },
+            {
+                "action": "hide",
+                "element": "choice-immuk",
+                "delayAfter": 0
+            },
+            // Skift udseende på "Næste"-knappen til rund grøn knap
+            {
+                "action": "setNextButtonClass",
+                "data": "start-btn",
+                "delayAfter": 0
             },
             {
                 "action": "fadeIn",
-                "delayAfter": 2000,
-                "element": "next"
+                "element": "next",
+                "delayAfter": 0
+            },
+            {
+                // "Klik grøn når du er klar" / "Piareeruit qorsuk tooruk"
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Instruktion/7b.17.wav",
+                "delayAfter": 0
             }
         ]
     },
@@ -362,18 +297,58 @@
         "question_type": "multiple_choice",
         "image": "resources/wordreading_2/Øveopgave/Fod.png",
         "correct": "isigak",
-        "wrong": ["isi", "immuk", "ini"]
+        "wrong": ["isi", "immuk", "ini"],
+        "reminder_source": "resources/wordreading_2/Øveopgave/7c.2.wav",
+        "continue_when_instruction_is_complete": false,
+        "instruction_sequence": [
+            // Sørg for at "challenge" og "næste" faktisk er synlige
+            {
+                "action": "show",
+                "element": "challenge-image",
+                "delayAfter": 0
+            },
+            {
+                "action": "show",
+                "element": "next",
+                "delayAfter": 0
+            },
+            {
+                // "Du vil få besked, hvis du vælger forkert under kun øveopgaverne" / "Sungiusarnermi taamaallaat [...]"
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Øveopgave/7c.1.wav",
+                "delayAfter": 0
+            }
+        ]
     },
     {
         "question_type": "multiple_choice",
         "image": "resources/wordreading_2/Øveopgave/Mælk.png",
         "correct": "immuk",
-        "wrong": ["imaq", "illu", "imeq"]
+        "wrong": ["imaq", "illu", "imeq"],
+        "reminder_source": "resources/wordreading_2/Øveopgave/7c.2.wav"
     },
     {
         "question_type": "no_input_required",
         "instruction_sequence": [
             {
+                // "Øvelserne er færdige" / "Sungiusarneq naammassivoq"
+                "action": "playSound",
+                "delayAfter": 1250,
+                "resource": "resources/wordreading_2/Øveopgave/7c.7.wav"
+            },
+
+            // "Næste" og "Gentag" vises i "fade out" tilstand
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "repeat"
+            },
+            {
                 "action": "fadeOut",
                 "delayAfter": 0,
                 "element": "next"
@@ -383,64 +358,69 @@
                 "delayAfter": 0,
                 "element": "repeat"
             },
-            {
-                "action": "playSound",
-                "delayAfter": 0,
-                "resource": "resources/wordreading_2/Øveopgave/7d.2.wav"
-            },
+
             {
                 "action": "setRepeatButtonDestination",
                 "delayAfter": 0,
                 "data": "0"
             },
+
             {
-                "action": "show",
+                "action": "fadeIn",
                 "delayAfter": 0,
                 "element": "repeat"
             },
             {
-                "action": "show",
+                "action": "fadeIn",
                 "delayAfter": 1,
                 "element": "next"
             },
             {
-                "action": "fadeIn",
+                // "Aaku tuugassat marluk"
+                "action": "playSound",
+                "delayAfter": 750,
+                "resource": "resources/wordreading_2/Øveopgave/7d.1.wav"
+            },
+
+            {
+                "action": "highlight",
                 "delayAfter": 0,
                 "element": "next"
             },
             {
+                // "Hvis du har forstået, hvad du skal gøre [...]" / "Qanoq iliornissat [...]"
                 "action": "playSound",
-                "delayAfter": 0,
-                "resource": "resources/wordreading_2/Øveopgave/9d.4a.wav"
+                "delayAfter": 750,
+                "resource": "resources/wordreading_2/Øveopgave/7d.2.wav"
             },
+
             {
-                "action": "fadeIn",
+                "action": "highlight",
                 "delayAfter": 0,
                 "element": "repeat"
             },
             {
+                // "Men, hvis du ikke har forstået [...]" / "Suliassatilli paasilluanngitsoorukkit [...]"
                 "action": "playSound",
                 "delayAfter": 1250,
-                "resource": "resources/wordreading_2/Øveopgave/9d.4b.wav"
+                "resource": "resources/wordreading_2/Øveopgave/7d.3.wav"
             },
-            // 7d.3a
+
             {
-                "action": "setButtonSoundOnce",
+                "action": "highlight",
                 "delayAfter": 0,
-                "resource": "resources/wordreading_2/Øveopgave/7d.3a.wav",
                 "element": "next"
             },
-            // 7d.3b
             {
-                "action": "setButtonSoundOnce",
+                "action": "highlight",
                 "delayAfter": 0,
-                "resource": "resources/wordreading_2/Øveopgave/7d.3b.wav",
                 "element": "repeat"
             },
             {
+                // "Vælg et ikon (klik)" / "Toorseriarit"
                 "action": "playSound",
-                "delayAfter": 0,
-                "resource": "resources/wordreading_2/Øveopgave/7d.3.wav"
+                "delayAfter": 750,
+                "resource": "resources/wordreading_2/Øveopgave/7d.4.wav"
             }
         ]
     }

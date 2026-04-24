@@ -116,7 +116,18 @@ export class GroupTestView extends StudentTestView {
             }
 
             if (this.currentQuestion.instruction_sequence) {
-                this.runInstructions(true);
+                this.runInstructions(() => {
+                    if (this.currentQuestion.continueWhenInstructionIsComplete) {
+                        // Prompt user to go to next question (by removing the question elements)
+                        // (This is the default behavior.)
+                        this.domElements.toggleQuestionDisplay("none");
+                        console.debug("Hiding current question");
+                    } else {
+                        // Keep the question on screen - the user must give an answer
+                        // before they can continue.
+                        console.debug("Waiting for user input ...");
+                    }
+                });
             } else {
                 this.setupNonPractice();
 
@@ -131,6 +142,7 @@ export class GroupTestView extends StudentTestView {
                     domEls.playBtn.click();
                 }
             }
+
             this.questionDisplayedAt = document.timeline.currentTime;
             if (!this.isPracticing) {
                 this.send({
@@ -144,6 +156,7 @@ export class GroupTestView extends StudentTestView {
                 });
             }
         }
+
         return canShow;
     }
 
@@ -240,13 +253,20 @@ export class GroupTestView extends StudentTestView {
             if (this.selectedAnswer.isCorrect) {
                 this.domElements.makeButtonHappy(this.selectedAnswer.buttonId);
                 this.domElements.enableNextButton();
+                // Play "you guessed correct" sound snippet
+                let source = null;
+                this.domElements.playSound(
+                    "/static/audio/7c.4.wav",
+                    source,
+                    this.audioContext,
+                );
             } else {
                 this.domElements.makeButtonAngry(this.selectedAnswer.buttonId);
                 this.domElements.disableNextButton();
                 // Play "you guessed wrong" sound snippet
                 let source = null;
                 this.domElements.playSound(
-                    "/static/audio/7c.1a.wav",
+                    "/static/audio/7c.3.wav",
                     source,
                     this.audioContext,
                 );
