@@ -7,6 +7,7 @@ from pathlib import Path
 
 from django.contrib.auth.models import Group
 from django.core.files.images import ImageFile
+from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
 
@@ -15,7 +16,9 @@ from dysleksi.models import (
     TEACHERS,
     Class,
     Institution,
+    PartResponse,
     PossibleAnswer,
+    QuestionResponse,
     QuestionType,
     Student,
     Teacher,
@@ -214,5 +217,121 @@ class DysleksiTest(TestCase):
         view = view_class()
         view.setup(request, **kwargs)
         if get:
-            view.get(request, **kwargs)
+            view.response = view.get(request, **kwargs)
         return view
+
+    @staticmethod
+    def html_table_to_list(soup_element):
+        return [
+            [
+                list(filter(lambda x: x, [item.strip() for item in cell.strings]))
+                for cell in row.find_all(["td", "th"])
+            ]
+            for row in soup_element.find_all("tr")
+        ]
+
+
+class ResponseTest(DysleksiTest):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        call_command("create_result_categories")
+
+        students = cls.klasse.students.all().order_by("pk")
+        student1 = students[0]
+        student2 = students[1]
+
+        cls.group_question_1 = TestQuestion.objects.create(
+            part=cls.group_test_part,
+            challenge=cls.resource1,
+            reminder=5000,
+            reminder_source=cls.resource4,
+        )
+        cls.possible_correct_answer1 = PossibleAnswer.objects.create(
+            question=cls.group_question_1,
+            resource=cls.resource2,
+            is_correct=True,
+        )
+        cls.possible_wrong_answer1 = PossibleAnswer.objects.create(
+            question=cls.group_question_1,
+            resource=cls.resource3,
+            is_correct=False,
+        )
+        cls.group_question_2 = TestQuestion.objects.create(
+            part=cls.group_test_part,
+            challenge=cls.resource2,
+            question_type=QuestionType.MULTIPLE_CHOICE,
+        )
+        cls.group_question_3 = TestQuestion.objects.create(
+            part=cls.group_test_part,
+            challenge=None,
+            question_type=QuestionType.NO_INPUT_REQUIRED,
+        )
+        cls.group_question_4 = TestQuestion.objects.create(
+            part=cls.group_test_part,
+            challenge=cls.resource4,
+            question_type=QuestionType.FREE_TEXT,
+        )
+
+        cls.group_testresponse_1 = TestResponse.objects.create(
+            assignment=cls.test_assignment_class, student=student1, completed=True
+        )
+        cls.group_testresponse_2 = TestResponse.objects.create(
+            assignment=cls.test_assignment_class, student=student2, completed=True
+        )
+
+        cls.group_partresponse_1 = PartResponse.objects.create(
+            testresponse=cls.group_testresponse_1,
+            testpart=cls.group_test_part,
+            completed=True,
+        )
+        cls.group_partresponse_2 = PartResponse.objects.create(
+            testresponse=cls.group_testresponse_2,
+            testpart=cls.group_test_part,
+            completed=True,
+        )
+
+        cls.group_questionresponse_1_1 = QuestionResponse.objects.create(
+            partresponse=cls.group_partresponse_1,
+            question=cls.group_question_1,
+            answer_option=cls.possible_correct_answer1,
+            correct=True,
+        )
+        cls.group_questionresponse_1_2 = QuestionResponse.objects.create(
+            partresponse=cls.group_partresponse_1,
+            question=cls.group_question_2,
+            correct=True,
+        )
+        cls.group_questionresponse_1_3 = QuestionResponse.objects.create(
+            partresponse=cls.group_partresponse_1,
+            question=cls.group_question_3,
+            correct=True,
+        )
+        cls.group_questionresponse_1_4 = QuestionResponse.objects.create(
+            partresponse=cls.group_partresponse_1,
+            question=cls.group_question_4,
+            correct=True,
+        )
+
+        cls.group_questionresponse_2_1 = QuestionResponse.objects.create(
+            partresponse=cls.group_partresponse_2,
+            question=cls.group_question_1,
+            answer_option=cls.possible_correct_answer1,
+            correct=True,
+        )
+        cls.group_questionresponse_2_2 = QuestionResponse.objects.create(
+            partresponse=cls.group_partresponse_2,
+            question=cls.group_question_2,
+            correct=False,
+        )
+        cls.group_questionresponse_2_3 = QuestionResponse.objects.create(
+            partresponse=cls.group_partresponse_2,
+            question=cls.group_question_3,
+            correct=False,
+        )
+        cls.group_questionresponse_2_4 = QuestionResponse.objects.create(
+            partresponse=cls.group_partresponse_2,
+            question=cls.group_question_4,
+            correct=False,
+        )

@@ -8,8 +8,11 @@ from uuid import uuid4
 
 from django.conf import settings
 from django.core.exceptions import ValidationError
+from django.core.management import call_command
 from django.db import IntegrityError
+from django.db.models import Q
 from django.db.models.fields.files import FieldFile
+from django.test import TestCase
 from django.utils import timezone
 from freezegun import freeze_time
 
@@ -25,6 +28,8 @@ from dysleksi.models import (
     PlannedDateTime,
     PossibleAnswer,
     QuestionResponse,
+    ResultCategory,
+    ResultCategoryChoice,
     Test,
     TestAssignment,
     TestPart,
@@ -33,7 +38,7 @@ from dysleksi.models import (
     TestResponse,
     User,
 )
-from dysleksi.tests.base import DysleksiTest
+from dysleksi.tests.base import DysleksiTest, ResponseTest
 
 
 class TestUser(DysleksiTest):
@@ -808,3 +813,172 @@ class TestInstruction(DysleksiTest):
 
         orders = list(seq.instructions.values_list("order", flat=True))
         self.assertEqual(orders, [1, 2, 3])
+
+
+class TestResultCategory(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        call_command("create_result_categories")
+        cls.gray = ResultCategory.objects.get(color_key=ResultCategoryChoice.GRAY)
+        cls.red = ResultCategory.objects.get(color_key=ResultCategoryChoice.RED)
+        cls.yellow = ResultCategory.objects.get(color_key=ResultCategoryChoice.YELLOW)
+        cls.green = ResultCategory.objects.get(color_key=ResultCategoryChoice.GREEN)
+        cls.blue = ResultCategory.objects.get(color_key=ResultCategoryChoice.BLUE)
+
+    def test_gray(self):
+        self.assertIsNone(self.gray.lower_proportion_limit)
+        self.assertIsNone(self.gray.upper_proportion_limit)
+        self.assertTrue(self.gray.is_default)
+        self.assertEqual(self.gray.label_da, "Ikke fuldført")
+
+    def test_red(self):
+        self.assertEqual(self.red.lower_proportion_limit, 0.0)
+        self.assertEqual(self.red.upper_proportion_limit, 0.1)
+        self.assertFalse(self.red.is_default)
+        self.assertEqual(self.red.label_da, "Betydeligt under middel")
+
+    def test_yellow(self):
+        self.assertEqual(self.yellow.lower_proportion_limit, 0.1)
+        self.assertEqual(self.yellow.upper_proportion_limit, 0.35)
+        self.assertFalse(self.yellow.is_default)
+        self.assertEqual(self.yellow.label_da, "Under middel")
+
+    def test_green(self):
+        self.assertEqual(self.green.lower_proportion_limit, 0.35)
+        self.assertEqual(self.green.upper_proportion_limit, 0.75)
+        self.assertFalse(self.green.is_default)
+        self.assertEqual(self.green.label_da, "Middel")
+
+    def test_blue(self):
+        self.assertEqual(self.blue.lower_proportion_limit, 0.75)
+        self.assertEqual(self.blue.upper_proportion_limit, 1.0)
+        self.assertFalse(self.blue.is_default)
+        self.assertEqual(self.blue.label_da, "Over middel")
+
+    def test_default(self):
+        self.assertEqual(ResultCategory.default(), self.gray)
+
+    def test_non_default(self):
+        qs = ResultCategory.non_default()
+        self.assertIn(self.red, qs)
+        self.assertIn(self.yellow, qs)
+        self.assertIn(self.green, qs)
+        self.assertIn(self.blue, qs)
+        self.assertNotIn(self.gray, qs)
+
+    def test_categorize_proportion(self):
+        self.assertEqual(ResultCategory.categorize_proportion(0.0), self.red)
+        self.assertEqual(ResultCategory.categorize_proportion(0.05), self.red)
+        self.assertEqual(ResultCategory.categorize_proportion(0.15), self.yellow)
+        self.assertEqual(ResultCategory.categorize_proportion(0.35), self.yellow)
+        self.assertEqual(ResultCategory.categorize_proportion(0.36), self.green)
+        self.assertEqual(ResultCategory.categorize_proportion(0.70), self.green)
+        self.assertEqual(ResultCategory.categorize_proportion(0.85), self.blue)
+        self.assertEqual(ResultCategory.categorize_proportion(1.0), self.blue)
+        self.assertEqual(ResultCategory.categorize_proportion(None), self.gray)
+        with self.assertRaises(ValueError):
+            ResultCategory.categorize_proportion(-0.01)
+        with self.assertRaises(ValueError):
+            ResultCategory.categorize_proportion(1.01)
+
+    def test_validate_categories_two_defaults(self):
+        self.green.is_default = True
+        self.green.save()
+        with self.assertRaises(ValidationError) as cm:
+            ResultCategory.validate_categories()
+        self.assertEqual(
+            cm.exception.message, "More than one ResultCategory with is_default=True"
+        )
+
+    def test_validate_categories_no_defaults(self):
+        ResultCategory.objects.filter(is_default=True).delete()
+        with self.assertRaises(ValidationError) as cm:
+            ResultCategory.validate_categories()
+        self.assertEqual(cm.exception.message, "No ResultCategory with is_default=True")
+
+    def test_validate_categories_upper_1(self):
+        self.blue.upper_proportion_limit = 2.0
+        self.blue.save()
+        with self.assertRaises(ValidationError) as cm:
+            ResultCategory.validate_categories()
+        self.assertEqual(
+            cm.exception.message,
+            "Topmost ResultCategory must have upper_proportion_limit 1",
+        )
+
+
+class TestTestResponseQuerySet(ResponseTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        cls.qs = TestResponse.objects.filter(
+            pk__in=(cls.group_testresponse_1.pk, cls.group_testresponse_2.pk)
+        ).order_by("student__pk")
+
+    def test_annotate_correct_count(self):
+        qs = self.qs.annotate_correct_count("correct_count")
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.correct_count, 4)
+        self.assertEqual(student2_answer.correct_count, 1)
+
+        qs = self.qs.annotate_correct_count(
+            "correct_count", Q(partresponses__testpart=self.group_test_part)
+        )
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.correct_count, 4)
+        self.assertEqual(student2_answer.correct_count, 1)
+
+    def test_annotate_ordering(self):
+        qs = self.qs.annotate_correct_count("correct_count").annotate_ordering(
+            "correct_count", "ranking", False
+        )
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.ranking, 1)
+        self.assertEqual(student2_answer.ranking, 2)
+
+        qs = self.qs.annotate_correct_count("correct_count").annotate_ordering(
+            "correct_count", "ranking", True
+        )
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.ranking, 2)
+        self.assertEqual(student2_answer.ranking, 1)
+
+    def test_annotate_correct_proportion(self):
+        qs = self.qs.annotate_correct_count(
+            "correct_count"
+        ).annotate_correct_proportion(
+            "correct_count",
+            "proportion",
+            TestQuestion.objects.filter(part__tests=self.test).count(),
+        )
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.proportion, 1)
+        self.assertEqual(student2_answer.proportion, 0.25)
+
+    def test_annotate_score_category(self):
+        qs = (
+            self.qs.annotate_correct_count("correct_count")
+            .annotate_correct_proportion(
+                "correct_count",
+                "proportion",
+                TestQuestion.objects.filter(part__tests=self.test).count(),
+            )
+            .annotate_score_category("proportion", "category")
+        )
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(
+            student1_answer.category,
+            ResultCategory.objects.get(color_key=ResultCategoryChoice.BLUE).pk,
+        )
+        self.assertEqual(
+            student2_answer.category,
+            ResultCategory.objects.get(color_key=ResultCategoryChoice.YELLOW).pk,
+        )

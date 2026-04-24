@@ -1,14 +1,23 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
-
+from bs4 import BeautifulSoup
 from django.contrib.auth.models import AnonymousUser
 from django.urls import reverse
 from django.views import View
 
-from dysleksi.models import Student, Test, TestAssignment, TestType, User
-from dysleksi.tests.base import DysleksiTest
+from dysleksi.models import (
+    ResultCategory,
+    Student,
+    Test,
+    TestAssignment,
+    TestType,
+    User,
+)
+from dysleksi.tables import TestResultTable
+from dysleksi.tests.base import DysleksiTest, ResponseTest
 from dysleksi.views import (
+    AssignmentResultsView,
     AssignmentView,
     ClassListView,
     RootView,
@@ -362,3 +371,82 @@ class TestStartRoomView(DysleksiTest):
         self.assertRedirects(response, expected_url)
         self.assertTrue(test_count_after == test_count_before + 1)
         self.assertTrue(assignment.test, Test.objects.latest("pk"))
+
+
+class TestAssignmentResultsView(ResponseTest):
+
+    def test_by_category(self):
+        view = self.setup_view(
+            AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk
+        )
+        by_category = view.get_by_category()
+        self.assertEqual(len(by_category), ResultCategory.objects.count())
+        self.assertEqual(
+            [category["color"] for category in by_category],
+            list(
+                ResultCategory.objects.order_by(
+                    "is_default", "upper_proportion_limit"
+                ).values_list("color_key", flat=True)
+            ),
+        )
+        self.assertEqual(
+            [category["label"] for category in by_category],
+            list(
+                ResultCategory.objects.order_by(
+                    "is_default", "upper_proportion_limit"
+                ).values_list("label_da", flat=True)
+            ),
+        )
+        self.assertIn(
+            self.group_testresponse_1, by_category[3]["items"]
+        )  # group_testresponse_1 er over middel
+        self.assertIn(
+            self.group_testresponse_2, by_category[1]["items"]
+        )  # group_testresponse_2 er under middel
+
+    def test_table(self):
+        view = self.setup_view(
+            AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk
+        )
+        table = view.get_table()
+        self.assertTrue(isinstance(table, TestResultTable))
+        qs = table.data.data
+
+        part1_key = f"part_{self.group_test_part.pk}_correct"
+
+        best = qs[0]
+        self.assertEqual(best.rank, 1)
+        self.assertEqual(getattr(best, f"{part1_key}_count"), 4)
+        self.assertEqual(getattr(best, f"{part1_key}_proportion"), 1.0)
+        self.assertEqual(
+            getattr(best, f"{part1_key}_category"),
+            ResultCategory.objects.get(color_key="blue").pk,
+        )
+
+        secondbest = qs[1]
+        self.assertEqual(secondbest.rank, 2)
+        self.assertEqual(getattr(secondbest, f"{part1_key}_count"), 1)
+        self.assertEqual(getattr(secondbest, f"{part1_key}_proportion"), 0.25)
+        self.assertEqual(
+            getattr(secondbest, f"{part1_key}_category"),
+            ResultCategory.objects.get(color_key="yellow").pk,
+        )
+
+    def test_render(self):
+        view = self.setup_view(
+            AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk
+        )
+        response = view.response
+        response.render()
+        soup = BeautifulSoup(response.content, "html.parser")
+        table = self.html_table_to_list(soup.find("table"))
+        self.assertEqual(
+            table,
+            [
+                [["Elev"], ["GroupTestPart1"]],
+                [["1. Test Elev"], ["4"]],
+                [["2."], ["1"]],
+                [["3. Test Elev"], ["0"]],
+                [["Gennemsnit"], ["Middel"]],
+            ],
+        )

@@ -1,0 +1,16 @@
+{% load i18n %}
+{% with key=value.category.color_key %}
+<div class="result-score category-{{ key }}">
+    {% if key == "red" %}
+        {% translate "Elendigt" %}
+    {% elif key == "yellow" %}
+        {% translate "Under middel" %}
+    {% elif key == "green" %}
+        {% translate "Middel" %}
+    {% elif key == "blue" %}
+        {% translate "Fantastisk" %}
+    {% else %}
+        {% translate "Ikke fuldført" %}
+    {% endif %}
+</div>
+{% endwith %}

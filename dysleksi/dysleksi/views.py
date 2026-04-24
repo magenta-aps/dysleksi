@@ -1,10 +1,11 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
+from functools import partial
 from typing import Any
 
 from django.db import transaction
-from django.db.models import Case, Count, F, Value, When
+from django.db.models import Case, Count, F, Q, QuerySet, Value, When
 from django.http import HttpResponseRedirect
 from django.shortcuts import redirect
 from django.urls import reverse
@@ -16,13 +17,23 @@ from dysleksi.forms import StartClassRoomForm, StartIndividualRoomForm
 from dysleksi.models import (
     TEACHERS,
     Class,
+    ResultCategory,
     Student,
     Test,
     TestAssignment,
+    TestPart,
+    TestQuestion,
+    TestResponseQuerySet,
     TestType,
     User,
 )
-from dysleksi.tables import ClassTable, StudentTable, TestAssignmentTable
+from dysleksi.tables import (
+    ClassTable,
+    StudentTable,
+    TestAssignmentTable,
+    TestResultColumn,
+    TestResultTable,
+)
 from dysleksi.utils import scan_static_files
 
 
@@ -244,3 +255,123 @@ class StartGroupAssignmentView(StartAssignmentView):
 class AdminRootView(GroupRequiredMixin, TemplateView):
     groups_required = [TEACHERS]
     template_name = "dysleksi/admin/base.html"
+
+
+class AssignmentResultsView(GroupRequiredMixin, DetailView):
+    groups_required = [TEACHERS]
+    model = TestAssignment
+    table_class = TestResultTable
+
+    def get_template_names(self) -> list[str]:
+        if self.object.test.test_type == TestType.INDIVIDUAL:  # pragma: no cover
+            # Endnu ikke klar, kommer senere
+            return ["dysleksi/admin/test_assignment/result_individual.html"]
+        else:
+            return ["dysleksi/admin/test_assignment/result_group.html"]
+
+    def get_by_category(self):
+        key = "all_correct"
+        count_key = f"{key}_count"
+        proportion_key = f"{key}_proportion"
+        category_key = f"{key}_category"
+
+        questions_count: int = TestQuestion.objects.filter(
+            part__tests=self.object.test
+        ).count()
+
+        # Data til kasserne i toppen, hvor hver kategori har nogle elever
+        # Hver entry i qs er en elevs besvarelse af hele testen
+        qs: TestResponseQuerySet = (
+            self.object.responses.all()
+            # Annotér med antallet af korrekte svar i hele testen
+            .annotate_correct_count(count_key)
+            # Annotér med andelen af korrekte svar i hele testen (float mellem 0 og 1)
+            .annotate_correct_proportion(count_key, proportion_key, questions_count)
+            # Annotér kategorien af korrekte svar i hele testen (pk på ResultCategory)
+            .annotate_score_category(proportion_key, category_key)
+        )
+        return [
+            {
+                "color": category.color_key,
+                "label": category.label_da,
+                "items": qs.filter(**{category_key: category.pk}).order_by(count_key),
+            }
+            for category in ResultCategory.objects.all().order_by(
+                "is_default", "upper_proportion_limit"
+            )
+        ]
+
+    def get_table(self):
+        # Data til tabellen, hvor linjerne er elever og kolonnerne er deltests
+        qs: TestResponseQuerySet = (
+            self.object.responses.all()
+            # Annotér med antallet af korrekte svar i hele testen
+            .annotate_correct_count("total_score")
+            # Annotér med rangering ud fra rækkefølge
+            .annotate_ordering("total_score", "rank", False)
+        )
+        parts: QuerySet[TestPart] = self.object.test.parts.all()
+        extra_columns = []
+        for part in parts:
+            key = f"part_{part.pk}_correct"
+            count_key = f"{key}_count"
+            proportion_key = f"{key}_proportion"
+            category_key = f"{key}_category"
+            part_questions_count = part.questions.count()
+            qs = (
+                # Annotér med antallet af korrekte svar i denne Part
+                qs.annotate_correct_count(count_key, Q(partresponses__testpart=part))
+                # Annotér med andelen af korrekte svar i denne Part
+                # (float mellem 0 og 1)
+                .annotate_correct_proportion(
+                    count_key, proportion_key, part_questions_count
+                )
+                # Annotér kategorien af korrekte svar i denne Part
+                # (red, yellow, green, blue)
+                .annotate_score_category(proportion_key, category_key)
+            )
+            # Tilføj en søjle til data for denne Part
+            extra_columns.append(
+                (
+                    key,
+                    TestResultColumn(
+                        template_name="dysleksi/admin/table_columns/"
+                        "test_response_score.html",
+                        footer_template_name="dysleksi/admin/table_columns/"
+                        "test_response_score_footer.html",
+                        verbose_name=part.name,
+                        accessor=count_key,
+                        extra_context={  # til brug i template for celle
+                            "count_key": count_key,
+                            "proportion_key": proportion_key,
+                            "category_key": category_key,
+                        },
+                        average_value_modifier=partial(
+                            lambda average_count, part_questions_count: {
+                                # Til brug i template for footer,
+                                # som viser opsummeringen
+                                # average_count er det gennemsnitlige antal korrekte
+                                # besvarelser af denne deltest for hele klassen
+                                # "count": average_count,
+                                # "total": part_questions_count,
+                                # "proportion": average_count / part_questions_count,
+                                "category": ResultCategory.categorize_proportion(
+                                    average_count / part_questions_count
+                                ),
+                            },
+                            part_questions_count=part_questions_count,
+                        ),
+                    ),
+                )
+            )
+        qs = qs.order_by("rank")
+        return self.table_class(data=qs, extra_columns=extra_columns)
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data["by_category"] = self.get_by_category()
+        context_data["table"] = self.get_table()
+        context_data["ResultCategories"] = {
+            category.pk: category for category in ResultCategory.objects.all()
+        }
+        return context_data

@@ -142,6 +142,26 @@ h4, th {
   color: $mono-gray-dark-3;
   text-transform: uppercase;
 }
+h5 {
+  .subheader {
+    color: $mono-gray-dark-1;
+  }
+  i.ph {
+    display: inline-flex;
+    width: 2rem;
+    height: 2rem;
+    justify-content: space-around;
+    align-items: center;
+    background: #6b7c93;
+    color: #fff;
+    border-radius: 5rem;
+    margin-right: 0.5rem;
+    vertical-align: -5%;
+  }
+}
+h6 {
+  font-weight: bold;
+}
 .btn {
   font-family: "DM Sans Medium", "Helvetica", sans-serif;
   font-size: $spacer;
@@ -377,58 +397,71 @@ textarea.form-control {
   background-color: $white;
   border-radius: $spacer;
   box-shadow: 0 0 $spacer $mono-gray-lightest;
-}
-.table {
-  tr {
-    vertical-align: middle;
+
+  .table {
+    tr {
+      vertical-align: middle;
+    }
+
+    th {
+      white-space: nowrap;
+      width: 1%;
+      padding: $spacer $spacer 0.5 * $spacer $spacer;
+      background-color: $white;
+      text-transform: uppercase;
+    }
+
+    th a {
+      text-decoration: none;
+    }
+
+    th.orderable a::after {
+      font-family: "Phosphor-Fill";
+      content: "\e140"; // `caret-up-down`
+      color: $mono-gray-light;
+      float: right;
+      vertical-align: bottom;
+    }
+
+    th.orderable.asc a::after {
+      font-family: "Phosphor-Fill";
+      content: "\e13c"; // `caret-up`
+    }
+
+    th.orderable.desc a::after {
+      font-family: "Phosphor-Fill";
+      content: "\e136"; // `caret-down`
+    }
+
+    td {
+      white-space: nowrap;
+      width: 1%;
+      padding: $spacer;
+      background-color: $white;
+      vertical-align: middle;
+    }
+
+    // Forces all table headers to design color
+    > :not(caption) > * > th,
+    > :not(caption) > * > th > a {
+      color: $mono-gray-dark-3;
+    }
+
+    tr:last-child > td {
+      border-bottom: 0;
+    }
+
+    tfoot > tr {
+      td {
+        background-color: $mono-gray-lightest;
+      }
+    }
   }
 
-  th {
-    white-space: nowrap;
-    width: 1%;
-    padding: $spacer $spacer 0.5 * $spacer $spacer;
-    background-color: $white;
-    text-transform: uppercase;
-  }
-
-  th a {
-    text-decoration: none;
-  }
-
-  th.orderable a::after {
-    font-family: "Phosphor-Fill";
-    content: "\e140"; // `caret-up-down`
-    color: $mono-gray-light;
-    float: right;
-    vertical-align: bottom;
-  }
-
-  th.orderable.asc a::after {
-    font-family: "Phosphor-Fill";
-    content: "\e13c"; // `caret-up`
-  }
-
-  th.orderable.desc a::after {
-    font-family: "Phosphor-Fill";
-    content: "\e136"; // `caret-down`
-  }
-
-  td {
-    white-space: nowrap;
-    width: 1%;
-    padding: $spacer;
-    background-color: $white;
-    vertical-align: middle;
-  }
-
-  // Forces all table headers to design color
-  > :not(caption) > * > th,
-  > :not(caption) > * > th > a {
-    color: $mono-gray-dark-3;
-  }
-
-  tbody > tr:last-child > td {
-    border-bottom: 0;
+  .table-first-col-bordered {
+    td:first-child {
+      border-right-width: var(--bs-border-width);
+    }
   }
 }
 
@@ -1000,3 +1033,64 @@ $border-radius-student-card: $spacer / 4 * 3;
 }
 
 
+.category-red {
+  color: $white;
+  background-color: $red-darker-2;
+}
+
+.category-yellow {
+  color: $mono-gray-darkest;
+  background-color: $yellow-normal;
+}
+
+.category-green {
+  color: $mono-gray-darkest;
+  background-color: $green-light;
+}
+
+.category-blue {
+  color: $white;
+  background-color: $bright-blue-darker;
+}
+
+.category-gray {
+  color: $mono-gray-dark-3;
+  background-color: $mono-gray-lightest;
+}
+
+.card {
+
+  &.result-card {
+    background: $white;
+    border: 1px solid $mono-gray-lighter;
+    --bs-gutter-x: 0;
+    .card-header {
+      text-align: center;
+      font-size: $spacer;
+    }
+  }
+
+}
+
+.result-score {
+  text-align: center;
+}
+
+
+/* Bootstrap collapse, where `.collapse-autoremove *` will be hidden when expanding */
+.collapse-autoremove {
+  display: grid;
+  grid-template-rows: 1fr;
+  transition: grid-template-rows 0.35s;
+  * {
+    overflow: hidden;
+  }
+}
+
+.collapse-autoremove[aria-expanded="true"] {
+  /* transition from 1fr to 0fr in 0.35ms */
+  grid-template-rows: 0fr;
+  * {
+    visibility: hidden;
+  }
+ }

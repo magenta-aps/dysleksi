@@ -38,6 +38,9 @@ fi
 echo 'creating cache table'
 python manage.py createcachetable
 
+echo 'ensuring result categories'
+python manage.py create_result_categories
+
 if [ "${PULL_IDP_METADATA,,}" = true ]; then
   echo "Updating metadata"
   python manage.py update_mitid_idp_metadata

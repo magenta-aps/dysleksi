@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.urls import URLPattern, URLResolver, path
 
 from dysleksi.views import (
+    AssignmentResultsView,
     AssignmentView,
     ClassListView,
     RootView,
@@ -38,5 +39,10 @@ urlpatterns: list[URLResolver | URLPattern] = [
         "admin/test-assignments/",
         TestAssignmentListView.as_view(),
         name="test_assignment_list",
+    ),
+    path(
+        "assignment/<int:pk>/result/",
+        AssignmentResultsView.as_view(),
+        name="test_assignment_results",
     ),
 ]
