@@ -85,19 +85,52 @@ describe("GroupTestDomElements.showQuestionChallenge (sound only)", () => {
     });
 });
 
-describe("GroupTestDomElements.showSummary (new structure)", () => {
+describe("GroupTestDomElements.showSummary", () => {
     let dom;
+
+    // Helper to simulate scrolling in JSDOM
+    const simulateScroll = (element, scrollTop) => {
+        Object.defineProperty(element, "scrollTop", {
+            value: scrollTop,
+            configurable: true,
+        });
+        element.dispatchEvent(new Event("scroll"));
+    };
+
+    // Helper to set up the "physical" dimensions of the container
+    const setDimensions = (element, { scrollHeight, clientHeight }) => {
+        Object.defineProperty(element, "scrollHeight", {
+            value: scrollHeight,
+            configurable: true,
+        });
+        Object.defineProperty(element, "clientHeight", {
+            value: clientHeight,
+            configurable: true,
+        });
+    };
 
     beforeEach(() => {
         document.body.innerHTML = `
             <div id="test-summary" style="display: none">
                 <div class="center-content">
-                    <div id="summary-container"></div>
+                    <div class="scroll-wrapper">
+                        <div id="summary-container" class="summary-container"></div>
+                        <div id="summary-scroll-controls" class="scroll-controls">
+                            <div id="scroll-summary-up" class="scroll-arrow disabled">
+                                <i class="ph-fill ph-arrow-up"></i>
+                            </div>
+                            <div id="scroll-summary-down" class="scroll-arrow">
+                                <i class="ph-fill ph-arrow-down"></i>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
     `;
 
         dom = new GroupTestDomElements();
+        Element.prototype.scrollBy = vi.fn();
 
         // Spy on console.log to suppress output during tests
         vi.spyOn(console, "log").mockImplementation(() => {});
@@ -162,6 +195,49 @@ describe("GroupTestDomElements.showSummary (new structure)", () => {
         expect(block.childNodes[0].childNodes[0].textContent.trim()).toBe(
             "Bogstavbenævnelse",
         );
+    });
+
+    it("Shows test summary with lots of parts and scroll-arrows", async () => {
+        const test = {
+            parts: [
+                { name: "Part1", questions: [1], image: "/static/1.png" },
+                { name: "Part2", questions: [1], image: "/static/2.png" },
+                { name: "Part3", questions: [1], image: "/static/3.png" },
+                { name: "Part4", questions: [1], image: "/static/4.png" },
+                { name: "Part5", questions: [1], image: "/static/5.png" },
+                { name: "Part6", questions: [1], image: "/static/6.png" },
+            ],
+        };
+
+        setDimensions(dom.summaryContainer, { scrollHeight: 1000, clientHeight: 500 });
+        simulateScroll(dom.summaryContainer, 0);
+
+        dom.showSummary(test.parts);
+        await new Promise((resolve) => setTimeout(resolve, 20));
+
+        expect(dom.summaryScrollControls.style.display).toBe("flex");
+        expect(dom.scrollSummaryUpArrow.classList.contains("disabled")).toBe(true);
+        expect(dom.scrollSummaryDownArrow.classList.contains("disabled")).toBe(false);
+
+        // Press the "scroll down" button
+        dom.scrollSummaryDownArrow.click();
+        simulateScroll(dom.summaryContainer, 100);
+
+        expect(dom.scrollSummaryUpArrow.classList.contains("disabled")).toBe(false);
+        expect(dom.scrollSummaryDownArrow.classList.contains("disabled")).toBe(false);
+
+        // Scroll all the way down
+        simulateScroll(dom.summaryContainer, 500);
+
+        expect(dom.scrollSummaryUpArrow.classList.contains("disabled")).toBe(false);
+        expect(dom.scrollSummaryDownArrow.classList.contains("disabled")).toBe(true);
+
+        // Press the "scroll up" button
+        dom.scrollSummaryUpArrow.click();
+        simulateScroll(dom.summaryContainer, 400);
+
+        expect(dom.scrollSummaryUpArrow.classList.contains("disabled")).toBe(false);
+        expect(dom.scrollSummaryDownArrow.classList.contains("disabled")).toBe(false);
     });
 });
 
@@ -800,7 +876,18 @@ describe("GroupTestDomElements.showTestExit", () => {
             <div id="student-header"></div>
             <div id="question-challenge"></div>
             <button id="end-summary"></button>
-            <div id="summary-container"></div>
+            <div class="scroll-wrapper">
+                <div id="summary-container" class="summary-container"></div>
+                <div id="summary-scroll-controls" class="scroll-controls">
+                    <div id="scroll-summary-up" class="scroll-arrow disabled">
+                        <i class="ph-fill ph-arrow-up"></i>
+                    </div>
+                    <div id="scroll-summary-down" class="scroll-arrow">
+                        <i class="ph-fill ph-arrow-down"></i>
+                    </div>
+                </div>
+            </div>
+
             <button id="next"></button>
             <div id="fade-overlay"></div>
             <div id="test-intro"></div>

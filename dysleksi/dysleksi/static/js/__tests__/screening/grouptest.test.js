@@ -96,7 +96,17 @@ describe("GroupTestFlow", () => {
             <h1 id="student-header" class="student-header"></h1>
             <audio id="instructions-sound"></audio>
             <audio id="reminder-sound"></audio>
-            <div id="summary-container"></div>
+            <div class="scroll-wrapper">
+                <div id="summary-container" class="summary-container"></div>
+                <div id="summary-scroll-controls" class="scroll-controls">
+                    <div id="scroll-summary-up" class="scroll-arrow disabled">
+                        <i class="ph-fill ph-arrow-up"></i>
+                    </div>
+                    <div id="scroll-summary-down" class="scroll-arrow">
+                        <i class="ph-fill ph-arrow-down"></i>
+                    </div>
+                </div>
+            </div>
             <button id="end-summary"></button>
             <div id="question-challenge"></div>
             <div id="choices" class="multiple-choice-choices"></div>
@@ -1340,7 +1350,18 @@ describe("Timer and Reminder Cleanup", () => {
             <h1 id="student-header" class="student-header"></h1>
             <audio id="instructions-sound"></audio>
             <audio id="reminder-sound"></audio>
-            <div id="summary-container"></div>
+            <div class="scroll-wrapper">
+                <div id="summary-container" class="summary-container"></div>
+                <div id="summary-scroll-controls" class="scroll-controls">
+                    <div id="scroll-summary-up" class="scroll-arrow disabled">
+                        <i class="ph-fill ph-arrow-up"></i>
+                    </div>
+                    <div id="scroll-summary-down" class="scroll-arrow">
+                        <i class="ph-fill ph-arrow-down"></i>
+                    </div>
+                </div>
+            </div>
+
             <button id="end-summary"></button>
             <div id="question-challenge"></div>
             <div id="choices" class="multiple-choice-choices"></div>
@@ -1436,7 +1457,18 @@ describe("StudentTestView - updateNextButtonClass", () => {
             <h1 id="student-header" class="student-header"></h1>
             <audio id="instructions-sound"></audio>
             <audio id="reminder-sound"></audio>
-            <div id="summary-container"></div>
+            <div class="scroll-wrapper">
+                <div id="summary-container" class="summary-container"></div>
+                <div id="summary-scroll-controls" class="scroll-controls">
+                    <div id="scroll-summary-up" class="scroll-arrow disabled">
+                        <i class="ph-fill ph-arrow-up"></i>
+                    </div>
+                    <div id="scroll-summary-down" class="scroll-arrow">
+                        <i class="ph-fill ph-arrow-down"></i>
+                    </div>
+                </div>
+            </div>
+
             <button id="end-summary"></button>
             <div id="question-challenge"></div>
             <div id="choices" class="multiple-choice-choices"></div>
@@ -1675,7 +1707,18 @@ describe("LetterSoundTest", () => {
             <h1 id="student-header" class="student-header"></h1>
             <audio id="instructions-sound"></audio>
             <audio id="reminder-sound"></audio>
-            <div id="summary-container"></div>
+            <div class="scroll-wrapper">
+                <div id="summary-container" class="summary-container"></div>
+                <div id="summary-scroll-controls" class="scroll-controls">
+                    <div id="scroll-summary-up" class="scroll-arrow disabled">
+                        <i class="ph-fill ph-arrow-up"></i>
+                    </div>
+                    <div id="scroll-summary-down" class="scroll-arrow">
+                        <i class="ph-fill ph-arrow-down"></i>
+                    </div>
+                </div>
+            </div>
+
             <button id="end-summary"></button>
             <div id="question-challenge"></div>
             <div id="choices" class="multiple-choice-choices"></div>
@@ -1754,7 +1797,18 @@ describe("LetterNameTest", () => {
             <h1 id="student-header" class="student-header"></h1>
             <audio id="instructions-sound"></audio>
             <audio id="reminder-sound"></audio>
-            <div id="summary-container"></div>
+            <div class="scroll-wrapper">
+                <div id="summary-container" class="summary-container"></div>
+                <div id="summary-scroll-controls" class="scroll-controls">
+                    <div id="scroll-summary-up" class="scroll-arrow disabled">
+                        <i class="ph-fill ph-arrow-up"></i>
+                    </div>
+                    <div id="scroll-summary-down" class="scroll-arrow">
+                        <i class="ph-fill ph-arrow-down"></i>
+                    </div>
+                </div>
+            </div>
+
             <button id="end-summary"></button>
             <div id="question-challenge"></div>
             <div id="choices" class="multiple-choice-choices"></div>
@@ -1817,7 +1871,18 @@ describe("Sentence Reading Test", () => {
             <h1 id="student-header" class="student-header"></h1>
             <audio id="instructions-sound"></audio>
             <audio id="reminder-sound"></audio>
-            <div id="summary-container"></div>
+            <div class="scroll-wrapper">
+                <div id="summary-container" class="summary-container"></div>
+                <div id="summary-scroll-controls" class="scroll-controls">
+                    <div id="scroll-summary-up" class="scroll-arrow disabled">
+                        <i class="ph-fill ph-arrow-up"></i>
+                    </div>
+                    <div id="scroll-summary-down" class="scroll-arrow">
+                        <i class="ph-fill ph-arrow-down"></i>
+                    </div>
+                </div>
+            </div>
+
             <button id="end-summary"></button>
             <div id="question-challenge"></div>
             <div id="choices" class="multiple-choice-choices"></div>

@@ -69,7 +69,17 @@
 
 <div id="test-summary" style="display: none" class="center-screen">
     <div class="center-content">
-        <div id="summary-container"></div>
+        <div class="scroll-wrapper">
+            <div id="summary-container" class="summary-container"></div>
+            <div id="summary-scroll-controls" class="scroll-controls">
+                <div id="scroll-summary-up" class="scroll-arrow disabled">
+                    <i class="ph-fill ph-arrow-up"></i>
+                </div>
+                <div id="scroll-summary-down" class="scroll-arrow">
+                    <i class="ph-fill ph-arrow-down"></i>
+                </div>
+            </div>
+        </div>
         <button class="btn mt-5 start-btn" id="end-summary"></button>
     </div>
 </div>
