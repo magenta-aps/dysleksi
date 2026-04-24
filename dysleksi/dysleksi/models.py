@@ -16,7 +16,20 @@ from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
-from django.db.models import QuerySet, TextChoices
+from django.db.models import (
+    Case,
+    Count,
+    ExpressionWrapper,
+    F,
+    FloatField,
+    Q,
+    QuerySet,
+    TextChoices,
+    Value,
+    When,
+    Window,
+)
+from django.db.models.functions import RowNumber
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -749,7 +762,81 @@ class PossibleAnswer(models.Model):
         return f"{str(self.question)} / {str(self.is_correct)}"
 
 
+class TestResponseQuerySet(QuerySet):
+
+    def annotate_correct_count(
+        self, output_key: str, filter: Q | None = None
+    ) -> "TestResponseQuerySet":
+        if filter is None:
+            filter = Q()
+        return self.annotate(
+            **{
+                output_key: Count(
+                    "partresponses__questionresponses",
+                    filter=filter & Q(partresponses__questionresponses__correct=True),
+                )
+            }
+        )
+
+    def annotate_ordering(
+        self, order_key: str, output_key: str, ascending: bool
+    ) -> "TestResponseQuerySet":
+        ordering = F(order_key)
+        return self.annotate(
+            **{
+                output_key: Window(
+                    expression=RowNumber(),
+                    order_by=ordering.asc() if ascending else ordering.desc(),
+                )
+            }
+        )
+
+    def annotate_correct_proportion(
+        self, count_key: str, output_key: str, questions_count: int
+    ) -> "TestResponseQuerySet":
+        return self.annotate(
+            **{
+                output_key: ExpressionWrapper(
+                    F(count_key) / Value(questions_count, output_field=FloatField()),
+                    output_field=FloatField(),
+                )
+            }
+        )
+
+    def annotate_score_category(
+        self, proportion_key: str, output_key: str
+    ) -> "TestResponseQuerySet":
+
+        default_key = ResultCategory.default().pk
+        cases = []
+        completed_filter = Q(completed=True)
+
+        for category in ResultCategory.non_default():
+            if category.lower_proportion_limit == 0.0:
+                lower_filter = Q(
+                    **{f"{proportion_key}__gte": category.lower_proportion_limit}
+                )
+            else:
+                lower_filter = Q(
+                    **{f"{proportion_key}__gt": category.lower_proportion_limit}
+                )
+            upper_filter = Q(
+                **{f"{proportion_key}__lte": category.upper_proportion_limit}
+            )
+            cases.append(
+                When(
+                    completed_filter & lower_filter & upper_filter,
+                    then=Value(category.pk),
+                )
+            )
+
+        return self.annotate(**{output_key: Case(*cases, default=Value(default_key))})
+
+
 class TestResponse(models.Model):
+
+    objects = TestResponseQuerySet.as_manager()
+
     def clean(self):
         if self.assignment.student is not None:
             if self.student != self.assignment.student:
@@ -1041,3 +1128,86 @@ class Message(models.Model):
         finally:
             self.processed = timezone.now()
             self.save()
+
+
+class ResultCategoryChoice(TextChoices):
+    GRAY = "gray"
+    RED = "red"
+    YELLOW = "yellow"
+    GREEN = "green"
+    BLUE = "blue"
+
+
+class ResultCategory(models.Model):
+    upper_proportion_limit = models.FloatField(
+        default=1.0,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        null=True,
+    )
+    color_key = models.CharField(
+        choices=ResultCategoryChoice.choices,
+        max_length=6,
+        editable=False,
+        null=False,
+        unique=True,
+    )
+    is_default = models.BooleanField()
+    label_da = models.CharField(max_length=30, null=False, blank=False)
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(upper_proportion_limit__isnull=False)
+                | models.Q(color_key=ResultCategoryChoice.GRAY),
+                name="Only color_key: GRAY may have null upper limit",
+            )
+        ]
+
+    @property
+    def lower_proportion_limit(self) -> float | None:
+        if self.is_default:
+            return None
+        lower = (
+            ResultCategory.objects.filter(
+                upper_proportion_limit__lt=self.upper_proportion_limit
+            )
+            .order_by("-upper_proportion_limit")
+            .first()
+        )
+        if lower is None:
+            return 0.0
+        return lower.upper_proportion_limit
+
+    @staticmethod
+    def categorize_proportion(proportion: float | None) -> "ResultCategory | None":
+        if proportion is None:
+            return ResultCategory.default()
+        if proportion < 0 or proportion > 1:
+            raise ValueError("proportion must be between 0 and 1")
+        return (
+            ResultCategory.objects.filter(
+                is_default=False, upper_proportion_limit__gte=proportion
+            )
+            .order_by("upper_proportion_limit")
+            .first()
+        )
+
+    @staticmethod
+    def validate_categories():
+        if ResultCategory.objects.filter(is_default=True).count() > 1:
+            raise ValidationError("More than one ResultCategory with is_default=True")
+        if not ResultCategory.objects.filter(is_default=True).exists():
+            raise ValidationError("No ResultCategory with is_default=True")
+        upper = ResultCategory.objects.filter(is_default=False).order_by("-id").first()
+        if upper.upper_proportion_limit != 1:
+            raise ValidationError(
+                "Topmost ResultCategory must have upper_proportion_limit 1"
+            )
+
+    @staticmethod
+    def default():
+        return ResultCategory.objects.get(is_default=True)
+
+    @staticmethod
+    def non_default():
+        return ResultCategory.objects.filter(is_default=False)

@@ -1,0 +1,80 @@
+{% extends "dysleksi/admin/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dysleksi:test_assignment_list' %}">{% translate 'Tests' %}</a></li>
+<li class="breadcrumb-item">
+    <a href="{% url 'dysleksi:room' object.pk %}">
+        {% blocktranslate trimmed with class_name=class_name test_name=object.test.name %}
+            Klasse {{ class_name }} - {{ test_name }}
+        {% endblocktranslate %}
+    </a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">{% translate "Resultater" %}</li>
+{% endblock %}
+
+{% block inner_content %}
+    <div class="row">
+        <div class="col-9">
+            <h5 class="mt-2 mb-4">
+                <i class="ph ph-chart-bar fs-5"></i>
+                {% translate "Klassens resultater" %}
+                <span class="subheader">
+                    ({% blocktranslate trimmed with class_name=class_name test_name=object.test.name %}
+                    Klasse {{class_name}} - {{ test_name }}
+                    {% endblocktranslate %})
+                </span>
+            </h5>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-primary mt-2 float-end"><i class="ph ph-upload-simple"></i>{% translate "Eksportér som PDF" %}</button>
+        </div>
+    </div>
+
+    <h6>Klassens fordeling</h6>
+    <div class="row">
+        {% for category in by_category %}
+        <div class="col card result-card mx-2">
+            <h1 class="card-header category-{{ category.color }}">
+                {{ category.label }} ({{ category.items.count }})
+                <i class="ph-fill ph-question"></i>
+            </h1>
+            <div class="card-body">
+                <ul class="list-unstyled">
+                    {% if category.items|length > 5 %}
+                        {# Show 5, and allow user to reveal the rest #}
+                        {% for item in category.items|slice:":5" %}
+                            <li>{{ item.student.get_full_name }}</li>
+                        {% endfor %}
+
+                        <div id="collapse_{{ category.color }}" class="collapse">
+                            {% for item in category.items|slice:"5:" %}
+                                <li>{{ item.student.get_full_name }}</li>
+                            {% endfor %}
+                        </div>
+                        <a data-bs-toggle="collapse" href="#collapse_{{ category.color }}" class="collapse-autoremove">
+                            <div>{# this will be hidden when expanding #}
+                            {% blocktranslate with count=category.items|length|add:-5 trimmed %}
+                            Vis {{ count }} mere
+                            {% endblocktranslate %}
+                            </div>
+                        </a>
+                    {% else %}
+                        {# Show all #}
+                        {% for item in category.items %}
+                        <li>{{ item.student.get_full_name }}</li>
+                        {% endfor %}
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h6 class="mt-3">Samlet overblik over score i deltest</h6>
+    <div class="results-table">
+    {% render_table table %}
+    </div>
+{% endblock %}

@@ -1,6 +1,8 @@
-from typing import List
+from typing import Callable, List
 
 from django.db.models import QuerySet
+from django.template import Context
+from django.template.loader import get_template
 from django.utils.translation import gettext_lazy as _
 from django_tables2 import A, Table, TemplateColumn, tables
 
@@ -117,3 +119,52 @@ class TestAssignmentTable(Table):
         orderable=False,
         verbose_name=_("Handlinger"),
     )
+
+
+class TestResultTable(Table):
+
+    class Meta:
+        attrs = {"class": "table table-first-col-bordered"}
+
+    student = TemplateColumn(
+        template_name="dysleksi/admin/table_columns/test_response_student_name.html",
+        verbose_name=_("Elev"),
+        footer=_("Gennemsnit"),
+    )
+
+
+class TestResultColumn(TemplateColumn):
+
+    def __init__(
+        self,
+        footer_template_name: str,
+        average_value_modifier: Callable | None = None,
+        *args,
+        **kwargs
+    ):
+        super().__init__(args, **kwargs)
+        self.footer_template_name = footer_template_name
+        self.average_value_modifier = average_value_modifier
+
+    def render_footer(self, bound_column, table):
+        # Get average
+        count = len(table.data)
+        if count > 0:
+            total = sum(bound_column.accessor.resolve(row) for row in table.data)
+            value = total / count
+        else:
+            value = None
+
+        if self.average_value_modifier:
+            value = self.average_value_modifier(value)
+
+        # Render footer
+        context = getattr(table, "context", Context())
+        additional_context = {
+            "default": bound_column.default,
+            "column": bound_column,
+            "value": value,
+        }
+        additional_context.update(self.extra_context)
+        with context.update(additional_context):
+            return get_template(self.footer_template_name).render(context.flatten())
