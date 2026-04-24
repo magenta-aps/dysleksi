@@ -178,6 +178,11 @@ class UtilTest(TestCase):
         create_wordreading_1_test(self.test, self.wordreading_1_data)
         self.assertTrue(TestResource.objects.filter(text="Cykel").exists())
 
+        # Validate that the resource only exists once. Also when we call the command
+        # again
+        create_wordreading_1_test(self.test, self.wordreading_1_data)
+        self.assertEqual(TestResource.objects.filter(text="Cykel").count(), 1)
+
     def test_create_letter_sound_test(self):
         create_letter_sound_test(self.test, self.letter_sound_data)
 
