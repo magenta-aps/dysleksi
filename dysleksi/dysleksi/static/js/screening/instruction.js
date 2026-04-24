@@ -95,6 +95,10 @@ export class InstructionSequenceRunner {
                 this.domElements.highlight(this.getEl(element));
                 break;
 
+            case "setNextButtonClass":
+                this.domElements.setNextButtonClass(data);
+                break;
+
             case "select":
                 this.domElements.toggleButtonSelected(this.getEl(element), true);
                 break;

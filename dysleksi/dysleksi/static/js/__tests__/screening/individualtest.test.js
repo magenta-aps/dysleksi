@@ -531,7 +531,7 @@ describe("IndividualTestFlow", () => {
         expect(domElements.setStudentHeader).toHaveBeenCalledWith(
             '<i class="ph ph-ear"></i>',
         );
-        expect(view.runInstructions).toHaveBeenCalledWith(false);
+        expect(view.runInstructions).toHaveBeenCalledWith();
     });
 });
 
