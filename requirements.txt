@@ -121,7 +121,7 @@ Incremental==24.11.0
 libsass==0.23.0
 msgpack==1.1.2
 mypy_extensions==1.1.0
-packaging==26.1
+packaging==26.2
 py-ubjson==0.16.1
 pyasn1==0.6.3
 pyasn1_modules==0.4.2
