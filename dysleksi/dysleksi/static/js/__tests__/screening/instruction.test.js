@@ -510,4 +510,89 @@ describe("InstructionSequenceRunner", () => {
         });
         expect(domElements.removeText).toHaveBeenLastCalledWith(element, 1);
     });
+
+    describe("waitForClick", () => {
+        it("sets pointer events and pulse class, then cleans up after click", async () => {
+            runner = new InstructionSequenceRunner(null, [], domElements, fakeContext);
+            const btn = document.getElementById("btn1");
+
+            // Start the wait
+            const waitPromise = runner.waitForClick(btn);
+
+            // Verify initial state
+            expect(btn.style.pointerEvents).toBe("auto");
+            expect(btn.tabIndex).toBe(0);
+            expect(btn.classList.contains("pulse-instruction")).toBe(true);
+
+            // Simulate the click
+            btn.click();
+
+            await waitPromise;
+
+            // Verify cleanup state
+            expect(btn.classList.contains("pulse-instruction")).toBe(false);
+            expect(btn.style.pointerEvents).toBe("none");
+            expect(btn.tabIndex).toBe(-1);
+        });
+
+        it("returns immediately if skipAll is true", async () => {
+            runner = new InstructionSequenceRunner(null, [], domElements, fakeContext);
+            runner.skipAll = true;
+            const btn = document.getElementById("btn1");
+
+            await runner.waitForClick(btn);
+
+            // Element should not have been modified
+            expect(btn.classList.contains("pulse-instruction")).toBe(false);
+            expect(btn.style.pointerEvents).not.toBe("auto");
+        });
+
+        it("executeInstruction with waitForUserClick calls waitForClick", async () => {
+            runner = new InstructionSequenceRunner(null, [], domElements, fakeContext);
+            const waitForClickSpy = vi
+                .spyOn(runner, "waitForClick")
+                .mockResolvedValue();
+
+            await runner.executeInstruction({
+                action: "waitForUserClick",
+                element: "btn1",
+            });
+
+            expect(waitForClickSpy).toHaveBeenCalledWith(
+                document.getElementById("btn1"),
+            );
+        });
+
+        it("run loop remains paused until waitForUserClick is resolved", async () => {
+            const instrs = [
+                { action: "show", element: "el1" },
+                { action: "waitForUserClick", element: "btn1" },
+                { action: "hide", element: "el2" },
+            ];
+            runner = new InstructionSequenceRunner(
+                null,
+                instrs,
+                domElements,
+                fakeContext,
+            );
+
+            const runPromise = runner.run();
+
+            // Advance microtasks
+            await vi.waitFor(() => {
+                expect(domElements.showElement).toHaveBeenCalled();
+            });
+
+            // The 'hide' action should not have happened yet
+            expect(domElements.hideElement).not.toHaveBeenCalled();
+
+            // Simulate user click
+            document.getElementById("btn1").click();
+
+            await runPromise;
+
+            // Now the rest should have finished
+            expect(domElements.hideElement).toHaveBeenCalled();
+        });
+    });
 });

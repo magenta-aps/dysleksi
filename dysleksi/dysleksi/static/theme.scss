@@ -169,6 +169,9 @@ body.show-instructions {
       background-color: white !important;
     }
   }
+  .pulse-instruction {
+    animation: pulse 1s infinite !important;
+  }
 }
 
 .erase-btn {

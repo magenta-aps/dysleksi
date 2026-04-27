@@ -148,9 +148,32 @@ export class InstructionSequenceRunner {
                 this.domElements.removeText(this.getEl(element), parseInt(data) || 1);
                 break;
 
+            case "waitForUserClick":
+                const targetEl = this.getEl(instr.element);
+                await this.waitForClick(targetEl);
+                break;
+
             default:
                 throw new Error("Unknown action: " + action);
         }
+    }
+
+    async waitForClick(el) {
+        if (this.skipAll) return;
+        el.style.pointerEvents = "auto";
+        el.tabIndex = 0;
+        el.classList.add("pulse-instruction");
+
+        return new Promise((resolve) => {
+            const onClick = () => {
+                el.classList.remove("pulse-instruction");
+                el.removeEventListener("click", onClick);
+                el.style.pointerEvents = "none";
+                el.tabIndex = -1;
+                resolve();
+            };
+            el.addEventListener("click", onClick);
+        });
     }
 
     async playSound(url) {

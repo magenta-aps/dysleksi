@@ -213,6 +213,15 @@ class UtilTest(TestCase):
         )
 
     def test_create_fore_sound_test(self):
+        create_fore_sound_test(self.test, self.fore_sound_data)
+
+        self.assertTrue(
+            TestResource.objects.filter(
+                image="resources/dummy/fore_sound/Opgave/abe.png"
+            ).exists()
+        )
+
+    def test_create_fore_sound_test_with_practice_run(self):
         create_fore_sound_test(
             self.test, self.fore_sound_data, self.fore_sound_practice_data
         )
