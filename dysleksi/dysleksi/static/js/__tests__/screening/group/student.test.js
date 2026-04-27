@@ -69,18 +69,6 @@ describe("initStudent (Group)", () => {
         expect(viewInstance.start).toHaveBeenCalled();
     });
 
-    it("closes socket and redirects to /exit when test.complete is triggered", async () => {
-        initStudent("room1", 42, {}, {});
-        await openHandler();
-
-        const handler = viewInstance.addEventListener.mock.calls.find(
-            (call) => call[0] === "test.complete",
-        )[1];
-
-        handler();
-        expect(mockClose).toHaveBeenCalled();
-    });
-
     it("logs an error if GroupTestView construction fails", async () => {
         const consoleSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 

@@ -342,7 +342,6 @@ describe("Teacher Individual test View", () => {
         audioIndicator = new AudioIndicator("#audio-indicator");
 
         view = new TeacherView(
-            "room1",
             individualTest,
             1,
             wsGetter,
@@ -383,7 +382,6 @@ describe("Teacher Individual test View", () => {
         expect(p2pChannel.send).toHaveBeenCalledWith({
             uuid: "UUID-SKIP",
             event: "question.feedback",
-            roomName: "room1",
             partIndex: 0,
             questionIndex: 0,
             questionId: 1,
@@ -423,9 +421,9 @@ describe("Teacher Individual test View", () => {
     });
 
     it("initializes default sub-views when optional arguments are omitted", () => {
-        // We only pass the required arguments: roomName, test, assignmentId, wsGetter
+        // We only pass the required arguments: test, assignmentId, wsGetter
         // The rest (table, buttons, noteField, questionView) will fall back to 'new' instances
-        const minimalView = new TeacherView("room1", individualTest, 1, wsGetter);
+        const minimalView = new TeacherView(individualTest, 1, wsGetter);
 
         // Verify that the properties are instances of their respective classes
         expect(minimalView.table).toBeInstanceOf(EventTable);
@@ -485,7 +483,6 @@ describe("Teacher Individual test View", () => {
             "#question-number",
         );
         view = new TeacherView(
-            "room1",
             individualTest,
             1,
             wsGetter,
@@ -524,7 +521,7 @@ describe("Teacher Individual test View", () => {
     });
 
     it("initializes socket and button listeners", () => {
-        expect(wsGetter).toHaveBeenCalledWith("room1");
+        expect(wsGetter).toHaveBeenCalledWith();
         expect(socket.addEventListener).toHaveBeenCalledWith(
             "message",
             expect.any(Function),
@@ -627,7 +624,6 @@ describe("Teacher Individual test View", () => {
         expect(p2pChannel.send).toHaveBeenCalledWith({
             uuid: "UUID123",
             event: "question.feedback",
-            roomName: "room1",
             partIndex: 0,
             questionIndex: 0,
             questionId: 1,
@@ -660,7 +656,6 @@ describe("Teacher Individual test View", () => {
         expect(p2pChannel.send).toHaveBeenCalledWith({
             uuid: "UUID123",
             event: "question.feedback",
-            roomName: "room1",
             partIndex: 0,
             questionIndex: 1,
             questionId: 2,
@@ -806,7 +801,6 @@ describe("Teacher Individual test View", () => {
         const expectedContent = {
             uuid: "UUID123",
             event: "test.cancelled",
-            roomName: "room1",
             partIndex: 0,
             questionIndex: 0,
             questionId: 1,
@@ -1297,7 +1291,6 @@ describe("TeacherView _initFilterButtonSelection", () => {
         const testData = { parts: [] };
 
         new TeacherView(
-            "room1",
             testData,
             1,
             wsGetter,
@@ -1431,7 +1424,6 @@ describe("TeacherView socket 'test.started' handling", () => {
         wsGetter = vi.fn().mockReturnValue(socket);
 
         view = new TeacherView(
-            "room1",
             {
                 testType: "group",
                 parts: [
@@ -1917,7 +1909,6 @@ describe("TeacherView Sync Logic", () => {
         wsGetter = vi.fn().mockReturnValue(socket);
 
         view = new TeacherView(
-            "room1",
             { parts: [] },
             1,
             wsGetter,
@@ -2040,7 +2031,7 @@ describe("TeacherView _initSocket", () => {
         };
         wsGetter = vi.fn().mockReturnValue(socket);
 
-        view = new TeacherView("room1", { parts: [] }, 1, wsGetter);
+        view = new TeacherView({ parts: [] }, 1, wsGetter);
     });
 
     afterEach(() => {
@@ -2135,7 +2126,6 @@ describe("TeacherView _initSocket", () => {
 describe("TeacherView messageQueue initialization", () => {
     let socket;
     let wsGetter;
-    const roomName = "test-room";
 
     beforeEach(() => {
         vi.useFakeTimers();
@@ -2156,10 +2146,10 @@ describe("TeacherView messageQueue initialization", () => {
         // Path: savedQueue is null
         vi.mocked(localStorage.getItem).mockReturnValue(null);
 
-        const view = new TeacherView(roomName, { parts: [] }, 1, wsGetter);
+        const view = new TeacherView({ parts: [] }, 1, wsGetter);
 
         expect(view.messageQueue).toEqual([]);
-        expect(localStorage.getItem).toHaveBeenCalledWith(`msg_queue_${roomName}`);
+        expect(localStorage.getItem).toHaveBeenCalledWith(`msg_queue_1`);
     });
 
     it("restores the message queue if valid JSON exists in localStorage", () => {
@@ -2170,7 +2160,7 @@ describe("TeacherView messageQueue initialization", () => {
         ];
         vi.mocked(localStorage.getItem).mockReturnValue(JSON.stringify(mockQueue));
 
-        const view = new TeacherView(roomName, { parts: [] }, 1, wsGetter);
+        const view = new TeacherView({ parts: [] }, 1, wsGetter);
 
         expect(view.messageQueue).toEqual(mockQueue);
         expect(view.messageQueue.length).toBe(2);
@@ -2181,7 +2171,7 @@ describe("TeacherView messageQueue initialization", () => {
         vi.mocked(localStorage.getItem).mockReturnValue("not-valid-json");
 
         expect(() => {
-            new TeacherView(roomName, { parts: [] }, 1, wsGetter);
+            new TeacherView({ parts: [] }, 1, wsGetter);
         }).toThrow(); // JSON.parse will throw here
     });
 });

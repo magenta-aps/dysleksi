@@ -94,7 +94,7 @@ class StartRoomForm(forms.ModelForm):
 
 class StudentChoiceField(ModelChoiceField):
     def label_from_instance(self, obj: Student) -> str:
-        return f"{obj.first_name} {obj.last_name} ({obj.klasse})"
+        return f"{obj.first_name} {obj.last_name} ({obj.classes})"
 
 
 class StartIndividualRoomForm(DynamicFormMixin, StartRoomForm):

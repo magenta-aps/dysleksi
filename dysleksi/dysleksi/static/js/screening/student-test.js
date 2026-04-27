@@ -7,7 +7,6 @@ import { WebRTCChannel } from "../webRTC.js";
 
 export class StudentTestView extends EventTarget {
     chatSocket;
-    roomName;
     assignmentId;
     domElements;
     student;
@@ -22,13 +21,12 @@ export class StudentTestView extends EventTarget {
     isPracticing = false;
     repeatQuestionIndex = null;
 
-    constructor(test, chatSocket, roomName, assignmentId, domElements, student) {
+    constructor(test, chatSocket, assignmentId, domElements, student) {
         super();
         preventDoubleTapZoom();
         this.test = test;
         this.p2p = new WebRTCChannel();
         this.p2p.studentSetup(chatSocket, student);
-        this.roomName = roomName;
         this.assignmentId = assignmentId;
         this.domElements = domElements;
         this.student = student;
@@ -47,7 +45,6 @@ export class StudentTestView extends EventTarget {
     }
 
     send(data) {
-        data.roomName = this.roomName;
         data.assignmentId = this.assignmentId;
         data.uuid = crypto.randomUUID();
         data.student = this.student;

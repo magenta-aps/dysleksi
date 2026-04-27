@@ -10,6 +10,7 @@ vi.mock("../ws.js", () => ({
 describe("initStudentLobby / initRedirectSocket", () => {
     let sockets;
     let originalLocation;
+    let studentId;
 
     beforeEach(() => {
         sockets = {};
@@ -21,7 +22,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
         };
 
         // Mock getWebSocket
-        vi.spyOn(wsModule, "getWebSocket").mockImplementation((assignment) => {
+        vi.spyOn(wsModule, "getWebSocket").mockImplementation(() => {
             const listeners = {};
 
             const socket = {
@@ -34,9 +35,11 @@ describe("initStudentLobby / initRedirectSocket", () => {
                 },
             };
 
-            sockets[assignment] = socket;
+            sockets["lobby"] = socket;
             return socket;
         });
+
+        studentId = 1;
     });
 
     afterEach(() => {
@@ -44,25 +47,18 @@ describe("initStudentLobby / initRedirectSocket", () => {
         global.window.location = originalLocation;
     });
 
-    it("creates redirect sockets for both individual and class rooms", () => {
-        initStudentLobby({
-            individualRoomName: "individual-room",
-            classRoomName: "class-room",
-        });
+    it("creates redirect socket", () => {
+        initStudentLobby(studentId);
 
-        expect(wsModule.getWebSocket).toHaveBeenCalledTimes(2);
-        expect(wsModule.getWebSocket).toHaveBeenCalledWith("individual-room");
-        expect(wsModule.getWebSocket).toHaveBeenCalledWith("class-room");
+        expect(wsModule.getWebSocket).toHaveBeenCalledTimes(1);
+        expect(wsModule.getWebSocket).toHaveBeenCalledWith();
     });
 
     it("sends student.ready once when socket opens", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
-        initStudentLobby({
-            individualRoomName: "room-1",
-            classRoomName: "room-2",
-        });
+        initStudentLobby(studentId);
 
-        const socket = sockets["room-1"];
+        const socket = sockets["lobby"];
 
         socket.__trigger("open");
 
@@ -70,23 +66,21 @@ describe("initStudentLobby / initRedirectSocket", () => {
             JSON.stringify({
                 uuid: "UUID123",
                 event: "student.ready",
-                roomName: "room-1",
+                studentId: studentId,
             }),
         );
     });
 
     it("redirects on session.in_progress", () => {
-        initStudentLobby({
-            individualRoomName: "room-1",
-            classRoomName: "room-2",
-        });
+        initStudentLobby(studentId);
 
-        const socket = sockets["room-1"];
+        const socket = sockets["lobby"];
 
         socket.__trigger("message", {
             data: JSON.stringify({
                 event: "session.in_progress",
                 roomUrl: "/rooms/room-1/",
+                students: [studentId],
             }),
         });
 
@@ -94,30 +88,41 @@ describe("initStudentLobby / initRedirectSocket", () => {
     });
 
     it("redirects on session.start", () => {
-        initStudentLobby({
-            individualRoomName: "room-1",
-            classRoomName: "room-2",
-        });
+        initStudentLobby(studentId);
 
-        const socket = sockets["room-2"];
+        const socket = sockets["lobby"];
 
         socket.__trigger("message", {
             data: JSON.stringify({
                 event: "session.start",
                 roomUrl: "/rooms/room-2/",
+                students: [studentId],
             }),
         });
 
         expect(window.location).toBe("/rooms/room-2/");
     });
 
-    it("does not redirect on unrelated events", () => {
-        initStudentLobby({
-            individualRoomName: "room-1",
-            classRoomName: "room-2",
+    it("Does not redirect if studentId does not match", () => {
+        initStudentLobby(studentId);
+
+        const socket = sockets["lobby"];
+
+        socket.__trigger("message", {
+            data: JSON.stringify({
+                event: "session.start",
+                roomUrl: "/rooms/room-2/",
+                students: [1337],
+            }),
         });
 
-        const socket = sockets["room-1"];
+        expect(window.location).not.toBe("/rooms/room-2/");
+    });
+
+    it("does not redirect on unrelated events", () => {
+        initStudentLobby(studentId);
+
+        const socket = sockets["lobby"];
 
         socket.__trigger("message", {
             data: JSON.stringify({

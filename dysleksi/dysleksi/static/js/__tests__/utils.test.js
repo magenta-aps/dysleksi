@@ -34,10 +34,11 @@ vi.spyOn(wsModule, "getWebSocket").mockImplementation((roomName) => {
 });
 
 describe("test startSession", () => {
+    let studentIds = [1];
+
     it("should send session.start event", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
-        const roomName = "room-1";
-        const chatSocket = startSession(roomName);
+        const chatSocket = startSession(studentIds);
         expect(chatSocket.addEventListener).toHaveBeenCalled();
 
         chatSocket.__trigger("open");
@@ -46,6 +47,7 @@ describe("test startSession", () => {
                 uuid: "UUID123",
                 event: "session.start",
                 roomUrl: "/",
+                students: studentIds,
             }),
         );
     });
@@ -53,8 +55,7 @@ describe("test startSession", () => {
     it("should refresh session", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
 
-        const roomName = "room-1";
-        let chatSocket = startSession(roomName);
+        let chatSocket = startSession(studentIds);
         expect(chatSocket.addEventListener).toHaveBeenCalled();
 
         chatSocket.__trigger("message", {
@@ -66,6 +67,7 @@ describe("test startSession", () => {
                 uuid: "UUID123",
                 event: "session.in_progress",
                 roomUrl: "/",
+                students: studentIds,
             }),
         );
     });
@@ -73,8 +75,8 @@ describe("test startSession", () => {
     it("should not refresh session is student is not ready", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
 
-        const roomName = "room-3";
-        let chatSocket = startSession(roomName);
+        let chatSocket = startSession(studentIds);
+        chatSocket.send.mockClear();
         expect(chatSocket.addEventListener).toHaveBeenCalled();
 
         chatSocket.__trigger("message", {
@@ -84,8 +86,7 @@ describe("test startSession", () => {
     });
 
     it("should not send session.in_progress if socket is not OPEN", () => {
-        const roomName = "room-closed";
-        const chatSocket = startSession(roomName);
+        const chatSocket = startSession(studentIds);
 
         // Manually change the mock's readyState to CLOSED (or any value != 1)
         chatSocket.readyState = WebSocket.CLOSED;
@@ -94,7 +95,7 @@ describe("test startSession", () => {
         chatSocket.send.mockClear();
 
         // Trigger the refresh
-        refreshSession(roomName);
+        refreshSession(studentIds);
 
         // Verify send was never called
         expect(chatSocket.send).not.toHaveBeenCalled();

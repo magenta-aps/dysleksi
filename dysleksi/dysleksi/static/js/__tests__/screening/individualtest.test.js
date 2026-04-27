@@ -110,15 +110,7 @@ describe("IndividualTestFlow", () => {
         });
 
         test = new Test(individualTestData);
-        view = new IndividualTestView(
-            test,
-            ws,
-            "student_1",
-            1,
-            domElements,
-            mediaRecorder,
-            student,
-        );
+        view = new IndividualTestView(test, ws, 1, domElements, mediaRecorder, student);
         testSpy(view);
     });
 
@@ -250,7 +242,6 @@ describe("IndividualTestFlow", () => {
             displayedAt: 0,
             questionTitle: "1/3 (Individuel deltest)",
             assignmentId: 1,
-            roomName: "student_1",
         });
         expect(mediaRecorder.start).toHaveBeenCalled();
     });
@@ -317,7 +308,6 @@ describe("IndividualTestFlow", () => {
             partId: partId,
             duration: 75,
             assignmentId: 1,
-            roomName: "student_1",
         });
 
         expect(superSpy).toHaveBeenCalled();
@@ -354,7 +344,6 @@ describe("IndividualTestFlow", () => {
             answeredAt: 55,
             duration: 45,
             assignmentId: 1,
-            roomName: "student_1",
         });
     });
 
@@ -563,15 +552,7 @@ describe("Individual Test - Timer and Reminder Cleanup", () => {
 
         ws = getWebSocket("class_123");
 
-        view = new IndividualTestView(
-            test,
-            ws,
-            "student_1",
-            1,
-            domElements,
-            mediaRecorder,
-            student,
-        );
+        view = new IndividualTestView(test, ws, 1, domElements, mediaRecorder, student);
         view.setPart(0);
     });
 

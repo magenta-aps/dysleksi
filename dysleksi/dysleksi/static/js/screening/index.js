@@ -9,10 +9,11 @@ export async function start() {
     const testType = roleEl.dataset.testType;
     let initStudent, initTeacher;
 
-    const roomName = roleEl.dataset.roomName;
     const assignmentId = roleEl.dataset.assignmentId;
     const testContentsEl = document.getElementById("test_contents");
     const testContents = testContentsEl ? JSON.parse(testContentsEl.textContent) : null;
+    const studentIdsEl = document.getElementById("student_ids");
+    const studentIds = studentIdsEl ? JSON.parse(studentIdsEl.textContent) : null;
     const test = new Test(testContents);
 
     const studentData = {};
@@ -45,11 +46,11 @@ export async function start() {
     }
 
     if (role === "student") {
-        initStudent(roomName, assignmentId, test, student, testType);
+        initStudent(assignmentId, test, student, testType);
     }
     if (role === "teacher") {
-        initTeacher(roomName, assignmentId, test);
-        startSession(roomName);
+        initTeacher(assignmentId, test);
+        startSession(studentIds);
     }
 }
 

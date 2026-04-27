@@ -9,8 +9,7 @@
 {% block content %}
 <div
     class="container"
-    data-individual-room-name="student_{{ student.id }}"
-    data-class-room-name="class_{{ student.klasse.id }}"
+    data-student-id="{{ student.id }}"
 >
     <h1>{% translate "Elev" %} ({{ student.klasse }})</h1>
     <p>

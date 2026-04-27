@@ -799,7 +799,6 @@ export class ElapsedTimeView {
 
 export class TeacherView {
     constructor(
-        roomName,
         test,
         assignmentId,
         wsGetter,
@@ -811,7 +810,6 @@ export class TeacherView {
         audioIndicator = null,
     ) {
         this.assignmentId = assignmentId;
-        this.roomName = roomName;
         this.wsGetter = wsGetter;
         this.chatSocket = null;
         this.test = test;
@@ -835,7 +833,7 @@ export class TeacherView {
         this.filterButtons = document.querySelectorAll(".group-test-header .btn");
         this.studentChannels = {};
 
-        const savedQueue = localStorage.getItem(`msg_queue_${this.roomName}`);
+        const savedQueue = localStorage.getItem(`msg_queue_${this.assignmentId}`);
         this.messageQueue = savedQueue ? JSON.parse(savedQueue) : [];
 
         this._initSocket();
@@ -1012,7 +1010,7 @@ export class TeacherView {
     }
 
     _initSocket() {
-        this.chatSocket = this.wsGetter(this.roomName);
+        this.chatSocket = this.wsGetter();
         this.chatSocket.addEventListener("message", (e) => {
             const data = JSON.parse(e.data);
 
@@ -1040,7 +1038,7 @@ export class TeacherView {
 
     _persistQueue() {
         localStorage.setItem(
-            `msg_queue_${this.roomName}`,
+            `msg_queue_${this.assignmentId}`,
             JSON.stringify(this.messageQueue),
         );
     }
@@ -1130,7 +1128,6 @@ export class TeacherView {
             channel.send({
                 uuid: crypto.randomUUID(),
                 event: "test.cancelled",
-                roomName: this.roomName,
                 partIndex: this.partIndex,
                 questionIndex: this.questionIndex,
                 questionId: this.currentQuestion.id,
@@ -1147,7 +1144,6 @@ export class TeacherView {
         const data = {
             uuid: crypto.randomUUID(),
             event: "question.feedback",
-            roomName: this.roomName,
             partIndex: this.partIndex,
             questionIndex: this.questionIndex,
             questionId: this.currentQuestion.id,

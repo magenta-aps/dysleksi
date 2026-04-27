@@ -8,7 +8,7 @@ import {
 } from "../controlroom.js";
 import { getWebSocket } from "../../ws.js";
 
-export function initTeacher(roomName, assignmentId, test) {
+export function initTeacher(assignmentId, test) {
     console.log("called initTeacher");
 
     const table = new EventTable(test);
@@ -28,7 +28,6 @@ export function initTeacher(roomName, assignmentId, test) {
     questionView.show();
 
     new TeacherView(
-        roomName,
         test,
         assignmentId,
         getWebSocket,

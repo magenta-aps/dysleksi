@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { getWebSocket } from "../ws.js";
+import { getWebSocket, resetSockets } from "../ws.js";
 
 describe("getWebSocket", () => {
     let originalWebSocket;
@@ -31,19 +31,20 @@ describe("getWebSocket", () => {
     afterEach(() => {
         // Restore WebSocket
         global.WebSocket = originalWebSocket;
+        resetSockets();
     });
 
     it("uses wss protocol for https", () => {
-        const ws = getWebSocket("room123");
+        const ws = getWebSocket();
 
-        expect(ws.url).toBe("wss://example.com/ws/chat/room123/");
+        expect(ws.url).toBe("wss://example.com/ws/chat/lobby/");
     });
 
     it("uses ws protocol for http", () => {
         window.location.protocol = "http:";
-        const ws = getWebSocket("abc");
+        const ws = getWebSocket();
 
-        expect(ws.url).toBe("ws://example.com/ws/chat/abc/");
+        expect(ws.url).toBe("ws://example.com/ws/chat/lobby/");
     });
 
     it("removes the socket from the cache when it closes", () => {
@@ -59,7 +60,7 @@ describe("getWebSocket", () => {
             });
 
         // 2. Create the first socket
-        const firstWs = getWebSocket("room-to-close");
+        const firstWs = getWebSocket();
 
         // Verify the listener was actually attached
         expect(addEventListenerSpy).toHaveBeenCalledWith("close", expect.any(Function));
@@ -68,7 +69,7 @@ describe("getWebSocket", () => {
         if (closeCallback) closeCallback();
 
         // 4. Call getWebSocket again for the same ID
-        const secondWs = getWebSocket("room-to-close");
+        const secondWs = getWebSocket();
 
         // 5. Assert: They MUST be different objects now
         expect(secondWs).not.toBe(firstWs);
