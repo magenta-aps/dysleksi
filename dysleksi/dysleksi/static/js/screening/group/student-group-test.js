@@ -128,10 +128,10 @@ export class GroupTestView extends StudentTestView {
                         console.debug("Waiting for user input ...");
                     }
                 });
-            } else {
-                this.setupNonPractice();
+            }
 
-                // If question challenge has a sound, it also has a play button
+            if (!this.isPracticing) {
+                // If question challenge has a sound, it also has a play button.
                 // "Click" the play button to play the sound immediately, as well as
                 // performing the expected DOM updates.
                 if (this.currentQuestion.challengeSoundUrl && domEls.playBtn) {
@@ -144,7 +144,11 @@ export class GroupTestView extends StudentTestView {
             }
 
             this.questionDisplayedAt = document.timeline.currentTime;
+
             if (!this.isPracticing) {
+                // Set up timeouts for "reminder" and "time up" events
+                this.setupNonPractice();
+
                 this.send({
                     event: "question.displayed",
                     partIndex: this.currentPartIndex,

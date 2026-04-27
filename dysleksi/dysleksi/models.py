@@ -330,8 +330,7 @@ class Test(models.Model):
                         "possible_answers": [],
                         "instruction_sequence": (
                             question.instruction_sequence.to_json()
-                            if question.is_practice
-                            and hasattr(question, "instruction_sequence")
+                            if hasattr(question, "instruction_sequence")
                             else None
                         ),
                         "reminder": question.reminder,
@@ -511,14 +510,14 @@ class TestPart(models.Model):
                 question["timeout"] = data["timeout"]
             else:
                 question["timeout"] = 0
-            if "continue_when_instruction_is_complete" in data and is_practice:
+            if "continue_when_instruction_is_complete" in data:
                 question["continue_when_instruction_is_complete"] = data[
                     "continue_when_instruction_is_complete"
                 ]
 
             question = TestQuestion.objects.create(**question)
 
-            if is_practice and "instruction_sequence" in data:
+            if "instruction_sequence" in data:
                 question.create_instruction_sequence(data["instruction_sequence"])
 
             # Correct answer
