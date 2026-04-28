@@ -140,9 +140,9 @@
                 "delayAfter": 0
             },
             {
-                // "Skal læse ordene stille og ..."
+                // "Oqaatsit" / "ord(-ene)"
                 "action": "playSound",
-                "resource": "resources/wordreading_2/Instruktion/7b.10.wav",
+                "resource": "resources/wordreading_2/Instruktion/7b.10-00.wav",
                 "delayAfter": 0
             },
             {
@@ -151,14 +151,26 @@
                 "delayAfter": 500
             },
             {
+                // "nipaqanngitsumik" / "stille, 'uden at give lyd'"
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Instruktion/7b.10-01.wav",
+                "delayAfter": 0
+            },
+            {
                 "action": "highlight",
                 "element": "choice-isigak",
                 "delayAfter": 500
             },
             {
+                // "atuariarlugit" / "læse, "skal læse"
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Instruktion/7b.10-02.wav",
+                "delayAfter": 0
+            },
+            {
                 "action": "highlight",
                 "element": "choice-illu",
-                "delayAfter": 500
+                "delayAfter": 1000
             },
             {
                 "action": "highlight",
