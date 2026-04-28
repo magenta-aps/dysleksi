@@ -1,8 +1,11 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
+import json
+
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import AnonymousUser
+from django.test import RequestFactory
 from django.urls import reverse
 from django.views import View
 
@@ -17,6 +20,7 @@ from dysleksi.models import (
 from dysleksi.tables import TestResultTable
 from dysleksi.tests.base import DysleksiTest, ResponseTest
 from dysleksi.views import (
+    AssignmentResultsFlagView,
     AssignmentResultsView,
     AssignmentView,
     ClassListView,
@@ -444,9 +448,64 @@ class TestAssignmentResultsView(ResponseTest):
             table,
             [
                 [["Elev"], ["GroupTestPart1"]],
-                [["1. Test Elev"], ["4"]],
+                [["1.", "Test Elev"], ["4"]],
                 [["2."], ["1"]],
-                [["3. Test Elev"], ["0"]],
+                [["3.", "Test Elev"], ["0"]],
                 [["Gennemsnit"], ["Middel"]],
             ],
         )
+
+
+class TestAssignmentResultsFlagView(ResponseTest):
+
+    def request(self, user: User, method: str, pk: int, data: dict | None = None):
+        request_factory = RequestFactory()
+        path = reverse("dysleksi:test_response_flag", kwargs={"pk": pk})
+        if method == "get":
+            request = request_factory.get(path)
+        elif method == "post":
+            request = request_factory.post(path, data)
+        else:
+            raise ValueError(f"method must be get or post, not '{method}'")
+        request.user = user
+        view = AssignmentResultsFlagView()
+        view.setup(request, pk=pk)
+        view.response = view.dispatch(request, pk=pk)
+        return view
+
+    def test_teacher_access(self):
+        view = self.request(self.teacher, "get", self.group_testresponse_1.pk)
+        self.assertEqual(view.response.status_code, 200)
+
+    def test_student_access(self):
+        for student in Student.objects.all():
+            view = self.request(student, "get", self.group_testresponse_1.pk)
+            self.assertEqual(view.response.status_code, 403)
+
+    def test_admin_access(self):
+        view = self.request(self.admin, "get", self.group_testresponse_1.pk)
+        self.assertEqual(view.response.status_code, 200)
+
+    def test_other_access(self):
+        view = self.request(self.other_user, "get", self.group_testresponse_1.pk)
+        self.assertEqual(view.response.status_code, 403)
+
+    def test_set_true(self):
+        self.group_testresponse_1.flagged = False
+        self.group_testresponse_1.save()
+        view = self.request(
+            self.teacher, "post", self.group_testresponse_1.pk, {"flagged": "true"}
+        )
+        self.group_testresponse_1.refresh_from_db()
+        self.assertTrue(self.group_testresponse_1.flagged)
+        self.assertEqual(json.loads(view.response.content), {"flagged": True})
+
+    def test_set_false(self):
+        self.group_testresponse_1.flagged = True
+        self.group_testresponse_1.save()
+        view = self.request(
+            self.teacher, "post", self.group_testresponse_1.pk, {"flagged": "false"}
+        )
+        self.group_testresponse_1.refresh_from_db()
+        self.assertFalse(self.group_testresponse_1.flagged)
+        self.assertEqual(json.loads(view.response.content), {"flagged": False})

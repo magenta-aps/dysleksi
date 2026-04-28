@@ -16,6 +16,7 @@
 {% endblock %}
 
 {% block inner_content %}
+    {% csrf_token %}
     <div class="row">
         <div class="col-9">
             <h5 class="mt-2 mb-4">
@@ -45,13 +46,13 @@
                 <ul class="list-unstyled">
                     {% if category.items|length > 5 %}
                         {# Show 5, and allow user to reveal the rest #}
-                        {% for item in category.items|slice:":5" %}
-                            <li>{{ item.student.get_full_name }}</li>
+                        {% for testresponse in category.items|slice:":5" %}
+                        {% include "dysleksi/admin/test_assignment/result_group_flag_link.html" with testresponse=testresponse %}
                         {% endfor %}
 
                         <div id="collapse_{{ category.color }}" class="collapse">
-                            {% for item in category.items|slice:"5:" %}
-                                <li>{{ item.student.get_full_name }}</li>
+                            {% for testresponse in category.items|slice:"5:" %}
+                            {% include "dysleksi/admin/test_assignment/result_group_flag_link.html" with testresponse=testresponse %}
                             {% endfor %}
                         </div>
                         <a data-bs-toggle="collapse" href="#collapse_{{ category.color }}" class="collapse-autoremove">
@@ -63,8 +64,8 @@
                         </a>
                     {% else %}
                         {# Show all #}
-                        {% for item in category.items %}
-                        <li>{{ item.student.get_full_name }}</li>
+                        {% for testresponse in category.items %}
+                        {% include "dysleksi/admin/test_assignment/result_group_flag_link.html" with testresponse=testresponse %}
                         {% endfor %}
                     {% endif %}
                 </ul>
@@ -77,4 +78,41 @@
     <div class="results-table">
     {% render_table table %}
     </div>
+{% endblock %}
+
+{% block js_module %}
+    {{ block.super }}
+    <script>
+    const flag_links = document.querySelectorAll(".student-flag-link");
+    const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
+    for (let flag_link of flag_links) {
+        flag_link.addEventListener("click", function() {
+            const pk = this.getAttribute("data-response-pk");
+            const url = "{% url 'dysleksi:test_response_flag' pk=0 %}".replace("/0", "/"+pk);
+            const form = new FormData();
+            form.set("flagged", this.classList.contains("flagged") ? "false" : "true");
+            fetch(
+                url,
+                {
+                    method: "POST",
+                    headers: {
+                        "X-CSRFToken": csrf_token
+                    },
+                    body: form
+                }
+            ).then(response => {
+                if (response.ok) {
+                    return response.json()
+                }
+            }).then(data => {
+                if (data) {
+                    for (let other_flag_link of document.querySelectorAll("[data-response-pk='" + pk + "']")) {
+                        other_flag_link.classList.toggle("flagged", data.flagged);
+                    }
+                }
+            })
+        });
+    }
+    //test_response_flag
+    </script>
 {% endblock %}
