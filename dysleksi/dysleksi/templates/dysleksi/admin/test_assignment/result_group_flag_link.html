@@ -1,0 +1,3 @@
+<{{ tag|default:"li" }} class="student-flag-link{% if testresponse.flagged %} flagged{% endif %}" data-response-pk="{{ testresponse.pk }}">
+    {{ testresponse.student.get_full_name }}
+</{{ tag }}>

@@ -6,7 +6,7 @@ from datetime import date
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 
-from dysleksi.models import Class, Student, Teacher
+from dysleksi.models import Class, Institution, Student, Teacher
 
 
 class Command(BaseCommand):
@@ -14,6 +14,7 @@ class Command(BaseCommand):
 
         teacher_group = Group.objects.get(name="Lærere")
         student_group = Group.objects.get(name="Elever")
+        school, _ = Institution.objects.get_or_create(name="TestSkolen", number="1234")
 
         # Create teacher who is in idp
         teacher, created = Teacher.objects.update_or_create(
@@ -24,6 +25,7 @@ class Command(BaseCommand):
                 "first_name": "Lærer",
                 "last_name": "Lærersen",
                 "cpr": "0222222222",
+                "institution": school,
             },
         )
         if created:
@@ -40,6 +42,7 @@ class Command(BaseCommand):
                 "first_name": "Lærer",
                 "last_name": "Lærersen",
                 "cpr": "0222222223",
+                "institution": school,
             },
         )
         if created:
@@ -56,6 +59,7 @@ class Command(BaseCommand):
                 "first_name": "Admin",
                 "last_name": "Adminsen",
                 "cpr": "0222222224",
+                "institution": school,
             },
         )
         if created:
@@ -72,6 +76,7 @@ class Command(BaseCommand):
                 "first_name": "Elev",
                 "last_name": "Elevsen",
                 "cpr": "0111111111",
+                "institution": school,
             },
         )
         if created:
@@ -87,6 +92,7 @@ class Command(BaseCommand):
                 "first_name": "Elev2",
                 "last_name": "Elevsen",
                 "cpr": "0111111112",
+                "institution": school,
             },
         )
         if created:
@@ -102,6 +108,7 @@ class Command(BaseCommand):
                 "first_name": "Steve",
                 "last_name": "Jobs",
                 "cpr": "0111111113",
+                "institution": school,
             },
         )
         if created:
@@ -121,6 +128,7 @@ class Command(BaseCommand):
                     "first_name": f"Dummy{student_id}",
                     "last_name": f"Student{student_id}",
                     "cpr": f"011111112{student_id}",
+                    "institution": school,
                 },
             )
             if created:
@@ -135,16 +143,25 @@ class Command(BaseCommand):
         for classnumber in range(0, 7):
             for letter in ("A", "B", "C"):
                 c, _ = Class.objects.get_or_create(
-                    school_year_start=school_year_start,
-                    name=f"{classnumber}.{letter}",
-                    is_main=True,
+                    group_id=f"{classnumber}_{letter}_"
+                    f"{school.name}_{school_year_start}",
+                    defaults={
+                        "school_year_start": school_year_start,
+                        "name": f"{classnumber}.{letter}",
+                        "is_main": True,
+                        "institution": school,
+                    },
                 )
                 c.teachers.set([teacher, teacher2, teacher3])
 
         # Add students to classes
 
         secondary_class, _ = Class.objects.get_or_create(
-            school_year_start=school_year_start, name="Dansk 1", is_main=False
+            group_id=f"Dansk_1_{school.name}_{school_year_start}",
+            school_year_start=school_year_start,
+            name="Dansk 1",
+            is_main=False,
+            institution=school,
         )
         secondary_class.teachers.set([teacher, teacher2, teacher3])
 
@@ -158,6 +175,5 @@ class Command(BaseCommand):
         klasse.students.add(student3)
         secondary_class.students.add(student3)
 
-        klasse = Class.objects.get(school_year_start=school_year_start, name="0.C")
         for group_test_student in group_test_students:
             klasse.students.add(group_test_student)

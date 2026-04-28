@@ -465,6 +465,12 @@ textarea.form-control {
   }
 }
 
+.results-table {
+  th:first-child, td:first-child {
+    width: 25%;
+  }
+}
+
 // Modal styles
 .modal-body {
   padding: 0;
@@ -1094,3 +1100,38 @@ $border-radius-student-card: $spacer / 4 * 3;
     visibility: hidden;
   }
  }
+
+.student-flag-link {
+
+  &:hover {
+    color: $blue-dark;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  &.flagged {
+    &:after {
+      content: "";
+      background-image: url("./images/FlagPennant.svg");
+      vertical-align: text-top;
+      background-repeat: no-repeat;
+      background-size: contain;
+      display: inline-block;
+      height: 1.2em;
+      width: 1.2em;
+    }
+  }
+
+  &:not(.flagged):hover {
+    &::after {
+      content: "";
+      background-image: url("./images/FlagPennantPlus.svg");
+      vertical-align: text-top;
+      background-repeat: no-repeat;
+      background-size: contain;
+      display: inline-block;
+      height: 1.2em;
+      width: 1.2em;
+    }
+  }
+}

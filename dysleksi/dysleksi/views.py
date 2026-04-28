@@ -7,9 +7,11 @@ from typing import Any
 from django.db import transaction
 from django.db.models import Case, Count, F, Q, QuerySet, Value, When
 from django.http import HttpResponseRedirect
+from django.http.response import HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, TemplateView
+from django.views.generic.edit import UpdateView
 from django_tables2 import SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
 
@@ -23,6 +25,7 @@ from dysleksi.models import (
     TestAssignment,
     TestPart,
     TestQuestion,
+    TestResponse,
     TestResponseQuerySet,
     TestType,
     User,
@@ -373,3 +376,31 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
             category.pk: category for category in ResultCategory.objects.all()
         }
         return context_data
+
+
+class AssignmentResultsFlagView(LoginRequiredMixin, UpdateView):
+    model = TestResponse
+    fields = ("flagged",)
+
+    def dispatch(self, request, *args, **kwargs):
+        if not (
+            self.user.is_superuser
+            or (
+                isinstance(self.user, User)
+                and self.user.is_teacher
+                and self.user.institution is not None
+                and self.user.institution.students.filter(
+                    responses__pk=self.kwargs.get(self.pk_url_kwarg)
+                ).exists()
+            )
+        ):
+            return HttpResponseForbidden()
+        return super().dispatch(request, *args, **kwargs)
+
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        return JsonResponse({"flagged": self.object.flagged})
+
+    def form_valid(self, form):
+        self.object = form.save()
+        return JsonResponse({"flagged": self.object.flagged})

@@ -1,1 +1,2 @@
-{{ record.rank }}. {{ record.student.get_full_name }}
+{{ record.rank }}.
+{% include "dysleksi/admin/test_assignment/result_group_flag_link.html" with testresponse=record tag="span" %}

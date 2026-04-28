@@ -868,6 +868,11 @@ class TestResponse(models.Model):
         null=False,
         default=False,
     )
+    flagged = models.BooleanField(
+        blank=True,
+        null=False,
+        default=False,
+    )
 
     def __str__(self) -> str:
         return f"{str(self.assignment)} / {str(self.student)}"

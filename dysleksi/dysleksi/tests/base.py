@@ -134,7 +134,6 @@ class DysleksiTest(TestCase):
             question_type=QuestionType.FREE_TEXT,
         )
 
-        cls.klasse, _ = Class.objects.get_or_create(school_year_start=2025, name="1.A")
         cls.teacher.classes.add(cls.klasse)
         for student in ("elev1", "elev2"):
             cls.klasse.students.add(cls.create_student(student))
