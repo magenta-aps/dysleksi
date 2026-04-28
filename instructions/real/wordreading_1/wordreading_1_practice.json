@@ -139,9 +139,10 @@
                 "delayAfter": 0
             },
             {
-                "action": "highlight",
-                "delayAfter": 0,
-                "element": "choice-Blomst.jpg"
+                // Her er billederne/valgmuligheder:
+                "action": "playSound",
+                "resource": "resources/wordreading_1/Instruktion/5b.4-00.wav",
+                "delayAfter": 750
             },
             {
                 "action": "highlight",
@@ -149,9 +150,32 @@
                 "element": "choice-Politi.jpg"
             },
             {
+                // politimand,
+                "action": "playSound",
+                "resource": "resources/wordreading_1/Instruktion/5b.4-01.wav",
+                "delayAfter": 750
+            },
+            {
                 "action": "highlight",
                 "delayAfter": 0,
                 "element": "choice-Bamse.jpg"
+            },
+            {
+                // bamse
+                "action": "playSound",
+                "resource": "resources/wordreading_1/Instruktion/5b.4-02.wav",
+                "delayAfter": 750
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-Blomst.jpg"
+            },
+            {
+                // blomst
+                "action": "playSound",
+                "resource": "resources/wordreading_1/Instruktion/5b.4-03.wav",
+                "delayAfter": 750
             },
             {
                 "action": "highlight",
@@ -159,13 +183,9 @@
                 "element": "choice-Mælk.jpg"
             },
             {
-                // Her er billederne/valgmuligheder:
-                // politimand,
-                // bamse
-                // blomst
                 // og mælk.
                 "action": "playSound",
-                "resource": "resources/wordreading_1/Instruktion/5b.4.wav",
+                "resource": "resources/wordreading_1/Instruktion/5b.4-04.wav",
                 "delayAfter": 750
             },
             {
