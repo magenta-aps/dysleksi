@@ -189,15 +189,18 @@
                 "delayAfter": 1500,
                 "element": "challenge-sound-btn"
             },
-            // Ikke implementeret:
-            // Elever kan ikke trykke på knapper under instruktionsforløb
-            //{
+            {
                 // Hvis du ikke hører bogstavlyden så godt, kan du høre det igen ved at
                 // trykke på lydikonet. Prøv at trykke.
-            //    "action": "playSound",
-            //    "delayAfter": 750,
-            //    "resource": "resources/letter_sound/Instruktion/1b.10.wav"
-            //},
+                "action": "playSound",
+                "delayAfter": 750,
+                "resource": "resources/letter_sound/Instruktion/1b.10.wav"
+            },
+            {
+                "action": "waitForUserClick",
+                "element": "challenge-sound-btn",
+                "delayAfter": 1250
+            },
             {
                 // Du
                 "action": "playSound",
