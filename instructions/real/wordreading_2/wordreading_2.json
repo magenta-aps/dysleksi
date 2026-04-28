@@ -7,7 +7,18 @@
             "illu",
             "igalaaq"
         ],
-        "correct": "iga"
+        "correct": "iga",
+        "continue_when_instruction_is_complete": false,
+        "instruction_sequence": [
+            {
+                // "Ordlæsningen varer i 10minutter ... Du starter nu"
+                // "Oqaatsinik atuarneq minutsini qulini sivisussuseqassaaq ... Aallartipputit"
+                // TODO: selve opgaven skal først være synlig, når ordet "Aallartipputit" læses op
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Deltests/7e.1.wav",
+                "delayAfter": 0
+            }
+        ]
     },
     {
         "image": "resources/wordreading_2/Opgave/2_-_Ulu.jpg",
