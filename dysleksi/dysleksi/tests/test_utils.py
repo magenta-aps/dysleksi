@@ -5,6 +5,7 @@
 from data_tools.utils import (
     create_fore_sound_test,
     create_letter_name_test,
+    create_letter_shape_test,
     create_letter_sound_test,
     create_nonwordspelling_test,
     create_sentence_reading_test,
@@ -149,6 +150,27 @@ class UtilTest(TestCase):
             },
         ]
 
+        self.letter_shape_data = [
+            {
+                "question_type": "multiple_choice_match",
+                "correct": "Ss",
+                "set1": ["S", "B"],
+                "set2": ["s", "a"],
+            },
+        ]
+
+        self.letter_shape_practice_data = [
+            {
+                "question_type": "multiple_choice_match",
+                "correct": "Ss",
+                "set1": ["S", "B"],
+                "set2": ["s", "a"],
+                "instruction_sequence": [
+                    {"action": "show", "element": "challenge-text", "delayAfter": 0},
+                ],
+            },
+        ]
+
         self.test = Test.objects.create(name="test test")
 
     def test_create_wordspelling_test(self):
@@ -251,3 +273,15 @@ class UtilTest(TestCase):
                 image="resources/dummy/sentence_reading/Opgave/Blomst.jpg"
             ).exists()
         )
+
+    def test_create_letter_shape_data_test(self):
+        create_letter_shape_test(self.test, self.letter_shape_data)
+
+        self.assertTrue(TestResource.objects.filter(text="Ss").exists())
+
+    def test_create_letter_shape_data_test_with_practice_data(self):
+        create_letter_shape_test(
+            self.test, self.letter_shape_data, self.letter_shape_practice_data
+        )
+
+        self.assertTrue(TestResource.objects.filter(text="Ss").exists())

@@ -135,6 +135,33 @@ def create_letter_name_test(
     test.parts.add(part)
 
 
+def create_letter_shape_test(
+    test, questions_data, practice_questions_data=None, name="Bogstavers form"
+):
+
+    # TODO: Replace with actual reminder sound when we get it
+    reminder, created = TestResource.objects.get_or_create(
+        name="resources/letter_shape/Deltest/xx.x.wav",
+        sound="resources/letter_shape/Deltest/xx.x.wav",
+    )
+
+    part, created = TestPart.objects.get_or_create(
+        name=name,
+        defaults={
+            "timeout": 0,
+            "partial_score_after": 0,
+            "image_url": "/static/images/letter_shape.png",
+            "reminder": 10000,  # 15 seconds
+            "reminder_source": reminder,
+        },
+    )
+    if created:
+        part.create_test_resources(questions_data, False)
+        if practice_questions_data:
+            part.create_test_resources(practice_questions_data, True)
+    test.parts.add(part)
+
+
 def create_wordspelling_test(
     test, questions_data, practice_questions_data=None, name="Ordstavning"
 ):

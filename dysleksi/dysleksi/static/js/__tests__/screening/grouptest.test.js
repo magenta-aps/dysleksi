@@ -6,6 +6,7 @@ import * as groupTestData from "./grouptest.json" with { type: "json" };
 import * as letterSoundTestData from "./letter_sound_test.json" with { type: "json" };
 import * as letterNameTestData from "./letter_name_test.json" with { type: "json" };
 import * as sentenceReadingTestData from "./sentence_reading_test.json" with { type: "json" };
+import * as letterShapeTestData from "./letter_shape_test.json" with { type: "json" };
 import { getWebSocket } from "../../ws";
 import { GroupTestDomElements } from "../../screening/dom.js";
 import { Test } from "../../screening/model.js";
@@ -62,6 +63,48 @@ const student = new Student({
 const ws = getWebSocket();
 const mockSend = vi.fn();
 
+const SHARED_DOM_HTML = `
+    <div id="fade-overlay"></div>
+    <h1 id="student-header" class="student-header"></h1>
+    <audio id="instructions-sound"></audio>
+    <audio id="reminder-sound"></audio>
+    <div class="scroll-wrapper">
+        <div id="summary-container" class="summary-container"></div>
+        <div id="summary-scroll-controls" class="scroll-controls">
+            <div id="scroll-summary-up" class="scroll-arrow disabled">
+                <i class="ph-fill ph-arrow-up"></i>
+            </div>
+            <div id="scroll-summary-down" class="scroll-arrow">
+                <i class="ph-fill ph-arrow-down"></i>
+            </div>
+        </div>
+    </div>
+    <button id="end-summary"></button>
+    <div id="question-challenge"></div>
+    <div id="choices" class="multiple-choice-choices"></div>
+    <div id="choices-row-2" class="multiple-choice-choices"></div>
+    <div id="multiple-choice-match-container" class="multiple-choice-match-container" style="display: none;">
+        <div id="choices-left" class="multiple-choice-choices vertical"></div>
+        <div id="choices-right" class="multiple-choice-choices vertical"></div>
+    </div>
+    <div id="multiple-choice-answer-display" class="form-control multiple-choice-answer-display" style="display: none;"></div>
+    <button id="next"></button>
+    <button id="repeat"></button>
+    <button id="log-out"></button>
+    <div id="test-summary"></div>
+    <div id="test-exit"></div>
+    <div id="testpart-intro"></div>
+    <div id="test-intro"></div>
+    <div id="test-container"></div>
+    <button id="start-testpart"></button>
+    <button id="start-summary"></button>
+    <h2 id="testpart-intro-text"> </h2>
+    <img src="/foo" alt="img" id="testpart-intro-image">
+    <button id="start-practice"></button>
+    <button id="start-questions"></button>
+    <div id="instructions-text"></div>
+`;
+
 global.WebSocket = class {
     constructor(url) {
         this.url = url;
@@ -91,37 +134,7 @@ describe("GroupTestFlow", () => {
 
     beforeEach(() => {
         vi.useFakeTimers();
-        document.body.innerHTML = `
-            <div id="fade-overlay"></div>
-            <h1 id="student-header" class="student-header"></h1>
-            <audio id="instructions-sound"></audio>
-            <audio id="reminder-sound"></audio>
-            <div class="scroll-wrapper">
-                <div id="summary-container" class="summary-container"></div>
-                <div id="summary-scroll-controls" class="scroll-controls">
-                    <div id="scroll-summary-up" class="scroll-arrow disabled">
-                        <i class="ph-fill ph-arrow-up"></i>
-                    </div>
-                    <div id="scroll-summary-down" class="scroll-arrow">
-                        <i class="ph-fill ph-arrow-down"></i>
-                    </div>
-                </div>
-            </div>
-            <button id="end-summary"></button>
-            <div id="question-challenge"></div>
-            <div id="choices" class="multiple-choice-choices"></div>
-            <div id="choices-row-2" class="multiple-choice-choices"></div>
-            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
-            <button id="next"></button>
-            <div id="test-summary"></div>
-            <div id="testpart-intro"></div>
-            <div id="test-intro"></div>
-            <div id="test-container"></div>
-            <button id="start-testpart"></button>
-            <button id="start-summary"></button>
-            <h2 id="testpart-intro-text"> </h2>
-            <img src="/foo" alt="img" id="testpart-intro-image">
-        `;
+        document.body.innerHTML = SHARED_DOM_HTML;
 
         domElements = new GroupTestDomElements();
 
@@ -914,25 +927,7 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
 
     beforeEach(() => {
         vi.useFakeTimers();
-        document.body.innerHTML = `
-            <div id="fade-overlay" style="opacity: 0;"></div>
-            <div id="choices" class="multiple-choice-choices"></div>
-            <div id="choices-row-2" class="multiple-choice-choices"></div>
-            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
-            <audio id="instructions-sound"></audio>
-            <audio id="reminder-sound"></audio>
-            <div id="instructions-text"></div>
-            <button id="start-practice"></button>
-            <button id="start-questions"></button>
-            <button id="end-summary"></button>
-            <div id="question-title"></div>
-            <div id="question-challenge"></div>
-            <button id="next"></button>
-            <div id="test-summary"></div>
-            <div id="testpart-intro"></div>
-            <div id="test-intro"></div>
-            <div id="test-container"></div>
-        `;
+        document.body.innerHTML = SHARED_DOM_HTML;
 
         domElements = new GroupTestDomElements();
         listenerMock = vi.fn();
@@ -1032,21 +1027,7 @@ describe("GroupTestDomElements - showQuestionChallenge", () => {
 
     beforeEach(() => {
         vi.useFakeTimers();
-        document.body.innerHTML = `
-            <div id="fade-overlay" style="opacity: 0;"></div>
-            <div id="choices" class="multiple-choice-choices"></div>
-            <div id="choices-row-2" class="multiple-choice-choices"></div>
-            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
-            <audio id="instructions-sound"></audio>
-            <audio id="reminder-sound"></audio>
-            <div id="instructions-text"></div>
-            <button id="start-practice"></button>
-            <button id="start-questions"></button>
-            <button id="end-summary"></button>
-            <div id="question-title"></div>
-            <div id="question-challenge"></div>
-            <button id="next"></button>
-        `;
+        document.body.innerHTML = SHARED_DOM_HTML;
         domElements = new GroupTestDomElements();
 
         mockAudioContext = mockAudioContextInstance;
@@ -1205,24 +1186,7 @@ describe("GroupTestDomElements - Repeatbutton", () => {
 
     beforeEach(() => {
         vi.useFakeTimers();
-        document.body.innerHTML = `
-            <div id="fade-overlay" style="opacity: 0;"></div>
-            <h1 id="student-header"></h1> <div id="choices"></div>
-            <div id="choices" class="multiple-choice-choices"></div>
-            <div id="choices-row-2" class="multiple-choice-choices"></div>
-            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
-            <audio id="instructions-sound"></audio>
-            <audio id="reminder-sound"></audio>
-            <div id="instructions-text"></div>
-            <button id="start-practice"></button>
-            <button id="start-questions"></button>
-            <table id="summary-table"></table>
-            <button id="end-summary"></button>
-            <div id="question-title"></div>
-            <div id="question-challenge"></div>
-            <button id="next"></button>
-            <button id="repeat"></button>
-        `;
+        document.body.innerHTML = SHARED_DOM_HTML;
         domElements = new GroupTestDomElements();
         vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
     });
@@ -1336,38 +1300,7 @@ describe("Timer and Reminder Cleanup", () => {
         vi.useFakeTimers();
         vi.spyOn(global, "clearTimeout");
 
-        document.body.innerHTML = `
-            <div id="fade-overlay"></div>
-            <h1 id="student-header" class="student-header"></h1>
-            <audio id="instructions-sound"></audio>
-            <audio id="reminder-sound"></audio>
-            <div class="scroll-wrapper">
-                <div id="summary-container" class="summary-container"></div>
-                <div id="summary-scroll-controls" class="scroll-controls">
-                    <div id="scroll-summary-up" class="scroll-arrow disabled">
-                        <i class="ph-fill ph-arrow-up"></i>
-                    </div>
-                    <div id="scroll-summary-down" class="scroll-arrow">
-                        <i class="ph-fill ph-arrow-down"></i>
-                    </div>
-                </div>
-            </div>
-
-            <button id="end-summary"></button>
-            <div id="question-challenge"></div>
-            <div id="choices" class="multiple-choice-choices"></div>
-            <div id="choices-row-2" class="multiple-choice-choices"></div>
-            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
-            <button id="next"></button>
-            <div id="test-summary"></div>
-            <div id="testpart-intro"></div>
-            <div id="test-intro"></div>
-            <div id="test-container"></div>
-            <button id="start-testpart"></button>
-            <button id="start-summary"></button>
-            <h2 id="testpart-intro-text"> </h2>
-            <img src="/foo" alt="img" id="testpart-intro-image">
-        `;
+        document.body.innerHTML = SHARED_DOM_HTML;
 
         vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
             mockAudioContextInstance,
@@ -1443,38 +1376,7 @@ describe("StudentTestView - updateNextButtonClass", () => {
         vi.useFakeTimers();
         const test = new Test(groupTestData);
 
-        document.body.innerHTML = `
-            <div id="fade-overlay"></div>
-            <h1 id="student-header" class="student-header"></h1>
-            <audio id="instructions-sound"></audio>
-            <audio id="reminder-sound"></audio>
-            <div class="scroll-wrapper">
-                <div id="summary-container" class="summary-container"></div>
-                <div id="summary-scroll-controls" class="scroll-controls">
-                    <div id="scroll-summary-up" class="scroll-arrow disabled">
-                        <i class="ph-fill ph-arrow-up"></i>
-                    </div>
-                    <div id="scroll-summary-down" class="scroll-arrow">
-                        <i class="ph-fill ph-arrow-down"></i>
-                    </div>
-                </div>
-            </div>
-
-            <button id="end-summary"></button>
-            <div id="question-challenge"></div>
-            <div id="choices" class="multiple-choice-choices"></div>
-            <div id="choices-row-2" class="multiple-choice-choices"></div>
-            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
-            <button id="next"></button>
-            <div id="test-summary"></div>
-            <div id="testpart-intro"></div>
-            <div id="test-intro"></div>
-            <div id="test-container"></div>
-            <button id="start-testpart"></button>
-            <button id="start-summary"></button>
-            <h2 id="testpart-intro-text"> </h2>
-            <img src="/foo" alt="img" id="testpart-intro-image">
-        `;
+        document.body.innerHTML = SHARED_DOM_HTML;
 
         domElements = new GroupTestDomElements();
         spyAttributes(domElements);
@@ -1614,11 +1516,7 @@ describe("GroupTestDomElements - FreeText Touch Interaction", () => {
     beforeEach(() => {
         vi.useFakeTimers();
         // 1. Reset DOM
-        document.body.innerHTML = `
-                <div id="choices" class="multiple-choice-choices"></div>
-                <div id="choices-row-2" class="multiple-choice-choices"></div>
-                <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
-            `;
+        document.body.innerHTML = SHARED_DOM_HTML;
 
         // 2. Initialize Class & Mocks
         domElements = new GroupTestDomElements();
@@ -1693,40 +1591,7 @@ describe("LetterSoundTest", () => {
 
     beforeEach(() => {
         vi.useFakeTimers();
-        document.body.innerHTML = `
-            <div id="fade-overlay"></div>
-            <h1 id="student-header" class="student-header"></h1>
-            <audio id="instructions-sound"></audio>
-            <audio id="reminder-sound"></audio>
-            <div class="scroll-wrapper">
-                <div id="summary-container" class="summary-container"></div>
-                <div id="summary-scroll-controls" class="scroll-controls">
-                    <div id="scroll-summary-up" class="scroll-arrow disabled">
-                        <i class="ph-fill ph-arrow-up"></i>
-                    </div>
-                    <div id="scroll-summary-down" class="scroll-arrow">
-                        <i class="ph-fill ph-arrow-down"></i>
-                    </div>
-                </div>
-            </div>
-
-            <button id="end-summary"></button>
-            <div id="question-challenge"></div>
-            <div id="choices" class="multiple-choice-choices"></div>
-            <div id="choices-row-2" class="multiple-choice-choices"></div>
-            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
-            <button id="next"></button>
-            <button id="log-out"></button>
-            <div id="test-summary"></div>
-            <div id="test-exit"></div>
-            <div id="testpart-intro"></div>
-            <div id="test-intro"></div>
-            <div id="test-container"></div>
-            <button id="start-testpart"></button>
-            <button id="start-summary"></button>
-            <h2 id="testpart-intro-text"> </h2>
-            <img src="/foo" alt="img" id="testpart-intro-image">
-        `;
+        document.body.innerHTML = SHARED_DOM_HTML;
 
         domElements = new GroupTestDomElements();
         spyAttributes(domElements);
@@ -1783,40 +1648,7 @@ describe("LetterNameTest", () => {
 
     beforeEach(() => {
         vi.useFakeTimers();
-        document.body.innerHTML = `
-            <div id="fade-overlay"></div>
-            <h1 id="student-header" class="student-header"></h1>
-            <audio id="instructions-sound"></audio>
-            <audio id="reminder-sound"></audio>
-            <div class="scroll-wrapper">
-                <div id="summary-container" class="summary-container"></div>
-                <div id="summary-scroll-controls" class="scroll-controls">
-                    <div id="scroll-summary-up" class="scroll-arrow disabled">
-                        <i class="ph-fill ph-arrow-up"></i>
-                    </div>
-                    <div id="scroll-summary-down" class="scroll-arrow">
-                        <i class="ph-fill ph-arrow-down"></i>
-                    </div>
-                </div>
-            </div>
-
-            <button id="end-summary"></button>
-            <div id="question-challenge"></div>
-            <div id="choices" class="multiple-choice-choices"></div>
-            <div id="choices-row-2" class="multiple-choice-choices"></div>
-            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
-            <button id="next"></button>
-            <button id="log-out"></button>
-            <div id="test-summary"></div>
-            <div id="test-exit"></div>
-            <div id="testpart-intro"></div>
-            <div id="test-intro"></div>
-            <div id="test-container"></div>
-            <button id="start-testpart"></button>
-            <button id="start-summary"></button>
-            <h2 id="testpart-intro-text"> </h2>
-            <img src="/foo" alt="img" id="testpart-intro-image">
-        `;
+        document.body.innerHTML = SHARED_DOM_HTML;
 
         domElements = new GroupTestDomElements();
         spyAttributes(domElements);
@@ -1857,40 +1689,7 @@ describe("Sentence Reading Test", () => {
 
     beforeEach(() => {
         vi.useFakeTimers();
-        document.body.innerHTML = `
-            <div id="fade-overlay"></div>
-            <h1 id="student-header" class="student-header"></h1>
-            <audio id="instructions-sound"></audio>
-            <audio id="reminder-sound"></audio>
-            <div class="scroll-wrapper">
-                <div id="summary-container" class="summary-container"></div>
-                <div id="summary-scroll-controls" class="scroll-controls">
-                    <div id="scroll-summary-up" class="scroll-arrow disabled">
-                        <i class="ph-fill ph-arrow-up"></i>
-                    </div>
-                    <div id="scroll-summary-down" class="scroll-arrow">
-                        <i class="ph-fill ph-arrow-down"></i>
-                    </div>
-                </div>
-            </div>
-
-            <button id="end-summary"></button>
-            <div id="question-challenge"></div>
-            <div id="choices" class="multiple-choice-choices"></div>
-            <div id="choices-row-2" class="multiple-choice-choices"></div>
-            <div id="multiple-choice-answer-display" class=" form-control multiple-choice-answer-display"  style="display: none;"></div>
-            <button id="next"></button>
-            <button id="log-out"></button>
-            <div id="test-summary"></div>
-            <div id="test-exit"></div>
-            <div id="testpart-intro"></div>
-            <div id="test-intro"></div>
-            <div id="test-container"></div>
-            <button id="start-testpart"></button>
-            <button id="start-summary"></button>
-            <h2 id="testpart-intro-text"> </h2>
-            <img src="/foo" alt="img" id="testpart-intro-image">
-        `;
+        document.body.innerHTML = SHARED_DOM_HTML;
 
         domElements = new GroupTestDomElements();
         spyAttributes(domElements);
@@ -1920,5 +1719,146 @@ describe("Sentence Reading Test", () => {
 
         expect(challengeImage.src.endsWith("static/blomst.jpg")).toBe(true);
         expect(challengeText.innerHTML).toBe("Jeg er en blomst");
+    });
+});
+
+describe("Letter Shape Test", () => {
+    let domElements;
+
+    beforeEach(() => {
+        vi.useFakeTimers();
+        document.body.innerHTML = SHARED_DOM_HTML;
+
+        domElements = new GroupTestDomElements();
+        spyAttributes(domElements);
+
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
+            mockAudioContextInstance,
+        );
+        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
+    });
+
+    afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
+        document.body.innerHTML = "";
+        vi.clearAllMocks();
+    });
+
+    it("Updates elements and correctly identifies the correct answer", async () => {
+        const test = new Test(letterShapeTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        view.setPart(0);
+        view.showFirstQuestion(false);
+
+        const leftRow = document.getElementById("choices-left");
+        const rightRow = document.getElementById("choices-right");
+
+        // Assert that there are two buttons in each row
+        expect(leftRow.children.length).toBe(2);
+        expect(rightRow.children.length).toBe(2);
+
+        // Assert that the left row contains the buttons "S" and "B"
+        const leftTexts = Array.from(leftRow.children).map((btn) => btn.textContent);
+        expect(leftTexts).toContain("S");
+        expect(leftTexts).toContain("B");
+
+        // Assert that the right row contains the buttons "s" and "a"
+        const rightTexts = Array.from(rightRow.children).map((btn) => btn.textContent);
+        expect(rightTexts).toContain("s");
+        expect(rightTexts).toContain("a");
+
+        // Click the S button
+        const sBtn = Array.from(leftRow.children).find(
+            (btn) => btn.textContent === "S",
+        );
+        sBtn.click();
+
+        // Validate that the next button is still hidden
+        expect(domElements.toggleNextButton).not.toHaveBeenCalledWith(true);
+
+        // CLick the s button
+        const lowerSBtn = Array.from(rightRow.children).find(
+            (btn) => btn.textContent === "s",
+        );
+        lowerSBtn.click();
+
+        // Validate that the next button is now visible
+        expect(domElements.toggleNextButton).toHaveBeenCalledWith(true);
+
+        // Validate that the answer is correct
+        expect(view.answerIsCorrect()).toBe(true);
+
+        // CLick the a button
+        const lowerABtn = Array.from(rightRow.children).find(
+            (btn) => btn.textContent === "a",
+        );
+        lowerABtn.click();
+
+        // Validate that the answer is incorrect
+        expect(view.answerIsCorrect()).toBe(false);
+    });
+
+    it("Allows proceeding from practice question when both answers are correct", async () => {
+        const test = new Test(letterShapeTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        view.setPart(0);
+        view.showFirstQuestion(true);
+
+        const leftRow = document.getElementById("choices-left");
+        const rightRow = document.getElementById("choices-right");
+        const nextButton = document.getElementById("next");
+
+        const lowerSBtn = Array.from(rightRow.children).find(
+            (btn) => btn.textContent === "s",
+        );
+        const sBtn = Array.from(leftRow.children).find(
+            (btn) => btn.textContent === "S",
+        );
+        const lowerABtn = Array.from(rightRow.children).find(
+            (btn) => btn.textContent === "a",
+        );
+
+        // Click the S button
+        sBtn.click();
+
+        // CLick the a button
+        lowerABtn.click();
+
+        // Validate that the next button is not clickable
+        expect(nextButton.disabled).toBe(true);
+
+        // CLick the s button
+        lowerSBtn.click();
+
+        // Validate that the next button is now clickable
+        expect(nextButton.disabled).toBe(false);
+    });
+
+    it("Disabled next button when both answers are wrong", async () => {
+        const test = new Test(letterShapeTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        view.setPart(0);
+        view.showFirstQuestion(true);
+
+        const leftRow = document.getElementById("choices-left");
+        const rightRow = document.getElementById("choices-right");
+        const nextButton = document.getElementById("next");
+
+        const bBtn = Array.from(leftRow.children).find(
+            (btn) => btn.textContent === "B",
+        );
+        const lowerABtn = Array.from(rightRow.children).find(
+            (btn) => btn.textContent === "a",
+        );
+
+        // Click the B button
+        bBtn.click();
+
+        // CLick the a button
+        lowerABtn.click();
+
+        // Validate that the next button is not clickable
+        expect(nextButton.disabled).toBe(true);
     });
 });

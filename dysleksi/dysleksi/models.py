@@ -568,6 +568,35 @@ class TestPart(models.Model):
                         resource=wrong_resource,
                         defaults={"is_correct": False},
                     )
+            if data.get("set1") and data.get("set2"):
+                for possible_answer in data["set1"] + data["set2"]:
+                    resource, created = TestResource.objects.get_or_create(
+                        text=possible_answer,
+                        name=(
+                            possible_answer
+                            + "-"
+                            + ("set1" if possible_answer in data["set1"] else "set2")
+                        ),
+                    )
+
+                    if (
+                        possible_answer in data["set1"]
+                        and possible_answer == data["correct"][0]
+                    ):
+                        is_correct = True
+                    elif (
+                        possible_answer in data["set2"]
+                        and possible_answer == data["correct"][1]
+                    ):
+                        is_correct = True
+                    else:
+                        is_correct = False
+
+                    PossibleAnswer.objects.get_or_create(
+                        question=question,
+                        resource=resource,
+                        defaults={"is_correct": is_correct},
+                    )
 
 
 class TestQuestion(models.Model):

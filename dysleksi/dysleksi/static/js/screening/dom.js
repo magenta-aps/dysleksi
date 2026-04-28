@@ -471,6 +471,9 @@ class TestDomElements {
     showQuestionChallenge(text, sound, imageUrl, audioContext) {
         if (!text && !sound && !imageUrl) {
             this.questionChallengeEl.innerHTML = "";
+            this.questionChallengeEl.style.display = "none";
+        } else {
+            this.questionChallengeEl.style.display = "flex";
         }
         let img = document.querySelector("#challenge-image");
         let textEl = document.querySelector("#challenge-text");
@@ -681,6 +684,12 @@ export class GroupTestDomElements extends TestDomElements {
         super();
         this.choicesEl = document.querySelector("#choices");
         this.choicesElSecondRow = document.querySelector("#choices-row-2");
+
+        this.choicesElLeft = document.querySelector("#choices-left");
+        this.choicesElRight = document.querySelector("#choices-right");
+        this.multipleChoiceMatchContainer = document.querySelector(
+            "#multiple-choice-match-container",
+        );
     }
 
     toggleQuestionDisplay(state) {
@@ -692,9 +701,11 @@ export class GroupTestDomElements extends TestDomElements {
     clearQuestionChoices() {
         this.choicesEl.innerHTML = "";
         this.choicesElSecondRow.innerHTML = "";
+        this.choicesElLeft.innerHTML = "";
+        this.choicesElRight.innerHTML = "";
     }
 
-    showQuestionChoice(answer, listener, answerCount, squareButton = false) {
+    showQuestionChoice(answer, listener, answerCount, container, squareButton = false) {
         const text = answer.resourceText;
         //const sound = answer.resourceSoundUrl;
         const imageUrl = answer.resourceImageUrl;
@@ -734,12 +745,8 @@ export class GroupTestDomElements extends TestDomElements {
 
         // TODO: render sound
         btn.id = answer.buttonId;
-        if (this.choicesEl.childElementCount < 6) {
-            this.choicesEl.append(btn);
-        } else {
-            btn.style.marginTop = "24px";
-            this.choicesElSecondRow.append(btn);
-        }
+
+        container.append(btn);
         if (listener) {
             btn.addEventListener("click", listener);
         }
