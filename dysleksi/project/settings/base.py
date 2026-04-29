@@ -78,3 +78,5 @@ class XMLFilter(logging.Filter):
 
 
 WEBRTC_KEY = os.environ.get("WEBRTC_KEY")
+
+RESULT_TABLE_SIZE = int(os.environ.get("RESULT_TABLE_SIZE", 3))

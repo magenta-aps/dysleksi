@@ -209,9 +209,16 @@ class DysleksiTest(TestCase):
         )
         return student
 
-    def setup_view(self, view_class, user: User, get: bool = True, **kwargs):
+    def setup_view(
+        self,
+        view_class,
+        user: User,
+        get: bool = True,
+        query_params: dict | None = None,
+        **kwargs
+    ):
         request_factory = RequestFactory()
-        request = request_factory.get("")
+        request = request_factory.get("", query_params=query_params)
         request.user = user
         view = view_class()
         view.setup(request, **kwargs)

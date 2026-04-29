@@ -166,6 +166,10 @@ h6 {
   font-family: "DM Sans Medium", "Helvetica", sans-serif;
   font-size: $spacer;
 }
+.btn-borderless {
+  border: 0 none;
+  color: $btn-link-hover-color;
+}
 
 // Layout when sidebar navigation is expanded to full size
 .main {
@@ -462,12 +466,6 @@ textarea.form-control {
     td:first-child {
       border-right-width: var(--bs-border-width);
     }
-  }
-}
-
-.results-table {
-  th:first-child, td:first-child {
-    width: 25%;
   }
 }
 
@@ -1078,8 +1076,19 @@ $border-radius-student-card: $spacer / 4 * 3;
 
 }
 
-.result-score {
-  text-align: center;
+.results-table {
+  .result-score {
+    text-align: center;
+  }
+  table {
+    table-layout: fixed;
+    th:first-child {
+      width: 20%;
+    }
+    th:not(:first-child) {
+      width: 26.666%
+    }
+  }
 }
 
 

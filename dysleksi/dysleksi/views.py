@@ -2,12 +2,14 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 from functools import partial
+from math import ceil
 from typing import Any
 
+from django.conf import settings
 from django.db import transaction
 from django.db.models import Case, Count, F, Q, QuerySet, Value, When
 from django.http import HttpResponseRedirect
-from django.http.response import HttpResponseForbidden, JsonResponse
+from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import redirect
 from django.urls import reverse
 from django.views.generic import CreateView, DetailView, TemplateView
@@ -32,6 +34,7 @@ from dysleksi.models import (
 )
 from dysleksi.tables import (
     ClassTable,
+    EmptyColumn,
     StudentTable,
     TestAssignmentTable,
     TestResultColumn,
@@ -302,7 +305,14 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
             )
         ]
 
-    def get_table(self):
+    def get_current_page(self) -> int:
+        page_str = self.request.GET.get("page")
+        return int(page_str) if page_str is not None else 1
+
+    def get_page_size(self) -> int:
+        return settings.RESULT_TABLE_SIZE  # type: ignore[misc]
+
+    def get_table(self, page: int = 1):
         # Data til tabellen, hvor linjerne er elever og kolonnerne er deltests
         qs: TestResponseQuerySet = (
             self.object.responses.all()
@@ -311,7 +321,10 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
             # Annotér med rangering ud fra rækkefølge
             .annotate_ordering("total_score", "rank", False)
         )
-        parts: QuerySet[TestPart] = self.object.test.parts.all()
+        pagesize = self.get_page_size()
+        parts: QuerySet[TestPart] = self.object.test.parts.all()[
+            (page - 1) * pagesize : page * pagesize
+        ]
         extra_columns = []
         for part in parts:
             key = f"part_{part.pk}_correct"
@@ -346,6 +359,10 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
                             "count_key": count_key,
                             "proportion_key": proportion_key,
                             "category_key": category_key,
+                            "ResultCategories": {
+                                category.pk: category
+                                for category in ResultCategory.objects.all()
+                            },
                         },
                         average_value_modifier=partial(
                             lambda average_count, part_questions_count: {
@@ -365,13 +382,38 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
                     ),
                 )
             )
+        e = 0
+        while len(extra_columns) % self.get_page_size() != 0:
+            extra_columns.append((f"empty_{e}", EmptyColumn()))
+            e += 1
         qs = qs.order_by("rank")
         return self.table_class(data=qs, extra_columns=extra_columns)
 
+    def get_pagination(self, page: int):
+        parts_count = self.object.test.parts.count()
+        page_size = self.get_page_size()
+        return {
+            "current_page": page,
+            "current_first": min(((page - 1) * page_size) + 1, parts_count),
+            "current_last": min(page * page_size, parts_count),
+            "total_count": parts_count,
+            "page_size": page_size,
+            "last_page": ceil(parts_count / page_size),
+        }
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.GET.get("only_table") == "true":
+            return HttpResponse(context["table"].as_html(self.request))
+        else:
+            return super().render_to_response(context, **response_kwargs)
+
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data["by_category"] = self.get_by_category()
-        context_data["table"] = self.get_table()
+        page = self.get_current_page()
+        if self.request.GET.get("only_table") != "true":
+            context_data["by_category"] = self.get_by_category()
+            context_data["pagination"] = self.get_pagination(page)
+        context_data["table"] = self.get_table(page)
         context_data["ResultCategories"] = {
             category.pk: category for category in ResultCategory.objects.all()
         }
