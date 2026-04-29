@@ -320,7 +320,7 @@
                 "delayAfter": 0
             },
             {
-                "action": "show",
+                "action": "hide",
                 "element": "next",
                 "delayAfter": 0
             },

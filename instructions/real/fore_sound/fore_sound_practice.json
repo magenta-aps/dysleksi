@@ -329,7 +329,7 @@
                 "delayAfter": 0
             },
             {
-                "action": "show",
+                "action": "hide",
                 "element": "next",
                 "delayAfter": 0
             },
@@ -341,11 +341,6 @@
             {
                 "action": "fadeOut",
                 "element": "challenge-sound-btn",
-                "delayAfter": 0
-            },
-            {
-                "action": "fadeOut",
-                "element": "next",
                 "delayAfter": 0
             },
             {
@@ -372,11 +367,6 @@
             {
                 "action": "fadeIn",
                 "element": "challenge-sound-btn",
-                "delayAfter": 0
-            },
-            {
-                "action": "fadeIn",
-                "element": "next",
                 "delayAfter": 0
             },
             {
