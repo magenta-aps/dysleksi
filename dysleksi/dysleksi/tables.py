@@ -4,7 +4,7 @@ from django.db.models import QuerySet
 from django.template import Context
 from django.template.loader import get_template
 from django.utils.translation import gettext_lazy as _
-from django_tables2 import A, Table, TemplateColumn, tables
+from django_tables2 import A, Column, Table, TemplateColumn, tables
 
 from dysleksi.models import Class, Student, TestAssignment
 
@@ -168,3 +168,17 @@ class TestResultColumn(TemplateColumn):
         additional_context.update(self.extra_context)
         with context.update(additional_context):
             return get_template(self.footer_template_name).render(context.flatten())
+
+
+class EmptyColumn(Column):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(orderable=False, *args, **kwargs)
+
+    empty_values = ()
+
+    def header(self):
+        return ""
+
+    def render(self, value):
+        return ""

@@ -5,7 +5,7 @@ import json
 
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import AnonymousUser
-from django.test import RequestFactory
+from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from django.views import View
 
@@ -436,6 +436,7 @@ class TestAssignmentResultsView(ResponseTest):
             ResultCategory.objects.get(color_key="yellow").pk,
         )
 
+    @override_settings(RESULT_TABLE_SIZE=3)
     def test_render(self):
         view = self.setup_view(
             AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk
@@ -447,13 +448,58 @@ class TestAssignmentResultsView(ResponseTest):
         self.assertEqual(
             table,
             [
-                [["Elev"], ["GroupTestPart1"]],
-                [["1.", "Test Elev"], ["4"]],
-                [["2."], ["1"]],
-                [["3.", "Test Elev"], ["0"]],
-                [["Gennemsnit"], ["Middel"]],
+                [["Elev"], ["GroupTestPart1"], [], []],
+                [["1.", "Test Elev"], ["4"], [], []],
+                [["2."], ["1"], [], []],
+                [["3.", "Test Elev"], ["0"], [], []],
+                [["Gennemsnit"], ["Middel"], [], []],
             ],
         )
+        self.assertIsNotNone(soup.find(id="results-by-category"))
+
+    @override_settings(RESULT_TABLE_SIZE=3)
+    def test_only_table(self):
+        view = self.setup_view(
+            AssignmentResultsView,
+            self.teacher,
+            query_params={"only_table": "true"},
+            pk=self.test_assignment_class.pk,
+        )
+        response = view.response
+        soup = BeautifulSoup(response.content, "html.parser")
+        table = self.html_table_to_list(soup.find("table"))
+        self.assertEqual(
+            table,
+            [
+                [["Elev"], ["GroupTestPart1"], [], []],
+                [["1.", "Test Elev"], ["4"], [], []],
+                [["2."], ["1"], [], []],
+                [["3.", "Test Elev"], ["0"], [], []],
+                [["Gennemsnit"], ["Middel"], [], []],
+            ],
+        )
+        self.assertIsNone(soup.find(id="results-by-category"))
+
+    @override_settings(RESULT_TABLE_SIZE=3)
+    def test_get_pagination(self):
+        view = self.setup_view(
+            AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk
+        )
+        pagination = view.get_pagination(1)
+        self.assertTrue(type(pagination) is dict)
+        self.assertEqual(pagination["current_page"], 1)
+        self.assertEqual(pagination["current_first"], 1)
+        self.assertEqual(pagination["current_last"], 1)
+        self.assertEqual(pagination["total_count"], 1)
+        self.assertEqual(pagination["page_size"], 3)
+        self.assertEqual(pagination["last_page"], 1)
+        pagination = view.get_pagination(2)
+        self.assertEqual(pagination["current_page"], 2)
+        self.assertEqual(pagination["current_first"], 1)
+        self.assertEqual(pagination["current_last"], 1)
+        self.assertEqual(pagination["total_count"], 1)
+        self.assertEqual(pagination["page_size"], 3)
+        self.assertEqual(pagination["last_page"], 1)
 
 
 class TestAssignmentResultsFlagView(ResponseTest):
