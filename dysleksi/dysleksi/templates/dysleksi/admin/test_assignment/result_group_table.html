@@ -1,0 +1,27 @@
+{% extends "django_tables2/table.html" %}
+{% load django_tables2 %}
+{% load i18n l10n %}
+
+{% block table.thead %}
+    {% if table.show_header %}
+        <thead {{ table.attrs.thead.as_html }}>
+        <tr>
+            {% for column in table.columns %}
+                <th {{ column.attrs.th.as_html }}>
+                    {% if column.orderable %}
+                        {% if sort == column.order_by_alias.next %}
+                            <a href="{% querystring sort="-"|add:column.order_by_alias.next %}">
+                        {% else %}
+                            <a href="{% querystring sort=column.order_by_alias.next %}">
+                        {% endif %}
+                            {% include "dysleksi/admin/table_columns/test_response_score_header.html" %}
+                        </a>
+                    {% else %}
+                        {% include "dysleksi/admin/table_columns/test_response_score_header.html" %}
+                    {% endif %}
+                </th>
+            {% endfor %}
+        </tr>
+        </thead>
+    {% endif %}
+{% endblock table.thead %}

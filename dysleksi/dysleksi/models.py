@@ -6,7 +6,9 @@ import mimetypes
 import os
 import re
 from base64 import b64decode
+from dataclasses import dataclass
 from datetime import date
+from math import floor
 from typing import Any, Dict, List
 
 from django.conf import settings
@@ -1210,3 +1212,30 @@ class ResultCategory(models.Model):
     @staticmethod
     def non_default():
         return ResultCategory.objects.filter(is_default=False)
+
+    @staticmethod
+    def partition_question_count(
+        question_count: int,
+    ) -> List["ResultCategoryRange"]:
+        if question_count <= 0:
+            raise ValueError()
+        lower: int | None = None
+        partitions: List[ResultCategoryRange] = []
+        for category in ResultCategory.non_default().order_by("upper_proportion_limit"):
+            upper: int = floor(question_count * category.upper_proportion_limit)
+            partitions.append(
+                ResultCategoryRange(
+                    category=category,
+                    lower_bound=0 if lower is None else lower + 1,
+                    upper_bound=upper,
+                )
+            )
+            lower = upper
+        return partitions
+
+
+@dataclass
+class ResultCategoryRange:
+    category: ResultCategory
+    lower_bound: int
+    upper_bound: int

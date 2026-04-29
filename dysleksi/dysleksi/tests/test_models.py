@@ -30,6 +30,7 @@ from dysleksi.models import (
     QuestionResponse,
     ResultCategory,
     ResultCategoryChoice,
+    ResultCategoryRange,
     Test,
     TestAssignment,
     TestPart,
@@ -982,3 +983,50 @@ class TestTestResponseQuerySet(ResponseTest):
             student2_answer.category,
             ResultCategory.objects.get(color_key=ResultCategoryChoice.YELLOW).pk,
         )
+
+    def test_partition_question_count(self):
+        self.maxDiff = None
+        red = ResultCategory.objects.get(color_key=ResultCategoryChoice.RED)
+        yellow = ResultCategory.objects.get(color_key=ResultCategoryChoice.YELLOW)
+        green = ResultCategory.objects.get(color_key=ResultCategoryChoice.GREEN)
+        blue = ResultCategory.objects.get(color_key=ResultCategoryChoice.BLUE)
+        self.assertEqual(
+            ResultCategory.partition_question_count(10),
+            [
+                ResultCategoryRange(category=red, lower_bound=0, upper_bound=1),
+                ResultCategoryRange(category=yellow, lower_bound=2, upper_bound=3),
+                ResultCategoryRange(category=green, lower_bound=4, upper_bound=7),
+                ResultCategoryRange(category=blue, lower_bound=8, upper_bound=10),
+            ],
+        )
+        self.assertEqual(
+            ResultCategory.partition_question_count(15),
+            [
+                ResultCategoryRange(category=red, lower_bound=0, upper_bound=1),
+                ResultCategoryRange(category=yellow, lower_bound=2, upper_bound=5),
+                ResultCategoryRange(category=green, lower_bound=6, upper_bound=11),
+                ResultCategoryRange(category=blue, lower_bound=12, upper_bound=15),
+            ],
+        )
+        self.assertEqual(
+            ResultCategory.partition_question_count(20),
+            [
+                ResultCategoryRange(category=red, lower_bound=0, upper_bound=2),
+                ResultCategoryRange(category=yellow, lower_bound=3, upper_bound=7),
+                ResultCategoryRange(category=green, lower_bound=8, upper_bound=15),
+                ResultCategoryRange(category=blue, lower_bound=16, upper_bound=20),
+            ],
+        )
+        self.assertEqual(
+            ResultCategory.partition_question_count(22),
+            [
+                ResultCategoryRange(category=red, lower_bound=0, upper_bound=2),
+                ResultCategoryRange(category=yellow, lower_bound=3, upper_bound=7),
+                ResultCategoryRange(category=green, lower_bound=8, upper_bound=16),
+                ResultCategoryRange(category=blue, lower_bound=17, upper_bound=22),
+            ],
+        )
+        with self.assertRaises(ValueError):
+            ResultCategory.partition_question_count(0)
+        with self.assertRaises(ValueError):
+            ResultCategory.partition_question_count(-1)

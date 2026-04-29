@@ -379,6 +379,9 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
                             },
                             part_questions_count=part_questions_count,
                         ),
+                        subgroups=ResultCategory.partition_question_count(
+                            part_questions_count
+                        ),
                     ),
                 )
             )
@@ -386,7 +389,7 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
         while len(extra_columns) % self.get_page_size() != 0:
             extra_columns.append((f"empty_{e}", EmptyColumn()))
             e += 1
-        qs = qs.order_by("rank")
+        qs = qs.order_by(*self.get_ordering())
         return self.table_class(data=qs, extra_columns=extra_columns)
 
     def get_pagination(self, page: int):
@@ -403,20 +406,50 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.GET.get("only_table") == "true":
+            print("context")
+            print(context)
             return HttpResponse(context["table"].as_html(self.request))
         else:
             return super().render_to_response(context, **response_kwargs)
+
+    def get_ordering(self):
+        sort = self.request.GET.get("sort")
+        desc = False
+        if sort is not None:
+            if sort.startswith("-"):
+                desc = True
+                sort = sort[1:]
+            if sort == "student":
+                ordering = "rank"
+            else:
+                ordering = f"{sort}_count"
+        else:
+            ordering = "rank"
+        if desc:
+            return ["-" + ordering]
+        else:
+            return [ordering]
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
         page = self.get_current_page()
         if self.request.GET.get("only_table") != "true":
-            context_data["by_category"] = self.get_by_category()
-            context_data["pagination"] = self.get_pagination(page)
-        context_data["table"] = self.get_table(page)
-        context_data["ResultCategories"] = {
-            category.pk: category for category in ResultCategory.objects.all()
-        }
+            context_data.update(
+                {
+                    "by_category": self.get_by_category(),
+                    "pagination": self.get_pagination(page),
+                }
+            )
+        context_data.update(
+            {
+                "request": self.request,
+                "table": self.get_table(page),
+                "ResultCategories": {
+                    category.pk: category for category in ResultCategory.objects.all()
+                },
+                "sort": self.request.GET.get("sort"),
+            }
+        )
         return context_data
 
 

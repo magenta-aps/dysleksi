@@ -448,7 +448,7 @@ class TestAssignmentResultsView(ResponseTest):
         self.assertEqual(
             table,
             [
-                [["Elev"], ["GroupTestPart1"], [], []],
+                [["Elev"], ["GroupTestPart1", "0-0", "1-1", "2-3", "4-4"], [], []],
                 [["1.", "Test Elev"], ["4"], [], []],
                 [["2."], ["1"], [], []],
                 [["3.", "Test Elev"], ["0"], [], []],
@@ -471,7 +471,7 @@ class TestAssignmentResultsView(ResponseTest):
         self.assertEqual(
             table,
             [
-                [["Elev"], ["GroupTestPart1"], [], []],
+                [["Elev"], ["GroupTestPart1", "0-0", "1-1", "2-3", "4-4"], [], []],
                 [["1.", "Test Elev"], ["4"], [], []],
                 [["2."], ["1"], [], []],
                 [["3.", "Test Elev"], ["0"], [], []],
@@ -555,3 +555,44 @@ class TestAssignmentResultsFlagView(ResponseTest):
         self.group_testresponse_1.refresh_from_db()
         self.assertFalse(self.group_testresponse_1.flagged)
         self.assertEqual(json.loads(view.response.content), {"flagged": False})
+
+    def test_get_ordering(self):
+        part1_key = f"part_{self.group_test_part.pk}_correct"
+        view = self.setup_view(
+            AssignmentResultsView,
+            self.teacher,
+            pk=self.test_assignment_class.pk,
+            query_params={"sort": part1_key},
+        )
+        self.assertEqual(view.get_ordering(), [f"{part1_key}_count"])
+
+        view = self.setup_view(
+            AssignmentResultsView,
+            self.teacher,
+            pk=self.test_assignment_class.pk,
+            query_params={"sort": "-" + part1_key},
+        )
+        self.assertEqual(view.get_ordering(), [f"-{part1_key}_count"])
+
+        view = self.setup_view(
+            AssignmentResultsView,
+            self.teacher,
+            pk=self.test_assignment_class.pk,
+            query_params={"sort": "student"},
+        )
+        self.assertEqual(view.get_ordering(), ["rank"])
+
+        view = self.setup_view(
+            AssignmentResultsView,
+            self.teacher,
+            pk=self.test_assignment_class.pk,
+            query_params={"sort": "-student"},
+        )
+        self.assertEqual(view.get_ordering(), ["-rank"])
+
+        view = self.setup_view(
+            AssignmentResultsView,
+            self.teacher,
+            pk=self.test_assignment_class.pk,
+        )
+        self.assertEqual(view.get_ordering(), ["rank"])
