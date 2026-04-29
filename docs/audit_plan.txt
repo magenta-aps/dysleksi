@@ -37,7 +37,7 @@ Application repo
 salt-automation
 ===============
 
-[ ] Rootfs of all containers is mounted as read-only (`read_only: true`).
+[x] Rootfs of all containers is mounted as read-only (`read_only: true`).
 [ ] All config files are mounted as read-only.
 [ ] Docker socket is not mounted into containers.
 [ ] All ports mappings bind to a specific network interface.
