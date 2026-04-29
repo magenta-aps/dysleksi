@@ -28,7 +28,7 @@ Application repo
 [ ] All containers run with least privileged user necessary. It is documented
     if and why a container runs as root.
 [x] No secrets in docker build arg.
-[ ] The application does not ship outdated/insecure third party dependencies
+[x] The application does not ship outdated/insecure third party dependencies
     see https://labs.docs.magenta.dk/projects/general/dependencies.html
 [x] Up-to-date versions of protocols are used, e.g. HTTPS > HTTP, TLS > SSL,
     Email over port 587, not 25 etc.
@@ -38,26 +38,26 @@ salt-automation
 ===============
 
 [x] Rootfs of all containers is mounted as read-only (`read_only: true`).
-[ ] All config files are mounted as read-only.
-[ ] Docker socket is not mounted into containers.
-[ ] All ports mappings bind to a specific network interface.
-[ ] No container is running as `--privileged`.
+[x] All config files are mounted as read-only.
+[x] Docker socket is not mounted into containers.
+[x] All ports mappings bind to a specific network interface.
+[x] No container is running as `--privileged`.
 [ ] All files provisioned by salt have explicit set user, group and mode.
 [x] No plaintext secrets in salt-automation.
-[ ] unattended-upgrades salt state is installed.
+[x] unattended-upgrades salt state is installed.
 
 
 Live system
 ===========
 
-[ ] Port 80 redirects to 443 or no HTTP service is running.
-[ ] Incoming web requests are encrypted.
-[ ] Incoming web requests are authenticated (in application).
+[x] Port 80 redirects to 443 or no HTTP service is running.
+[x] Incoming web requests are encrypted.
+[x] Incoming web requests are authenticated (in application).
 [ ] You can vouch for all listening processes:
     `netstat -tulpn`, `nmap -sT -O localhost`.
-[ ] There are iptables rules whitelisting intended services.
+[x] There are iptables rules whitelisting intended services.
     Everything else is blocked.
-[ ] No missing security updates.
+[x] No missing security updates.
 [ ] You can vouch for all installed packages: `dpkg --list`.
 [ ] You can vouch for all users on the server. There are no former employees
     and unused service accounts (see system.users salt state).
