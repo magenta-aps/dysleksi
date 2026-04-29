@@ -26,6 +26,7 @@ services:
     user: "75200:1000"  # Override in docker-compose.override.yml if your local user is different
     container_name: dysleksi-web
     image: dysleksi:latest
+    read_only: true
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -45,6 +46,7 @@ services:
       # In a production environment we would use /static-copy/
       - staticfiles-data:/static/
       - mediafiles-data:/upload/
+      - static-copy:/static-copy
     environment:
       - PULL_IDP_METADATA=true
       - MAKE_MIGRATIONS=true
@@ -72,10 +74,12 @@ services:
     # Do not set `user` here
     container_name: dysleksi-db
     image: postgres:18
+    read_only: true
     env_file:
       - ./dev-environment/dysleksi.env
     volumes:
       - postgres-data:/var/lib/postgresql/18/data
+      - postgres-var:/var/run/postgresql
     networks:
       - database
 
@@ -208,6 +212,8 @@ volumes:
   mediafiles-data:
   vitest-coverage:
   lobby-bots-modules:
+  static-copy:
+  postgres-var:
 
 networks:
   default:
