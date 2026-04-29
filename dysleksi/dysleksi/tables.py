@@ -1,3 +1,4 @@
+from itertools import count
 from typing import Callable, List
 
 from django.db.models import QuerySet
@@ -6,7 +7,7 @@ from django.template.loader import get_template
 from django.utils.translation import gettext_lazy as _
 from django_tables2 import A, Column, Table, TemplateColumn, tables
 
-from dysleksi.models import Class, Student, TestAssignment
+from dysleksi.models import Class, ResultCategoryRange, Student, TestAssignment
 
 
 class ClassTable(Table):
@@ -126,11 +127,31 @@ class TestResultTable(Table):
     class Meta:
         attrs = {"class": "table table-first-col-bordered"}
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            template_name="dysleksi/admin/test_assignment/result_group_table.html",
+            *args,
+            **kwargs
+        )
+
     student = TemplateColumn(
         template_name="dysleksi/admin/table_columns/test_response_student_name.html",
         verbose_name=_("Elev"),
         footer=_("Gennemsnit"),
     )
+
+    def as_html(self, request):
+        """
+        Render the table to an HTML table, adding `request` to the context.
+        """
+        # reset counter for new rendering
+        self._counter = count()
+        template = get_template(self.template_name)
+
+        context = {"table": self, "request": request}
+
+        self.before_render(request)
+        return template.render(context, request)
 
 
 class TestResultColumn(TemplateColumn):
@@ -139,12 +160,14 @@ class TestResultColumn(TemplateColumn):
         self,
         footer_template_name: str,
         average_value_modifier: Callable | None = None,
+        subgroups=List[ResultCategoryRange],
         *args,
         **kwargs
     ):
         super().__init__(args, **kwargs)
         self.footer_template_name = footer_template_name
         self.average_value_modifier = average_value_modifier
+        self.subgroups = subgroups
 
     def render_footer(self, bound_column, table):
         # Get average

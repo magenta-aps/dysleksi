@@ -1,0 +1,8 @@
+<div class="d-inline-block">
+    <span class="result-part-header">{{ column.header }}</span>
+<ul>
+{% for subgroup in column.column.subgroups %}
+    <li class="category-header-{{ subgroup.category.color_key }}">{{ subgroup.lower_bound }}-{{ subgroup.upper_bound }}</li>
+{% endfor %}
+</ul>
+</div>

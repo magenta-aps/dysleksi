@@ -1077,16 +1077,60 @@ $border-radius-student-card: $spacer / 4 * 3;
 }
 
 .results-table {
-  .result-score {
-    text-align: center;
+.result-score {
+  text-align: center;
   }
   table {
     table-layout: fixed;
-    th:first-child {
-      width: 20%;
-    }
-    th:not(:first-child) {
-      width: 26.666%
+    th {
+      font-size: 0.9rem;
+      font-weight: normal;
+
+      &:first-child {
+        width: 20%;
+      }
+
+      &:not(:first-child) {
+        width: 26.666%;
+        text-align: center;
+        text-transform: capitalize !important;
+
+        .result-part-header {
+          text-decoration: underline;
+        }
+
+        ul {
+          padding: 0;
+          margin: 0;
+
+          li {
+            display: inline;
+            padding: 0 0.5rem;
+            text-decoration: underline;
+            font-size: 0.8rem;
+
+            &.category-header-red {
+              color: $red-darker-2;
+            }
+
+            &.category-header-yellow {
+              color: $yellow-normal;
+            }
+
+            &.category-header-green {
+              color: $green-light;
+            }
+
+            &.category-header-blue {
+              color: $bright-blue-darker;
+            }
+
+            &.category-header-gray {
+              color: $mono-gray-dark-3;
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -1143,4 +1187,4 @@ $border-radius-student-card: $spacer / 4 * 3;
       width: 1.2em;
     }
   }
-}
+ }
