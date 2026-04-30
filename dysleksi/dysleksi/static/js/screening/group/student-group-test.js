@@ -61,6 +61,9 @@ export class GroupTestView extends StudentTestView {
 
             // Show question challenge and choices
             this.domElements.toggleQuestionDisplay("flex");
+
+            // Display 'next' button as green rectangle with arrow
+            this.endedInstructions = false;
             this.updateNextButtonClass();
 
             this.domElements.clearQuestionChoices();

@@ -137,6 +137,16 @@ export class StudentTestView extends EventTarget {
             }
 
             if (
+                this.currentQuestion.continueWhenInstructionIsComplete &&
+                this.endedInstructions
+            ) {
+                // Vi er netop skiftet til en øveopgave, hvor vi skal vente på elevens input, efter at instruktionerne
+                // er afspillet færdige.
+                this.domElements.setNextButtonClass("start-btn"); // Rund knap
+                return;
+            }
+
+            if (
                 this.currentPart.practice
                     .slice(0, this.currentQuestionIndex + 1)
                     .every((q) => !!q.instruction_sequence) &&
@@ -149,7 +159,7 @@ export class StudentTestView extends EventTarget {
                 return;
             }
         }
-        this.domElements.setNextButtonClass("next-btn"); // Grøn knap
+        this.domElements.setNextButtonClass("next-btn"); // Grøn knap med pil
     }
 
     showFirstQuestion(isPracticing = false) {
@@ -292,6 +302,7 @@ export class StudentTestView extends EventTarget {
             this.currentQuestion.instruction_sequence,
         );
         this.showingInstructions = true;
+        this.endedInstructions = false;
         this.updateNextButtonClass();
         this.domElements.lockInput();
         this.domElements.toggleBodyClass("show-instructions", true);
@@ -322,6 +333,7 @@ export class StudentTestView extends EventTarget {
                 this.domElements.skipInstructionButton.style.display = "none";
                 this.domElements.skipAllInstructionsButton.style.display = "none";
             }
+            this.endedInstructions = true;
             this.updateNextButtonClass();
             onCompleted();
         });
