@@ -100,6 +100,14 @@ h1, h2, h3, h4, h5, h6 {
   border-width: 1px !important;
   font-size: 1.1rem;
   border-radius: 16px !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+  overflow: hidden;
+  white-space: nowrap;
+
 
   &:hover, &:focus, &:active {
     background-color: $student-blue !important;
@@ -457,7 +465,9 @@ body.show-instructions .sound-btn.pulse {
 }
 
 .student-header {
-  position: relative;
+  position: absolute;
+  top: 0;
+  left: 0;
   width: 100%;
   background: $student-yellow-light;
   margin: 0;
@@ -465,7 +475,7 @@ body.show-instructions .sound-btn.pulse {
   font-size: 2.625 * $spacer;
   line-height: 1;
   text-align: right;
-  z-index: 9999;
+  z-index: 1;
   color: $student-yellow;
 
   i.ph {
@@ -717,4 +727,36 @@ body.show-instructions .sound-btn.pulse {
 
 #free-text-field {
   margin: 0;
+}
+
+.multiple-choice-match-container {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: stretch;
+    gap: 4rem;
+    width: 60vw;
+    margin: 0;
+
+    .match-divider {
+        width: 5px;
+        background-color: $student-grey-light;
+        align-self: stretch;
+        border-radius: 5px;
+    }
+
+    .multiple-choice-choices {
+        flex: 1;
+        flex-direction: column;
+        width: auto;
+        gap: 24px;
+        
+        button {
+            width: 200px;
+            height: calc(50vh / 6);
+            margin: 0;
+            flex: none;
+            font-size: 38px !important;
+        }
+    }
 }

@@ -95,27 +95,64 @@ export class GroupTestView extends StudentTestView {
                 this.domElements.multipleChoiceAnswerDisplay.style.display = "none";
             }
 
+            if (this.currentQuestion.type === "multiple_choice_match") {
+                this.domElements.multipleChoiceMatchContainer.style.display = "flex";
+            } else {
+                this.domElements.multipleChoiceMatchContainer.style.display = "none";
+            }
+
             if (
                 this.currentQuestion.type === "multiple_choice" ||
                 this.currentQuestion.type === "multiple_choice_with_display_field"
             ) {
                 this.answerButtons = [];
-                for (let answer of answers) {
+                answers.forEach((answer, i) => {
                     const button = this.domElements.showQuestionChoice(
                         answer,
                         () => {
                             this.selectAnswer(answer);
                         },
                         answers.length,
+                        i < 6
+                            ? this.domElements.choicesEl
+                            : this.domElements.choicesElSecondRow,
                         answers.length < 6 &&
                             answers.some((a) => a.resourceText?.length === 1),
                     );
                     this.answerButtons.push({ button: button, answer: answer });
-                }
+
+                    if (i >= 6) {
+                        button.style.marginTop = "24px";
+                    }
+                });
             } else if (this.currentQuestion.type === "free_text") {
                 this.input = this.domElements.showQuestionFreeText(() =>
                     this.selectFreeText(),
                 );
+            } else if (this.currentQuestion.type === "multiple_choice_match") {
+                this.answerButtons = [];
+
+                const set1Answers = answers.filter((a) =>
+                    a.resourceName.endsWith("set1"),
+                );
+                const set2Answers = answers.filter((a) =>
+                    a.resourceName.endsWith("set2"),
+                );
+
+                const renderGroup = (groupAnswers, container) => {
+                    for (let answer of groupAnswers) {
+                        const button = this.domElements.showQuestionChoice(
+                            answer,
+                            () => this.selectAnswer(answer, true),
+                            groupAnswers.length,
+                            container,
+                        );
+                        this.answerButtons.push({ button: button, answer: answer });
+                    }
+                };
+
+                renderGroup(set1Answers, this.domElements.choicesElLeft);
+                renderGroup(set2Answers, this.domElements.choicesElRight);
             }
 
             if (this.currentQuestion.instruction_sequence) {
@@ -252,12 +289,55 @@ export class GroupTestView extends StudentTestView {
         }
     }
 
-    selectAnswer(answer) {
+    selectAnswer(answer, isMatchPair = false) {
         this.selectedAnswer = answer;
-        this.domElements.toggleNextButton(true);
+        let leftSelectedEntry;
+        let rightSelectedEntry;
+        if (isMatchPair) {
+            const clickedEntry = this.answerButtons.find((a) => a.answer === answer);
+            const parentColumn = clickedEntry.button.parentElement;
 
-        if (this.isPracticing) {
-            if (this.selectedAnswer.isCorrect) {
+            this.answerButtons.forEach((a) => {
+                if (a.button.parentElement === parentColumn) {
+                    this.domElements.toggleButtonSelected(
+                        a.button,
+                        a.answer === answer,
+                    );
+                }
+            });
+
+            leftSelectedEntry = this.answerButtons.find(
+                (a) =>
+                    this.domElements.choicesElLeft.contains(a.button) &&
+                    a.button.classList.contains("selected"),
+            );
+
+            rightSelectedEntry = this.answerButtons.find(
+                (a) =>
+                    this.domElements.choicesElRight.contains(a.button) &&
+                    a.button.classList.contains("selected"),
+            );
+
+            if (leftSelectedEntry && rightSelectedEntry) {
+                this.domElements.toggleNextButton(true);
+                this.textAnswer =
+                    leftSelectedEntry.answer.resourceText +
+                    rightSelectedEntry.answer.resourceText;
+            }
+        } else {
+            this.domElements.toggleNextButton(true);
+            for (let a of this.answerButtons) {
+                this.domElements.toggleButtonSelected(
+                    a["button"],
+                    a["answer"] === answer,
+                );
+            }
+        }
+        const isSelectionComplete =
+            !isMatchPair || (leftSelectedEntry && rightSelectedEntry);
+
+        if (this.isPracticing && isSelectionComplete) {
+            if (this.answerIsCorrect()) {
                 this.domElements.makeButtonHappy(this.selectedAnswer.buttonId);
                 this.domElements.enableNextButton();
                 // Play "you guessed correct" sound snippet
@@ -282,9 +362,6 @@ export class GroupTestView extends StudentTestView {
             this.domElements.makeButtonGlow(this.selectedAnswer.buttonId);
         }
 
-        for (let a of this.answerButtons) {
-            this.domElements.toggleButtonSelected(a["button"], a["answer"] === answer);
-        }
         this.domElements.multipleChoiceAnswerDisplay.innerHTML = answer.resourceText;
     }
 

@@ -304,14 +304,16 @@ describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
             buttonId: "btn2",
         };
 
-        const button1 = dom.showQuestionChoice(answer1, null);
+        const container = document.querySelector("#choices");
+
+        const button1 = dom.showQuestionChoice(answer1, null, 2, container);
         expect(button1.textContent).toBe("");
         expect(button1.addEventListener).not.toHaveBeenCalled();
         const image = button1.firstChild;
         expect(image).not.toBeNull();
         expect(image.src).toContain("option1.png");
 
-        const button2 = dom.showQuestionChoice(answer2, listener);
+        const button2 = dom.showQuestionChoice(answer2, listener, 2, container);
         expect(button2.textContent).toBe("Option A");
         expect(button2.addEventListener).toHaveBeenCalledWith("click", listener);
     });

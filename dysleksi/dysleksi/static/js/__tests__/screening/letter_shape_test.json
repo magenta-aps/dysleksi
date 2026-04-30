@@ -1,0 +1,136 @@
+{
+  "id": 3,
+  "name": "Middle 2. grade",
+  "test_type": "group",
+  "parts": [
+    {
+      "id": 6,
+      "name": "Bogstavernes form",
+      "instructions_url": null,
+      "timeout": 60,
+      "partial_score_after": 30,
+      "practice": [
+        {
+          "id": 28,
+          "challenge_id": 5,
+          "challenge_name": null,
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": null,
+          "question_type": "multiple_choice_match",
+          "possible_answers": [
+            {
+              "id": 200,
+              "resource_id": 200,
+              "resource_name": "Ss",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "Ss",
+              "is_correct": true
+            },
+            {
+              "id": 201,
+              "resource_id": 201,
+              "resource_name": "S_set1",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "S",
+              "is_correct": true
+            },
+            {
+              "id": 202,
+              "resource_id": 202,
+              "resource_name": "B_set1",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "B",
+              "is_correct": false
+            },
+            {
+              "id": 203,
+              "resource_id": 203,
+              "resource_name": "s_set2",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "s",
+              "is_correct": true
+            },
+            {
+              "id": 204,
+              "resource_id": 204,
+              "resource_name": "a_set2",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "a",
+              "is_correct": false
+            }
+          ]
+        }
+
+
+
+      ],
+      "questions": [
+        {
+          "id": 28,
+          "challenge_id": 5,
+          "challenge_name": null,
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": null,
+          "question_type": "multiple_choice_match",
+          "possible_answers": [
+            {
+              "id": 200,
+              "resource_id": 200,
+              "resource_name": "Ss",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "Ss",
+              "is_correct": true
+            },
+            {
+              "id": 201,
+              "resource_id": 201,
+              "resource_name": "S_set1",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "S",
+              "is_correct": true
+            },
+            {
+              "id": 202,
+              "resource_id": 202,
+              "resource_name": "B_set1",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "B",
+              "is_correct": false
+            },
+            {
+              "id": 203,
+              "resource_id": 203,
+              "resource_name": "s_set2",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "s",
+              "is_correct": true
+            },
+            {
+              "id": 204,
+              "resource_id": 204,
+              "resource_name": "a_set2",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "a",
+              "is_correct": false
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "summary": [
+    "Bogstavernes form"
+  ]
+}

@@ -70,6 +70,10 @@ def create_group_test(
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
             / "dummy/sentence_reading/sentence_reading.json",
         )
+        letter_shape_data_path = (
+            Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+            / "dummy/letter_shape/letter_shape.json",
+        )
 
         wordreading_test_name = "Ordlæsning 2A (dummy)"
         wordreading_1_test_name = "Ordlæsning 1 (dummy)"
@@ -79,6 +83,7 @@ def create_group_test(
         letter_name_test_name = "Bogstavnavne (dummy)"
         fore_sound_test_name = "Forlyd (dummy)"
         sentence_reading_test_name = "Sætningslæsning (dummy)"
+        letter_shape_test_name = "Bogstavers form (dummy)"
     else:
         wordreading_data_path = (
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
@@ -103,6 +108,10 @@ def create_group_test(
             / "real/fore_sound/fore_sound.json",
         )
         sentence_reading_data_path = None
+        letter_shape_data_path = (
+            Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+            / "real/letter_shape/letter_shape.json",
+        )
 
         wordreading_test_name = "Ordlæsning 2A"
         wordreading_1_test_name = "Ordlæsning 1"
@@ -112,6 +121,7 @@ def create_group_test(
         letter_name_test_name = "Bogstavnavne"
         fore_sound_test_name = "Forlyd"
         sentence_reading_test_name = "Sætningslæsning"
+        letter_shape_test_name = "Bogstavers form"
 
     if grade == 1:
         call_command(
@@ -138,7 +148,10 @@ def create_group_test(
             ),
         )
 
-        if letter_name_data_path:
+        # This test was developed but ended up not making it in the final test set
+        # We keep supporting it for a while in case they change their mind...
+        # Therefore it is only included in dummy data
+        if letter_name_data_path and dummy:
             call_command(
                 "import_test",
                 name,
@@ -146,6 +159,18 @@ def create_group_test(
                 letter_name_data_path,
                 "letter_name",
             )
+
+        call_command(
+            "import_test",
+            name,
+            letter_shape_test_name,
+            letter_shape_data_path,
+            "letter_shape",
+            practice_json_path=(
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "real/letter_shape/letter_shape_practice.json"
+            ),
+        )
 
     if (grade == 1 and period == "slut") or (grade == 2 and period == "midt"):
         if nonwordspelling_data_path:

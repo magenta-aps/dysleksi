@@ -1,0 +1,8 @@
+[
+  {
+    "question_type": "multiple_choice_match",
+    "correct": "Ss",
+    "set1": ["S", "C", "M", "Z", "T", "F"],
+    "set2": ["s", "q", "n", "e", "l", "æ"]
+  }
+]
