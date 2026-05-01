@@ -1030,3 +1030,163 @@ class TestTestResponseQuerySet(ResponseTest):
             ResultCategory.partition_question_count(0)
         with self.assertRaises(ValueError):
             ResultCategory.partition_question_count(-1)
+
+
+class TestPartResponseQuerySet(ResponseTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+
+        cls.qs: TestPartResponseQuerySet = PartResponse.objects.filter(
+            pk__in=(cls.group_partresponse_1.pk, cls.group_partresponse_2.pk)
+        ).order_by("testresponse__student__pk")
+
+    def test_annotate_responses_count(self):
+        qs = self.qs.annotate_responses_count("responses_count")
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.responses_count, 4)
+        self.assertEqual(student2_answer.responses_count, 4)
+
+        qs = self.qs.annotate_responses_count("responses_count", Q(completed=False))
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.responses_count, 0)
+        self.assertEqual(student2_answer.responses_count, 0)
+
+    def test_annotate_correct_count(self):
+        qs = self.qs.annotate_correct_count("correct_count")
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.correct_count, 4)
+        self.assertEqual(student2_answer.correct_count, 1)
+
+        qs = self.qs.annotate_correct_count("correct_count", Q(completed=False))
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.correct_count, 0)
+        self.assertEqual(student2_answer.correct_count, 0)
+
+    def test_annotate_ordering(self):
+        qs = self.qs.annotate_correct_count("correct_count").annotate_ordering(
+            "correct_count", "ranking", False
+        )
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.ranking, 1)
+        self.assertEqual(student2_answer.ranking, 2)
+
+        qs = self.qs.annotate_correct_count("correct_count").annotate_ordering(
+            "correct_count", "ranking", True
+        )
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.ranking, 2)
+        self.assertEqual(student2_answer.ranking, 1)
+
+    def test_annotate_correct_proportion(self):
+        qs = (
+            self.qs.annotate_responses_count(
+                "responses_count",
+            )
+            .annotate_correct_count("correct_count")
+            .annotate_correct_proportion(
+                "responses_count",
+                "correct_count",
+                "proportion",
+            )
+        )
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.proportion, 1)
+        self.assertEqual(student2_answer.proportion, 0.25)
+
+    def test_annotate_correct_percentage(self):
+        qs = (
+            self.qs.annotate_responses_count(
+                "responses_count",
+            )
+            .annotate_correct_count("correct_count")
+            .annotate_correct_proportion(
+                "responses_count",
+                "correct_count",
+                "proportion",
+            )
+            .annotate_correct_percentage("proportion", "percentage")
+        )
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.percentage, 100)
+        self.assertEqual(student2_answer.percentage, 25)
+
+    def test_annotate_score_category(self):
+        qs = (
+            self.qs.annotate_responses_count(
+                "responses_count",
+            )
+            .annotate_correct_count("correct_count")
+            .annotate_correct_proportion(
+                "responses_count",
+                "correct_count",
+                "proportion",
+            )
+            .annotate_score_category("proportion", "category")
+        )
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(
+            student1_answer.category,
+            ResultCategory.objects.get(color_key=ResultCategoryChoice.BLUE).pk,
+        )
+        self.assertEqual(
+            student2_answer.category,
+            ResultCategory.objects.get(color_key=ResultCategoryChoice.YELLOW).pk,
+        )
+
+    def test_partition_question_count(self):
+        self.maxDiff = None
+        red = ResultCategory.objects.get(color_key=ResultCategoryChoice.RED)
+        yellow = ResultCategory.objects.get(color_key=ResultCategoryChoice.YELLOW)
+        green = ResultCategory.objects.get(color_key=ResultCategoryChoice.GREEN)
+        blue = ResultCategory.objects.get(color_key=ResultCategoryChoice.BLUE)
+        self.assertEqual(
+            ResultCategory.partition_question_count(10),
+            [
+                ResultCategoryRange(category=red, lower_bound=0, upper_bound=1),
+                ResultCategoryRange(category=yellow, lower_bound=2, upper_bound=3),
+                ResultCategoryRange(category=green, lower_bound=4, upper_bound=7),
+                ResultCategoryRange(category=blue, lower_bound=8, upper_bound=10),
+            ],
+        )
+        self.assertEqual(
+            ResultCategory.partition_question_count(15),
+            [
+                ResultCategoryRange(category=red, lower_bound=0, upper_bound=1),
+                ResultCategoryRange(category=yellow, lower_bound=2, upper_bound=5),
+                ResultCategoryRange(category=green, lower_bound=6, upper_bound=11),
+                ResultCategoryRange(category=blue, lower_bound=12, upper_bound=15),
+            ],
+        )
+        self.assertEqual(
+            ResultCategory.partition_question_count(20),
+            [
+                ResultCategoryRange(category=red, lower_bound=0, upper_bound=2),
+                ResultCategoryRange(category=yellow, lower_bound=3, upper_bound=7),
+                ResultCategoryRange(category=green, lower_bound=8, upper_bound=15),
+                ResultCategoryRange(category=blue, lower_bound=16, upper_bound=20),
+            ],
+        )
+        self.assertEqual(
+            ResultCategory.partition_question_count(22),
+            [
+                ResultCategoryRange(category=red, lower_bound=0, upper_bound=2),
+                ResultCategoryRange(category=yellow, lower_bound=3, upper_bound=7),
+                ResultCategoryRange(category=green, lower_bound=8, upper_bound=16),
+                ResultCategoryRange(category=blue, lower_bound=17, upper_bound=22),
+            ],
+        )
+        with self.assertRaises(ValueError):
+            ResultCategory.partition_question_count(0)
+        with self.assertRaises(ValueError):
+            ResultCategory.partition_question_count(-1)

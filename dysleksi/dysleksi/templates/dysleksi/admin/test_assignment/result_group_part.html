@@ -1,0 +1,89 @@
+{% extends "dysleksi/admin/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item">
+    <a href="{% url 'dysleksi:test_assignment_list' %}">{% translate 'Tests' %}</a>
+</li>
+<li class="breadcrumb-item">
+    <a href="{% url 'dysleksi:room' assignment.pk %}">
+        {% blocktranslate trimmed with class_name=class_name test_name=assignment.test.name %}
+            Klasse {{ class_name }} - {{ test_name }}
+        {% endblocktranslate %}
+    </a>
+</li>
+<li class="breadcrumb-item" aria-current="page">
+    <a href="{% url 'dysleksi:test_assignment_results' pk=assignment.pk %}">
+    {% translate "Resultater" %}
+    </a>
+</li>
+    <li class="breadcrumb-item active">{{ part.name }}</li>
+{% endblock %}
+
+{% block inner_content %}
+    {% csrf_token %}
+    <a href="{% url 'dysleksi:test_assignment_results' pk=assignment.pk %}" class="ms-3">
+        <i class="ph ph-arrow-elbow-left-up"></i>
+        {% translate "Tilbage til klassens resultater" %}
+    </a>
+    <div class="row">
+        <div class="col-9">
+            <h5 class="mt-2 mb-4">
+                <i class="ph ph-chart-bar fs-5"></i>
+                {% blocktranslate trimmed with part_name=part.name %}
+                Resultater for {{ part_name }}
+                {% endblocktranslate %}
+                <span class="subheader">
+                    ({% blocktranslate trimmed with class_name=assignment.klasse_name test_name=assignment.test.name %}
+                    Klasse {{klasse_name}} - {{ test_name }}
+                    {% endblocktranslate %})
+                </span>
+            </h5>
+        </div>
+        <div class="col-3">
+            <button class="btn btn-primary mt-2 float-end">
+                <i class="ph ph-upload-simple"></i>{% translate "Eksportér som PDF" %}
+            </button>
+        </div>
+    </div>
+
+    <h6>{% translate "Fordeling af score" %}</h6>
+    <div class="dropdown py-2">
+        <button class="btn btn-outline-secondary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+            {% translate "Sortering:" %}
+            {% if sort == "student" %}{% translate "Navn (A-Å)" %}
+            {% elif sort == "-student" %}{% translate "Navn (Å-A)" %}
+            {% elif sort == "responses_count" %}{% translate "Forsøgte (Stigende)" %}
+            {% elif sort == "-responses_count" %}{% translate "Forsøgte (Faldende)" %}
+            {% elif sort == "correct_count" %}{% translate "Rigtige (Stigende)" %}
+            {% elif sort == "-correct_count" %}{% translate "Rigtige (Faldende)" %}
+            {% elif sort == "correct_proportion" %}{% translate "Rigtighedsprocent (Stigende)" %}
+            {% elif sort == "-correct_proportion" %}{% translate "Rigtighedsprocent (Faldende)" %}
+            {% endif %}
+            <i class="ph {% if sort|first == "-" %}ph-sort-descending{% else %}ph-sort-ascending{% endif %}"></i>
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="?sort=student">{% translate "Navn (A-Å)" %}</a></li>
+            <li><a class="dropdown-item" href="?sort=-student">{% translate "Navn (Å-A)" %}</a></li>
+            <li><a class="dropdown-item" href="?sort=responses_count">{% translate "Forsøgte (Stigende)" %}</a></li>
+            <li><a class="dropdown-item" href="?sort=-responses_count">{% translate "Forsøgte (Faldende)" %}</a></li>
+            <li><a class="dropdown-item" href="?sort=correct_count">{% translate "Rigtige (Stigende)" %}</a></li>
+            <li><a class="dropdown-item" href="?sort=-correct_count">{% translate "Rigtige (Faldende)" %}</a></li>
+            <li><a class="dropdown-item" href="?sort=correct_proportion">{% translate "Rigtighedsprocent (Stigende)" %}</a></li>
+            <li><a class="dropdown-item" href="?sort=-correct_proportion">{% translate "Rigtighedsprocent (Faldende)" %}</a></li>
+        </ul>
+    </div>
+    <div id="test-results-table" class="part-results-table">
+        {% render_table table %}
+    </div>
+{% endblock %}
+
+
+{% block js_module %}
+    {{ block.super }}
+    {% url 'dysleksi:test_response_flag' pk=0 as flag_url %}
+    {{ flag_url|json_script:"flag_url" }}
+    <script type=module" src="{% static 'js/admin/flag.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% load l10n %}
+
+<div class="normscore-arrow" style="left: {{ value }}%">
+    <div>
+    {{ value }}
+    <i class="ph-fill ph-caret-down"></i>
+    </div>
+</div>
+<div class="normscore-bar">
+    {% spaceless %}
+    {% for category in ResultCategories.values %}
+        <div
+                class="normscore-part category-{{ category.color_key }}"
+                {% localize off %}
+                style="width: calc(100% * ({{ category.upper_proportion_limit }} - {{ category.lower_proportion_limit }}))"
+                {% endlocalize %}
+        >
+        </div>
+    {% endfor %}
+    {% endspaceless %}
+</div>

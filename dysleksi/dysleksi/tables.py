@@ -131,7 +131,7 @@ class TestResultTable(Table):
         super().__init__(
             template_name="dysleksi/admin/test_assignment/result_group_table.html",
             *args,
-            **kwargs
+            **kwargs,
         )
 
     student = TemplateColumn(
@@ -162,7 +162,7 @@ class TestResultColumn(TemplateColumn):
         average_value_modifier: Callable | None = None,
         subgroups=List[ResultCategoryRange],
         *args,
-        **kwargs
+        **kwargs,
     ):
         super().__init__(args, **kwargs)
         self.footer_template_name = footer_template_name
@@ -191,6 +191,37 @@ class TestResultColumn(TemplateColumn):
         additional_context.update(self.extra_context)
         with context.update(additional_context):
             return get_template(self.footer_template_name).render(context.flatten())
+
+
+class PartResultTable(Table):
+    student = Column(
+        # template_name="dysleksi/admin/table_columns/part_response_student_name.html",
+        verbose_name=_("Elev"),
+        accessor=A("testresponse__student"),
+    )
+    responses_count = Column(
+        verbose_name=_("Forsøgte"),
+        accessor=A("responses_count"),
+    )
+    correct_count = Column(
+        verbose_name=_("Rigtige"),
+        accessor=A("correct_count"),
+    )
+    correct_proportion = Column(
+        verbose_name=_("Rigtighedsprocent"),
+        accessor=A("correct_proportion"),
+    )
+    normscore = TemplateColumn(
+        verbose_name=_("Normscore (0-100)"),
+        template_name="dysleksi/admin/table_columns/part_response_normscore.html",
+        accessor=A("correct_percentage"),
+    )
+
+    def render_student(self, value, record):
+        return f"{record.rank}. {value.get_full_name()}"
+
+    def render_correct_proportion(self, value):
+        return f"{int(value * 100)}%"
 
 
 class EmptyColumn(Column):

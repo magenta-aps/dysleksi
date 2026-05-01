@@ -6,6 +6,7 @@ from django.http import HttpResponse
 from django.urls import URLPattern, URLResolver, path
 
 from dysleksi.views import (
+    AssignmentPartResultsView,
     AssignmentResultsFlagView,
     AssignmentResultsView,
     AssignmentView,
@@ -47,8 +48,13 @@ urlpatterns: list[URLResolver | URLPattern] = [
         name="test_assignment_results",
     ),
     path(
-        "testresponse/<int:pk>/flag",
+        "testresponse/<int:pk>/flag/",
         AssignmentResultsFlagView.as_view(),
         name="test_response_flag",
+    ),
+    path(
+        "assignment/<int:assignment_pk>/<int:testpart_pk>/result/",
+        AssignmentPartResultsView.as_view(),
+        name="test_assignment_part_results",
     ),
 ]

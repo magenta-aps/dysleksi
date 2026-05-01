@@ -10,9 +10,9 @@ from django.db import transaction
 from django.db.models import Case, Count, F, Q, QuerySet, Value, When
 from django.http import HttpResponseRedirect
 from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse
-from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
-from django.views.generic import CreateView, DetailView, TemplateView
+from django.views.generic import CreateView, DetailView, ListView, TemplateView
 from django.views.generic.edit import UpdateView
 from django_tables2 import SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
@@ -21,6 +21,7 @@ from dysleksi.forms import StartClassRoomForm, StartIndividualRoomForm
 from dysleksi.models import (
     TEACHERS,
     Class,
+    PartResponse,
     ResultCategory,
     Student,
     Test,
@@ -35,6 +36,7 @@ from dysleksi.models import (
 from dysleksi.tables import (
     ClassTable,
     EmptyColumn,
+    PartResultTable,
     StudentTable,
     TestAssignmentTable,
     TestResultColumn,
@@ -363,6 +365,8 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
                                 category.pk: category
                                 for category in ResultCategory.objects.all()
                             },
+                            "object": self.object,
+                            "part": part,
                         },
                         average_value_modifier=partial(
                             lambda average_count, part_questions_count: {
@@ -406,8 +410,6 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.GET.get("only_table") == "true":
-            print("context")
-            print(context)
             return HttpResponse(context["table"].as_html(self.request))
         else:
             return super().render_to_response(context, **response_kwargs)
@@ -447,7 +449,7 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
                 "ResultCategories": {
                     category.pk: category for category in ResultCategory.objects.all()
                 },
-                "sort": self.request.GET.get("sort"),
+                "sort": self.request.GET.get("sort", "rank"),
             }
         )
         return context_data
@@ -479,3 +481,71 @@ class AssignmentResultsFlagView(LoginRequiredMixin, UpdateView):
     def form_valid(self, form):
         self.object = form.save()
         return JsonResponse({"flagged": self.object.flagged})
+
+
+class AssignmentPartResultsView(GroupRequiredMixin, ListView):
+    groups_required = [TEACHERS]
+    model = PartResponse
+    table_class = PartResultTable
+    template_name = "dysleksi/admin/test_assignment/result_group_part.html"
+
+    def get(self, request, *args, **kwargs):
+        self.assignment = get_object_or_404(
+            TestAssignment, pk=self.kwargs["assignment_pk"]
+        )
+        self.part = get_object_or_404(TestPart, pk=self.kwargs["testpart_pk"])
+        return super().get(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return (
+            PartResponse.objects.filter(
+                testresponse__assignment=self.assignment, testpart=self.part
+            )
+            .annotate_responses_count(
+                "responses_count",
+            )
+            .annotate_correct_count(
+                "correct_count",
+            )
+            .annotate_correct_proportion(
+                "responses_count", "correct_count", "correct_proportion"
+            )
+            .annotate_correct_percentage("correct_proportion", "correct_percentage")
+            .annotate_ordering("correct_count", "rank", False)
+        ).order_by(*self.get_ordering())
+
+    def get_ordering(self):
+        sort = self.request.GET.get("sort", "student")
+        desc = False
+        if sort.startswith("-"):
+            desc = True
+            sort = sort[1:]
+        if sort == "student":
+            ordering = [
+                "testresponse__student__first_name",
+                "testresponse__student__last_name",
+            ]
+        else:
+            ordering = [sort]
+        if desc:
+            return ["-" + o for o in ordering]
+        else:
+            return ordering
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "assignment": self.assignment,
+                "part": self.part,
+                "table": self.get_table(),
+                "ResultCategories": {
+                    category.pk: category for category in ResultCategory.non_default()
+                },
+                "sort": self.request.GET.get("sort", "student"),
+            }
+        )
+        return context
+
+    def get_table(self):
+        return PartResultTable(data=self.object_list)

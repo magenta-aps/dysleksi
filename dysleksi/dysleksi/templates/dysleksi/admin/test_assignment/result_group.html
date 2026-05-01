@@ -6,7 +6,7 @@
 {% block css %}
 {{ block.super }}
     <style>
-        .results-table table th:not(:first-child) {
+        .test-results-table table th:not(:first-child) {
             width: calc(80%/{{ pagination.page_size }});
         }
     </style>
@@ -95,13 +95,14 @@
             </div>
         </div>
     </div>
-    <div id="results-table" class="results-table">
+
+    <div id="test-results-table" class="test-results-table">
     {% render_table table %}
     </div>
 
     {{ pagination|json_script:"pagination" }}
     <script>
-    const table = document.getElementById("results-table");
+    const table = document.getElementById("test-results-table");
     const paginator = document.getElementById("paginator-text");
     const pagination = JSON.parse(document.getElementById("pagination").innerText);
     const total = {{ pagination.total_count }};
@@ -136,37 +137,10 @@
 
 {% block js_module %}
     {{ block.super }}
-    <script>
-    const flag_links = document.querySelectorAll(".student-flag-link");
-    const csrf_token = document.querySelector('[name=csrfmiddlewaretoken]').value;
-    for (let flag_link of flag_links) {
-        flag_link.addEventListener("click", function() {
-            const pk = this.getAttribute("data-response-pk");
-            const url = "{% url 'dysleksi:test_response_flag' pk=0 %}".replace("/0", "/"+pk);
-            const form = new FormData();
-            form.set("flagged", this.classList.contains("flagged") ? "false" : "true");
-            fetch(
-                url,
-                {
-                    method: "POST",
-                    headers: {
-                        "X-CSRFToken": csrf_token
-                    },
-                    body: form
-                }
-            ).then(response => {
-                if (response.ok) {
-                    return response.json()
-                }
-            }).then(data => {
-                if (data) {
-                    for (let other_flag_link of document.querySelectorAll("[data-response-pk='" + pk + "']")) {
-                        other_flag_link.classList.toggle("flagged", data.flagged);
-                    }
-                }
-            })
-        });
-    }
-    //test_response_flag
+    {% url 'dysleksi:test_response_flag' pk=0 as flag_url %}
+    {{ flag_url|json_script:"flag_url" }}
+    <script type="module">
+        import { initialize_flagging } from '{% static 'js/admin/flag.js' %}';
+        document.addEventListener("DOMContentLoaded", initialize_flagging);
     </script>
 {% endblock %}
