@@ -360,8 +360,8 @@ h6 {
   border-color: $red-normal;
 }
 .btn-outline-secondary {
+  border: 1px solid $blue-normal;
   color: $blue-darkest;
-  border-color: $blue-normal;
 }
 .btn-outline-secondary:hover {
   border: 1px solid $blue-normal;
@@ -1076,9 +1076,9 @@ $border-radius-student-card: $spacer / 4 * 3;
 
 }
 
-.results-table {
-.result-score {
-  text-align: center;
+.test-results-table {
+  .result-score {
+    text-align: center;
   }
   table {
     table-layout: fixed;
@@ -1087,8 +1087,8 @@ $border-radius-student-card: $spacer / 4 * 3;
       font-weight: normal;
 
       &:first-child {
-        width: 20%;
-      }
+      width: 20%;
+    }
 
       &:not(:first-child) {
         width: 26.666%;
@@ -1187,4 +1187,25 @@ $border-radius-student-card: $spacer / 4 * 3;
       width: 1.2em;
     }
   }
- }
+}
+
+.normscore-arrow {
+  text-align: center;
+  width: min-content;
+  position: relative;
+  div {
+    margin-left: -100%;
+    i {
+      font-size: 1.2rem;
+      display: block;
+    }
+  }
+}
+.normscore-bar {
+  .normscore-part {
+    display: inline-block;
+    padding: 0;
+    margin: 0;
+    height: 1rem;
+  }
+}

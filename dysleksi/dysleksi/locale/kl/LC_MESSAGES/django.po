@@ -131,6 +131,22 @@ msgstr ""
 msgid "Gennemsnit"
 msgstr ""
 
+#: dysleksi/tables.py
+msgid "Forsøgte"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Rigtige"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Rigtighedsprocent"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Normscore (0-100)"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/base.html
 #: dysleksi/templates/dysleksi/admin/modals/base.html
 msgid "Luk"
@@ -141,6 +157,7 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/list.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/result_group.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
 msgid "Tests"
 msgstr ""
 
@@ -252,6 +269,10 @@ msgstr ""
 msgid "Ikke fuldført"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/table_columns/test_response_score_footer.html
+msgid "Se detaljer"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Del"
 msgstr ""
@@ -290,6 +311,7 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/result_group.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
 msgid "Resultater"
 msgstr ""
 
@@ -306,6 +328,7 @@ msgid "Bemærkning"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/result_group.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
 #, python-format
 msgid "Klasse %(class_name)s - %(test_name)s"
 msgstr ""
@@ -315,12 +338,67 @@ msgid "Klassens resultater"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/result_group.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
 msgid "Eksportér som PDF"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/result_group.html
 #, python-format
 msgid "Vis %(count)s mere"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Tilbage til klassens resultater"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+#, python-format
+msgid "Resultater for %(part_name)s"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+#, python-format
+msgid "Klasse %(klasse_name)s - %(test_name)s"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Fordeling af score"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Sortering:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Navn (A-Å)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Navn (Å-A)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Forsøgte (Stigende)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Forsøgte (Faldende)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Rigtige (Stigende)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Rigtige (Faldende)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Rigtighedsprocent (Stigende)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Rigtighedsprocent (Faldende)"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/base.html

@@ -17,9 +17,10 @@ from dysleksi.models import (
     TestType,
     User,
 )
-from dysleksi.tables import TestResultTable
+from dysleksi.tables import PartResultTable, TestResultTable
 from dysleksi.tests.base import DysleksiTest, ResponseTest
 from dysleksi.views import (
+    AssignmentPartResultsView,
     AssignmentResultsFlagView,
     AssignmentResultsView,
     AssignmentView,
@@ -452,7 +453,7 @@ class TestAssignmentResultsView(ResponseTest):
                 [["1.", "Test Elev"], ["4"], [], []],
                 [["2."], ["1"], [], []],
                 [["3.", "Test Elev"], ["0"], [], []],
-                [["Gennemsnit"], ["Middel"], [], []],
+                [["Gennemsnit"], ["Middel", "Se detaljer"], [], []],
             ],
         )
         self.assertIsNotNone(soup.find(id="results-by-category"))
@@ -475,7 +476,7 @@ class TestAssignmentResultsView(ResponseTest):
                 [["1.", "Test Elev"], ["4"], [], []],
                 [["2."], ["1"], [], []],
                 [["3.", "Test Elev"], ["0"], [], []],
-                [["Gennemsnit"], ["Middel"], [], []],
+                [["Gennemsnit"], ["Middel", "Se detaljer"], [], []],
             ],
         )
         self.assertIsNone(soup.find(id="results-by-category"))
@@ -596,3 +597,94 @@ class TestAssignmentResultsFlagView(ResponseTest):
             pk=self.test_assignment_class.pk,
         )
         self.assertEqual(view.get_ordering(), ["rank"])
+
+
+class TestAssignmentPartResultsView(ResponseTest):
+
+    def test_table(self):
+        view = self.setup_view(
+            AssignmentPartResultsView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testpart_pk=self.group_test_part.pk,
+        )
+        table = view.get_table()
+        self.assertTrue(isinstance(table, PartResultTable))
+        qs = table.data.data
+        answer1 = qs[0]
+        answer2 = qs[1]
+
+        self.assertEqual(answer1.responses_count, 4)
+        self.assertEqual(answer1.correct_count, 1)
+        self.assertEqual(answer1.correct_proportion, 0.25)
+        self.assertEqual(answer1.correct_percentage, 25)
+
+        self.assertEqual(answer2.responses_count, 4)
+        self.assertEqual(answer2.correct_count, 4)
+        self.assertEqual(answer2.correct_proportion, 1.0)
+        self.assertEqual(answer2.correct_percentage, 100)
+
+    def test_get_ordering(self):
+        view = self.setup_view(
+            AssignmentPartResultsView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testpart_pk=self.group_test_part.pk,
+            query_params={"sort": "student"},
+        )
+        self.assertEqual(
+            view.get_ordering(),
+            [
+                "testresponse__student__first_name",
+                "testresponse__student__last_name",
+            ],
+        )
+
+        view = self.setup_view(
+            AssignmentPartResultsView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testpart_pk=self.group_test_part.pk,
+            query_params={"sort": "-student"},
+        )
+        self.assertEqual(
+            view.get_ordering(),
+            [
+                "-testresponse__student__first_name",
+                "-testresponse__student__last_name",
+            ],
+        )
+
+        view = self.setup_view(
+            AssignmentPartResultsView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testpart_pk=self.group_test_part.pk,
+            query_params={"sort": "correct_count"},
+        )
+        self.assertEqual(view.get_ordering(), ["correct_count"])
+
+    def test_table_render(self):
+        view = self.setup_view(
+            AssignmentPartResultsView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testpart_pk=self.group_test_part.pk,
+        )
+        response = view.response
+        response.render()
+        soup = BeautifulSoup(response.content, "html.parser")
+        self.assertEqual(
+            self.html_table_to_list(soup.find("table")),
+            [
+                [
+                    ["Elev"],
+                    ["Forsøgte"],
+                    ["Rigtige"],
+                    ["Rigtighedsprocent"],
+                    ["Normscore (0-100)"],
+                ],
+                [["2."], ["4"], ["1"], ["25%"], ["25"]],
+                [["1. Test Elev"], ["4"], ["4"], ["100%"], ["100"]],
+            ],
+        )

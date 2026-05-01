@@ -24,6 +24,7 @@ from django.db.models import (
     ExpressionWrapper,
     F,
     FloatField,
+    IntegerField,
     Q,
     QuerySet,
     TextChoices,
@@ -31,7 +32,7 @@ from django.db.models import (
     When,
     Window,
 )
-from django.db.models.functions import RowNumber
+from django.db.models.functions import Cast, RowNumber
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -909,7 +910,104 @@ class TestResponse(models.Model):
         return f"{str(self.assignment)} / {str(self.student)}"
 
 
+class PartResponseQuerySet(QuerySet):
+
+    def annotate_responses_count(
+        self, output_key: str, filter: Q | None = None
+    ) -> "PartResponseQuerySet":
+        if filter is None:
+            filter = Q()
+        return self.annotate(
+            **{
+                output_key: Count(
+                    "questionresponses",
+                    filter=filter,
+                )
+            }
+        )
+
+    def annotate_ordering(
+        self, order_key: str, output_key: str, ascending: bool
+    ) -> "PartResponseQuerySet":
+        ordering = F(order_key)
+        return self.annotate(
+            **{
+                output_key: Window(
+                    expression=RowNumber(),
+                    order_by=ordering.asc() if ascending else ordering.desc(),
+                )
+            }
+        )
+
+    def annotate_correct_count(
+        self, output_key: str, filter: Q | None = None
+    ) -> "PartResponseQuerySet":
+        if filter is None:
+            filter = Q()
+        return self.annotate(
+            **{
+                output_key: Count(
+                    "questionresponses",
+                    filter=filter & Q(questionresponses__correct=True),
+                )
+            }
+        )
+
+    def annotate_correct_proportion(
+        self, count_key: str, correct_key: str, output_key: str
+    ) -> "PartResponseQuerySet":
+        return self.annotate(
+            **{
+                output_key: ExpressionWrapper(
+                    Cast(correct_key, output_field=FloatField()) / F(count_key),
+                    output_field=FloatField(),
+                )
+            }
+        )
+
+    def annotate_correct_percentage(self, proportion_key: str, output_key: str):
+        return self.annotate(
+            **{
+                output_key: ExpressionWrapper(
+                    F(proportion_key) * Value(100), output_field=IntegerField()
+                )
+            }
+        )
+
+    def annotate_score_category(
+        self, proportion_key: str, output_key: str
+    ) -> "PartResponseQuerySet":
+
+        default_key = ResultCategory.default().pk
+        cases = []
+        completed_filter = Q(completed=True)
+
+        for category in ResultCategory.non_default():
+            if category.lower_proportion_limit == 0.0:
+                lower_filter = Q(
+                    **{f"{proportion_key}__gte": category.lower_proportion_limit}
+                )
+            else:
+                lower_filter = Q(
+                    **{f"{proportion_key}__gt": category.lower_proportion_limit}
+                )
+            upper_filter = Q(
+                **{f"{proportion_key}__lte": category.upper_proportion_limit}
+            )
+            cases.append(
+                When(
+                    completed_filter & lower_filter & upper_filter,
+                    then=Value(category.pk),
+                )
+            )
+
+        return self.annotate(**{output_key: Case(*cases, default=Value(default_key))})
+
+
 class PartResponse(models.Model):
+
+    objects = PartResponseQuerySet.as_manager()
+
     testresponse = models.ForeignKey(
         TestResponse,
         on_delete=models.CASCADE,
@@ -1192,6 +1290,7 @@ class ResultCategory(models.Model):
                 name="Only color_key: GRAY may have null upper limit",
             )
         ]
+        ordering = ["upper_proportion_limit"]
 
     @property
     def lower_proportion_limit(self) -> float | None:

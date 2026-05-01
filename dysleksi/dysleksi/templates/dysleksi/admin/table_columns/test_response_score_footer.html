@@ -13,4 +13,9 @@
         {% translate "Ikke fuldført" %}
     {% endif %}
 </div>
+<div class="text-center">
+    <a href="{% url 'dysleksi:test_assignment_part_results' assignment_pk=object.pk testpart_pk=part.pk %}">
+        {% translate "Se detaljer" %}
+    </a>
+</div>
 {% endwith %}
