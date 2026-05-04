@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 import os
+from typing import List
 
 from django.conf import settings
 from django.templatetags.static import static
@@ -25,3 +26,7 @@ def scan_static_files(folders_to_scan=["images", "audio", "vendor/fonts"]):
                 url = static(rel_path)
                 static_files.append(url)
     return static_files
+
+
+def reverse_ordering(ordering: List[str]) -> List[str]:
+    return [o[1:] if o[0] == "-" else ("-" + o) for o in ordering]

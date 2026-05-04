@@ -42,6 +42,12 @@ SPDX-FileCopyrightText = "2011-2021 The Bootstrap Authors (https://github.com/tw
 SPDX-License-Identifier = "MIT"
 
 [[annotations]]
+path = "dysleksi/dysleksi/static/vendor/js/chartjs/**"
+precedence = "aggregate"
+SPDX-FileCopyrightText = "(c) 2025 Chart.js Contributors"
+SPDX-License-Identifier = "MIT"
+
+[[annotations]]
 path = "dysleksi/dysleksi/static/fonts/Karinika-Regular.otf**"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Copyright 2026 Magenta ApS and SIL Global"

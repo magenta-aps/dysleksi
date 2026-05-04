@@ -1,7 +1,15 @@
 {% extends "dysleksi/admin/base.html" %}
 {% load i18n %}
+{% load l10n %}
 {% load static %}
 {% load render_table from django_tables2 %}
+
+{% block extra_headers %}
+    {{ block.super }}
+    {% if plot %}
+    <script src="{% static 'vendor/js/chartjs/chart.umd.min.js' %}"></script>
+    {% endif %}
+{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item">
@@ -78,6 +86,142 @@
     <div id="test-results-table" class="part-results-table">
         {% render_table table %}
     </div>
+
+    {% if plot %}
+    <div class="normscore-readingspeed-plot mt-4">
+    <h6>{% translate 'Normscore og læsetempo' %}</h6>
+
+    <div class="plot-y-label-container">
+        <div class="plot-y-label-text">{% translate 'Læsetempo' %}</div>
+    </div>
+
+    <div class="plot-table-container">
+
+    {% localize off %}
+        <canvas id="chart" class="plot-canvas" style="
+                {# I samarbejde med min og max-specifikationen nede i chartjs-setuppet #}
+                {# Vi gør canvasset lidt større end dens plads i tabellen,  #}
+                {# således at prikker i yderområderne (f.eks. (1.0, 1.0) ikke skæres af og renderes som en halv- eller kvartcirkel #}
+            left: calc(var(--plot-y-label-width) - 16px);
+            top: -16px;
+            width: calc(var(--plot-canvas-width) + 33px);
+            height: calc(var(--plot-canvas-height) + 33px);
+        "></canvas>
+
+        <table class="table table-bordered plot-table">
+        <tbody>
+        {% for pk, reading_category in ReadingSpeeedCategories.items %}
+            <tr>
+                <td
+                        class="plot-table-y-category-cell category-{{ reading_category.color_key }}"
+                        style="height: calc({{ reading_category.width }} * var(--plot-canvas-height)); "
+                >
+                    <div
+                            class="plot-table-y-category-label"
+                            style="
+                                    width: calc({{ reading_category.width }} * var(--plot-canvas-height));
+                                    left: calc(var(--plot-y-label-width) - 0.75rem - ({{ reading_category.width }} * 20rem));
+                                    top: calc(({{ reading_category.width }} * var(--plot-canvas-height) / 2) - var(--plot-y-label-width) / 2)
+                            "
+                    >{{ reading_category.label_da }}</div>
+                </td>
+                {% for pk, category in CorrectnessCategories.items %}
+                <td style="width: calc(({{ category.width }}) * var(--plot-canvas-width))"></td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+            <tr>
+                <th class="plot-table-x-category-cell category-red"></th>
+                {% localize off %}
+                    {% for pk, category in CorrectnessCategories.items %}
+                        <td
+                                class="plot-table-x-category-cell category-{{ category.color_key }}"
+                                style="width: calc(({{ category.width }}) * var(--plot-canvas-width))"
+                        >
+                            {{ category.label_da }}
+                        </td>
+                    {% endfor %}
+                {% endlocalize %}
+            </tr>
+        </tbody>
+    </table>
+        {% endlocalize %}
+        <div class="plot-x-label-text">{% translate 'Normscore' %}</div>
+    </div>
+    </div>
+
+    <style>
+        .normscore-readingspeed-plot .plot-table-container {
+            --vertical-category-count: {{ ReadingSpeeedCategories|length }};
+        }
+    </style>
+
+
+        {{ plot|json_script:"plot_data" }}
+        <script>
+            const chart = new Chart(
+                document.getElementById("chart"),
+                {
+                    type: "scatter",
+                    data: {
+                        datasets: [
+                            {
+                                data: JSON.parse(document.getElementById("plot_data").textContent)
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: false,
+                        animation: false,
+                        layout: {
+                            padding: {
+                                left: 10,
+                                right: 10,
+                                top: 10,
+                                bottom: 10
+                            },
+                            autoPadding: false,
+                        },
+                        scales: {
+                            x: {
+                                display: false,
+                                {# Lav plads til at et punkt på grænsen, f.eks. (1.0, 1.0) ikke ligger lige #}
+                                {# der hvor vi stopper med at rendere #}
+                                min: -0.01,
+                                max: 1.01,
+                                ticks: {
+                                    display:false,
+                                },
+                            },
+                            y: {
+                                display: false,
+                                min: -0.01,
+                                max: 1.01,
+                                ticks: {
+                                    display:false
+                                },
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        elements: {
+                            point: {
+                                borderWidth: 0,
+                                backgroundColor: "#000",
+                            }
+                        }
+                    }
+
+                }
+            )
+
+        </script>
+    {% endif %}
+
+
 {% endblock %}
 
 
@@ -85,5 +229,5 @@
     {{ block.super }}
     {% url 'dysleksi:test_response_flag' pk=0 as flag_url %}
     {{ flag_url|json_script:"flag_url" }}
-    <script type=module" src="{% static 'js/admin/flag.js' %}"></script>
+    <script type="module" src="{% static 'js/admin/flag.js' %}"></script>
 {% endblock %}

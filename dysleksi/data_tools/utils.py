@@ -20,6 +20,7 @@ def create_wordreading_2_test(
             "reminder": 20000,  # 20 seconds
             "image_url": "/static/images/wordreading.png",
             "reminder_source": reminder,
+            "show_normscore_speed_plot": True,
         },
     )
     if created:
@@ -46,6 +47,7 @@ def create_wordreading_1_test(
             "image_url": "/static/images/wordreading_1.png",
             "reminder": 15000,  # 15 seconds
             "reminder_source": reminder,
+            "show_normscore_speed_plot": True,
         },
     )
     if created:

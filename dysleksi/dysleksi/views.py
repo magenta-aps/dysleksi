@@ -3,7 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 from functools import partial
 from math import ceil
-from typing import Any
+from typing import Any, List, Tuple
 
 from django.conf import settings
 from django.db import transaction
@@ -21,8 +21,9 @@ from dysleksi.forms import StartClassRoomForm, StartIndividualRoomForm
 from dysleksi.models import (
     TEACHERS,
     Class,
+    CorrectnessCategory,
     PartResponse,
-    ResultCategory,
+    ReadingSpeedCategory,
     Student,
     Test,
     TestAssignment,
@@ -42,7 +43,7 @@ from dysleksi.tables import (
     TestResultColumn,
     TestResultTable,
 )
-from dysleksi.utils import scan_static_files
+from dysleksi.utils import reverse_ordering, scan_static_files
 
 
 class UserTypeMixin(LoginRequiredMixin):
@@ -302,7 +303,7 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
                 "label": category.label_da,
                 "items": qs.filter(**{category_key: category.pk}).order_by(count_key),
             }
-            for category in ResultCategory.objects.all().order_by(
+            for category in CorrectnessCategory.objects.all().order_by(
                 "is_default", "upper_proportion_limit"
             )
         ]
@@ -361,9 +362,9 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
                             "count_key": count_key,
                             "proportion_key": proportion_key,
                             "category_key": category_key,
-                            "ResultCategories": {
+                            "CorrectnessCategories": {
                                 category.pk: category
-                                for category in ResultCategory.objects.all()
+                                for category in CorrectnessCategory.objects.all()
                             },
                             "object": self.object,
                             "part": part,
@@ -377,13 +378,13 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
                                 # "count": average_count,
                                 # "total": part_questions_count,
                                 # "proportion": average_count / part_questions_count,
-                                "category": ResultCategory.categorize_proportion(
+                                "category": CorrectnessCategory.categorize_proportion(
                                     average_count / part_questions_count
                                 ),
                             },
                             part_questions_count=part_questions_count,
                         ),
-                        subgroups=ResultCategory.partition_question_count(
+                        subgroups=CorrectnessCategory.partition_question_count(
                             part_questions_count
                         ),
                     ),
@@ -446,8 +447,9 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
             {
                 "request": self.request,
                 "table": self.get_table(page),
-                "ResultCategories": {
-                    category.pk: category for category in ResultCategory.objects.all()
+                "CorrectnessCategories": {
+                    category.pk: category
+                    for category in CorrectnessCategory.objects.all()
                 },
                 "sort": self.request.GET.get("sort", "rank"),
             }
@@ -514,7 +516,7 @@ class AssignmentPartResultsView(GroupRequiredMixin, ListView):
             .annotate_ordering("correct_count", "rank", False)
         ).order_by(*self.get_ordering())
 
-    def get_ordering(self):
+    def get_ordering(self) -> List[str]:
         sort = self.request.GET.get("sort", "student")
         desc = False
         if sort.startswith("-"):
@@ -527,10 +529,7 @@ class AssignmentPartResultsView(GroupRequiredMixin, ListView):
             ]
         else:
             ordering = [sort]
-        if desc:
-            return ["-" + o for o in ordering]
-        else:
-            return ordering
+        return reverse_ordering(ordering) if desc else ordering
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -539,13 +538,44 @@ class AssignmentPartResultsView(GroupRequiredMixin, ListView):
                 "assignment": self.assignment,
                 "part": self.part,
                 "table": self.get_table(),
-                "ResultCategories": {
-                    category.pk: category for category in ResultCategory.non_default()
-                },
+                "CorrectnessCategories": CorrectnessCategory.pk_map(),
                 "sort": self.request.GET.get("sort", "student"),
+                "ReadingSpeeedCategories": ReadingSpeedCategory.pk_map(reverse=True),
             }
         )
+        if self.part.show_normscore_speed_plot:  # pragma: no cover
+            context["plot"] = self.get_plot_data()
         return context
 
-    def get_table(self):
+    def get_table(self) -> PartResultTable:
         return PartResultTable(data=self.object_list)
+
+    def get_plot_data(self) -> List[Tuple[float, float]]:  # pragma: no cover
+        # Til demonstration af hvor godt renderingen rammer
+        return [
+            (0.0, 0.0),
+            (0.0, 0.1),
+            (0.0, 0.35),
+            (0.0, 0.75),
+            (0.0, 1.0),
+            (0.1, 0.0),
+            (0.1, 0.1),
+            (0.1, 0.35),
+            (0.1, 0.75),
+            (0.1, 1.0),
+            (0.35, 0.0),
+            (0.35, 0.1),
+            (0.35, 0.35),
+            (0.35, 0.75),
+            (0.35, 1.0),
+            (0.75, 0.0),
+            (0.75, 0.1),
+            (0.75, 0.35),
+            (0.75, 0.75),
+            (0.75, 1.0),
+            (1.0, 0.0),
+            (1.0, 0.1),
+            (1.0, 0.35),
+            (1.0, 0.75),
+            (1.0, 1.0),
+        ]

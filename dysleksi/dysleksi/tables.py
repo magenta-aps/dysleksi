@@ -7,7 +7,7 @@ from django.template.loader import get_template
 from django.utils.translation import gettext_lazy as _
 from django_tables2 import A, Column, Table, TemplateColumn, tables
 
-from dysleksi.models import Class, ResultCategoryRange, Student, TestAssignment
+from dysleksi.models import CategoryRange, Class, Student, TestAssignment
 
 
 class ClassTable(Table):
@@ -160,7 +160,7 @@ class TestResultColumn(TemplateColumn):
         self,
         footer_template_name: str,
         average_value_modifier: Callable | None = None,
-        subgroups=List[ResultCategoryRange],
+        subgroups=List[CategoryRange],
         *args,
         **kwargs,
     ):

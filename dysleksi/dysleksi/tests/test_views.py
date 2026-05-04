@@ -10,7 +10,7 @@ from django.urls import reverse
 from django.views import View
 
 from dysleksi.models import (
-    ResultCategory,
+    CorrectnessCategory,
     Student,
     Test,
     TestAssignment,
@@ -385,11 +385,11 @@ class TestAssignmentResultsView(ResponseTest):
             AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk
         )
         by_category = view.get_by_category()
-        self.assertEqual(len(by_category), ResultCategory.objects.count())
+        self.assertEqual(len(by_category), CorrectnessCategory.objects.count())
         self.assertEqual(
             [category["color"] for category in by_category],
             list(
-                ResultCategory.objects.order_by(
+                CorrectnessCategory.objects.order_by(
                     "is_default", "upper_proportion_limit"
                 ).values_list("color_key", flat=True)
             ),
@@ -397,7 +397,7 @@ class TestAssignmentResultsView(ResponseTest):
         self.assertEqual(
             [category["label"] for category in by_category],
             list(
-                ResultCategory.objects.order_by(
+                CorrectnessCategory.objects.order_by(
                     "is_default", "upper_proportion_limit"
                 ).values_list("label_da", flat=True)
             ),
@@ -425,7 +425,7 @@ class TestAssignmentResultsView(ResponseTest):
         self.assertEqual(getattr(best, f"{part1_key}_proportion"), 1.0)
         self.assertEqual(
             getattr(best, f"{part1_key}_category"),
-            ResultCategory.objects.get(color_key="blue").pk,
+            CorrectnessCategory.objects.get(color_key="blue").pk,
         )
 
         secondbest = qs[1]
@@ -434,7 +434,7 @@ class TestAssignmentResultsView(ResponseTest):
         self.assertEqual(getattr(secondbest, f"{part1_key}_proportion"), 0.25)
         self.assertEqual(
             getattr(secondbest, f"{part1_key}_category"),
-            ResultCategory.objects.get(color_key="yellow").pk,
+            CorrectnessCategory.objects.get(color_key="yellow").pk,
         )
 
     @override_settings(RESULT_TABLE_SIZE=3)

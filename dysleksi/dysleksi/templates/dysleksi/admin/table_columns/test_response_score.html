@@ -1,5 +1,5 @@
 {% with category_pk=record|get:category_key %}
-    {% with category=ResultCategories|get:category_pk %}
+    {% with category=CorrectnessCategories|get:category_pk %}
         <div class="result-score category-{{ category.color_key }}"
              data-proportion="{{ record|get:proportion_key }}"
         >
