@@ -402,6 +402,18 @@ msgstr ""
 msgid "Rigtighedsprocent (Faldende)"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Normscore og læsetempo"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Læsetempo"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_group_part.html
+msgid "Normscore"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/base.html
 msgid "Dysleksi"
 msgstr ""

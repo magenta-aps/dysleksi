@@ -9,7 +9,7 @@ from base64 import b64decode
 from dataclasses import dataclass
 from datetime import date
 from math import floor
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Self
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
@@ -480,6 +480,7 @@ class TestPart(models.Model):
         null=True,
         related_name="reminder_testpart",
     )
+    show_normscore_speed_plot = models.BooleanField(default=False)
 
     def __str__(self) -> str:
         return self.name
@@ -832,11 +833,11 @@ class TestResponseQuerySet(QuerySet):
         self, proportion_key: str, output_key: str
     ) -> "TestResponseQuerySet":
 
-        default_key = ResultCategory.default().pk
+        default_key = CorrectnessCategory.default().pk
         cases = []
         completed_filter = Q(completed=True)
 
-        for category in ResultCategory.non_default():
+        for category in CorrectnessCategory.non_default():
             if category.lower_proportion_limit == 0.0:
                 lower_filter = Q(
                     **{f"{proportion_key}__gte": category.lower_proportion_limit}
@@ -978,11 +979,11 @@ class PartResponseQuerySet(QuerySet):
         self, proportion_key: str, output_key: str
     ) -> "PartResponseQuerySet":
 
-        default_key = ResultCategory.default().pk
+        default_key = CorrectnessCategory.default().pk
         cases = []
         completed_filter = Q(completed=True)
 
-        for category in ResultCategory.non_default():
+        for category in CorrectnessCategory.non_default():
             if category.lower_proportion_limit == 0.0:
                 lower_filter = Q(
                     **{f"{proportion_key}__gte": category.lower_proportion_limit}
@@ -1258,7 +1259,7 @@ class Message(models.Model):
             self.save()
 
 
-class ResultCategoryChoice(TextChoices):
+class CategoryColorChoice(TextChoices):
     GRAY = "gray"
     RED = "red"
     YELLOW = "yellow"
@@ -1266,40 +1267,34 @@ class ResultCategoryChoice(TextChoices):
     BLUE = "blue"
 
 
-class ResultCategory(models.Model):
+class Category(models.Model):
+    class Meta:
+        abstract = True
+        ordering = ["upper_proportion_limit"]
+
     upper_proportion_limit = models.FloatField(
         default=1.0,
         validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
         null=True,
     )
     color_key = models.CharField(
-        choices=ResultCategoryChoice.choices,
+        choices=CategoryColorChoice.choices,
         max_length=6,
         editable=False,
         null=False,
         unique=True,
     )
-    is_default = models.BooleanField()
     label_da = models.CharField(max_length=30, null=False, blank=False)
 
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                condition=models.Q(upper_proportion_limit__isnull=False)
-                | models.Q(color_key=ResultCategoryChoice.GRAY),
-                name="Only color_key: GRAY may have null upper limit",
-            )
-        ]
-        ordering = ["upper_proportion_limit"]
+    @classmethod
+    def with_proportion(cls):
+        return cls.objects.filter(upper_proportion_limit__isnull=False)
 
     @property
     def lower_proportion_limit(self) -> float | None:
-        if self.is_default:
-            return None
         lower = (
-            ResultCategory.objects.filter(
-                upper_proportion_limit__lt=self.upper_proportion_limit
-            )
+            self.with_proportion()
+            .filter(upper_proportion_limit__lt=self.upper_proportion_limit)
             .order_by("-upper_proportion_limit")
             .first()
         )
@@ -1307,52 +1302,104 @@ class ResultCategory(models.Model):
             return 0.0
         return lower.upper_proportion_limit
 
-    @staticmethod
-    def categorize_proportion(proportion: float | None) -> "ResultCategory | None":
-        if proportion is None:
-            return ResultCategory.default()
+    @property
+    def width(self) -> float | None:
+        upper = self.upper_proportion_limit
+        lower = self.lower_proportion_limit
+        if upper is None or lower is None:
+            return None
+        return upper - lower
+
+    @property
+    def width_pct(self) -> float | None:
+        width = self.width
+        return 100.0 * width if width is not None else None
+
+    @classmethod
+    def categorize_proportion(cls, proportion: float) -> Self:
         if proportion < 0 or proportion > 1:
             raise ValueError("proportion must be between 0 and 1")
+        qs = cls.with_proportion()
         return (
-            ResultCategory.objects.filter(
-                is_default=False, upper_proportion_limit__gte=proportion
-            )
+            qs.filter(upper_proportion_limit__gte=proportion)
             .order_by("upper_proportion_limit")
             .first()
         )
 
-    @staticmethod
-    def validate_categories():
-        if ResultCategory.objects.filter(is_default=True).count() > 1:
-            raise ValidationError("More than one ResultCategory with is_default=True")
-        if not ResultCategory.objects.filter(is_default=True).exists():
-            raise ValidationError("No ResultCategory with is_default=True")
-        upper = ResultCategory.objects.filter(is_default=False).order_by("-id").first()
+    @classmethod
+    def validate_categories(cls):
+        qs = cls.with_proportion()
+        upper = qs.order_by("-id").first()
         if upper.upper_proportion_limit != 1:
             raise ValidationError(
-                "Topmost ResultCategory must have upper_proportion_limit 1"
+                f"Topmost {cls.__name__} must have upper_proportion_limit 1"
             )
 
-    @staticmethod
-    def default():
-        return ResultCategory.objects.get(is_default=True)
+    @classmethod
+    def pk_map(cls, reverse: bool = False):
+        qs = cls.with_proportion()
+        if reverse:
+            qs = qs.order_by("-upper_proportion_limit")
+        return {category.pk: category for category in qs}
 
-    @staticmethod
-    def non_default():
-        return ResultCategory.objects.filter(is_default=False)
+
+class CorrectnessCategory(Category):
+    is_default = models.BooleanField()
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                condition=models.Q(upper_proportion_limit__isnull=False)
+                | models.Q(color_key=CategoryColorChoice.GRAY),
+                name="Only color_key: GRAY may have null upper limit",
+            )
+        ]
+
+    @property
+    def lower_proportion_limit(self) -> float | None:
+        if self.is_default:
+            return None
+        return super().lower_proportion_limit
+
+    @classmethod
+    def categorize_proportion(cls, proportion: float | None) -> Self:
+        if proportion is None:
+            return CorrectnessCategory.default()
+        else:
+            return super().categorize_proportion(proportion)
+
+    @classmethod
+    def validate_categories(cls):
+        if CorrectnessCategory.objects.filter(is_default=True).count() > 1:
+            raise ValidationError(
+                "More than one CorrectnessCategory with is_default=True"
+            )
+        if not CorrectnessCategory.objects.filter(is_default=True).exists():
+            raise ValidationError("No CorrectnessCategory with is_default=True")
+        super().validate_categories()
+
+    @classmethod
+    def default(cls):
+        return CorrectnessCategory.objects.get(is_default=True)
+
+    @classmethod
+    def non_default(cls):
+        return CorrectnessCategory.objects.filter(is_default=False)
 
     @staticmethod
     def partition_question_count(
         question_count: int,
-    ) -> List["ResultCategoryRange"]:
+    ) -> List["CategoryRange"]:
         if question_count <= 0:
             raise ValueError()
         lower: int | None = None
-        partitions: List[ResultCategoryRange] = []
-        for category in ResultCategory.non_default().order_by("upper_proportion_limit"):
+        partitions: List[CategoryRange] = []
+        for category in CorrectnessCategory.non_default().order_by(
+            "upper_proportion_limit"
+        ):
             upper: int = floor(question_count * category.upper_proportion_limit)
             partitions.append(
-                ResultCategoryRange(
+                CategoryRange(
                     category=category,
                     lower_bound=0 if lower is None else lower + 1,
                     upper_bound=upper,
@@ -1363,7 +1410,11 @@ class ResultCategory(models.Model):
 
 
 @dataclass
-class ResultCategoryRange:
-    category: ResultCategory
+class CategoryRange:
+    category: Category
     lower_bound: int
     upper_bound: int
+
+
+class ReadingSpeedCategory(Category):
+    pass

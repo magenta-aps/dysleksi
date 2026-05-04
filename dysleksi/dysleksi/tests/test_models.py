@@ -19,7 +19,10 @@ from freezegun import freeze_time
 from dysleksi.models import (
     STUDENTS,
     TEACHERS,
+    CategoryColorChoice,
+    CategoryRange,
     Class,
+    CorrectnessCategory,
     Instruction,
     InstructionAction,
     InstructionSequence,
@@ -28,9 +31,6 @@ from dysleksi.models import (
     PlannedDateTime,
     PossibleAnswer,
     QuestionResponse,
-    ResultCategory,
-    ResultCategoryChoice,
-    ResultCategoryRange,
     Test,
     TestAssignment,
     TestPart,
@@ -820,47 +820,59 @@ class TestResultCategory(TestCase):
     @classmethod
     def setUpTestData(cls):
         call_command("create_result_categories")
-        cls.gray = ResultCategory.objects.get(color_key=ResultCategoryChoice.GRAY)
-        cls.red = ResultCategory.objects.get(color_key=ResultCategoryChoice.RED)
-        cls.yellow = ResultCategory.objects.get(color_key=ResultCategoryChoice.YELLOW)
-        cls.green = ResultCategory.objects.get(color_key=ResultCategoryChoice.GREEN)
-        cls.blue = ResultCategory.objects.get(color_key=ResultCategoryChoice.BLUE)
+        cls.gray = CorrectnessCategory.objects.get(color_key=CategoryColorChoice.GRAY)
+        cls.red = CorrectnessCategory.objects.get(color_key=CategoryColorChoice.RED)
+        cls.yellow = CorrectnessCategory.objects.get(
+            color_key=CategoryColorChoice.YELLOW
+        )
+        cls.green = CorrectnessCategory.objects.get(color_key=CategoryColorChoice.GREEN)
+        cls.blue = CorrectnessCategory.objects.get(color_key=CategoryColorChoice.BLUE)
 
     def test_gray(self):
         self.assertIsNone(self.gray.lower_proportion_limit)
         self.assertIsNone(self.gray.upper_proportion_limit)
         self.assertTrue(self.gray.is_default)
         self.assertEqual(self.gray.label_da, "Ikke fuldført")
+        self.assertIsNone(self.gray.width)
+        self.assertIsNone(self.gray.width_pct)
 
     def test_red(self):
         self.assertEqual(self.red.lower_proportion_limit, 0.0)
         self.assertEqual(self.red.upper_proportion_limit, 0.1)
         self.assertFalse(self.red.is_default)
         self.assertEqual(self.red.label_da, "Betydeligt under middel")
+        self.assertAlmostEqual(self.red.width, 0.1)
+        self.assertAlmostEqual(self.red.width_pct, 10.0)
 
     def test_yellow(self):
         self.assertEqual(self.yellow.lower_proportion_limit, 0.1)
         self.assertEqual(self.yellow.upper_proportion_limit, 0.35)
         self.assertFalse(self.yellow.is_default)
         self.assertEqual(self.yellow.label_da, "Under middel")
+        self.assertAlmostEqual(self.yellow.width, 0.25)
+        self.assertAlmostEqual(self.yellow.width_pct, 25.0)
 
     def test_green(self):
         self.assertEqual(self.green.lower_proportion_limit, 0.35)
         self.assertEqual(self.green.upper_proportion_limit, 0.75)
         self.assertFalse(self.green.is_default)
         self.assertEqual(self.green.label_da, "Middel")
+        self.assertAlmostEqual(self.green.width, 0.4)
+        self.assertAlmostEqual(self.green.width_pct, 40.0)
 
     def test_blue(self):
         self.assertEqual(self.blue.lower_proportion_limit, 0.75)
         self.assertEqual(self.blue.upper_proportion_limit, 1.0)
         self.assertFalse(self.blue.is_default)
         self.assertEqual(self.blue.label_da, "Over middel")
+        self.assertAlmostEqual(self.blue.width, 0.25)
+        self.assertAlmostEqual(self.blue.width_pct, 25.0)
 
     def test_default(self):
-        self.assertEqual(ResultCategory.default(), self.gray)
+        self.assertEqual(CorrectnessCategory.default(), self.gray)
 
     def test_non_default(self):
-        qs = ResultCategory.non_default()
+        qs = CorrectnessCategory.non_default()
         self.assertIn(self.red, qs)
         self.assertIn(self.yellow, qs)
         self.assertIn(self.green, qs)
@@ -868,43 +880,46 @@ class TestResultCategory(TestCase):
         self.assertNotIn(self.gray, qs)
 
     def test_categorize_proportion(self):
-        self.assertEqual(ResultCategory.categorize_proportion(0.0), self.red)
-        self.assertEqual(ResultCategory.categorize_proportion(0.05), self.red)
-        self.assertEqual(ResultCategory.categorize_proportion(0.15), self.yellow)
-        self.assertEqual(ResultCategory.categorize_proportion(0.35), self.yellow)
-        self.assertEqual(ResultCategory.categorize_proportion(0.36), self.green)
-        self.assertEqual(ResultCategory.categorize_proportion(0.70), self.green)
-        self.assertEqual(ResultCategory.categorize_proportion(0.85), self.blue)
-        self.assertEqual(ResultCategory.categorize_proportion(1.0), self.blue)
-        self.assertEqual(ResultCategory.categorize_proportion(None), self.gray)
+        self.assertEqual(CorrectnessCategory.categorize_proportion(0.0), self.red)
+        self.assertEqual(CorrectnessCategory.categorize_proportion(0.05), self.red)
+        self.assertEqual(CorrectnessCategory.categorize_proportion(0.15), self.yellow)
+        self.assertEqual(CorrectnessCategory.categorize_proportion(0.35), self.yellow)
+        self.assertEqual(CorrectnessCategory.categorize_proportion(0.36), self.green)
+        self.assertEqual(CorrectnessCategory.categorize_proportion(0.70), self.green)
+        self.assertEqual(CorrectnessCategory.categorize_proportion(0.85), self.blue)
+        self.assertEqual(CorrectnessCategory.categorize_proportion(1.0), self.blue)
+        self.assertEqual(CorrectnessCategory.categorize_proportion(None), self.gray)
         with self.assertRaises(ValueError):
-            ResultCategory.categorize_proportion(-0.01)
+            CorrectnessCategory.categorize_proportion(-0.01)
         with self.assertRaises(ValueError):
-            ResultCategory.categorize_proportion(1.01)
+            CorrectnessCategory.categorize_proportion(1.01)
 
     def test_validate_categories_two_defaults(self):
         self.green.is_default = True
         self.green.save()
         with self.assertRaises(ValidationError) as cm:
-            ResultCategory.validate_categories()
+            CorrectnessCategory.validate_categories()
         self.assertEqual(
-            cm.exception.message, "More than one ResultCategory with is_default=True"
+            cm.exception.message,
+            "More than one CorrectnessCategory with is_default=True",
         )
 
     def test_validate_categories_no_defaults(self):
-        ResultCategory.objects.filter(is_default=True).delete()
+        CorrectnessCategory.objects.filter(is_default=True).delete()
         with self.assertRaises(ValidationError) as cm:
-            ResultCategory.validate_categories()
-        self.assertEqual(cm.exception.message, "No ResultCategory with is_default=True")
+            CorrectnessCategory.validate_categories()
+        self.assertEqual(
+            cm.exception.message, "No CorrectnessCategory with is_default=True"
+        )
 
     def test_validate_categories_upper_1(self):
         self.blue.upper_proportion_limit = 2.0
         self.blue.save()
         with self.assertRaises(ValidationError) as cm:
-            ResultCategory.validate_categories()
+            CorrectnessCategory.validate_categories()
         self.assertEqual(
             cm.exception.message,
-            "Topmost ResultCategory must have upper_proportion_limit 1",
+            "Topmost CorrectnessCategory must have upper_proportion_limit 1",
         )
 
 
@@ -977,59 +992,59 @@ class TestTestResponseQuerySet(ResponseTest):
         student2_answer = qs[1]
         self.assertEqual(
             student1_answer.category,
-            ResultCategory.objects.get(color_key=ResultCategoryChoice.BLUE).pk,
+            CorrectnessCategory.objects.get(color_key=CategoryColorChoice.BLUE).pk,
         )
         self.assertEqual(
             student2_answer.category,
-            ResultCategory.objects.get(color_key=ResultCategoryChoice.YELLOW).pk,
+            CorrectnessCategory.objects.get(color_key=CategoryColorChoice.YELLOW).pk,
         )
 
     def test_partition_question_count(self):
         self.maxDiff = None
-        red = ResultCategory.objects.get(color_key=ResultCategoryChoice.RED)
-        yellow = ResultCategory.objects.get(color_key=ResultCategoryChoice.YELLOW)
-        green = ResultCategory.objects.get(color_key=ResultCategoryChoice.GREEN)
-        blue = ResultCategory.objects.get(color_key=ResultCategoryChoice.BLUE)
+        red = CorrectnessCategory.objects.get(color_key=CategoryColorChoice.RED)
+        yellow = CorrectnessCategory.objects.get(color_key=CategoryColorChoice.YELLOW)
+        green = CorrectnessCategory.objects.get(color_key=CategoryColorChoice.GREEN)
+        blue = CorrectnessCategory.objects.get(color_key=CategoryColorChoice.BLUE)
         self.assertEqual(
-            ResultCategory.partition_question_count(10),
+            CorrectnessCategory.partition_question_count(10),
             [
-                ResultCategoryRange(category=red, lower_bound=0, upper_bound=1),
-                ResultCategoryRange(category=yellow, lower_bound=2, upper_bound=3),
-                ResultCategoryRange(category=green, lower_bound=4, upper_bound=7),
-                ResultCategoryRange(category=blue, lower_bound=8, upper_bound=10),
+                CategoryRange(category=red, lower_bound=0, upper_bound=1),
+                CategoryRange(category=yellow, lower_bound=2, upper_bound=3),
+                CategoryRange(category=green, lower_bound=4, upper_bound=7),
+                CategoryRange(category=blue, lower_bound=8, upper_bound=10),
             ],
         )
         self.assertEqual(
-            ResultCategory.partition_question_count(15),
+            CorrectnessCategory.partition_question_count(15),
             [
-                ResultCategoryRange(category=red, lower_bound=0, upper_bound=1),
-                ResultCategoryRange(category=yellow, lower_bound=2, upper_bound=5),
-                ResultCategoryRange(category=green, lower_bound=6, upper_bound=11),
-                ResultCategoryRange(category=blue, lower_bound=12, upper_bound=15),
+                CategoryRange(category=red, lower_bound=0, upper_bound=1),
+                CategoryRange(category=yellow, lower_bound=2, upper_bound=5),
+                CategoryRange(category=green, lower_bound=6, upper_bound=11),
+                CategoryRange(category=blue, lower_bound=12, upper_bound=15),
             ],
         )
         self.assertEqual(
-            ResultCategory.partition_question_count(20),
+            CorrectnessCategory.partition_question_count(20),
             [
-                ResultCategoryRange(category=red, lower_bound=0, upper_bound=2),
-                ResultCategoryRange(category=yellow, lower_bound=3, upper_bound=7),
-                ResultCategoryRange(category=green, lower_bound=8, upper_bound=15),
-                ResultCategoryRange(category=blue, lower_bound=16, upper_bound=20),
+                CategoryRange(category=red, lower_bound=0, upper_bound=2),
+                CategoryRange(category=yellow, lower_bound=3, upper_bound=7),
+                CategoryRange(category=green, lower_bound=8, upper_bound=15),
+                CategoryRange(category=blue, lower_bound=16, upper_bound=20),
             ],
         )
         self.assertEqual(
-            ResultCategory.partition_question_count(22),
+            CorrectnessCategory.partition_question_count(22),
             [
-                ResultCategoryRange(category=red, lower_bound=0, upper_bound=2),
-                ResultCategoryRange(category=yellow, lower_bound=3, upper_bound=7),
-                ResultCategoryRange(category=green, lower_bound=8, upper_bound=16),
-                ResultCategoryRange(category=blue, lower_bound=17, upper_bound=22),
+                CategoryRange(category=red, lower_bound=0, upper_bound=2),
+                CategoryRange(category=yellow, lower_bound=3, upper_bound=7),
+                CategoryRange(category=green, lower_bound=8, upper_bound=16),
+                CategoryRange(category=blue, lower_bound=17, upper_bound=22),
             ],
         )
         with self.assertRaises(ValueError):
-            ResultCategory.partition_question_count(0)
+            CorrectnessCategory.partition_question_count(0)
         with self.assertRaises(ValueError):
-            ResultCategory.partition_question_count(-1)
+            CorrectnessCategory.partition_question_count(-1)
 
 
 class TestPartResponseQuerySet(ResponseTest):
@@ -1137,56 +1152,56 @@ class TestPartResponseQuerySet(ResponseTest):
         student2_answer = qs[1]
         self.assertEqual(
             student1_answer.category,
-            ResultCategory.objects.get(color_key=ResultCategoryChoice.BLUE).pk,
+            CorrectnessCategory.objects.get(color_key=CategoryColorChoice.BLUE).pk,
         )
         self.assertEqual(
             student2_answer.category,
-            ResultCategory.objects.get(color_key=ResultCategoryChoice.YELLOW).pk,
+            CorrectnessCategory.objects.get(color_key=CategoryColorChoice.YELLOW).pk,
         )
 
     def test_partition_question_count(self):
         self.maxDiff = None
-        red = ResultCategory.objects.get(color_key=ResultCategoryChoice.RED)
-        yellow = ResultCategory.objects.get(color_key=ResultCategoryChoice.YELLOW)
-        green = ResultCategory.objects.get(color_key=ResultCategoryChoice.GREEN)
-        blue = ResultCategory.objects.get(color_key=ResultCategoryChoice.BLUE)
+        red = CorrectnessCategory.objects.get(color_key=CategoryColorChoice.RED)
+        yellow = CorrectnessCategory.objects.get(color_key=CategoryColorChoice.YELLOW)
+        green = CorrectnessCategory.objects.get(color_key=CategoryColorChoice.GREEN)
+        blue = CorrectnessCategory.objects.get(color_key=CategoryColorChoice.BLUE)
         self.assertEqual(
-            ResultCategory.partition_question_count(10),
+            CorrectnessCategory.partition_question_count(10),
             [
-                ResultCategoryRange(category=red, lower_bound=0, upper_bound=1),
-                ResultCategoryRange(category=yellow, lower_bound=2, upper_bound=3),
-                ResultCategoryRange(category=green, lower_bound=4, upper_bound=7),
-                ResultCategoryRange(category=blue, lower_bound=8, upper_bound=10),
+                CategoryRange(category=red, lower_bound=0, upper_bound=1),
+                CategoryRange(category=yellow, lower_bound=2, upper_bound=3),
+                CategoryRange(category=green, lower_bound=4, upper_bound=7),
+                CategoryRange(category=blue, lower_bound=8, upper_bound=10),
             ],
         )
         self.assertEqual(
-            ResultCategory.partition_question_count(15),
+            CorrectnessCategory.partition_question_count(15),
             [
-                ResultCategoryRange(category=red, lower_bound=0, upper_bound=1),
-                ResultCategoryRange(category=yellow, lower_bound=2, upper_bound=5),
-                ResultCategoryRange(category=green, lower_bound=6, upper_bound=11),
-                ResultCategoryRange(category=blue, lower_bound=12, upper_bound=15),
+                CategoryRange(category=red, lower_bound=0, upper_bound=1),
+                CategoryRange(category=yellow, lower_bound=2, upper_bound=5),
+                CategoryRange(category=green, lower_bound=6, upper_bound=11),
+                CategoryRange(category=blue, lower_bound=12, upper_bound=15),
             ],
         )
         self.assertEqual(
-            ResultCategory.partition_question_count(20),
+            CorrectnessCategory.partition_question_count(20),
             [
-                ResultCategoryRange(category=red, lower_bound=0, upper_bound=2),
-                ResultCategoryRange(category=yellow, lower_bound=3, upper_bound=7),
-                ResultCategoryRange(category=green, lower_bound=8, upper_bound=15),
-                ResultCategoryRange(category=blue, lower_bound=16, upper_bound=20),
+                CategoryRange(category=red, lower_bound=0, upper_bound=2),
+                CategoryRange(category=yellow, lower_bound=3, upper_bound=7),
+                CategoryRange(category=green, lower_bound=8, upper_bound=15),
+                CategoryRange(category=blue, lower_bound=16, upper_bound=20),
             ],
         )
         self.assertEqual(
-            ResultCategory.partition_question_count(22),
+            CorrectnessCategory.partition_question_count(22),
             [
-                ResultCategoryRange(category=red, lower_bound=0, upper_bound=2),
-                ResultCategoryRange(category=yellow, lower_bound=3, upper_bound=7),
-                ResultCategoryRange(category=green, lower_bound=8, upper_bound=16),
-                ResultCategoryRange(category=blue, lower_bound=17, upper_bound=22),
+                CategoryRange(category=red, lower_bound=0, upper_bound=2),
+                CategoryRange(category=yellow, lower_bound=3, upper_bound=7),
+                CategoryRange(category=green, lower_bound=8, upper_bound=16),
+                CategoryRange(category=blue, lower_bound=17, upper_bound=22),
             ],
         )
         with self.assertRaises(ValueError):
-            ResultCategory.partition_question_count(0)
+            CorrectnessCategory.partition_question_count(0)
         with self.assertRaises(ValueError):
-            ResultCategory.partition_question_count(-1)
+            CorrectnessCategory.partition_question_count(-1)
