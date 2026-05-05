@@ -797,6 +797,53 @@ export class ElapsedTimeView {
     }
 }
 
+export class DetailsPopup {
+    constructor(toggleSelector = "#details-toggle", popupSelector = "#details-popup") {
+        this.toggle = document.querySelector(toggleSelector);
+        this.popup = document.querySelector(popupSelector);
+        if (!this.toggle || !this.popup) {
+            return;
+        }
+        this._initListeners();
+    }
+
+    _initListeners() {
+        this.toggle.addEventListener("click", (e) => {
+            e.stopPropagation();
+            if (this.isOpen()) {
+                this.close();
+            } else {
+                this.open();
+            }
+        });
+
+        // Close on outside click
+        document.addEventListener("click", (e) => {
+            if (
+                this.isOpen() &&
+                !this.toggle.contains(e.target) &&
+                !this.popup.contains(e.target)
+            ) {
+                this.close();
+            }
+        });
+    }
+
+    isOpen() {
+        return !this.popup.hasAttribute("hidden");
+    }
+
+    open() {
+        this.popup.removeAttribute("hidden");
+        this.toggle.setAttribute("aria-expanded", "true");
+    }
+
+    close() {
+        this.popup.setAttribute("hidden", "");
+        this.toggle.setAttribute("aria-expanded", "false");
+    }
+}
+
 export class TeacherView {
     constructor(
         test,
@@ -829,6 +876,7 @@ export class TeacherView {
         this.questionView = questionView || new QuestionView();
         this.elapsedTimeView = elapsedTimeView;
         this.audioIndicator = audioIndicator;
+        this.detailsPopup = new DetailsPopup();
 
         this.filterButtons = document.querySelectorAll(".group-test-header .btn");
         this.studentChannels = {};

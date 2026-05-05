@@ -53,7 +53,11 @@
      data-test-type="{{ test_type }}"
      data-room-name="{{ room_name }}"
      data-assignment-id="{{ object.pk }}">
-    <h5 class="mt-2 mb-4">Klasse {{class_name}} - Screening {{ test_name }}</h5>
+
+    <div class="screening-header">
+        <h2 class="mt-2 mb-4">Klasse {{class_name}} - Screening {{ test_name }}</h2>
+        {% details_popup %}
+    </div>
     <div class="group-test-container">
         <div class="group-test-header">
             <button id="all-students-button" class="btn btn-outline-primary">

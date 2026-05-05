@@ -111,10 +111,16 @@ class AssignmentView(UserTypeMixin, DetailView):
         else:
             context["student_ids"] = [assignment.student.id]
         context["test_type"] = self.get_room_type()
+        context["test_type_label"] = "Test"
         context["student"] = self.user
         context["room_type"] = self.get_room_type()
         context["test_name"] = test.name
-        context["class_name"] = assignment.klasse_name
+        context["class_name"] = assignment.klasse_name or ", ".join(
+            [c.name for c in assignment.student.classes.all()]
+        )
+        context["student_count"] = (
+            assignment.klasse.students.all().count() if assignment.klasse else None
+        )
         context["static_files"] = scan_static_files()
 
         return context
