@@ -18,6 +18,7 @@ import { GroupTestContainer } from "../../screening/controlroom.js";
 import { StudentCard } from "../../screening/controlroom.js";
 import { Student } from "../../screening/model.js";
 import { WebRTCChannel } from "../../webRTC.js";
+import { DetailsPopup } from "../../screening/controlroom.js";
 
 vi.mock("../../screening/utils.js");
 
@@ -2319,5 +2320,73 @@ describe("GroupTestContainer Filtering", () => {
 
         expect(document.getElementById("ongoing-students-count").innerHTML).toBe("1");
         expect(document.getElementById("finished-students-count").innerHTML).toBe("2");
+    });
+});
+
+describe("DetailsPopup", () => {
+    let detailsPopup;
+
+    beforeEach(() => {
+        document.body.innerHTML = `
+            <div class="details-wrapper">
+                <button id="details-toggle" class="details-button" type="button" aria-expanded="false">
+                    <span>Se detaljer</span>
+                    <i class="ph-fill ph-caret-down"></i>
+                </button>
+                <div id="details-popup" class="details-popup" hidden>
+                    <div class="details-row">
+                        <span class="details-label">Testtype:</span>
+                        <span class="details-value">Individuel</span>
+                    </div>
+                </div>
+            </div>
+            <div id="outside-element">Outside content</div>
+        `;
+        detailsPopup = new DetailsPopup();
+    });
+
+    it("starts in closed state", () => {
+        expect(detailsPopup.isOpen()).toBe(false);
+        expect(detailsPopup.popup.hasAttribute("hidden")).toBe(true);
+        expect(detailsPopup.toggle.getAttribute("aria-expanded")).toBe("false");
+    });
+
+    it("opens when toggle button is clicked", () => {
+        detailsPopup.toggle.click();
+
+        expect(detailsPopup.isOpen()).toBe(true);
+        expect(detailsPopup.popup.hasAttribute("hidden")).toBe(false);
+        expect(detailsPopup.toggle.getAttribute("aria-expanded")).toBe("true");
+    });
+
+    it("closes when toggle button is clicked again", () => {
+        detailsPopup.toggle.click();
+        expect(detailsPopup.isOpen()).toBe(true);
+
+        detailsPopup.toggle.click();
+        expect(detailsPopup.isOpen()).toBe(false);
+        expect(detailsPopup.popup.hasAttribute("hidden")).toBe(true);
+        expect(detailsPopup.toggle.getAttribute("aria-expanded")).toBe("false");
+    });
+
+    it("closes when clicking outside the popup", () => {
+        detailsPopup.open();
+        expect(detailsPopup.isOpen()).toBe(true);
+
+        // Click on an element outside both toggle and popup
+        const outside = document.getElementById("outside-element");
+        outside.dispatchEvent(new Event("click", { bubbles: true }));
+
+        expect(detailsPopup.isOpen()).toBe(false);
+    });
+
+    it("does not close when clicking inside the popup", () => {
+        detailsPopup.open();
+
+        // Click on something inside the popup
+        const innerLabel = detailsPopup.popup.querySelector(".details-label");
+        innerLabel.dispatchEvent(new Event("click", { bubbles: true }));
+
+        expect(detailsPopup.isOpen()).toBe(true);
     });
 });

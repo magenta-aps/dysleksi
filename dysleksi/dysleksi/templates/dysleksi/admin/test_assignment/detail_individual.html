@@ -14,7 +14,11 @@
      data-test-type="{{ test_type }}"
      data-room-name="{{ room_name }}"
      data-assignment-id="{{ object.pk }}">
-    <h2 class="mt-2 mb-4">{{ test_assignment.student.get_full_name }} - {{ test_assignment.test.name }}</h2>
+
+    <div class="screening-header">
+        <h2 class="mt-2 mb-4">{{ test_assignment.student.get_full_name }} - {{ test_assignment.test.name }}</h2>
+        {% details_popup %}
+    </div>
     <div class="card">
         <div class="card-header d-flex align-items-center justify-content-between">
             <span id="current-test-part-name" class="me-2 fw-bold">{% translate 'Deltest' %}</span>

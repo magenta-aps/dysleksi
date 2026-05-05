@@ -1,0 +1,35 @@
+<div class="details-wrapper">
+    <button id="details-toggle" class="details-button" type="button" aria-expanded="false">
+        <span>Se detaljer</span>
+        <i class="ph-fill ph-caret-down"></i>
+    </button>
+
+    <div id="details-popup" class="details-popup" hidden>
+        <div class="details-row">
+            <span class="details-label">Deltagere:</span>
+            {% if student_count %}
+                <span class="details-value">Klasse {{ class_name }} ({{ student_count }} elever)</span>
+            {% else %}
+                <span class="details-value">{{ test_assignment.student.get_full_name }} (Klasse {{ class_name }})</span>
+            {% endif %}
+        </div>
+        <div class="details-row">
+            <span class="details-label">Testtype:</span>
+            <span class="details-value">{{ test_type_label }}</span>
+        </div>
+        <div class="details-row">
+            <span class="details-label">Test:</span>
+            <span class="details-value">{{ test_name }}</span>
+        </div>
+        <div class="details-row">
+            <span class="details-label">Deltests:</span>
+            <div class="details-value">
+                <ol>
+                    {% for part in test_contents.parts %}
+                        <li>{{ part.name }} ({{ part.questions|length }} opgaver)</li>
+                    {% endfor %}
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
