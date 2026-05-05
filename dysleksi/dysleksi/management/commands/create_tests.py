@@ -97,7 +97,10 @@ def create_group_test(
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
             / "real/wordspelling/wordspelling.json",
         )
-        nonwordspelling_data_path = None
+        nonwordspelling_data_path = (
+            Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+            / "real/nonwordspelling/nonwordspelling.json",
+        )
         letter_sound_data_path = (
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
             / "real/letter_sound/letter_sound.json",
@@ -173,14 +176,17 @@ def create_group_test(
         )
 
     if (grade == 1 and period == "slut") or (grade == 2 and period == "midt"):
-        if nonwordspelling_data_path:
-            call_command(
-                "import_test",
-                name,
-                nonwordspelling_test_name,
-                nonwordspelling_data_path,
-                "nonwordspelling",
-            )
+        call_command(
+            "import_test",
+            name,
+            nonwordspelling_test_name,
+            nonwordspelling_data_path,
+            "nonwordspelling",
+            practice_json_path=(
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "real/nonwordspelling/nonwordspelling_practice.json"
+            ),
+        )
 
     if grade == 1 and period == "slut":
         call_command(

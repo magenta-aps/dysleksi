@@ -608,20 +608,11 @@
         "resource": "resources/wordspelling/Instruktion/6d.2b.wav",
         "delayAfter": 500
       },
-      {
-        "action": "fadeOut",
-        "element": "repeat",
-        "delayAfter": 1000
-      },
 
       // 6d.3
       {
         "action": "fadeIn",
         "element": "next"
-      },
-      {
-        "action": "fadeIn",
-        "element": "repeat"
       },
       {
         // Vælg ikon (klik).

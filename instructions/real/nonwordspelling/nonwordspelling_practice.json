@@ -1,0 +1,446 @@
+[
+  {
+    // No input required
+    "image": "resources/nonwordspelling/Indledning/Stavning.png",
+    "question_type": "no_input_required",
+    "instruction_sequence": [
+      {
+        "action": "show",
+        "delayAfter": 0,
+        "element": "question-challenge"
+      },
+      {
+        "action": "hide",
+        "delayAfter": 0,
+        "element": "choices"
+      },
+      {
+        "action": "hide",
+        "delayAfter": 0,
+        "element": "next"
+      },
+      {
+        // Nonordstavning er nu ved at starte.
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4a.1.mp3"
+      },
+      {
+        // Nonordene betyder ikke noget, men de kan skrives.
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4a.2.mp3"
+      },
+      {
+        // Først får du vist, hvad du skal gøre.
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4a.3.mp3"
+      },
+      {
+        "action": "fadeOut",
+        "delayAfter": 0,
+        "element": "question-challenge"
+      },
+      {
+        "action": "show",
+        "delayAfter": 0,
+        "element": "next"
+      },
+      {
+        // Tryk grøn, når du er klar.
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4a.4.mp3"
+      }
+    ]
+  },
+  {
+    "sound": "resources/nonwordspelling/Martha/4b.5.mp3",
+    "question_type": "free_text",
+    "instruction_sequence": [
+      {
+        "action": "hide",
+        "delayAfter": 0,
+        "element": "repeat"
+      },
+      {
+        "action": "show",
+        "delayAfter": 0,
+        "element": "question-challenge"
+      },
+      {
+        "action": "show",
+        "delayAfter": 0,
+        "element": "choices"
+      },
+      {
+        "action": "show",
+        "delayAfter": 1500,
+        "element": "next"
+      },
+      {
+        // Lyt godt efter
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.1.mp3"
+      },
+      {
+        "action": "fadeOut",
+        "delayAfter": 0,
+        "element": "choices"
+      },
+      {
+        "action": "fadeOut",
+        "delayAfter": 0,
+        "element": "question-challenge"
+      },
+      {
+        "action": "fadeOut",
+        "delayAfter": 0,
+        "element": "next"
+      },
+      {
+        // Her er
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.2.mp3"
+      },
+      {
+        "action": "fadeIn",
+        "delayAfter": 0,
+        "element": "choices"
+      },
+      {
+        "action": "highlight",
+        "delayAfter": 0,
+        "element": "free-text-buttons"
+      },
+      {
+        // Dem, der skal klikkes på, når man skriver.
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.3.mp3"
+      },
+      {
+        "action": "fadeIn",
+        "delayAfter": 0,
+        "element": "question-challenge"
+      },
+      {
+        // Du vil høre nonordet du skal skrive, f.eks.
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.4.mp3"
+      },
+      {
+        "action": "highlight",
+        "delayAfter": 0,
+        "element": "question-challenge"
+      },
+      {
+        "action": "clickButton",
+        "delayAfter": 1500,
+        "element": "challenge-sound-btn"
+      },
+      {
+        // Du
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.6.mp3"
+      },
+      {
+        "action": "highlight",
+        "delayAfter": 0,
+        "element": "free-text-buttons"
+      },
+      {
+        // Så skal du skrive det norord du hører, ved at klikke på bogstaverne, således...
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.7.mp3"
+      },
+      {
+        "action": "clickButton",
+        "delayAfter": 750,
+        "element": "free-text-q"
+      },
+      {
+        "action": "clickButton",
+        "delayAfter": 750,
+        "element": "free-text-a"
+      },
+      {
+        // Hvis du ikke helt forstod nonordet, du skal skrive, kan du trykke på
+        // lydikonet for at høre det igen.
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.8.mp3"
+      },
+      {
+        "action": "waitForUserClick",
+        "element": "challenge-sound-btn",
+        "delayAfter": 1250
+      },
+      {
+        // Hvis du kommer til at fejle, kan du ændre det, du har skrevet,
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.9.mp3"
+      },
+      {
+        "action": "setText",
+        "delayAfter": 0,
+        "element": "free-text-field",
+        "data": ""
+      },
+      {
+        // F.eks.: Hvis du kommer til at skrive su,
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.10.mp3"
+      },
+      {
+        "action": "clickButton",
+        "delayAfter": 750,
+        "element": "free-text-s"
+      },
+      {
+        "action": "clickButton",
+        "delayAfter": 750,
+        "element": "free-text-u"
+      },
+      {
+        // kan du slette det, du har skrevet, ved at trykke på backspace,
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.11.mp3"
+      },
+      {
+        "action": "clickButton",
+        "delayAfter": 750,
+        "element": "free-text-erase-btn"
+      },
+      {
+        "action": "clickButton",
+        "delayAfter": 750,
+        "element": "free-text-erase-btn"
+      },
+      {
+        //  og skrive det rigtige qa
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.12.mp3"
+      },
+      {
+        "action": "clickButton",
+        "delayAfter": 750,
+        "element": "free-text-q"
+      },
+      {
+        "action": "clickButton",
+        "delayAfter": 750,
+        "element": "free-text-a"
+      },
+      {
+        // Du må gerne gætte, hvis du ikke kan finde ud af opgaven.
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.13.mp3"
+      },
+      {
+        "action": "fadeIn",
+        "delayAfter": 0,
+        "element": "next"
+      },
+      {
+        "action": "highlight",
+        "delayAfter": 0,
+        "element": "next"
+      },
+      {
+        // Når du har skrevet, går du videre til næste opgave ved at trykke på pilen.
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.14.mp3"
+      },
+      {
+        "action": "fadeOut",
+        "delayAfter": 0,
+        "element": "next"
+      },
+      {
+        "action": "fadeOut",
+        "delayAfter": 0,
+        "element": "choices"
+      },
+      {
+        "action": "fadeOut",
+        "delayAfter": 0,
+        "element": "question-challenge"
+      },
+      {
+        // Det er sådan, du skal skrive
+        "action": "playSound",
+        "delayAfter": 1000,
+        "resource": "resources/nonwordspelling/Martha/4b.15.mp3"
+      },
+      {
+        // Nu skal du selv prøve øveopgaverne. Kun nonordet vil blive angivet.
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/nonwordspelling/Martha/4b.16.mp3"
+      },
+      {
+        "action": "fadeIn",
+        "delayAfter": 0,
+        "element": "next"
+      },
+      {
+        // Tryk grøn når du er klar.
+        "action": "playSound",
+        "delayAfter": 0,
+        "resource": "resources/nonwordspelling/Martha/4b.17.mp3"
+      }
+    ]
+  },
+  {
+    "sound": "resources/nonwordspelling/Martha/4c.4.mp3",
+    "question_type": "free_text",
+    "correct": "si",
+    "reminder": 20000,
+    "reminder_source": "resources/nonwordspelling/Martha/4e.4.mp3",
+    "continue_when_instruction_is_complete": false,
+    "instruction_sequence": [
+        {
+            "action": "hide",
+            "element": "next",
+            "delayAfter": 0
+        },
+        {
+            "action": "show",
+            "element": "choices",
+            "delayAfter": 0
+        },
+        {
+            "action": "show",
+            "element": "question-challenge",
+            "delayAfter": 0
+        },
+        {
+            "action": "fadeOut",
+            "element": "choices",
+            "delayAfter": 0
+        },
+        {
+            "action": "fadeOut",
+            "element": "question-challenge",
+            "delayAfter": 0
+        },
+        {
+            // Du skal skrive det nonord der bliver angivet.
+            "action": "playSound",
+            "resource": "/resources/nonwordspelling/Martha/4c.2.mp3",
+            "delayAfter": 1250
+        },
+        {
+            // Du starter nu
+            "action": "playSound",
+            "resource": "/resources/nonwordspelling/Martha/4c.3.mp3",
+            "delayAfter": 1250
+        },
+        {
+            "action": "fadeIn",
+            "element": "choices",
+            "delayAfter": 0
+        },
+        {
+            "action": "fadeIn",
+            "element": "question-challenge",
+            "delayAfter": 0
+        }
+    ]
+  },
+  {
+    "sound": "resources/nonwordspelling/Martha/4c.7.mp3",
+    "question_type": "free_text",
+    "correct": "ika",
+    "reminder": 20000,
+    "reminder_source": "resources/nonwordspelling/Martha/4e.4.mp3"
+  },
+  {
+    "question_type": "no_input_required",
+    "instruction_sequence": [
+      {
+        "action": "setRepeatButtonDestination",
+        "data": 1
+      },
+      {
+        // Øvelserne er færdige.
+        "action": "playSound",
+        "resource": "resources/nonwordspelling/Martha/4c.8.mp3",
+        "delayAfter": 1000
+      },
+      {
+        "action": "showFaded",
+        "element": "repeat"
+      },
+      {
+        "action": "showFaded",
+        "element": "next"
+      },
+
+      {
+        // Her kan du se to knapper.
+        "action": "playSound",
+        "resource": "resources/nonwordspelling/Martha/4d.1.mp3",
+        "delayAfter": 500
+      },
+
+      // 9d.4a
+      {
+        "action": "fadeIn",
+        "element": "next"
+      },
+      {
+        // Hvis du har forstået, hvad du skal gøre,
+        // skal du klikke på den blå. Så starte opgaverne.
+        "action": "playSound",
+        "resource": "resources/nonwordspelling/Martha/4d.2.mp3",
+        "delayAfter": 500
+      },
+
+      // 6d.2b
+      {
+        "action": "fadeOut",
+        "element": "next"
+      },
+      {
+        "action": "fadeIn",
+        "element": "repeat"
+      },
+      {
+        // Men hvis du ikke har forstået, hvad du skal gøre,
+        // skal du klikke på den grå. Så skal du øve dig igen.
+        "action": "playSound",
+        "resource": "resources/nonwordspelling/Martha/4d.3.mp3",
+        "delayAfter": 500
+      },
+      {
+        "action": "fadeIn",
+        "element": "next"
+      },
+      {
+        // Vælg ikon (klik).
+        "action": "playSound",
+        "resource": "resources/nonwordspelling/Martha/4d.4.mp3",
+        "delayAfter": 500
+      },
+      {
+        "action": "setButtonSoundOnce",
+        "element": "next",
+        "resource": "resources/nonwordspelling/Martha/4e.3.mp3"
+      }
+    ]
+  }
+]

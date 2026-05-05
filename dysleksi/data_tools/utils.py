@@ -193,8 +193,8 @@ def create_nonwordspelling_test(
 ):
     # TODO: Add this sound to dysleksi-binaries when we receive it
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/nonwordspelling/Øveopgave/xx.x.wav",
-        sound="resources/nonwordspelling/Øveopgave/xx.x.wav",
+        name="resources/nonwordspelling/Martha/4e.4.mp3",
+        sound="resources/nonwordspelling/Martha/4e.4.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(

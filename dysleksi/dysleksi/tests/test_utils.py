@@ -190,6 +190,12 @@ class UtilTest(TestCase):
             TestResource.objects.filter(sound="nonwordspelling_dummy/foo.mp3").exists()
         )
 
+    def test_create_nonwordspelling_test_without_practice_run(self):
+        create_nonwordspelling_test(self.test, self.nonwordspelling_data)
+        self.assertTrue(
+            TestResource.objects.filter(sound="nonwordspelling_dummy/foo.mp3").exists()
+        )
+
     def test_create_wordreading_1_test_with_practice_data(self):
         create_wordreading_1_test(
             self.test, self.wordreading_1_data, self.wordreading_1_pratice_data
