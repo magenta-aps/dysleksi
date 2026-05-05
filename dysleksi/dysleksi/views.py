@@ -495,7 +495,7 @@ class AssignmentPartResultsView(GroupRequiredMixin, ListView):
     groups_required = [TEACHERS]
     model = PartResponse
     table_class = PartResultTable
-    template_name = "dysleksi/admin/test_assignment/result_group_part.html"
+    template_name = "dysleksi/admin/part_responses/group/list.html"
 
     def get(self, request, *args, **kwargs):
         self.assignment = get_object_or_404(
