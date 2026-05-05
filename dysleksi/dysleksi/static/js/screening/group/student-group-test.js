@@ -363,6 +363,16 @@ export class GroupTestView extends StudentTestView {
         }
 
         this.domElements.multipleChoiceAnswerDisplay.innerHTML = answer.resourceText;
+
+        if (answer.resourceText === "true" || answer.resourceText === "false") {
+            this.answerButtons.forEach((a) => {
+                if (a.answer === answer) {
+                    a.button.classList.remove("dimmed");
+                } else {
+                    a.button.classList.add("dimmed");
+                }
+            });
+        }
     }
 
     answerIsCorrect() {

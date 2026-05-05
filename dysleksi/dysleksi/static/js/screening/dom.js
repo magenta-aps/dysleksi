@@ -693,13 +693,18 @@ export class GroupTestDomElements extends TestDomElements {
     }
 
     toggleQuestionDisplay(state) {
-        for (const el of [this.questionChallengeEl, this.choicesEl]) {
+        for (const el of [
+            this.questionChallengeEl,
+            this.choicesEl,
+            this.multipleChoiceMatchContainer,
+        ]) {
             el.style.display = state;
         }
     }
 
     clearQuestionChoices() {
         this.choicesEl.innerHTML = "";
+        this.choicesEl.classList.remove("true-false-layout");
         this.choicesElSecondRow.innerHTML = "";
         this.choicesElLeft.innerHTML = "";
         this.choicesElRight.innerHTML = "";
@@ -717,11 +722,13 @@ export class GroupTestDomElements extends TestDomElements {
                 btn.classList.remove("btn-outline-primary");
                 btn.classList.add("btn-true-false");
                 btn.classList.add("true");
+                this.choicesEl.classList.add("true-false-layout");
             } else if (text === "false") {
                 btn.innerHTML = '<i class="ph-fill ph-x-circle"></i>';
                 btn.classList.remove("btn-outline-primary");
                 btn.classList.add("btn-true-false");
                 btn.classList.add("false");
+                this.choicesEl.classList.add("true-false-layout");
             } else {
                 btn.textContent = text;
             }

@@ -292,12 +292,7 @@
             // Skjul alle opgave-elementer
             {
                 "action": "hide",
-                "element": "challenge-sound-btn",
-                "delayAfter": 0
-            },
-            {
-                "action": "hide",
-                "element": "choices",
+                "element": "multiple-choice-match-container",
                 "delayAfter": 0
             },
             {

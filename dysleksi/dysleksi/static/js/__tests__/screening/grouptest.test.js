@@ -1720,6 +1720,27 @@ describe("Sentence Reading Test", () => {
         expect(challengeImage.src.endsWith("static/blomst.jpg")).toBe(true);
         expect(challengeText.innerHTML).toBe("Jeg er en blomst");
     });
+
+    it("Dims True when False is clicked and the other way around", async () => {
+        const test = new Test(sentenceReadingTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        view.setPart(0);
+        view.showFirstQuestion(false);
+
+        const trueButton = document.getElementById("choice-true");
+        const falseButton = document.getElementById("choice-false");
+
+        expect(trueButton.classList).not.toContain("dimmed");
+        expect(falseButton.classList).not.toContain("dimmed");
+
+        trueButton.click();
+        expect(trueButton.classList).not.toContain("dimmed");
+        expect(falseButton.classList).toContain("dimmed");
+
+        falseButton.click();
+        expect(trueButton.classList).toContain("dimmed");
+        expect(falseButton.classList).not.toContain("dimmed");
+    });
 });
 
 describe("Letter Shape Test", () => {
