@@ -36,12 +36,14 @@ class TabulexClient:
         self,
         wsdl: str,
         cert: Tuple[str, str],
+        system_id: str,
         auth: dict,
         proxy: dict | None = None,
         mock: bool = False,
     ):
         self.cert = cert
         self.wsdl: str = wsdl
+        self.system_id = system_id
         self._client: Client | None = None
         self.auth: dict = auth
         self.proxy: dict | None = proxy
@@ -51,11 +53,12 @@ class TabulexClient:
     def from_settings(cls):
         tabulex_settings = settings.TABULEX
         return cls(
-            tabulex_settings["wsdl"],
-            tabulex_settings["client_cert"],
-            tabulex_settings["auth"],
-            tabulex_settings.get("proxy"),
-            tabulex_settings.get("mock", False),
+            wsdl=tabulex_settings["wsdl"],
+            cert=tabulex_settings["client_cert"],
+            system_id=tabulex_settings["system_id"],
+            auth=tabulex_settings["auth"],
+            proxy=tabulex_settings.get("proxy"),
+            mock=tabulex_settings.get("mock", False),
         )
 
     def test_connection(self):
@@ -63,16 +66,14 @@ class TabulexClient:
             pass  # pragma: no cover
         else:
             response = self.client.service.helloWorldWithCertificate(
-                _soapheaders={"UdbydersystemId": "ettest"}
+                _soapheaders={"UdbydersystemId": self.system_id}
             )
             print(response)
 
     def export_xml(self, institution_number: str):
-        # There are also eksporterXmlMellem and eksporterXmlFuld, adding data such as
-        # email-address, address, phonenumber, birthdate, gender, cpr etc.
-        # but we don't need those
-        return self.client.service.eksporterXmlLille(
-            _soapheaders={"UdbydersystemId": "ettest"},
+        # There are also eksporterXmlLille and eksporterXmlFuld
+        return self.client.service.eksporterXmlMellem(
+            _soapheaders={"UdbydersystemId": self.system_id},
             instnr=institution_number,
         )
 

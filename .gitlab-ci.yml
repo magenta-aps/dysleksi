@@ -193,6 +193,7 @@ Lint Javascript:
     TABULEX_DUMMY_DATA: /builds/gronlandsprojekter/dysleksi/file-data/tabulex/test.json
     TABULEX_CLIENT_CERT: /builds/gronlandsprojekter/dysleksi/file-data/tabulex/selfsigned.crt
     TABULEX_CLIENT_KEY: /builds/gronlandsprojekter/dysleksi/file-data/tabulex/selfsigned.key
+    TABULEX_SYSTEM_ID: abc123
 
 
   image: ${IMAGE_SHA}
