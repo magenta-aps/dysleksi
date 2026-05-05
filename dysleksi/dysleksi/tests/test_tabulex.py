@@ -51,10 +51,10 @@ class TestTabulex(TestCase):
     def test_export_xml(self, client_property_mock):
         dummy_data: Export = self.tabulex_client.load_dummydata()
         client_mock = client_property_mock.return_value = MagicMock()
-        client_mock.service.eksporterXmlLille.return_value = dummy_data
+        client_mock.service.eksporterXmlMellem.return_value = dummy_data
         data = self.tabulex_client.export_xml("R00123")
         self.assertEqual(data, dummy_data)
-        client_mock.service.eksporterXmlLille.assert_called_once()
+        client_mock.service.eksporterXmlMellem.assert_called_once()
 
     def test_apply_signature(self):
         signature_handler = CustomBinarySignature(
@@ -194,6 +194,7 @@ class TestTabulex(TestCase):
                     }
                 },
                 "client_cert": ("/ssl/client.crt", "/ssl/client.key"),
+                "system_id": "foobar",
                 "proxy": {"socks": "http://localhost:1234"},
                 "mock": True,
             }
@@ -212,6 +213,7 @@ class TestTabulex(TestCase):
             )
             self.assertEqual(client.proxy, {"socks": "http://localhost:1234"})
             self.assertEqual(client.mock, True)
+            self.assertEqual(client.system_id, "foobar")
 
     def test_load_dummydata(self):
         self.tabulex_client.update_model("abc", False, False)
