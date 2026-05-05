@@ -195,7 +195,6 @@ class TestResultColumn(TemplateColumn):
 
 class PartResultTable(Table):
     student = Column(
-        # template_name="dysleksi/admin/table_columns/part_response_student_name.html",
         verbose_name=_("Elev"),
         accessor=A("testresponse__student"),
     )
@@ -213,7 +212,7 @@ class PartResultTable(Table):
     )
     normscore = TemplateColumn(
         verbose_name=_("Normscore (0-100)"),
-        template_name="dysleksi/admin/table_columns/part_response_normscore.html",
+        template_name="dysleksi/admin/part_responses/group/normscore.html",
         accessor=A("correct_percentage"),
     )
 
