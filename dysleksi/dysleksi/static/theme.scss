@@ -1,6 +1,7 @@
 // "Design names"
 $student-grey-lightest: #F9F7F4;
 $student-grey-light: #DED9D2;
+$student-grey-light2: #B9B2A7;
 $student-grey: #ACA9A4;
 $student-grey-dark: #7B7670;
 $student-grey-darker: #494743;
@@ -9,13 +10,13 @@ $student-purple-lightest: #e5d4df;
 $student-purple-light: #bd94af;
 $student-purple: #7b295e;
 $student-purple-dark: #3d142f;
-$student-green-lightest: #d5dfd2;
-$student-green-light: #95af8f;
-$student-green: #2b5f20;
+$student-green-lightest: #DDF5D4;
+$student-green-light: #8CCB7F;
+$student-green: #2B8019;
 $student-green-dark: #183012;
-$student-red-lightest: #ecd0d0;
-$student-red-light: #cf898a;
-$student-red: #9f1415;
+$student-red-lightest: #FFE0E0;
+$student-red-light: #F27C7E;
+$student-red: #8C1B1B;
 $student-red-dark: #500a0b;
 $student-yellow-lightest: #faf2dd;
 $student-yellow-light: #f2deaa;
@@ -41,6 +42,40 @@ $asset-manifest: (
   "bg-repeat-btn":         '/static/images/Knap-gentag-instruktion.svg',
   "bg-audio-bars":         '/static/images/audiobars.svg'
 );
+
+
+$button-shadow:
+  0 4px 4px 0 rgba(0, 0, 0, 0.25),
+  inset 0 -6px 10px 0 #DED9D2;
+
+$dark-button-shadow:
+  0 4px 4px 0 rgba(0, 0, 0, 0.25),
+  inset 0 -6px 10px 0 #B9B2A7;
+
+$darkest-button-shadow:
+  0 4px 4px 0 rgba(0, 0, 0, 0.25),
+  inset 0 -6px 10px 0 #8A8377;
+
+$blue-button-shadow:
+  0 4px 4px 0 rgba(0, 0, 0, 0.25),
+  inset 0 -6px 10px 0 #00438280;
+
+$green-button-shadow:
+  0 4px 4px 0 rgba(0, 0, 0, 0.25),
+  inset 0 -6px 10px 0 #A9D8A0;
+
+$dark-green-button-shadow:
+  0 4px 4px 0 rgba(0, 0, 0, 0.25),
+  inset 0 -6px 10px 0 #598F4E;
+
+$red-button-shadow:
+  0 4px 4px 0 rgba(0, 0, 0, 0.25),
+  inset 0 -6px 10px 0 #E09A9C;
+
+$dark-red-button-shadow:
+  0 4px 4px 0 rgba(0, 0, 0, 0.25),
+  inset 0 -6px 10px 0 #942E30;
+
 
 
 // 3. Generate the :root CSS variables so JS can access and modify them
@@ -111,12 +146,13 @@ h1, h2, h3, h4, h5, h6 {
 
   &:hover, &:focus, &:active {
     background-color: $student-blue !important;
-    border-width: 2px !important;
-    padding: calc(1rem - 1px) calc(3rem - 1px) !important;
+    outline: 4px solid $student-blue-dark !important;
+    box-shadow: $blue-button-shadow;
   }
+
   &.selected {
     background-color: $student-blue !important;
-    outline: 3px solid $student-blue-dark !important;
+    outline: 4px solid $student-blue-dark !important;
   }
 
   &:disabled {
@@ -129,39 +165,50 @@ h1, h2, h3, h4, h5, h6 {
 .btn-true-false {
   color: black !important;
   background-color: white !important;
-  border-width: 8px !important;
+
   font-size: 1.1rem;
   border-radius: 16px !important;
   width: 200px !important;
   flex: none !important;
 
+  transition: opacity 0.2s ease-out !important;
+
+  &.dimmed {
+    opacity: 0.5;
+  }
+
   &.true {
     border-color: $student-green !important;
     background-color: $student-green-lightest !important;
-    color: $student-green !important;
+    color: $student-green-lightest !important;
+    box-shadow: $green-button-shadow;
+    outline: 8px solid $student-green !important;
 
     i {
       color: $student-green;
     }
 
-    &.selected {
+    &.selected,
+    &:hover {
       background-color: $student-green-light !important;
-      outline: 2px solid;
+      box-shadow: $dark-green-button-shadow;
     }
   }
 
   &.false {
     border-color: $student-red !important;
     background-color: $student-red-lightest !important;
-    color: $student-red !important;
+    color: $student-red-lightest !important;
+    outline: 8px solid $student-red !important;
 
     i {
       color: $student-red;
     }
 
-    &.selected {
+    &.selected,
+    &:hover {
       background-color: $student-red-light !important;
-      outline: 2px solid;
+      box-shadow: $dark-red-button-shadow;
     }
   }
 }
@@ -185,7 +232,7 @@ body.show-instructions {
 .erase-btn {
   background-color: $student-grey-light !important;
   color: black;
-  border: 1px solid black !important;
+  border: 0px !important;
   height: 4rem;
   padding: 0 2rem;
   display: flex;
@@ -194,15 +241,14 @@ body.show-instructions {
   margin: 0 0.5rem 0.5rem 0.5rem;
   font-size: 2.5rem !important;
   margin: 0;
+  box-shadow: $dark-button-shadow !important;
 
   &:disabled {
-    color: white; // changes text/icon color when button is disabled
-    background-color: $student-grey-light !important;
-    border-color: $student-grey !important;
-
-    .ph {
-      color: white; // ensures icon itself is white
-    }
+    opacity: 50%;
+  }
+  &:hover {
+    background-color: $student-grey !important;
+    box-shadow: $darkest-button-shadow !important;
   }
 }
 
@@ -291,6 +337,32 @@ body.show-instructions {
   background-image: var(--bg-next-btn);
   width: 180px;
   height: 80px;
+  align-self: flex-end;
+  margin-right: 48px;
+
+}
+
+.task-btn {
+  background-color: $student-grey-light;
+  border: 1px solid $student-grey-darker;
+  border-radius: 16px;
+  color: black;
+  font-size: 28px;
+  padding: 16px 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  &:hover{
+    background-color: $student-grey;
+  }
+
+  i {
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1;
+  }
+
 }
 
 .repeat-btn {
@@ -376,6 +448,13 @@ body.show-instructions {
     padding: 1rem 3rem;
     border: 1px solid #ccc;
     border-radius: 0.5rem;
+    border-width: 0px !important;
+    box-shadow: $button-shadow;
+    transition: filter 0.2s ease-out;
+  }
+
+  &.true-false-layout {
+      gap: 32px;
   }
 }
 
@@ -402,7 +481,7 @@ body.show-instructions {
   margin: 0 auto 0 auto;
   
   background-color: #ffffff;
-  border: 2px solid $student-grey-light;
+  border: 1px solid $student-grey-light;
   border-radius: 16px !important;
 
   height: auto;
@@ -568,7 +647,7 @@ body.show-instructions .sound-btn.pulse {
 
 .angry-btn {
     animation: angry-shake 0.35s ease-in-out 0s 2;
-    box-shadow: 0 0 0.6rem $student-red, 0 0 1.2rem lighten($student-red, 20%);
+    filter: drop-shadow(0 0 0.6rem $student-red);
 }
 
 @keyframes angry-shake {
@@ -587,35 +666,33 @@ body.show-instructions .sound-btn.pulse {
 
 .happy-btn {
     animation: happy-flash 0.5s ease-in-out;
-    box-shadow: 0 0 0.3rem rgba($student-green, 0);
 }
 
 @keyframes happy-flash {
     0% {
-        box-shadow: 0 0 0.3rem rgba($student-green, 0.6);
+        filter: drop-shadow(0 0 0.3rem rgba($student-green, 0.6));
     }
     50% {
-        box-shadow: 0 0 0.9rem rgba($student-green, 0.9);
+        filter: drop-shadow(0 0 0.9rem rgba($student-green, 0.9));
     }
     100% {
-        box-shadow: 0 0 0.3rem rgba($student-green, 0);
+        filter: drop-shadow(0 0 0.3rem rgba($student-green, 0));
     }
 }
 
 .pressed-btn {
     animation: button-press-flash 0.5s ease-in-out;
-    box-shadow: 0 0 0.3rem rgba($student-grey-darkest, 0);
 }
 
 @keyframes button-press-flash {
     0% {
-        box-shadow: 0 0 0.3rem rgba($student-grey-darkest, 0.6);
+        filter: drop-shadow(0 0 0.3rem rgba($student-grey-darkest, 0));
     }
     50% {
-        box-shadow: 0 0 0.9rem rgba($student-grey-darkest, 0.9);
+        filter: drop-shadow(0 0 0.4rem rgba($student-grey-darkest, 0.9));
     }
     100% {
-        box-shadow: 0 0 0.3rem rgba($student-grey-darkest, 0);
+        filter: drop-shadow(0 0 0.3rem rgba($student-grey-darkest, 0));
     }
 }
 
