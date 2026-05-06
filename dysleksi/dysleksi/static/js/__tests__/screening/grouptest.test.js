@@ -1746,6 +1746,79 @@ describe("Sentence Reading Test", () => {
         expect(trueButton.classList).toContain("dimmed");
         expect(falseButton.classList).not.toContain("dimmed");
     });
+
+    it("Resets button states when a button is clicked again", async () => {
+        const test = new Test(sentenceReadingTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        view.setPart(0);
+        view.showFirstQuestion(false);
+
+        const trueButton = document.getElementById("choice-true");
+        const falseButton = document.getElementById("choice-false");
+
+        expect(trueButton.classList).not.toContain("dimmed");
+        expect(falseButton.classList).not.toContain("dimmed");
+
+        trueButton.click();
+        expect(trueButton.classList).not.toContain("dimmed");
+        expect(falseButton.classList).toContain("dimmed");
+        expect(trueButton.classList).toContain("selected");
+
+        trueButton.click();
+        expect(trueButton.classList).not.toContain("dimmed");
+        expect(falseButton.classList).not.toContain("dimmed");
+        expect(trueButton.classList).not.toContain("selected");
+    });
+
+    it("Resets button states when a non-button element is clicked", async () => {
+        const test = new Test(sentenceReadingTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        view.start();
+        view.setPart(0);
+        view.showFirstQuestion(false);
+
+        const trueButton = document.getElementById("choice-true");
+        const falseButton = document.getElementById("choice-false");
+        const questionChallenge = document.getElementById("question-challenge");
+
+        expect(trueButton.classList).not.toContain("dimmed");
+        expect(falseButton.classList).not.toContain("dimmed");
+
+        trueButton.click();
+        expect(trueButton.classList).not.toContain("dimmed");
+        expect(falseButton.classList).toContain("dimmed");
+        expect(trueButton.classList).toContain("selected");
+
+        questionChallenge.click();
+        expect(trueButton.classList).not.toContain("dimmed");
+        expect(falseButton.classList).not.toContain("dimmed");
+        expect(trueButton.classList).not.toContain("selected");
+    });
+
+    it("Adds no-hover class when unselecting and removes it on pointerleave", async () => {
+        const test = new Test(sentenceReadingTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        view.start();
+        view.setPart(0);
+        view.showFirstQuestion(false);
+
+        const trueButton = document.getElementById("choice-true");
+
+        trueButton.click();
+        expect(trueButton.classList).toContain("selected");
+
+        trueButton.click();
+        expect(trueButton.classList).not.toContain("selected");
+
+        // After unselecting, no-hover should be applied
+        expect(trueButton.classList).toContain("no-hover");
+
+        // Simulate the pointer leaving the button
+        trueButton.dispatchEvent(new Event("pointerleave"));
+
+        // no-hover should now be removed
+        expect(trueButton.classList).not.toContain("no-hover");
+    });
 });
 
 describe("Letter Shape Test", () => {

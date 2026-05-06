@@ -18,6 +18,7 @@ export class GroupTestView extends StudentTestView {
         this.domElements.setNextButtonListener(() =>
             this.onQuestionComplete(this.currentQuestion, false),
         );
+        document.addEventListener("click", (e) => this.handleOutsideClick(e));
     }
 
     // ---- Parts ----
@@ -310,12 +311,50 @@ export class GroupTestView extends StudentTestView {
         }
     }
 
+    getSelectedButtons() {
+        if (!this.answerButtons) return [];
+        return this.answerButtons
+            .filter((a) => a.button.classList.contains("selected"))
+            .map((a) => a.button);
+    }
+
+    handleOutsideClick(e) {
+        if (!e.target.closest("button")) {
+            this.getSelectedButtons().forEach((btn) => this.unselectAnswer(btn));
+        }
+    }
+
+    unselectAnswer(btn) {
+        this.domElements.toggleButtonSelected(btn, false);
+        this.domElements.toggleNextButton(false);
+        this.domElements.multipleChoiceAnswerDisplay.innerHTML = "";
+        this.selectedAnswer = null;
+        this.textAnswer = null;
+
+        btn.classList.add("no-hover");
+        btn.addEventListener("pointerleave", () => btn.classList.remove("no-hover"), {
+            once: true,
+        });
+
+        this.answerButtons.forEach((a) => {
+            a.button.classList.remove("dimmed");
+        });
+    }
+
     selectAnswer(answer, isMatchPair = false) {
         this.selectedAnswer = answer;
         let leftSelectedEntry;
         let rightSelectedEntry;
+
+        const clickedEntry = this.answerButtons.find((a) => a.answer === answer);
+        const wasSelected = clickedEntry.button.classList.contains("selected");
+
+        if (wasSelected) {
+            this.unselectAnswer(clickedEntry.button);
+            return;
+        }
+
         if (isMatchPair) {
-            const clickedEntry = this.answerButtons.find((a) => a.answer === answer);
             const parentColumn = clickedEntry.button.parentElement;
 
             this.answerButtons.forEach((a) => {
