@@ -278,9 +278,9 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
     def get_template_names(self) -> list[str]:
         if self.object.test.test_type == TestType.INDIVIDUAL:  # pragma: no cover
             # Endnu ikke klar, kommer senere
-            return ["dysleksi/admin/test_assignment/result_individual.html"]
+            return ["dysleksi/admin/test_responses/individual/list.html"]
         else:
-            return ["dysleksi/admin/test_assignment/result_group.html"]
+            return ["dysleksi/admin/test_responses/group/list.html"]
 
     def get_by_category(self):
         key = "all_correct"
@@ -358,10 +358,9 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
                 (
                     key,
                     TestResultColumn(
-                        template_name="dysleksi/admin/table_columns/"
-                        "test_response_score.html",
-                        footer_template_name="dysleksi/admin/table_columns/"
-                        "test_response_score_footer.html",
+                        template_name="dysleksi/admin/test_responses/group/score.html",
+                        footer_template_name="dysleksi/admin/"
+                        "test_responses/group/footer.html",
                         verbose_name=part.name,
                         accessor=count_key,
                         extra_context={  # til brug i template for celle

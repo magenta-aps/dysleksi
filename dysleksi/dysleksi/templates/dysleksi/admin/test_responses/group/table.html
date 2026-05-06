@@ -14,10 +14,10 @@
                         {% else %}
                             <a href="{% querystring sort=column.order_by_alias.next %}">
                         {% endif %}
-                            {% include "dysleksi/admin/table_columns/test_response_score_header.html" %}
+                            {% include "dysleksi/admin/test_responses/group/header.html" %}
                         </a>
                     {% else %}
-                        {% include "dysleksi/admin/table_columns/test_response_score_header.html" %}
+                        {% include "dysleksi/admin/test_responses/group/header.html" %}
                     {% endif %}
                 </th>
             {% endfor %}

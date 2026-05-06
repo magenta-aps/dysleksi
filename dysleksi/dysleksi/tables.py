@@ -129,13 +129,13 @@ class TestResultTable(Table):
 
     def __init__(self, *args, **kwargs):
         super().__init__(
-            template_name="dysleksi/admin/test_assignment/result_group_table.html",
+            template_name="dysleksi/admin/test_responses/group/table.html",
             *args,
             **kwargs,
         )
 
     student = TemplateColumn(
-        template_name="dysleksi/admin/table_columns/test_response_student_name.html",
+        template_name="dysleksi/admin/test_responses/group/student_name.html",
         verbose_name=_("Elev"),
         footer=_("Gennemsnit"),
     )

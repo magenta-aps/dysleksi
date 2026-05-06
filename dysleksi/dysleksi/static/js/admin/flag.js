@@ -16,7 +16,7 @@ export function initialize_flagging() {
                 body: form,
             });
             if (response.ok) {
-                const data = response.json();
+                const data = await response.json();
                 if (data && (data.flagged === true || data.flagged === false)) {
                     for (let other_flag_link of document.querySelectorAll(
                         "[data-response-pk='" + pk + "']",
@@ -25,6 +25,7 @@ export function initialize_flagging() {
                     }
                 }
             }
+            flag_link.dispatchEvent(new Event("flag_resolved"));
         });
     }
 }
