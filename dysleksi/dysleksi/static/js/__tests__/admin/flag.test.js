@@ -12,11 +12,13 @@ const mockDoc = `
 
 describe("Flagging", () => {
     let flag_link;
-    const createMockResponse = (data) => ({
-        json: () => data,
-        status: 200,
-        ok: true,
-    });
+    let flag_complete;
+    const createMockResponse = (data) =>
+        Promise.resolve({
+            json: () => Promise.resolve(data),
+            status: 200,
+            ok: true,
+        });
     const createMockResponseFail = () => ({
         status: 500,
         ok: false,
@@ -24,6 +26,11 @@ describe("Flagging", () => {
     beforeEach(() => {
         document.body.innerHTML = mockDoc;
         flag_link = document.querySelector(".student-flag-link");
+        flag_complete = new Promise((resolve) => {
+            flag_link.addEventListener("flag_resolved", () => {
+                resolve();
+            });
+        });
     });
 
     it("flag", async () => {
@@ -33,6 +40,7 @@ describe("Flagging", () => {
         );
         initialize_flagging();
         await flag_link.click();
+        await flag_complete;
         expect(global.fetch).toHaveBeenCalledTimes(1);
         const form = new FormData();
         form.set("flagged", "true");
@@ -43,6 +51,7 @@ describe("Flagging", () => {
             },
             method: "POST",
         });
+
         flag_link = document.querySelector(".student-flag-link");
         expect(Array.from(flag_link.classList)).toContain("flagged");
     });
@@ -55,6 +64,7 @@ describe("Flagging", () => {
         );
         initialize_flagging();
         await flag_link.click();
+        await flag_complete;
         expect(global.fetch).toHaveBeenCalledTimes(1);
         const form = new FormData();
         form.set("flagged", "false");
@@ -73,6 +83,7 @@ describe("Flagging", () => {
         vi.mocked(global.fetch).mockResolvedValue(createMockResponseFail());
         initialize_flagging();
         await flag_link.click();
+        await flag_complete;
         expect(global.fetch).toHaveBeenCalledTimes(1);
         const form = new FormData();
         form.set("flagged", "true");
@@ -91,6 +102,7 @@ describe("Flagging", () => {
         vi.mocked(global.fetch).mockResolvedValue(createMockResponse(null));
         initialize_flagging();
         await flag_link.click();
+        await flag_complete;
         expect(global.fetch).toHaveBeenCalledTimes(1);
         const form = new FormData();
         form.set("flagged", "true");
@@ -111,6 +123,7 @@ describe("Flagging", () => {
         );
         initialize_flagging();
         await flag_link.click();
+        await flag_complete;
         expect(global.fetch).toHaveBeenCalledTimes(1);
         const form = new FormData();
         form.set("flagged", "true");
