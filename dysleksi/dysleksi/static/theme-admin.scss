@@ -1366,3 +1366,10 @@ $border-radius-student-card: $spacer / 4 * 3;
     gap: 12px !important;
   }
 }
+
+.truncate-cell {
+  max-width: 10vw; 
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
