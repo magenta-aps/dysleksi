@@ -64,7 +64,7 @@ export class IndividualTestView extends StudentTestView {
                 this.domElements.setRepeatButtonListener(() => this.repeat());
                 this.runInstructions();
             } else {
-                this.setupNonPractice();
+                this.setupReminder();
                 this.domElements.toggleRepeatButton(false);
             }
 

@@ -168,8 +168,8 @@ def create_wordspelling_test(
     test, questions_data, practice_questions_data=None, name="Ordstavning"
 ):
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/wordspelling/Øveopgave/6e.1.wav",
-        sound="resources/wordspelling/Øveopgave/6e.1.wav",
+        name="resources/wordspelling/Deltest/6e.2.wav",
+        sound="resources/wordspelling/Deltest/6e.2.wav",
     )
 
     part, created = TestPart.objects.get_or_create(
