@@ -6,7 +6,10 @@ import { initialize_flagging } from "../../admin/flag.js";
 
 const mockDoc = `
     <script id="flag_url" type="application/json">"/flag/0/"</script>
-    <div class="student-flag-link" data-response-pk="4"></div>
+    
+    <div class="student-name">
+    <span class="student-flag" data-response-pk="4"></span>
+    </div>
     <input type="hidden" name="csrfmiddlewaretoken" value="12345" />
 `;
 
@@ -25,7 +28,7 @@ describe("Flagging", () => {
     });
     beforeEach(() => {
         document.body.innerHTML = mockDoc;
-        flag_link = document.querySelector(".student-flag-link");
+        flag_link = document.querySelector(".student-flag");
         flag_complete = new Promise((resolve) => {
             flag_link.addEventListener("flag_resolved", () => {
                 resolve();
@@ -52,7 +55,7 @@ describe("Flagging", () => {
             method: "POST",
         });
 
-        flag_link = document.querySelector(".student-flag-link");
+        flag_link = document.querySelector(".student-flag");
         expect(Array.from(flag_link.classList)).toContain("flagged");
     });
 

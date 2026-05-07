@@ -1131,6 +1131,15 @@ $border-radius-student-card: $spacer / 4 * 3;
           }
         }
       }
+
+      &[colspan] {
+        border-bottom: 0;
+      }
+    }
+    td {
+      &:not(:first-child) {
+        text-align: center;
+      }
     }
   }
 }
@@ -1154,37 +1163,26 @@ $border-radius-student-card: $spacer / 4 * 3;
   }
  }
 
-.student-flag-link {
+.student-name {
 
-  &:hover {
-    color: $blue-dark;
-    text-decoration: underline;
+  .student-flag {
+    float: right;
+    vertical-align: text-top;
+    display: inline-block;
+    height: 1.2em;
+    width: 1.2em;
+    background-repeat: no-repeat;
+    background-size: contain;
     cursor: pointer;
-  }
 
-  &.flagged {
-    &:after {
-      content: "";
+    &.flagged {
       background-image: url("./images/FlagPennant.svg");
-      vertical-align: text-top;
-      background-repeat: no-repeat;
-      background-size: contain;
-      display: inline-block;
-      height: 1.2em;
-      width: 1.2em;
     }
   }
 
-  &:not(.flagged):hover {
-    &::after {
-      content: "";
+  &:hover {
+    .student-flag:not(.flagged) {
       background-image: url("./images/FlagPennantPlus.svg");
-      vertical-align: text-top;
-      background-repeat: no-repeat;
-      background-size: contain;
-      display: inline-block;
-      height: 1.2em;
-      width: 1.2em;
     }
   }
 }

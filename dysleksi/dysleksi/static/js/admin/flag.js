@@ -1,5 +1,5 @@
 export function initialize_flagging() {
-    const flag_links = document.querySelectorAll(".student-flag-link");
+    const flag_links = document.querySelectorAll(".student-flag");
     const csrf_token = document.querySelector("[name=csrfmiddlewaretoken]").value;
     const flag_url_base = JSON.parse(document.getElementById("flag_url").textContent);
     for (let flag_link of flag_links) {

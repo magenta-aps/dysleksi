@@ -7,7 +7,7 @@ from django.template.loader import get_template
 from django.utils.translation import gettext_lazy as _
 from django_tables2 import A, Column, Table, TemplateColumn, tables
 
-from dysleksi.models import CategoryRange, Class, Student, TestAssignment
+from dysleksi.models import CategoryRange, Class, Student, TestAssignment, TestPart
 
 
 class ClassTable(Table):
@@ -154,23 +154,56 @@ class TestResultTable(Table):
         return template.render(context, request)
 
 
-class TestResultColumn(TemplateColumn):
-
+class FooterColumnMixin(Column):
     def __init__(
         self,
         footer_template_name: str,
-        average_value_modifier: Callable | None = None,
-        subgroups=List[CategoryRange],
         *args,
         **kwargs,
     ):
-        super().__init__(args, **kwargs)
+        super().__init__(*args, **kwargs)
         self.footer_template_name = footer_template_name
-        self.average_value_modifier = average_value_modifier
-        self.subgroups = subgroups
+
+    def get_footer_value(self, bound_column, table):
+        # Override in subclasses
+        return None  # pragma: no cover
+
+    def get_footer_additional_context(self, bound_column, table):
+        # Render footer
+        additional_context = {
+            "default": bound_column.default,
+            "column": bound_column,
+            "value": self.get_footer_value(bound_column, table),
+        }
+        if hasattr(self, "extra_context"):
+            additional_context.update(self.extra_context)
+        return additional_context
 
     def render_footer(self, bound_column, table):
-        # Get average
+        context = getattr(table, "context", Context())
+        additional_context = self.get_footer_additional_context(bound_column, table)
+        with context.update(additional_context):
+            return get_template(self.footer_template_name).render(context.flatten())
+
+
+class TestResultColumn(FooterColumnMixin, TemplateColumn):
+
+    def __init__(
+        self,
+        average_value_modifier: Callable | None = None,
+        subgroups: List[CategoryRange] | None = None,
+        assignment: TestAssignment | None = None,
+        part: TestPart | None = None,
+        *args,
+        **kwargs,
+    ):
+        super().__init__(*args, **kwargs)
+        self.average_value_modifier = average_value_modifier
+        self.subgroups = subgroups
+        self.assignment = assignment
+        self.part = part
+
+    def get_footer_value(self, bound_column, table):
         count = len(table.data)
         if count > 0:
             total = sum(bound_column.accessor.resolve(row) for row in table.data)
@@ -180,17 +213,7 @@ class TestResultColumn(TemplateColumn):
 
         if self.average_value_modifier:
             value = self.average_value_modifier(value)
-
-        # Render footer
-        context = getattr(table, "context", Context())
-        additional_context = {
-            "default": bound_column.default,
-            "column": bound_column,
-            "value": value,
-        }
-        additional_context.update(self.extra_context)
-        with context.update(additional_context):
-            return get_template(self.footer_template_name).render(context.flatten())
+        return value
 
 
 class PartResultTable(Table):
@@ -235,3 +258,36 @@ class EmptyColumn(Column):
 
     def render(self, value):
         return ""
+
+
+class StudentTestResponseTable(Table):
+
+    data_category = Column(verbose_name="", footer=_("Bedømmelse"))
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            *args,
+            orderable=False,
+            template_name="dysleksi/admin/test_response/group/table.html",
+            **kwargs,
+        )
+
+
+# def column_group(group_label: str, *columns: Column):
+#     group_dict = {"label": group_label, "count": len(columns), "first": False}
+#     for key, column in columns:
+#         column.group = copy(group_dict)
+#     first_column = columns[0][1]
+#     first_column.group["first"] = True
+#     return columns
+
+
+class StudentTestResultsColumn(FooterColumnMixin, Column):
+
+    def __init__(self, footer_value: Callable, *args, **kwargs):
+        self.footer_value = footer_value
+        super().__init__(*args, **kwargs)
+
+    def get_footer_value(self, bound_column, table):
+        data = [bound_column.accessor.resolve(row) for row in table.data]
+        return self.footer_value(data)

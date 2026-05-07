@@ -1070,6 +1070,19 @@ class TestPartResponseQuerySet(ResponseTest):
         self.assertEqual(student1_answer.responses_count, 0)
         self.assertEqual(student2_answer.responses_count, 0)
 
+    def test_annotate_questions_count(self):
+        qs = self.qs.annotate_questions_count("questions_count")
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.questions_count, 4)
+        self.assertEqual(student2_answer.questions_count, 4)
+
+        qs = self.qs.annotate_questions_count("questions_count", Q(is_practice=False))
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.questions_count, 4)
+        self.assertEqual(student2_answer.questions_count, 4)
+
     def test_annotate_correct_count(self):
         qs = self.qs.annotate_correct_count("correct_count")
         student1_answer = qs[0]
