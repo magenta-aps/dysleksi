@@ -1,0 +1,36 @@
+{% extends "django_tables2/bootstrap5.html" %}
+{% load django_tables2 %}
+{% load i18n l10n %}
+
+{% block table.thead %}
+    {% if table.show_header %}
+        <thead {{ table.attrs.thead.as_html }}>
+        <tr>
+            {% for column in table.columns %}
+                {% if column.column.group %}
+                    {% if column.column.group.first %}
+                        {# first column of group #}
+                    <th {{ column.attrs.th.as_html }} scope="col" colspan="{{ column.column.group.count }}">
+                        {{ column.column.group.label }}
+                    </th>
+                    {% else %}
+                        {# non-first column of group #}
+                    {% endif %}
+                {% else %}
+                    {# non-group (normal) column #}
+                    <th {{ column.attrs.th.as_html }} scope="col" rowspan="2">
+                        {{ column.header }}
+                    </th>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        <tr>
+            {% for column in table.columns %}
+                {% if column.column.group %}
+                    <th>{{ column.header }}</th>
+                {% endif %}
+            {% endfor %}
+        </tr>
+        </thead>
+    {% endif %}
+{% endblock table.thead %}

@@ -1,3 +1,4 @@
-<{{ tag|default:"li" }} class="student-flag-link{% if testresponse.flagged %} flagged{% endif %}" data-response-pk="{{ testresponse.pk }}">
-    {{ testresponse.student.get_full_name }}
-</{{ tag }}>
+<{{ tag|default:"li" }} class="student-name">
+<a href="{% url 'dysleksi:test_assignment_student_results' assignment_pk=testresponse.assignment_id response_pk=testresponse.pk %}">{{ testresponse.student.get_full_name }}</a>
+<span class="student-flag {% if testresponse.flagged %} flagged{% endif %}" data-response-pk="{{ testresponse.pk }}"></span>
+</{{ tag|default:"li" }}>

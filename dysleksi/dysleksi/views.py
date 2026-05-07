@@ -12,6 +12,7 @@ from django.http import HttpResponseRedirect
 from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
 from django.views.generic.edit import UpdateView
 from django_tables2 import SingleTableView
@@ -23,6 +24,7 @@ from dysleksi.models import (
     Class,
     CorrectnessCategory,
     PartResponse,
+    PartResponseQuerySet,
     ReadingSpeedCategory,
     Student,
     Test,
@@ -39,6 +41,8 @@ from dysleksi.tables import (
     EmptyColumn,
     PartResultTable,
     StudentTable,
+    StudentTestResponseTable,
+    StudentTestResultsColumn,
     TestAssignmentTable,
     TestResultColumn,
     TestResultTable,
@@ -392,6 +396,8 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
                         subgroups=CorrectnessCategory.partition_question_count(
                             part_questions_count
                         ),
+                        assignment=self.object,
+                        part=part,
                     ),
                 )
             )
@@ -584,3 +590,102 @@ class AssignmentPartResultsView(GroupRequiredMixin, ListView):
             (1.0, 0.75),
             (1.0, 1.0),
         ]
+
+
+class TestResponseView(LoginRequiredMixin, DetailView):
+    model = TestResponse
+    template_name = "dysleksi/admin/test_response/group/detail.html"
+
+    def get_object(self, queryset=...):
+        return get_object_or_404(
+            TestResponse,
+            assignment=self.kwargs["assignment_pk"],
+            pk=self.kwargs["response_pk"],
+        )
+
+    def get_table(self):
+
+        data: PartResponseQuerySet = (
+            self.object.partresponses.all()
+            .annotate_questions_count("questions_count", Q(is_practice=False))
+            .annotate_responses_count("responses_count")
+            .annotate_correct_count("correct_count")
+            .annotate_correct_proportion(
+                "responses_count", "correct_count", "correct_proportion_of_answered"
+            )
+            .annotate_correct_percentage(
+                "correct_proportion_of_answered", "correct_pct_of_answered"
+            )
+            .annotate_correct_proportion(
+                "questions_count", "correct_count", "correct_proportion_of_all"
+            )
+            .annotate_correct_percentage(
+                "correct_proportion_of_all", "correct_pct_of_all"
+            )
+        )
+
+        part_header = _("%(part_name)s (%(questions_count)s opg.)")
+
+        return StudentTestResponseTable(
+            data=[
+                {
+                    "data_category": _("Antal forsøgte"),
+                    **{
+                        f"part_{item.testpart.pk}": item.responses_count
+                        for item in data
+                    },
+                },
+                {
+                    "data_category": _("Antal rigtige"),
+                    **{f"part_{item.testpart.pk}": item.correct_count for item in data},
+                },
+                {
+                    "data_category": _("Rigtighedsprocent"),
+                    **{
+                        f"part_{item.testpart.pk}": f"{item.correct_pct_of_answered} %"
+                        for item in data
+                    },
+                },
+                {
+                    "data_category": _("Normscore"),
+                    **{
+                        f"part_{item.testpart.pk}": f"{item.correct_pct_of_all} %"
+                        for item in data
+                    },
+                },
+            ],
+            extra_columns=[
+                (
+                    f"part_{part.pk}",
+                    StudentTestResultsColumn(
+                        verbose_name=part_header
+                        % {
+                            "part_name": part.name,
+                            "questions_count": part.questions.count(),
+                        },
+                        footer_template_name="dysleksi/admin/"
+                        "test_response/group/footer.html",
+                        footer_value=lambda column_values: {
+                            "category": CorrectnessCategory.categorize_proportion(
+                                # Matcher rækkefølgen af linjer i `data` ovenfor.
+                                # For at regne kategorien ud deler vi antal rigtige
+                                # (række 1) med antal besvarelser (række 0)
+                                (column_values[1] / column_values[0])
+                                if column_values[0] != 0
+                                else None
+                            ),
+                        },
+                    ),
+                )
+                for part in self.object.assignment.test.parts.all()
+            ],
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update(
+            {
+                "table": self.get_table(),
+            }
+        )
+        return context

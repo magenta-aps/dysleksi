@@ -32,6 +32,7 @@ from django.db.models import (
     When,
     Window,
 )
+from django.db.models.expressions import OuterRef, Subquery
 from django.db.models.functions import Cast, RowNumber
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -923,6 +924,25 @@ class PartResponseQuerySet(QuerySet):
                 output_key: Count(
                     "questionresponses",
                     filter=filter,
+                )
+            }
+        )
+
+    def annotate_questions_count(
+        self, output_key: str, filter: Q | None = None
+    ) -> "PartResponseQuerySet":
+        if filter is None:
+            filter = Q()
+        return self.annotate(
+            **{
+                output_key: Subquery(
+                    TestQuestion.objects.filter(
+                        part=OuterRef("testpart"),
+                    )
+                    .filter(filter)
+                    .values("part")
+                    .annotate(count=Count("id"))
+                    .values("count")
                 )
             }
         )

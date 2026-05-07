@@ -17,7 +17,7 @@ from dysleksi.models import (
     TestType,
     User,
 )
-from dysleksi.tables import PartResultTable, TestResultTable
+from dysleksi.tables import PartResultTable, StudentTestResponseTable, TestResultTable
 from dysleksi.tests.base import DysleksiTest, ResponseTest
 from dysleksi.views import (
     AssignmentPartResultsView,
@@ -28,6 +28,7 @@ from dysleksi.views import (
     RootView,
     StudentListView,
     TestAssignmentListView,
+    TestResponseView,
     UserTypeMixin,
 )
 
@@ -687,4 +688,35 @@ class TestAssignmentPartResultsView(ResponseTest):
                 [["2."], ["4"], ["1"], ["25%"], ["25"]],
                 [["1. Test Elev"], ["4"], ["4"], ["100%"], ["100"]],
             ],
+        )
+
+
+class TestTestResponseView(ResponseTest):
+    def test_table(self):
+        view = self.setup_view(
+            TestResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            response_pk=self.group_testresponse_1.pk,
+        )
+        table = view.get_table()
+        self.assertTrue(isinstance(table, StudentTestResponseTable))
+        part_pk = self.group_test_part.pk
+        self.assertEqual(
+            table.data.data,
+            [
+                {"data_category": "Antal forsøgte", f"part_{part_pk}": 4},
+                {"data_category": "Antal rigtige", f"part_{part_pk}": 4},
+                {"data_category": "Rigtighedsprocent", f"part_{part_pk}": "100 %"},
+                {"data_category": "Normscore", f"part_{part_pk}": "100 %"},
+            ],
+        )
+        self.assertEqual(
+            [
+                BeautifulSoup(str(column.footer), "html.parser").get_text(
+                    separator=";", strip=True
+                )
+                for column in table.columns
+            ],
+            ["Bedømmelse", "Over middel;Se elevens svar"],
         )

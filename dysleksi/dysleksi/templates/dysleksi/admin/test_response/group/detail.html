@@ -1,0 +1,50 @@
+{% extends "dysleksi/admin/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dysleksi:test_assignment_list' %}">{% translate 'Tests' %}</a></li>
+<li class="breadcrumb-item">
+    <a href="{% url 'dysleksi:room' object.pk %}">
+        {% blocktranslate trimmed with class_name=object.assignment.klasse_name test_name=object.assignment.test.name %}
+            Klasse {{ class_name }} - {{ test_name }}
+        {% endblocktranslate %}
+    </a>
+</li>
+<li class="breadcrumb-item">{% translate "Resultater" %}</li>
+<li class="breadcrumb-item active" aria-current="page">{{ object.student.get_full_name }}</li>
+{% endblock %}
+
+{% block inner_content %}
+    <a href="{% url 'dysleksi:test_assignment_results' pk=object.assignment.pk %}" class="ms-3">
+        <i class="ph ph-arrow-elbow-left-up"></i>
+        {% translate "Tilbage til klassens resultater" %}
+    </a>
+    <div class="row">
+        <div class="col-9">
+            <h5 class="mt-2 mb-4">
+                <i class="ph ph-chart-bar fs-5"></i>
+                {% blocktranslate trimmed with name=object.student.get_full_name %}
+                    Elevrapport for {{ name }}
+                {% endblocktranslate %}
+                <span class="subheader">
+                    ({% blocktranslate trimmed with class_name=assignment.klasse_name test_name=object.assignment.test.name %}
+                    Klasse {{class_name}} - {{ test_name }}
+                    {% endblocktranslate %})
+                </span>
+            </h5>
+        </div>
+    </div>
+
+    <h6>{% translate "Elevens resultater" %}</h6>
+    <div id="test-results-table" class="test-results-table">
+        {% render_table table %}
+    </div>
+{% endblock %}
+
+{% block js_module %}
+
+{% endblock %}
