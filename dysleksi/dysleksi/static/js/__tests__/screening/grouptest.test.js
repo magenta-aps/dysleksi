@@ -681,25 +681,30 @@ describe("GroupTestFlow", () => {
         expect(view.showQuestion).toHaveBeenCalledWith(false, 1);
     });
 
-    it("plays the challenge sound immediately on question display", () => {
+    it("plays the challenge sound on question display", () => {
         // Arrange
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
-        const spyShowQuestionChallenge = vi.spyOn(domElements, "showQuestionChallenge");
-        vi.spyOn(console, "log");
-        view.setPart(1); // go to word spelling questions (which use sound challenges)
-        // Act
+        const spyRunInstructions = vi.spyOn(view, "runInstructions");
+        const spyPlayChallengeSound = vi.spyOn(view, "playChallengeSound");
+        // Arrange: go to word spelling questions (which use sound challenges)
+        view.setPart(1);
+
+        // Act: go to first non-practice question (which does not contain instructions)
+        view.showQuestion(false, 0);
+        vi.advanceTimersByTime(500);
+        // Assert: no instruction audio is played
+        expect(spyRunInstructions).not.toHaveBeenCalled();
+        // Assert: the challenge audio is played
+        expect(spyPlayChallengeSound).toHaveBeenCalled();
+
+        // Act: go to second non-practice question (which also contains instructions)
         view.showQuestion(false, 1);
-        // Assert
-        expect(spyShowQuestionChallenge).toHaveReturnedWith({
-            textEl: null,
-            img: null,
-            playBtn: expect.anything(),
-        });
-        expect(console.log).toHaveBeenCalledWith(
-            "Playing challenge sound",
-            view.currentQuestion.challengeSoundUrl,
-        );
+        vi.advanceTimersByTime(500);
+        // Assert: instruction audio was played
+        expect(spyRunInstructions).toHaveBeenCalled();
+        // Assert: the challenge audio is played
+        expect(spyPlayChallengeSound).toHaveBeenCalled();
     });
 
     it("Answer practice question without selecting answer", () => {

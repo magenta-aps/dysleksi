@@ -3,7 +3,17 @@
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.1.wav",
     "correct": "iki",
-    "reminder": 20000
+    "reminder": 20000,
+    "continue_when_instruction_is_complete": false,
+    "instruction_sequence": [
+      {
+        // "Ordet, som du skal skrive, vil kun blive angivet under opgaverne. Du starter nu"
+        // "Oqaatsinik allannermi oqaaseq allatassat taamaallaat taaneqartassaaq.... Aallartipputit"
+        "action": "playSound",
+        "resource": "resources/wordspelling/Deltest/6e.1.wav",
+        "delayAfter": 0
+      }
+    ]
   },
   {
     "question_type": "free_text",
@@ -120,4 +130,3 @@
     "reminder": 20000
   }
 ]
-

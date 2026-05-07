@@ -412,7 +412,8 @@
               "resource_text": "aput",
               "is_correct": null
             }
-          ]
+          ],
+          "instruction_sequence": null
         },
         {
           "id": 27,
@@ -432,7 +433,16 @@
               "resource_text": "iki",
               "is_correct": null
             }
-          ]
+          ],
+          "instruction_sequence": {
+            "instructions": [
+              {
+                "action": "playSound",
+                "delayAfter": 0,
+                "resource": "foo/bar.mp3"
+              }
+            ]
+          }
         }
       ]
     }

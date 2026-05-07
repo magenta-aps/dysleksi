@@ -167,28 +167,35 @@ export class GroupTestView extends StudentTestView {
                         // before they can continue.
                         console.debug("Waiting for user input ...");
                     }
+
+                    // Play challenge sound *after* instruction sequence is completed
+                    // (in order to avoid overlapping sounds.)
+                    if (!this.isPracticing) {
+                        this.playChallengeSound(domEls.playBtn);
+                    }
                 });
             }
 
-            if (!this.isPracticing) {
-                // If question challenge has a sound, it also has a play button.
-                // "Click" the play button to play the sound immediately, as well as
-                // performing the expected DOM updates.
-                if (this.currentQuestion.challengeSoundUrl && domEls.playBtn) {
-                    console.log(
-                        "Playing challenge sound",
-                        this.currentQuestion.challengeSoundUrl,
-                    );
-                    domEls.playBtn.click();
-                }
+            // Play challenge sound (this handles the case where the question does not have an instruction sequence)
+            if (
+                this.currentQuestion.instruction_sequence === null &&
+                !this.isPracticing
+            ) {
+                this.playChallengeSound(domEls.playBtn);
             }
 
             this.questionDisplayedAt = document.timeline.currentTime;
 
+            // When we are no longer practicing, disable the CSS rules used during
+            // instructions and practice questions.
             if (!this.isPracticing) {
-                // Set up timeouts for "reminder" and "time up" events
-                this.setupNonPractice();
+                this.domElements.toggleBodyClass("show-instructions", false);
+            }
 
+            // Set up timeouts for "reminder" and "time up" events
+            this.setupReminder();
+
+            if (!this.isPracticing) {
                 this.send({
                     event: "question.displayed",
                     partIndex: this.currentPartIndex,
@@ -202,6 +209,20 @@ export class GroupTestView extends StudentTestView {
         }
 
         return canShow;
+    }
+
+    playChallengeSound(playBtn) {
+        // If question challenge has a sound, it also has a play button.
+        // "Click" the play button to play the sound as well as performing the expected DOM updates.
+        if (this.currentQuestion.challengeSoundUrl && playBtn) {
+            setTimeout(() => {
+                console.log(
+                    "Playing challenge sound",
+                    this.currentQuestion.challengeSoundUrl,
+                );
+                playBtn.click();
+            }, 500);
+        }
     }
 
     onQuestionComplete(question, outOfTime = false) {

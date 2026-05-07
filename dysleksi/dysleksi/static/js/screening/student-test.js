@@ -339,8 +339,7 @@ export class StudentTestView extends EventTarget {
         });
     }
 
-    setupNonPractice() {
-        this.domElements.toggleBodyClass("show-instructions", false);
+    setupReminder() {
         if (Number(this.currentQuestion.timeout) > 1) {
             if (this.questionTimeoutId) {
                 clearTimeout(this.questionTimeoutId);
@@ -356,6 +355,10 @@ export class StudentTestView extends EventTarget {
                 this.questionReminderId = null;
             }
             this.questionReminderId = setTimeout(() => {
+                console.log(
+                    "Playing reminder sound",
+                    this.currentQuestion.reminderSource,
+                );
                 let currentSource = null;
                 this.domElements.playSound(
                     this.currentQuestion.reminderSource,
