@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 import json
+from unittest.mock import patch
 
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import AnonymousUser
@@ -487,21 +488,24 @@ class TestAssignmentResultsView(ResponseTest):
         view = self.setup_view(
             AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk
         )
-        pagination = view.get_pagination(1)
-        self.assertTrue(type(pagination) is dict)
-        self.assertEqual(pagination["current_page"], 1)
-        self.assertEqual(pagination["current_first"], 1)
-        self.assertEqual(pagination["current_last"], 1)
-        self.assertEqual(pagination["total_count"], 1)
-        self.assertEqual(pagination["page_size"], 3)
-        self.assertEqual(pagination["last_page"], 1)
-        pagination = view.get_pagination(2)
-        self.assertEqual(pagination["current_page"], 2)
-        self.assertEqual(pagination["current_first"], 1)
-        self.assertEqual(pagination["current_last"], 1)
-        self.assertEqual(pagination["total_count"], 1)
-        self.assertEqual(pagination["page_size"], 3)
-        self.assertEqual(pagination["last_page"], 1)
+        with patch.object(view, "get_current_page", return_value=1):
+            pagination = view.get_pagination()
+            self.assertTrue(type(pagination) is dict)
+            self.assertEqual(pagination["current_page"], 1)
+            self.assertEqual(pagination["current_first"], 1)
+            self.assertEqual(pagination["current_last"], 1)
+            self.assertEqual(pagination["total_count"], 1)
+            self.assertEqual(pagination["page_size"], 3)
+            self.assertEqual(pagination["last_page"], 1)
+
+        with patch.object(view, "get_current_page", return_value=2):
+            pagination = view.get_pagination()
+            self.assertEqual(pagination["current_page"], 2)
+            self.assertEqual(pagination["current_first"], 1)
+            self.assertEqual(pagination["current_last"], 1)
+            self.assertEqual(pagination["total_count"], 1)
+            self.assertEqual(pagination["page_size"], 3)
+            self.assertEqual(pagination["last_page"], 1)
 
 
 class TestAssignmentResultsFlagView(ResponseTest):
@@ -692,6 +696,8 @@ class TestAssignmentPartResultsView(ResponseTest):
 
 
 class TestTestResponseView(ResponseTest):
+
+    @override_settings(RESULT_TABLE_SIZE=3)
     def test_table(self):
         view = self.setup_view(
             TestResponseView,
@@ -718,5 +724,30 @@ class TestTestResponseView(ResponseTest):
                 )
                 for column in table.columns
             ],
-            ["Bedømmelse", "Over middel;Se elevens svar"],
+            ["Bedømmelse", "Over middel;Se elevens svar", "", ""],
+        )
+
+    @override_settings(RESULT_TABLE_SIZE=3)
+    def test_only_table(self):
+        view = self.setup_view(
+            TestResponseView,
+            self.teacher,
+            query_params={"only_table": "true"},
+            assignment_pk=self.test_assignment_class.pk,
+            response_pk=self.group_testresponse_1.pk,
+        )
+        response = view.response
+        soup = BeautifulSoup(response.content, "html.parser")
+        table = self.html_table_to_list(soup.find("table"))
+        self.assertEqual(
+            table,
+            [
+                [[], ["GroupTestPart1 (4 opg.)"], [], []],
+                [],
+                [["Antal forsøgte"], ["4"], [], []],
+                [["Antal rigtige"], ["4"], [], []],
+                [["Rigtighedsprocent"], ["100 %"], [], []],
+                [["Normscore"], ["100 %"], [], []],
+                [["Bedømmelse"], ["Over middel", "Se elevens svar"], [], []],
+            ],
         )

@@ -274,7 +274,40 @@ class AdminRootView(GroupRequiredMixin, TemplateView):
     template_name = "dysleksi/admin/base.html"
 
 
-class AssignmentResultsView(GroupRequiredMixin, DetailView):
+class PartPaginationMixin:
+
+    def get_page_size(self) -> int:
+        return settings.RESULT_TABLE_SIZE  # type: ignore[misc]
+
+    def get_parts(self) -> QuerySet[TestPart]:
+        raise NotImplementedError  # pragma: no cover
+
+    def get_pagination(self):
+        parts_count = self.get_parts().count()
+        page = self.get_current_page()
+        page_size = self.get_page_size()
+        return {
+            "current_page": page,
+            "current_first": min(((page - 1) * page_size) + 1, parts_count),
+            "current_last": min(page * page_size, parts_count),
+            "total_count": parts_count,
+            "page_size": page_size,
+            "last_page": ceil(parts_count / page_size),
+        }
+
+    def get_current_page(self) -> int:
+        page_str = self.request.GET.get("page")  # type: ignore[attr-defined]
+        return int(page_str) if page_str is not None else 1
+
+    def get_current_parts(self) -> QuerySet[TestPart]:
+        page = self.get_current_page()
+        pagesize = self.get_page_size()
+        start = (page - 1) * pagesize
+        end = page * pagesize
+        return self.get_parts()[start:end]
+
+
+class AssignmentResultsView(GroupRequiredMixin, PartPaginationMixin, DetailView):
     groups_required = [TEACHERS]
     model = TestAssignment
     table_class = TestResultTable
@@ -318,14 +351,7 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
             )
         ]
 
-    def get_current_page(self) -> int:
-        page_str = self.request.GET.get("page")
-        return int(page_str) if page_str is not None else 1
-
-    def get_page_size(self) -> int:
-        return settings.RESULT_TABLE_SIZE  # type: ignore[misc]
-
-    def get_table(self, page: int = 1):
+    def get_table(self):
         # Data til tabellen, hvor linjerne er elever og kolonnerne er deltests
         qs: TestResponseQuerySet = (
             self.object.responses.all()
@@ -334,10 +360,7 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
             # Annotér med rangering ud fra rækkefølge
             .annotate_ordering("total_score", "rank", False)
         )
-        pagesize = self.get_page_size()
-        parts: QuerySet[TestPart] = self.object.test.parts.all()[
-            (page - 1) * pagesize : page * pagesize
-        ]
+        parts = self.get_current_parts()
         extra_columns = []
         for part in parts:
             key = f"part_{part.pk}_correct"
@@ -408,17 +431,8 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
         qs = qs.order_by(*self.get_ordering())
         return self.table_class(data=qs, extra_columns=extra_columns)
 
-    def get_pagination(self, page: int):
-        parts_count = self.object.test.parts.count()
-        page_size = self.get_page_size()
-        return {
-            "current_page": page,
-            "current_first": min(((page - 1) * page_size) + 1, parts_count),
-            "current_last": min(page * page_size, parts_count),
-            "total_count": parts_count,
-            "page_size": page_size,
-            "last_page": ceil(parts_count / page_size),
-        }
+    def get_parts(self) -> QuerySet[TestPart]:
+        return self.object.test.parts.all()
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.GET.get("only_table") == "true":
@@ -446,18 +460,17 @@ class AssignmentResultsView(GroupRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        page = self.get_current_page()
         if self.request.GET.get("only_table") != "true":
             context_data.update(
                 {
                     "by_category": self.get_by_category(),
-                    "pagination": self.get_pagination(page),
+                    "pagination": self.get_pagination(),
                 }
             )
         context_data.update(
             {
                 "request": self.request,
-                "table": self.get_table(page),
+                "table": self.get_table(),
                 "CorrectnessCategories": {
                     category.pk: category
                     for category in CorrectnessCategory.objects.all()
@@ -592,7 +605,7 @@ class AssignmentPartResultsView(GroupRequiredMixin, ListView):
         ]
 
 
-class TestResponseView(LoginRequiredMixin, DetailView):
+class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
     model = TestResponse
     template_name = "dysleksi/admin/test_response/group/detail.html"
 
@@ -603,9 +616,12 @@ class TestResponseView(LoginRequiredMixin, DetailView):
             pk=self.kwargs["response_pk"],
         )
 
-    def get_table(self):
+    def get_parts(self) -> QuerySet[TestPart]:
+        return self.object.assignment.test.parts.all()
 
-        data: PartResponseQuerySet = (
+    def get_table(self) -> StudentTestResponseTable:
+
+        qs: PartResponseQuerySet = (
             self.object.partresponses.all()
             .annotate_questions_count("questions_count", Q(is_practice=False))
             .annotate_responses_count("responses_count")
@@ -626,66 +642,83 @@ class TestResponseView(LoginRequiredMixin, DetailView):
 
         part_header = _("%(part_name)s (%(questions_count)s opg.)")
 
-        return StudentTestResponseTable(
-            data=[
-                {
-                    "data_category": _("Antal forsøgte"),
-                    **{
-                        f"part_{item.testpart.pk}": item.responses_count
-                        for item in data
+        parts = self.get_current_parts()
+
+        extra_columns = [
+            (
+                f"part_{part.pk}",
+                StudentTestResultsColumn(
+                    verbose_name=part_header
+                    % {
+                        "part_name": part.name,
+                        "questions_count": part.questions.count(),
                     },
-                },
-                {
-                    "data_category": _("Antal rigtige"),
-                    **{f"part_{item.testpart.pk}": item.correct_count for item in data},
-                },
-                {
-                    "data_category": _("Rigtighedsprocent"),
-                    **{
-                        f"part_{item.testpart.pk}": f"{item.correct_pct_of_answered} %"
-                        for item in data
+                    footer_template_name="dysleksi/admin/"
+                    "test_response/group/footer.html",
+                    footer_value=lambda column_values: {
+                        "category": CorrectnessCategory.categorize_proportion(
+                            # Matcher rækkefølgen af linjer i `data` ovenfor.
+                            # For at regne kategorien ud deler vi antal rigtige
+                            # (række 1) med antal besvarelser (række 0)
+                            (column_values[1] / column_values[0])
+                            if column_values[0] != 0
+                            else None
+                        ),
                     },
+                ),
+            )
+            for part in parts
+        ]
+
+        e = 0
+        while len(extra_columns) % self.get_page_size() != 0:
+            extra_columns.append((f"empty_{e}", EmptyColumn()))
+            e += 1
+
+        data = [
+            {
+                "data_category": _("Antal forsøgte"),
+                **{f"part_{item.testpart.pk}": item.responses_count for item in qs},
+            },
+            {
+                "data_category": _("Antal rigtige"),
+                **{f"part_{item.testpart.pk}": item.correct_count for item in qs},
+            },
+            {
+                "data_category": _("Rigtighedsprocent"),
+                **{
+                    f"part_{item.testpart.pk}": f"{item.correct_pct_of_answered} %"
+                    for item in qs
                 },
-                {
-                    "data_category": _("Normscore"),
-                    **{
-                        f"part_{item.testpart.pk}": f"{item.correct_pct_of_all} %"
-                        for item in data
-                    },
+            },
+            {
+                "data_category": _("Normscore"),
+                **{
+                    f"part_{item.testpart.pk}": f"{item.correct_pct_of_all} %"
+                    for item in qs
                 },
-            ],
-            extra_columns=[
-                (
-                    f"part_{part.pk}",
-                    StudentTestResultsColumn(
-                        verbose_name=part_header
-                        % {
-                            "part_name": part.name,
-                            "questions_count": part.questions.count(),
-                        },
-                        footer_template_name="dysleksi/admin/"
-                        "test_response/group/footer.html",
-                        footer_value=lambda column_values: {
-                            "category": CorrectnessCategory.categorize_proportion(
-                                # Matcher rækkefølgen af linjer i `data` ovenfor.
-                                # For at regne kategorien ud deler vi antal rigtige
-                                # (række 1) med antal besvarelser (række 0)
-                                (column_values[1] / column_values[0])
-                                if column_values[0] != 0
-                                else None
-                            ),
-                        },
-                    ),
-                )
-                for part in self.object.assignment.test.parts.all()
-            ],
-        )
+            },
+        ]
+
+        return StudentTestResponseTable(data=data, extra_columns=extra_columns)
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.GET.get("only_table") == "true":
+            return HttpResponse(context["table"].as_html(self.request))
+        else:
+            return super().render_to_response(context, **response_kwargs)
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context.update(
             {
+                "request": self.request,
                 "table": self.get_table(),
+                "CorrectnessCategories": {
+                    category.pk: category
+                    for category in CorrectnessCategory.objects.all()
+                },
+                "pagination": self.get_pagination(),
             }
         )
         return context

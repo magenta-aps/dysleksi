@@ -39,12 +39,39 @@
         </div>
     </div>
 
-    <h6>{% translate "Elevens resultater" %}</h6>
+
+    <div class="row">
+        <div class="col-10">
+            <h6>{% translate "Elevens resultater" %}</h6>
+        </div>
+        {{ pagination|json_script:"pagination" }}
+        <div data-pagination-details="pagination" data-pagination-param="page" data-pagination-target="test-results-table" class="col-2 d-flex align-items-center justify-content-md-end">
+            <span class="paginator-text" data-format="{% translate '${first} - ${last} af ${total}' %}">
+                {% blocktranslate trimmed with first=pagination.current_first last=pagination.current_last total=pagination.total_count %}
+                    {{ first }} - {{ last }} af {{ total }}
+                {% endblocktranslate %}
+            </span>
+            <div class="btn-group">
+                <button class="paginate-left btn btn-borderless" {% if pagination.current_page <= 1 %}disabled{% endif %}>
+                    <i class="ph ph-arrow-left m-0"></i>
+                </button>
+                <button class="paginate-right btn btn-borderless" {% if pagination.current_page >= pagination.last_page %}disabled{% endif %}>
+                    <i class="ph ph-arrow-right m-0"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
     <div id="test-results-table" class="test-results-table">
         {% render_table table %}
     </div>
+
 {% endblock %}
 
 {% block js_module %}
-
+    {{ block.super }}
+    <script type="module">
+    import { initialize_pagination } from '{% static 'js/admin/pagination.js' %}';
+    document.addEventListener("DOMContentLoaded", initialize_pagination);
+    </script>
 {% endblock %}
