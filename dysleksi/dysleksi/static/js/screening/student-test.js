@@ -367,6 +367,5 @@ export class StudentTestView extends EventTarget {
                 );
             }, this.currentQuestion.reminder);
         }
-        this.domElements.toggleNextButton(false);
     }
 }
