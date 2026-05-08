@@ -79,6 +79,7 @@ LOGGING: dict = {
             "propagate": False,
             "handlers": ["gunicorn"],
         },
+        "mozilla_django_oidc": {"handlers": ["gunicorn"], "level": "DEBUG"},
     },
 }
 

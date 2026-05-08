@@ -34,8 +34,7 @@ class LoginTest(TestCase):
         cls.staff_user.save()
 
 
-class LoginGeneralTest(TestCase):
-
+class LoginGeneralTest(LoginTest):
     def test_redirect_to_login(self):
         response = self.client.get(reverse("dysleksi:root"))
         self.assertEqual(response.status_code, 302)
@@ -44,16 +43,75 @@ class LoginGeneralTest(TestCase):
             reverse("login:login") + "?next=/",
         )
 
+    def test_choose_login_provider(self):
+        response = self.client.post(reverse("login:login"), {"provider": "mitid"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"],
+            reverse("login:login_forward", kwargs={"provider": "mitid"}),
+        )
+
+        response = self.client.post(reverse("login:login"), {"provider": "unilogin"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"],
+            reverse("login:login_forward", kwargs={"provider": "unilogin"}),
+        )
+
+        response = self.client.post(reverse("login:login"), {"provider": "django"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"],
+            reverse("login:login_forward", kwargs={"provider": "django"}),
+        )
+
+    def test_choose_invalid_provider(self):
+        response = self.client.post(reverse("login:login"), {"provider": "invalid"})
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"],
+            reverse("login:login"),
+        )
+
     def test_logout_already_logged_out(self):
         response = self.client.get(reverse("login:logout"))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], settings.LOGOUT_REDIRECT_URL)
         self.assertNotIn("_auth_user_id", dict(self.client.session).keys())
 
+    def test_not_logged_in(self):
+        response = self.client.get(reverse("login:login"))
+        self.assertEqual(response.status_code, 200)
+
+    def test_login_already_logged_in(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.post(reverse("login:login"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/")
+
+    def test_login_forward_already_logged_in(self):
+        self.client.force_login(self.staff_user)
+        response = self.client.get(
+            reverse("login:login_forward", kwargs={"provider": "django"})
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/")
+
 
 @override_settings(PUBLIC=True)
-@override_settings(LOGIN_BYPASS_ENABLED=False)
 class SamlLoginTest(LoginTest):
+    def test_invalid_saml_data(self):
+        session = self.client.session
+        session.update(
+            {
+                "saml": {
+                    "this config": "is invalid",
+                }
+            }
+        )
+        session.save()
+        response = self.client.get(reverse("login:login"))
+        self.assertEqual(response.status_code, 200)
 
     def test_postlogin(self):
         session = self.client.session
@@ -70,7 +128,9 @@ class SamlLoginTest(LoginTest):
             }
         )
         session.save()
-        response = self.client.get(reverse("login:login"))
+        response = self.client.get(
+            reverse("login:login_forward", kwargs={"provider": "mitid"})
+        )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], "/")
 
@@ -117,11 +177,35 @@ class SamlLoginTest(LoginTest):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], "/foobar")
 
+    def test_login_forward_back(self):
+        session = self.client.session
+        session.update(
+            {
+                "saml": {
+                    "ava": {
+                        "cpr": ["1234567890"],
+                        "firstname": ["Test"],
+                        "lastname": ["Testersen"],
+                        "email": ["test@example.com"],
+                    }
+                },
+            }
+        )
+        session.save()
+        self.client.cookies["back"] = "/foobar"
+        response = self.client.get(
+            reverse("login:login_forward", kwargs={"provider": "mitid"})
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/foobar")
+
     def test_redirect(self):
         session = self.client.session
         session["saml"] = {"cpr": "1234567890"}
         session.save()
-        response = self.client.get(reverse("login:login"))
+        response = self.client.get(
+            reverse("login:login_forward", kwargs={"provider": "mitid"})
+        )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], reverse("login:mitid:login"))
 
@@ -139,11 +223,48 @@ class SamlLoginTest(LoginTest):
         self.assertEqual(response.headers["Location"], reverse("login:mitid:logout"))
 
 
+@override_settings(PUBLIC=True)
+class OIDCLoginTest(LoginTest):
+    def test_already_logged_in(self):
+        url = reverse("dysleksi:root")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"],
+            reverse("login:login") + "?next=/",
+        )
+
+    def test_redirect(self):
+        response = self.client.get(
+            reverse("login:login_forward", kwargs={"provider": "unilogin"})
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"],
+            reverse("login:unilogin:oidc_authentication_init"),
+        )
+
+    def test_logout_redirect(self):
+        self.client.login(username="test", password="test")
+        session = self.client.session
+        session.update(
+            {
+                BACKEND_SESSION_KEY: (
+                    "login.authentication_backend.DysleksiOIDCAuthenticationBackend"
+                ),
+            }
+        )
+        session.save()
+        response = self.client.get(reverse("login:logout"))
+        self.assertEqual(
+            response.headers["Location"], reverse("login:unilogin:oidc_logout")
+        )
+
+
 @override_settings(
     BYPASS_2FA=False, REQUIRE_2FA=True, LANGUAGE_CODE="da-dk", PUBLIC=False
 )
 class Django2FaLoginTest(LoginTest):
-
     def test_redirect_to_login_needs_2fa(self):
         self.client.force_login(self.staff_user)
         response = self.client.get(reverse("dysleksi:root"))
@@ -161,11 +282,28 @@ class Django2FaLoginTest(LoginTest):
 
     def test_django_login_form(self):
         response = self.client.post(
-            reverse("login:login"),
+            reverse("login:login_forward", kwargs={"provider": "django"}),
             {
                 "auth-username": "test",
                 "auth-password": "test",
-                "login_view-current_step": "auth",
+                "login_forward_view-current_step": "auth",
+            },
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/")
+        response = self.client.get(reverse("login:login") + "?back=/foobar")
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], "/foobar")
+
+    @override_settings(PUBLIC=True)
+    def test_public_django_login_form(self):
+        self.client.get(reverse("login:login_forward", kwargs={"provider": "django"}))
+        response = self.client.post(
+            reverse("login:login_forward", kwargs={"provider": "django"}),
+            {
+                "auth-username": "test",
+                "auth-password": "test",
+                "login_forward_view-current_step": "auth",
             },
         )
         self.assertEqual(response.status_code, 302)
@@ -176,13 +314,13 @@ class Django2FaLoginTest(LoginTest):
 
     @override_settings()
     def test_django_login_form_incorrect(self):
-        self.client.get(reverse("login:login"))
+        self.client.get(reverse("login:login_forward", kwargs={"provider": "django"}))
         response = self.client.post(
-            reverse("login:login"),
+            reverse("login:login_forward", kwargs={"provider": "django"}),
             {
                 "auth-username": "test",
                 "auth-password": "incorrect",
-                "login_view-current_step": "auth",
+                "login_forward_view-current_step": "auth",
             },
         )
         self.assertEqual(response.status_code, 200)
@@ -196,14 +334,20 @@ class Django2FaLoginTest(LoginTest):
         response = self.client.get(reverse("login:logout"))
         self.assertEqual(response.headers["Location"], settings.LOGOUT_REDIRECT_URL)
 
+    @override_settings(PUBLIC=True)
+    def test_public_django_logout_redirect(self):
+        self.client.login(username="test", password="test")
+        response = self.client.get(reverse("login:logout"))
+        self.assertEqual(response.headers["Location"], settings.LOGOUT_REDIRECT_URL)
+
     def test_django_login_back(self):
         self.client.cookies["back"] = "/foobar"
         self.client.post(
-            reverse("login:login"),
+            reverse("login:login_forward", kwargs={"provider": "django"}),
             {
                 "auth-username": "test",
                 "auth-password": "test",
-                "login_view-current_step": "auth",
+                "login_forward_view-current_step": "auth",
             },
         )
         response = self.client.get(reverse("login:login"))
@@ -213,11 +357,12 @@ class Django2FaLoginTest(LoginTest):
         self.client.logout()
 
         self.client.post(
-            reverse("login:login") + "?back=/foobaz",
+            reverse("login:login_forward", kwargs={"provider": "django"})
+            + "?back=/foobaz",
             {
                 "auth-username": "test",
                 "auth-password": "test",
-                "login_view-current_step": "auth",
+                "login_forward_view-current_step": "auth",
             },
         )
         response = self.client.get(reverse("login:login"))
@@ -229,16 +374,20 @@ class Django2FaLoginTest(LoginTest):
         data = {
             "auth-username": "test",
             "auth-password": "test",
-            "login_view-current_step": "auth",
+            "login_forward_view-current_step": "auth",
         }
-        response = self.client.post(reverse("login:login"), data)
+        response = self.client.post(
+            reverse("login:login_forward", kwargs={"provider": "django"}), data
+        )
         self.assertContains(response, "Kode:")
 
         data = {
             "token-otp_token": "123456",
-            "login_view-current_step": "token",
+            "login_forward_view-current_step": "token",
         }
-        response = self.client.post(reverse("login:login"), data)
+        response = self.client.post(
+            reverse("login:login_forward", kwargs={"provider": "django"}), data
+        )
         self.assertEqual(
             response.context_data["wizard"]["form"].errors,
             {
@@ -250,11 +399,13 @@ class Django2FaLoginTest(LoginTest):
 
         data = {
             "token-otp_token": totp_str(device.bin_key),
-            "login_view-current_step": "token",
+            "login_forward_view-current_step": "token",
         }
         device.throttle_reset()
 
-        response = self.client.post(reverse("login:login"), data)
+        response = self.client.post(
+            reverse("login:login_forward", kwargs={"provider": "django"}), data
+        )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], "/")
 
@@ -265,9 +416,11 @@ class Django2FaLoginTest(LoginTest):
         data = {
             "auth-username": "test",
             "auth-password": "test",
-            "login_view-current_step": "auth",
+            "login_forward_view-current_step": "auth",
         }
-        response = self.client.post(reverse("login:login"), data)
+        response = self.client.post(
+            reverse("login:login_forward", kwargs={"provider": "django"}), data
+        )
 
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], "/")
@@ -324,7 +477,6 @@ class Django2FaLoginTest(LoginTest):
 
 
 class LoginTimeoutTest(LoginTest):
-
     def test_session_expired_call(self):
         self.client.login(username="test", password="test")
         session = self.client.session

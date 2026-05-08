@@ -86,7 +86,6 @@ services:
     environment:
       - TEST=false
       - ALLOWED_HOSTS=["<hostname>.local","dysleksi-web","localhost","host.docker.internal"]
-      - LOGIN_BYPASS_ENABLED=True
       - CSRF_TRUSTED_ORIGINS=["https://<hostname (lowercase)>.local","https://dysleksi-web"]
   dysleksi-traefik:
     environment:

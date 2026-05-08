@@ -94,6 +94,14 @@ class User(AbstractUser):
         unique=True,
     )
 
+    uniid = models.CharField(
+        null=True,
+        blank=True,
+        unique=True,
+        verbose_name=_("UniLogin UniID"),
+        max_length=100,
+    )
+
     @cached_property
     def group_names(self) -> List[str]:
         if self.pk:

@@ -73,6 +73,10 @@ msgid "CPR"
 msgstr ""
 
 #: dysleksi/models.py
+msgid "UniLogin UniID"
+msgstr ""
+
+#: dysleksi/models.py
 msgid "Student must match assignment."
 msgstr ""
 

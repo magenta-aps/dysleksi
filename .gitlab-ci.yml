@@ -194,6 +194,13 @@ Lint Javascript:
     TABULEX_CLIENT_CERT: /builds/gronlandsprojekter/dysleksi/file-data/tabulex/selfsigned.crt
     TABULEX_CLIENT_KEY: /builds/gronlandsprojekter/dysleksi/file-data/tabulex/selfsigned.key
     TABULEX_SYSTEM_ID: abc123
+    OIDC_RP_CLIENT_ID: dysleksi
+    OIDC_RP_CLIENT_SECRET: dysleksi-secret
+    OIDC_OP_JWKS_ENDPOINT: http://dysleksi-oidc-provider:9000/certs
+    OIDC_OP_AUTHORIZATION_ENDPOINT: https://dysleksi-oidc-provider/auth
+    OIDC_OP_TOKEN_ENDPOINT: http://dysleksi-oidc-provider:9000/token
+    OIDC_OP_USER_ENDPOINT: http://dysleksi-oidc-provider:9000/me
+    OIDC_AUTHENTICATION_CALLBACK_URL: https://dysleksi-web/oidc/callback/
 
 
   image: ${IMAGE_SHA}

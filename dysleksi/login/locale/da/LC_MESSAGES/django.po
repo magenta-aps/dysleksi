@@ -33,13 +33,34 @@ msgstr ""
 msgid "Husk mig på denne maskine i {days} dage"
 msgstr ""
 
-#: login/templates/login/login.html login/templates/login/login_repeat.html
+#: login/templates/login/login.html
+msgid "Vælg Login"
+msgstr ""
+
+#: login/templates/login/login_choice.html
+msgid "Vælg Login Metode"
+msgstr ""
+
+#: login/templates/login/login_choice.html
+msgid "Log ind med UniLogin"
+msgstr ""
+
+#: login/templates/login/login_choice.html
+msgid "Log ind med MitID"
+msgstr ""
+
+#: login/templates/login/login_choice.html
+msgid "Log ind med brugernavn/kodeord"
+msgstr ""
+
+#: login/templates/login/login_django.html
+#: login/templates/login/login_repeat.html
 #: login/templates/login/login_timeout.html
 #: login/templates/two_factor/_wizard_actions.html
 msgid "Log ind"
 msgstr ""
 
-#: login/templates/login/login.html
+#: login/templates/login/login_django.html
 msgid "Indtast venligst koden, der er genereret af din token-generator."
 msgstr ""
 

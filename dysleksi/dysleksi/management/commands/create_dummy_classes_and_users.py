@@ -77,6 +77,7 @@ class Command(BaseCommand):
                 "last_name": "Elevsen",
                 "cpr": "0111111111",
                 "institution": school,
+                "uniid": "1a2b3c4d5e",
             },
         )
         if created:

@@ -3,23 +3,16 @@
 
 {% extends "card.html" %}
 {% load i18n %}
-{% load two_factor_tags %}
 
 {% block title %}
-{% translate "Log ind" %}
+{% translate "Vælg Login" %}
 {% endblock %}
 
 {% block card_content %}
-{% if wizard.steps.current == 'token' %}
-<p>{% translate "Indtast venligst koden, der er genereret af din token-generator." %}</p>
-{% endif %}
 <form action="" method="post">
-    {% block main_form_content %}
     {% csrf_token %}
-    {% include "two_factor/_wizard_forms.html" %}
-    {# hidden submit button to enable [enter] key #}
-    <input type="submit" value="" hidden/>
-    {% include "two_factor/_wizard_actions.html" %}
-    {% endblock %}
+    <button type="submit" name="provider" value="unilogin">UniLogin</button>
+    <button type="submit" name="provider" value="mitid">MitID</button>
+    <button type="submit" name="provider" value="django">Brugernavn/Password</button>
 </form>
 {% endblock %}

@@ -5,7 +5,7 @@
 from django.urls import URLPattern, URLResolver, include, path
 from django.views.generic import TemplateView
 from django_mitid_auth.saml.views import AccessDeniedView
-from login.views import LoginView, LogoutView, TwoFactorSetup
+from login.views import LoginForwardView, LoginView, LogoutView, TwoFactorSetup
 
 app_name = "login"
 
@@ -13,7 +13,19 @@ app_name = "login"
 urlpatterns: list[URLResolver | URLPattern] = [
     path("mitid/", include("django_mitid_auth.urls", namespace="mitid")),
     path(
-        "login",
+        "oidc/",
+        include(
+            ("mozilla_django_oidc.urls", "unilogin"),
+            namespace="unilogin",
+        ),
+    ),
+    path(
+        "login/forward/<str:provider>",
+        LoginForwardView.as_view(),
+        name="login_forward",
+    ),
+    path(
+        "login/",
         LoginView.as_view(),
         name="login",
     ),
