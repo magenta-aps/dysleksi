@@ -334,6 +334,7 @@ export class StudentTestView extends EventTarget {
                 this.domElements.skipAllInstructionsButton.style.display = "none";
             }
             this.endedInstructions = true;
+            this.showingInstructions = false;
             this.updateNextButtonClass();
             onCompleted();
         });
