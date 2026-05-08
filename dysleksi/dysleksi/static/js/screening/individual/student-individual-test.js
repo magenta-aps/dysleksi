@@ -44,6 +44,7 @@ export class IndividualTestView extends StudentTestView {
     // ---- Questions ----
     showQuestion(isPracticing, questionIndex) {
         const canShow = this.setQuestion(isPracticing, questionIndex);
+        this.domElements.toggleNextButton(false);
         if (canShow) {
             // TODO: [#68981] Refactor this code somewhere else
             console.log("---------------------------------------------");
