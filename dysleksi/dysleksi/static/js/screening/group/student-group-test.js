@@ -319,7 +319,7 @@ export class GroupTestView extends StudentTestView {
     }
 
     handleOutsideClick(e) {
-        if (!e.target.closest("button")) {
+        if (!e.target.closest("button") && !this.showingInstructions) {
             this.getSelectedButtons().forEach((btn) => this.unselectAnswer(btn));
         }
     }
