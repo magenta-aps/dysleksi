@@ -144,7 +144,7 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap;
 
 
-  &:hover, &:focus, &:active {
+  &:not(.no-hover):hover {
     background-color: $student-blue !important;
     outline: 4px solid $student-blue-dark !important;
     box-shadow: $blue-button-shadow;
@@ -189,7 +189,7 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     &.selected,
-    &:hover {
+    &:not(.no-hover):hover {
       background-color: $student-green-light !important;
       box-shadow: $dark-green-button-shadow;
     }
@@ -206,7 +206,7 @@ h1, h2, h3, h4, h5, h6 {
     }
 
     &.selected,
-    &:hover {
+    &:not(.no-hover):hover {
       background-color: $student-red-light !important;
       box-shadow: $dark-red-button-shadow;
     }
