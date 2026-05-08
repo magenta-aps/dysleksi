@@ -373,6 +373,15 @@ class TestDomElements {
         const inputs = document.querySelectorAll("input:not(.debug-input)");
         inputs.forEach((input) => {
             input.readOnly = inputLocked;
+            if (inputLocked) {
+                input.style.pointerEvents = "none";
+                input.tabIndex = -1;
+                input.setAttribute("inert", "");
+            } else {
+                input.style.pointerEvents = "";
+                input.removeAttribute("tabindex");
+                input.removeAttribute("inert");
+            }
         });
         this.toggleBodyClass("input-locked", inputLocked);
     }
