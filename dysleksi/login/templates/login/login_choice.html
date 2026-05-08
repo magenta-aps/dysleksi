@@ -1,0 +1,15 @@
+{# SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk> #}
+{# SPDX-License-Identifier: MPL-2.0 #}
+
+{% extends "card.html" %}
+{% load i18n %}
+
+{% block title %}
+{% translate "Vælg Login Metode" %}
+{% endblock %}
+
+{% block card_content %}
+<a href="{% url 'login:login' provider="unilogin" %}" class="btn btn-outline-primary">{% translate "Log ind med UniLogin" %}</a>
+<a href="{% url 'login:login' provider="mitid" %}" class="btn btn-outline-primary">{% translate "Log ind med MitID" %}</a>
+<a href="{% url 'login:login' %}" class="btn btn-outline-primary">{% translate "Log ind med brugernavn/kodeord" %}</a>
+{% endblock %}

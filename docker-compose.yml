@@ -203,6 +203,17 @@ services:
       - default
     restart: unless-stopped
 
+  dysleksi-oidc-provider:
+    container_name: dysleksi-oidc-provider
+    image: qlik/simple-oidc-provider
+    volumes:
+      - ./dev-environment/oidc/:/conf:ro
+    environment:
+      USERS_FILE: "/conf/users.json"
+      CONFIG_FILE: "/conf/oidc.conf"
+    networks:
+      - default
+
 
 volumes:
   postgres-data:

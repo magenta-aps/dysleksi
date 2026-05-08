@@ -3,7 +3,7 @@
 hosts_file="/hosts"
 
 add_hosts=""
-for hostname in dysleksi-web dysleksi-idp; do
+for hostname in dysleksi-web dysleksi-idp dysleksi-oidc-provider; do
   if ! grep $hostname $hosts_file; then
     add_hosts+=" $hostname"
   fi

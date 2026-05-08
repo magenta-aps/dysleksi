@@ -17,3 +17,8 @@ http:
       loadBalancer:
         servers:
           - url: "http://dysleksi-web:8000"
+  middlewares:
+    dysleksi-headers:
+      headers:
+        customRequestHeaders:
+          X-Forwarded-Proto: "https"

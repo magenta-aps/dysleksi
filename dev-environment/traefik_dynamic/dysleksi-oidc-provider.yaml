@@ -1,0 +1,12 @@
+http:
+  routers:
+    dysleksi-oidc-provider:
+      rule: "Host(`dysleksi-oidc-provider`)"
+      service: dysleksi-oidc-provider
+      entryPoints:
+        - websecure
+  services:
+    dysleksi-oidc-provider:
+      loadBalancer:
+        servers:
+          - url: "http://dysleksi-oidc-provider:9000"

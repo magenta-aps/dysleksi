@@ -10,7 +10,8 @@ from pathlib import Path
 
 import saml2
 from django.urls import reverse_lazy
-from project.settings.base import DEBUG
+from django.utils.text import format_lazy
+from project.settings.base import DEBUG, HOST_DOMAIN
 from project.util import strtobool
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -31,6 +32,7 @@ AUTH_PASSWORD_VALIDATORS = [
 AUTHENTICATION_BACKENDS = [
     "django_mitid_auth.saml.backend.Saml2Backend",  # Will log in mitid users
     "django.contrib.auth.backends.ModelBackend",  # Will log in django users
+    "login.authentication_backend.DysleksiOIDCAuthenticationBackend",  # Will log in to unilogin
 ]
 
 DEFAULT_CPR = "1234567890"
@@ -63,6 +65,7 @@ LOGIN_WHITELISTED_URLS = [
     "/_ht/",
     "/jsi18n/",
     LOGIN_URL,
+    reverse_lazy("login:login"),
     LOGIN_TIMEOUT_URL,
     LOGIN_REPEATED_URL,
     LOGIN_NO_CPRCVR_URL,
@@ -74,6 +77,11 @@ LOGIN_WHITELISTED_URLS = [
     # Whitelist the Django "set_language" view, so it works even outside
     # authenticated contexts.
     reverse_lazy("set_language"),
+    reverse_lazy("login:login_forward", kwargs={"provider": "mitid"}),
+    reverse_lazy("login:login_forward", kwargs={"provider": "unilogin"}),
+    reverse_lazy("login:login_forward", kwargs={"provider": "django"}),
+    reverse_lazy("login:unilogin:oidc_authentication_init"),
+    reverse_lazy("login:unilogin:oidc_authentication_callback"),
 ]
 MITID_TEST_ENABLED = bool(strtobool(os.environ.get("MITID_TEST_ENABLED", "False")))
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
@@ -182,3 +190,17 @@ SAML = {
         ],
     },
 }
+# OIDC settings
+OIDC_RP_CLIENT_ID = os.environ["OIDC_RP_CLIENT_ID"]
+OIDC_RP_CLIENT_SECRET = os.environ["OIDC_RP_CLIENT_SECRET"]
+OIDC_RP_SIGN_ALGO = "RS256"
+OIDC_RP_IDP_SIGN_KEY = os.environ.get("OIDC_RP_IDP_SIGN_KEY", None)
+OIDC_OP_JWKS_ENDPOINT = os.environ.get("OIDC_OP_JWKS_ENDPOINT", None)
+OIDC_OP_AUTHORIZATION_ENDPOINT = os.environ["OIDC_OP_AUTHORIZATION_ENDPOINT"]
+OIDC_OP_TOKEN_ENDPOINT = os.environ["OIDC_OP_TOKEN_ENDPOINT"]
+OIDC_OP_USER_ENDPOINT = os.environ["OIDC_OP_USER_ENDPOINT"]
+OIDC_AUTHENTICATION_CALLBACK_URL = "login:unilogin:oidc_authentication_callback"
+OIDC_VERIFY_SSL = not DEBUG
+OIDC_TOKEN_USE_BASIC_AUTH = DEBUG
+ALLOW_LOGOUT_GET_METHOD = True
+SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")

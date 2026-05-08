@@ -1,0 +1,11 @@
+[
+  {
+    "id": "elevelevsen",
+    "email": "elev@elev.gl",
+    "email_verified": true,
+    "name": "Elev Elevsen",
+    "uniid": "1a2b3c4d5e",
+    "password": "elev",
+    "groups": [ "Elever" ]
+  }
+]

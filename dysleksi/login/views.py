@@ -16,9 +16,70 @@ from two_factor.views import SetupView
 
 
 class LoginView(TwoFactorLoginView):
+    template_name = "login/login.html"
+
+    def get_success_url(self):
+        return self.back or super().get_success_url()
+
+    def get(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            saml_data = request.session.get("saml")
+            if saml_data:
+                user = authenticate(
+                    request=request,
+                    saml_data=saml_data,
+                )
+                if user and user.is_authenticated:
+                    # Callback from MitID login should log in authenticated users
+                    # store user in session
+                    login(
+                        request=request,
+                        user=user,
+                        backend="django_mitid_auth.saml.backend.Saml2Backend",
+                    )
+                    return redirect(self.get_success_url())
+            # No valid user in SAML data. Go to provider choice
+            return super().get(request, *args, **kwargs)
+        else:
+            # User already authenticated. Go to success URL
+            return redirect(self.get_success_url())
+
+    def post(self, request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            provider = request.POST.get("provider")
+            if provider in ["mitid", "unilogin", "django"]:
+                return redirect(
+                    reverse(
+                        "login:login_forward",
+                        kwargs={"provider": provider},
+                    )
+                )
+            else:
+                return redirect(reverse("login:login"))
+        else:
+            return redirect(self.get_success_url())
+
+    def get_context_data(self, **context):
+        return super().get_context_data(
+            **{
+                **context,
+                "back": self.back,
+            }
+        )
+
+    @property
+    def back(self):
+        return (
+            self.request.GET.get("back")
+            or self.request.GET.get(REDIRECT_FIELD_NAME)
+            or self.request.COOKIES.get("back")
+        )
+
+
+class LoginForwardView(TwoFactorLoginView):
     AUTH_STEP = TwoFactorLoginView.AUTH_STEP
     TOKEN_STEP = TwoFactorLoginView.TOKEN_STEP
-    template_name = "login/login.html"
+    template_name = "login/login_django.html"
 
     form_list = (
         (AUTH_STEP, AuthenticationForm),
@@ -58,9 +119,17 @@ class LoginView(TwoFactorLoginView):
 
     def get(self, request, *args, **kwargs):
         if not request.user.is_authenticated:
-            if settings.PUBLIC and not settings.LOGIN_BYPASS_ENABLED:
-                # MitID login
-                return self.login_mitid(request, *args, **kwargs)
+            if settings.PUBLIC:
+                if kwargs["provider"] == "mitid":
+                    # MitID login
+                    return self.login_mitid(request, *args, **kwargs)
+                elif kwargs["provider"] == "unilogin":
+                    # UniLogin
+                    return self.login_unilogin(request, *args, **kwargs)
+                else:
+                    # Django login as fallback, since only these three provider
+                    # values are allowed for unauthenticated users
+                    return self.login_django(request, *args, **kwargs)
             else:
                 # Django login
                 return self.login_django(request, *args, **kwargs)
@@ -85,18 +154,14 @@ class LoginView(TwoFactorLoginView):
             request=request,
             saml_data=request.session.get("saml"),
         )
-        if user and user.is_authenticated:
-            # store user in session
-            login(
-                request=request,
-                user=user,
-                backend="django_mitid_auth.saml.backend.Saml2Backend",
-            )
         if user is None or not user.is_authenticated:
             # no user, redirect to login page
             return redirect(reverse("login:mitid:login"))
         else:
             return redirect(self.get_success_url())
+
+    def login_unilogin(self, request, *args, **kwargs) -> HttpResponse:
+        return redirect(reverse("login:unilogin:oidc_authentication_init"))
 
     def login_django(self, request, *args, **kwargs) -> HttpResponse:
         return super().get(request, *args, **kwargs)
@@ -132,7 +197,15 @@ class LogoutView(RedirectView):
     def get_redirect_url(self, *args, **kwargs):
         if self.request.user.is_authenticated:
             if settings.PUBLIC:
-                return reverse("login:mitid:logout")
+                if self.request.session.get("saml"):
+                    return reverse("login:mitid:logout")
+                elif (
+                    self.request.session.get("_auth_user_backend")
+                    == "login.authentication_backend.DysleksiOIDCAuthenticationBackend"
+                ):
+                    return reverse("login:unilogin:oidc_logout")
+                else:
+                    logout(self.request)
             else:
                 logout(self.request)
         return settings.LOGOUT_REDIRECT_URL
