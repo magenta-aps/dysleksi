@@ -98,10 +98,13 @@ describe("AssetCache", () => {
     });
 
     describe("applyCssVariables", () => {
-        it("updates :root CSS variables with cached blobs", () => {
-            cache.map.set("/static/bg.png", mockBlobUrl);
+        let mockStyle;
+        let mockStyle2;
+        let mockStyle3;
+        let setPropertySpy;
 
-            const mockStyle = {
+        beforeEach(() => {
+            mockStyle = {
                 "--bg-image": 'url("/static/bg.png")',
                 getPropertyValue: (name) =>
                     name === "--bg-image" ? 'url("/static/bg.png")' : "",
@@ -112,7 +115,7 @@ describe("AssetCache", () => {
                 },
             };
 
-            const mockStyle2 = {
+            mockStyle2 = {
                 "--some-other-var": "foo.png",
                 getPropertyValue: (name) =>
                     name === "--some-other-var" ? "foo.png" : "",
@@ -123,7 +126,7 @@ describe("AssetCache", () => {
                 },
             };
 
-            const mockStyle3 = {
+            mockStyle3 = {
                 "some-other-var": "foo.png",
                 getPropertyValue: (name) =>
                     name === "some-other-var" ? "foo.png" : "",
@@ -164,10 +167,11 @@ describe("AssetCache", () => {
                 getPropertyValue: (prop) => mockStyle.getPropertyValue(prop),
             });
 
-            const setPropertySpy = vi.spyOn(
-                document.documentElement.style,
-                "setProperty",
-            );
+            setPropertySpy = vi.spyOn(document.documentElement.style, "setProperty");
+        });
+
+        it("updates :root CSS variables with cached blobs", () => {
+            cache.map.set("/static/bg.png", mockBlobUrl);
 
             cache.applyCssVariables();
 
@@ -184,6 +188,31 @@ describe("AssetCache", () => {
                 expect.any(String),
             );
             expect(setPropertySpy).toHaveBeenCalledTimes(1);
+        });
+
+        it("updates CSS variables if filename contains hash", () => {
+            cache.map.set("/static/bg.6eca11d940e6.png", mockBlobUrl);
+
+            cache.applyCssVariables();
+
+            expect(setPropertySpy).toHaveBeenCalledWith(
+                "--bg-image",
+                `url(${mockBlobUrl})`,
+            );
+        });
+
+        it("Raise warning if CSS variable is not in map", () => {
+            cache.map.set("/static/bg2.png", mockBlobUrl);
+
+            const warnSpy = vi.spyOn(console, "warn").mockImplementation(() => {});
+            cache.applyCssVariables();
+            expect(setPropertySpy).toHaveBeenCalledTimes(0);
+
+            // We expect the code to complain that bg.png is not present in the map
+            expect(warnSpy).toHaveBeenCalledWith(
+                expect.stringContaining("bg.png"),
+                expect.any(Map),
+            );
         });
     });
 
@@ -208,6 +237,20 @@ describe("AssetCache", () => {
             );
 
             expect(document.fonts.add).toHaveBeenCalled();
+        });
+    });
+
+    describe("stripHash", () => {
+        it("strips hashes", async () => {
+            const strippedPath = cache._stripHash("/static/file.6eca11d940e6.png");
+            const strippedPath2 = cache._stripHash("/static/file.png");
+            const strippedPath3 = cache._stripHash("/static/1a.2.wav");
+            const strippedPath4 = cache._stripHash("/static/1a.2.c2ecd49d10b7.wav");
+
+            expect(strippedPath).toBe("/static/file.png");
+            expect(strippedPath2).toBe("/static/file.png");
+            expect(strippedPath3).toBe("/static/1a.2.wav");
+            expect(strippedPath4).toBe("/static/1a.2.wav");
         });
     });
 });

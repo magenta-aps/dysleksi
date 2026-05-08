@@ -3,6 +3,26 @@ export class AssetCache {
         this.map = new Map();
     }
 
+    // Strip a content hash like ".6eca11d940e6" from before the extension
+    // "/static/file.6eca11d940e6.png" -> "/static/file.png"
+    // "/static/file.png" -> "/static/file.png" (unchanged)
+    _stripHash(path) {
+        return path.replace(/\.[a-f0-9]{8,}(\.[^./]+)$/i, "$1");
+    }
+
+    _lookup(path) {
+        // Try exact match first
+        if (this.map.has(path)) return this.map.get(path);
+
+        // Strip hashes from map keys and check if there is a match
+        for (const [key, value] of this.map.entries()) {
+            if (this._stripHash(key) === path) {
+                return value;
+            }
+        }
+        return undefined;
+    }
+
     fetch(url) {
         // Return a blob-URL given a static or media URL
         return this.map.get(url) || url;
@@ -70,9 +90,16 @@ export class AssetCache {
                 // Convert absolute URL to relative path (e.g., /static/...)
                 const path = new URL(fullUrl, window.location.origin).pathname;
 
-                const blobUrl = this.map.get(path);
-                document.documentElement.style.setProperty(varName, `url(${blobUrl})`);
-                console.log(`Successfully mapped ${varName} -> ${path}`);
+                const blobUrl = this._lookup(path);
+                if (!blobUrl) {
+                    console.warn(`${path} is not in the map: `, this.map);
+                } else {
+                    document.documentElement.style.setProperty(
+                        varName,
+                        `url(${blobUrl})`,
+                    );
+                    console.log(`Successfully mapped ${varName} -> ${path}`);
+                }
             }
         });
     }
