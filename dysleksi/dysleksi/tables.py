@@ -82,6 +82,11 @@ class StudentTable(Table):
     )
 
 
+def _test_assignment_title(record):
+    subject = record.student.get_full_name() if record.student else record.klasse.name
+    return f"{subject} - {record.test}"
+
+
 class TestAssignmentTable(Table):
     class Meta:
         model = TestAssignment
@@ -91,6 +96,12 @@ class TestAssignmentTable(Table):
         template_name="dysleksi/admin/table_columns/test_assignment_name.html",
         orderable=False,
         verbose_name=_("Navn"),
+        attrs={
+            "td": {
+                "class": "truncate-cell",
+                "title": _test_assignment_title,
+            }
+        },
     )
 
     type = tables.Column(
@@ -101,6 +112,12 @@ class TestAssignmentTable(Table):
     test = tables.Column(
         accessor=A("test__name"),
         verbose_name=_("Test"),
+        attrs={
+            "td": {
+                "class": "truncate-cell",
+                "title": lambda record: str(record.test),
+            }
+        },
     )
 
     number_of_students = tables.Column(
