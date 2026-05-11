@@ -516,9 +516,10 @@ class TestPart(models.Model):
             )
             question["reminder"] = data.get("reminder", self.reminder)
             question_reminder_source = data.get("reminder_source", self.reminder_source)
-            question["reminder_source"], _ = TestResource.objects.get_or_create(
-                name=question_reminder_source, sound=question_reminder_source
-            )
+            if question_reminder_source is not None:
+                question["reminder_source"], _ = TestResource.objects.get_or_create(
+                    name=question_reminder_source, sound=question_reminder_source
+                )
             if "timeout" in data and not is_practice:
                 question["timeout"] = data["timeout"]
             else:

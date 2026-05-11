@@ -1,201 +1,72 @@
 [
+  // 9a.1-9a.5 - indledning
   {
-    // TODO: Find du af question type, og om image behøves at sættes til noget
     "question_type": "no_input_required",
+    "text": " ",
     "instruction_sequence": [
-      // 9a.1
+      // 9a.1 - skærmen vises tydeligt/normalt
       {
         "action": "playSound",
         "resource": "resources/letter_pronunciation/Indledning/9a.1.wav",
-        "delayAfter": 500
+        "delayAfter": 0
+      },
+      {
+        "action": "show",
+        "element": "question-challenge",
+        "delayAfter": 0
+      },
+      {
+        "action": "fadeIn",
+        "element": "question-challenge",
+        "delayAfter": 1250
       },
 
       // 9a.2
       {
         "action": "playSound",
         "resource": "resources/letter_pronunciation/Indledning/9a.2.wav",
-        "delayAfter": 500
+        "delayAfter": 1250
       },
 
       // 9a.3
       {
         "action": "playSound",
         "resource": "resources/letter_pronunciation/Indledning/9a.3.wav",
-        "delayAfter": 500
+        "delayAfter": 1250
       },
 
       // 9a.4
       {
         "action": "playSound",
         "resource": "resources/letter_pronunciation/Indledning/9a.4.wav",
-        "delayAfter": 500
+        "delayAfter": 1250
       },
 
-      // 9a.5
+      // 9a.5 - "Næste"-knappen vises
+      {
+        "action": "playSound",
+        "resource": "resources/letter_pronunciation/Indledning/9a.5.wav",
+        "delayAfter": 0
+      },
       {
         "action": "show",
         "element": "next",
         "delayAfter": 0
       },
       {
-        "action": "playSound",
-        "resource": "resources/letter_pronunciation/Indledning/9a.5.wav",
-        "delayAfter": 500
-      }
-    ]
-  },
-  {
-    "text": "D",
-    "question_type": "no_input_required",
-    "instruction_sequence": [
-      // 9b.1a
-      {
-        "action": "hide",
-        "element": "next"
-      },
-      {
-        "action": "hide",
-        "element": "repeat"
-      },
-      {
-        "action": "show",
-        "element": "question-challenge"
-      },
-      {
-        "action": "playSound",
-        "resource": "resources/letter_pronunciation/Instruktion/9b.1a.wav",
-        "delayAfter": 500
-      },
-      {
-        "action": "highlight",
-        "element": "question-challenge"
-      },
-      
-      // 9b.1b
-      {
-        "action": "playSound",
-        "resource": "resources/letter_pronunciation/Instruktion/9b.1b.wav",
-        "delayAfter": 500
-      },
-
-      // 9b.1c
-      {
-        "action": "playSound",
-        "resource": "resources/letter_pronunciation/Instruktion/9b.1c.wav",
-        "delayAfter": 500
-      },
-
-      // 9b.1d
-      {
-        "action": "fadeOut",
-        "element": "question-challenge"
-      },
-      {
-        "action": "playSound",
-        "resource": "resources/letter_pronunciation/Instruktion/9b.1d.wav",
-        "delayAfter": 500
-      },
-
-      // 9b.2
-      {
-        "action": "playSound",
-        "resource": "resources/letter_pronunciation/Instruktion/9b.2.wav",
-        "delayAfter": 500
-      },
-
-      // 9b.3
-      {
-        "action": "playSound",
-        "resource": "resources/letter_pronunciation/Instruktion/9b.3.wav",
-        "delayAfter": 500
-      },
-      {
-        "action": "show",
-        "element": "next"
-      }
-    ]
-  },
-  {
-    "question_type": "no_input_required",
-    "text": "C",
-    "correct": null,
-    "wrong": [],
-    "reminder": 5000,
-    "reminder_source": "resources/letter_pronunciation/Øveopgave1/9c.4a.wav"
-  },
-  {
-    "question_type": "no_input_required",
-    "text": "B",
-    "correct": null,
-    "wrong": [],
-    "reminder": 5000,
-    "reminder_source": "resources/letter_pronunciation/Øveopgave2/9d.2.wav"
-  },
-  {
-    "question_type": "no_input_required",
-    "instruction_sequence": [
-      // 9d.4
-      {
-        "action": "fadeOut",
-        "element": "next"
-      },
-      {
-        "action": "fadeOut",
-        "element": "repeat"
-      },
-      {
-        "action": "show",
-        "element": "next"
-      },
-      {
-        "action": "show",
-        "element": "repeat"
-      },
-      {
-        "action": "playSound",
-        "resource": "resources/letter_pronunciation/Øveopgave2/9d.4.wav",
-        "delayAfter": 500
-      },
-      {
         "action": "fadeIn",
-        "element": "next"
-      },
-      {
-        "action": "highlight",
-        "element": "next"
-      },
-      {
-        "action": "playSound",
-        "resource": "resources/letter_pronunciation/Øveopgave2/9d.4a.wav",
-        "delayAfter": 500
-      },
-      {
-        "action": "setRepeatButtonDestination",
-        "data": 1
-      },
-      {
-        "action": "fadeIn",
-        "element": "repeat"
-      },
-      {
-        "action": "highlight",
-        "element": "repeat"
-      },
-      {
-        "action": "playSound",
-        "resource": "resources/letter_pronunciation/Øveopgave2/9d.4b.wav",
-        "delayAfter": 500
-      },
-      {
-        "action": "setButtonSoundOnce",
         "element": "next",
-        "resource": "resources/letter_pronunciation/Øveopgave2/9d.5a.wav"
-      },
-      {
-        "action": "setButtonSoundOnce",
-        "element": "repeat",
-        "resource": "resources/letter_pronunciation/Øveopgave2/9d.5b.wav"
+        "delayAfter": 1250
       }
     ]
+  },
+
+  // 9b.1 - eleven ser bogstavet "B" mens læreren afgør, om eleven forstår opgaven.
+  //
+  // Læreren spørger eleven, hvad bogstavet hedder, og eventuelt hvad forbogstavet i elevens navn er.
+  // Når eleven forstår opgaven, siger læreren til eleven: "Nu starter opgaverne" og trykker på videreknappen.
+  {
+    "text": "B",
+    "question_type": "no_input_required"
   }
 ]

@@ -129,7 +129,7 @@ class Command(BaseCommand):
             )
         elif test_type == "pronunciation":
             create_pronunciation_test(
-                test, questions_data, testpart_name, practice_data
+                test, questions_data, practice_data, name=testpart_name
             )
         elif test_type == "letter_sound":
             create_letter_sound_test(
