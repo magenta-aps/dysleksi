@@ -176,6 +176,7 @@ describe("IndividualTestFlow", () => {
     });
 
     it("cancel test", () => {
+        view.setPart(0);
         view.onChatMessage({
             uuid: crypto.randomUUID(),
             event: "test.cancelled",
@@ -199,6 +200,7 @@ describe("IndividualTestFlow", () => {
     });
 
     it("cancel test without media recorder", () => {
+        view.setPart(0);
         view.mediaRecorder = null;
         view.onChatMessage({
             uuid: crypto.randomUUID(),

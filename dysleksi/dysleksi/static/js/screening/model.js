@@ -197,6 +197,7 @@ export class TestPart {
         this.instructionsUrl = data.instructions_url;
         this.timeout = data.timeout;
         this.partialScoreAfter = data.partial_score_after;
+        this.completionSource = data.completion_source;
         this.questionIndex = 0;
         this.currentQuestion = null;
         const questionClass = this.getQuestionClass();
