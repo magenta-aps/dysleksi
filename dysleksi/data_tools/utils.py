@@ -12,6 +12,10 @@ def create_wordreading_2_test(
         name="resources/wordreading_2/Deltests/7e.2.wav",
         sound="resources/wordreading_2/Deltests/7e.2.wav",
     )
+    completion, created = TestResource.objects.get_or_create(
+        name="resources/wordreading_2/Deltests/7e.3.wav",
+        sound="resources/wordreading_2/Deltests/7e.3.wav",
+    )
     part, created = TestPart.objects.get_or_create(
         name=name,
         defaults={
@@ -20,6 +24,7 @@ def create_wordreading_2_test(
             "reminder": 20000,  # 20 seconds
             "image_url": "/static/images/wordreading.png",
             "reminder_source": reminder,
+            "completion_source": completion,
             "show_normscore_speed_plot": True,
         },
     )
@@ -38,6 +43,10 @@ def create_wordreading_1_test(
         name="resources/wordreading_1/Deltest/5e.2.wav",
         sound="resources/wordreading_1/Deltest/5e.2.wav",
     )
+    completion, created = TestResource.objects.get_or_create(
+        name="resources/wordreading_1/Deltest/5e.3.wav",
+        sound="resources/wordreading_1/Deltest/5e.3.wav",
+    )
 
     part, created = TestPart.objects.get_or_create(
         name=name,
@@ -47,6 +56,7 @@ def create_wordreading_1_test(
             "image_url": "/static/images/wordreading_1.png",
             "reminder": 15000,  # 15 seconds
             "reminder_source": reminder,
+            "completion_source": completion,
             "show_normscore_speed_plot": True,
         },
     )
@@ -63,8 +73,13 @@ def create_fore_sound_test(
 
     # TODO: Add this sound to dysleksi-binaries when we receive it
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/fore_sound/Deltests/xxx.wav",
-        sound="resources/fore_sound/Deltests/xxx.wav",
+        name="resources/fore_sound/Martha/2e.2.mp3",
+        sound="resources/fore_sound/Martha/2e.2.mp3",
+    )
+
+    completion, created = TestResource.objects.get_or_create(
+        name="resources/fore_sound/Martha/2e.3.mp3",
+        sound="resources/fore_sound/Martha/2e.3.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -75,6 +90,7 @@ def create_fore_sound_test(
             "image_url": "/static/images/fore_sound.png",
             "reminder": 15000,  # 15 seconds
             "reminder_source": reminder,
+            "completion_source": completion,
         },
     )
     if created:
@@ -92,6 +108,10 @@ def create_letter_sound_test(
         name="resources/letter_sound/Deltest/1e.2.wav",
         sound="resources/letter_sound/Deltest/1e.2.wav",
     )
+    completion, created = TestResource.objects.get_or_create(
+        name="resources/letter_sound/Deltest/1e.3.wav",
+        sound="resources/letter_sound/Deltest/1e.3.wav",
+    )
 
     part, created = TestPart.objects.get_or_create(
         name=name,
@@ -101,6 +121,7 @@ def create_letter_sound_test(
             "image_url": "/static/images/letter_sound.png",
             "reminder": 15000,  # 15 seconds
             "reminder_source": reminder,
+            "completion_source": completion,
         },
     )
     if created:
@@ -110,12 +131,17 @@ def create_letter_sound_test(
     test.parts.add(part)
 
 
+# This test was developed but ended up not making it in the final test set
+# We keep supporting it for a while in case they change their mind...
 def create_letter_name_test(
     test, questions_data, practice_questions_data=None, name="Bogstavnavne"
 ):
 
-    # TODO: Replace with actual reminder sound when we get it
     reminder, created = TestResource.objects.get_or_create(
+        name="resources/letter_name/Deltest/xx.x.wav",
+        sound="resources/letter_name/Deltest/xx.x.wav",
+    )
+    completion, created = TestResource.objects.get_or_create(
         name="resources/letter_name/Deltest/xx.x.wav",
         sound="resources/letter_name/Deltest/xx.x.wav",
     )
@@ -128,6 +154,7 @@ def create_letter_name_test(
             "image_url": "/static/images/letter_name.png",
             "reminder": 15000,  # 15 seconds
             "reminder_source": reminder,
+            "completion_source": completion,
         },
     )
     if created:
@@ -143,8 +170,12 @@ def create_letter_shape_test(
 
     # TODO: Replace with actual reminder sound when we get it
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/letter_shape/Deltest/xx.x.wav",
-        sound="resources/letter_shape/Deltest/xx.x.wav",
+        name="resources/letter_shape/Martha/3e.2.mp3",
+        sound="resources/letter_shape/Martha/3e.2.mp3",
+    )
+    completion, created = TestResource.objects.get_or_create(
+        name="resources/letter_shape/Martha/3e.3.mp3",
+        sound="resources/letter_shape/Martha/3e.3.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -155,6 +186,7 @@ def create_letter_shape_test(
             "image_url": "/static/images/letter_shape.png",
             "reminder": 10000,  # 15 seconds
             "reminder_source": reminder,
+            "completion_source": completion,
         },
     )
     if created:
@@ -171,6 +203,10 @@ def create_wordspelling_test(
         name="resources/wordspelling/Deltest/6e.2.wav",
         sound="resources/wordspelling/Deltest/6e.2.wav",
     )
+    completion, created = TestResource.objects.get_or_create(
+        name="resources/wordspelling/Deltest/6e.3.wav",
+        sound="resources/wordspelling/Deltest/6e.3.wav",
+    )
 
     part, created = TestPart.objects.get_or_create(
         name=name,
@@ -179,6 +215,7 @@ def create_wordspelling_test(
             "partial_score_after": 0,  # no partial score (?)
             "image_url": "/static/images/wordspelling.png",
             "reminder_source": reminder,
+            "completion_source": completion,
         },
     )
     if created:
@@ -196,6 +233,10 @@ def create_nonwordspelling_test(
         name="resources/nonwordspelling/Martha/4e.4.mp3",
         sound="resources/nonwordspelling/Martha/4e.4.mp3",
     )
+    completion, created = TestResource.objects.get_or_create(
+        name="resources/nonwordspelling/Martha/4e.5.mp3",
+        sound="resources/nonwordspelling/Martha/4e.5.mp3",
+    )
 
     part, created = TestPart.objects.get_or_create(
         name=name,
@@ -204,6 +245,7 @@ def create_nonwordspelling_test(
             "partial_score_after": 0,  # no partial score (?)
             "image_url": "/static/images/nonwordspelling.png",
             "reminder_source": reminder,
+            "completion_source": completion,
         },
     )
     if created:
@@ -213,18 +255,75 @@ def create_nonwordspelling_test(
     test.parts.add(part)
 
 
-def create_pronunciation_test(
-    test,
-    questions_data,
-    practice_questions_data=None,
-    name="Bogstavbenævnelse",
+def create_letter_pronunciation_test(
+    test, questions_data, practice_questions_data=None, name="Bogstavbenævnelse"
 ):
+    reminder, created = TestResource.objects.get_or_create(
+        name="resources/letter_pronunciation/Deltests/9e.1.wav",
+        sound="resources/letter_pronunciation/Deltests/9e.1.wav",
+    )
+    completion, created = TestResource.objects.get_or_create(
+        name="resources/letter_pronunciation/Deltests/9e.2.wav",
+        sound="resources/letter_pronunciation/Deltests/9e.2.wav",
+    )
+
     part, created = TestPart.objects.get_or_create(
         name=name,
         defaults={
             "timeout": 0,
             "partial_score_after": 30000,
             "image_url": "/static/images/letter_pronunciation.png",
+            "completion_source": completion,
+        },
+    )
+    if created:  # pragma: no branch
+        part.create_test_resources(questions_data, False)
+        if practice_questions_data:
+            part.create_test_resources(practice_questions_data, True)
+    test.parts.add(part)
+
+
+def create_word_pronunciation_test(
+    test, questions_data, practice_questions_data=None, name="Højtlæsning af ord"
+):
+    completion, created = TestResource.objects.get_or_create(
+        name="resources/word_pronunciation/Martha/10c.2.mp3",
+        sound="resources/word_pronunciation/Martha/10c.2.mp3",
+    )
+
+    part, created = TestPart.objects.get_or_create(
+        name=name,
+        defaults={
+            "timeout": 0,
+            "partial_score_after": 30000,
+            "image_url": "/static/images/word_pronunciation.png",
+            "reminder_source": None,
+            "completion_source": completion,
+        },
+    )
+    if created:  # pragma: no branch
+        part.create_test_resources(questions_data, False)
+        if practice_questions_data:
+            part.create_test_resources(practice_questions_data, True)
+    test.parts.add(part)
+
+
+def create_nonsense_word_pronunciation_test(
+    test, questions_data, practice_questions_data=None, name="Højtlæsning af nonord"
+):
+    completion, created = TestResource.objects.get_or_create(
+        name="resources/nonsense_word_pronunciation/Martha/11c.2.mp3",
+        sound="resources/nonsense_word_pronunciation/Martha/11c.2.mp3",
+    )
+
+    part, created = TestPart.objects.get_or_create(
+        name=name,
+        defaults={
+            "timeout": 0,
+            "partial_score_after": 30000,
+            "image_url": "/static/images/nonsense_word_pronunciation.png",
+            "reminder_source": None,
+            "completion_source": completion,
         },
     )
     if created:  # pragma: no branch
@@ -239,8 +338,12 @@ def create_sentence_reading_test(
 ):
     # TODO: Add this sound to dysleksi-binaries when we receive it
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/sentence_reading/Øveopgave/xx.x.wav",
-        sound="resources/sentence_reading/Øveopgave/xx.x.wav",
+        name="resources/sentence_reading/Martha/8e.5.mp3",
+        sound="resources/sentence_reading/Martha/8e.5.mp3",
+    )
+    completion, created = TestResource.objects.get_or_create(
+        name="resources/sentence_reading/Martha/8e.6.mp3",
+        sound="resources/sentence_reading/Martha/8e.6.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -250,6 +353,7 @@ def create_sentence_reading_test(
             "partial_score_after": 4 * 60 * 1000,  # 4 minutes
             "image_url": "/static/images/sentence_reading.png",
             "reminder_source": reminder,
+            "completion_source": completion,
         },
     )
     if created:

@@ -282,7 +282,7 @@ def create_individual_test(
             test_name,
             letter_pronunciation_test_name,
             letter_pronunciation_data_path,
-            "pronunciation",
+            "letter_pronunciation",
             practice_json_path=(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/letter_pronunciation/letter_pronunciation_practice.json"
@@ -297,7 +297,7 @@ def create_individual_test(
                 test_name,
                 word_pronunciation_test_name,
                 word_pronunciation_data_path,
-                "pronunciation",
+                "word_pronunciation",
             )
 
         if nonsense_word_pronunciation_data_path:
@@ -306,7 +306,7 @@ def create_individual_test(
                 test_name,
                 nonsense_word_pronunciation_test_name,
                 nonsense_word_pronunciation_data_path,
-                "pronunciation",
+                "nonsense_word_pronunciation",
             )
     return test
 

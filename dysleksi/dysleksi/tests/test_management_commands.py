@@ -95,7 +95,7 @@ class ImportTestTest(TestCase):
             self.test_name,
             "Bogstavsbenævnelse",
             str(tmp_questions_data_path),
-            "pronunciation",
+            "letter_pronunciation",
             practice_json_path=str(tmp_practice_data_path),
         )
 
@@ -129,7 +129,7 @@ class ImportTestTest(TestCase):
             self.test_name,
             "Bogstavsbenævnelse",
             str(tmp_questions_data_path),
-            "pronunciation",
+            "letter_pronunciation",
             practice_json_path=None,
         )
 

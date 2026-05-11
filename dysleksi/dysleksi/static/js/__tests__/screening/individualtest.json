@@ -9,6 +9,7 @@
       "instructions_url": null,
       "timeout": 60,
       "partial_score_after": 30,
+      "completion_source": "/static/foo.mp3",
       "practice": [
         {
           "id": 0,
@@ -85,6 +86,7 @@
       "instructions_url": null,
       "timeout": 60,
       "partial_score_after": 30,
+      "completion_source": "/static/foo.mp3",
       "practice": [],
       "questions": [
         {

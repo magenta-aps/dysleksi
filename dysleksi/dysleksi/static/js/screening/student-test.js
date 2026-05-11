@@ -86,6 +86,12 @@ export class StudentTestView extends EventTarget {
                     ' <span class="checkmark"><i class="ph-fill ph-check-fat"></i></span>',
             );
             this.domElements.showTestPartIntroImage();
+
+            this.domElements.playSound(
+                this.previousPart.completionSource,
+                null,
+                this.audioContext,
+            );
         } else {
             this.domElements.hideTestPartIntroImage();
         }
@@ -202,6 +208,11 @@ export class StudentTestView extends EventTarget {
         );
         this.domElements.hideTestContainer();
         this.domElements.showTestExit();
+        this.domElements.playSound(
+            this.currentPart.completionSource,
+            null,
+            this.audioContext,
+        );
     }
 
     // ---- Parts ----

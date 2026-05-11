@@ -5,10 +5,13 @@
 from data_tools.utils import (
     create_fore_sound_test,
     create_letter_name_test,
+    create_letter_pronunciation_test,
     create_letter_shape_test,
     create_letter_sound_test,
+    create_nonsense_word_pronunciation_test,
     create_nonwordspelling_test,
     create_sentence_reading_test,
+    create_word_pronunciation_test,
     create_wordreading_1_test,
     create_wordspelling_test,
 )
@@ -19,6 +22,68 @@ from dysleksi.models import Test, TestResource
 
 class UtilTest(TestCase):
     def setUp(self):
+
+        self.letter_pronunciation_data = [
+            {
+                "text": "s",
+                "correct": None,
+                "wrong": [],
+                "question_type": "no_input_required",
+            },
+        ]
+        self.word_pronunciation_data = [
+            {
+                "text": "iput",
+                "correct": None,
+                "wrong": [],
+                "question_type": "no_input_required",
+            },
+        ]
+
+        self.nonsense_word_pronunciation_data = [
+            {
+                "text": "foo",
+                "correct": None,
+                "wrong": [],
+                "question_type": "no_input_required",
+            },
+        ]
+
+        self.letter_pronunciation_practice_data = [
+            {
+                "text": "s",
+                "correct": None,
+                "wrong": [],
+                "question_type": "no_input_required",
+                "instruction_sequence": [
+                    {"action": "show", "element": "challenge-text", "delayAfter": 0},
+                ],
+            },
+        ]
+        self.word_pronunciation_practice_data = [
+            {
+                "text": "iput",
+                "correct": None,
+                "wrong": [],
+                "question_type": "no_input_required",
+                "instruction_sequence": [
+                    {"action": "show", "element": "challenge-text", "delayAfter": 0},
+                ],
+            },
+        ]
+
+        self.nonsense_word_pronunciation_practice_data = [
+            {
+                "text": "foo",
+                "correct": None,
+                "wrong": [],
+                "question_type": "no_input_required",
+                "instruction_sequence": [
+                    {"action": "show", "element": "challenge-text", "delayAfter": 0},
+                ],
+            },
+        ]
+
         self.wordspelling_data = [
             {
                 "sound": "wordspelling_dummy/iki.mp3",
@@ -291,3 +356,47 @@ class UtilTest(TestCase):
         )
 
         self.assertTrue(TestResource.objects.filter(text="Ss").exists())
+
+    def test_create_letter_pronunciation_test(self):
+
+        create_letter_pronunciation_test(self.test, self.letter_pronunciation_data)
+        self.assertTrue(TestResource.objects.filter(text="s").exists())
+
+    def test_create_letter_pronunciation_test_with_practice_run(self):
+
+        create_letter_pronunciation_test(
+            self.test,
+            self.letter_pronunciation_data,
+            self.letter_pronunciation_practice_data,
+        )
+        self.assertTrue(TestResource.objects.filter(text="s").exists())
+
+    def test_create_word_pronunciation_test(self):
+
+        create_word_pronunciation_test(self.test, self.word_pronunciation_data)
+        self.assertTrue(TestResource.objects.filter(text="iput").exists())
+
+    def test_create_word_pronunciation_test_with_practice_run(self):
+
+        create_word_pronunciation_test(
+            self.test,
+            self.word_pronunciation_data,
+            self.word_pronunciation_practice_data,
+        )
+        self.assertTrue(TestResource.objects.filter(text="iput").exists())
+
+    def test_create_nonsense_word_pronunciation_test(self):
+
+        create_nonsense_word_pronunciation_test(
+            self.test, self.nonsense_word_pronunciation_data
+        )
+        self.assertTrue(TestResource.objects.filter(text="foo").exists())
+
+    def test_create_nonsense_word_pronunciation_test_with_practice_run(self):
+
+        create_nonsense_word_pronunciation_test(
+            self.test,
+            self.nonsense_word_pronunciation_data,
+            self.nonsense_word_pronunciation_practice_data,
+        )
+        self.assertTrue(TestResource.objects.filter(text="foo").exists())

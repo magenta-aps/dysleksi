@@ -329,6 +329,9 @@ class Test(models.Model):
                 "partial_score_after": part.partial_score_after,
                 "practice": [],
                 "questions": [],
+                "completion_source": (
+                    part.completion_source.url if part.completion_source else None
+                ),
             }
 
             for practice, questions in (
@@ -488,6 +491,13 @@ class TestPart(models.Model):
         blank=True,
         null=True,
         related_name="reminder_testpart",
+    )
+    completion_source = models.ForeignKey(
+        TestResource,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name="completion_testpart",
     )
     show_normscore_speed_plot = models.BooleanField(default=False)
 
