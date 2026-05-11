@@ -213,19 +213,18 @@ def create_nonwordspelling_test(
     test.parts.add(part)
 
 
-def create_pronunciation_test(test, questions_data, name, practice_questions_data=None):
-    reminder, created = TestResource.objects.get_or_create(
-        name="resources/letter_pronunciation/Deltests/9e.1.wav",
-        sound="resources/letter_pronunciation/Deltests/9e.1.wav",
-    )
-
+def create_pronunciation_test(
+    test,
+    questions_data,
+    practice_questions_data=None,
+    name="Bogstavbenævnelse",
+):
     part, created = TestPart.objects.get_or_create(
         name=name,
         defaults={
             "timeout": 0,
             "partial_score_after": 30000,
             "image_url": "/static/images/letter_pronunciation.png",
-            "reminder_source": reminder,
         },
     )
     if created:  # pragma: no branch
