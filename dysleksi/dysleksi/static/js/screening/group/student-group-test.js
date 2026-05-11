@@ -382,7 +382,7 @@ export class GroupTestView extends StudentTestView {
         const isSelectionComplete =
             !isMatchPair || (leftSelectedEntry && rightSelectedEntry);
 
-        if (this.isPracticing && isSelectionComplete) {
+        if (this.isPracticing && isSelectionComplete && !this.showingInstructions) {
             if (this.answerIsCorrect()) {
                 this.domElements.makeButtonHappy(this.selectedAnswer.buttonId);
                 this.domElements.enableNextButton();

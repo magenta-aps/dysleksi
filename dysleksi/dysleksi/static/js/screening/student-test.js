@@ -155,7 +155,11 @@ export class StudentTestView extends EventTarget {
             if (
                 this.currentPart.practice
                     .slice(0, this.currentQuestionIndex + 1)
-                    .every((q) => !!q.instruction_sequence) &&
+                    .every(
+                        (q) =>
+                            !!q.instruction_sequence &&
+                            q.continueWhenInstructionIsComplete !== false,
+                    ) &&
                 !this.currentPart.practice[this.currentQuestionIndex + 1]
                     .instruction_sequence &&
                 !this.showingInstructions
@@ -348,6 +352,9 @@ export class StudentTestView extends EventTarget {
             this.showingInstructions = false;
             this.updateNextButtonClass();
             onCompleted();
+            if (this.currentQuestion.advanceAutomatically) {
+                this.showNextQuestion();
+            }
         });
     }
 

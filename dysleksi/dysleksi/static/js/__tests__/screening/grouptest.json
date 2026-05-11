@@ -21,6 +21,7 @@
           "challenge_text": null,
           "possible_answers": [],
           "continue_when_instruction_is_complete": true,
+          "advance_automatically": true,
           "instruction_sequence": {
             "instructions": [
               {

@@ -308,6 +308,7 @@ describe("GroupTestFlow", () => {
         // 3. Create a question with an instruction sequence
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 1, localDomElements, student);
+        testSpy(view);
 
         // Mock the InstructionSequenceRunner.run to return a promise we can control
         // This prevents the "then" block from hiding buttons immediately
@@ -350,6 +351,8 @@ describe("GroupTestFlow", () => {
                 "none",
             );
         });
+
+        expect(view.showNextQuestion).toHaveBeenCalled();
     });
 
     it("should handle free_text selection and update next button state", () => {
@@ -762,6 +765,7 @@ describe("GroupTestFlow", () => {
         view.setPart(0);
 
         view.showQuestion(true, 2);
+        view.showingInstructions = false;
         const question = view.currentQuestion;
         const correctAnswer = question.possibleAnswers.find((a) => a.isCorrect);
         view.selectAnswer(correctAnswer);
@@ -1680,6 +1684,22 @@ describe("Sentence Reading Test", () => {
 
         expect(challengeImage.src.endsWith("static/blomst.jpg")).toBe(true);
         expect(challengeText.innerHTML).toBe("Jeg er en blomst");
+    });
+
+    it("Uses correct font size", async () => {
+        const test = new Test(sentenceReadingTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        view.setPart(0);
+        view.showFirstQuestion(false);
+
+        const challengeText = document.getElementById("challenge-text");
+
+        expect(challengeText.innerHTML).toBe("Jeg er en blomst");
+        expect(challengeText.style.fontSize).toBe("32px");
+
+        view.showNextQuestion();
+        expect(challengeText.innerHTML).toBe("Blomst");
+        expect(challengeText.style.fontSize).toBe("32px");
     });
 
     it("Dims True when False is clicked and the other way around", async () => {

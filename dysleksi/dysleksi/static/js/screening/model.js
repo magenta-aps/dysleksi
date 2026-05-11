@@ -259,6 +259,7 @@ export class Question {
         this.timeout = data.timeout;
         this.continueWhenInstructionIsComplete =
             data.continue_when_instruction_is_complete;
+        this.advanceAutomatically = data.advance_automatically;
     }
 
     getAnswerClass() {
