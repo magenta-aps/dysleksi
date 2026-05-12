@@ -9,7 +9,7 @@ const mockDoc = `
         PAGE 1
     </div>
     <i id="pagination">{"current_page": 1, "current_first": 1, "current_last": 2, "total_count": 3, "page_size": 2, "last_page": 2}</i>
-    <div data-pagination-details="pagination" data-pagination-param="page" data-pagination-target="test-results-table" class="col-2 d-flex align-items-center justify-content-md-end">
+    <div data-pagination-details="pagination" data-pagination-page-param="page" data-pagination-target="test-results-table" data-pagination-content-param="only_table" class="col-2 d-flex align-items-center justify-content-md-end">
         <span class="paginator-text" data-format="\${first} - \${last} af \${total} \${foobar}">1 - 2 af 3</span>
         <div class="btn-group">
             <button class="paginate-left btn btn-borderless" disabled>

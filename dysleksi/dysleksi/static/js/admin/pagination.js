@@ -6,7 +6,8 @@ export function paginate(container) {
     const target = document.getElementById(
         container.getAttribute("data-pagination-target"),
     );
-    const param = container.getAttribute("data-pagination-param");
+    const page_param = container.getAttribute("data-pagination-page-param");
+    const content_param = container.getAttribute("data-pagination-content-param");
     const pagination = JSON.parse(
         document.getElementById(container.getAttribute("data-pagination-details"))
             .textContent,
@@ -19,9 +20,9 @@ export function paginate(container) {
     const table_urlparams = new URLSearchParams(window.location.search);
 
     const goto_page = async function (page) {
-        page_urlparams.set(param, page);
-        table_urlparams.set(param, page);
-        table_urlparams.set("only_table", "true");
+        page_urlparams.set(page_param, page);
+        table_urlparams.set(page_param, page);
+        table_urlparams.set(content_param, "true");
         const response = await fetch("?" + table_urlparams.toString());
         if (response.ok) {
             target.innerHTML = await response.text();

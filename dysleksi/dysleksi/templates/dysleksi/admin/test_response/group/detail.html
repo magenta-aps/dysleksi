@@ -1,9 +1,13 @@
 {% extends "dysleksi/admin/base.html" %}
 {% load i18n %}
+{% load l10n %}
 {% load static %}
 {% load render_table from django_tables2 %}
 
-
+{% block extra_headers %}
+    {{ block.super }}
+    <script src="{% static 'vendor/js/chartjs/chart.umd.min.js' %}"></script>
+{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'dysleksi:test_assignment_list' %}">{% translate 'Tests' %}</a></li>
@@ -44,20 +48,32 @@
         <div class="col-10">
             <h6>{% translate "Elevens resultater" %}</h6>
         </div>
-        {{ pagination|json_script:"pagination" }}
-        <div data-pagination-details="pagination" data-pagination-param="page" data-pagination-target="test-results-table" class="col-2 d-flex align-items-center justify-content-md-end">
+        <div class="col-2 d-flex align-items-center justify-content-md-end">
+            {# Simple pagination that replaces the entire page #}
             <span class="paginator-text" data-format="{% translate '${first} - ${last} af ${total}' %}">
                 {% blocktranslate trimmed with first=pagination.current_first last=pagination.current_last total=pagination.total_count %}
                     {{ first }} - {{ last }} af {{ total }}
                 {% endblocktranslate %}
             </span>
             <div class="btn-group">
-                <button class="paginate-left btn btn-borderless" {% if pagination.current_page <= 1 %}disabled{% endif %}>
+                {% if pagination.current_page <= 1 %}
+                <button class="paginate-left btn btn-borderless" disabled>
                     <i class="ph ph-arrow-left m-0"></i>
                 </button>
-                <button class="paginate-right btn btn-borderless" {% if pagination.current_page >= pagination.last_page %}disabled{% endif %}>
+            {% else %}
+                <a class="paginate-left btn btn-borderless" href="{% querystring page=pagination.current_page|add:-1 %}">
+                    <i class="ph ph-arrow-left m-0"></i>
+                </a>
+            {% endif %}
+                {% if pagination.current_page >= pagination.last_page %}
+                <button class="paginate-right btn btn-borderless" disabled>
                     <i class="ph ph-arrow-right m-0"></i>
                 </button>
+            {% else %}
+                <a class="paginate-right btn btn-borderless" href="{% querystring page=pagination.current_page|add:1 %}">
+                    <i class="ph ph-arrow-right m-0"></i>
+                </a>
+            {% endif %}
             </div>
         </div>
     </div>
@@ -66,12 +82,130 @@
         {% render_table table %}
     </div>
 
+    <div class="normscore-bar-plot mt-4">
+
+        <div class="plot-y-label-container">
+            <div class="plot-y-label-text">{% translate 'Normscore' %}</div>
+        </div>
+        <div class="plot-y-scale">
+            {# Vi har akser, labels osv. her i stedet for i Chart, for at have mere finkornet kontrol med layout #}
+            <div>
+                <span>100</span>
+                <span>90</span>
+                <span>80</span>
+                <span>70</span>
+                <span>60</span>
+                <span>50</span>
+                <span>40</span>
+                <span>30</span>
+                <span>20</span>
+                <span>10</span>
+                <span>0</span>
+            </div>
+        </div>
+
+        <div class="plot-table-container">
+
+            <canvas id="chart" class="plot-canvas" style="width: var(--plot-canvas-width); height: var(--plot-canvas-height);"></canvas>
+
+            <table class="table table-bordered plot-table">
+                <tbody>
+                {% localize off %}
+                    {% for pk, category in CorrectnessCategories.items reversed %}
+                        <tr style="height: {{ category.width_pct }}%">
+                            {% for item in plot %}
+                                <td
+                                        class="plot-table-x-category-cell category-{{ category.color_key }}"
+                                ></td>
+                            {% endfor %}
+                        </tr>
+                    {% endfor %}
+                {% endlocalize %}
+                </tbody>
+                <tfoot>
+                <tr>
+                    {% localize off %}
+                        {% for part_pk, part_name in part_names.items %}
+                            <td class="plot-x-scale-text">
+                                <div>{{ part_name }}</div>
+                                <a href="#{{ part_pk }}">{% translate "Se elevens svar" %}</a>
+                            </td>
+                        {% endfor %}
+                    {% endlocalize %}
+                </tr>
+                <tr>
+                    <td class="plot-x-label-text" colspan="{{ parts|length }}">
+                        {% translate "Deltests" %}
+                    </td>
+                </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        {{ plot|json_script:"plot_data" }}
+        {{ part_names|json_script:"part_names" }}
+        <script>
+            const data = JSON.parse(document.getElementById("plot_data").textContent);
+            const part_names = JSON.parse(document.getElementById("part_names").textContent);
+            const chart = new Chart(
+                document.getElementById("chart"),
+                {
+                    type: "bar",
+                    data: {
+                        datasets: [
+                            {
+                                data: data
+                            }
+                        ],
+                        "labels": Object.keys(part_names).map((key) => part_names[key])
+                    },
+                    options: {
+                        responsive: false,
+                        animation: false,
+                        layout: {
+                            autoPadding: false,
+                        },
+                        scales: {
+                            x: {
+                                display: false,
+                                ticks: {
+                                    display:false,
+                                },
+                            },
+                            y: {
+                                min: 0,
+                                max: 100,
+                                display: false,
+                                ticks: {
+                                    display:false,
+                                },
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        barThickness: 20,
+                        elements: {
+                            bar: {
+                                backgroundColor: "#004769"
+                            }
+                        }
+                    }
+
+                }
+            )
+        </script>
+
+    </div>
+
 {% endblock %}
 
 {% block js_module %}
     {{ block.super }}
     <script type="module">
-    import { initialize_pagination } from '{% static 'js/admin/pagination.js' %}';
-    document.addEventListener("DOMContentLoaded", initialize_pagination);
+    {#import { initialize_pagination } from '{% static 'js/admin/pagination.js' %}';#}
+    {#document.addEventListener("DOMContentLoaded", initialize_pagination);#}
     </script>
 {% endblock %}

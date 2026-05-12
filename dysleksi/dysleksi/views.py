@@ -1,9 +1,9 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
-from functools import partial
+from functools import cached_property, partial
 from math import ceil
-from typing import Any, List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from django.conf import settings
 from django.db import transaction
@@ -608,6 +608,7 @@ class AssignmentPartResultsView(GroupRequiredMixin, ListView):
 class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
     model = TestResponse
     template_name = "dysleksi/admin/test_response/group/detail.html"
+    chart_template_name = "dysleksi/admin/test_response/group/chart.html"
 
     def get_object(self, queryset=...):
         return get_object_or_404(
@@ -617,15 +618,19 @@ class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
         )
 
     def get_parts(self) -> QuerySet[TestPart]:
-        return self.object.assignment.test.parts.all()
+        return self.object.assignment.test.parts.all().order_by("pk")
 
-    def get_table(self) -> StudentTestResponseTable:
-
-        qs: PartResponseQuerySet = (
-            self.object.partresponses.all()
+    @cached_property
+    def data(self) -> PartResponseQuerySet:
+        return (
+            self.object.partresponses.filter(testpart__in=self.get_current_parts())
             .annotate_questions_count("questions_count", Q(is_practice=False))
-            .annotate_responses_count("responses_count")
-            .annotate_correct_count("correct_count")
+            .annotate_responses_count(
+                "responses_count", Q(questionresponses__question__is_practice=False)
+            )
+            .annotate_correct_count(
+                "correct_count", Q(questionresponses__question__is_practice=False)
+            )
             .annotate_correct_proportion(
                 "responses_count", "correct_count", "correct_proportion_of_answered"
             )
@@ -638,7 +643,14 @@ class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
             .annotate_correct_percentage(
                 "correct_proportion_of_all", "correct_pct_of_all"
             )
+            .order_by(
+                "pk",
+            )
         )
+
+    def get_table(self) -> StudentTestResponseTable:
+
+        qs: PartResponseQuerySet = self.data
 
         part_header = _("%(part_name)s (%(questions_count)s opg.)")
 
@@ -651,7 +663,9 @@ class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
                     verbose_name=part_header
                     % {
                         "part_name": part.name,
-                        "questions_count": part.questions.count(),
+                        "questions_count": part.questions.filter(
+                            is_practice=False
+                        ).count(),
                     },
                     footer_template_name="dysleksi/admin/"
                     "test_response/group/footer.html",
@@ -699,8 +713,14 @@ class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
                 },
             },
         ]
-
         return StudentTestResponseTable(data=data, extra_columns=extra_columns)
+
+    def get_plot_data(self) -> List[int]:
+        qs: PartResponseQuerySet = self.data
+        return [item.correct_pct_of_all for item in qs]
+
+    def get_part_names(self) -> Dict[int, str]:
+        return {part.pk: part.name for part in self.get_current_parts()}
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.GET.get("only_table") == "true":
@@ -714,11 +734,10 @@ class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
             {
                 "request": self.request,
                 "table": self.get_table(),
-                "CorrectnessCategories": {
-                    category.pk: category
-                    for category in CorrectnessCategory.objects.all()
-                },
+                "CorrectnessCategories": CorrectnessCategory.pk_map(),
                 "pagination": self.get_pagination(),
+                "plot": self.get_plot_data(),
+                "part_names": self.get_part_names(),
             }
         )
         return context

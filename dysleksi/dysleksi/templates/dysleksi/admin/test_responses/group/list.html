@@ -88,7 +88,7 @@
             <h6 class="mt-3">Samlet overblik over score i deltest</h6>
         </div>
         {{ pagination|json_script:"pagination" }}
-        <div data-pagination-details="pagination" data-pagination-param="page" data-pagination-target="test-results-table" class="col-2 d-flex align-items-center justify-content-md-end">
+        <div data-pagination-details="pagination" data-pagination-page-param="page" data-pagination-target="test-results-table" data-pagination-content-param="only_table" class="col-2 d-flex align-items-center justify-content-md-end">
             <span class="paginator-text" data-format="{% translate '${first} - ${last} af ${total}' %}">
                 {% blocktranslate trimmed with first=pagination.current_first last=pagination.current_last total=pagination.total_count %}
                     {{ first }} - {{ last }} af {{ total }}
