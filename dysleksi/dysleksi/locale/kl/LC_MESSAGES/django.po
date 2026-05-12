@@ -331,6 +331,7 @@ msgid "Læsetempo"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
+#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
 #: dysleksi/views.py
 msgid "Normscore"
 msgstr ""
@@ -414,6 +415,15 @@ msgstr ""
 msgid "%(first)s - %(last)s af %(total)s"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/group/footer.html
+msgid "Se elevens svar"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+msgid "Deltests"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/test_response/group/footer.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
 msgid "Elendigt"
@@ -436,10 +446,6 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/test_response/group/footer.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
 msgid "Ikke fuldført"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_response/group/footer.html
-msgid "Se elevens svar"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html

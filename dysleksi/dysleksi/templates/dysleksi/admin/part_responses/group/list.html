@@ -89,65 +89,65 @@
 
     {% if plot %}
     <div class="normscore-readingspeed-plot mt-4">
-    <h6>{% translate 'Normscore og læsetempo' %}</h6>
+        <h6>{% translate 'Normscore og læsetempo' %}</h6>
 
-    <div class="plot-y-label-container">
-        <div class="plot-y-label-text">{% translate 'Læsetempo' %}</div>
-    </div>
+        <div class="plot-y-label-container">
+            <div class="plot-y-label-text">{% translate 'Læsetempo' %}</div>
+        </div>
 
-    <div class="plot-table-container">
+        <div class="plot-table-container">
 
-    {% localize off %}
-        <canvas id="chart" class="plot-canvas" style="
-                {# I samarbejde med min og max-specifikationen nede i chartjs-setuppet #}
-                {# Vi gør canvasset lidt større end dens plads i tabellen,  #}
-                {# således at prikker i yderområderne (f.eks. (1.0, 1.0) ikke skæres af og renderes som en halv- eller kvartcirkel #}
-            left: calc(var(--plot-y-label-width) - 16px);
-            top: -16px;
-            width: calc(var(--plot-canvas-width) + 33px);
-            height: calc(var(--plot-canvas-height) + 33px);
-        "></canvas>
+        {% localize off %}
+            <canvas id="chart" class="plot-canvas" style="
+                    {# I samarbejde med min og max-specifikationen nede i chartjs-setuppet #}
+                    {# Vi gør canvasset lidt større end dens plads i tabellen,  #}
+                    {# således at prikker i yderområderne (f.eks. (1.0, 1.0) ikke skæres af og renderes som en halv- eller kvartcirkel #}
+                left: calc(var(--plot-y-label-width) - 16px);
+                top: -16px;
+                width: calc(var(--plot-canvas-width) + 33px);
+                height: calc(var(--plot-canvas-height) + 33px);
+            "></canvas>
 
-        <table class="table table-bordered plot-table">
-        <tbody>
-        {% for pk, reading_category in ReadingSpeeedCategories.items %}
-            <tr>
-                <td
-                        class="plot-table-y-category-cell category-{{ reading_category.color_key }}"
-                        style="height: calc({{ reading_category.width }} * var(--plot-canvas-height)); "
-                >
-                    <div
-                            class="plot-table-y-category-label"
-                            style="
-                                    width: calc({{ reading_category.width }} * var(--plot-canvas-height));
-                                    left: calc(var(--plot-y-label-width) - 0.75rem - ({{ reading_category.width }} * 20rem));
-                                    top: calc(({{ reading_category.width }} * var(--plot-canvas-height) / 2) - var(--plot-y-label-width) / 2)
-                            "
-                    >{{ reading_category.label_da }}</div>
-                </td>
-                {% for pk, category in CorrectnessCategories.items %}
-                <td style="width: calc(({{ category.width }}) * var(--plot-canvas-width))"></td>
-                {% endfor %}
-            </tr>
-        {% endfor %}
-            <tr>
-                <th class="plot-table-x-category-cell category-red"></th>
-                {% localize off %}
+            <table class="table table-bordered plot-table">
+            <tbody>
+            {% for pk, reading_category in ReadingSpeeedCategories.items %}
+                <tr>
+                    <td
+                            class="plot-table-y-category-cell category-{{ reading_category.color_key }}"
+                            style="height: calc({{ reading_category.width }} * var(--plot-canvas-height)); "
+                    >
+                        <div
+                                class="plot-table-y-category-label"
+                                style="
+                                        width: calc({{ reading_category.width }} * var(--plot-canvas-height));
+                                        left: calc(var(--plot-y-label-width) - 0.75rem - ({{ reading_category.width }} * 20rem));
+                                        top: calc(({{ reading_category.width }} * var(--plot-canvas-height) / 2) - var(--plot-y-label-width) / 2)
+                                "
+                        >{{ reading_category.label_da }}</div>
+                    </td>
                     {% for pk, category in CorrectnessCategories.items %}
-                        <td
-                                class="plot-table-x-category-cell category-{{ category.color_key }}"
-                                style="width: calc(({{ category.width }}) * var(--plot-canvas-width))"
-                        >
-                            {{ category.label_da }}
-                        </td>
+                    <td style="width: calc(({{ category.width }}) * var(--plot-canvas-width))"></td>
                     {% endfor %}
-                {% endlocalize %}
-            </tr>
-        </tbody>
-    </table>
+                </tr>
+            {% endfor %}
+                <tr>
+                    <th class="plot-table-x-category-cell category-red"></th>
+                    {% localize off %}
+                        {% for pk, category in CorrectnessCategories.items %}
+                            <td
+                                    class="plot-table-x-category-cell category-{{ category.color_key }}"
+                                    style="width: calc(({{ category.width }}) * var(--plot-canvas-width))"
+                            >
+                                {{ category.label_da }}
+                            </td>
+                        {% endfor %}
+                    {% endlocalize %}
+                </tr>
+            </tbody>
+        </table>
         {% endlocalize %}
         <div class="plot-x-label-text">{% translate 'Normscore' %}</div>
-    </div>
+        </div>
     </div>
 
     <style>

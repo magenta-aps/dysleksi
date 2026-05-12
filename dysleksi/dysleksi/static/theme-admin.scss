@@ -1279,6 +1279,92 @@ $border-radius-student-card: $spacer / 4 * 3;
   }
 }
 
+
+.normscore-bar-plot {
+
+  --plot-x-scale-height: 3rem;
+  --plot-x-label-height: 2rem;
+  --plot-y-label-width: 2rem;
+  --plot-y-scale-width: 2rem;
+  --plot-canvas-width: 100%;
+  --plot-canvas-height: 30rem;
+
+  .plot-y-label-container {
+    width: var(--plot-y-label-width);
+    display: inline-block;
+    position: relative;
+    vertical-align: top;
+    height: var(--plot-canvas-height);
+    .plot-y-label-text {
+      text-align: center;
+      transform: rotate(270deg);
+      position:absolute;
+      left: -80%;
+      top: 50%;
+      text-transform: uppercase;
+    }
+  }
+
+  .plot-y-scale {
+    width: var(--plot-y-scale-width);
+    display: inline-block;
+    height: var(--plot-canvas-height);
+    position: relative;
+    vertical-align: top;
+    div {
+      position: absolute;
+      top: calc(-1 * var(--plot-canvas-height) / 20);
+      height: var(--plot-canvas-height);
+      span {
+        height: calc(var(--plot-canvas-height) / 10);
+        line-height: calc(var(--plot-canvas-height) / 10);
+        display: block;
+        text-align: right;
+      }
+    }
+  }
+
+  .plot-table-container {
+    display: inline-block;
+    position: relative;
+    width: calc(100% - var(--plot-y-scale-width) - var(--plot-y-label-width) - 0.5rem);
+
+    .plot-canvas {
+      position: absolute;
+      z-index: 1;
+      left: 0;
+      top: 0;
+    }
+
+    .plot-table {
+      table-layout:fixed;
+      height: var(--plot-canvas-height);
+      position: relative;
+      margin-bottom: 0;
+      tbody {
+        td {
+          opacity: 0.5;
+        }
+      }
+      tfoot {
+        tr, td {
+          border: 0 none;
+        }
+        .plot-x-scale-text {
+          height: var(--plot-x-scale-height);
+          text-align:center;
+        }
+        .plot-x-label-text {
+          height: var(--plot-x-label-height);
+          text-align:center;
+          text-transform: uppercase;
+        }
+      }
+    }
+  }
+}
+
+
 .screening-header {
   display: flex;
   align-items: center;
