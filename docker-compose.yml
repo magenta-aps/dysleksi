@@ -160,7 +160,7 @@ services:
       - default
 
   lobby-bots:
-    image: mcr.microsoft.com/playwright:v1.59.1-jammy
+    image: mcr.microsoft.com/playwright:v1.60.0-jammy
     container_name: lobby-bots
     volumes:
       - ./playwright/lobby_mock.js:/app/lobby_mock.js:ro
