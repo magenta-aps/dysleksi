@@ -4,7 +4,6 @@
 
 from data_tools.utils import (
     create_fore_sound_test,
-    create_letter_name_test,
     create_letter_pronunciation_test,
     create_letter_shape_test,
     create_letter_sound_test,
@@ -174,24 +173,6 @@ class UtilTest(TestCase):
             },
         ]
 
-        self.letter_name_data = [
-            {
-                "sound": "resources/dummy/letter_name/Opgave/a.mp3",
-                "question_type": "multiple_choice",
-                "correct": "a",
-                "wrong": ["b", "x", "d"],
-            },
-        ]
-
-        self.letter_name_practice_data = [
-            {
-                "sound": "resources/dummy/letter_name/Opgave/a.mp3",
-                "question_type": "multiple_choice",
-                "correct": "a",
-                "wrong": ["b", "x", "d"],
-            },
-        ]
-
         self.sentence_reading_data = [
             {
                 "image": "resources/dummy/sentence_reading/Opgave/Blomst.jpg",
@@ -282,26 +263,6 @@ class UtilTest(TestCase):
         self.assertTrue(
             TestResource.objects.filter(
                 sound="resources/dummy/letter_sound/Opgave/a.mp3"
-            ).exists()
-        )
-
-    def test_create_letter_name_test(self):
-        create_letter_name_test(self.test, self.letter_name_data)
-
-        self.assertTrue(
-            TestResource.objects.filter(
-                sound="resources/dummy/letter_name/Opgave/a.mp3"
-            ).exists()
-        )
-
-    def test_create_letter_name_test_with_practice_data(self):
-        create_letter_name_test(
-            self.test, self.letter_name_data, self.letter_name_practice_data
-        )
-
-        self.assertTrue(
-            TestResource.objects.filter(
-                sound="resources/dummy/letter_name/Opgave/a.mp3"
             ).exists()
         )
 

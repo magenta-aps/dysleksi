@@ -89,13 +89,6 @@ export class GroupTestView extends StudentTestView {
                 answers = shuffleArray(answers);
             }
 
-            if (this.currentQuestion.type === "multiple_choice_with_display_field") {
-                this.domElements.multipleChoiceAnswerDisplay.style.display = "flex";
-                this.domElements.multipleChoiceAnswerDisplay.innerHTML = "";
-            } else {
-                this.domElements.multipleChoiceAnswerDisplay.style.display = "none";
-            }
-
             if (this.currentQuestion.type === "multiple_choice_match") {
                 this.domElements.multipleChoiceMatchContainer.style.display = "flex";
             } else {
@@ -107,24 +100,18 @@ export class GroupTestView extends StudentTestView {
                 this.currentQuestion.type === "multiple_choice_with_display_field"
             ) {
                 this.answerButtons = [];
-                answers.forEach((answer, i) => {
+                answers.forEach((answer) => {
                     const button = this.domElements.showQuestionChoice(
                         answer,
                         () => {
                             this.selectAnswer(answer);
                         },
                         answers.length,
-                        i < 6
-                            ? this.domElements.choicesEl
-                            : this.domElements.choicesElSecondRow,
+                        this.domElements.choicesEl,
                         answers.length < 6 &&
                             answers.some((a) => a.resourceText?.length === 1),
                     );
                     this.answerButtons.push({ button: button, answer: answer });
-
-                    if (i >= 6) {
-                        button.style.marginTop = "24px";
-                    }
                 });
             } else if (this.currentQuestion.type === "free_text") {
                 this.input = this.domElements.showQuestionFreeText(() =>
@@ -327,7 +314,6 @@ export class GroupTestView extends StudentTestView {
     unselectAnswer(btn) {
         this.domElements.toggleButtonSelected(btn, false);
         this.domElements.toggleNextButton(false);
-        this.domElements.multipleChoiceAnswerDisplay.innerHTML = "";
         this.selectedAnswer = null;
         this.textAnswer = null;
 
@@ -421,8 +407,6 @@ export class GroupTestView extends StudentTestView {
         } else {
             this.domElements.makeButtonGlow(this.selectedAnswer.buttonId);
         }
-
-        this.domElements.multipleChoiceAnswerDisplay.innerHTML = answer.resourceText;
 
         if (answer.resourceText === "true" || answer.resourceText === "false") {
             this.answerButtons.forEach((a) => {
