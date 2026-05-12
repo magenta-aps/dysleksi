@@ -4,7 +4,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
 import * as groupTestData from "./grouptest.json" with { type: "json" };
 import * as letterSoundTestData from "./letter_sound_test.json" with { type: "json" };
-import * as letterNameTestData from "./letter_name_test.json" with { type: "json" };
 import * as sentenceReadingTestData from "./sentence_reading_test.json" with { type: "json" };
 import * as letterShapeTestData from "./letter_shape_test.json" with { type: "json" };
 import { getWebSocket } from "../../ws";
@@ -82,12 +81,10 @@ const SHARED_DOM_HTML = `
     <button id="end-summary"></button>
     <div id="question-challenge"></div>
     <div id="choices" class="multiple-choice-choices"></div>
-    <div id="choices-row-2" class="multiple-choice-choices"></div>
     <div id="multiple-choice-match-container" class="multiple-choice-match-container" style="display: none;">
         <div id="choices-left" class="multiple-choice-choices vertical"></div>
         <div id="choices-right" class="multiple-choice-choices vertical"></div>
     </div>
-    <div id="multiple-choice-answer-display" class="form-control multiple-choice-answer-display" style="display: none;"></div>
     <button id="next"></button>
     <button id="repeat"></button>
     <button id="log-out"></button>
@@ -1645,47 +1642,6 @@ describe("LetterSoundTest", () => {
         await vi.waitFor(() => {
             expect(playBtn.classList.contains("playing")).toBe(false);
         });
-    });
-});
-
-describe("LetterNameTest", () => {
-    let domElements;
-
-    beforeEach(() => {
-        vi.useFakeTimers();
-        document.body.innerHTML = SHARED_DOM_HTML;
-
-        domElements = new GroupTestDomElements();
-        spyAttributes(domElements);
-
-        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
-            mockAudioContextInstance,
-        );
-        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
-    });
-
-    afterEach(() => {
-        vi.clearAllTimers();
-        vi.useRealTimers();
-        document.body.innerHTML = "";
-        vi.clearAllMocks();
-    });
-
-    it("Updates display field when a button is pressed", async () => {
-        const test = new Test(letterNameTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
-        view.setPart(0);
-        view.showFirstQuestion(false);
-
-        const MultipleChoicedisplay = document.getElementById(
-            "multiple-choice-answer-display",
-        );
-        const answerButtonObj = view.answerButtons[0];
-
-        expect(MultipleChoicedisplay.innerHTML).toBe("");
-        expect(MultipleChoicedisplay.style.display).toBe("flex");
-        answerButtonObj.button.click();
-        expect(MultipleChoicedisplay.innerHTML).toBe(answerButtonObj.button.innerHTML);
     });
 });
 

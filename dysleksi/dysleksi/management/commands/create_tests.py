@@ -58,10 +58,6 @@ def create_group_test(
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
             / "dummy/letter_sound/letter_sound.json",
         )
-        letter_name_data_path = (
-            Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
-            / "dummy/letter_name/letter_name.json",
-        )
         fore_sound_data_path = (
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
             / "dummy/fore_sound/fore_sound.json",
@@ -80,7 +76,6 @@ def create_group_test(
         wordspelling_test_name = "Ordstavning (dummy)"
         nonwordspelling_test_name = "Nonordstavning (dummy)"
         letter_sound_test_name = "Bogstavlyde (dummy)"
-        letter_name_test_name = "Bogstavnavne (dummy)"
         fore_sound_test_name = "Forlyd (dummy)"
         sentence_reading_test_name = "Sætningslæsning (dummy)"
         letter_shape_test_name = "Bogstavers form (dummy)"
@@ -105,7 +100,6 @@ def create_group_test(
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
             / "real/letter_sound/letter_sound.json",
         )
-        letter_name_data_path = None
         fore_sound_data_path = (
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
             / "real/fore_sound/fore_sound.json",
@@ -121,7 +115,6 @@ def create_group_test(
         wordspelling_test_name = "Ordstavning"
         nonwordspelling_test_name = "Nonordstavning"
         letter_sound_test_name = "Bogstavlyde"
-        letter_name_test_name = "Bogstavnavne"
         fore_sound_test_name = "Forlyd"
         sentence_reading_test_name = "Sætningslæsning"
         letter_shape_test_name = "Bogstavers form"
@@ -150,18 +143,6 @@ def create_group_test(
                 / "real/fore_sound/fore_sound_practice.json"
             ),
         )
-
-        # This test was developed but ended up not making it in the final test set
-        # We keep supporting it for a while in case they change their mind...
-        # Therefore it is only included in dummy data
-        if letter_name_data_path and dummy:
-            call_command(
-                "import_test",
-                name,
-                letter_name_test_name,
-                letter_name_data_path,
-                "letter_name",
-            )
 
         call_command(
             "import_test",

@@ -37,9 +37,6 @@ class TestDomElements {
             "#skip-all-instructions",
         );
         this.repeatBtn = document.querySelector("#repeat");
-        this.multipleChoiceAnswerDisplay = document.querySelector(
-            "#multiple-choice-answer-display",
-        );
     }
 
     updateSummaryArrows() {
@@ -692,7 +689,6 @@ export class GroupTestDomElements extends TestDomElements {
     constructor() {
         super();
         this.choicesEl = document.querySelector("#choices");
-        this.choicesElSecondRow = document.querySelector("#choices-row-2");
 
         this.choicesElLeft = document.querySelector("#choices-left");
         this.choicesElRight = document.querySelector("#choices-right");
@@ -714,7 +710,6 @@ export class GroupTestDomElements extends TestDomElements {
     clearQuestionChoices() {
         this.choicesEl.innerHTML = "";
         this.choicesEl.classList.remove("true-false-layout");
-        this.choicesElSecondRow.innerHTML = "";
         this.choicesElLeft.innerHTML = "";
         this.choicesElRight.innerHTML = "";
     }
@@ -744,8 +739,6 @@ export class GroupTestDomElements extends TestDomElements {
 
             if (squareButton) {
                 btn.style.fontSize = "72px";
-            } else if (answerCount > 6) {
-                btn.style.fontSize = "38px";
             } else {
                 btn.style.fontSize = "32px";
             }
