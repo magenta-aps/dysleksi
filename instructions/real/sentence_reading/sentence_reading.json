@@ -1,0 +1,338 @@
+[
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 1-2-3-4.jpg",
+        "text": "Nujaqarpoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 1-2-3-4.jpg",
+        "text": "Arpappoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 1-2-3-4.jpg",
+        "text": "Utoqqaavoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 1-2-3-4.jpg",
+        "text": "Qiavoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 5-6-7-8.jpg",
+        "text": "Aasaavoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 5-6-7-8.jpg",
+        "text": "Nittaappoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 5-6-7-8.jpg",
+        "text": "Seqinnerpoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 5-6-7-8.jpg",
+        "text": "Nuiaqarpoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave  9-10-11-12.jpg",
+        "text": "Salik ermippoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave  9-10-11-12.jpg",
+        "text": "Imeq kuuppoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave  9-10-11-12.jpg",
+        "text": "Una arsarpoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave  9-10-11-12.jpg",
+        "text": "Salik pisuppoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 13-14-15-16.jpg",
+        "text": "Ataata biilerpoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 13-14-15-16.jpg",
+        "text": "Angut sinippoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 13-14-15-16.jpg",
+        "text": "Ataata igavoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 13-14-15-16.jpg",
+        "text": "Nasaa qaqorpoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 17-18-19-20.jpg",
+        "text": "Aana atuagaq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 17-18-19-20.jpg",
+        "text": "Ida nerivoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 17-18-19-20.jpg",
+        "text": "Ida apuserivoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 17-18-19-20.jpg",
+        "text": "Ida atuarpoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 21-22-23-24.jpg",
+        "text": "Naja pinnguarpoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 21-22-23-24.jpg",
+        "text": "Naja arsarpoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 21-22-23-24.jpg",
+        "text": "Aaku pinngussat",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 21-22-23-24.jpg",
+        "text": "Aaku paarnat",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 25-26-27-28.jpg",
+        "text": "Angaju kisimiippoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 25-26-27-28.jpg",
+        "text": "Angaju inuuissiorpoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 25-26-27-28.jpg",
+        "text": "Naneruutit ikumapput",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 25-26-27-28.jpg",
+        "text": "Inuit pingasuupput",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 29-30-31-32.jpg",
+        "text": "Imaq tungujortuuvoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 29-30-31-32.jpg",
+        "text": "Sissami ujaraqarpoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 29-30-31-32.jpg",
+        "text": "Meeqqat naloraarput",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 29-30-31-32.jpg",
+        "text": "Ataata qajartorpoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 33-34-35-36.jpg",
+        "text": "Ani angajulu pinnguarput",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 33-34-35-36.jpg",
+        "text": "Assimi apivoq qiianarlunilu",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 33-34-35-36.jpg",
+        "text": "Assimi aataa qungujulavoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 33-34-35-36.jpg",
+        "text": "Assimi qilak tungujorpoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 37-38-39-40.jpg",
+        "text": "Aalisartoq kummeqarpoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 37-38-39-40.jpg",
+        "text": "Niviarsiaraq nikorfavoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 37-38-39-40.jpg",
+        "text": "Angutip naasut tigummivai",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 37-38-39-40.jpg",
+        "text": "Angutip umii qernerput",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 41-42-43-44.jpg",
+        "text": "Timmiaaraq sissami sikutorpoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 41-42-43-44.jpg",
+        "text": "Aapakaaq pamiukkaaq nerivoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 41-42-43-44.jpg",
+        "text": "Aapakaap tigummiaa qorsuuvoq",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 41-42-43-44.jpg",
+        "text": "Aapakaaq immami uumasuuvoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 45-46-47-48.jpg",
+        "text": "Umiaq motoorimik aquteqarpoq",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 45-46-47-48.jpg",
+        "text": "Umiami iputtut arnat sisamaapput",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 45-46-47-48.jpg",
+        "text": "Arnat qaqortumik tujuuloarput",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "image": "resources/sentence_reading/Opgave/Opgave 45-46-47-48.jpg",
+        "text": "Angut aquttoq annoraaqarpoq",
+        "correct": "true",
+        "wrong": ["false"]
+    }
+]

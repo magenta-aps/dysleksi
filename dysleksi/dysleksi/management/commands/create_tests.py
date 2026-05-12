@@ -104,7 +104,10 @@ def create_group_test(
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
             / "real/fore_sound/fore_sound.json",
         )
-        sentence_reading_data_path = None
+        sentence_reading_data_path = (
+            Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+            / "real/sentence_reading/sentence_reading.json",
+        )
         letter_shape_data_path = (
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
             / "real/letter_shape/letter_shape.json",
@@ -208,14 +211,17 @@ def create_group_test(
         )
 
     if (grade == 2 and period == "slut") or grade == 3:
-        if sentence_reading_data_path:
-            call_command(
-                "import_test",
-                name,
-                sentence_reading_test_name,
-                sentence_reading_data_path,
-                "sentence_reading",
-            )
+        call_command(
+            "import_test",
+            name,
+            sentence_reading_test_name,
+            sentence_reading_data_path,
+            "sentence_reading",
+            practice_json_path=(
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "real/sentence_reading/sentence_reading_practice.json"
+            ),
+        )
         return test
 
 

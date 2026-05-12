@@ -39,6 +39,35 @@
               "is_correct": false
             }
           ]
+        },
+        {
+          "id": 28,
+          "challenge_id": 5,
+          "challenge_name": "challenge",
+          "challenge_image_url": "static/blomst.jpg",
+          "challenge_sound_url": null,
+          "challenge_text": "Blomst",
+          "question_type": "multiple_choice",
+          "possible_answers": [
+            {
+              "id": 200,
+              "resource_id": 200,
+              "resource_name": "true",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "true",
+              "is_correct": true
+            },
+            {
+              "id": 201,
+              "resource_id": 201,
+              "resource_name": "false",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "false",
+              "is_correct": false
+            }
+          ]
         }
       ]
     }

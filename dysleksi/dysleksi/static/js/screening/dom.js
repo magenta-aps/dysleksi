@@ -511,7 +511,11 @@ class TestDomElements {
             } else if (text.includes(" ")) {
                 textEl.style.fontSize = "32px";
             } else {
-                textEl.style.fontSize = "72px";
+                if (imageUrl) {
+                    textEl.style.fontSize = "32px";
+                } else {
+                    textEl.style.fontSize = "72px";
+                }
             }
         } else {
             if (textEl) {
