@@ -4,7 +4,7 @@
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
       "automerge": true,
-      "autoApprove": true,
+      "gitLabIgnoreApprovals": true,
       "platformAutomerge": true
     }
   ]
