@@ -23,7 +23,7 @@ const students = Array.from({ length: 4 }, (_, i) => ({
                 page.on('pageerror', err => console.log(`BROWSER ERROR [${student.user}]: ${err.message}`));
                 
                 console.log(`Logging in as ${student.user}...`);
-                await page.goto('https://dysleksi-web/login?next=/');
+                await page.goto('https://dysleksi-web/login/forward/django?next=/');
                 
                 const userField = 'input[name="auth-username"]';
                 const passField = 'input[name="auth-password"]';

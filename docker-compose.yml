@@ -170,7 +170,8 @@ services:
       - dysleksi-traefik:dysleksi-web
     command: >
       sh -c "
-        npm install playwright@1.59.1 &&
+        PW_VERSION=$$(cat /ms-playwright-agent/node_modules/playwright-core/package.json | grep '\"version\"' | head -1 | sed 's/[^0-9.]//g') &&
+        npm install playwright@$$PW_VERSION &&
         echo 'Waiting for dysleksi-web to be healthy (no 502)...' &&
         until curl -k -s -f https://dysleksi-web/login?next=/ > /dev/null; do
           sleep 2
