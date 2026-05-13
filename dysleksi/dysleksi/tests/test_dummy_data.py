@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
+import random
 from unittest.mock import patch
 
 from django.core.management import call_command
@@ -15,6 +16,7 @@ class DummyDataTest(TestCase):
     @classmethod
     def setUpTestData(cls):
         """Runs once for the entire class."""
+        random.seed(42)
         call_command("create_groups")
         call_command("create_dummy_classes_and_users")
         call_command("create_tests")
