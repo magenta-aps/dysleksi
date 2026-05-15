@@ -23,13 +23,13 @@
         // "Ordstavning er nu ved at starte."
         "action": "playSound",
         "delayAfter": 250,
-        "resource": "resources/wordspelling/Indledning/6a.1.wav"
+        "resource": "resources/wordspelling/Enhanced/Indledning/6a.1.wav"
       },
       {
         // "Først får du vist, hvad du skal gøre."
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/wordspelling/Indledning/6a.2.wav"
+        "resource": "resources/wordspelling/Enhanced/Indledning/6a.2.wav"
       },
       {
         "action": "fadeOut",
@@ -45,12 +45,12 @@
         // "Tryk grøn, når du er klar." / "Piareeruit qorsuk tooruk."
         "action": "playSound",
         "delayAfter": 1250,
-        "resource": "resources/wordspelling/Indledning/6a.3.wav"
+        "resource": "resources/wordspelling/Enhanced/Indledning/6a.3.wav"
       }
     ]
   },
   {
-    "sound": "resources/wordspelling/Instruktion/6b.5.wav",
+    "sound": "resources/wordspelling/Enhanced/Instruktion/6b.5.wav",
     "question_type": "free_text",
     "instruction_sequence": [
       {
@@ -78,7 +78,7 @@
         // "Lyt godt efter"
         "action": "playSound",
         "delayAfter": 2000,
-        "resource": "resources/wordspelling/Instruktion/6b.1.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.1.wav"
       },
       // 6b.2
       {
@@ -110,7 +110,7 @@
         // "Her er" / "Aaku"
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/wordspelling/Instruktion/6b.2.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.2.wav"
       },
       // 6b.3 - fremhæv tastaturet
       {
@@ -127,13 +127,13 @@
         // "Her er dem, du skal klikke på, når du skriver." / "Allannermi toortagassat."
         "action": "playSound",
         "delayAfter": 750,
-        "resource": "resources/wordspelling/Instruktion/6b.3.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.3.wav"
       },
       {
         // "Hvad er det, du skal bruge, når du skriver." / "Allannermi atugassat."
         "action": "playSound",
         "delayAfter": 1250,
-        "resource": "resources/wordspelling/Instruktion/6b.3x.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.3x.wav"
       },
       // 6b.4
       {
@@ -150,21 +150,21 @@
         // "Du vil høre ordet du skal skrive, f.eks." / "Oqaaseq allatassat ilinnut tusaatinneqartassaaq, soorlu"
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/wordspelling/Instruktion/6b.4.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.4.wav"
       },
       // 6b.5
       {
         // "tui"
         "action": "playSound",
         "delayAfter": 1250,
-        "resource": "resources/wordspelling/Instruktion/6b.5.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.5.wav"
       },
       // 6b.6
       {
         // "Du skal skrive det ord, du hører" / "Oqaaseq tusaalluanngitsoorukku"
         "action": "playSound",
         "delayAfter": 0,
-        "resource": "resources/wordspelling/Instruktion/6b.6-00.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.6-00.wav"
       },
       {
         "action": "highlight",
@@ -175,7 +175,7 @@
         // "ved at klikke på bogstaverne." / "nipinut tusarnaarut toorlugu [...]"
         "action": "playSound",
         "delayAfter": 1250,
-        "resource": "resources/wordspelling/Instruktion/6b.6-01.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.6-01.wav"
       },
 
       // 6b.7
@@ -186,7 +186,7 @@
         // "Taava oqaaseq tusaasat, naqinnerit toortarlugit imatut allattassavat"
         "action": "playSound",
         "delayAfter": 1500,
-        "resource": "resources/wordspelling/Instruktion/6b.7.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.7.wav"
       },
       // Simuler tryk på lydikon (oplæser 'tui')
       {
@@ -233,7 +233,7 @@
         // "Hvis du kommer til at skrive forkert, f.eks. sui" / "Kukkullutit, soorlu sui allattoorukku"
         "action": "playSound",
         "delayAfter": 0,
-        "resource": "resources/wordspelling/Instruktion/6b.8-00.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.8-00.wav"
       },
       // Slet det "indtastede" fra trin 6b.7
       {
@@ -262,7 +262,7 @@
         // "kan du slette de skrevne ved at trykke på backspace" / "piiaat toortarlugu allatat piiarsinnaavat"
         "action": "playSound",
         "delayAfter": 0,
-        "resource": "resources/wordspelling/Instruktion/6b.8-01.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.8-01.wav"
       },
       // Fade backspace-knappen ind
       {
@@ -300,7 +300,7 @@
         // "og skrive det rigtige tui" / "eqqortorlu tui allallugu"
         "action": "playSound",
         "delayAfter": 0,
-        "resource": "resources/wordspelling/Instruktion/6b.8-02.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.8-02.wav"
       },
       {
         "action": "clickButton",
@@ -344,7 +344,7 @@
         // Men, du skal først skrive noget, for at kunne trykke på pilen.
         "action": "playSound",
         "delayAfter": 1500,
-        "resource": "resources/wordspelling/Instruktion/6b.9.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.9.wav"
       },
 
       // 6b.10
@@ -361,12 +361,12 @@
         // "Aatsaalli naqinnermik ataatsimik allataqareeruit suliassap tullianukarsinnaavuti"
         "action": "playSound",
         "delayAfter": 750,
-        "resource": "resources/wordspelling/Instruktion/6b.10.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.10.wav"
       },
       {
         "action": "playSound",
         "delayAfter": 1250,
-        "resource": "resources/wordspelling/Instruktion/6b.10x.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.10x.wav"
       },
 
       // 6b.11 - Pilen fremhæves og klikkes når “toorlugu” angives
@@ -374,7 +374,7 @@
         // "Når du har skrevet," / "Allareeraangavit tikkuut,"
         "action": "playSound",
         "delayAfter": 0,
-        "resource": "resources/wordspelling/Instruktion/6b.11-00.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.11-00.wav"
       },
       {
         "action": "fadeIn",
@@ -390,7 +390,7 @@
         // "går du videre til næste opgave ved at trykke på pilen" / "toorlugu suliassap tullianut ingerlaqqittassaatit"
         "action": "playSound",
         "delayAfter": 1250,
-        "resource": "resources/wordspelling/Instruktion/6b.11-01.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.11-01.wav"
       },
 
       // 6b.12 - opgaven fader ud
@@ -398,7 +398,7 @@
         // "Det er sådan, du skal skrive" / "Tassa taamatut suliaqassaatit"
         "action": "playSound",
         "delayAfter": 0,
-        "resource": "resources/wordspelling/Instruktion/6b.12.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.12.wav"
       },
       {
         "action": "fadeOut",
@@ -427,7 +427,7 @@
         // "Massakkut sungiusaatinik misiliilerputit. Oqaaseq allatassat taamaallaat taaneqartassaaq."
         "action": "playSound",
         "delayAfter": 750,
-        "resource": "resources/wordspelling/Instruktion/6b.13.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.13.wav"
       },
 
       // 6b.14 - grøn knap vises
@@ -440,7 +440,7 @@
         // "Tryk grøn når du er klar" / "Piareeruit qorsuk tooruk"
         "action": "playSound",
         "delayAfter": 1250,
-        "resource": "resources/wordspelling/Instruktion/6b.14.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.14.wav"
       },
 
       // 6b.15
@@ -449,7 +449,7 @@
         // "Sungiusarnermi oqaaseq allatassat taamaallaat taaneqartassaaq."
         "action": "playSound",
         "delayAfter": 1250,
-        "resource": "resources/wordspelling/Instruktion/6b.15.wav"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.15.wav"
       }
     ]
   },
@@ -465,7 +465,7 @@
       {
         // "Du starter nu" / "Aallartipputit"
         "action": "playSound",
-        "resource": "resources/wordspelling/Øveopgave/6c.1.wav",
+        "resource": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6c.1.wav",
         "delayAfter": 1250
       },
       {
@@ -515,7 +515,7 @@
       {
         // "Her kan du se to knapper" / "Aaku tuugassat marluk"
         "action": "playSound",
-        "resource": "resources/wordspelling/Øveopgave/6d.1.wav",
+        "resource": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6d.1.wav",
         "delayAfter": 1250
       },
 
@@ -528,7 +528,7 @@
         // "Hvis du har forstået, hvad du skal gøre, skal du klikke på den blå knap for at starte opgaverne"
         // "Qanoq iliornissat paasilluarsimagukku, suliassatit aallartinniarlugit tungujortoq tuussavat"
         "action": "playSound",
-        "resource": "resources/wordspelling/Øveopgave/6d.2.wav",
+        "resource": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6d.2.wav",
         "delayAfter": 1250
       },
 
@@ -541,7 +541,7 @@
         // "Suliassatilli paasilluanngitsoorukkit, qasertoq tuussavat. Taava sungiusaqqissaatit"
         // "Men hvis du ikke har forstået, hvad du skal gøre, skal du klikke på den grå. Så skal du øve dig igen"
         "action": "playSound",
-        "resource": "resources/wordspelling/Øveopgave/6d.3.wav",
+        "resource": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6d.3.wav",
         "delayAfter": 1250
       },
 
@@ -557,7 +557,7 @@
       {
         // "Vælg ikon (klik)" / "Toorseriarit"
         "action": "playSound",
-        "resource": "resources/wordspelling/Øveopgave/6d.4.wav",
+        "resource": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6d.4.wav",
         "delayAfter": 750
       }
     ]
