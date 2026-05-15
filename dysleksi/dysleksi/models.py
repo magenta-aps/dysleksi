@@ -841,7 +841,7 @@ class TestResponseQuerySet(QuerySet):
             }
         )
 
-    def annotate_correct_proportion(
+    def annotate_proportion(
         self, count_key: str, output_key: str, questions_count: int
     ) -> "TestResponseQuerySet":
         return self.annotate(
@@ -997,19 +997,19 @@ class PartResponseQuerySet(QuerySet):
             }
         )
 
-    def annotate_correct_proportion(
-        self, count_key: str, correct_key: str, output_key: str
+    def annotate_proportion(
+        self, total_key: str, count_key: str, output_key: str
     ) -> "PartResponseQuerySet":
         return self.annotate(
             **{
                 output_key: ExpressionWrapper(
-                    Cast(correct_key, output_field=FloatField()) / F(count_key),
+                    Cast(count_key, output_field=FloatField()) / F(total_key),
                     output_field=FloatField(),
                 )
             }
         )
 
-    def annotate_correct_percentage(self, proportion_key: str, output_key: str):
+    def annotate_percentage(self, proportion_key: str, output_key: str):
         return self.annotate(
             **{
                 output_key: ExpressionWrapper(
@@ -1075,6 +1075,15 @@ class PartResponse(models.Model):
 
     def __str__(self) -> str:
         return f"{str(self.testresponse)} / {str(self.finished_after)}"
+
+    @property
+    def correctness_category_answered(self):
+        correct_responses_count = self.questionresponses.filter(correct=True).count()
+        responses_count = self.questionresponses.count()
+        correct_proportion_of_answered = float(correct_responses_count) / float(
+            responses_count
+        )
+        return CorrectnessCategory.categorize_proportion(correct_proportion_of_answered)
 
 
 class QuestionResponse(models.Model):

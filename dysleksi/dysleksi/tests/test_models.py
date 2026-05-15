@@ -88,7 +88,7 @@ class TestClass(DysleksiTest):
             self.assertNotIn(self.klasse, Class.objects.all().current())
 
 
-class TestPartResponse(DysleksiTest):
+class TestPartResponse(ResponseTest):
     def test_str(self):
         test = Test.objects.create(name="Test")
         assignment = TestAssignment.objects.create(
@@ -103,6 +103,16 @@ class TestPartResponse(DysleksiTest):
         pr = PartResponse(testresponse=response)
         pr.finished_after = "World"
         self.assertEqual(str(pr), f"{str(pr.testresponse)} / {str(pr.finished_after)}")
+
+    def test_correctness_category_answered(self):
+        self.assertEqual(
+            self.group_partresponse_1.correctness_category_answered,
+            CorrectnessCategory.objects.get(color_key=CategoryColorChoice.BLUE),
+        )
+        self.assertEqual(
+            self.group_partresponse_2.correctness_category_answered,
+            CorrectnessCategory.objects.get(color_key=CategoryColorChoice.YELLOW),
+        )
 
 
 class TestQuestionResponse(DysleksiTest):
@@ -965,10 +975,8 @@ class TestTestResponseQuerySet(ResponseTest):
         self.assertEqual(student1_answer.ranking, 2)
         self.assertEqual(student2_answer.ranking, 1)
 
-    def test_annotate_correct_proportion(self):
-        qs = self.qs.annotate_correct_count(
-            "correct_count"
-        ).annotate_correct_proportion(
+    def test_annotate_proportion(self):
+        qs = self.qs.annotate_correct_count("correct_count").annotate_proportion(
             "correct_count",
             "proportion",
             TestQuestion.objects.filter(part__tests=self.test).count(),
@@ -981,7 +989,7 @@ class TestTestResponseQuerySet(ResponseTest):
     def test_annotate_score_category(self):
         qs = (
             self.qs.annotate_correct_count("correct_count")
-            .annotate_correct_proportion(
+            .annotate_proportion(
                 "correct_count",
                 "proportion",
                 TestQuestion.objects.filter(part__tests=self.test).count(),
@@ -1113,13 +1121,13 @@ class TestPartResponseQuerySet(ResponseTest):
         self.assertEqual(student1_answer.ranking, 2)
         self.assertEqual(student2_answer.ranking, 1)
 
-    def test_annotate_correct_proportion(self):
+    def test_annotate_proportion(self):
         qs = (
             self.qs.annotate_responses_count(
                 "responses_count",
             )
             .annotate_correct_count("correct_count")
-            .annotate_correct_proportion(
+            .annotate_proportion(
                 "responses_count",
                 "correct_count",
                 "proportion",
@@ -1136,12 +1144,12 @@ class TestPartResponseQuerySet(ResponseTest):
                 "responses_count",
             )
             .annotate_correct_count("correct_count")
-            .annotate_correct_proportion(
+            .annotate_proportion(
                 "responses_count",
                 "correct_count",
                 "proportion",
             )
-            .annotate_correct_percentage("proportion", "percentage")
+            .annotate_percentage("proportion", "percentage")
         )
         student1_answer = qs[0]
         student2_answer = qs[1]
@@ -1154,7 +1162,7 @@ class TestPartResponseQuerySet(ResponseTest):
                 "responses_count",
             )
             .annotate_correct_count("correct_count")
-            .annotate_correct_proportion(
+            .annotate_proportion(
                 "responses_count",
                 "correct_count",
                 "proportion",
