@@ -23,19 +23,19 @@
         // Nonordstavning er nu ved at starte.
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4a.1.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Indledning/4a.1.wav"
       },
       {
         // Nonordene betyder ikke noget, men de kan skrives.
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4a.2.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Indledning/4a.2.wav"
       },
       {
         // Først får du vist, hvad du skal gøre.
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4a.3.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Indledning/4a.3.wav"
       },
       {
         "action": "fadeOut",
@@ -51,7 +51,7 @@
         // Tryk grøn, når du er klar.
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4a.4.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Indledning/4a.4.wav"
       }
     ]
   },
@@ -83,7 +83,7 @@
         // Lyt godt efter
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.1.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.1.wav"
       },
       {
         "action": "fadeOut",
@@ -104,7 +104,7 @@
         // Her er
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.2.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.2.wav"
       },
       {
         "action": "fadeIn",
@@ -120,7 +120,7 @@
         // Dem, der skal klikkes på, når man skriver.
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.3.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.3.wav"
       },
       {
         "action": "fadeIn",
@@ -131,7 +131,7 @@
         // Du vil høre nonordet du skal skrive, f.eks.
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.4.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.4.wav"
       },
       {
         "action": "highlight",
@@ -147,7 +147,7 @@
         // Du
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.6.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.6.wav"
       },
       {
         "action": "highlight",
@@ -158,7 +158,7 @@
         // Så skal du skrive det norord du hører, ved at klikke på bogstaverne, således...
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.7.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.7.wav"
       },
       {
         "action": "clickButton",
@@ -175,7 +175,7 @@
         // lydikonet for at høre det igen.
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.8.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.8.wav"
       },
       {
         "action": "waitForUserClick",
@@ -186,7 +186,7 @@
         // Hvis du kommer til at fejle, kan du ændre det, du har skrevet,
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.9.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.9.wav"
       },
       {
         "action": "setText",
@@ -198,7 +198,7 @@
         // F.eks.: Hvis du kommer til at skrive su,
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.10.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.10.wav"
       },
       {
         "action": "clickButton",
@@ -214,7 +214,7 @@
         // kan du slette det, du har skrevet, ved at trykke på backspace,
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.11.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.11.wav"
       },
       {
         "action": "clickButton",
@@ -230,7 +230,7 @@
         //  og skrive det rigtige qa
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.12.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.12.wav"
       },
       {
         "action": "clickButton",
@@ -246,7 +246,7 @@
         // Du må gerne gætte, hvis du ikke kan finde ud af opgaven.
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.13.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.13.wav"
       },
       {
         "action": "fadeIn",
@@ -262,7 +262,7 @@
         // Når du har skrevet, går du videre til næste opgave ved at trykke på pilen.
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.14.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.14.wav"
       },
       {
         "action": "fadeOut",
@@ -283,13 +283,13 @@
         // Det er sådan, du skal skrive
         "action": "playSound",
         "delayAfter": 1000,
-        "resource": "resources/nonwordspelling/Martha/4b.15.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.15.wav"
       },
       {
         // Nu skal du selv prøve øveopgaverne. Kun nonordet vil blive angivet.
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Martha/4b.16.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.16.wav"
       },
       {
         "action": "fadeIn",
@@ -300,7 +300,7 @@
         // Tryk grøn når du er klar.
         "action": "playSound",
         "delayAfter": 0,
-        "resource": "resources/nonwordspelling/Martha/4b.17.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.17.wav"
       }
     ]
   },
@@ -340,13 +340,13 @@
         {
             // Du skal skrive det nonord der bliver angivet.
             "action": "playSound",
-            "resource": "/resources/nonwordspelling/Martha/4c.2.mp3",
+            "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4c.2.wav",
             "delayAfter": 1250
         },
         {
             // Du starter nu
             "action": "playSound",
-            "resource": "/resources/nonwordspelling/Martha/4c.3.mp3",
+            "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4c.3.wav",
             "delayAfter": 1250
         },
         {
@@ -378,7 +378,7 @@
       {
         // Øvelserne er færdige.
         "action": "playSound",
-        "resource": "resources/nonwordspelling/Martha/4c.8.mp3",
+        "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4c.8.wav",
         "delayAfter": 1000
       },
       {
@@ -393,7 +393,7 @@
       {
         // Her kan du se to knapper.
         "action": "playSound",
-        "resource": "resources/nonwordspelling/Martha/4d.1.mp3",
+        "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.1.wav",
         "delayAfter": 500
       },
 
@@ -406,7 +406,7 @@
         // Hvis du har forstået, hvad du skal gøre,
         // skal du klikke på den blå. Så starte opgaverne.
         "action": "playSound",
-        "resource": "resources/nonwordspelling/Martha/4d.2.mp3",
+        "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.2.wav",
         "delayAfter": 500
       },
 
@@ -423,7 +423,7 @@
         // Men hvis du ikke har forstået, hvad du skal gøre,
         // skal du klikke på den grå. Så skal du øve dig igen.
         "action": "playSound",
-        "resource": "resources/nonwordspelling/Martha/4d.3.mp3",
+        "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.3.wav",
         "delayAfter": 500
       },
       {
@@ -433,13 +433,13 @@
       {
         // Vælg ikon (klik).
         "action": "playSound",
-        "resource": "resources/nonwordspelling/Martha/4d.4.mp3",
+        "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.4.wav",
         "delayAfter": 500
       },
       {
         "action": "setButtonSoundOnce",
         "element": "next",
-        "resource": "resources/nonwordspelling/Martha/4e.3.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Deltests/4e.3.wav"
       }
     ]
   }

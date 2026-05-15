@@ -10,7 +10,7 @@
         // "Ordet, som du skal skrive, vil kun blive angivet under opgaverne. Du starter nu"
         // "Oqaatsinik allannermi oqaaseq allatassat taamaallaat taaneqartassaaq.... Aallartipputit"
         "action": "playSound",
-        "resource": "resources/wordspelling/Deltest/6e.1.wav",
+        "resource": "resources/wordspelling/Enhanced/Deltest/6e.1.wav",
         "delayAfter": 0
       }
     ]

@@ -18,13 +18,13 @@
             {
                 // Opgaven om bogstavlyde er nu ved at starte.
                 "action": "playSound",
-                "resource": "resources/letter_sound/Indledning/1a.1.wav",
+                "resource": "resources/letter_sound/Enhanced/Indledning/1a.1.wav",
                 "delayAfter": 500
             },
             {
                 // Først skal du vises, hvordan du skal gøre.
                 "action": "playSound",
-                "resource": "resources/letter_sound/Indledning/1a.2.wav",
+                "resource": "resources/letter_sound/Enhanced/Indledning/1a.2.wav",
                 "delayAfter": 500
             },
             {
@@ -40,7 +40,7 @@
             {
                 // Tryk grøn, når du er klar.
                 "action": "playSound",
-                "resource": "resources/letter_sound/Indledning/1a.3.wav",
+                "resource": "resources/letter_sound/Enhanced/Indledning/1a.3.wav",
                 "delayAfter": 500
             }
         ]
@@ -59,7 +59,7 @@
             {
                 // Lyt godt efter.
                 "action": "playSound",
-                "resource": "resources/letter_sound/Instruktion/1b.1.wav",
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.1.wav",
                 "delayAfter": 750
             },
             {
@@ -95,13 +95,13 @@
             {
                 // Se
                 "action": "playSound",
-                "resource": "resources/letter_sound/Instruktion/1b.2.wav",
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.2.wav",
                 "delayAfter": 750
             },
             {
                 // Her er bogstaverne, som kan vælges
                 "action": "playSound",
-                "resource": "resources/letter_sound/Instruktion/1b.3.wav",
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.3.wav",
                 "delayAfter": 750
             },
             {
@@ -117,7 +117,7 @@
             {
                 // j
                 "action": "playSound",
-                "resource": "resources/letter_sound/Instruktion/1b.4.wav",
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.4.wav",
                 "delayAfter": 750
             },
             {
@@ -133,7 +133,7 @@
             {
                 // d
                 "action": "playSound",
-                "resource": "resources/letter_sound/Instruktion/1b.5.wav",
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.5.wav",
                 "delayAfter": 750
             },
             {
@@ -149,7 +149,7 @@
             {
                 // c
                 "action": "playSound",
-                "resource": "resources/letter_sound/Instruktion/1b.6.wav",
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.6.wav",
                 "delayAfter": 750
             },
             {
@@ -165,14 +165,14 @@
             {
                 // Og g
                 "action": "playSound",
-                "resource": "resources/letter_sound/Instruktion/1b.7.wav",
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.7.wav",
                 "delayAfter": 750
             },
             {
                 // Du kommer til at høre bogstavlydene enkeltvis.
                 "action": "playSound",
                 "delayAfter": 1000,
-                "resource": "resources/letter_sound/Instruktion/1b.8.wav"
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.8.wav"
             },
             {
                 "action": "fadeIn",
@@ -194,7 +194,7 @@
                 // trykke på lydikonet. Prøv at trykke.
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/letter_sound/Instruktion/1b.10.wav"
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.10.wav"
             },
             {
                 "action": "waitForUserClick",
@@ -205,13 +205,13 @@
                 // Du
                 "action": "playSound",
                 "delayAfter": 0,
-                "resource": "resources/letter_sound/Instruktion/1b.11.wav"
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.11.wav"
             },
             {
                 // Skal vælge bogstavet, der passer til lyden du hører.
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/letter_sound/Instruktion/1b.12.wav"
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.12.wav"
             },
             {
                 "action": "select",
@@ -224,7 +224,7 @@
                 // gætte, hvis du ikke kan finde ud af opgaven
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/letter_sound/Instruktion/1b.13.wav"
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.13.wav"
             },
 
             {
@@ -242,7 +242,7 @@
                 // Når du har valgt, går du videre til næste opgave ved at trykke  på pilen.
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/letter_sound/Instruktion/1b.14.wav"
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.14.wav"
             },
             {
                 "action": "fadeOut",
@@ -278,19 +278,19 @@
                 // Det er sådan, du skal løse opgaverne.
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/letter_sound/Instruktion/1b.15.wav"
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.15.wav"
             },
             {
                 // Nu skal du selv prøve øveopgaverne.
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/letter_sound/Instruktion/1b.16.wav"
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.16.wav"
             },
             {
                 // Klik på den grønne pil, når du er klar.
                 "action": "playSound",
                 "delayAfter": 0,
-                "resource": "resources/letter_sound/Instruktion/1b.17.wav"
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.17.wav"
             },
             {
                 "action": "fadeIn",
@@ -328,7 +328,7 @@
             {
                 "action": "playSound",
                 "delayAfter": 0,
-                "resource": "resources/letter_sound/Øveopgave 1 og 2/1d.1.wav"
+                "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.1.wav"
             },
             {
                 "action": "setRepeatButtonDestination",
@@ -355,7 +355,7 @@
             {
                 "action": "playSound",
                 "delayAfter": 0,
-                "resource": "resources/letter_sound/Øveopgave 1 og 2/1d.2.wav"
+                "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.2.wav"
             },
             {
                 "action": "fadeIn",
@@ -367,13 +367,13 @@
             {
                 "action": "playSound",
                 "delayAfter": 1250,
-                "resource": "resources/letter_sound/Øveopgave 1 og 2/1d.3.wav"
+                "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.3.wav"
             },
             // Vælg ikon (klik).
             {
                 "action": "setButtonSoundOnce",
                 "delayAfter": 0,
-                "resource": "resources/letter_sound/Øveopgave 1 og 2/1d.4.wav",
+                "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.4.wav",
                 "element": "next"
             }
         ]
