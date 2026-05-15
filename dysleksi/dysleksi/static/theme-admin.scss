@@ -66,6 +66,7 @@ $warning: $red-lightest;
 $danger: $red-normal;
 $btn-color: $mono-white;
 $body-bg: $mono-white;
+$dropdown-bg: $white;
 $input-bg: $white;
 $modal-content-bg: $white;
 $list-group-disabled-color: $mono-gray-light;
@@ -282,6 +283,19 @@ h6 {
           .form-control:focus {
             box-shadow: none;
           }
+        }
+      }
+
+      .dropdown-menu {
+        position: absolute;
+        box-shadow: 0 0.125 * $spacer $spacer $mono-gray-dark-1;
+
+        &.show {
+          right: $spacer;
+        }
+
+        .dropdown-item {
+          font-size: 0.875 * $spacer;
         }
       }
     }
@@ -1481,7 +1495,7 @@ $border-radius-student-card: $spacer / 4 * 3;
 }
 
 .truncate-cell {
-  max-width: 10vw; 
+  max-width: 10vw;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

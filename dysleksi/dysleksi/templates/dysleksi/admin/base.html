@@ -57,12 +57,22 @@
                     <input class="form-control" type="search" placeholder="{% translate 'Søg efter test, klasse eller elev' %}" aria-label="{% translate 'Søg' %}" />
                 </div>
             </form>
-            <div class="navbar-nav">
-                <a class="nav-link d-flex align-items-center text-black" href="#">
-                    <i class="ph-fill ph-user-circle fs-5 me-1"></i>
-                    <span>{{ request.user.get_full_name }}</span>
-                </a>
-            </div>
+            <ul class="navbar-nav me-1">
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle d-flex align-items-center text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="ph-fill ph-user-circle fs-5 me-1"></i>
+                        <span>{{ request.user.get_full_name }}</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li>
+                            <a class="dropdown-item d-flex align-items-center text-black" href="{% url 'login:logout' %}">
+                                <i class="ph ph-sign-out fs-5 me-1"></i>
+                                <span>{% translate 'Log ud' %}</span>
+                            </a>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
         </nav>
         <div class="inner-content">
             {% block inner_content %}
