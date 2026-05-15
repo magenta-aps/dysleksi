@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import AnonymousUser
+from django.http.response import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from django.views import View
@@ -26,6 +27,7 @@ from dysleksi.views import (
     AssignmentResultsView,
     AssignmentView,
     ClassListView,
+    PartResponseView,
     RootView,
     StudentListView,
     TestAssignmentListView,
@@ -751,3 +753,48 @@ class TestTestResponseView(ResponseTest):
                 [["Bedømmelse"], ["Over middel", "Se elevens svar"], [], []],
             ],
         )
+
+
+class TestPartResponseView(ResponseTest):
+    def test_get_object(self):
+        view = self.setup_view(
+            PartResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            response_pk=self.group_testresponse_1.pk,
+            testpart_pk=self.group_test_part.pk,
+        )
+        object = view.get_object()
+        self.assertEqual(object.responses_count, 4)
+        self.assertEqual(object.questions_count, 4)
+        self.assertEqual(object.correct_count, 4)
+        self.assertEqual(object.responses_proportion, 1.0)
+        self.assertEqual(object.responses_pct, 100)
+        self.assertEqual(object.correct_proportion, 1.0)
+        self.assertEqual(object.correct_pct, 100)
+
+        view = self.setup_view(
+            PartResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            response_pk=self.group_testresponse_2.pk,
+            testpart_pk=self.group_test_part.pk,
+        )
+        object = view.get_object()
+        self.assertEqual(object.responses_count, 4)
+        self.assertEqual(object.questions_count, 4)
+        self.assertEqual(object.correct_count, 1)
+        self.assertEqual(object.responses_proportion, 1.0)
+        self.assertEqual(object.responses_pct, 100)
+        self.assertEqual(object.correct_proportion, 0.25)
+        self.assertEqual(object.correct_pct, 25)
+
+    def test_get_object_404(self):
+        with self.assertRaises(Http404):
+            self.setup_view(
+                PartResponseView,
+                self.teacher,
+                assignment_pk=self.test_assignment_class.pk,
+                response_pk=self.group_testresponse_1.pk,
+                testpart_pk=self.group_test_part.pk + 1,
+            )

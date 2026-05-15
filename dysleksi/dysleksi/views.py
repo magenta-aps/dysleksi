@@ -9,7 +9,12 @@ from django.conf import settings
 from django.db import transaction
 from django.db.models import Case, Count, F, Q, QuerySet, Value, When
 from django.http import HttpResponseRedirect
-from django.http.response import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http.response import (
+    Http404,
+    HttpResponse,
+    HttpResponseForbidden,
+    JsonResponse,
+)
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -336,7 +341,7 @@ class AssignmentResultsView(GroupRequiredMixin, PartPaginationMixin, DetailView)
             # Annotér med antallet af korrekte svar i hele testen
             .annotate_correct_count(count_key)
             # Annotér med andelen af korrekte svar i hele testen (float mellem 0 og 1)
-            .annotate_correct_proportion(count_key, proportion_key, questions_count)
+            .annotate_proportion(count_key, proportion_key, questions_count)
             # Annotér kategorien af korrekte svar i hele testen (pk på ResultCategory)
             .annotate_score_category(proportion_key, category_key)
         )
@@ -373,9 +378,7 @@ class AssignmentResultsView(GroupRequiredMixin, PartPaginationMixin, DetailView)
                 qs.annotate_correct_count(count_key, Q(partresponses__testpart=part))
                 # Annotér med andelen af korrekte svar i denne Part
                 # (float mellem 0 og 1)
-                .annotate_correct_proportion(
-                    count_key, proportion_key, part_questions_count
-                )
+                .annotate_proportion(count_key, proportion_key, part_questions_count)
                 # Annotér kategorien af korrekte svar i denne Part
                 # (red, yellow, green, blue)
                 .annotate_score_category(proportion_key, category_key)
@@ -533,10 +536,10 @@ class AssignmentPartResultsView(GroupRequiredMixin, ListView):
             .annotate_correct_count(
                 "correct_count",
             )
-            .annotate_correct_proportion(
+            .annotate_proportion(
                 "responses_count", "correct_count", "correct_proportion"
             )
-            .annotate_correct_percentage("correct_proportion", "correct_percentage")
+            .annotate_percentage("correct_proportion", "correct_percentage")
             .annotate_ordering("correct_count", "rank", False)
         ).order_by(*self.get_ordering())
 
@@ -631,18 +634,16 @@ class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
             .annotate_correct_count(
                 "correct_count", Q(questionresponses__question__is_practice=False)
             )
-            .annotate_correct_proportion(
+            .annotate_proportion(
                 "responses_count", "correct_count", "correct_proportion_of_answered"
             )
-            .annotate_correct_percentage(
+            .annotate_percentage(
                 "correct_proportion_of_answered", "correct_pct_of_answered"
             )
-            .annotate_correct_proportion(
+            .annotate_proportion(
                 "questions_count", "correct_count", "correct_proportion_of_all"
             )
-            .annotate_correct_percentage(
-                "correct_proportion_of_all", "correct_pct_of_all"
-            )
+            .annotate_percentage("correct_proportion_of_all", "correct_pct_of_all")
             .order_by(
                 "pk",
             )
@@ -669,16 +670,21 @@ class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
                     },
                     footer_template_name="dysleksi/admin/"
                     "test_response/group/footer.html",
-                    footer_value=lambda column_values: {
-                        "category": CorrectnessCategory.categorize_proportion(
-                            # Matcher rækkefølgen af linjer i `data` ovenfor.
-                            # For at regne kategorien ud deler vi antal rigtige
-                            # (række 1) med antal besvarelser (række 0)
-                            (column_values[1] / column_values[0])
-                            if column_values[0] != 0
-                            else None
-                        ),
-                    },
+                    footer_value=partial(
+                        lambda part, column_values: {
+                            "response": self.object,
+                            "part": part,
+                            "category": CorrectnessCategory.categorize_proportion(
+                                # Matcher rækkefølgen af linjer i `data` ovenfor.
+                                # For at regne kategorien ud deler vi antal rigtige
+                                # (række 1) med antal besvarelser (række 0)
+                                (column_values[1] / column_values[0])
+                                if column_values[0] != 0
+                                else None
+                            ),
+                        },
+                        part,
+                    ),
                 ),
             )
             for part in parts
@@ -713,6 +719,7 @@ class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
                 },
             },
         ]
+
         return StudentTestResponseTable(data=data, extra_columns=extra_columns)
 
     def get_plot_data(self) -> List[int]:
@@ -741,3 +748,34 @@ class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
             }
         )
         return context
+
+
+class PartResponseView(LoginRequiredMixin, DetailView):
+    model = PartResponse
+    template_name = "dysleksi/admin/part_response/group/detail.html"
+
+    def get_object(self, queryset=...):
+        qs = (
+            PartResponse.objects.filter(
+                testresponse__assignment=self.kwargs["assignment_pk"],
+                testpart=self.kwargs["testpart_pk"],
+                testresponse=self.kwargs["response_pk"],
+            )
+            .annotate_responses_count("responses_count")
+            .annotate_questions_count("questions_count")
+            .annotate_correct_count("correct_count")
+            .annotate_proportion(
+                "questions_count", "responses_count", "responses_proportion"
+            )
+            .annotate_percentage("responses_proportion", "responses_pct")
+            .annotate_proportion(
+                "responses_count", "correct_count", "correct_proportion"
+            )
+            .annotate_percentage("correct_proportion", "correct_pct")
+        )
+        object = qs.first()
+        if object is None:
+            raise Http404(
+                "No %s matches the given query." % PartResponse._meta.object_name
+            )
+        return object

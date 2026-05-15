@@ -162,6 +162,7 @@ msgid "Luk"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/base.html
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
@@ -249,6 +250,7 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
 #: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
@@ -256,11 +258,37 @@ msgstr ""
 msgid "Klasse %(class_name)s - %(test_name)s"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 #: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
 msgid "Resultater"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+msgid "Tilbage til elevrapport"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+#, python-format
+msgid "Resultater for %(name)s - %(part_name)s"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+msgid "Oversigt"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+msgid "Totalt resultat"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+msgid "Fordeling på tid"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+msgid "Fordeling på ordlængde"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html

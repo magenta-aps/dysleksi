@@ -1,5 +1,5 @@
 {% load i18n %}
-{% with key=value.category.color_key %}
+{% with key=value.category.color_key part=value.part response=value.response %}
 <div class="result-score category-{{ key }}">
     {% if key == "red" %}
         {% translate "Elendigt" %}
@@ -14,7 +14,7 @@
     {% endif %}
 </div>
 <div class="text-center">
-    <a href="">
+    <a href="{% url 'dysleksi:test_assignment_part_result' assignment_pk=response.assignment_id testpart_pk=part.pk response_pk=response.pk %}">
         {% translate "Se elevens svar" %}
     </a>
 </div>
