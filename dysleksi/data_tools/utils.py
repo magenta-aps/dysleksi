@@ -225,13 +225,9 @@ def create_nonwordspelling_test(
 def create_letter_pronunciation_test(
     test, questions_data, practice_questions_data=None, name="Bogstavbenævnelse"
 ):
-    reminder, created = TestResource.objects.get_or_create(
-        name="resources/letter_pronunciation/Deltests/9e.1.wav",
-        sound="resources/letter_pronunciation/Deltests/9e.1.wav",
-    )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/letter_pronunciation/Deltests/9e.2.wav",
-        sound="resources/letter_pronunciation/Deltests/9e.2.wav",
+        name="resources/letter_pronunciation/Enhanced/9c.2.wav",
+        sound="resources/letter_pronunciation/Enhanced/9c.2.wav",
     )
 
     part, created = TestPart.objects.get_or_create(
