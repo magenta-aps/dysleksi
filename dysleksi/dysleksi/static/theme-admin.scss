@@ -55,9 +55,8 @@ $partially-correct: $yellow-normal;
 $wrong: $bright-red-normal;
 
 // Define our own constants
-$sidebar-navigation-min-width: 15rem;
-$sidebar-navigation-med-width: 10vw;
-$sidebar-navigation-max-width: 20vw;
+$sidebar-navigation-min-width: 5rem;
+$sidebar-navigation-max-width: 15rem;
 
 // Map design colors to Bootstrap variables
 $primary: $blue-dark;
@@ -126,6 +125,7 @@ h1 {
   font-family: "DM Sans Medium", "Helvetica", sans-serif;
   font-size: 1.25 * $spacer;
   color: $black;
+  margin: 0 0 $spacer 0;
 }
 h2 {
   font-family: "DM Sans Medium", "Helvetica", sans-serif;
@@ -165,7 +165,7 @@ h6 {
 }
 .btn {
   font-family: "DM Sans Medium", "Helvetica", sans-serif;
-  font-size: $spacer;
+  font-size: 0.875 * $spacer;
 }
 .btn-borderless {
   border: 0 none;
@@ -249,7 +249,7 @@ h6 {
     overflow: scroll;
 
     .inner-content {
-      padding: $spacer;
+      padding: 1.5 * $spacer 2.5 * $spacer;
     }
 
     // Secondary navigation: breadcrumb, search field and user menu
@@ -257,11 +257,18 @@ h6 {
       flex-flow: row nowrap;
       justify-items: center;
       background: $white;
-      padding: 0.5 * $spacer $spacer;
+      padding: 0.5 * $spacer 2.5 * $spacer;
       box-shadow: 0 0.25 * $spacer $spacer $mono-gray-lightest;
 
+      .breadcrumb,
+      .breadcrumb-item {
+        font-family: "DM Sans Medium", "Helvetica", sans-serif;
+        font-size: 0.75 * $spacer;
+        color: $mono-gray-normal;
+      }
+
       .breadcrumb-item a {
-        color: $black;
+        color: $mono-gray-darkest;
         text-decoration: none;
       }
 
@@ -288,7 +295,7 @@ h6 {
 
       .dropdown-menu {
         position: absolute;
-        box-shadow: 0 0.125 * $spacer $spacer $mono-gray-dark-1;
+        box-shadow: 0 0.5 * $spacer $spacer $mono-gray-lightest;
 
         &.show {
           right: $spacer;
@@ -306,7 +313,8 @@ h6 {
   // Layout where sidebar navigation is "medium size"
   // and sidebar is not manually expanded
   .main .navigation:not(.show,.showing) {
-    width: $sidebar-navigation-med-width;
+    width: $sidebar-navigation-min-width;
+    flex: 0 0 $sidebar-navigation-min-width;
   }
   .main .navigation:not(.show,.showing) nav {
     justify-content: center;
@@ -328,6 +336,12 @@ h6 {
   }
   .main .navigation:not(.show,.showing) .version {
     display: none;
+  }
+  .main .content .inner-content {
+    padding: 1.5 * $spacer;
+  }
+  .main .content nav.navbar {
+    padding: 0.5 * $spacer 1.5 * $spacer;
   }
 }
 
@@ -355,6 +369,7 @@ h6 {
 
     .navigation {
       min-width: $sidebar-navigation-min-width;
+      flex: 0 0 $sidebar-navigation-min-width;
 
       .offcanvas-header {
         border-bottom: 1px solid $mono-gray-dark-2;
@@ -402,19 +417,31 @@ h6 {
   margin-right: $spacer;
 }
 input[type='datetime-local'] {
-  border-radius: $spacer;
+  border-radius: 0.75 * $spacer;
 }
 textarea.form-control {
   resize: none;
+}
+// Focus style for input field with preceding icon (e.g. search)
+.input-group-text:has(+ .form-control:focus) {
+  border: $border-width solid #80adc2;
+}
+// Text input fields
+.form-control {
+  font-size: 0.75 * $spacer;
 }
 
 // Table styles
 .table-container {
   overflow: hidden !important;
-  padding: $spacer;
+  padding: $spacer 0 0 0;
   background-color: $white;
-  border-radius: $spacer;
-  box-shadow: 0 0 $spacer $mono-gray-lightest;
+  border: 1px solid $mono-gray-lighter;
+  border-radius: 0.75 * $spacer;
+
+  &:not(:last-child) {
+    margin-bottom: 2 * $spacer;
+  }
 
   .table {
     tr {
@@ -424,7 +451,9 @@ textarea.form-control {
     th {
       white-space: nowrap;
       width: 1%;
+      font-size: 0.75 * $spacer;
       padding: $spacer $spacer 0.5 * $spacer $spacer;
+      color: $mono-gray-dark-3;
       background-color: $white;
       text-transform: uppercase;
     }
@@ -521,11 +550,12 @@ ul.modal-progress {
     pointer-events: none;
   }
 }
+
 .summary {
   padding: $spacer;
   margin: $spacer 0;
   border: 1px solid $mono-gray-lighter;
-  border-radius: $spacer;
+  border-radius: 0.75 * $spacer;
 
   table {
     tr {
@@ -600,10 +630,6 @@ td.note input {
 
 // Teacher UI for running individual tests
 div[data-role='teacher'][data-test-type='individual'] {
-  .card {
-    box-shadow: 0 0 $spacer $mono-gray-lightest;
-  }
-
   .card-header {
     background: $blue-lightest;
     border: 1px solid $blue-lighter-1;
@@ -636,7 +662,7 @@ div[data-role='teacher'][data-test-type='individual'] {
         justify-content: space-around;
         background: $mono-white;
         border: 1px solid $mono-gray-light;
-        border-radius: $spacer;
+        border-radius: 0.75 * $spacer;
       }
 
       .current-question p {
@@ -711,7 +737,6 @@ div[data-role='teacher'][data-test-type='individual'] {
   // Results table
   .table-container {
     padding: 0;
-    border: 1px solid $mono-gray-lighter;
   }
 
   .table {
@@ -738,7 +763,7 @@ div[data-role='teacher'][data-test-type='individual'] {
       padding: 0.25 * $spacer $spacer 0.25 * $spacer 0.75 * $spacer;
       background: $mono-gray-lightest;
       color: $mono-gray-dark-3;
-      border-radius: $spacer;
+      border-radius: 0.75 * $spacer;
 
       // Play button
       i.ph-play { color: $mono-gray-dark-3; }
@@ -765,7 +790,6 @@ div[data-role='teacher'][data-test-type='individual'] {
 .group-test-container {
   background: white;
   border-radius: 1.5rem;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
   width: 100%;
   margin: 4rem 0;
   overflow: hidden;
@@ -1460,7 +1484,7 @@ $border-radius-student-card: $spacer / 4 * 3;
   min-width: 480px;
   max-width: 90vw;
   background: white;
-  border-radius: 16px;
+  border-radius: 0.75 * $spacer;
   padding: 0 1.5 * $spacer;
   box-shadow: 0 0 $spacer $mono-gray-lightest;
   font-size: 14px;
