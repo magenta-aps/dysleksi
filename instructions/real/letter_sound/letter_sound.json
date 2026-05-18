@@ -91,7 +91,7 @@
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.16 - h - Martha.mp3",
+        "sound": "resources/shared/Bogstavlyde/1f.16  Bogstav H.wav",
         "correct": "h",
         "wrong": ["f", "r", "l"]
     },

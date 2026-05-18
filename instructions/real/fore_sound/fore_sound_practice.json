@@ -46,7 +46,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.16 - h - Martha.mp3",
+        "sound": "resources/shared/Bogstavlyde/1f.16  Bogstav H.wav",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Hest.jpg",
         "wrong": [
@@ -320,7 +320,7 @@
             "resources/fore_sound/Opgave/Ørn.jpg",
             "resources/fore_sound/Opgave/Skur.jpg"
         ],
-        "reminder_source": "/resources/fore_sound/Martha/2e.2_3.mp3",
+        "reminder_source": "/resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.wav",
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
             {
@@ -390,7 +390,7 @@
             "resources/fore_sound/Opgave/Frø.jpg",
             "resources/fore_sound/Opgave/Svamp2.jpg"
         ],
-        "reminder_source": "/resources/fore_sound/Martha/2e.2_3.mp3"
+        "reminder_source": "/resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.wav"
     },
     {
         "question_type": "no_input_required",
