@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 import tempfile
+from datetime import datetime
 from pathlib import Path
 
 from django.contrib.auth.models import Group
@@ -10,6 +11,7 @@ from django.core.files.images import ImageFile
 from django.core.management import call_command
 from django.test import TestCase, override_settings
 from django.test.client import RequestFactory
+from django.utils import timezone
 
 from dysleksi.models import (
     STUDENTS,
@@ -80,6 +82,9 @@ class DysleksiTest(TestCase):
             name="GroupTestPart1",
             timeout=60000,
             partial_score_after=30000,
+        )
+        cls.group_test_part.set_data_breakdown_ranges(
+            "wordlength_data_breakdown", [(3, 4), (5, 6), (7, 8), (9, 11), (12, 15)]
         )
         cls.group_test.parts.add(cls.group_test_part)
         cls.resource1, _ = TestResource.objects.get_or_create(
@@ -269,6 +274,16 @@ class ResponseTest(DysleksiTest):
             challenge=cls.resource2,
             question_type=QuestionType.MULTIPLE_CHOICE,
         )
+        cls.possible_correct_answer2 = PossibleAnswer.objects.create(
+            question=cls.group_question_2,
+            resource=cls.resource3,
+            is_correct=True,
+        )
+        cls.possible_wrong_answer2 = PossibleAnswer.objects.create(
+            question=cls.group_question_2,
+            resource=cls.resource4,
+            is_correct=False,
+        )
         cls.group_question_3 = TestQuestion.objects.create(
             part=cls.group_test_part,
             challenge=None,
@@ -287,15 +302,18 @@ class ResponseTest(DysleksiTest):
             assignment=cls.test_assignment_class, student=student2, completed=True
         )
 
+        tz = timezone.get_current_timezone()
         cls.group_partresponse_1 = PartResponse.objects.create(
             testresponse=cls.group_testresponse_1,
             testpart=cls.group_test_part,
             completed=True,
+            started_at=datetime(2026, 5, 1, 12, 0, 0, tzinfo=tz),
         )
         cls.group_partresponse_2 = PartResponse.objects.create(
             testresponse=cls.group_testresponse_2,
             testpart=cls.group_test_part,
             completed=True,
+            started_at=datetime(2026, 5, 1, 14, 0, 0, tzinfo=tz),
         )
 
         cls.group_questionresponse_1_1 = QuestionResponse.objects.create(
@@ -304,21 +322,40 @@ class ResponseTest(DysleksiTest):
             answer_option=cls.possible_correct_answer1,
             correct=True,
         )
+        cls.group_questionresponse_1_1.submitted_at = datetime(
+            2026, 5, 1, 12, 0, 10, tzinfo=tz
+        )
+        cls.group_questionresponse_1_1.save()
+
         cls.group_questionresponse_1_2 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_1,
             question=cls.group_question_2,
             correct=True,
         )
+        cls.group_questionresponse_1_2.submitted_at = datetime(
+            2026, 5, 1, 12, 0, 15, tzinfo=tz
+        )
+        cls.group_questionresponse_1_2.save()
+
         cls.group_questionresponse_1_3 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_1,
             question=cls.group_question_3,
             correct=True,
         )
+        cls.group_questionresponse_1_3.submitted_at = datetime(
+            2026, 5, 1, 12, 0, 25, tzinfo=tz
+        )
+        cls.group_questionresponse_1_3.save()
+
         cls.group_questionresponse_1_4 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_1,
             question=cls.group_question_4,
             correct=True,
         )
+        cls.group_questionresponse_1_4.submitted_at = datetime(
+            2026, 5, 1, 12, 0, 40, tzinfo=tz
+        )
+        cls.group_questionresponse_1_4.save()
 
         cls.group_questionresponse_2_1 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_2,
@@ -326,18 +363,37 @@ class ResponseTest(DysleksiTest):
             answer_option=cls.possible_correct_answer1,
             correct=True,
         )
+        cls.group_questionresponse_2_1.submitted_at = datetime(
+            2026, 5, 1, 12, 0, 12, tzinfo=tz
+        )
+        cls.group_questionresponse_2_1.save()
+
         cls.group_questionresponse_2_2 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_2,
             question=cls.group_question_2,
             correct=False,
         )
+        cls.group_questionresponse_2_2.submitted_at = datetime(
+            2026, 5, 1, 12, 0, 25, tzinfo=tz
+        )
+        cls.group_questionresponse_2_2.save()
+
         cls.group_questionresponse_2_3 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_2,
             question=cls.group_question_3,
             correct=False,
         )
+        cls.group_questionresponse_2_3.submitted_at = datetime(
+            2026, 5, 1, 12, 0, 40, tzinfo=tz
+        )
+        cls.group_questionresponse_2_3.save()
+
         cls.group_questionresponse_2_4 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_2,
             question=cls.group_question_4,
             correct=False,
         )
+        cls.group_questionresponse_2_4.submitted_at = datetime(
+            2026, 5, 1, 12, 0, 55, tzinfo=tz
+        )
+        cls.group_questionresponse_2_4.save()

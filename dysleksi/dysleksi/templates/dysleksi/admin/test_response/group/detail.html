@@ -128,7 +128,9 @@
                         {% for part_pk, part_name in part_names.items %}
                             <td class="plot-x-scale-text">
                                 <div>{{ part_name }}</div>
-                                <a href="{% url 'dysleksi:test_assignment_part_result' assignment_pk=object.assignment_id testpart_pk=part_pk response_pk=object.pk %}">{% translate "Se elevens svar" %}</a>
+                                <a href="{% url 'dysleksi:test_assignment_part_result' assignment_pk=object.assignment_id testpart_pk=part_pk testresponse_pk=object.pk %}">
+                                    {% translate "Se elevens svar" %}
+                                </a>
                             </td>
                         {% endfor %}
                     {% endlocalize %}

@@ -1,6 +1,8 @@
 import random
+from datetime import timedelta
 
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from dysleksi.models import (
     Class,
@@ -104,13 +106,15 @@ class Command(BaseCommand):
             testresponse = TestResponse.objects.create(
                 assignment=assignment, student=student, completed=True
             )
-            for testpart in test.parts.all():
+            time = timezone.now() - timedelta(hours=1)
+            for i, testpart in enumerate(test.parts.all()):
                 completed = random.randint(1, 100) < 20
                 partresponse = PartResponse.objects.create(
                     testresponse=testresponse,
                     testpart=testpart,
                     finished_after=random.randint(2000, 10000),
                     completed=completed,
+                    started_at=time,
                 )
 
                 for question in testpart.questions.all():
@@ -137,11 +141,14 @@ class Command(BaseCommand):
                             .order_by("?")
                             .first()
                         )
+                    time = time + timedelta(seconds=random.randint(3, 20))
 
-                    QuestionResponse.objects.create(
+                    response = QuestionResponse.objects.create(
                         question=question,
                         partresponse=partresponse,
                         correct=correct,
                         answer_option=answer_option,
                         answer_text=answer_text,
                     )
+                    response.submitted_at = time
+                    response.save()

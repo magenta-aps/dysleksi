@@ -1,13 +1,29 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
+from datetime import timedelta
 from functools import cached_property, partial
 from math import ceil
 from typing import Any, Dict, List, Tuple
 
 from django.conf import settings
 from django.db import transaction
-from django.db.models import Case, Count, F, Q, QuerySet, Value, When
+from django.db.models import (
+    Aggregate,
+    Case,
+    CharField,
+    Count,
+    DurationField,
+    ExpressionWrapper,
+    F,
+    IntegerField,
+    Q,
+    QuerySet,
+    Value,
+    When,
+)
+from django.db.models.expressions import BaseExpression, OuterRef, Subquery
+from django.db.models.functions import Coalesce, Length, Replace
 from django.http import HttpResponseRedirect
 from django.http.response import (
     Http404,
@@ -30,6 +46,8 @@ from dysleksi.models import (
     CorrectnessCategory,
     PartResponse,
     PartResponseQuerySet,
+    PossibleAnswer,
+    QuestionResponse,
     ReadingSpeedCategory,
     Student,
     Test,
@@ -42,9 +60,12 @@ from dysleksi.models import (
     User,
 )
 from dysleksi.tables import (
+    AnswerByTimeResultsTable,
     ClassTable,
     EmptyColumn,
     PartResultTable,
+    ReadingWordCountResultsTable,
+    ReadingWordLengthResultsTable,
     StudentTable,
     StudentTestResponseTable,
     StudentTestResultsColumn,
@@ -528,13 +549,16 @@ class AssignmentPartResultsView(GroupRequiredMixin, ListView):
     def get_queryset(self):
         return (
             PartResponse.objects.filter(
-                testresponse__assignment=self.assignment, testpart=self.part
+                testresponse__assignment=self.assignment,
+                testpart=self.part,
             )
-            .annotate_responses_count(
+            .annotate_questionresponses_count(
                 "responses_count",
+                Q(question__is_practice=False),
             )
-            .annotate_correct_count(
+            .annotate_questionresponses_count(
                 "correct_count",
+                Q(correct=True, question__is_practice=False),
             )
             .annotate_proportion(
                 "responses_count", "correct_count", "correct_proportion"
@@ -628,11 +652,11 @@ class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
         return (
             self.object.partresponses.filter(testpart__in=self.get_current_parts())
             .annotate_questions_count("questions_count", Q(is_practice=False))
-            .annotate_responses_count(
-                "responses_count", Q(questionresponses__question__is_practice=False)
+            .annotate_questionresponses_count(
+                "responses_count", Q(question__is_practice=False)
             )
-            .annotate_correct_count(
-                "correct_count", Q(questionresponses__question__is_practice=False)
+            .annotate_questionresponses_count(
+                "correct_count", Q(question__is_practice=False, correct=True)
             )
             .annotate_proportion(
                 "responses_count", "correct_count", "correct_proportion_of_answered"
@@ -759,11 +783,15 @@ class PartResponseView(LoginRequiredMixin, DetailView):
             PartResponse.objects.filter(
                 testresponse__assignment=self.kwargs["assignment_pk"],
                 testpart=self.kwargs["testpart_pk"],
-                testresponse=self.kwargs["response_pk"],
+                testresponse=self.kwargs["testresponse_pk"],
             )
-            .annotate_responses_count("responses_count")
-            .annotate_questions_count("questions_count")
-            .annotate_correct_count("correct_count")
+            .annotate_questionresponses_count(
+                "responses_count", Q(question__is_practice=False)
+            )
+            .annotate_questions_count("questions_count", Q(is_practice=False))
+            .annotate_questionresponses_count(
+                "correct_count", Q(question__is_practice=False, correct=True)
+            )
             .annotate_proportion(
                 "questions_count", "responses_count", "responses_proportion"
             )
@@ -779,3 +807,198 @@ class PartResponseView(LoginRequiredMixin, DetailView):
                 "No %s matches the given query." % PartResponse._meta.object_name
             )
         return object
+
+    @cached_property
+    def part(self):
+        return self.object.testpart
+
+    def get_question_qs(self) -> QuerySet[TestQuestion]:
+        return self.part.questions.filter(is_practice=False)
+
+    def get_question_qs_annotations(self) -> Dict[str, BaseExpression]:
+        annotations: Dict[str, BaseExpression] = {}
+        if len(self.part.answer_wordlength_data_ranges) or len(
+            self.part.answer_wordcount_data_ranges
+        ):  # pragma: no branch
+            annotations["challenge_text"] = Coalesce(
+                F("challenge__text"),
+                Subquery(
+                    PossibleAnswer.objects.filter(
+                        question=OuterRef("pk"),
+                        is_correct=True,
+                    ).values("resource__text"),
+                    output_field=CharField(),
+                ),
+            )
+            annotations["challenge_text_length"] = Length("challenge_text")
+        if len(self.part.answer_wordcount_data_ranges):  # pragma: no branch
+            annotations["challenge_word_count"] = ExpressionWrapper(
+                # Count the number of words by
+                # number_of_letters - number_of_letters_without_spaces + 1
+                F("challenge_text_length")
+                - Length(Replace("challenge_text", Value(" "), Value("")))
+                + Value(1),
+                output_field=IntegerField(),
+            )
+        return annotations
+
+    def get_question_qs_aggregations(self) -> Dict[str, Aggregate]:
+        aggregations: Dict[str, Aggregate] = {}
+        for lower, upper in self.part.answer_wordlength_data_ranges:
+            q = Q()
+            if lower is not None:
+                q &= Q(challenge_text_length__gte=lower)
+            if upper is not None:
+                q &= Q(challenge_text_length__lte=upper)
+            aggregations[f"challenge_text_length__{lower}_{upper}__questions"] = Count(
+                "id", filter=q
+            )
+        for lower, upper in self.part.answer_wordcount_data_ranges:
+            q = Q()
+            if lower is not None:
+                q &= Q(challenge_word_count__gte=lower)
+            if upper is not None:
+                q &= Q(challenge_word_count__lte=upper)
+            aggregations[f"challenge_word_count__{lower}_{upper}__questions"] = Count(
+                "id", filter=q
+            )
+        return aggregations
+
+    def get_questions_aggregated_data(self) -> Dict[str, Any]:
+        question_qs = self.get_question_qs()
+        aggregations = self.get_question_qs_aggregations()
+        if aggregations:
+            annotations = self.get_question_qs_annotations()
+            if annotations:  # pragma: no branch
+                question_qs = question_qs.annotate(**annotations)
+            return question_qs.aggregate(**aggregations)
+        return {}
+
+    def get_questionresponse_qs(self) -> QuerySet[QuestionResponse]:
+        return self.object.questionresponses.filter(question__is_practice=False)
+
+    def get_questionresponse_qs_annotations(self) -> Dict[str, BaseExpression]:
+        annotations: Dict[str, BaseExpression] = {}
+        if self.part.answer_time_data_breakdown_ranges:
+            annotations["submitted_after"] = ExpressionWrapper(
+                F("submitted_at") - F("partresponse__started_at"),
+                output_field=DurationField(),
+            )
+        if (
+            self.part.answer_wordlength_data_ranges
+            or self.part.answer_wordcount_data_ranges
+        ):
+            annotations["challenge_text"] = Coalesce(
+                F("question__challenge__text"),
+                Subquery(
+                    PossibleAnswer.objects.filter(
+                        question=OuterRef("question__pk"),
+                        is_correct=True,
+                    ).values("resource__text"),
+                    output_field=CharField(),
+                ),
+            )
+            annotations["challenge_text_length"] = Length("challenge_text")
+        if self.part.answer_wordcount_data_ranges:
+            annotations["challenge_word_count"] = ExpressionWrapper(
+                # Count the number of words by
+                # number_of_letters - number_of_letters_without_spaces + 1
+                F("challenge_text_length")
+                - Length(Replace("challenge_text", Value(" "), Value("")))
+                + Value(1),
+                output_field=IntegerField(),
+            )
+        return annotations
+
+    def get_questionresponse_qs_aggregations(self) -> Dict[str, Aggregate]:
+        aggregations: Dict[str, Aggregate] = {}
+        for lower, upper in self.part.answer_time_data_breakdown_ranges:
+            q = Q(correct=True)
+            if lower is not None:
+                q &= Q(submitted_after__gt=timedelta(minutes=lower))
+            if upper is not None:
+                q &= Q(submitted_after__lt=timedelta(minutes=upper))
+            aggregations[f"time_slot__{lower}_{upper}__correct"] = Count("id", filter=q)
+        for lower, upper in self.part.answer_wordlength_data_ranges:
+            q = Q(correct=True)
+            if lower is not None:
+                q &= Q(challenge_text_length__gte=lower)
+            if upper is not None:
+                q &= Q(challenge_text_length__lte=upper)
+            aggregations[f"challenge_text_length__{lower}_{upper}__correct"] = Count(
+                "id", filter=q
+            )
+        for lower, upper in self.part.answer_wordcount_data_ranges:
+            q = Q(correct=True)
+            if lower is not None:
+                q &= Q(challenge_word_count__gte=lower)
+            if upper is not None:
+                q &= Q(challenge_word_count__lte=upper)
+            aggregations[f"challenge_word_count__{lower}_{upper}__correct"] = Count(
+                "id", filter=q
+            )
+        return aggregations
+
+    def get_questionresponses_aggregated_data(self) -> Dict[str, Any]:
+        questionresponse_qs = self.get_questionresponse_qs()
+        aggregations = self.get_questionresponse_qs_aggregations()
+        if aggregations:
+            annotations = self.get_questionresponse_qs_annotations()
+            if annotations:  # pragma: no branch
+                questionresponse_qs = questionresponse_qs.annotate(**annotations)
+            return questionresponse_qs.aggregate(**aggregations)
+        return {}
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        questions_counts = self.get_questions_aggregated_data()
+        questionresponses_counts = self.get_questionresponses_aggregated_data()
+
+        context["questionresponses"] = questionresponses_counts
+
+        if self.part.answer_time_data_breakdown_ranges:
+            context["timeslot_table"] = AnswerByTimeResultsTable(
+                data=[
+                    {
+                        "time_slot": (lower, upper),
+                        "correct_count": questionresponses_counts[
+                            f"time_slot__{lower}_{upper}__correct"
+                        ],
+                    }
+                    for lower, upper in self.part.answer_time_data_breakdown_ranges
+                ]
+            )
+
+        if self.part.answer_wordlength_data_ranges:
+            context["wordlength_table"] = ReadingWordLengthResultsTable(
+                data=[
+                    {
+                        "word_length": f"{lower}-{upper}",
+                        "questions_count": questions_counts[
+                            f"challenge_text_length__{lower}_{upper}__questions"
+                        ],
+                        "correct_count": questionresponses_counts[
+                            f"challenge_text_length__{lower}_{upper}__correct"
+                        ],
+                    }
+                    for lower, upper in self.part.answer_wordlength_data_ranges
+                ]
+            )
+
+        if self.part.answer_wordcount_data_ranges:
+            context["wordcount_table"] = ReadingWordCountResultsTable(
+                data=[
+                    {
+                        "word_count": f"{lower}-{upper}",
+                        "questions_count": questions_counts[
+                            f"challenge_word_count__{lower}_{upper}__questions"
+                        ],
+                        "correct_count": questionresponses_counts[
+                            f"challenge_word_count__{lower}_{upper}__correct"
+                        ],
+                    }
+                    for lower, upper in self.part.answer_wordcount_data_ranges
+                ]
+            )
+        return context

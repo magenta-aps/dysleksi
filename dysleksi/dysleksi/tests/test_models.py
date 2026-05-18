@@ -139,6 +139,37 @@ class TestTestPart(DysleksiTest):
         test_part = TestPart(name="Test")
         self.assertEqual(str(test_part), "Test")
 
+    def test_breakdown_ranges(self):
+        test_part = TestPart.objects.create(
+            name="Test", timeout=30000, partial_score_after=15000
+        )
+        with self.assertRaises(ValueError):
+            test_part.set_data_breakdown_ranges("foobar", [(1 - 2)])
+        test_part.set_data_breakdown_ranges(
+            "answer_time_data_breakdown", [(None, 5), (5, None)]
+        )
+        self.assertTrue(
+            test_part.answer_time_data_breakdown.filter(
+                lower__isnull=True, upper=5
+            ).exists()
+        )
+        self.assertTrue(
+            test_part.answer_time_data_breakdown.filter(
+                lower=5, upper__isnull=True
+            ).exists()
+        )
+        test_part.set_data_breakdown_ranges(
+            "wordlength_data_breakdown", [(1, 5), (6, None)]
+        )
+        self.assertTrue(
+            test_part.wordlength_data_breakdown.filter(lower=1, upper=5).exists()
+        )
+        self.assertTrue(
+            test_part.wordlength_data_breakdown.filter(
+                lower=6, upper__isnull=True
+            ).exists()
+        )
+
 
 class TestPlannedDateTime(DysleksiTest):
     def test_str(self):
@@ -1066,17 +1097,19 @@ class TestPartResponseQuerySet(ResponseTest):
         ).order_by("testresponse__student__pk")
 
     def test_annotate_responses_count(self):
-        qs = self.qs.annotate_responses_count("responses_count")
+        qs = self.qs.annotate_questionresponses_count("responses_count")
         student1_answer = qs[0]
         student2_answer = qs[1]
         self.assertEqual(student1_answer.responses_count, 4)
         self.assertEqual(student2_answer.responses_count, 4)
 
-        qs = self.qs.annotate_responses_count("responses_count", Q(completed=False))
+        qs = self.qs.annotate_questionresponses_count(
+            "responses_count", Q(correct=True)
+        )
         student1_answer = qs[0]
         student2_answer = qs[1]
-        self.assertEqual(student1_answer.responses_count, 0)
-        self.assertEqual(student2_answer.responses_count, 0)
+        self.assertEqual(student1_answer.responses_count, 4)
+        self.assertEqual(student2_answer.responses_count, 1)
 
     def test_annotate_questions_count(self):
         qs = self.qs.annotate_questions_count("questions_count")
@@ -1091,31 +1124,18 @@ class TestPartResponseQuerySet(ResponseTest):
         self.assertEqual(student1_answer.questions_count, 4)
         self.assertEqual(student2_answer.questions_count, 4)
 
-    def test_annotate_correct_count(self):
-        qs = self.qs.annotate_correct_count("correct_count")
-        student1_answer = qs[0]
-        student2_answer = qs[1]
-        self.assertEqual(student1_answer.correct_count, 4)
-        self.assertEqual(student2_answer.correct_count, 1)
-
-        qs = self.qs.annotate_correct_count("correct_count", Q(completed=False))
-        student1_answer = qs[0]
-        student2_answer = qs[1]
-        self.assertEqual(student1_answer.correct_count, 0)
-        self.assertEqual(student2_answer.correct_count, 0)
-
     def test_annotate_ordering(self):
-        qs = self.qs.annotate_correct_count("correct_count").annotate_ordering(
-            "correct_count", "ranking", False
-        )
+        qs = self.qs.annotate_questionresponses_count(
+            "correct_count", Q(correct=True)
+        ).annotate_ordering("correct_count", "ranking", False)
         student1_answer = qs[0]
         student2_answer = qs[1]
         self.assertEqual(student1_answer.ranking, 1)
         self.assertEqual(student2_answer.ranking, 2)
 
-        qs = self.qs.annotate_correct_count("correct_count").annotate_ordering(
-            "correct_count", "ranking", True
-        )
+        qs = self.qs.annotate_questionresponses_count(
+            "correct_count", Q(correct=True)
+        ).annotate_ordering("correct_count", "ranking", True)
         student1_answer = qs[0]
         student2_answer = qs[1]
         self.assertEqual(student1_answer.ranking, 2)
@@ -1123,10 +1143,10 @@ class TestPartResponseQuerySet(ResponseTest):
 
     def test_annotate_proportion(self):
         qs = (
-            self.qs.annotate_responses_count(
+            self.qs.annotate_questionresponses_count(
                 "responses_count",
             )
-            .annotate_correct_count("correct_count")
+            .annotate_questionresponses_count("correct_count", Q(correct=True))
             .annotate_proportion(
                 "responses_count",
                 "correct_count",
@@ -1140,10 +1160,10 @@ class TestPartResponseQuerySet(ResponseTest):
 
     def test_annotate_correct_percentage(self):
         qs = (
-            self.qs.annotate_responses_count(
+            self.qs.annotate_questionresponses_count(
                 "responses_count",
             )
-            .annotate_correct_count("correct_count")
+            .annotate_questionresponses_count("correct_count", Q(correct=True))
             .annotate_proportion(
                 "responses_count",
                 "correct_count",
@@ -1158,10 +1178,10 @@ class TestPartResponseQuerySet(ResponseTest):
 
     def test_annotate_score_category(self):
         qs = (
-            self.qs.annotate_responses_count(
+            self.qs.annotate_questionresponses_count(
                 "responses_count",
             )
-            .annotate_correct_count("correct_count")
+            .annotate_questionresponses_count("correct_count", Q(correct=True))
             .annotate_proportion(
                 "responses_count",
                 "correct_count",
