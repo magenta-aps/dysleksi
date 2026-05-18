@@ -191,6 +191,10 @@ msgstr ""
 msgid "Søg"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/base.html
+msgid "Log ud"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 #: dysleksi/templates/dysleksi/admin/modals/assign_group.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/list.html
