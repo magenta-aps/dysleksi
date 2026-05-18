@@ -204,7 +204,7 @@ OIDC_OP_LOGOUT_URL_METHOD = os.environ.get(
     "login.authentication_backend.unilogin_logout",
 )
 OIDC_OP_LOGOUT_URL = os.environ.get("OIDC_OP_LOGOUT_URL", "")
-OIDC_AUTHENTICATION_CALLBACK_URL = os.environ["OIDC_AUTHENTICATION_CALLBACK_URL"]
+OIDC_AUTHENTICATION_CALLBACK_URL = "login:unilogin:oidc_authentication_callback"
 OIDC_VERIFY_SSL = not DEBUG
 OIDC_TOKEN_USE_BASIC_AUTH = DEBUG
 OIDC_STORE_ID_TOKEN = os.environ.get("OIDC_STORE_ID_TOKEN", True)
