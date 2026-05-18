@@ -313,7 +313,7 @@
         "correct": "Cc",
         "set1": ["A","C","H","S","G","B"],
         "set2": ["d","o","v","j","c","k"],
-        "reminder_source": "/resources/letter_shape/Martha/3c.1.mp3",
+        "reminder_source": "/resources/letter_shape/Enhanced/Instruktion/3c.1.wav",
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
             {
@@ -370,7 +370,7 @@
         "correct": "Aa",
         "set1": ["B","W","C","S","A","H"],
         "set2": ["d","o","a","j","v","k"],
-        "reminder_source": "/resources/letter_shape/Martha/3c.1.mp3"
+        "reminder_source": "/resources/letter_shape/Enhanced/Instruktion/3c.1.wav"
     },
     {
         "question_type": "no_input_required",
