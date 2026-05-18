@@ -15,7 +15,7 @@ psycopg==3.3.4
 
 ## Async packages, for handling websockets
 channels==4.3.2
-types-channels==4.3.0.20260508
+types-channels==4.3.0.20260518
 channels_redis==4.3.0
 uvicorn==0.47.0
 daphne==4.2.1
