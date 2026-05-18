@@ -1,103 +1,103 @@
 [
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.1.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.1.wav",
     "correct": "ma",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.2.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.2.wav",
     "correct": "pu",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.3.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.3.wav",
     "correct": "ni",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.4.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.4.wav",
     "correct": "aq",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.5.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.5.wav",
     "correct": "uu",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.6.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.6.wav",
     "correct": "ua",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.7.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.7.wav",
     "correct": "toq",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.8.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.8.wav",
     "correct": "nut",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.9.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.9.wav",
     "correct": "sak",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.10.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.10.wav",
     "correct": "miu",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.11.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.11.wav",
     "correct": "laa",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.12.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.12.wav",
     "correct": "isa",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.13.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.13.wav",
     "correct": "ara",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.14.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.14.wav",
     "correct": "puli",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.15.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.15.wav",
     "correct": "alli",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.16.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.16.wav",
     "correct": "ikka",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/nonwordspelling/Martha/4f.17.mp3",
+    "sound": "resources/nonwordspelling/Nonord/4f.17.wav",
     "correct": "ammi",
     "reminder": 20000
   }
