@@ -156,6 +156,37 @@ msgstr ""
 msgid "Bedømmelse"
 msgstr ""
 
+#: dysleksi/tables.py
+msgid "Alle"
+msgstr ""
+
+#: dysleksi/tables.py
+#, python-brace-format
+msgid "Første {x} minutter"
+msgstr ""
+
+#: dysleksi/tables.py
+#, python-brace-format
+msgid "Sidste {x} minutter"
+msgstr ""
+
+#: dysleksi/tables.py
+#, python-brace-format
+msgid "{x} minutter til {y} minutter"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Ordlængde (ant. bogstaver)"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Opgaver"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Sætningslængde (ant. ord)"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/base.html
 #: dysleksi/templates/dysleksi/admin/modals/base.html
 msgid "Luk"
@@ -293,6 +324,10 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
 msgid "Fordeling på ordlængde"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+msgid "Fordeling på sætningslængde"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html

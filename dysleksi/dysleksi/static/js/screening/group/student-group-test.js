@@ -184,6 +184,8 @@ export class GroupTestView extends StudentTestView {
             this.setupReminder();
 
             if (!this.isPracticing) {
+                // It is important to only send this when displaying real questions, not practice,
+                // because we save the timestamp and compare it to answer timestamps of the questions
                 this.send({
                     event: "question.displayed",
                     partIndex: this.currentPartIndex,

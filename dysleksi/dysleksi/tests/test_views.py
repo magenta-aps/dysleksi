@@ -16,6 +16,7 @@ from dysleksi.models import (
     Student,
     Test,
     TestAssignment,
+    TestPart,
     TestType,
     User,
 )
@@ -761,7 +762,7 @@ class TestPartResponseView(ResponseTest):
             PartResponseView,
             self.teacher,
             assignment_pk=self.test_assignment_class.pk,
-            response_pk=self.group_testresponse_1.pk,
+            testresponse_pk=self.group_testresponse_1.pk,
             testpart_pk=self.group_test_part.pk,
         )
         object = view.get_object()
@@ -777,7 +778,7 @@ class TestPartResponseView(ResponseTest):
             PartResponseView,
             self.teacher,
             assignment_pk=self.test_assignment_class.pk,
-            response_pk=self.group_testresponse_2.pk,
+            testresponse_pk=self.group_testresponse_2.pk,
             testpart_pk=self.group_test_part.pk,
         )
         object = view.get_object()
@@ -795,6 +796,139 @@ class TestPartResponseView(ResponseTest):
                 PartResponseView,
                 self.teacher,
                 assignment_pk=self.test_assignment_class.pk,
-                response_pk=self.group_testresponse_1.pk,
+                testresponse_pk=self.group_testresponse_1.pk,
                 testpart_pk=self.group_test_part.pk + 1,
             )
+
+    def test_word_length_table(self):
+        part: TestPart = self.group_test_part
+        part.wordcount_data_breakdown.clear()
+        part.answer_time_data_breakdown.clear()
+        part.set_data_breakdown_ranges(
+            "wordlength_data_breakdown", [(None, 4), (5, 6), (7, 8), (9, None)]
+        )
+        view = self.setup_view(
+            PartResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testresponse_pk=self.group_testresponse_1.pk,
+            testpart_pk=self.group_test_part.pk,
+        )
+        context = view.get_context_data()
+        table_data = [row for row in context["wordlength_table"].data]
+
+        self.assertEqual(
+            table_data,
+            [
+                {"word_length": "None-4", "questions_count": 0, "correct_count": 0},
+                {"word_length": "5-6", "questions_count": 0, "correct_count": 0},
+                {"word_length": "7-8", "questions_count": 2, "correct_count": 2},
+                {"word_length": "9-None", "questions_count": 0, "correct_count": 0},
+            ],
+        )
+        response = view.response
+        response.render()
+        soup = BeautifulSoup(response.content, "html.parser")
+        table = self.html_table_to_list(soup.find("table"))
+        self.assertEqual(
+            table,
+            [
+                [["Ordlængde (ant. bogstaver)"], ["Opgaver"], ["Rigtige"]],
+                [["None-4"], ["0"], ["0"]],
+                [["5-6"], ["0"], ["0"]],
+                [["7-8"], ["2"], ["2"]],
+                [["9-None"], ["0"], ["0"]],
+            ],
+        )
+
+    def test_word_count_table(self):
+        part: TestPart = self.group_test_part
+        part.wordlength_data_breakdown.clear()
+        part.answer_time_data_breakdown.clear()
+        part.set_data_breakdown_ranges(
+            "wordcount_data_breakdown", [(None, 2), (3, None)]
+        )
+        view = self.setup_view(
+            PartResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testresponse_pk=self.group_testresponse_1.pk,
+            testpart_pk=self.group_test_part.pk,
+        )
+        context = view.get_context_data()
+        table_data = [row for row in context["wordcount_table"].data]
+        self.assertEqual(
+            table_data,
+            [
+                {"word_count": "None-2", "questions_count": 2, "correct_count": 2},
+                {"word_count": "3-None", "questions_count": 0, "correct_count": 0},
+            ],
+        )
+        response = view.response
+        response.render()
+        soup = BeautifulSoup(response.content, "html.parser")
+        table = self.html_table_to_list(soup.find("table"))
+        self.assertEqual(
+            table,
+            [
+                [["Sætningslængde (ant. ord)"], ["Opgaver"], ["Rigtige"]],
+                [["None-2"], ["2"], ["2"]],
+                [["3-None"], ["0"], ["0"]],
+            ],
+        )
+
+    def test_answer_time_table(self):
+        part: TestPart = self.group_test_part
+        part.wordlength_data_breakdown.clear()
+        part.wordcount_data_breakdown.clear()
+        part.set_data_breakdown_ranges(
+            "answer_time_data_breakdown", [(None, 5), (5, None), (None, None), (0, 7)]
+        )
+        view = self.setup_view(
+            PartResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testresponse_pk=self.group_testresponse_1.pk,
+            testpart_pk=self.group_test_part.pk,
+        )
+        context = view.get_context_data()
+        table_data = [row for row in context["timeslot_table"].data]
+        self.assertEqual(
+            table_data,
+            [
+                {"time_slot": (None, 5), "correct_count": 4},
+                {"time_slot": (None, None), "correct_count": 4},
+                {"time_slot": (0, 7), "correct_count": 4},
+                {"time_slot": (5, None), "correct_count": 0},
+            ],
+        )
+        response = view.response
+        response.render()
+        soup = BeautifulSoup(response.content, "html.parser")
+        table = self.html_table_to_list(soup.find("table"))
+        self.assertEqual(
+            table,
+            [
+                [["Første 5 minutter"], ["4"]],
+                [["Alle"], ["4"]],
+                [["0 minutter til 7 minutter"], ["4"]],
+                [["Sidste 5 minutter"], ["0"]],
+            ],
+        )
+
+    def test_no_tables(self):
+        part: TestPart = self.group_test_part
+        part.wordlength_data_breakdown.clear()
+        part.wordcount_data_breakdown.clear()
+        part.answer_time_data_breakdown.clear()
+        view = self.setup_view(
+            PartResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testresponse_pk=self.group_testresponse_1.pk,
+            testpart_pk=self.group_test_part.pk,
+        )
+        context = view.get_context_data()
+        self.assertFalse("timeslot_table" in context)
+        self.assertFalse("wordcount_table" in context)
+        self.assertFalse("wordlength_table" in context)

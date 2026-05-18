@@ -9,7 +9,7 @@ from base64 import b64decode
 from dataclasses import dataclass
 from datetime import date
 from math import floor
-from typing import Any, Dict, List, Self
+from typing import Any, Dict, List, Self, Tuple
 
 from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
@@ -469,6 +469,22 @@ class TestAssignment(models.Model):
         return f"{self.test.name}/{str(self.teacher)} ({str(assignee)})"
 
 
+class TestPartResultsBreakdownRange(models.Model):
+    lower = models.IntegerField(
+        null=True,
+    )
+    upper = models.IntegerField(
+        null=True,
+    )
+
+    class Meta:
+        ordering = [F("lower").asc(nulls_first=True), F("upper").asc(nulls_last=True)]
+
+    @property
+    def as_tuple(self) -> Tuple[int | None, int | None]:
+        return self.lower, self.upper
+
+
 class TestPart(models.Model):
     tests = models.ManyToManyField(
         Test,
@@ -501,6 +517,19 @@ class TestPart(models.Model):
         related_name="completion_testpart",
     )
     show_normscore_speed_plot = models.BooleanField(default=False)
+
+    answer_time_data_breakdown = models.ManyToManyField(
+        TestPartResultsBreakdownRange,
+        related_name="answer_time_data_breakdown_parts",
+    )
+    wordlength_data_breakdown = models.ManyToManyField(
+        TestPartResultsBreakdownRange,
+        related_name="wordlength_data_breakdown_parts",
+    )
+    wordcount_data_breakdown = models.ManyToManyField(
+        TestPartResultsBreakdownRange,
+        related_name="wordcount_data_breakdown_parts",
+    )
 
     def __str__(self) -> str:
         return self.name
@@ -622,6 +651,35 @@ class TestPart(models.Model):
                         resource=resource,
                         defaults={"is_correct": is_correct},
                     )
+
+    def set_data_breakdown_ranges(self, field_name, ranges: List[Tuple[int, int]]):
+        if field_name not in (
+            "answer_time_data_breakdown",
+            "wordlength_data_breakdown",
+            "wordcount_data_breakdown",
+        ):
+            raise ValueError(f"Incorrect field_name '{field_name}'")
+        field = getattr(self, field_name)
+        breakdowns = []
+        for range in ranges:
+            breakdown, _ = TestPartResultsBreakdownRange.objects.get_or_create(
+                lower=range[0],
+                upper=range[1],
+            )
+            breakdowns.append(breakdown)
+        field.set(breakdowns)
+
+    @cached_property
+    def answer_time_data_breakdown_ranges(self):
+        return [r.as_tuple for r in self.answer_time_data_breakdown.all()]
+
+    @cached_property
+    def answer_wordlength_data_ranges(self):
+        return [r.as_tuple for r in self.wordlength_data_breakdown.all()]
+
+    @cached_property
+    def answer_wordcount_data_ranges(self):
+        return [r.as_tuple for r in self.wordcount_data_breakdown.all()]
 
 
 class TestQuestion(models.Model):
@@ -937,16 +995,21 @@ class TestResponse(models.Model):
 
 class PartResponseQuerySet(QuerySet):
 
-    def annotate_responses_count(
+    def annotate_questionresponses_count(
         self, output_key: str, filter: Q | None = None
     ) -> "PartResponseQuerySet":
         if filter is None:
             filter = Q()
         return self.annotate(
             **{
-                output_key: Count(
-                    "questionresponses",
-                    filter=filter,
+                output_key: Subquery(
+                    QuestionResponse.objects.filter(
+                        partresponse=OuterRef("pk"),
+                    )
+                    .filter(filter)
+                    .values("partresponse")
+                    .annotate(count=Count("id"))
+                    .values("count")
                 )
             }
         )
@@ -979,20 +1042,6 @@ class PartResponseQuerySet(QuerySet):
                 output_key: Window(
                     expression=RowNumber(),
                     order_by=ordering.asc() if ascending else ordering.desc(),
-                )
-            }
-        )
-
-    def annotate_correct_count(
-        self, output_key: str, filter: Q | None = None
-    ) -> "PartResponseQuerySet":
-        if filter is None:
-            filter = Q()
-        return self.annotate(
-            **{
-                output_key: Count(
-                    "questionresponses",
-                    filter=filter & Q(questionresponses__correct=True),
                 )
             }
         )
@@ -1061,6 +1110,9 @@ class PartResponse(models.Model):
         TestPart,
         on_delete=models.CASCADE,
         related_name="partresponses",
+    )
+    started_at = models.DateTimeField(
+        null=True,
     )
     finished_after = models.IntegerField(
         verbose_name=_("Completion time in milliseconds"),
@@ -1135,6 +1187,7 @@ class QuestionResponse(models.Model):
 
 
 class HandledEvent(TextChoices):
+    QUESTION_DISPLAYED = "question.displayed"
     QUESTION_ANSWERED = "question.answered"
     QUESTION_FEEDBACK = "question.feedback"
     PART_COMPLETE = "part.complete"
@@ -1231,7 +1284,13 @@ class Message(models.Model):
 
         # Message is new, process it so that significant data is stored in other models
         try:
-            if self.event == HandledEvent.QUESTION_ANSWERED:
+            if self.event == HandledEvent.QUESTION_DISPLAYED:
+                part = self.part_response
+                if part.started_at is None:
+                    part.started_at = timezone.now()
+                    part.save(update_fields=["started_at"])
+
+            elif self.event == HandledEvent.QUESTION_ANSWERED:
                 choiceId = self.data.get("choiceId")
                 duration = self.data.get("duration")
                 choice: PossibleAnswer | None = (

@@ -32,6 +32,10 @@ def create_wordreading_2_test(
         part.create_test_resources(questions_data, False)
         if practice_questions_data:
             part.create_test_resources(practice_questions_data, True)
+    part.set_data_breakdown_ranges("answer_time_data_breakdown", [(None, 5), (5, None)])
+    part.set_data_breakdown_ranges(
+        "wordlength_data_breakdown", [(3, 4), (5, 6), (7, 8), (9, 11), (12, 15)]
+    )
     test.parts.add(part)
 
 
@@ -64,6 +68,11 @@ def create_wordreading_1_test(
         part.create_test_resources(questions_data, False)
         if practice_questions_data:
             part.create_test_resources(practice_questions_data, True)
+
+    part.set_data_breakdown_ranges("answer_time_data_breakdown", [(None, 5), (5, None)])
+    part.set_data_breakdown_ranges(
+        "wordlength_data_breakdown", [(3, 4), (5, 6), (7, 8), (9, 11), (12, 15)]
+    )
     test.parts.add(part)
 
 
@@ -319,4 +328,7 @@ def create_sentence_reading_test(
         part.create_test_resources(questions_data, False)
         if practice_questions_data:
             part.create_test_resources(practice_questions_data, True)
+
+    part.set_data_breakdown_ranges("answer_time_data_breakdown", [(None, 4), (4, None)])
+    part.set_data_breakdown_ranges("wordcount_data_breakdown", [(1, 2), (3, 4)])
     test.parts.add(part)

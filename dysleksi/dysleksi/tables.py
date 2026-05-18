@@ -4,10 +4,21 @@ from typing import Callable, List
 from django.db.models import QuerySet
 from django.template import Context
 from django.template.loader import get_template
+from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_tables2 import A, Column, Table, TemplateColumn, tables
 
 from dysleksi.models import CategoryRange, Class, Student, TestAssignment, TestPart
+
+
+class NonOrderableTableMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(orderable=False, *args, **kwargs)
+
+
+class HeaderlessTableMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(show_header=False, *args, **kwargs)
 
 
 class ClassTable(Table):
@@ -237,6 +248,14 @@ class PartResultTable(Table):
     student = Column(
         verbose_name=_("Elev"),
         accessor=A("testresponse__student"),
+        linkify=lambda record: reverse(
+            "dysleksi:test_assignment_part_result",
+            kwargs={
+                "assignment_pk": record.testresponse.assignment_id,
+                "testpart_pk": record.testpart_id,
+                "testresponse_pk": record.testresponse_id,
+            },
+        ),
     )
     responses_count = Column(
         verbose_name=_("Forsøgte"),
@@ -277,14 +296,13 @@ class EmptyColumn(Column):
         return ""
 
 
-class StudentTestResponseTable(Table):
+class StudentTestResponseTable(NonOrderableTableMixin, Table):
 
     data_category = Column(verbose_name="", footer=_("Bedømmelse"))
 
     def __init__(self, *args, **kwargs):
         super().__init__(
             *args,
-            orderable=False,
             template_name="dysleksi/admin/test_response/group/table.html",
             **kwargs,
         )
@@ -308,3 +326,30 @@ class StudentTestResultsColumn(FooterColumnMixin, Column):
     def get_footer_value(self, bound_column, table):
         data = [bound_column.accessor.resolve(row) for row in table.data]
         return self.footer_value(data)
+
+
+class AnswerByTimeResultsTable(NonOrderableTableMixin, HeaderlessTableMixin, Table):
+    time_slot = Column()
+    correct_count = Column(verbose_name=_("Rigtige"))
+
+    def render_time_slot(self, value):
+        lower, upper = value
+        if lower is None and upper is None:
+            return _("Alle")
+        if lower is None:
+            return _("Første {x} minutter").format(x=upper)
+        if upper is None:
+            return _("Sidste {x} minutter").format(x=lower)
+        return _("{x} minutter til {y} minutter").format(x=lower, y=upper)
+
+
+class ReadingWordLengthResultsTable(NonOrderableTableMixin, Table):
+    word_length = Column(verbose_name=_("Ordlængde (ant. bogstaver)"))
+    questions_count = Column(verbose_name=_("Opgaver"))
+    correct_count = Column(verbose_name=_("Rigtige"))
+
+
+class ReadingWordCountResultsTable(NonOrderableTableMixin, Table):
+    word_count = Column(verbose_name=_("Sætningslængde (ant. ord)"))
+    questions_count = Column(verbose_name=_("Opgaver"))
+    correct_count = Column(verbose_name=_("Rigtige"))

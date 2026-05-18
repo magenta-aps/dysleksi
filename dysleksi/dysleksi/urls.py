@@ -65,7 +65,7 @@ urlpatterns: list[URLResolver | URLPattern] = [
         name="test_assignment_student_results",
     ),
     path(
-        "assignment/<int:assignment_pk>/<int:testpart_pk>/<int:response_pk>/",
+        "assignment/<int:assignment_pk>/<int:testpart_pk>/<int:testresponse_pk>/",
         PartResponseView.as_view(),
         name="test_assignment_part_result",
     ),
