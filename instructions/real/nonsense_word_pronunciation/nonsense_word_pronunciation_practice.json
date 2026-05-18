@@ -1,0 +1,77 @@
+[
+  // 9a.1-9a.5 - indledning
+  {
+    "question_type": "no_input_required",
+    "image": "/resources/fore_sound/Indledning/Læsning.png",
+    "instruction_sequence": [
+      // Højtlæsning af nonord er nu ved at starte.
+      {
+        "action": "playSound",
+        "resource": "resources/nonsense_word_pronunciation/Enhanced/Indledning/11a.1.wav",
+        "delayAfter": 0
+      },
+      {
+        "action": "show",
+        "element": "question-challenge",
+        "delayAfter": 0
+      },
+      {
+        "action": "fadeIn",
+        "element": "question-challenge",
+        "delayAfter": 1250
+      },
+
+      // Et ord, som du skal læse, vises.
+      {
+        "action": "playSound",
+        "resource": "resources/nonsense_word_pronunciation/Enhanced/Indledning/11a.2.wav",
+        "delayAfter": 1250
+      },
+
+      // Du skal læse ordet (højt).
+      {
+        "action": "playSound",
+        "resource": "resources/nonsense_word_pronunciation/Enhanced/Indledning/11a.3.wav",
+        "delayAfter": 1250
+      },
+
+      // Men først skal du prøve øveopagverne.
+      {
+        "action": "playSound",
+        "resource": "resources/nonsense_word_pronunciation/Enhanced/Indledning/11a.4.wav",
+        "delayAfter": 1250
+      },
+
+      // Tryk på det grønne ikon, når du er klar.
+      {
+        "action": "playSound",
+        "resource": "resources/nonsense_word_pronunciation/Enhanced/Indledning/11a.5.wav",
+        "delayAfter": 0
+      },
+      {
+        "action": "show",
+        "element": "next",
+        "delayAfter": 0
+      },
+      {
+        "action": "fadeIn",
+        "element": "next",
+        "delayAfter": 1250
+      }
+    ]
+  },
+
+  // Læreren er ansvarlig for forståelse af opgaven
+  {
+    "text": "qa",
+    "question_type": "no_input_required"
+  },
+  {
+    "text": "pu",
+    "question_type": "no_input_required"
+  },
+  {
+    "text": "mak",
+    "question_type": "no_input_required"
+  }
+]

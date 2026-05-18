@@ -256,8 +256,8 @@ def create_word_pronunciation_test(
     test, questions_data, practice_questions_data=None, name="Højtlæsning af ord"
 ):
     completion, created = TestResource.objects.get_or_create(
-        name="resources/word_pronunciation/Martha/10c.2.mp3",
-        sound="resources/word_pronunciation/Martha/10c.2.mp3",
+        name="resources/word_pronunciation/Enhanced/Deltests/10c.2.wav",
+        sound="resources/word_pronunciation/Enhanced/Deltests/10c.2.wav",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -281,8 +281,8 @@ def create_nonsense_word_pronunciation_test(
     test, questions_data, practice_questions_data=None, name="Højtlæsning af nonord"
 ):
     completion, created = TestResource.objects.get_or_create(
-        name="resources/nonsense_word_pronunciation/Martha/11c.2.mp3",
-        sound="resources/nonsense_word_pronunciation/Martha/11c.2.mp3",
+        name="resources/nonsense_word_pronunciation/Enhanced/Deltests/11c.2.wav",
+        sound="resources/nonsense_word_pronunciation/Enhanced/Deltests/11c.2.wav",
     )
 
     part, created = TestPart.objects.get_or_create(
