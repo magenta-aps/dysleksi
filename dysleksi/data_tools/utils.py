@@ -303,14 +303,13 @@ def create_nonsense_word_pronunciation_test(
 def create_sentence_reading_test(
     test, questions_data, practice_questions_data=None, name="Sætningslæsning"
 ):
-    # TODO: Add this sound to dysleksi-binaries when we receive it
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/sentence_reading/Martha/8e.5.mp3",
-        sound="resources/sentence_reading/Martha/8e.5.mp3",
+        name="resources/sentence_reading/Enhanced/Deltests/8e.5.wav",
+        sound="resources/sentence_reading/Enhanced/Deltests/8e.5.wav",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/sentence_reading/Martha/8e.6.mp3",
-        sound="resources/sentence_reading/Martha/8e.6.mp3",
+        name="resources/sentence_reading/Enhanced/Deltests/8e.6.wav",
+        sound="resources/sentence_reading/Enhanced/Deltests/8e.6.wav",
     )
 
     part, created = TestPart.objects.get_or_create(
