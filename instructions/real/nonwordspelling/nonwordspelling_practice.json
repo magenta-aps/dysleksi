@@ -56,7 +56,7 @@
     ]
   },
   {
-    "sound": "resources/nonwordspelling/Martha/4b.5.mp3",
+    "sound": "resources/nonwordspelling/Enhanced/Instruktion/4b.5.wav",
     "question_type": "free_text",
     "instruction_sequence": [
       {
@@ -305,11 +305,11 @@
     ]
   },
   {
-    "sound": "resources/nonwordspelling/Martha/4c.4.mp3",
+    "sound": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4c.4.wav",
     "question_type": "free_text",
     "correct": "si",
     "reminder": 20000,
-    "reminder_source": "resources/nonwordspelling/Martha/4e.4.mp3",
+    "reminder_source": "resources/nonwordspelling/Enhanced/Deltests/4e.4.wav",
     "continue_when_instruction_is_complete": false,
     "instruction_sequence": [
         {
@@ -362,11 +362,11 @@
     ]
   },
   {
-    "sound": "resources/nonwordspelling/Martha/4c.7.mp3",
+    "sound": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4c.7.wav",
     "question_type": "free_text",
     "correct": "ika",
     "reminder": 20000,
-    "reminder_source": "resources/nonwordspelling/Martha/4e.4.mp3"
+    "reminder_source": "resources/nonwordspelling/Enhanced/Deltests/4e.4.wav"
   },
   {
     "question_type": "no_input_required",
