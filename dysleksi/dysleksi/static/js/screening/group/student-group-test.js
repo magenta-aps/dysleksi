@@ -154,22 +154,19 @@ export class GroupTestView extends StudentTestView {
                         // Keep the question on screen - the user must give an answer
                         // before they can continue.
                         console.debug("Waiting for user input ...");
-                    }
-
-                    // Play challenge sound *after* instruction sequence is completed
-                    // (in order to avoid overlapping sounds.)
-                    if (!this.isPracticing) {
                         this.playChallengeSound(domEls.playBtn);
+                        this.setupReminder();
                     }
                 });
             }
 
             // Play challenge sound (this handles the case where the question does not have an instruction sequence)
             if (
-                this.currentQuestion.instruction_sequence === null &&
-                !this.isPracticing
+                this.currentQuestion.instruction_sequence === null ||
+                !this.currentQuestion.instruction_sequence
             ) {
                 this.playChallengeSound(domEls.playBtn);
+                this.setupReminder();
             }
 
             this.questionDisplayedAt = document.timeline.currentTime;
@@ -179,9 +176,6 @@ export class GroupTestView extends StudentTestView {
             if (!this.isPracticing) {
                 this.domElements.toggleBodyClass("show-instructions", false);
             }
-
-            // Set up timeouts for "reminder" and "time up" events
-            this.setupReminder();
 
             if (!this.isPracticing) {
                 // It is important to only send this when displaying real questions, not practice,
@@ -227,10 +221,7 @@ export class GroupTestView extends StudentTestView {
                 return;
             }
 
-            if (this.questionReminderId) {
-                clearTimeout(this.questionReminderId);
-                this.questionReminderId = null;
-            }
+            this.clearReminder();
 
             if (this.isPracticing) {
                 if (!this.textAnswer && !this.answerIsCorrect()) {
@@ -272,10 +263,7 @@ export class GroupTestView extends StudentTestView {
             }
         }
 
-        if (this.questionTimeoutId) {
-            clearTimeout(this.questionTimeoutId);
-            this.questionTimeoutId = null;
-        }
+        this.clearTimeout();
 
         if (this.showNextQuestion()) {
             // Next question is being shown
