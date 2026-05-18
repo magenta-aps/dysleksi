@@ -71,15 +71,14 @@ def create_fore_sound_test(
     test, questions_data, practice_questions_data=None, name="Forlyd"
 ):
 
-    # TODO: Add this sound to dysleksi-binaries when we receive it
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/fore_sound/Martha/2e.2.mp3",
-        sound="resources/fore_sound/Martha/2e.2.mp3",
+        name="resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.wav",
+        sound="resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.wav",
     )
 
     completion, created = TestResource.objects.get_or_create(
-        name="resources/fore_sound/Martha/2e.3.mp3",
-        sound="resources/fore_sound/Martha/2e.3.mp3",
+        name="resources/fore_sound/Enhanced/Deltests/2e.3.wav",
+        sound="resources/fore_sound/Enhanced/Deltests/2e.3.wav",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -135,14 +134,13 @@ def create_letter_shape_test(
     test, questions_data, practice_questions_data=None, name="Bogstavers form"
 ):
 
-    # TODO: Replace with actual reminder sound when we get it
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/letter_shape/Martha/3e.2.mp3",
-        sound="resources/letter_shape/Martha/3e.2.mp3",
+        name="resources/letter_shape/Enhanced/Deltests/3e.2.wav",
+        sound="resources/letter_shape/Enhanced/Deltests/3e.2.wav",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/letter_shape/Martha/3e.3.mp3",
-        sound="resources/letter_shape/Martha/3e.3.mp3",
+        name="resources/letter_shape/Enhanced/Deltests/3e.3.wav",
+        sound="resources/letter_shape/Enhanced/Deltests/3e.3.wav",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -195,14 +193,13 @@ def create_wordspelling_test(
 def create_nonwordspelling_test(
     test, questions_data, practice_questions_data=None, name="Nonordstavning"
 ):
-    # TODO: Add this sound to dysleksi-binaries when we receive it
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/nonwordspelling/Martha/4e.4.mp3",
-        sound="resources/nonwordspelling/Martha/4e.4.mp3",
+        name="resources/nonwordspelling/Enhanced/Deltests/4e.4.wav",
+        sound="resources/nonwordspelling/Enhanced/Deltests/4e.4.wav",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/nonwordspelling/Martha/4e.5.mp3",
-        sound="resources/nonwordspelling/Martha/4e.5.mp3",
+        name="resources/nonwordspelling/Enhanced/Deltests/4e.5.wav",
+        sound="resources/nonwordspelling/Enhanced/Deltests/4e.5.wav",
     )
 
     part, created = TestPart.objects.get_or_create(
