@@ -7,8 +7,8 @@
       "id": 1,
       "name": "Individuel deltest",
       "instructions_url": null,
-      "timeout": 60,
-      "partial_score_after": 30,
+      "timeout": 60000,
+      "partial_score_after": 30000,
       "completion_source": "/static/foo.mp3",
       "practice": [
         {
@@ -84,8 +84,8 @@
       "id": 2,
       "name": "Højtlæsning af ord",
       "instructions_url": null,
-      "timeout": 60,
-      "partial_score_after": 30,
+      "timeout": 60000,
+      "partial_score_after": 30000,
       "completion_source": "/static/foo.mp3",
       "practice": [],
       "questions": [

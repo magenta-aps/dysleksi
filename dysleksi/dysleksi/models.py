@@ -502,9 +502,22 @@ class TestPart(models.Model):
     )
 
     instructions = models.FileField(upload_to="instructions", blank=True, null=True)
-    timeout = models.PositiveIntegerField(blank=False, null=False)
-    partial_score_after = models.PositiveIntegerField(blank=False, null=False)
-    reminder = models.PositiveIntegerField(blank=False, null=False, default=0)
+    timeout = models.PositiveIntegerField(
+        blank=False,
+        null=False,
+        help_text="Time to complete testpart, in milliseconds",
+    )
+    partial_score_after = models.PositiveIntegerField(
+        blank=False,
+        null=False,
+        help_text="Student gets only partial score after this timeout, in milliseconds",
+    )
+    reminder = models.PositiveIntegerField(
+        blank=False,
+        null=False,
+        default=0,
+        help_text="Time after which to play reminder sound, in milliseconds",
+    )
     reminder_source = models.ForeignKey(
         TestResource,
         on_delete=models.PROTECT,
@@ -714,8 +727,18 @@ class TestQuestion(models.Model):
         choices=QuestionType,
         default=QuestionType.MULTIPLE_CHOICE,
     )
-    timeout = models.PositiveIntegerField(blank=False, null=False, default=0)
-    reminder = models.PositiveIntegerField(blank=False, null=False, default=0)
+    timeout = models.PositiveIntegerField(
+        blank=False,
+        null=False,
+        default=0,
+        help_text="Time to answer question, in milliseconds",
+    )
+    reminder = models.PositiveIntegerField(
+        blank=False,
+        null=False,
+        default=0,
+        help_text="Time after which to play reminder sound, in milliseconds",
+    )
     reminder_source = models.ForeignKey(
         TestResource,
         on_delete=models.PROTECT,
@@ -744,8 +767,6 @@ class TestQuestion(models.Model):
         sequence, _ = InstructionSequence.objects.get_or_create(question=self)
 
         for order, data in enumerate(instructions_data):
-            resource = None
-
             if data.get("resource") is None:
                 resource = None
             else:
