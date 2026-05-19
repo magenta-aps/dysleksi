@@ -388,6 +388,7 @@ class TestTest(DysleksiTest):
         self.assertEqual(
             question_model.reminder_source.url, question_json["reminderSource"]
         )
+        self.assertEqual(question_model.hint_source.url, question_json["hintSource"])
         self.assertEqual(
             (
                 question_model.challenge.image.url

@@ -235,6 +235,7 @@ export class Question {
     instruction_sequence;
     reminder;
     reminderSource;
+    hintSource;
     timeout;
     continueWhenInstructionIsComplete;
     resultGroup;
@@ -257,6 +258,7 @@ export class Question {
         this.instruction_sequence = data.instruction_sequence;
         this.reminder = data.reminder;
         this.reminderSource = data.reminderSource;
+        this.hintSource = data.hintSource;
         this.timeout = data.timeout;
         this.continueWhenInstructionIsComplete =
             data.continue_when_instruction_is_complete;

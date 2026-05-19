@@ -941,3 +941,160 @@ describe("GroupTestDomElements.showTestExit", () => {
         expect(window.location.href).toBe("/logout");
     });
 });
+
+describe("GroupTestDomElements.playSound", () => {
+    let dom;
+    let mockAudioContext;
+    let mockSource;
+    let mockBuffer;
+    let createBufferSourceSpy;
+
+    beforeEach(async () => {
+        document.body.innerHTML = `
+            <div id="fade-overlay" style="opacity: 0;"></div>
+            <audio id="instructions-sound"></audio>
+            <audio id="reminder-sound"></audio>
+            <div id="question-challenge"></div>
+            <div id="choices"></div>
+            <button id="end-summary"></button>
+            <button id="next"></button>
+        `;
+
+        dom = new GroupTestDomElements();
+
+        // Mock fetch for asset loading
+        global.fetch = vi.fn().mockResolvedValue({
+            arrayBuffer: vi.fn().mockResolvedValue(new ArrayBuffer(8)),
+        });
+
+        // Mock assetCache.fetch
+        const { assetCache } = await import("../../screening/cache.js");
+        vi.spyOn(assetCache, "fetch").mockImplementation((url) => url);
+
+        mockBuffer = { duration: 1 };
+
+        // Factory for source mocks — each call to createBufferSource gets its own
+        const makeMockSource = () => ({
+            buffer: null,
+            connect: vi.fn(),
+            start: vi.fn(),
+            stop: vi.fn(),
+            onended: null,
+        });
+
+        mockSource = makeMockSource();
+        createBufferSourceSpy = vi.fn(() => mockSource);
+
+        mockAudioContext = {
+            decodeAudioData: vi.fn().mockResolvedValue(mockBuffer),
+            createBufferSource: createBufferSourceSpy,
+            destination: {},
+        };
+    });
+
+    it("plays a sound and clears currentAudioSource when finished", async () => {
+        const playPromise = dom.playSound("/sound.mp3", mockAudioContext);
+
+        // Let microtasks resolve so fetch/decode complete and source is created
+        await Promise.resolve();
+        await Promise.resolve();
+        await Promise.resolve();
+
+        expect(mockSource.connect).toHaveBeenCalledWith(mockAudioContext.destination);
+        expect(mockSource.start).toHaveBeenCalled();
+        expect(mockSource.buffer).toBe(mockBuffer);
+        expect(dom.currentAudioSource).toBe(mockSource);
+
+        // Trigger end-of-playback
+        mockSource.onended();
+        await playPromise;
+
+        expect(dom.currentAudioSource).toBeNull();
+    });
+
+    it("interrupts a currently playing sound in default 'interrupt' mode", async () => {
+        // Set up an existing playing source
+        const existingSource = { stop: vi.fn() };
+        dom.currentAudioSource = existingSource;
+
+        const playPromise = dom.playSound("/sound.mp3", mockAudioContext);
+
+        await Promise.resolve();
+        await Promise.resolve();
+        await Promise.resolve();
+
+        // The existing source should have been stopped
+        expect(existingSource.stop).toHaveBeenCalled();
+
+        // The new source should now be active and started
+        expect(dom.currentAudioSource).toBe(mockSource);
+        expect(mockSource.start).toHaveBeenCalled();
+
+        mockSource.onended();
+        await playPromise;
+    });
+
+    it("drops the new sound in 'drop' mode when one is already playing", async () => {
+        const existingSource = { stop: vi.fn() };
+        dom.currentAudioSource = existingSource;
+
+        const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
+
+        await dom.playSound("/sound.mp3", mockAudioContext, "drop");
+
+        // Existing source should NOT be stopped
+        expect(existingSource.stop).not.toHaveBeenCalled();
+        // No new source should have been created
+        expect(createBufferSourceSpy).not.toHaveBeenCalled();
+        // currentAudioSource should still be the original
+        expect(dom.currentAudioSource).toBe(existingSource);
+        // Should log the drop
+        expect(consoleSpy).toHaveBeenCalledWith(
+            "Something is already playing. Dropped ",
+            "/sound.mp3",
+        );
+
+        consoleSpy.mockRestore();
+    });
+
+    it("plays normally in 'drop' mode when nothing is currently playing", async () => {
+        expect(dom.currentAudioSource).toBeNull();
+
+        const playPromise = dom.playSound("/sound.mp3", mockAudioContext, "drop");
+
+        await Promise.resolve();
+        await Promise.resolve();
+        await Promise.resolve();
+
+        expect(createBufferSourceSpy).toHaveBeenCalled();
+        expect(mockSource.start).toHaveBeenCalled();
+        expect(dom.currentAudioSource).toBe(mockSource);
+
+        mockSource.onended();
+        await playPromise;
+
+        expect(dom.currentAudioSource).toBeNull();
+    });
+
+    it("does not clear currentAudioSource if it was replaced by another call", async () => {
+        const playPromise = dom.playSound("/sound.mp3", mockAudioContext);
+
+        await Promise.resolve();
+        await Promise.resolve();
+        await Promise.resolve();
+
+        const firstSource = dom.currentAudioSource;
+        expect(firstSource).toBe(mockSource);
+
+        // Simulate another playSound call replacing the active source
+        const replacementSource = { stop: vi.fn() };
+        dom.currentAudioSource = replacementSource;
+
+        // Now the first source finishes
+        firstSource.onended();
+        await playPromise;
+
+        // currentAudioSource should still be the replacement, NOT null
+        expect(dom.currentAudioSource).toBe(replacementSource);
+    });
+});

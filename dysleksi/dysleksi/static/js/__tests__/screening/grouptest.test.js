@@ -1910,6 +1910,129 @@ describe("Letter Shape Test", () => {
         expect(nextButton.disabled).toBe(false);
     });
 
+    it("Helps student after three failed attempts", async () => {
+        const test = new Test(letterShapeTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        view.setPart(0);
+        view.showFirstQuestion(true);
+
+        const leftRow = document.getElementById("choices-left");
+        const rightRow = document.getElementById("choices-right");
+
+        const bBtn = Array.from(leftRow.children).find(
+            (btn) => btn.textContent === "B",
+        );
+        const sBtn = Array.from(leftRow.children).find(
+            (btn) => btn.textContent === "S",
+        );
+        const lowerSBtn = Array.from(rightRow.children).find(
+            (btn) => btn.textContent === "s",
+        );
+        const lowerABtn = Array.from(rightRow.children).find(
+            (btn) => btn.textContent === "a",
+        );
+        const lowerXBtn = Array.from(rightRow.children).find(
+            (btn) => btn.textContent === "x",
+        );
+
+        bBtn.click();
+
+        // first failed attempt
+        lowerABtn.click();
+
+        // second failed attempt
+        lowerXBtn.click();
+
+        // third failed attempt
+        lowerABtn.click();
+
+        // The correct buttons now starts pulsating
+        expect(lowerSBtn.classList).toContain("pulse");
+        expect(sBtn.classList).toContain("pulse");
+
+        // The buttons stop pulsating when clicked
+        lowerSBtn.click();
+        sBtn.click();
+        expect(lowerSBtn.classList).not.toContain("pulse");
+        expect(sBtn.classList).not.toContain("pulse");
+    });
+
+    it("Helps student after three failed attempts when left row is correct", async () => {
+        const test = new Test(letterShapeTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        view.setPart(0);
+        view.showFirstQuestion(true);
+
+        const leftRow = document.getElementById("choices-left");
+        const rightRow = document.getElementById("choices-right");
+
+        const sBtn = Array.from(leftRow.children).find(
+            (btn) => btn.textContent === "S",
+        );
+        const lowerSBtn = Array.from(rightRow.children).find(
+            (btn) => btn.textContent === "s",
+        );
+        const lowerABtn = Array.from(rightRow.children).find(
+            (btn) => btn.textContent === "a",
+        );
+        const lowerXBtn = Array.from(rightRow.children).find(
+            (btn) => btn.textContent === "x",
+        );
+
+        sBtn.click();
+
+        // first failed attempt
+        lowerABtn.click();
+
+        // second failed attempt
+        lowerXBtn.click();
+
+        // third failed attempt
+        lowerABtn.click();
+
+        // The correct button now starts pulsating
+        expect(lowerSBtn.classList).toContain("pulse");
+        expect(sBtn.classList).not.toContain("pulse");
+    });
+
+    it("Helps student after three failed attempts when right row is correct", async () => {
+        const test = new Test(letterShapeTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        view.setPart(0);
+        view.showFirstQuestion(true);
+
+        const leftRow = document.getElementById("choices-left");
+        const rightRow = document.getElementById("choices-right");
+
+        const bBtn = Array.from(leftRow.children).find(
+            (btn) => btn.textContent === "B",
+        );
+        const cBtn = Array.from(leftRow.children).find(
+            (btn) => btn.textContent === "C",
+        );
+        const sBtn = Array.from(leftRow.children).find(
+            (btn) => btn.textContent === "S",
+        );
+        const lowerSBtn = Array.from(rightRow.children).find(
+            (btn) => btn.textContent === "s",
+        );
+
+        lowerSBtn.click();
+
+        // first failed attempt
+        bBtn.click();
+
+        // second failed attempt
+        cBtn.click();
+
+        // third failed attempt
+        bBtn.click();
+
+        // The correct button now starts pulsating
+        expect(lowerSBtn.classList).not.toContain("pulse");
+        expect(sBtn.classList).toContain("pulse");
+    });
+
     it("Disabled next button when both answers are wrong", async () => {
         const test = new Test(letterShapeTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);

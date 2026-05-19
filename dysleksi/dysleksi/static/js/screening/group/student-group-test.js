@@ -59,6 +59,7 @@ export class GroupTestView extends StudentTestView {
             this.setStudentHeader();
             this.domElements.toggleRepeatButton(false);
             this.domElements.toggleNextButton(false);
+            this.failedAttempts = 0;
 
             // Show question challenge and choices
             this.domElements.toggleQuestionDisplay("flex");
@@ -377,23 +378,48 @@ export class GroupTestView extends StudentTestView {
                 this.domElements.makeButtonHappy(this.selectedAnswer.buttonId);
                 this.domElements.enableNextButton();
                 // Play "you guessed correct" sound snippet
-                let source = null;
-                this.domElements.playSound(
-                    "/static/audio/7c.4.wav",
-                    source,
-                    this.audioContext,
-                );
+                this.domElements.playSound("/static/audio/7c.4.wav", this.audioContext);
             } else {
-                this.domElements.makeButtonAngry(this.selectedAnswer.buttonId);
                 this.domElements.disableNextButton();
                 // Play "you guessed wrong" sound snippet
-                let source = null;
-                this.domElements.playSound(
-                    "/static/audio/7c.3.wav",
-                    source,
-                    this.audioContext,
-                );
+                this.failedAttempts += 1;
+
+                if (isMatchPair && this.failedAttempts == 3) {
+                    const correctLeft = this.answerButtons.find(
+                        (a) =>
+                            this.domElements.choicesElLeft.contains(a.button) &&
+                            a.answer.isCorrect,
+                    );
+                    const correctRight = this.answerButtons.find(
+                        (a) =>
+                            this.domElements.choicesElRight.contains(a.button) &&
+                            a.answer.isCorrect,
+                    );
+
+                    console.log("Playing hint audio");
+                    this.domElements.playSound(
+                        this.currentQuestion.hintSource,
+                        this.audioContext,
+                    );
+
+                    console.log("Highlighting correct answer");
+                    if (!correctLeft.button.classList.contains("selected")) {
+                        correctLeft.button.classList.add("pulse");
+                    }
+                    if (!correctRight.button.classList.contains("selected")) {
+                        correctRight.button.classList.add("pulse");
+                    }
+                } else {
+                    if (!clickedEntry.button.classList.contains("pulse")) {
+                        this.domElements.makeButtonAngry(this.selectedAnswer.buttonId);
+                        this.domElements.playSound(
+                            "/static/audio/7c.3.wav",
+                            this.audioContext,
+                        );
+                    }
+                }
             }
+            clickedEntry.button.classList.remove("pulse");
         } else {
             this.domElements.makeButtonGlow(this.selectedAnswer.buttonId);
         }

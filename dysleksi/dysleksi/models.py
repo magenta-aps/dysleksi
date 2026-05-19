@@ -361,6 +361,8 @@ class Test(models.Model):
                     }
                     if question.reminder_source:
                         question_data["reminderSource"] = question.reminder_source.url
+                    if question.hint_source:
+                        question_data["hintSource"] = question.hint_source.url
                     if question.challenge:
                         question_data.update(
                             {
@@ -561,6 +563,11 @@ class TestPart(models.Model):
                 question["reminder_source"], _ = TestResource.objects.get_or_create(
                     name=question_reminder_source, sound=question_reminder_source
                 )
+            question_hint_source = data.get("hint_source")
+            if question_hint_source is not None:
+                question["hint_source"], _ = TestResource.objects.get_or_create(
+                    name=question_hint_source, sound=question_hint_source
+                )
             if "timeout" in data and not is_practice:
                 question["timeout"] = data["timeout"]
             else:
@@ -715,6 +722,13 @@ class TestQuestion(models.Model):
         blank=True,
         null=True,
         related_name="reminder_testquestion",
+    )
+    hint_source = models.ForeignKey(
+        TestResource,
+        on_delete=models.PROTECT,
+        blank=True,
+        null=True,
+        related_name="hint_testquestion",
     )
     continue_when_instruction_is_complete = models.BooleanField(default=True)
     advance_automatically = models.BooleanField(default=False)

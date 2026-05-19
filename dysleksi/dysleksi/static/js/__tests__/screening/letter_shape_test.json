@@ -49,6 +49,15 @@
             },
             {
               "id": 203,
+              "resource_id": 202,
+              "resource_name": "C_set1",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "C",
+              "is_correct": false
+            },
+            {
+              "id": 204,
               "resource_id": 203,
               "resource_name": "s_set2",
               "resource_image_url": null,
@@ -57,14 +66,24 @@
               "is_correct": true
             },
             {
-              "id": 204,
+              "id": 205,
               "resource_id": 204,
               "resource_name": "a_set2",
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "a",
               "is_correct": false
+            },
+            {
+              "id": 206,
+              "resource_id": 204,
+              "resource_name": "x_set2",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "x",
+              "is_correct": false
             }
+
           ]
         }
 

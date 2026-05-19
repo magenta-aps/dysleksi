@@ -34,6 +34,7 @@ export class StudentTestView extends EventTarget {
             this.onChatMessage(e.detail);
         });
         this.audioContext = unlockAudioOnGesture();
+        this.failedAttempts = 0;
     }
 
     questionTitle(practice = false) {
@@ -89,7 +90,6 @@ export class StudentTestView extends EventTarget {
 
             this.domElements.playSound(
                 this.previousPart.completionSource,
-                null,
                 this.audioContext,
             );
         } else {
@@ -214,7 +214,6 @@ export class StudentTestView extends EventTarget {
         this.domElements.showTestExit();
         this.domElements.playSound(
             this.currentPart.completionSource,
-            null,
             this.audioContext,
         );
     }
@@ -385,11 +384,10 @@ export class StudentTestView extends EventTarget {
                     "Playing reminder sound",
                     this.currentQuestion.reminderSource,
                 );
-                let currentSource = null;
                 this.domElements.playSound(
                     this.currentQuestion.reminderSource,
-                    currentSource,
                     this.audioContext,
+                    "drop",
                 );
             }, this.currentQuestion.reminder);
         }
