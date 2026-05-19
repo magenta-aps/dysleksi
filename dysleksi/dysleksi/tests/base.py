@@ -111,6 +111,7 @@ class DysleksiTest(TestCase):
             challenge=cls.resource1,
             reminder=5000,
             reminder_source=cls.resource4,
+            hint_source=cls.resource4,
         )
 
         cls.possible_correct_answer1 = PossibleAnswer.objects.create(

@@ -37,6 +37,8 @@ class TestDomElements {
             "#skip-all-instructions",
         );
         this.repeatBtn = document.querySelector("#repeat");
+
+        this.currentAudioSource = null;
     }
 
     updateSummaryArrows() {
@@ -532,7 +534,6 @@ class TestDomElements {
             this._insert(this.questionChallengeEl, playBtn, [img, textEl], null);
 
             let isPlaying = false;
-            let currentSource = null;
 
             playBtn.onclick = async () => {
                 if (isPlaying) return; // prevent double-clicks
@@ -540,7 +541,7 @@ class TestDomElements {
                 playBtn.classList.remove("pulse");
                 playBtn.classList.add("playing");
 
-                await this.playSound(sound, currentSource, audioContext);
+                await this.playSound(sound, audioContext);
 
                 isPlaying = false;
                 playBtn.classList.remove("playing");
@@ -562,22 +563,40 @@ class TestDomElements {
         };
     }
 
-    async playSound(sound, currentSource, audioContext) {
+    async playSound(sound, audioContext, mode = "interrupt") {
+        if (mode === "drop" && this.currentAudioSource) {
+            console.log("Something is already playing. Dropped ", sound);
+            return;
+        }
+
+        if (mode === "interrupt" && this.currentAudioSource) {
+            // Stop whatever is playing right now.
+            this.currentAudioSource.stop();
+            this.currentAudioSource = null;
+        }
+
         // Fetch & decode audio
         const response = await fetch(assetCache.fetch(sound));
         const arrayBuffer = await response.arrayBuffer();
         const audioBuffer = await audioContext.decodeAudioData(arrayBuffer);
 
         // Play
-        currentSource = audioContext.createBufferSource();
-        currentSource.buffer = audioBuffer;
-        currentSource.connect(audioContext.destination);
-        currentSource.start();
+        const source = audioContext.createBufferSource();
+        source.buffer = audioBuffer;
+        source.connect(audioContext.destination);
+        this.currentAudioSource = source;
+        source.start();
 
         // Wait until finished
         await new Promise((resolve) => {
-            currentSource.onended = resolve;
+            source.onended = resolve;
         });
+
+        // Only clear if this source is still the active one
+        // (an "interrupt" call may have replaced it).
+        if (this.currentAudioSource === source) {
+            this.currentAudioSource = null;
+        }
     }
 
     showQuestionFreeText(listener) {
