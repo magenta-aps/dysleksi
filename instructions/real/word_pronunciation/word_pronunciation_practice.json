@@ -1,0 +1,77 @@
+[
+  // 9a.1-9a.5 - indledning
+  {
+    "question_type": "no_input_required",
+    "image": "/resources/shared/Læsning.png",
+    "instruction_sequence": [
+      // Højtlæsning af ord er nu ved at starte.
+      {
+        "action": "playSound",
+        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.1.wav",
+        "delayAfter": 0
+      },
+      {
+        "action": "show",
+        "element": "question-challenge",
+        "delayAfter": 0
+      },
+      {
+        "action": "fadeIn",
+        "element": "question-challenge",
+        "delayAfter": 1250
+      },
+
+      // Et ord, som du skal læse, vises.
+      {
+        "action": "playSound",
+        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.2.wav",
+        "delayAfter": 1250
+      },
+
+      // Du skal læse ordet (højt).
+      {
+        "action": "playSound",
+        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.3.wav",
+        "delayAfter": 1250
+      },
+
+      // Men først skal du prøve øveopagverne.
+      {
+        "action": "playSound",
+        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.4.wav",
+        "delayAfter": 1250
+      },
+
+      // Tryk på det grønne ikon, når du er klar.
+      {
+        "action": "playSound",
+        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.5.wav",
+        "delayAfter": 0
+      },
+      {
+        "action": "show",
+        "element": "next",
+        "delayAfter": 0
+      },
+      {
+        "action": "fadeIn",
+        "element": "next",
+        "delayAfter": 1250
+      }
+    ]
+  },
+
+  // Læreren er ansvarlig for forståelse af opgaven
+  {
+    "text": "ini",
+    "question_type": "no_input_required"
+  },
+  {
+    "text": "siku",
+    "question_type": "no_input_required"
+  },
+  {
+    "text": "matu",
+    "question_type": "no_input_required"
+  }
+]

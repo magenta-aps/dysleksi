@@ -259,9 +259,17 @@ def create_individual_test(
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
             / "real/letter_pronunciation/letter_pronunciation.json"
         )
-        word_pronunciation_data_path = None
-        nonsense_word_pronunciation_data_path = None
+        word_pronunciation_data_path = (
+            Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+            / "real/word_pronunciation/word_pronunciation.json"
+        )
+        nonsense_word_pronunciation_data_path = (
+            Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+            / "real/nonsense_word_pronunciation/nonsense_word_pronunciation.json"
+        )
         letter_pronunciation_test_name = "Bogstavbenævnelse"
+        word_pronunciation_test_name = "Højtlæsning af ord"
+        nonsense_word_pronunciation_test_name = "Højtlæsning af nonsensord"
 
     if grade == 1:
         call_command(
@@ -278,23 +286,32 @@ def create_individual_test(
 
     if (grade == 1 and period == "slut") or grade >= 2:
 
-        if word_pronunciation_data_path:
-            call_command(
-                "import_test",
-                test_name,
-                word_pronunciation_test_name,
-                word_pronunciation_data_path,
-                "word_pronunciation",
-            )
+        call_command(
+            "import_test",
+            test_name,
+            word_pronunciation_test_name,
+            word_pronunciation_data_path,
+            "word_pronunciation",
+            practice_json_path=(
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / "real/word_pronunciation/word_pronunciation_practice.json"
+            ),
+        )
 
-        if nonsense_word_pronunciation_data_path:
-            call_command(
-                "import_test",
-                test_name,
-                nonsense_word_pronunciation_test_name,
-                nonsense_word_pronunciation_data_path,
-                "nonsense_word_pronunciation",
-            )
+        call_command(
+            "import_test",
+            test_name,
+            nonsense_word_pronunciation_test_name,
+            nonsense_word_pronunciation_data_path,
+            "nonsense_word_pronunciation",
+            practice_json_path=(
+                Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
+                / (
+                    "real/nonsense_word_pronunciation/"
+                    "nonsense_word_pronunciation_practice.json"
+                )
+            ),
+        )
     return test
 
 
