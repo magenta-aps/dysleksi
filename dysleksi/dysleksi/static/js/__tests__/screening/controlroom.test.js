@@ -323,6 +323,7 @@ describe("Teacher Individual test View", () => {
             <button id="cancelled">Afslut test</button>
             <button id="skipped">Sprunget over</button>
             <button id="next">Næste</button>
+            <button id="goto-next-result-group">Hop til næste</button>
             <textarea id="note" class="d-none"></textarea>
             <div id="audio-indicator"></div>
         `;
@@ -1006,6 +1007,30 @@ describe("Teacher Individual test View", () => {
         );
         // Assert: audio indicator animation is started
         expect(spyStop).toHaveBeenCalled();
+    });
+
+    it("finds the 'goto next result group' button in DOM", () => {
+        expect(view.gotoNextResultGroupButton).not.toBeNull();
+    });
+
+    it("handles click events on the 'goto next result group button'", () => {
+        // Arrange
+        const spyGoto = vi.spyOn(view, "gotoNextResultGroup");
+        // Act: dispatch click event on button
+        view.gotoNextResultGroupButton.dispatchEvent(new Event("click"));
+        // Assert: handler was called
+        expect(spyGoto).toHaveBeenCalled();
+    });
+
+    it("can go to next result group", () => {
+        // Arrange: go to second test part (which has result groups)
+        view.setPartIndex(1);
+        view.setQuestionIndex(0);
+        // Act
+        view.gotoNextResultGroup();
+        // Assert: we are at the first question in result group 'B'
+        expect(view.currentQuestion.index).toBe(2);
+        expect(view.currentQuestion.resultGroup).toBe("B");
     });
 });
 

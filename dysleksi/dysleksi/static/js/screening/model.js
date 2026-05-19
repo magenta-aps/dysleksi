@@ -237,6 +237,7 @@ export class Question {
     reminderSource;
     timeout;
     continueWhenInstructionIsComplete;
+    resultGroup;
 
     constructor(data, part, index) {
         this.part = part;
@@ -260,6 +261,7 @@ export class Question {
         this.continueWhenInstructionIsComplete =
             data.continue_when_instruction_is_complete;
         this.advanceAutomatically = data.advance_automatically;
+        this.resultGroup = data.result_group;
     }
 
     getAnswerClass() {
