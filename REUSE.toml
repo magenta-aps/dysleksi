@@ -7,6 +7,7 @@ path = [
     "dysleksi/**",
     "dev-environment/**",
     "data/tabulex/selfsigned*",
+    "data/tabulex/inst.json",
     "docker/**",
     "docker-compose.yml",
     "docker-compose.override.template.yml",
