@@ -358,21 +358,28 @@ export class StudentTestView extends EventTarget {
         });
     }
 
+    clearTimeout() {
+        if (this.questionTimeoutId) {
+            clearTimeout(this.questionTimeoutId);
+            this.questionTimeoutId = null;
+        }
+    }
+    clearReminder() {
+        if (this.questionReminderId) {
+            clearTimeout(this.questionReminderId);
+            this.questionReminderId = null;
+        }
+    }
+
     setupReminder() {
         if (Number(this.currentQuestion.timeout) > 1) {
-            if (this.questionTimeoutId) {
-                clearTimeout(this.questionTimeoutId);
-                this.questionTimeoutId = null;
-            }
+            this.clearTimeout();
             this.questionTimeoutId = setTimeout(() => {
                 this.onQuestionComplete(this.currentQuestion, true);
             }, this.currentQuestion.timeout);
         }
         if (Number(this.currentQuestion.reminder) > 1) {
-            if (this.questionReminderId) {
-                clearTimeout(this.questionReminderId);
-                this.questionReminderId = null;
-            }
+            this.clearReminder();
             this.questionReminderId = setTimeout(() => {
                 console.log(
                     "Playing reminder sound",
