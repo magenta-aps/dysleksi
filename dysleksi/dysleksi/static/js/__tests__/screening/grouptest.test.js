@@ -161,8 +161,8 @@ describe("GroupTestFlow", () => {
         expect(test.parts[0].index).toBe(0);
         expect(test.parts[0].name).toBe("Wordreading 2A (dummy)");
         expect(test.parts[0].instructionsUrl).toBe(null);
-        expect(test.parts[0].timeout).toBe(60);
-        expect(test.parts[0].partialScoreAfter).toBe(30);
+        expect(test.parts[0].timeout).toBe(60000);
+        expect(test.parts[0].partialScoreAfter).toBe(30000);
         expect(test.parts[0].questions.length).toBe(5);
         expect(test.parts[0].questionIndex).toBe(0);
         expect(test.parts[0].currentQuestion).toBe(null);
@@ -187,8 +187,8 @@ describe("GroupTestFlow", () => {
         expect(test.parts[0].index).toBe(0);
         expect(test.parts[0].name).toBe("Wordreading 2A (dummy)");
         expect(test.parts[0].instructionsUrl).toBe(null);
-        expect(test.parts[0].timeout).toBe(60);
-        expect(test.parts[0].partialScoreAfter).toBe(30);
+        expect(test.parts[0].timeout).toBe(60000);
+        expect(test.parts[0].partialScoreAfter).toBe(30000);
         expect(test.parts[0].questions.length).toBe(5);
         expect(test.parts[0].questionIndex).toBe(0);
         expect(test.parts[0].currentQuestion).toBe(null);

@@ -7,8 +7,8 @@
       "id": 5,
       "name": "Wordreading 2A (dummy)",
       "instructions_url": null,
-      "timeout": 60,
-      "partial_score_after": 30,
+      "timeout": 60000,
+      "partial_score_after": 30000,
       "completion_source": "/static/foo.mp3",
       "practice": [
         {
@@ -390,8 +390,8 @@
       "id": 6,
       "name": "Wordspelling 2B (dummy)",
       "instructions_url": null,
-      "timeout": 60,
-      "partial_score_after": 30,
+      "timeout": 60000,
+      "partial_score_after": 30000,
       "completion_source": "/static/foo.mp3",
       "practice": [
 
