@@ -51,3 +51,7 @@ class DysleksiOIDCABTest(TestCase):
             }
         )
         self.assertIn(path, logout_url)
+
+    def test_verify_claims(self):
+        claims = {"exp": 1337, "jti": "unique", "etc": "osv"}
+        self.assertTrue(self.backend.verify_claims(claims))

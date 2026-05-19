@@ -17,6 +17,12 @@ class DysleksiOIDCAuthenticationBackend(OIDCAuthenticationBackend):
         except User.DoesNotExist:
             return self.UserModel.objects.none()
 
+    def verify_claims(self, claims):
+        # Custom claims verification, due to
+        # mozilla-django-oidc.readthedocs.io/en/stable/settings.html#OIDC_RP_SCOPES
+        # More specific validation will be implemented
+        return True
+
 
 def unilogin_logout(request):
     kwargs = {
