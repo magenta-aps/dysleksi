@@ -97,7 +97,30 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "meeqqat",
-          "possible_answers": []
+          "possible_answers": [],
+          "result_group": "A"
+        },
+        {
+          "id": 2,
+          "question_type": "free_text",
+          "challenge_id": 31,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "isuk",
+          "possible_answers": [],
+          "result_group": "A"
+        },
+        {
+          "id": 3,
+          "question_type": "free_text",
+          "challenge_id": 33,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "apa",
+          "possible_answers": [],
+          "result_group": "B"
         }
       ]
     }

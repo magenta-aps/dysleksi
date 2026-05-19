@@ -357,6 +357,7 @@ class Test(models.Model):
                             question.continue_when_instruction_is_complete
                         ),
                         "advance_automatically": question.advance_automatically,
+                        "result_group": question.result_group,
                     }
                     if question.reminder_source:
                         question_data["reminderSource"] = question.reminder_source.url
@@ -570,6 +571,8 @@ class TestPart(models.Model):
                 ]
             if "advance_automatically" in data:
                 question["advance_automatically"] = data["advance_automatically"]
+            if "result_group" in data:
+                question["result_group"] = data["result_group"]
 
             question = TestQuestion.objects.create(**question)
 
@@ -715,6 +718,10 @@ class TestQuestion(models.Model):
     )
     continue_when_instruction_is_complete = models.BooleanField(default=True)
     advance_automatically = models.BooleanField(default=False)
+    result_group = models.CharField(
+        blank=True,
+        null=True,
+    )
 
     def __str__(self) -> str:
         return f"{str(self.part)} / {self.pk}"

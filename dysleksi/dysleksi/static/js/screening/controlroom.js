@@ -879,6 +879,10 @@ export class TeacherView {
         this.detailsPopup = new DetailsPopup();
 
         this.filterButtons = document.querySelectorAll(".group-test-header .btn");
+        this.gotoNextResultGroupButton = document.querySelector(
+            "#goto-next-result-group",
+        );
+
         this.studentChannels = {};
 
         const savedQueue = localStorage.getItem(`msg_queue_${this.assignmentId}`);
@@ -1169,6 +1173,36 @@ export class TeacherView {
                 }
             }
         });
+        if (this.gotoNextResultGroupButton !== null) {
+            this.gotoNextResultGroupButton.addEventListener("click", () => {
+                this.gotoNextResultGroup();
+            });
+        }
+    }
+
+    gotoNextResultGroup() {
+        if (this.currentQuestion === null || this.currentIsPractice) {
+            return;
+        }
+        // Find next result group (if any)
+        for (
+            let q = this.currentQuestion.index;
+            q < this.currentPart.questions.length;
+            q++
+        ) {
+            const question = this.currentPart.questions[q];
+            if (
+                question.resultGroup &&
+                question.resultGroup !== this.currentQuestion.resultGroup
+            ) {
+                // Go to next result group
+                console.log(`Jumping to next result group (question ${q})`);
+                this.setQuestionIndex(q, false);
+                this.showQuestion(); // update local UI
+                this.sendQuestionChanged(); // update remote UIs (student sessions)
+                break;
+            }
+        }
     }
 
     sendTestCancelled() {
@@ -1209,6 +1243,21 @@ export class TeacherView {
         if (this.table !== null) {
             this.table.updateTable(data);
         }
+    }
+
+    sendQuestionChanged() {
+        Object.values(this.studentChannels).forEach((channel) => {
+            channel.send({
+                uuid: crypto.randomUUID(),
+                event: "question.changed",
+                partIndex: this.partIndex,
+                partId: this.currentPart.id,
+                questionIndex: this.questionIndex,
+                questionId: this.currentQuestion.id,
+                assignmentId: this.assignmentId,
+                practice: this.currentIsPractice,
+            });
+        });
     }
 
     showQuestion() {

@@ -524,6 +524,26 @@ describe("IndividualTestFlow", () => {
         );
         expect(view.runInstructions).toHaveBeenCalledWith();
     });
+
+    it("handles the 'question.changed' event", () => {
+        // Arrange
+        const newQuestionIndex = 1;
+        const isPractice = false;
+        view.setPart(0);
+        // Act
+        view.onChatMessage({
+            uuid: crypto.randomUUID(),
+            event: "question.changed",
+            partIndex: 0,
+            partId: 1,
+            questionIndex: newQuestionIndex,
+            questionId: 2,
+            assignmentId: 1,
+            practice: isPractice,
+        });
+        // Assert
+        expect(view.showQuestion).toHaveBeenCalledWith(isPractice, newQuestionIndex);
+    });
 });
 
 describe("Individual Test - Timer and Reminder Cleanup", () => {

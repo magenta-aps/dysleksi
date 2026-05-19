@@ -15,6 +15,9 @@ export class IndividualTestView extends StudentTestView {
         if (data.event === "question.feedback") {
             this.teacherFeedback(data.correct);
         }
+        if (data.event === "question.changed") {
+            this.showQuestion(data.practice, data.questionIndex);
+        }
         if (data.event === "test.cancelled") {
             this.onTestComplete(true);
         }
