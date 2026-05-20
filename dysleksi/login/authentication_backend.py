@@ -1,3 +1,4 @@
+import logging
 from urllib.parse import urlencode
 
 from django.conf import settings
@@ -5,10 +6,15 @@ from mozilla_django_oidc.auth import OIDCAuthenticationBackend
 
 from dysleksi.models import User
 
+if settings.TESTLOGGING:  # type: ignore
+    logger = logging.getLogger(__name__)  # pragma: no cover
+
 
 class DysleksiOIDCAuthenticationBackend(OIDCAuthenticationBackend):
     def filter_users_by_claims(self, claims):
         uniid = claims.get("uniid")
+        if settings.TESTLOGGING:  # type: ignore
+            logger.info(f"RECEIVED CLAIMS: {claims}")  # pragma: no cover
         if not uniid:
             return self.UserModel.objects.none()
         try:
