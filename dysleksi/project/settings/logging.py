@@ -95,6 +95,7 @@ if os.path.isfile(log_filename) and ENVIRONMENT != "development":
         "level": "INFO",
     }
     LOGGING["loggers"]["django"]["handlers"].append("file")
+TESTLOGGING = ENVIRONMENT != "production"
 
 
 # Make logging shut up during testing
