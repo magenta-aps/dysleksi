@@ -73,14 +73,15 @@ describe("IndividualTestFlow", () => {
             <div id="question-challenge"></div>
             <div id="test-summary"></div>
             <div id="test-container"></div>
-            <div id="testpart-intro"></div>
+            <div id="testpart-outro"></div>
             <div id="test-intro"></div>
             <button id="next"></button>
             <button id="repeat"></button>
             <button id="start-testpart"></button>
+            <button id="end-testpart-outro"></button>
             <div id="choices"></div>
-            <h2 id="testpart-intro-text"> </h2>
-            <img id="testpart-intro-image">
+            <h2 id="testpart-outro-text"> </h2>
+            <img id="testpart-outro-image">
             <button id="skip-instruction" style="display:none"></button>
             <button id="skip-all-instructions" style="display:none"></button>
         `;

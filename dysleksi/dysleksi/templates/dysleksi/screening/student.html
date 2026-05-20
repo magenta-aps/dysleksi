@@ -23,8 +23,17 @@
 </button>
 
 <button id="skip-all-instructions" class="debug-button">
-    DEBUG: Skip alle instruktioner
+    DEBUG: Skip all instructions
 </button>
+
+<button id="skip-sound-calibration" class="debug-button">
+    DEBUG: Skip sound calibration
+</button>
+
+<button id="skip-summary" class="debug-button">
+    DEBUG: Skip summary
+</button>
+
 </div>
 {% endif %}
 
@@ -35,20 +44,40 @@
             Hej {{ name }} {{ last_name }}
             {% endblocktrans %}
         </h2>
-        <button class="btn start-btn" id="start-summary"></button>
+        <button class="btn start-btn" id="end-intro"></button>
     </div>
 </div>
 
-<div id="testpart-intro" class="center-screen" style="display: none">
+<div id="test-sound-calibration" class="center-screen" style="display: none">
+    <i id="speaker" class="ph-fill ph-speaker-none"></i>
+
     <div class="center-content">
-        <h2 id="testpart-intro-text"> </h2>
+
+        <img src="{% static 'images/talking_face.png' %}"
+             alt="talkingSmiley"
+             class="smiley-button"
+             id="sound-calibration-animation">
+
+        <button class="btn start-btn" id="end-sound-calibration"></button>
+    </div>
+</div>
+
+<div id="test-break" class="center-screen" style="display: none">
+    <div class="center-content">
+        <button class="btn start-btn" id="end-break"></button>
+    </div>
+</div>
+
+<div id="testpart-outro" class="center-screen" style="display: none">
+    <div class="center-content">
+        <h2 id="testpart-outro-text"> </h2>
 
         <img src="{% static 'images/Smile.svg' %}"
              alt="Smiley"
              class="smiley-image"
-             id="testpart-intro-image">
+             id="testpart-outro-image">
 
-        <button class="btn start-btn" id="start-testpart"></button>
+        <button class="btn start-btn" id="end-testpart-outro"></button>
     </div>
 </div>
 
@@ -69,6 +98,7 @@
     </div>
 </div>
 
+
 <div id="test-summary" style="display: none" class="center-screen">
     <div class="center-content">
         <div class="scroll-wrapper">
@@ -83,6 +113,13 @@
             </div>
         </div>
         <button class="btn mt-5 start-btn" id="end-summary"></button>
+
+        <div id="test-finished-row" class="finished-row" style="display: none">
+            <i class="ph-fill ph-hands-clapping standalone-icon"></i>
+            <button type="button" class="btn task-btn" id="summary-log-out">
+                Log ud <i class="ph-fill ph-sign-out"></i>
+            </button>
+        </div>
     </div>
 </div>
 

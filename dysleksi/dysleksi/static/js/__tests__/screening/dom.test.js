@@ -111,7 +111,7 @@ describe("GroupTestDomElements.showSummary", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
-            <div id="test-summary" style="display: none">
+            <div id="test-summary" style="display: none" class="center-screen">
                 <div class="center-content">
                     <div class="scroll-wrapper">
                         <div id="summary-container" class="summary-container"></div>
@@ -124,7 +124,14 @@ describe("GroupTestDomElements.showSummary", () => {
                             </div>
                         </div>
                     </div>
-
+                    <button class="btn mt-5 start-btn" id="end-summary"></button>
+            
+                    <div id="test-finished-row" class="finished-row" style="display: none">
+                        <i class="ph-fill ph-hands-clapping standalone-icon"></i>
+                        <button type="button" class="btn task-btn" id="summary-log-out">
+                            Log ud <i class="ph-fill ph-sign-out"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
     `;
@@ -238,6 +245,17 @@ describe("GroupTestDomElements.showSummary", () => {
 
         expect(dom.scrollSummaryUpArrow.classList.contains("disabled")).toBe(false);
         expect(dom.scrollSummaryDownArrow.classList.contains("disabled")).toBe(false);
+    });
+
+    it("Shows summary for a completed test", async () => {
+        const test = { parts: [{ name: "Bogstavbenævnelse", questions: [] }] };
+        await dom.showSummary(test.parts, true);
+
+        const block = dom.summaryContainer.querySelector(".summary-block");
+        expect(block).not.toBeNull();
+        expect(block.childNodes[0].childNodes[0].textContent.trim()).toBe(
+            "Bogstavbenævnelse",
+        );
     });
 });
 
@@ -413,16 +431,31 @@ describe("GroupTestDomElements DOM utilities", () => {
       <button id="next"></button>
       <div id="test-el"></div>
       <div id="test-el2" data-hide-display="true"></div>
-      <div id="testpart-intro-image" style="display: flex;"></div>
+      <div id="testpart-outro-image" style="display: flex;"></div>
+      <div id="test-sound-calibration"></div>
+      <div id="test-summary"></div>
     `;
         dom = new GroupTestDomElements();
         el = document.getElementById("test-el");
         el2 = document.getElementById("test-el2");
     });
 
-    it("hideTestPartIntroImage sets display to none", () => {
-        dom.hideTestPartIntroImage();
-        expect(dom.testPartIntroImage.style.display).toBe("none");
+    it("hideTestPartOutroImage sets display to none", () => {
+        dom.hideTestPartOutroImage();
+        expect(dom.testPartOutroImage.style.display).toBe("none");
+    });
+
+    it("shows and hides sound calibration", () => {
+        dom.showSoundCalibration();
+        expect(dom.testSoundCalibration.style.display).toBe("flex");
+
+        dom.hideSoundCalibration();
+        expect(dom.testSoundCalibration.style.display).toBe("none");
+    });
+
+    it("hides summary", () => {
+        dom.hideSummary();
+        expect(dom.testSummary.style.display).toBe("none");
     });
 
     it("showFaded sets initial opacity and calls showElement after timeout", () => {
