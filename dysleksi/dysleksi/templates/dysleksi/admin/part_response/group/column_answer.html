@@ -1,0 +1,23 @@
+{% with question_type=record.question.question_type %}
+    {% if question_type == QuestionType.MULTIPLE_CHOICE or question_type == QuestionType.MULTIPLE_CHOICE_WITH_DISPLAY_FIELD %}
+        <div class="answer-multiple-choice">
+        {% for possible_answer in record.question.possible_answers.all %}
+            {% if possible_answer.is_teacher_judged %}
+                {% if record.answer_option == possible_answer %}
+                    {% include "dysleksi/admin/part_response/group/column_resource.html" with resource=possible_answer.resource %}
+                {% endif %}
+            {% else %}
+            <div class="answer-option answer {% if record.answer_option == possible_answer %}{% if possible_answer.is_correct %}answer-correct{% else %}answer-incorrect{% endif %}{% endif %}">
+                {% include "dysleksi/admin/part_response/group/column_resource.html" with resource=possible_answer.resource %}
+            </div>
+            {% endif %}
+        {% endfor %}
+        </div>
+    {% elif question_type == QuestionType.FREE_TEXT %}
+        <div class="answer
+            {% if record.correct %}answer-correct
+            {% else %}answer-incorrect
+            {% endif %}
+        ">{{ record.answer_text|default_if_none:"&nbsp;" }}</div>
+    {% endif %}
+{% endwith %}

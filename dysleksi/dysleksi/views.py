@@ -48,6 +48,7 @@ from dysleksi.models import (
     PartResponseQuerySet,
     PossibleAnswer,
     QuestionResponse,
+    QuestionType,
     ReadingSpeedCategory,
     Student,
     Test,
@@ -64,6 +65,7 @@ from dysleksi.tables import (
     ClassTable,
     EmptyColumn,
     PartResultTable,
+    QuestionResponsesTable,
     ReadingWordCountResultsTable,
     ReadingWordLengthResultsTable,
     StudentTable,
@@ -1001,4 +1003,50 @@ class PartResponseView(LoginRequiredMixin, DetailView):
                     for lower, upper in self.part.answer_wordcount_data_ranges
                 ]
             )
+
+        # Find ud af hvilken kolonne vi skal vise for "challenge"
+        # (billede, tekst eller lyd)
+        count_type_qs = (
+            self.get_questionresponse_qs()
+            .filter(question__is_practice=False)
+            .aggregate(
+                image=Count(
+                    "id",
+                    filter=Q(question__challenge__image__isnull=False)
+                    & ~Q(question__challenge__image=""),
+                ),
+                text=Count("id", filter=Q(question__challenge__text__isnull=False)),
+                sound=Count(
+                    "id",
+                    filter=Q(question__challenge__sound__isnull=False)
+                    & ~Q(question__challenge__sound=""),
+                ),
+                teacher_judged=Count(
+                    "id",
+                    filter=Q(
+                        question__possible_answers__resource__text__in=("true", "false")
+                    ),
+                ),
+            )
+        )
+        if count_type_qs["teacher_judged"] > 0:
+            show_type = "image"
+        else:
+            show_type = max(count_type_qs, key=lambda t: count_type_qs[t])
+
+        exclude_columns = [
+            f"challenge_{x}" for x in ("image", "text", "sound") if x != show_type
+        ]
+        if count_type_qs["teacher_judged"] == 0:
+            exclude_columns.append("challenge_sentence")
+
+        context["responses_table"] = QuestionResponsesTable(
+            data=self.get_questionresponse_qs().select_related(
+                "question", "question__challenge"
+            ),
+            exclude=exclude_columns,
+        )
+
+        context["QuestionType"] = QuestionType
+
         return context

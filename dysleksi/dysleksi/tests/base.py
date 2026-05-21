@@ -160,6 +160,17 @@ class DysleksiTest(TestCase):
         )
 
     @classmethod
+    def create_sentencereading_part(cls):
+        # TODO: Move other test creations into methods like this,
+        # and let individual Test classes decide what to initialize
+        cls.sentencereading_part, _ = TestPart.objects.get_or_create(
+            name="GroupTestPart2",
+            timeout=60000,
+            partial_score_after=30000,
+        )
+        cls.group_test.parts.add(cls.sentencereading_part)
+
+    @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
@@ -244,9 +255,11 @@ class DysleksiTest(TestCase):
 
 
 class ResponseTest(DysleksiTest):
+
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        tz = timezone.get_current_timezone()
 
         call_command("create_result_categories")
 
@@ -303,7 +316,6 @@ class ResponseTest(DysleksiTest):
             assignment=cls.test_assignment_class, student=student2, completed=True
         )
 
-        tz = timezone.get_current_timezone()
         cls.group_partresponse_1 = PartResponse.objects.create(
             testresponse=cls.group_testresponse_1,
             testpart=cls.group_test_part,
@@ -398,3 +410,49 @@ class ResponseTest(DysleksiTest):
             2026, 5, 1, 12, 0, 55, tzinfo=tz
         )
         cls.group_questionresponse_2_4.save()
+
+    @classmethod
+    def create_sentencereading_part(cls):
+        super().create_sentencereading_part()
+        tz = timezone.get_current_timezone()
+        cls.sentencereading_question = TestQuestion.objects.create(
+            part=cls.sentencereading_part,
+            challenge=cls.resource1,
+            reminder=5000,
+            reminder_source=cls.resource4,
+            hint_source=cls.resource4,
+        )
+        cls.sentencereading_resource_1 = TestResource.objects.create(
+            name="TestResource5a",
+            text="true",
+        )
+        cls.sentencereading_option_1 = PossibleAnswer.objects.create(
+            question=cls.sentencereading_question,
+            resource=cls.sentencereading_resource_1,
+            is_correct=True,
+        )
+        cls.sentencereading_resource_2 = TestResource.objects.create(
+            name="TestResource5b",
+            text="false",
+        )
+        cls.sentencereading_option_2 = PossibleAnswer.objects.create(
+            question=cls.sentencereading_question,
+            resource=cls.sentencereading_resource_2,
+            is_correct=False,
+        )
+        cls.sentencereading_partresponse_1 = PartResponse.objects.create(
+            testresponse=cls.group_testresponse_1,
+            testpart=cls.sentencereading_part,
+            completed=True,
+            started_at=datetime(2026, 5, 1, 12, 0, 0, tzinfo=tz),
+        )
+        cls.sentencereading_questionresponse_1 = QuestionResponse.objects.create(
+            partresponse=cls.sentencereading_partresponse_1,
+            question=cls.sentencereading_question,
+            correct=True,
+            answer_option=cls.sentencereading_option_1,
+        )
+        cls.sentencereading_questionresponse_1.submitted_at = datetime(
+            2026, 5, 1, 12, 0, 40, tzinfo=tz
+        )
+        cls.sentencereading_questionresponse_1.save()

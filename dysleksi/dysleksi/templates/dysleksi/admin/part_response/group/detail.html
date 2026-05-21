@@ -60,7 +60,7 @@
         <div class="col-6 autocolumn-col">
 
 
-        <div id="totalt_resultat" class="card autocolumn-item">
+        <div id="totalt_resultat" class="card result-card autocolumn-item">
             <div class="card-header">
                 {% translate "Totalt resultat" %}
             </div>
@@ -160,7 +160,7 @@
         </div>
 
         {% if timeslot_table %}
-            <div id="fordeling på tid" class="card autocolumn-item">
+            <div id="fordeling på tid" class="card result-card autocolumn-item">
                 <div class="card-header">
                     {% translate "Fordeling på tid" %}
                 </div>
@@ -172,7 +172,7 @@
 
 
         {% if wordlength_table %}
-            <div id="fordeling_på_ordlængde" class="card autocolumn-item">
+            <div id="fordeling_på_ordlængde" class="card result-card autocolumn-item">
                 <div class="card-header">
                     {% translate "Fordeling på ordlængde" %}
                 </div>
@@ -183,7 +183,7 @@
         {% endif %}
 
         {% if wordcount_table %}
-            <div id="fordeling_på_sætningslængde" class="card autocolumn-item">
+            <div id="fordeling_på_sætningslængde" class="card result-card autocolumn-item">
                 <div class="card-header">
                     {% translate "Fordeling på sætningslængde" %}
                 </div>
@@ -218,7 +218,7 @@
                 // There is room in this column for the entire item
                 column_heights[column_index] += item_height;
                 columns[column_index].append(item);
-            } else if (remaining_space > item_height/columns_count) {
+            } else if (remaining_space >= item_height/columns_count) {
                 // There is a bit of room, and that room is more than this column's fair share of the item
                 column_heights[column_index] += item_height;
                 columns[column_index].append(item);
@@ -234,5 +234,21 @@
 
     </script>
 
+    <h6>{% translate "Elevens svar" %}</h6>
+    <div class="row">
+        <div class="col-12">
+            {% render_table responses_table %}
+        </div>
+    </div>
+
     {% endwith %}
+{% endblock %}
+
+
+{% block js_module %}
+{{ block.super }}
+    <script type="module">
+    import { initialize_audio_players } from '{% static 'js/admin/audioplayer.js' %}';
+    document.addEventListener("DOMContentLoaded", initialize_audio_players);
+    </script>
 {% endblock %}

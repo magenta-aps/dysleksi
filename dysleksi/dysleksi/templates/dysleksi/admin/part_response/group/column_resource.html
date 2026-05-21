@@ -1,0 +1,24 @@
+{% load i18n %}
+{% if resource.image %}
+    {% if only_type is None or only_type == "image" %}
+        <img src="{{ resource.image.url }}" class="answer-image"/>
+    {% endif %}
+
+{% elif resource.text %}
+    {% if only_type is None or only_type == "text" %}
+        {% if resource.text == "true" or resource.text == "false" %}
+            <span class="answer-true {% if resource.text == "true" %}answer-selected{% endif %}">{% translate "Korrekt" %}</span><span class="answer-false {% if resource.text == "false" %}answer-selected{% endif %}">{% translate "Forkert" %}</span>
+        {% else %}
+            {{ resource.text }}
+        {% endif %}
+    {% endif %}
+
+{% elif resource.sound %}
+    {% if only_type is None or only_type == "sound"%}
+        <div class="audio">
+            <audio src="{{ resource.sound.url }}" preload="auto"></audio>
+            <i class="ph-fill ph-play"></i>
+            <span class="ms-1"></span>
+        </div>
+    {% endif %}
+{% endif %}

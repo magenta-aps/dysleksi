@@ -444,6 +444,7 @@ textarea.form-control {
   }
 
   .table {
+    margin-bottom: 0;
     tr {
       vertical-align: middle;
     }
@@ -757,32 +758,32 @@ div[data-role='teacher'][data-test-type='individual'] {
       font-family: "Karinika", "DM Sans Regular", sans-serif;
       font-weight: bold;
     }
+  }
+}
 
-    tbody .audio {
-      display: inline-flex;
-      padding: 0.25 * $spacer $spacer 0.25 * $spacer 0.75 * $spacer;
-      background: $mono-gray-lightest;
-      color: $mono-gray-dark-3;
-      border-radius: 0.75 * $spacer;
+.audio {
+  display: inline-flex;
+  padding: 0.25 * $spacer $spacer 0.25 * $spacer 0.75 * $spacer;
+  background: $mono-gray-lightest;
+  color: $mono-gray-dark-3;
+  border-radius: 0.75 * $spacer;
 
-      // Play button
-      i.ph-play { color: $mono-gray-dark-3; }
+  // Play button
+  i.ph-play { color: $mono-gray-dark-3; }
 
-      // Duration
-      span {
-        font-size: 0.75 * $spacer;
-        color: $mono-gray-dark-1;
-      }
+  // Duration
+  span {
+    font-size: 0.75 * $spacer;
+    color: $mono-gray-dark-1;
+  }
 
-      // "Playing" state (inverted colors)
-      &.playing {
-        background: $mono-gray-dark-3;
-        color: $mono-gray-lightest;
+  // "Playing" state (inverted colors)
+  &.playing {
+    background: $mono-gray-dark-3;
+    color: $mono-gray-lightest;
 
-        i.ph-play { color: $mono-gray-lightest }
-        span { color: $mono-gray-light }
-      }
-    }
+    i.ph-play { color: $mono-gray-lightest }
+    span { color: $mono-gray-light }
   }
 }
 
@@ -1106,11 +1107,25 @@ $border-radius-student-card: $spacer / 4 * 3;
     background: $white;
     border: 1px solid $mono-gray-lighter;
     --bs-gutter-x: 0;
+    margin-bottom: 1rem;
+
     .card-header {
       text-align: center;
       font-size: $spacer;
     }
+
+    .card-body {
+      &:has(.table-container:first-child) {
+        padding: 0;
+        .table-container:first-child {
+          padding: 0;
+          border: 0 none;
+        }
+      }
+    }
   }
+
+
 }
 
 .result-score {
@@ -1428,6 +1443,108 @@ $border-radius-student-card: $spacer / 4 * 3;
   }
 
 }
+
+.testresponse-table {
+
+  .column-counter {
+    width: 7.5% !important;
+  }
+  .column-challenge-image {
+    width: 15% !important;
+  }
+  .column-challenge-text {
+    width: 15% !important;
+  }
+  .column-challenge-sound {
+    width: 15% !important;
+  }
+  .column-correct-answer {
+    width: 15% !important;
+  }
+  .column-challenge-sentence {
+    width: 15% !important;
+  }
+  .column-student-answer-time {
+    width: 15% !important;
+  }
+  .column-student-answer {
+    width: 30% !important;
+  }
+  &:has(.column-challenge-sentence) {
+    .column-student-answer {
+      width: 15% !important;
+    }
+  }
+
+  .answer-multiple-choice {
+    white-space: normal; // Allow linebreak
+  }
+
+  .answer {
+    display: inline-block;
+    width: 15%;
+    border-radius: 5px;
+    border-width: 1px;
+    border-style: solid;
+    border-color: $mono-gray-normal;
+    text-align: center;
+
+    &.answer-correct {
+      border-color: $green-darker;
+      border-width: 3px;
+    }
+
+    &.answer-incorrect {
+      border-color: $red-darker-2;
+      border-width: 3px;
+    }
+
+    &.answer-almost-correct {
+      border-color: $yellow-normal;
+      border-width: 3px;
+    }
+  }
+
+  img.answer-image {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .answer-option {
+    display: inline-block;
+  }
+
+  .answer-true {
+    color: $green-darker;
+    border-color: $green-darker;
+    border-width: 1px;
+    border-top-left-radius: 1rem;
+    border-bottom-left-radius: 1rem;
+    border-style: solid;
+    padding: 0.125rem 0.5rem;
+
+    &.answer-selected {
+      color: $white;
+      background-color: $green-darker;
+    }
+  }
+
+  .answer-false {
+    color: $red-darker-2;
+    border-color: $red-darker-2;
+    border-width: 1px;
+    border-top-right-radius: 1rem;
+    border-bottom-right-radius: 1rem;
+    border-style: solid;
+    padding: 0.125rem 0.5rem;
+
+    &.answer-selected {
+      color: $white;
+      background-color: $red-darker-2;
+    }
+  }
+}
+
 
 
 .screening-header {
