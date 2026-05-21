@@ -187,6 +187,45 @@ msgstr ""
 msgid "Sætningslængde (ant. ord)"
 msgstr ""
 
+#: dysleksi/tables.py
+msgid "Opg."
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Billede"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Ord"
+msgstr ""
+
+#: dysleksi/tables.py
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Lyd"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Sætning"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Rigtigt svar"
+msgstr ""
+
+#: dysleksi/tables.py
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+msgid "Elevens svar"
+msgstr ""
+
+#: dysleksi/tables.py dysleksi/templates/dysleksi/admin/modals/assign_base.html
+msgid "Tid"
+msgstr ""
+
+#: dysleksi/tables.py
+#, python-format
+msgid "%(tid)s sek."
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/base.html
 #: dysleksi/templates/dysleksi/admin/modals/base.html
 msgid "Luk"
@@ -237,10 +276,6 @@ msgid "Deltagere og test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_base.html
-msgid "Tid"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Bekræft"
 msgstr ""
 
@@ -283,6 +318,16 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/base.html
 msgid "OK"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/column_resource.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Korrekt"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/column_resource.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Forkert"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
@@ -439,14 +484,6 @@ msgid "Markér svar som:"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Korrekt"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Forkert"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Sprunget over"
 msgstr ""
 
@@ -456,10 +493,6 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Resultat"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Lyd"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html

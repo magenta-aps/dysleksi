@@ -33,7 +33,7 @@ from django.db.models import (
     Window,
 )
 from django.db.models.expressions import OuterRef, Subquery
-from django.db.models.functions import Cast, RowNumber
+from django.db.models.functions import Cast, Coalesce, RowNumber
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -760,6 +760,10 @@ class TestQuestion(models.Model):
         null=True,
     )
 
+    @property
+    def correct_answer(self) -> "PossibleAnswer|None":
+        return self.possible_answers.filter(is_correct=True).first()
+
     def __str__(self) -> str:
         return f"{str(self.part)} / {self.pk}"
 
@@ -911,6 +915,10 @@ class PossibleAnswer(models.Model):
     def __str__(self) -> str:
         return f"{str(self.question)} / {str(self.is_correct)}"
 
+    @property
+    def is_teacher_judged(self):
+        return self.resource.text in ("true", "false")
+
 
 class TestResponseQuerySet(QuerySet):
 
@@ -1044,14 +1052,17 @@ class PartResponseQuerySet(QuerySet):
             filter = Q()
         return self.annotate(
             **{
-                output_key: Subquery(
-                    QuestionResponse.objects.filter(
-                        partresponse=OuterRef("pk"),
-                    )
-                    .filter(filter)
-                    .values("partresponse")
-                    .annotate(count=Count("id"))
-                    .values("count")
+                output_key: Coalesce(
+                    Subquery(
+                        QuestionResponse.objects.filter(
+                            partresponse=OuterRef("pk"),
+                        )
+                        .filter(filter)
+                        .values("partresponse")
+                        .annotate(count=Count("id"))
+                        .values("count")
+                    ),
+                    0,
                 )
             }
         )
@@ -1063,14 +1074,17 @@ class PartResponseQuerySet(QuerySet):
             filter = Q()
         return self.annotate(
             **{
-                output_key: Subquery(
-                    TestQuestion.objects.filter(
-                        part=OuterRef("testpart"),
-                    )
-                    .filter(filter)
-                    .values("part")
-                    .annotate(count=Count("id"))
-                    .values("count")
+                output_key: Coalesce(
+                    Subquery(
+                        TestQuestion.objects.filter(
+                            part=OuterRef("testpart"),
+                        )
+                        .filter(filter)
+                        .values("part")
+                        .annotate(count=Count("id"))
+                        .values("count")
+                    ),
+                    0,
                 )
             }
         )

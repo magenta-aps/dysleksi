@@ -757,6 +757,12 @@ class TestTestResponseView(ResponseTest):
 
 
 class TestPartResponseView(ResponseTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_sentencereading_part()
+
     def test_get_object(self):
         view = self.setup_view(
             PartResponseView,
@@ -797,7 +803,7 @@ class TestPartResponseView(ResponseTest):
                 self.teacher,
                 assignment_pk=self.test_assignment_class.pk,
                 testresponse_pk=self.group_testresponse_1.pk,
-                testpart_pk=self.group_test_part.pk + 1,
+                testpart_pk=self.group_test_part.pk + 100,
             )
 
     def test_word_length_table(self):
@@ -932,3 +938,15 @@ class TestPartResponseView(ResponseTest):
         self.assertFalse("timeslot_table" in context)
         self.assertFalse("wordcount_table" in context)
         self.assertFalse("wordlength_table" in context)
+
+    def test_answer_table_sentence_reading(self):
+        view = self.setup_view(
+            PartResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testresponse_pk=self.group_testresponse_1.pk,
+            testpart_pk=self.sentencereading_part.pk,
+        )
+        context = view.get_context_data()
+        table = context["responses_table"]
+        self.assertNotIn("challenge_sentence", table.exclude)

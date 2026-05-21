@@ -1,4 +1,5 @@
 from itertools import count
+from math import ceil
 from typing import Callable, List
 
 from django.db.models import QuerySet
@@ -353,3 +354,83 @@ class ReadingWordCountResultsTable(NonOrderableTableMixin, Table):
     word_count = Column(verbose_name=_("Sætningslængde (ant. ord)"))
     questions_count = Column(verbose_name=_("Opgaver"))
     correct_count = Column(verbose_name=_("Rigtige"))
+
+
+class QuestionResponsesTable(NonOrderableTableMixin, Table):
+    class Meta:
+        attrs = {"class": "table testresponse-table"}
+
+    counter = TemplateColumn(
+        "{{ row_counter|add:1 }}",
+        verbose_name=_("Opg."),
+        attrs={
+            "th": {"class": "column-counter"},
+            "td": {"class": "column-counter"},
+        },
+    )
+    challenge_image = TemplateColumn(
+        verbose_name=_("Billede"),
+        template_name="dysleksi/admin/part_response/group/column_challenge.html",
+        extra_context={"only_type": "image"},
+        attrs={
+            "th": {"class": "column-challenge-image"},
+            "td": {"class": "column-challenge-image"},
+        },
+    )
+    challenge_text = TemplateColumn(
+        verbose_name=_("Ord"),
+        template_name="dysleksi/admin/part_response/group/column_challenge.html",
+        extra_context={"only_type": "text"},
+        attrs={
+            "th": {"class": "column-challenge-text"},
+            "td": {"class": "column-challenge-text"},
+        },
+    )
+    challenge_sound = TemplateColumn(
+        verbose_name=_("Lyd"),
+        template_name="dysleksi/admin/part_response/group/column_challenge.html",
+        extra_context={"only_type": "sound"},
+        attrs={
+            "th": {"class": "column-challenge-sound"},
+            "td": {"class": "column-challenge-sound"},
+        },
+    )
+    challenge_sentence = Column(
+        verbose_name=_("Sætning"),
+        accessor="question__challenge__text",
+        attrs={
+            "th": {"class": "column-challenge-sentence"},
+            "td": {"class": "column-challenge-sentence"},
+        },
+    )
+    correct_answer = TemplateColumn(
+        verbose_name=_("Rigtigt svar"),
+        template_name="dysleksi/admin/part_response/group/column_correct.html",
+        attrs={
+            "th": {"class": "column-correct-answer"},
+            "td": {"class": "column-correct-answer"},
+        },
+    )
+    student_answer = TemplateColumn(
+        verbose_name=_("Elevens svar"),
+        template_name="dysleksi/admin/part_response/group/column_answer.html",
+        attrs={
+            "th": {"class": "column-student-answer"},
+            "td": {"class": "column-student-answer"},
+        },
+    )
+    student_answer_time = Column(
+        verbose_name=_("Tid"),
+        accessor="finished_after",
+        footer=lambda column, bound_column, table: table.render_answer_time(
+            sum(bound_column.accessor.resolve(row) or 0 for row in table.data)
+        ),
+        attrs={
+            "th": {"class": "column-student-answer-time"},
+            "td": {"class": "column-student-answer-time"},
+        },
+    )
+
+    def render_answer_time(self, value):
+        # Convert ms to s
+        return _("%(tid)s sek.") % {"tid": ceil(0.001 * value)}
