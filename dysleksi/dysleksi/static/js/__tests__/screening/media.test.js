@@ -1,5 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { TestMediaRecorder } from "../../screening/media";
+/**
+ * @vitest-environment jsdom
+ */
+import { describe, it, expect, expectTypeOf, vi, beforeEach } from "vitest";
+import { AudioDetector, TestMediaRecorder } from "../../screening/media";
+import { MockAudioContext } from "../mock_audio.js";
 
 describe("TestMediaRecorder", () => {
     let recorder;
@@ -171,5 +175,81 @@ describe("TestMediaRecorder", () => {
         // (Note: it might have been called during setup depending on your logic,
         // so we check that it wasn't called with the interval again here)
         expect(mockMediaRecorderInstance.start).not.toHaveBeenCalled();
+    });
+});
+
+describe("AudioDetector", () => {
+    beforeEach(() => {
+        global.window = {
+            AudioContext: MockAudioContext,
+        };
+        global.document.timeline = {
+            currentTime: 0,
+        };
+    });
+
+    const getInstance = (mockData = null) => {
+        const stream = vi.fn();
+        const instance = new AudioDetector(stream);
+        if (mockData !== null) {
+            instance.getBins = () => {
+                return mockData;
+            };
+        }
+        return instance;
+    };
+
+    it("initializes correctly", () => {
+        const instance = getInstance();
+        expect(instance.detectionLevelThreshold).toBe(0.25);
+        expect(instance.debounceTime).toBe(2500.0);
+        expect(instance.state).toBeNull();
+        expect(instance.lastEventAt).toBeNull();
+        expect(instance.analyser).not.toBeNull();
+    });
+
+    it("detects audio", () => {
+        const onDetected = vi.fn();
+        const instance = getInstance([256.0]);
+        instance.addEventListener("audio.detected", onDetected);
+        instance.run();
+        expect(onDetected).toHaveBeenCalled();
+    });
+
+    it("detects quietness", () => {
+        const onQuiet = vi.fn();
+        const instance = getInstance([128.0]);
+        instance.addEventListener("audio.quiet", onQuiet);
+        instance.run();
+        expect(onQuiet).toHaveBeenCalled();
+    });
+
+    it("only dispatches events if state has changed", () => {
+        const onFoo = vi.fn();
+        const instance = getInstance();
+        instance.addEventListener("foo", onFoo);
+        instance.dispatchDebounced("foo");
+        instance.dispatchDebounced("foo");
+        expect(onFoo).toHaveBeenCalledOnce();
+    });
+
+    it("only dispatches events if debounce period has passed", () => {
+        const onFoo = vi.fn();
+        const instance = getInstance();
+        instance.addEventListener("foo", onFoo);
+        // Dispatch initial event and then change state
+        instance.dispatchDebounced("foo");
+        instance.dispatchDebounced("bar");
+        expect(onFoo).toHaveBeenCalledOnce();
+        // Let time pass
+        global.document.timeline.currentTime += 5000;
+        instance.dispatchDebounced("foo");
+        expect(onFoo).toHaveBeenCalledOnce();
+    });
+
+    it("calls the underlying audio analyser", () => {
+        const instance = new AudioDetector(vi.fn());
+        const bins = instance.getBins();
+        expectTypeOf(bins).toEqualTypeOf(Uint8Array);
     });
 });

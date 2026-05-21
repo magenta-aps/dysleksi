@@ -1048,10 +1048,10 @@ export class TeacherView {
                 if (data.event === "test.started") {
                     this.audioIndicator.render(0); // Render initial (inanimate) state
                 }
-                if (data.event === "question.displayed" && !data.practice) {
+                if (data.event === "audio.detected") {
                     this.audioIndicator.start();
                 }
-                if (data.event === "question.answered" && !data.practice) {
+                if (data.event === "audio.quiet") {
                     this.audioIndicator.stop();
                 }
             }

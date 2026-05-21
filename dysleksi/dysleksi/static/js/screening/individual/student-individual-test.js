@@ -1,13 +1,27 @@
 import { StudentTestView } from "../student-test.js";
+import { AudioDetector } from "../media.js";
 
 export class IndividualTestView extends StudentTestView {
     mediaRecorder;
+    audioDetector;
     recordedAudio;
     isPracticing = false;
 
     constructor(test, chatSocket, assignmentId, domElements, mediaRecorder, student) {
         super(test, chatSocket, assignmentId, domElements, student);
         this.mediaRecorder = mediaRecorder;
+        this.audioDetector = new AudioDetector(this.mediaRecorder.stream);
+        for (const event of ["audio.detected", "audio.quiet"]) {
+            this.audioDetector.addEventListener(event, (e) => {
+                this.onAudioEvent(e.type);
+            });
+        }
+        this.audioDetector.run();
+    }
+
+    onAudioEvent(event) {
+        // Pass audio events on to teacher's session
+        this.send({ event: event });
     }
 
     onChatMessage(data) {

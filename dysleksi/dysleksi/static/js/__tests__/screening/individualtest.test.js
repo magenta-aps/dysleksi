@@ -12,6 +12,7 @@ import { StudentTestView } from "../../screening/student-test.js";
 import { spyAttributes } from "../utils.js";
 import * as utils from "../../screening/utils.js";
 import { InstructionSequenceRunner } from "../../screening/instruction.js";
+import { MockAudioContext } from "../mock_audio.js";
 
 const mockP2P = {
     connect: vi.fn(),
@@ -45,6 +46,7 @@ describe("IndividualTestFlow", () => {
         vi.useFakeTimers();
         global.window = {
             location: { protocol: "https:", host: "example.com" },
+            AudioContext: MockAudioContext,
         };
         global.document.timeline = {
             currentTime: 0,
@@ -96,6 +98,7 @@ describe("IndividualTestFlow", () => {
         mediaRecorder = {
             start: vi.fn(),
             stop: vi.fn(),
+            streamn: vi.fn(),
         };
         mediaRecorder.interval = vi.fn().mockResolvedValue("BASE64_AUDIO");
 
@@ -256,7 +259,7 @@ describe("IndividualTestFlow", () => {
         view.setPart(0);
         view.showFirstQuestion(false);
 
-        vi.runAllTimers();
+        vi.advanceTimersByTime(5000);
         expect(view.domElements.playSound).toHaveBeenCalled();
     });
 
@@ -543,6 +546,16 @@ describe("IndividualTestFlow", () => {
         });
         // Assert
         expect(view.showQuestion).toHaveBeenCalledWith(isPractice, newQuestionIndex);
+    });
+
+    it("passes 'audio.detected' and 'audio.quiet' events on to teacher's session", () => {
+        for (const event of ["audio.detected", "audio.quiet"]) {
+            // Act: pretend the audio detector dispatches an event
+            view.audioDetector.dispatchEvent(new Event(event));
+            // Assert that we pass the audio event on
+            expect(view.onAudioEvent).toHaveBeenCalledWith(event);
+            expect(view.send).toHaveBeenCalled();
+        }
     });
 });
 
