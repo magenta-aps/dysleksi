@@ -23,3 +23,8 @@ def assign_individual_modal(form=None, takes_context=True):
     context = get_base_context("assign_individual")
     context["form"] = form
     return context
+
+
+@register.inclusion_tag("dysleksi/admin/modals/error.html")
+def error_modal(takes_context=True):
+    return get_base_context("error")

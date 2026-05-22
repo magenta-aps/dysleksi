@@ -20,6 +20,7 @@ export function initStudent(assignmentId, test, student) {
                         uuid: crypto.randomUUID(),
                         event: "setup.error",
                         error: err.toString(),
+                        studentDisplayName: student.displayName,
                     }),
                 );
             })
