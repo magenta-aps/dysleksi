@@ -7,6 +7,7 @@ from math import ceil
 from typing import Any, Dict, List, Tuple
 
 from django.conf import settings
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import transaction
 from django.db.models import (
     Aggregate,
@@ -25,12 +26,7 @@ from django.db.models import (
 from django.db.models.expressions import BaseExpression, OuterRef, Subquery
 from django.db.models.functions import Coalesce, Length, Replace
 from django.http import HttpResponseRedirect
-from django.http.response import (
-    Http404,
-    HttpResponse,
-    HttpResponseForbidden,
-    JsonResponse,
-)
+from django.http.response import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
@@ -46,6 +42,9 @@ from dysleksi.models import (
     CorrectnessCategory,
     PartResponse,
     PartResponseQuerySet,
+)
+from dysleksi.models import PermissionsMixin as ModelPermissionsMixin
+from dysleksi.models import (
     PossibleAnswer,
     QuestionResponse,
     QuestionType,
@@ -96,6 +95,26 @@ class UserTypeMixin(LoginRequiredMixin):
         return [f"{prefix}/other.html"]
 
 
+class ObjectPermissionsMixin:
+
+    actions_required = ["view"]
+
+    def test_permissions(self, object):
+        # Raises exceptions if user does not have access to the object
+        if not isinstance(object, ModelPermissionsMixin):
+            raise ImproperlyConfigured
+        for action in self.actions_required:
+            if not object.has_permission(self.user, action):
+                raise PermissionDenied(
+                    f"{self.user.username} does not have permissions"
+                )
+
+    def get_object(self, queryset=None):
+        object = super().get_object(queryset)
+        self.test_permissions(object)
+        return object
+
+
 class RootView(UserTypeMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         if not self.user.is_anonymous and self.user.is_teacher:
@@ -112,13 +131,13 @@ class RootView(UserTypeMixin, TemplateView):
         return context_data
 
 
-class AssignmentView(UserTypeMixin, DetailView):
+class AssignmentView(UserTypeMixin, ObjectPermissionsMixin, DetailView):
 
     model = TestAssignment
     context_object_name = "test_assignment"
 
     def get_template_names(self) -> list[str]:
-        if self.user.is_teacher:
+        if self.user.is_superuser or self.user.is_teacher:
             if self.object.test.test_type == TestType.INDIVIDUAL:
                 return ["dysleksi/admin/test_assignment/detail_individual.html"]
             else:
@@ -127,9 +146,9 @@ class AssignmentView(UserTypeMixin, DetailView):
         return super().get_template_names()
 
     def get_template_prefix(self) -> str:
-        if self.user.is_teacher or self.user.is_student:
+        if self.user.is_superuser or self.user.is_teacher or self.user.is_student:
             return "dysleksi/screening"
-        raise ValueError("User is neither teacher nor student")
+        raise ValueError("User is neither teacher nor student")  # pragma: no cover
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -171,9 +190,7 @@ class ClassListView(GroupRequiredMixin, SingleTableView):
     template_name = "dysleksi/admin/class/list.html"
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        # Only show classes belonging to the teacher viewing the page
-        qs = qs.filter(institution=self.user.institution, teachers=self.user)
+        qs = super().get_queryset().filter_user_permissions(self.user, "view")
         # Only classes in the current school year
         # qs = qs.current()
         # Add annotations used by `ClassTable`
@@ -205,7 +222,7 @@ class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
     def get_queryset(self):
         qs = super().get_queryset()
         # Only show test assignments belonging to the teacher viewing the page
-        qs = qs.filter(teacher=self.user)
+        qs = qs.filter_user_permissions(self.user, "view")
         # Add annotations used by `TestAssignmentTable`
         qs = qs.annotate(
             number_of_students=Case(
@@ -243,10 +260,11 @@ class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
         return context
 
 
-class StartAssignmentView(CreateView):
+class StartAssignmentView(GroupRequiredMixin, CreateView):
     template_name = "dysleksi/lobby/start_room.html"
     model = TestAssignment
     http_method_names = ["post"]
+    groups_required = [TEACHERS]
     test_type: TestType | None = None  # overridden in subclasses
 
     def get_form_kwargs(self):
@@ -335,7 +353,9 @@ class PartPaginationMixin:
         return self.get_parts()[start:end]
 
 
-class AssignmentResultsView(GroupRequiredMixin, PartPaginationMixin, DetailView):
+class AssignmentResultsView(
+    GroupRequiredMixin, PartPaginationMixin, ObjectPermissionsMixin, DetailView
+):
     groups_required = [TEACHERS]
     model = TestAssignment
     table_class = TestResultTable
@@ -507,24 +527,11 @@ class AssignmentResultsView(GroupRequiredMixin, PartPaginationMixin, DetailView)
         return context_data
 
 
-class AssignmentResultsFlagView(LoginRequiredMixin, UpdateView):
+class AssignmentResultsFlagView(GroupRequiredMixin, ObjectPermissionsMixin, UpdateView):
     model = TestResponse
     fields = ("flagged",)
-
-    def dispatch(self, request, *args, **kwargs):
-        if not (
-            self.user.is_superuser
-            or (
-                isinstance(self.user, User)
-                and self.user.is_teacher
-                and self.user.institution is not None
-                and self.user.institution.students.filter(
-                    responses__pk=self.kwargs.get(self.pk_url_kwarg)
-                ).exists()
-            )
-        ):
-            return HttpResponseForbidden()
-        return super().dispatch(request, *args, **kwargs)
+    groups_required = [TEACHERS]
+    actions_required = ["view", "change"]
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -535,7 +542,7 @@ class AssignmentResultsFlagView(LoginRequiredMixin, UpdateView):
         return JsonResponse({"flagged": self.object.flagged})
 
 
-class AssignmentPartResultsView(GroupRequiredMixin, ListView):
+class AssignmentPartResultsView(GroupRequiredMixin, ObjectPermissionsMixin, ListView):
     groups_required = [TEACHERS]
     model = PartResponse
     table_class = PartResultTable
@@ -545,6 +552,7 @@ class AssignmentPartResultsView(GroupRequiredMixin, ListView):
         self.assignment = get_object_or_404(
             TestAssignment, pk=self.kwargs["assignment_pk"]
         )
+        self.test_permissions(self.assignment)
         self.part = get_object_or_404(TestPart, pk=self.kwargs["testpart_pk"])
         return super().get(request, *args, **kwargs)
 
@@ -634,17 +642,22 @@ class AssignmentPartResultsView(GroupRequiredMixin, ListView):
         ]
 
 
-class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
+class TestResponseView(
+    GroupRequiredMixin, PartPaginationMixin, ObjectPermissionsMixin, DetailView
+):
     model = TestResponse
     template_name = "dysleksi/admin/test_response/group/detail.html"
     chart_template_name = "dysleksi/admin/test_response/group/chart.html"
+    groups_required = [TEACHERS]
 
     def get_object(self, queryset=...):
-        return get_object_or_404(
+        object = get_object_or_404(
             TestResponse,
             assignment=self.kwargs["assignment_pk"],
             pk=self.kwargs["response_pk"],
         )
+        self.test_permissions(object)
+        return object
 
     def get_parts(self) -> QuerySet[TestPart]:
         return self.object.assignment.test.parts.all().order_by("pk")
@@ -776,9 +789,10 @@ class TestResponseView(LoginRequiredMixin, PartPaginationMixin, DetailView):
         return context
 
 
-class PartResponseView(LoginRequiredMixin, DetailView):
+class PartResponseView(GroupRequiredMixin, ObjectPermissionsMixin, DetailView):
     model = PartResponse
     template_name = "dysleksi/admin/part_response/group/detail.html"
+    groups_required = [TEACHERS]
 
     def get_object(self, queryset=...):
         qs = (
@@ -808,6 +822,7 @@ class PartResponseView(LoginRequiredMixin, DetailView):
             raise Http404(
                 "No %s matches the given query." % PartResponse._meta.object_name
             )
+        self.test_permissions(object)
         return object
 
     @cached_property

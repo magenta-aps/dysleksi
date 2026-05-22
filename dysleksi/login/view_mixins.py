@@ -60,7 +60,10 @@ class GroupRequiredMixin(LoginRequiredMixin):
         return q
 
     def get(self, request, *args, **kwargs):
-        if request.user.groups.filter(self.get_group_filter()).exists():
+        if (
+            request.user.is_superuser
+            or request.user.groups.filter(self.get_group_filter()).exists()
+        ):
             return super().get(request, *args, **kwargs)
         else:
             raise PermissionDenied

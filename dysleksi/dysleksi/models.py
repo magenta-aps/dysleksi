@@ -143,6 +143,97 @@ class User(AbstractUser):
         return self
 
 
+class PermissionsQuerySet(QuerySet):
+    class Meta:
+        abstract = True
+
+    @property
+    def model_name(self):
+        raise NotImplementedError  # pragma: no cover
+
+    def permission_name(self, action: str) -> str:
+        return f"dysleksi.{action}_{self.model_name}".lower()
+
+    def filter_user_permissions(self, user: User, action: str) -> QuerySet:
+        if user.is_anonymous or not user.is_active:
+            return self.none()
+        if user.is_superuser:
+            return self
+        if user.has_perm(self.permission_name(action), None):
+            logger.debug(
+                "user %s has class-level permissions to class %s",
+                user.username,
+                self.model_name,
+            )
+            # User has permission for all instances through
+            # the standard Django permission system
+            return self
+
+        qs1 = self.filter_user_object_permissions(user, action)
+        if qs1 is not None:
+            pks = [str(x) for x in qs1.values_list("pk", flat=True)]
+            logger.debug(
+                "user %s has object-level permissions to items [%s] of class %s",
+                user.username,
+                ",".join(pks),
+                self.model_name,
+            )
+            # User has permission to these specific instances
+            return qs1
+        return self.none()
+
+    def filter_user_object_permissions(self, user: User, action: str) -> QuerySet:
+        # Override in subclasses as needed
+        return self.none()  # pragma: no cover
+
+    def get(self, *args, **kwargs):
+        object = super().get(*args, **kwargs)
+        return object
+
+
+class PermissionsMixin:
+    def has_permission(self, user: User, action: str) -> bool:
+        if user.is_anonymous or not user.is_active:
+            return False
+        if user.is_superuser:
+            return True
+        manager: PermissionsQuerySet = (
+            self.__class__.objects  # type: ignore[attr-defined]
+        )
+        model_name = self._meta.model_name  # type: ignore[attr-defined]
+        if user.has_perm(manager.permission_name(action), None):
+            # User has permission for all instances through
+            # the standard Django permission system
+            logger.debug(
+                "user %s has class-level permissions to class %s",
+                user.username,
+                model_name,
+            )
+            return True
+        if self.has_object_permission(user, action):
+            # User has permission to this specific instance
+            logger.debug(
+                "user %s has object-level permissions to item %d of class %s",
+                user.username,
+                self.pk,  # type: ignore[attr-defined]
+                model_name,
+            )
+            return True
+        return False
+
+    def has_object_permission(self, user: User, action: str) -> bool:
+        # Use implementation in QuerySet
+        # override in subclass if you need something else
+        manager: PermissionsQuerySet = (
+            self.__class__.objects  # type: ignore[attr-defined]
+        )
+        return (
+            manager.filter(pk=self.pk)  # type: ignore[attr-defined]
+            .filter_user_permissions(user, action)
+            .exists()
+        )
+
+
 class Institution(models.Model):
     name = models.CharField(
         max_length=100,
@@ -191,15 +282,28 @@ def on_update_teacher(sender, instance: Teacher, created: bool, **kwargs):
         instance.groups.add(Group.objects.get(name=TEACHERS))
 
 
-class ClassQuerySet(QuerySet):
+class ClassQuerySet(PermissionsQuerySet):
+
     def current(self):
         today = date.today()
         return self.filter(
             school_year_start=today.year if today.month >= 7 else today.year - 1
         )
 
+    @property
+    def model_name(self):
+        return "Class"
 
-class Class(models.Model):
+    def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_teacher:
+            return self.filter(
+                institution=user.institution,  # type: ignore[attr-defined]
+                teachers=user,
+            )
+        return self.none()
+
+
+class Class(PermissionsMixin, models.Model):
 
     objects = ClassQuerySet.as_manager()
 
@@ -420,7 +524,20 @@ class PlannedDateTime(models.Model):
         return str(self.period)
 
 
-class TestAssignment(models.Model):
+class TestAssignmentQuerySet(PermissionsQuerySet):
+
+    @property
+    def model_name(self):
+        return "TestAssignment"
+
+    def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_teacher:
+            return self.filter(teacher=user)
+        if user.is_student:
+            return self.filter(Q(student=user) | Q(klasse__students=user))
+
+
+class TestAssignment(PermissionsMixin, models.Model):
     class Meta:
         constraints = [
             models.CheckConstraint(
@@ -429,6 +546,8 @@ class TestAssignment(models.Model):
                 name="student_or_class_must_be_set",
             )
         ]
+
+    objects = TestAssignmentQuerySet.as_manager()
 
     test = models.ForeignKey(
         Test,
@@ -920,7 +1039,16 @@ class PossibleAnswer(models.Model):
         return self.resource.text in ("true", "false")
 
 
-class TestResponseQuerySet(QuerySet):
+class TestResponseQuerySet(PermissionsQuerySet):
+
+    @property
+    def model_name(self):
+        return "Class"
+
+    def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_teacher:
+            return self.filter(assignment__teacher=user)
+        return self.none()
 
     def annotate_correct_count(
         self, output_key: str, filter: Q | None = None
@@ -991,7 +1119,7 @@ class TestResponseQuerySet(QuerySet):
         return self.annotate(**{output_key: Case(*cases, default=Value(default_key))})
 
 
-class TestResponse(models.Model):
+class TestResponse(PermissionsMixin, models.Model):
 
     objects = TestResponseQuerySet.as_manager()
 
@@ -1043,7 +1171,16 @@ class TestResponse(models.Model):
         return f"{str(self.assignment)} / {str(self.student)}"
 
 
-class PartResponseQuerySet(QuerySet):
+class PartResponseQuerySet(PermissionsQuerySet):
+
+    @property
+    def model_name(self):
+        return "PartResponse"
+
+    def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_teacher:
+            return self.filter(testresponse__assignment__teacher=user)
+        return self.none()
 
     def annotate_questionresponses_count(
         self, output_key: str, filter: Q | None = None
@@ -1153,7 +1290,7 @@ class PartResponseQuerySet(QuerySet):
         return self.annotate(**{output_key: Case(*cases, default=Value(default_key))})
 
 
-class PartResponse(models.Model):
+class PartResponse(PermissionsMixin, models.Model):
 
     objects = PartResponseQuerySet.as_manager()
 
@@ -1194,7 +1331,22 @@ class PartResponse(models.Model):
         return CorrectnessCategory.categorize_proportion(correct_proportion_of_answered)
 
 
-class QuestionResponse(models.Model):
+class QuestionResponseQuerySet(PermissionsQuerySet):
+
+    @property
+    def model_name(self):
+        return "QuestionResponse"
+
+    def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_teacher:
+            return self.filter(partresponse__testresponse__assignment__teacher=user)
+        return self.none()
+
+
+class QuestionResponse(PermissionsMixin, models.Model):
+
+    objects = QuestionResponseQuerySet.as_manager()
+
     question = models.ForeignKey(
         TestQuestion,
         on_delete=models.CASCADE,
