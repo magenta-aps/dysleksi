@@ -78,7 +78,6 @@ const SHARED_DOM_HTML = `
             </div>
         </div>
     </div>
-    <button id="end-summary"></button>
     <div id="question-challenge"></div>
     <div id="choices" class="multiple-choice-choices"></div>
     <div id="multiple-choice-match-container" class="multiple-choice-match-container" style="display: none;">
@@ -88,15 +87,34 @@ const SHARED_DOM_HTML = `
     <button id="next"></button>
     <button id="repeat"></button>
     <button id="log-out"></button>
+    <button id="end-intro"></button>
+    <button id="end-break"></button>
+    <button id="end-summary"></button>
+    <button id="skip-summary"></button>
+    <button id="end-testpart-outro"></button>
+    <button id="skip-sound-calibration"></button>
     <div id="test-summary"></div>
     <div id="test-exit"></div>
-    <div id="testpart-intro"></div>
+    <div id="testpart-outro"></div>
     <div id="test-intro"></div>
+    <div id="test-break"></div>
+    <div id="test-sound-calibration" class="center-screen" style="display: none">
+        <i id="speaker" class="ph-fill ph-speaker-none"></i>
+    
+        <div class="center-content">
+    
+            <img src="images/talking_face.png"
+                 alt="talkingSmiley"
+                 class="smiley-button"
+                 id="sound-calibration-animation">
+    
+            <button class="btn start-btn" id="end-sound-calibration"></button>
+        </div>
+    </div>
     <div id="test-container"></div>
     <button id="start-testpart"></button>
-    <button id="start-summary"></button>
-    <h2 id="testpart-intro-text"> </h2>
-    <img src="/foo" alt="img" id="testpart-intro-image">
+    <h2 id="testpart-outro-text"> </h2>
+    <img src="/foo" alt="img" id="testpart-outro-image">
     <button id="start-practice"></button>
     <button id="start-questions"></button>
     <div id="instructions-text"></div>
@@ -264,18 +282,18 @@ describe("GroupTestFlow", () => {
         view.previousPart = null;
 
         // 2. Trigger the method
-        view.showTestPartIntro();
+        view.startTestPartOutro();
 
         // 3. Assertions
         // It should show the intro container...
-        expect(domElements.showTestPartIntro).toHaveBeenCalled();
+        expect(domElements.showTestPartOutro).toHaveBeenCalled();
         // ...but specifically hide the "success/progress" image because it's the first part
-        expect(domElements.hideTestPartIntroImage).toHaveBeenCalled();
+        expect(domElements.hideTestPartOutroImage).toHaveBeenCalled();
         // Verify the "show" version was NOT called
-        expect(domElements.showTestPartIntroImage).not.toHaveBeenCalled();
+        expect(domElements.showTestPartOutroImage).not.toHaveBeenCalled();
     });
 
-    it("should show the test part intro image when moving from part 0 to part 1", () => {
+    it("should show the test part outro image when moving from part 0 to part 1", () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
         testSpy(view);
@@ -285,14 +303,14 @@ describe("GroupTestFlow", () => {
         view.setPart(1); // This moves currentPart to previousPart
 
         // 2. Trigger the method
-        view.showTestPartIntro();
+        view.startTestPartOutro();
 
         // 3. Assertions
-        expect(domElements.showTestPartIntroImage).toHaveBeenCalled();
-        expect(domElements.setTestPartIntroText).toHaveBeenCalledWith(
+        expect(domElements.showTestPartOutroImage).toHaveBeenCalled();
+        expect(domElements.setTestPartOutroText).toHaveBeenCalledWith(
             expect.stringContaining(test.parts[0].name),
         );
-        expect(domElements.hideTestPartIntroImage).not.toHaveBeenCalled();
+        expect(domElements.hideTestPartOutroImage).not.toHaveBeenCalled();
     });
 
     it("should setup and show skip buttons when instruction sequence starts", async () => {
@@ -407,7 +425,7 @@ describe("GroupTestFlow", () => {
         ).toThrowError("Test has no parts");
     });
 
-    it("Render Summary when canPractice() = true", () => {
+    it("Render Summary", () => {
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
@@ -417,7 +435,8 @@ describe("GroupTestFlow", () => {
         view.startSummary();
 
         expect(domElements.showSummary).toHaveBeenCalled();
-        expect(domElements.setEndSummaryButtonListener).toHaveBeenCalledWith(
+        expect(domElements._setButtonListener).toHaveBeenCalledWith(
+            view.domElements.endSummaryButton,
             expect.any(Function),
         );
 
@@ -425,41 +444,22 @@ describe("GroupTestFlow", () => {
         expect(view.endSummary).toHaveBeenCalled();
     });
 
-    it("Render Summary when canPractice() = false", () => {
-        const testData = JSON.parse(JSON.stringify(groupTestData));
-
-        // Ensure first part has no practice questions
-        testData.parts[0].practice = [];
-
-        const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
-        testSpy(view);
-
-        view.start();
-        view.startSummary();
-
-        expect(domElements.showSummary).toHaveBeenCalled();
-        expect(domElements.setEndSummaryButtonListener).toHaveBeenCalledWith(
-            expect.any(Function),
-        );
-    });
-
     it("Render intro and startSummary", () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
 
-        const showIntroSpy = vi.spyOn(view, "showIntro");
-        const startSummarySpy = vi.spyOn(view, "startSummary");
+        const startIntroSpy = vi.spyOn(view, "startIntro");
+        const startSoundCalibrationSpy = vi.spyOn(view, "startSoundCalibration");
 
         view.start();
 
         expect(view.currentPart).toBe(test.parts[0]);
-        expect(showIntroSpy).toHaveBeenCalled();
+        expect(startIntroSpy).toHaveBeenCalled();
 
-        // simulate user pressing the "start summary" button
-        domElements.startSummaryButton.click();
+        // When the user ends the intro, the sound calibration starts
+        domElements.endIntroButton.click();
 
-        expect(startSummarySpy).toHaveBeenCalled();
+        expect(startSoundCalibrationSpy).toHaveBeenCalled();
     });
 
     it("Ends summary and displays practice question", () => {
@@ -499,6 +499,197 @@ describe("GroupTestFlow", () => {
         expect(view.currentQuestionIndex).toBe(0);
         expect(view.isPracticing).toBe(false);
         expect(view.showFirstQuestion).toHaveBeenCalledWith(false);
+    });
+
+    it("Guides the student through sound calibration", async () => {
+        const testData = JSON.parse(JSON.stringify(groupTestData));
+        const test = new Test(testData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        domElements.playSound.mockResolvedValue();
+        view.start();
+        view.startSoundCalibration();
+        vi.spyOn(view, "endSoundCalibration").mockImplementation(() => {});
+
+        // The "next" button is hidden
+        expect(domElements.endSoundCalibrationButton.style.visibility).toBe("hidden");
+
+        // The smiley image is hidden
+        expect(domElements.soundCalibrationAnimation.style.visibility).toBe("hidden");
+
+        // The speaker icon is animated and voice-over audio starts playing
+        expect(domElements.speakerIcon.classList.contains("playing")).toBe(true);
+        await vi.waitFor(() => {
+            expect(domElements.playSound).toHaveBeenCalledWith(
+                "/static/audio/1t.1.wav",
+                mockAudioContextInstance,
+            );
+            expect(domElements.playSound).toHaveBeenCalledWith(
+                "/static/audio/1t.2.wav",
+                mockAudioContextInstance,
+            );
+        });
+
+        // After the voice-over finishes, the speaker icon stops animating
+        expect(domElements.speakerIcon.classList.contains("playing")).toBe(false);
+
+        // The smiley appears, ready for the student to click. It is not talking
+        await vi.waitFor(() => {
+            expect(domElements.soundCalibrationAnimation.style.visibility).toBe(
+                "visible",
+            );
+            expect(domElements.soundCalibrationAnimation.src.endsWith("png")).toBe(
+                true,
+            );
+        });
+
+        // Click the smiley
+        domElements.soundCalibrationAnimation.click();
+
+        // The smiley now starts talking
+        await vi.waitFor(() => {
+            expect(domElements.startSoundCalibrationAnimation).toHaveBeenCalled();
+            expect(domElements.playSound).toHaveBeenCalledWith(
+                "/static/audio/1t.3.wav",
+                mockAudioContextInstance,
+            );
+            expect(domElements.soundCalibrationAnimation.src.endsWith("gif")).toBe(
+                true,
+            );
+        });
+
+        // The smiley stops talking when the audio is finished
+        await vi.waitFor(() => {
+            expect(domElements.stopSoundCalibrationAnimation).toHaveBeenCalled();
+            expect(domElements.soundCalibrationAnimation.src.endsWith("png")).toBe(
+                true,
+            );
+        });
+
+        // The voice-over starts talking again.
+        await vi.waitFor(() => {
+            expect(domElements.playSound).toHaveBeenCalledWith(
+                "/static/audio/1t.4.wav",
+                mockAudioContextInstance,
+            );
+        });
+
+        // The "next" button appears when the voice-over is finished
+        expect(domElements.endSoundCalibrationButton.style.visibility).toBe("visible");
+
+        // The student can click the smiley again if he wants to test his sound
+        domElements.startSoundCalibrationAnimation.mockClear();
+        domElements.playSound.mockClear();
+        domElements.soundCalibrationAnimation.click();
+
+        await vi.waitFor(() => {
+            expect(domElements.startSoundCalibrationAnimation).toHaveBeenCalled();
+            expect(domElements.playSound).toHaveBeenCalledWith(
+                "/static/audio/1t.3.wav",
+                mockAudioContextInstance,
+            );
+
+            // Clicking again while the smiley is talking won't do a thing
+            domElements.startSoundCalibrationAnimation.mockClear();
+            domElements.soundCalibrationAnimation.click();
+            expect(domElements.startSoundCalibrationAnimation).not.toHaveBeenCalled();
+        });
+
+        domElements.endSoundCalibrationButton.click();
+        expect(view.endSoundCalibration).toHaveBeenCalled();
+    });
+
+    it("Skips sound calibration if the debug button is clicked", async () => {
+        const testData = JSON.parse(JSON.stringify(groupTestData));
+        const test = new Test(testData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        domElements.playSound.mockResolvedValue();
+        view.start();
+        view.startSoundCalibration();
+        vi.spyOn(view, "endSoundCalibration").mockImplementation(() => {});
+
+        domElements.skipSoundCalibrationButton.click();
+        expect(view.endSoundCalibration).toHaveBeenCalled();
+    });
+
+    it("Guides the student through the summary", async () => {
+        const testData = JSON.parse(JSON.stringify(groupTestData));
+        const test = new Test(testData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        domElements.playSound.mockResolvedValue();
+        view.start();
+        view.startSummary();
+        vi.spyOn(view, "endSummary").mockImplementation(() => {});
+
+        // The "next" button is hidden
+        expect(domElements.endSummaryButton.style.visibility).toBe("hidden");
+
+        // The voice-over audio starts playing
+        await vi.waitFor(() => {
+            expect(domElements.playSound).toHaveBeenCalledWith(
+                "/static/audio/1t.5.wav",
+                mockAudioContextInstance,
+            );
+        });
+        await vi.waitFor(() => {
+            expect(domElements.playSound).toHaveBeenCalledWith(
+                "/static/audio/1t.6.wav",
+                mockAudioContextInstance,
+            );
+        });
+        await vi.waitFor(() => {
+            expect(domElements.playSound).toHaveBeenCalledWith(
+                "/static/audio/1t.7.wav",
+                mockAudioContextInstance,
+            );
+        });
+
+        // After the voice-over finishes, the next button is visible
+        expect(domElements.endSummaryButton.style.visibility).toBe("visible");
+
+        // Clicking it ends the summary
+        domElements.endSummaryButton.click();
+        expect(view.endSummary).toHaveBeenCalled();
+    });
+
+    it("Allows skipping the summary with the debug button", async () => {
+        const testData = JSON.parse(JSON.stringify(groupTestData));
+        const test = new Test(testData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        domElements.playSound.mockResolvedValue();
+        view.start();
+        view.startSummary();
+        vi.spyOn(view, "endSummary").mockImplementation(() => {});
+
+        domElements.skipSummaryButton.click();
+        expect(view.endSummary).toHaveBeenCalled();
+    });
+
+    it("Moves on to the summary when sound calibration is ended", () => {
+        const testData = JSON.parse(JSON.stringify(groupTestData));
+
+        const test = new Test(testData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        testSpy(view);
+        view.start();
+        view.endSoundCalibration();
+
+        expect(view.startSummary).toHaveBeenCalled();
+    });
+
+    it("Moves on to the first question when sound calibration is ended ", () => {
+        const testData = JSON.parse(JSON.stringify(groupTestData));
+
+        // Ensure there is only one testpart; A summary is never displayed if there
+        // is only a single test part
+        testData.parts = testData.parts.slice(0, 1);
+
+        const test = new Test(testData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        testSpy(view);
+        view.start();
+        view.endSoundCalibration();
+
+        expect(view.showFirstQuestion).toHaveBeenCalled();
     });
 
     it("Trigger for first question reminder", () => {
@@ -791,9 +982,10 @@ describe("GroupTestFlow", () => {
         expect(view.onPartComplete).toHaveBeenCalled();
         expect(view.setPart).toHaveBeenCalledWith(1);
 
-        expect(view.showTestPartIntro).toHaveBeenCalled();
+        expect(view.startTestPartOutro).toHaveBeenCalled();
 
-        domElements.startTestPartButton.click();
+        domElements.endTestPartOutroButton.click();
+        domElements.endBreakButton.click();
         expect(view.showFirstQuestion).toHaveBeenCalled();
     });
 
@@ -900,6 +1092,38 @@ describe("GroupTestFlow", () => {
             roomName: view.roomName,
             student: expect.any(Object),
         });
+        expect(domElements.showSummary).toHaveBeenCalled();
+    });
+
+    it("Answer last question in last part when there is only a single testpart", () => {
+        // Ensure there is only one testpart;
+        const testData = JSON.parse(JSON.stringify(groupTestData));
+        testData.parts = testData.parts.slice(-1);
+
+        const test = new Test(testData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        testSpy(view);
+        const canShow = view.setPart(test.parts.length - 1);
+        expect(canShow).toBe(true);
+        const part = view.currentPart;
+        view.showQuestion(false, part.questions.length - 1);
+        const question = view.currentQuestion;
+        view.input.value = "iki";
+        view.selectFreeText();
+        view.onQuestionComplete(question);
+
+        expect(view.onQuestionComplete).toHaveBeenCalled();
+        expect(view.onPartComplete).toHaveBeenCalled();
+        expect(domElements.hideInstructions).toHaveBeenCalled();
+        expect(view.send).toHaveBeenCalledWith({
+            uuid: expect.any(String),
+            event: "test.complete",
+            assignmentId: 1,
+            message: "Testen er afsluttet",
+            roomName: view.roomName,
+            student: expect.any(Object),
+        });
+        expect(domElements.showTestExit).toHaveBeenCalled();
     });
 
     it("Answer question with instruction sequence", () => {

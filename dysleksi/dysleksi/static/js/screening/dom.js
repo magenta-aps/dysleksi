@@ -15,8 +15,12 @@ class TestDomElements {
         this.studentHeaderEl = document.querySelector("#student-header");
         this.questionChallengeEl = document.querySelector("#question-challenge");
         this.endSummaryButton = document.querySelector("#end-summary");
-        this.startSummaryButton = document.querySelector("#start-summary");
-        this.startTestPartButton = document.querySelector("#start-testpart");
+        this.endSoundCalibrationButton = document.querySelector(
+            "#end-sound-calibration",
+        );
+        this.endBreakButton = document.querySelector("#end-break");
+        this.endIntroButton = document.querySelector("#end-intro");
+        this.endTestPartOutroButton = document.querySelector("#end-testpart-outro");
         this.summaryContainer = document.querySelector("#summary-container");
         this.summaryScrollControls = document.querySelector("#summary-scroll-controls");
         this.scrollSummaryUpArrow = document.getElementById("scroll-summary-up");
@@ -25,18 +29,30 @@ class TestDomElements {
         this.overlay = document.getElementById("fade-overlay");
         this.reminderSoundEl = document.querySelector("#reminder-sound");
         this.testIntro = document.querySelector("#test-intro");
-        this.testPartIntro = document.querySelector("#testpart-intro");
+        this.testPartOutro = document.querySelector("#testpart-outro");
         this.testExit = document.querySelector("#test-exit");
         this.logOutButton = document.querySelector("#log-out");
-        this.testPartIntroText = document.querySelector("#testpart-intro-text");
-        this.testPartIntroImage = document.querySelector("#testpart-intro-image");
+        this.summaryLogOutButton = document.querySelector("#summary-log-out");
+        this.testPartOutroText = document.querySelector("#testpart-outro-text");
+        this.testPartOutroImage = document.querySelector("#testpart-outro-image");
         this.testSummary = document.querySelector("#test-summary");
+        this.testSoundCalibration = document.querySelector("#test-sound-calibration");
+        this.testBreak = document.querySelector("#test-break");
         this.testContainer = document.querySelector("#test-container");
         this.skipInstructionButton = document.querySelector("#skip-instruction");
         this.skipAllInstructionsButton = document.querySelector(
             "#skip-all-instructions",
         );
+        this.skipSoundCalibrationButton = document.querySelector(
+            "#skip-sound-calibration",
+        );
+        this.skipSummaryButton = document.querySelector("#skip-summary");
         this.repeatBtn = document.querySelector("#repeat");
+        this.soundCalibrationAnimation = document.querySelector(
+            "#sound-calibration-animation",
+        );
+        this.testFinishedRow = document.querySelector("#test-finished-row");
+        this.speakerIcon = document.querySelector("#speaker");
 
         this.currentAudioSource = null;
     }
@@ -115,8 +131,69 @@ class TestDomElements {
         document.body.classList.toggle(className, show);
     }
 
-    showSummary(parts) {
+    showSoundCalibration() {
+        this.testSoundCalibration.style.display = "flex";
+
+        if (this.skipSoundCalibrationButton) {
+            this.skipSoundCalibrationButton.style.display = "flex";
+        }
+    }
+
+    hideSoundCalibration() {
+        this.testSoundCalibration.style.display = "none";
+        if (this.skipSoundCalibrationButton) {
+            this.skipSoundCalibrationButton.style.display = "none";
+        }
+    }
+
+    showTestBreak() {
+        this.testBreak.style.display = "flex";
+    }
+    hideTestBreak() {
+        this.testBreak.style.display = "none";
+    }
+
+    showSoundCalibrationAnimation() {
+        this.showElement(this.soundCalibrationAnimation);
+    }
+
+    hideSoundCalibrationAnimation() {
+        this.hideElement(this.soundCalibrationAnimation);
+    }
+
+    stopSoundCalibrationAnimation() {
+        this.soundCalibrationAnimation.src = "/static/images/talking_face.png";
+    }
+    startSoundCalibrationAnimation() {
+        this.soundCalibrationAnimation.src = "/static/images/talking_face.gif";
+    }
+
+    async setLogOutButtonListener(buttonEl) {
+        this._setButtonListener(buttonEl, () => {
+            window.location.href = "/logout";
+        });
+
+        const isOnline = await serverOnline();
+        if (!isOnline) {
+            buttonEl.style.visibility = "hidden";
+        }
+    }
+
+    async showSummary(parts, complete = false) {
         this.testSummary.style.display = "flex";
+        this.summaryContainer.innerHTML = "";
+
+        if (complete) {
+            await this.setLogOutButtonListener(this.summaryLogOutButton);
+
+            this.testFinishedRow.style.display = "flex";
+            this.endSummaryButton.style.display = "none";
+        }
+
+        if (this.skipSummaryButton && !complete) {
+            this.skipSummaryButton.style.display = "flex";
+        }
+
         console.log("showSummary", arguments);
 
         parts.forEach((part) => {
@@ -128,12 +205,16 @@ class TestDomElements {
             block.style.alignItems = "center"; // vertically center text and image
             block.style.justifyContent = "space-between"; // ensures image stays on the right
 
-            // Normal part name text
-            const nameText = document.createTextNode(part.name + " ");
-
             // Container for text so the image is separate
             const textContainer = document.createElement("div");
-            textContainer.appendChild(nameText);
+
+            if (complete) {
+                textContainer.innerHTML =
+                    part.name +
+                    ' <span class="checkmark"><i class="ph-fill ph-check-fat"></i></span>';
+            } else {
+                textContainer.innerHTML = part.name;
+            }
 
             // Create image element
             const img = document.createElement("img");
@@ -178,6 +259,9 @@ class TestDomElements {
 
     hideSummary() {
         this.testSummary.style.display = "none";
+        if (this.skipSummaryButton) {
+            this.skipSummaryButton.style.display = "none";
+        }
     }
 
     hideTestContainer() {
@@ -190,45 +274,19 @@ class TestDomElements {
 
     async showTestExit() {
         this.testExit.style.display = "flex";
-        this._setButtonListener(this.logOutButton, () => {
-            window.location.href = "/logout";
-        });
-
-        const isOnline = await serverOnline();
-        if (!isOnline) {
-            this.logOutButton.style.visibility = "hidden";
-        }
+        await this.setLogOutButtonListener(this.logOutButton);
     }
 
     hideIntro() {
         this.testIntro.style.display = "none";
     }
 
-    hideTestPartIntro() {
-        this.testPartIntro.style.display = "none";
+    hideTestPartOutro() {
+        this.testPartOutro.style.display = "none";
     }
 
-    showTestPartIntro() {
-        this.testPartIntro.style.display = "flex";
-    }
-
-    setEndSummaryButtonListener(listener) {
-        this.endSummaryButton = this._setButtonListener(
-            this.endSummaryButton,
-            listener,
-        );
-    }
-    setStartSummaryButtonListener(listener) {
-        this.startSummaryButton = this._setButtonListener(
-            this.startSummaryButton,
-            listener,
-        );
-    }
-    setStartTestPartButtonListener(listener) {
-        this.startTestPartButton = this._setButtonListener(
-            this.startTestPartButton,
-            listener,
-        );
+    showTestPartOutro() {
+        this.testPartOutro.style.display = "flex";
     }
 
     toggleNextButton(show) {
@@ -350,6 +408,20 @@ class TestDomElements {
         el.setSelectionRange(position, position);
     }
 
+    async waitForClick(el) {
+        el.classList.add("pulse");
+
+        return new Promise((resolve) => {
+            const handler = async () => {
+                el.removeEventListener("click", handler);
+                el.classList.remove("pulse");
+                await el._busyPromise;
+                resolve();
+            };
+            el.addEventListener("click", handler);
+        });
+    }
+
     lockInput() {
         this._updateInputState(true);
     }
@@ -427,16 +499,16 @@ class TestDomElements {
         this.studentHeaderEl.style.display = "none";
     }
 
-    setTestPartIntroText(html) {
-        this.testPartIntroText.innerHTML = html;
+    setTestPartOutroText(html) {
+        this.testPartOutroText.innerHTML = html;
     }
 
-    hideTestPartIntroImage() {
-        this.testPartIntroImage.style.display = "none";
+    hideTestPartOutroImage() {
+        this.testPartOutroImage.style.display = "none";
     }
 
-    showTestPartIntroImage() {
-        this.testPartIntroImage.style.display = "flex";
+    showTestPartOutroImage() {
+        this.testPartOutroImage.style.display = "flex";
     }
 
     hideChallengeImage() {
@@ -563,16 +635,23 @@ class TestDomElements {
         };
     }
 
+    interruptSound() {
+        if (this.currentAudioSource) {
+            this.currentAudioSource.stop();
+            this.currentAudioSource = null;
+        }
+    }
+
     async playSound(sound, audioContext, mode = "interrupt") {
+        console.log("Playing", sound);
         if (mode === "drop" && this.currentAudioSource) {
             console.log("Something is already playing. Dropped ", sound);
             return;
         }
 
-        if (mode === "interrupt" && this.currentAudioSource) {
+        if (mode === "interrupt") {
             // Stop whatever is playing right now.
-            this.currentAudioSource.stop();
-            this.currentAudioSource = null;
+            this.interruptSound();
         }
 
         // Fetch & decode audio

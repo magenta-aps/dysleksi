@@ -609,10 +609,15 @@ body.show-instructions .sound-btn.pulse {
 }
 
 .smiley-image {
-    max-width: 100%;
+    width: 150px;
     height: auto;
     margin-bottom: 1rem;
     margin-top: 2rem;
+}
+
+.smiley-button {
+    @extend .smiley-image;
+    cursor: pointer;
 }
 
 #audio-indicator {
@@ -826,4 +831,54 @@ body.show-instructions .sound-btn.pulse {
             font-size: 38px !important;
         }
     }
+}
+
+
+.finished-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    width: 80vw;
+    margin: 2.5 * $spacer 0 0 0;
+
+    .standalone-icon {
+        font-size: 100px;
+    }
+
+    .btn {
+        position: absolute;
+        right: 0;
+    }
+}
+
+#speaker {
+  font-size: 100px;
+  color: $student-blue-darkest;
+  position: absolute;
+  top: 2 * $spacer;
+  right: 2 * $spacer;
+
+  &.playing::before {
+    animation: speaker-pulse 1.5s steps(1, end) infinite;
+  }
+}
+
+@keyframes speaker-pulse {
+  0%   { content: "\e44a"; } // high
+  8%   { content: "\e44c"; } // low
+  14%  { content: "\e44a"; } // high
+  22%  { content: "\e44a"; } // high  (held — sustained sound)
+  30%  { content: "\e44c"; } // low
+  36%  { content: "\e44e"; } // none  (brief gap)
+  40%  { content: "\e44a"; } // high
+  48%  { content: "\e44a"; } // high  (held)
+  56%  { content: "\e44c"; } // low
+  62%  { content: "\e44a"; } // high
+  70%  { content: "\e44c"; } // low
+  76%  { content: "\e44c"; } // low   (held)
+  82%  { content: "\e44e"; } // none  (brief gap)
+  86%  { content: "\e44a"; } // high
+  94%  { content: "\e44c"; } // low
+  100% { content: "\e44a"; } // high
 }

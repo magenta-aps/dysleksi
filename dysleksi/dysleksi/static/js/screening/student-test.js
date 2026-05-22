@@ -4,6 +4,7 @@ import { releaseWakeLock } from "./utils.js";
 import { unlockAudioOnGesture } from "./utils.js";
 import { preventDoubleTapZoom } from "./utils.js";
 import { WebRTCChannel } from "../webRTC.js";
+import { sleep } from "./utils.js";
 
 export class StudentTestView extends EventTarget {
     chatSocket;
@@ -60,7 +61,7 @@ export class StudentTestView extends EventTarget {
     start() {
         requestWakeLock();
         this.setPart(0);
-        this.showIntro();
+        this.startIntro();
 
         this.send({
             event: "test.started",
@@ -69,46 +70,167 @@ export class StudentTestView extends EventTarget {
         this.domElements.setRepeatButtonListener(() => this.repeat());
     }
 
-    showIntro() {
-        this.domElements.setStartSummaryButtonListener(() => this.startSummary());
+    startIntro() {
+        this.domElements._setButtonListener(this.domElements.endIntroButton, () =>
+            this.endIntro(),
+        );
     }
 
-    showTestPartIntro() {
+    startTestPartOutro() {
         this.showingIntro = true;
-        this.domElements.showTestPartIntro();
+        this.domElements.showTestPartOutro();
         this.domElements.hideTestContainer();
-        this.domElements.setStartTestPartButtonListener(() => {
-            this.showingIntro = false;
-            this.showFirstQuestion(this.canPractice());
-        });
+
+        this.domElements._setButtonListener(
+            this.domElements.endTestPartOutroButton,
+            () => this.endTestPartOutro(),
+        );
+
         if (this.previousPart) {
-            this.domElements.setTestPartIntroText(
+            this.domElements.setTestPartOutroText(
                 this.previousPart.name +
                     ' <span class="checkmark"><i class="ph-fill ph-check-fat"></i></span>',
             );
-            this.domElements.showTestPartIntroImage();
+            this.domElements.showTestPartOutroImage();
 
             this.domElements.playSound(
                 this.previousPart.completionSource,
                 this.audioContext,
             );
         } else {
-            this.domElements.hideTestPartIntroImage();
+            this.domElements.hideTestPartOutroImage();
         }
     }
 
-    startSummary() {
+    startBreak() {
+        this.domElements.showTestBreak();
+        this.domElements.hideTestPartOutro();
+
+        // Inden du går videre til den næste deltest kan du holde pause.
+        // Tryk på grøn knap når du er klar.
+        this.domElements.playSound("/static/audio/1t.9.wav", this.audioContext);
+        this.domElements._setButtonListener(this.domElements.endBreakButton, () => {
+            this.domElements.interruptSound();
+            this.endBreak();
+        });
+    }
+
+    async startSoundCalibration() {
+        this.domElements.hideSoundCalibrationAnimation();
+        this.domElements.hideElement(this.domElements.endSoundCalibrationButton);
+        this.domElements.showSoundCalibration();
+
+        this.domElements._setButtonListener(
+            this.domElements.endSoundCalibrationButton,
+            () => this.endSoundCalibration(),
+        );
+        this.domElements._setButtonListener(
+            this.domElements.skipSoundCalibrationButton,
+            () => this.endSoundCalibration(),
+        );
+
+        this.domElements._setButtonListener(
+            this.domElements.soundCalibrationAnimation,
+            async () => {
+                const el = this.domElements.soundCalibrationAnimation;
+                if (el._busyPromise) return;
+                el._busyPromise = (async () => {
+                    this.domElements.startSoundCalibrationAnimation();
+
+                    // Jeg hedder Pilu
+                    // Juster lyden, så du kan høre min stemme tydeligt.
+                    await this.domElements.playSound(
+                        "/static/audio/1t.3.wav",
+                        this.audioContext,
+                    );
+                    this.domElements.stopSoundCalibrationAnimation();
+                })();
+                el._busyPromise.finally(() => {
+                    el._busyPromise = null;
+                });
+            },
+        );
+
+        this.domElements.speakerIcon.classList.add("playing");
+
+        // Testen starter om lidt.
+        await this.domElements.playSound("/static/audio/1t.1.wav", this.audioContext);
+        await sleep(750);
+
+        // Først skal du justere lyden ved hjælp af iPadens lydknap.
+        await this.domElements.playSound("/static/audio/1t.2.wav", this.audioContext);
+        this.domElements.speakerIcon.classList.remove("playing");
+
+        await sleep(750);
+        this.domElements.showSoundCalibrationAnimation();
+        await this.domElements.waitForClick(this.domElements.soundCalibrationAnimation);
+
+        await sleep(750);
+        this.domElements.stopSoundCalibrationAnimation();
+
+        // Tryk grøn når du er klar.
+        this.domElements.speakerIcon.classList.add("playing");
+        await this.domElements.playSound("/static/audio/1t.4.wav", this.audioContext);
+        this.domElements.speakerIcon.classList.remove("playing");
+
+        this.domElements.showElement(this.domElements.endSoundCalibrationButton);
+    }
+
+    async startSummary() {
         console.log("Test started, showing summary");
-        this.domElements.hideInstructions();
+        this.domElements.hideElement(this.domElements.endSummaryButton);
         this.domElements.showSummary(this.test.parts);
-        this.domElements.hideIntro();
-        this.domElements.setEndSummaryButtonListener(() => this.endSummary());
+
+        this.domElements._setButtonListener(this.domElements.endSummaryButton, () =>
+            this.endSummary(),
+        );
+
+        this.domElements._setButtonListener(this.domElements.skipSummaryButton, () =>
+            this.endSummary(),
+        );
+
+        // Du kommer til at arbejde med forskellige opgaver.
+        await this.domElements.playSound("/static/audio/1t.5.wav", this.audioContext);
+        await sleep(750);
+
+        // Du får at vide, hvergang en ny deltests skal starte.
+        await this.domElements.playSound("/static/audio/1t.6.wav", this.audioContext);
+        await sleep(750);
+
+        // Tryk grøn når du er klar.
+        await this.domElements.playSound("/static/audio/1t.7.wav", this.audioContext);
+
+        this.domElements.showElement(this.domElements.endSummaryButton);
     }
 
     endSummary() {
-        console.log("Summary ended, showing first part");
         this.domElements.hideSummary();
         this.showFirstQuestion(this.canPractice());
+    }
+
+    endBreak() {
+        this.domElements.hideTestBreak();
+        this.showFirstQuestion(this.canPractice());
+    }
+
+    endIntro() {
+        this.domElements.hideIntro();
+        this.startSoundCalibration();
+    }
+
+    endTestPartOutro() {
+        this.domElements.hideTestPartOutro();
+        this.showingIntro = false;
+        this.startBreak();
+    }
+
+    endSoundCalibration() {
+        this.domElements.hideSoundCalibration();
+        if (this.test.parts.length > 1) {
+            this.startSummary();
+        } else {
+            this.showFirstQuestion(this.canPractice());
+        }
     }
 
     canPractice() {
@@ -179,7 +301,7 @@ export class StudentTestView extends EventTarget {
             this.isPracticing ? "(practice)" : "(test)",
         );
         this.domElements.showTestContainer();
-        this.domElements.hideTestPartIntro();
+        this.domElements.hideTestPartOutro();
 
         const result = this.showQuestion(this.isPracticing, 0);
         if (!this.isPracticing && Number(this.currentPart.timeout) > 1) {
@@ -211,11 +333,19 @@ export class StudentTestView extends EventTarget {
             }),
         );
         this.domElements.hideTestContainer();
-        this.domElements.showTestExit();
-        this.domElements.playSound(
-            this.currentPart.completionSource,
-            this.audioContext,
-        );
+
+        if (this.test.parts.length > 1) {
+            this.domElements.showSummary(this.test.parts, true);
+
+            // Du er færdig med alle deltest. Tak.
+            this.domElements.playSound("/static/audio/1t.10.wav", this.audioContext);
+        } else {
+            this.domElements.showTestExit();
+            this.domElements.playSound(
+                this.currentPart.completionSource,
+                this.audioContext,
+            );
+        }
     }
 
     // ---- Parts ----
@@ -247,7 +377,7 @@ export class StudentTestView extends EventTarget {
 
         if (canShow) {
             console.log("Part complete, showing next part");
-            this.showTestPartIntro();
+            this.startTestPartOutro();
         } else {
             console.log("Part complete, no more parts");
             this.onTestComplete();

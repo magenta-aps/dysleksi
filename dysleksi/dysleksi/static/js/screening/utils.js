@@ -1,6 +1,7 @@
 import { getWebSocket } from "../ws.js";
 
 let wakeLock = null;
+export const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export function startSession(studentIds) {
     const chatSocket = getWebSocket();
