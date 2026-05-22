@@ -93,7 +93,11 @@ describe("initStudent", () => {
     it("covers setup error path", async () => {
         mockSetup.mockRejectedValueOnce(new Error("mic failed"));
 
-        initStudent(42, {});
+        const mockStudent = {
+            displayName: "Elev E.",
+        };
+
+        initStudent(42, {}, mockStudent);
 
         await openHandler();
 
@@ -102,6 +106,7 @@ describe("initStudent", () => {
                 uuid: "uuid-123",
                 event: "setup.error",
                 error: "Error: mic failed",
+                studentDisplayName: mockStudent.displayName,
             }),
         );
 

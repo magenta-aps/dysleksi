@@ -1,6 +1,7 @@
 {% extends "dysleksi/admin/base.html" %}
 {% load i18n %}
 {% load static %}
+{% load error_modal from modals %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'dysleksi:test_assignment_list' %}">{% translate 'Tests' %}</a></li>
@@ -104,6 +105,10 @@
         </ul>
     </div>
 </template>
+{% endblock %}
+
+{% block modals %}
+{% error_modal %}
 {% endblock %}
 
 {% block js_module %}

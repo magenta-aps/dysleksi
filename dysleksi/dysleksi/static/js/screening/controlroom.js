@@ -1,6 +1,7 @@
 import { Student } from "./model.js";
 import { WebRTCChannel } from "../webRTC.js";
 import { serverOnline } from "./utils.js";
+import { Modal } from "bootstrap";
 
 const formatDuration = (duration) => {
     const hours = String(duration.getHours() - 1).padStart(2, "0");
@@ -1085,7 +1086,22 @@ export class TeacherView {
                     p2p.connect(data.webRTCId);
                 });
             }
+
+            if (data.event === "setup.error") {
+                this.onStudentSetupError(data);
+            }
         });
+    }
+
+    onStudentSetupError(data) {
+        const errorModal = new Modal("#error");
+        const modalBody = document.querySelector("#error .modal-body-inner");
+        modalBody.innerHTML = `
+            <p class="fw-bold">Fejl på ${data.studentDisplayName}'s computer.</p>
+            <p>Der er problemer med at afspille eller optage lyd på elevens computer.</p>
+            <p>(Systemfejlen er <code>${data.error}</code>)</p>
+        `;
+        errorModal.show();
     }
 
     _persistQueue() {

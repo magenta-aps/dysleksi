@@ -280,6 +280,7 @@ describe("Teacher Individual test View", () => {
     let view;
     let wsGetter;
     let individualTest;
+    let mainSocketHandler;
     let p2pChannel;
     const studentId = 123;
 
@@ -326,6 +327,11 @@ describe("Teacher Individual test View", () => {
             <button id="goto-next-result-group">Hop til næste</button>
             <textarea id="note" class="d-none"></textarea>
             <div id="audio-indicator"></div>
+            <div class="modal fade" id="error" tabindex="-1" aria-labelledby="error-label" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content"><div class="modal-body"><div class="modal-body-inner"></div></div></div>
+                </div>
+            </div>
         `;
 
         // Mock out asset preloader
@@ -355,7 +361,7 @@ describe("Teacher Individual test View", () => {
             audioIndicator,
         );
 
-        const mainSocketHandler = socket.addEventListener.mock.calls.find(
+        mainSocketHandler = socket.addEventListener.mock.calls.find(
             (c) => c[0] === "message",
         )[1];
         mainSocketHandler({
@@ -1017,6 +1023,19 @@ describe("Teacher Individual test View", () => {
         // Assert: we are at the first question in result group 'B'
         expect(view.currentQuestion.index).toBe(2);
         expect(view.currentQuestion.resultGroup).toBe("B");
+    });
+
+    it("displays an error modal if student audio setup fails", () => {
+        // Act: send "setup.error" event (this is not sent on the P2P channel)
+        mainSocketHandler({
+            data: JSON.stringify({ event: "setup.error" }),
+        });
+        // Assert: modal is displayed
+        const modal = document.querySelector("#error");
+        const modalBody = modal.querySelector(".modal-body-inner");
+        expect(modal).not.toBeNull();
+        expect(modal.classList.display).not.toBe("none");
+        expect(modalBody.innerHTML).not.toBe("");
     });
 });
 

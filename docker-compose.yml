@@ -126,6 +126,8 @@ services:
     working_dir: /app
     volumes:
       - ./dysleksi/dysleksi/static/js:/app/src:ro
+      - ./dysleksi/dysleksi/static/vendor/js:/app/vendor/js:ro
+      - ./dysleksi/vite.config.js:/app/vite.config.js:ro
       - ./dysleksi/package.json:/app/package.json:ro
       - ./dysleksi/package-lock.json:/app/package-lock.json:ro
       - vitest-coverage:/app/coverage
