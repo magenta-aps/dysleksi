@@ -976,16 +976,9 @@ describe("Teacher Individual test View", () => {
     it("runs animated audio indicator while the student answers", () => {
         // Arrange
         const spyStart = vi.spyOn(audioIndicator, "start");
-        // Act: display non-practice question
+        // Act: send "audio.detected" event
         p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.displayed",
-                    partIndex: 0,
-                    questionIndex: 0,
-                    practice: false,
-                },
-            }),
+            new CustomEvent("message", { detail: { event: "audio.detected" } }),
         );
         // Assert: audio indicator animation is started
         expect(spyStart).toHaveBeenCalled();
@@ -994,16 +987,9 @@ describe("Teacher Individual test View", () => {
     it("stops animated audio indicator when the student has answered", () => {
         // Arrange
         const spyStop = vi.spyOn(audioIndicator, "stop");
-        // Act: answer non-practice question
+        // Act: send "audio.quiet" event
         p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.answered",
-                    partIndex: 0,
-                    questionIndex: 0,
-                    practice: false,
-                },
-            }),
+            new CustomEvent("message", { detail: { event: "audio.quiet" } }),
         );
         // Assert: audio indicator animation is started
         expect(spyStop).toHaveBeenCalled();
