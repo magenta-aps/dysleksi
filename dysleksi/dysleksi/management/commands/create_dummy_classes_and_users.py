@@ -153,7 +153,7 @@ class Command(BaseCommand):
                         "institution": school,
                     },
                 )
-                c.teachers.set([teacher, teacher2, teacher3])
+                c.teachers.set([teacher, teacher3])
 
         # Add students to classes
 

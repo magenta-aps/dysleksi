@@ -6,6 +6,7 @@ from unittest.mock import patch
 
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import AnonymousUser
+from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http.response import Http404
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
@@ -130,7 +131,7 @@ class TestAssignmentView(DysleksiTest):
                 )
                 self.assertListEqual(view.get_template_names(), [template_name])
 
-        with self.assertRaises(ValueError) as cm:
+        with self.assertRaises(PermissionDenied):
             self.setup_view(
                 AssignmentView,
                 self.other_user,
@@ -138,8 +139,6 @@ class TestAssignmentView(DysleksiTest):
                 test_id=self.test.id,
                 pk=self.assignment1.id,
             )
-            exception = cm.exception
-            self.assertEqual(str(exception), "User is neither teacher nor student")
 
     def test_context_data(self):
         view = self.setup_view(
@@ -151,6 +150,40 @@ class TestAssignmentView(DysleksiTest):
         )
         context = view.get_context_data()
         self.assertIn("test_contents", context)
+
+    def test_access(self):
+        for assignment in (self.assignment1, self.assignment2):
+            for user in (self.admin, self.teacher, self.student, self.privileged_user):
+                self.setup_view(
+                    AssignmentView,
+                    user,
+                    room_name="class_1",
+                    test_id=self.test.id,
+                    pk=assignment.id,
+                )
+            for user in (
+                self.other_user,
+                self.other_teacher,
+                self.inactive_user,
+                self.not_logged_in_user,
+            ):
+                with self.assertRaises(PermissionDenied):
+                    self.setup_view(
+                        AssignmentView,
+                        user,
+                        room_name="class_1",
+                        test_id=self.test.id,
+                        pk=self.assignment1.id,
+                    )
+        view = self.setup_view(
+            AssignmentView,
+            self.admin,
+            room_name="class_1",
+            test_id=self.test.id,
+            pk=assignment.id,
+        )
+        with self.assertRaises(ImproperlyConfigured):
+            view.test_permissions({})
 
 
 class TestClassListView(DysleksiTest):
@@ -226,6 +259,19 @@ class TestTestAssignmentListView(DysleksiTest):
             view.get_template_names()[0], "dysleksi/admin/test_assignment/list.html"
         )
 
+    def test_privileged_user_view(self):
+        view = self.setup_view(TestAssignmentListView, self.privileged_user)
+        expected_objs = TestAssignment.objects.all()
+        self.assertQuerySetEqual(
+            view.get_context_data()["object_list"], expected_objs, ordered=False
+        )
+        self.client.force_login(self.privileged_user)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerySetEqual(
+            response.context_data["object_list"], expected_objs, ordered=False
+        )
+
     def test_teacher_view(self):
         view = self.setup_view(TestAssignmentListView, self.teacher)
         expected_objs = TestAssignment.objects.filter(teacher=self.teacher)
@@ -233,6 +279,19 @@ class TestTestAssignmentListView(DysleksiTest):
             view.get_context_data()["object_list"], expected_objs, ordered=False
         )
         self.client.force_login(self.teacher)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerySetEqual(
+            response.context_data["object_list"], expected_objs, ordered=False
+        )
+
+    def test_other_teacher_view(self):
+        view = self.setup_view(TestAssignmentListView, self.other_teacher)
+        expected_objs = TestAssignment.objects.filter(teacher=self.other_teacher)
+        self.assertQuerySetEqual(
+            view.get_context_data()["object_list"], expected_objs, ordered=False
+        )
+        self.client.force_login(self.other_teacher)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
         self.assertQuerySetEqual(
@@ -510,6 +569,22 @@ class TestAssignmentResultsView(ResponseTest):
             self.assertEqual(pagination["page_size"], 3)
             self.assertEqual(pagination["last_page"], 1)
 
+    def test_access(self):
+        self.setup_view(
+            AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk
+        )
+        for user in (
+            self.student,
+            self.other_user,
+            self.other_teacher,
+            self.inactive_user,
+            self.not_logged_in_user,
+        ):
+            with self.assertRaises(PermissionDenied):
+                self.setup_view(
+                    AssignmentResultsView, user, pk=self.test_assignment_class.pk
+                )
+
 
 class TestAssignmentResultsFlagView(ResponseTest):
 
@@ -527,23 +602,6 @@ class TestAssignmentResultsFlagView(ResponseTest):
         view.setup(request, pk=pk)
         view.response = view.dispatch(request, pk=pk)
         return view
-
-    def test_teacher_access(self):
-        view = self.request(self.teacher, "get", self.group_testresponse_1.pk)
-        self.assertEqual(view.response.status_code, 200)
-
-    def test_student_access(self):
-        for student in Student.objects.all():
-            view = self.request(student, "get", self.group_testresponse_1.pk)
-            self.assertEqual(view.response.status_code, 403)
-
-    def test_admin_access(self):
-        view = self.request(self.admin, "get", self.group_testresponse_1.pk)
-        self.assertEqual(view.response.status_code, 200)
-
-    def test_other_access(self):
-        view = self.request(self.other_user, "get", self.group_testresponse_1.pk)
-        self.assertEqual(view.response.status_code, 403)
 
     def test_set_true(self):
         self.group_testresponse_1.flagged = False
@@ -605,6 +663,33 @@ class TestAssignmentResultsFlagView(ResponseTest):
             pk=self.test_assignment_class.pk,
         )
         self.assertEqual(view.get_ordering(), ["rank"])
+
+    def test_access(self):
+        self.assertEqual(
+            self.request(
+                self.teacher, "get", self.group_testresponse_1.pk
+            ).response.status_code,
+            200,
+        )
+        self.assertEqual(
+            self.request(
+                self.teacher, "post", self.group_testresponse_1.pk, {"flagged": "true"}
+            ).response.status_code,
+            200,
+        )
+        for user in (
+            self.student,
+            self.other_user,
+            self.other_teacher,
+            self.inactive_user,
+        ):
+            with self.assertRaises(PermissionDenied, msg=user.username):
+                self.request(user, "get", self.group_testresponse_1.pk)
+
+            with self.assertRaises(PermissionDenied):
+                self.request(
+                    user, "post", self.group_testresponse_1.pk, {"flagged": "true"}
+                )
 
 
 class TestAssignmentPartResultsView(ResponseTest):
@@ -697,6 +782,28 @@ class TestAssignmentPartResultsView(ResponseTest):
             ],
         )
 
+    def test_access(self):
+        self.setup_view(
+            AssignmentPartResultsView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testpart_pk=self.group_test_part.pk,
+        )
+        for user in (
+            self.student,
+            self.other_user,
+            self.other_teacher,
+            self.inactive_user,
+            self.not_logged_in_user,
+        ):
+            with self.assertRaises(PermissionDenied):
+                self.setup_view(
+                    AssignmentPartResultsView,
+                    user,
+                    assignment_pk=self.test_assignment_class.pk,
+                    testpart_pk=self.group_test_part.pk,
+                )
+
 
 class TestTestResponseView(ResponseTest):
 
@@ -754,6 +861,28 @@ class TestTestResponseView(ResponseTest):
                 [["Bedømmelse"], ["Over middel", "Se elevens svar"], [], []],
             ],
         )
+
+    def test_access(self):
+        self.setup_view(
+            TestResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            response_pk=self.group_testresponse_1.pk,
+        )
+        for user in (
+            self.student,
+            self.other_user,
+            self.other_teacher,
+            self.inactive_user,
+            self.not_logged_in_user,
+        ):
+            with self.assertRaises(PermissionDenied):
+                self.setup_view(
+                    TestResponseView,
+                    user,
+                    assignment_pk=self.test_assignment_class.pk,
+                    response_pk=self.group_testresponse_1.pk,
+                )
 
 
 class TestPartResponseView(ResponseTest):
@@ -950,3 +1079,27 @@ class TestPartResponseView(ResponseTest):
         context = view.get_context_data()
         table = context["responses_table"]
         self.assertNotIn("challenge_sentence", table.exclude)
+
+    def test_access(self):
+        self.setup_view(
+            PartResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testresponse_pk=self.group_testresponse_1.pk,
+            testpart_pk=self.group_test_part.pk,
+        )
+        for user in (
+            self.student,
+            self.other_user,
+            self.other_teacher,
+            self.inactive_user,
+            self.not_logged_in_user,
+        ):
+            with self.assertRaises(PermissionDenied):
+                self.setup_view(
+                    PartResponseView,
+                    user,
+                    assignment_pk=self.test_assignment_class.pk,
+                    testresponse_pk=self.group_testresponse_1.pk,
+                    testpart_pk=self.group_test_part.pk,
+                )

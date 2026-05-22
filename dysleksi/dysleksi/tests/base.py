@@ -6,7 +6,7 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import AnonymousUser, Group, Permission
 from django.core.files.images import ImageFile
 from django.core.management import call_command
 from django.test import TestCase, override_settings
@@ -66,6 +66,24 @@ class DysleksiTest(TestCase):
             is_superuser=False,
             is_staff=False,
         )
+        cls.other_teacher = cls.create_teacher(
+            "Vikar",
+            cpr=1133557799,
+            first_name="Vikar",
+            last_name="Vikarsen",
+        )
+        cls.inactive_user = cls.create_teacher(
+            "Intruder",
+            cpr=6666666666,
+            first_name="Intruder",
+            last_name="Impostorsson",
+            is_active=False,
+        )
+        cls.not_logged_in_user = AnonymousUser()
+        cls.privileged_user = cls.create_teacher("Skoleinspektør", cpr="0000000000")
+        for permission in Permission.objects.all():
+            cls.privileged_user.user_permissions.add(permission)
+
         cls.test, _ = Test.objects.get_or_create(
             name="Test1", test_type=TestType.INDIVIDUAL
         )

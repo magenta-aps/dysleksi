@@ -87,6 +87,29 @@ class TestClass(DysleksiTest):
         with freeze_time("2026-12-01 00:00:00Z"):
             self.assertNotIn(self.klasse, Class.objects.all().current())
 
+    def test_access(self):
+        for user in (self.admin, self.privileged_user):
+            self.assertQuerySetEqual(
+                Class.objects.filter_user_permissions(user, "view"),
+                Class.objects.all(),
+                msg=user.username,
+            )
+        for user in (
+            self.inactive_user,
+            self.not_logged_in_user,
+            self.other_teacher,
+            self.student,
+        ):
+            self.assertQuerySetEqual(
+                Class.objects.filter_user_permissions(user, "view"),
+                Class.objects.none(),
+                msg=user.username,
+            )
+        self.assertQuerySetEqual(
+            Class.objects.filter_user_permissions(self.teacher, "view"),
+            Class.objects.filter(pk=self.klasse.pk),
+        )
+
 
 class TestPartResponse(ResponseTest):
     def test_str(self):
@@ -114,8 +137,37 @@ class TestPartResponse(ResponseTest):
             CorrectnessCategory.objects.get(color_key=CategoryColorChoice.YELLOW),
         )
 
+    def test_access(self):
+        for user in (self.admin, self.privileged_user):
+            self.assertQuerySetEqual(
+                PartResponse.objects.filter_user_permissions(user, "view").order_by(
+                    "pk"
+                ),
+                PartResponse.objects.all().order_by("pk"),
+                msg=user.username,
+            )
+        for user in (
+            self.inactive_user,
+            self.not_logged_in_user,
+            self.other_teacher,
+            self.student,
+        ):
+            self.assertQuerySetEqual(
+                PartResponse.objects.filter_user_permissions(user, "view"),
+                PartResponse.objects.none(),
+                msg=user.username,
+            )
+        self.assertQuerySetEqual(
+            PartResponse.objects.filter_user_permissions(self.teacher, "view").order_by(
+                "pk"
+            ),
+            PartResponse.objects.filter(
+                pk__in=(self.group_partresponse_1.pk, self.group_partresponse_2.pk)
+            ).order_by("pk"),
+        )
 
-class TestQuestionResponse(DysleksiTest):
+
+class TestQuestionResponse(ResponseTest):
     def test_str(self):
         test = Test.objects.create(name="Test")
         assignment = TestAssignment.objects.create(
@@ -132,6 +184,44 @@ class TestQuestionResponse(DysleksiTest):
         qr = QuestionResponse(partresponse=pr, question=question)
         qr.finished_after = "World"
         self.assertEqual(str(qr), f"{str(qr.question)} / {str(qr.partresponse)}")
+
+    def test_access(self):
+        for user in (self.admin, self.privileged_user):
+            self.assertQuerySetEqual(
+                QuestionResponse.objects.filter_user_permissions(user, "view").order_by(
+                    "pk"
+                ),
+                QuestionResponse.objects.all().order_by("pk"),
+                msg=user.username,
+            )
+        for user in (
+            self.inactive_user,
+            self.not_logged_in_user,
+            self.other_teacher,
+            self.student,
+        ):
+            self.assertQuerySetEqual(
+                QuestionResponse.objects.filter_user_permissions(user, "view"),
+                QuestionResponse.objects.none(),
+                msg=user.username,
+            )
+        self.assertQuerySetEqual(
+            QuestionResponse.objects.filter_user_permissions(
+                self.teacher, "view"
+            ).order_by("pk"),
+            QuestionResponse.objects.filter(
+                pk__in=(
+                    self.group_questionresponse_1_1.pk,
+                    self.group_questionresponse_1_2.pk,
+                    self.group_questionresponse_1_3.pk,
+                    self.group_questionresponse_1_4.pk,
+                    self.group_questionresponse_2_1.pk,
+                    self.group_questionresponse_2_2.pk,
+                    self.group_questionresponse_2_3.pk,
+                    self.group_questionresponse_2_4.pk,
+                )
+            ).order_by("pk"),
+        )
 
 
 class TestTestPart(DysleksiTest):
@@ -187,7 +277,7 @@ class TestPlannedDateTime(DysleksiTest):
         )
 
 
-class TestTestAssignment(DysleksiTest):
+class TestTestAssignment(ResponseTest):
     def test_str(self):
         test = Test.objects.create(name="Test")
         ta = TestAssignment(test=test, teacher=self.teacher, student=self.student)
@@ -210,8 +300,37 @@ class TestTestAssignment(DysleksiTest):
             )
         )
 
+    def test_access(self):
+        for user in (self.admin, self.privileged_user):
+            self.assertQuerySetEqual(
+                PartResponse.objects.filter_user_permissions(user, "view").order_by(
+                    "pk"
+                ),
+                PartResponse.objects.all().order_by("pk"),
+                msg=user.username,
+            )
+        for user in (
+            self.inactive_user,
+            self.not_logged_in_user,
+            self.other_teacher,
+            self.student,
+        ):
+            self.assertQuerySetEqual(
+                PartResponse.objects.filter_user_permissions(user, "view"),
+                PartResponse.objects.none(),
+                msg=user.username,
+            )
+        self.assertQuerySetEqual(
+            PartResponse.objects.filter_user_permissions(self.teacher, "view").order_by(
+                "pk"
+            ),
+            PartResponse.objects.filter(
+                pk__in=(self.group_partresponse_1.pk, self.group_partresponse_2.pk)
+            ).order_by("pk"),
+        )
 
-class TestTestResponse(DysleksiTest):
+
+class TestTestResponse(ResponseTest):
     def test_str(self):
         test = Test.objects.create(name="Test")
         assignment = TestAssignment.objects.create(
@@ -304,6 +423,35 @@ class TestTestResponse(DysleksiTest):
             student=self.student,
         )
         response.full_clean()
+
+    def test_access(self):
+        for user in (self.admin, self.privileged_user):
+            self.assertQuerySetEqual(
+                TestResponse.objects.filter_user_permissions(user, "view").order_by(
+                    "pk"
+                ),
+                TestResponse.objects.all().order_by("pk"),
+                msg=user.username,
+            )
+        for user in (
+            self.inactive_user,
+            self.not_logged_in_user,
+            self.other_teacher,
+            self.student,
+        ):
+            self.assertQuerySetEqual(
+                TestResponse.objects.filter_user_permissions(user, "view"),
+                TestResponse.objects.none(),
+                msg=user.username,
+            )
+        self.assertQuerySetEqual(
+            TestResponse.objects.filter_user_permissions(self.teacher, "view").order_by(
+                "pk"
+            ),
+            TestResponse.objects.filter(assignment__teacher=self.teacher).order_by(
+                "pk"
+            ),
+        )
 
 
 class TestTestResource(DysleksiTest):
