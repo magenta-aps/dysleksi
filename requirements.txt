@@ -7,7 +7,7 @@
 ## Core Django & gunicorn
 Django==6.0.5
 django-stubs==6.0.4
-django-stubs-ext==6.0.4
+django-stubs-ext==6.0.5
 gunicorn==26.0.0
 
 ## Postgres binding
