@@ -11,6 +11,15 @@ if settings.TESTLOGGING:  # type: ignore
 
 
 class DysleksiOIDCAuthenticationBackend(OIDCAuthenticationBackend):
+    def get_userinfo(self, access_token, id_token, payload):
+        userinfo_json = super().get_userinfo(access_token, id_token, payload)
+        key = settings.OIDC_RP_IDP_SIGN_KEY
+        if key is None:
+            key = self.retrieve_matching_jwk(id_token)
+        id_token_claims = self.get_payload_data(id_token, key)
+        userinfo_json.update(id_token_claims)
+        return userinfo_json
+
     def filter_users_by_claims(self, claims):
         uniid = claims.get("uniid")
         if settings.TESTLOGGING:  # type: ignore
