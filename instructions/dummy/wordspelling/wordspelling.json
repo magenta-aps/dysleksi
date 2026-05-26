@@ -3,12 +3,14 @@
     "question_type": "free_text",
     "sound": "dummy-resources/wordspelling/Opgave/aput.mp3",
     "correct": "aput",
+    "partially_correct": ["aaput"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "dummy-resources/wordspelling/Opgave/arsaq.mp3",
     "correct": "arsaq",
+    "partially_correct": ["aarsaq"],
     "reminder": 20000
   }
 ]

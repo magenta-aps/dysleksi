@@ -242,8 +242,8 @@ export class GroupTestView extends StudentTestView {
                     this.currentQuestionIndex,
                 );
 
-                const correct = outOfTime ? false : this.answerIsCorrect();
-                this.student.addResult(this.currentPartIndex, correct);
+                const correctness = outOfTime ? "wrong" : this.answerCorrectness();
+                this.student.addResult(this.currentPartIndex, correctness);
 
                 this.send({
                     event: "question.answered",
@@ -258,7 +258,7 @@ export class GroupTestView extends StudentTestView {
                     displayedAt: this.questionDisplayedAt,
                     answeredAt: questionAnsweredAt,
                     duration: duration,
-                    correct: correct,
+                    correctness: correctness,
                     textAnswer: this.textAnswer,
                 });
             }
@@ -388,12 +388,12 @@ export class GroupTestView extends StudentTestView {
                     const correctLeft = this.answerButtons.find(
                         (a) =>
                             this.domElements.choicesElLeft.contains(a.button) &&
-                            a.answer.isCorrect,
+                            a.answer.correctness === "correct",
                     );
                     const correctRight = this.answerButtons.find(
                         (a) =>
                             this.domElements.choicesElRight.contains(a.button) &&
-                            a.answer.isCorrect,
+                            a.answer.correctness === "correct",
                     );
 
                     console.log("Playing hint audio");
@@ -437,11 +437,19 @@ export class GroupTestView extends StudentTestView {
     }
 
     answerIsCorrect() {
+        return this.answerCorrectness() === "correct";
+    }
+
+    answerCorrectness() {
         if (this.textAnswer !== null) {
-            const answer = this.currentQuestion.possibleAnswers[0];
-            return this.compareTextAnswer(this.textAnswer, answer.resourceText);
+            for (const answer of this.currentQuestion.possibleAnswers) {
+                if (this.compareTextAnswer(this.textAnswer, answer.resourceText)) {
+                    return answer.correctness;
+                }
+            }
+            return "wrong";
         } else {
-            return this.selectedAnswer.isCorrect;
+            return this.selectedAnswer.correctness;
         }
     }
     selectFreeText() {

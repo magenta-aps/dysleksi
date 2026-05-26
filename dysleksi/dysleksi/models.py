@@ -70,6 +70,12 @@ class InstructionAction(TextChoices):
     REMOVE_TEXT = "removeText"
 
 
+class Correctness(models.TextChoices):
+    CORRECT = "correct"
+    PARTIAL = "partial"
+    WRONG = "wrong"
+
+
 class QuestionType(TextChoices):
     MULTIPLE_CHOICE = "multiple_choice"
     MULTIPLE_CHOICE_WITH_DISPLAY_FIELD = "multiple_choice_with_display_field"
@@ -502,7 +508,7 @@ class Test(models.Model):
                                 else None
                             ),
                             "resource_text": answer.resource.text,
-                            "is_correct": answer.is_correct,
+                            "correctness": answer.correctness,
                         }
                         question_data["possible_answers"].append(answer_data)
 
@@ -669,6 +675,13 @@ class TestPart(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    @cached_property
+    def has_partially_correct_answers(self) -> bool:
+        return PossibleAnswer.objects.filter(
+            question__part=self,
+            correctness=Correctness.PARTIAL,
+        ).exists()
+
     def create_test_resources(self, questions_data, is_practice=False):
         for data in questions_data:
             # Initialize new dict to avoid carry-over from previous question
@@ -738,8 +751,20 @@ class TestPart(models.Model):
                 PossibleAnswer.objects.get_or_create(
                     question=question,
                     resource=correct_resource,
-                    defaults={"is_correct": True},
+                    defaults={"correctness": Correctness.CORRECT},
                 )
+
+            # Almost correct answer
+            if data.get("partially_correct"):
+                for answer in data["partially_correct"]:
+                    partially_correct_resource, _ = TestResource.objects.get_or_create(
+                        name=answer, text=answer
+                    )
+                    PossibleAnswer.objects.get_or_create(
+                        question=question,
+                        resource=partially_correct_resource,
+                        defaults={"correctness": Correctness.PARTIAL},
+                    )
 
             # Wrong answers
             if data.get("wrong"):
@@ -762,7 +787,7 @@ class TestPart(models.Model):
                     PossibleAnswer.objects.get_or_create(
                         question=question,
                         resource=wrong_resource,
-                        defaults={"is_correct": False},
+                        defaults={"correctness": Correctness.WRONG},
                     )
             if data.get("set1") and data.get("set2"):
                 for possible_answer in data["set1"] + data["set2"]:
@@ -779,19 +804,19 @@ class TestPart(models.Model):
                         possible_answer in data["set1"]
                         and possible_answer == data["correct"][0]
                     ):
-                        is_correct = True
+                        correctness = Correctness.CORRECT
                     elif (
                         possible_answer in data["set2"]
                         and possible_answer == data["correct"][1]
                     ):
-                        is_correct = True
+                        correctness = Correctness.CORRECT
                     else:
-                        is_correct = False
+                        correctness = Correctness.WRONG
 
                     PossibleAnswer.objects.get_or_create(
                         question=question,
                         resource=resource,
-                        defaults={"is_correct": is_correct},
+                        defaults={"correctness": correctness},
                     )
 
     def set_data_breakdown_ranges(self, field_name, ranges: List[Tuple[int, int]]):
@@ -881,7 +906,7 @@ class TestQuestion(models.Model):
 
     @property
     def correct_answer(self) -> "PossibleAnswer|None":
-        return self.possible_answers.filter(is_correct=True).first()
+        return self.possible_answers.filter(correctness=Correctness.CORRECT).first()
 
     def __str__(self) -> str:
         return f"{str(self.part)} / {self.pk}"
@@ -1025,14 +1050,17 @@ class PossibleAnswer(models.Model):
         blank=False,
         null=False,
     )
-    is_correct = models.BooleanField(
+
+    correctness = models.CharField(
+        max_length=8,
+        choices=Correctness.choices,
+        default=Correctness.WRONG,
         blank=False,
         null=False,
-        default=False,
     )
 
     def __str__(self) -> str:
-        return f"{str(self.question)} / {str(self.is_correct)}"
+        return f"{self.question} / {self.get_correctness_display()}"
 
     @property
     def is_teacher_judged(self):
@@ -1055,11 +1083,13 @@ class TestResponseQuerySet(PermissionsQuerySet):
     ) -> "TestResponseQuerySet":
         if filter is None:
             filter = Q()
+        correct = Correctness.CORRECT
         return self.annotate(
             **{
                 output_key: Count(
                     "partresponses__questionresponses",
-                    filter=filter & Q(partresponses__questionresponses__correct=True),
+                    filter=filter
+                    & Q(partresponses__questionresponses__correctness=correct),
                 )
             }
         )
@@ -1323,7 +1353,9 @@ class PartResponse(PermissionsMixin, models.Model):
 
     @property
     def correctness_category_answered(self):
-        correct_responses_count = self.questionresponses.filter(correct=True).count()
+        correct_responses_count = self.questionresponses.filter(
+            correctness=Correctness.CORRECT
+        ).count()
         responses_count = self.questionresponses.count()
         correct_proportion_of_answered = float(correct_responses_count) / float(
             responses_count
@@ -1375,9 +1407,8 @@ class QuestionResponse(PermissionsMixin, models.Model):
         blank=True,
         null=True,
     )
-    correct = models.BooleanField(
-        blank=True,
-        null=True,
+    correctness = models.CharField(
+        max_length=8, choices=Correctness.choices, null=True, blank=True
     )
     submitted_at = models.DateTimeField(
         auto_now_add=True,
@@ -1510,9 +1541,11 @@ class Message(models.Model):
 
                 question_response.answer_option = choice
                 question_response.answer_text = self.data.get("textAnswer")
-                correct = choice.is_correct if choice else self.data.get("correct")
-                if correct is not None:
-                    question_response.correct = correct
+                correctness = (
+                    choice.correctness if choice else self.data.get("correctness")
+                )
+                if correctness is not None:
+                    question_response.correctness = correctness
                 question_response.finished_after = duration
 
                 sound_data = self.data.get("recordingBase64")
@@ -1546,7 +1579,7 @@ class Message(models.Model):
 
             elif self.event == HandledEvent.QUESTION_FEEDBACK:
                 question_response = self.question_response
-                question_response.correct = self.data.get("correct")
+                question_response.correctness = self.data.get("correctness")
                 question_response.note = self.data.get("note")
                 question_response.save()
 

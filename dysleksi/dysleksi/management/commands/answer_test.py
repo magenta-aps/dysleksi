@@ -6,6 +6,7 @@ from django.utils import timezone
 
 from dysleksi.models import (
     Class,
+    Correctness,
     PartResponse,
     QuestionResponse,
     QuestionType,
@@ -119,10 +120,24 @@ class Command(BaseCommand):
 
                 for question in testpart.questions.all():
                     correct = random.randint(1, 100) < skill
+
+                    if testpart.has_partially_correct_answers:
+                        correctness = (
+                            random.choice([Correctness.CORRECT, Correctness.PARTIAL])
+                            if correct
+                            else Correctness.WRONG
+                        )
+                    else:
+                        correctness = (
+                            Correctness.CORRECT if correct else Correctness.WRONG
+                        )
+
                     answer_text = None
                     if question.question_type == QuestionType.FREE_TEXT:
                         answer_option = (
-                            question.possible_answers.filter(is_correct=True)
+                            question.possible_answers.filter(
+                                correctness=Correctness.CORRECT
+                            )
                             .order_by("?")
                             .first()
                         )
@@ -137,7 +152,7 @@ class Command(BaseCommand):
                                         answer_text = self.repeat_letter(answer_text)
                     else:
                         answer_option = (
-                            question.possible_answers.filter(is_correct=correct)
+                            question.possible_answers.filter(correctness=correctness)
                             .order_by("?")
                             .first()
                         )
@@ -146,7 +161,7 @@ class Command(BaseCommand):
                     response = QuestionResponse.objects.create(
                         question=question,
                         partresponse=partresponse,
-                        correct=correct,
+                        correctness=correctness,
                         answer_option=answer_option,
                         answer_text=answer_text,
                     )

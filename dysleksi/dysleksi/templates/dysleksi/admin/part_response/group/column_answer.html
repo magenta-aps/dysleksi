@@ -7,7 +7,7 @@
                     {% include "dysleksi/admin/part_response/group/column_resource.html" with resource=possible_answer.resource %}
                 {% endif %}
             {% else %}
-            <div class="answer-option answer {% if record.answer_option == possible_answer %}{% if possible_answer.is_correct %}answer-correct{% else %}answer-incorrect{% endif %}{% endif %}">
+            <div class="answer-option answer {% if record.answer_option == possible_answer %}{% if possible_answer.correctness == 'correct' %}answer-correct{% else %}answer-incorrect{% endif %}{% endif %}">
                 {% include "dysleksi/admin/part_response/group/column_resource.html" with resource=possible_answer.resource %}
             </div>
             {% endif %}

@@ -54,7 +54,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "hund",
-              "is_correct": true
+              "correctness": "correct"
             },
             {
               "id": 94,
@@ -63,7 +63,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "kat",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 95,
@@ -72,7 +72,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "ko",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 96,
@@ -81,7 +81,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "hest",
-              "is_correct": false
+              "correctness": "wrong"
             }
           ]
         },
@@ -101,7 +101,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "kat",
-              "is_correct": true
+              "correctness": "correct"
             },
             {
               "id": 98,
@@ -110,7 +110,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "hund",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 99,
@@ -119,7 +119,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "ko",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 100,
@@ -128,7 +128,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "hest",
-              "is_correct": false
+              "correctness": "wrong"
             }
           ],
           "continue_when_instruction_is_complete": false,
@@ -165,7 +165,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "hund",
-              "is_correct": true
+              "correctness": "correct"
             },
             {
               "id": 74,
@@ -174,7 +174,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "kat",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 75,
@@ -183,7 +183,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "ko",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 76,
@@ -192,7 +192,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "hest",
-              "is_correct": false
+              "correctness": "wrong"
             }
           ]
         },
@@ -212,7 +212,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "cykel",
-              "is_correct": true
+              "correctness": "correct"
             },
             {
               "id": 78,
@@ -221,7 +221,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "bil",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 79,
@@ -230,7 +230,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "bus",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 80,
@@ -239,7 +239,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "tog",
-              "is_correct": false
+              "correctness": "wrong"
             }
           ]
         },
@@ -259,7 +259,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "kat",
-              "is_correct": true
+              "correctness": "correct"
             },
             {
               "id": 82,
@@ -268,7 +268,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "hund",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 83,
@@ -277,7 +277,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "mus",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 84,
@@ -286,7 +286,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "fugl",
-              "is_correct": false
+              "correctness": "wrong"
             }
           ]
         },
@@ -306,7 +306,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "hus",
-              "is_correct": true
+              "correctness": "correct"
             },
             {
               "id": 86,
@@ -315,7 +315,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "bil",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 87,
@@ -324,7 +324,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "træ",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 88,
@@ -333,7 +333,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "vej",
-              "is_correct": false
+              "correctness": "wrong"
             }
           ]
         },
@@ -353,7 +353,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "bil",
-              "is_correct": true
+              "correctness": "correct"
             },
             {
               "id": 90,
@@ -362,7 +362,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "cykel",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 91,
@@ -371,7 +371,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "tog",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 92,
@@ -380,7 +380,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "bus",
-              "is_correct": false
+              "correctness": "wrong"
             }
           ]
         }
@@ -413,7 +413,16 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "aput",
-              "is_correct": null
+              "correctness": "correct"
+            },
+            {
+              "id": 100,
+              "resource_id": 100,
+              "resource_name": "aput",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "abut",
+              "correctness": "partial"
             }
           ],
           "instruction_sequence": null
@@ -434,7 +443,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "iki",
-              "is_correct": null
+              "correctness": "correct"
             }
           ],
           "instruction_sequence": {

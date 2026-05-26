@@ -22,6 +22,7 @@ from dysleksi.models import (
     CategoryColorChoice,
     CategoryRange,
     Class,
+    Correctness,
     CorrectnessCategory,
     Instruction,
     InstructionAction,
@@ -484,7 +485,7 @@ class TestTestQuestion(DysleksiTest):
         self.assertEqual(question.challenge, self.resource1)
         self.assertEqual(test.name, "Test1")
         answer1 = PossibleAnswer.objects.create(
-            question=question, resource=self.resource2, is_correct=True
+            question=question, resource=self.resource2, correctness=Correctness.CORRECT
         )
         self.assertEqual(answer1.question, question)
         self.assertEqual(answer1.resource.name, "TestResource2")
@@ -494,9 +495,9 @@ class TestPossibleAnswer(DysleksiTest):
     def test_str(self):
         question = TestQuestion.objects.create(part=self.part, challenge=self.resource1)
         pa = PossibleAnswer.objects.create(
-            question=question, resource=self.resource2, is_correct=True
+            question=question, resource=self.resource2, correctness=Correctness.CORRECT
         )
-        self.assertTrue(str(pa) == f"{str(pa.question)} / {str(pa.is_correct)}")
+        self.assertEqual(str(pa), f"{str(pa.question)} / Correct")
 
 
 class TestTest(DysleksiTest):
@@ -576,7 +577,7 @@ class TestTest(DysleksiTest):
                 ans_json["resource_sound_url"],
             )
             self.assertEqual(ans_model.resource.text, ans_json["resource_text"])
-            self.assertEqual(ans_model.is_correct, ans_json["is_correct"])
+            self.assertEqual(ans_model.correctness, ans_json["correctness"])
 
         question2 = part_json["questions"][1]
         self.assertEqual(question2.get("possible_answers"), [])
@@ -649,7 +650,7 @@ class TestMessage(DysleksiTest):
         self.assertIsNotNone(questionresponse)
 
         self.assertEqual(questionresponse.answer_option, self.possible_correct_answer1)
-        self.assertTrue(questionresponse.correct)
+        self.assertTrue(questionresponse.correctness == Correctness.CORRECT)
 
     def test_question_answer_with_sound(self):
         with open(
@@ -1253,7 +1254,7 @@ class TestPartResponseQuerySet(ResponseTest):
         self.assertEqual(student2_answer.responses_count, 4)
 
         qs = self.qs.annotate_questionresponses_count(
-            "responses_count", Q(correct=True)
+            "responses_count", Q(correctness=Correctness.CORRECT)
         )
         student1_answer = qs[0]
         student2_answer = qs[1]
@@ -1275,7 +1276,7 @@ class TestPartResponseQuerySet(ResponseTest):
 
     def test_annotate_ordering(self):
         qs = self.qs.annotate_questionresponses_count(
-            "correct_count", Q(correct=True)
+            "correct_count", Q(correctness=Correctness.CORRECT)
         ).annotate_ordering("correct_count", "ranking", False)
         student1_answer = qs[0]
         student2_answer = qs[1]
@@ -1283,7 +1284,7 @@ class TestPartResponseQuerySet(ResponseTest):
         self.assertEqual(student2_answer.ranking, 2)
 
         qs = self.qs.annotate_questionresponses_count(
-            "correct_count", Q(correct=True)
+            "correct_count", Q(correctness=Correctness.CORRECT)
         ).annotate_ordering("correct_count", "ranking", True)
         student1_answer = qs[0]
         student2_answer = qs[1]
@@ -1295,7 +1296,9 @@ class TestPartResponseQuerySet(ResponseTest):
             self.qs.annotate_questionresponses_count(
                 "responses_count",
             )
-            .annotate_questionresponses_count("correct_count", Q(correct=True))
+            .annotate_questionresponses_count(
+                "correct_count", Q(correctness=Correctness.CORRECT)
+            )
             .annotate_proportion(
                 "responses_count",
                 "correct_count",
@@ -1312,7 +1315,9 @@ class TestPartResponseQuerySet(ResponseTest):
             self.qs.annotate_questionresponses_count(
                 "responses_count",
             )
-            .annotate_questionresponses_count("correct_count", Q(correct=True))
+            .annotate_questionresponses_count(
+                "correct_count", Q(correctness=Correctness.CORRECT)
+            )
             .annotate_proportion(
                 "responses_count",
                 "correct_count",
@@ -1330,7 +1335,9 @@ class TestPartResponseQuerySet(ResponseTest):
             self.qs.annotate_questionresponses_count(
                 "responses_count",
             )
-            .annotate_questionresponses_count("correct_count", Q(correct=True))
+            .annotate_questionresponses_count(
+                "correct_count", Q(correctness=Correctness.CORRECT)
+            )
             .annotate_proportion(
                 "responses_count",
                 "correct_count",
