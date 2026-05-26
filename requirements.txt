@@ -148,5 +148,5 @@ ujson==5.12.1
 urllib3==2.7.0
 xmlschema==2.5.1
 xmltodict==1.0.4
-zope.interface==8.4
+zope.interface==8.5
 websockets==16.0
