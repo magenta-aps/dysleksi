@@ -320,6 +320,10 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/modals/error.html
+msgid "Fejl!"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/part_response/group/column_resource.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Korrekt"
