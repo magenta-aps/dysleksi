@@ -13,7 +13,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         client = DysleksiTabulexClient.from_settings()
-        with open("/data/tabulex/inst.json", "r") as fp:
+        with open("/upload/tabulex/inst.json", "r") as fp:
             institution_ids = json.load(fp)
         for id in institution_ids:
             try:
