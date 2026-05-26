@@ -476,6 +476,9 @@ class TestDomElements {
     }
 
     _setButtonListener(button, listener) {
+        if (!button) {
+            return;
+        }
         if (button._clickHandler) {
             button.removeEventListener("click", button._clickHandler);
         }
