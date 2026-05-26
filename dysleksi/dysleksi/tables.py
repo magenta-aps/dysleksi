@@ -360,9 +360,9 @@ class QuestionResponsesTable(NonOrderableTableMixin, Table):
     class Meta:
         attrs = {"class": "table testresponse-table"}
 
-    counter = TemplateColumn(
-        "{{ row_counter|add:1 }}",
+    counter = Column(
         verbose_name=_("Opg."),
+        accessor="row_number",
         attrs={
             "th": {"class": "column-counter"},
             "td": {"class": "column-counter"},
