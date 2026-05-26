@@ -1,32 +1,32 @@
 [
     {
-        "sound": "resources/dummy/fore_sound/Opgave/s.mp3",
+        "sound": "dummy-resources/fore_sound/Opgave/s.mp3",
         "question_type": "multiple_choice",
-        "correct": "resources/dummy/fore_sound/Opgave/screwdriver.avif",
+        "correct": "dummy-resources/fore_sound/Opgave/screwdriver.avif",
         "wrong": [
-            "resources/dummy/fore_sound/Opgave/næsehorn.jpg",
-            "resources/dummy/fore_sound/Opgave/ice_cream.webp",
-            "resources/dummy/fore_sound/Opgave/flower.png"
+            "dummy-resources/fore_sound/Opgave/næsehorn.jpg",
+            "dummy-resources/fore_sound/Opgave/ice_cream.webp",
+            "dummy-resources/fore_sound/Opgave/flower.png"
         ]
     },
     {
-        "sound": "resources/dummy/fore_sound/Opgave/n.mp3",
+        "sound": "dummy-resources/fore_sound/Opgave/n.mp3",
         "question_type": "multiple_choice",
-        "correct": "resources/dummy/fore_sound/Opgave/næsehorn.jpg",
+        "correct": "dummy-resources/fore_sound/Opgave/næsehorn.jpg",
         "wrong": [
-            "resources/dummy/fore_sound/Opgave/flower.png",
-            "resources/dummy/fore_sound/Opgave/screwdriver.avif",
-            "resources/dummy/fore_sound/Opgave/ice_cream.webp"
+            "dummy-resources/fore_sound/Opgave/flower.png",
+            "dummy-resources/fore_sound/Opgave/screwdriver.avif",
+            "dummy-resources/fore_sound/Opgave/ice_cream.webp"
         ]
     },
     {
-        "sound": "resources/dummy/fore_sound/Opgave/i.mp3",
+        "sound": "dummy-resources/fore_sound/Opgave/i.mp3",
         "question_type": "multiple_choice",
-        "correct": "resources/dummy/fore_sound/Opgave/ice_cream.webp",
+        "correct": "dummy-resources/fore_sound/Opgave/ice_cream.webp",
         "wrong": [
-            "resources/dummy/fore_sound/Opgave/næsehorn.jpg",
-            "resources/dummy/fore_sound/Opgave/screwdriver.avif",
-            "resources/dummy/fore_sound/Opgave/flower.png"
+            "dummy-resources/fore_sound/Opgave/næsehorn.jpg",
+            "dummy-resources/fore_sound/Opgave/screwdriver.avif",
+            "dummy-resources/fore_sound/Opgave/flower.png"
         ]
     }
 ]
