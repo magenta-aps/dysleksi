@@ -378,6 +378,20 @@ msgstr ""
 msgid "Fordeling på sætningslængde"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
+#, python-brace-format
+msgid "${first} - ${last} af ${total}"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
+#, python-format
+msgid "%(first)s - %(last)s af %(total)s"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
 #: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
 msgid "Tilbage til klassens resultater"
@@ -509,18 +523,6 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
 msgid "Elevens resultater"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
-#: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
-#, python-brace-format
-msgid "${first} - ${last} af ${total}"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
-#: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
-#, python-format
-msgid "%(first)s - %(last)s af %(total)s"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_response/group/detail.html

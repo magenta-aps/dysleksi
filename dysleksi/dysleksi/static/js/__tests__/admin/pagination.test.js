@@ -15,6 +15,10 @@ const mockDoc = `
             <button class="paginate-left btn btn-borderless" disabled>
                 <i class="ph ph-arrow-left m-0"></i>
             </button>
+            
+            <button class="paginate-to btn btn-borderless" data-page="1">1</button>
+            <button class="paginate-to btn btn-borderless" data-page="2">2</button>
+            
             <button class="paginate-right btn btn-borderless">
                 <i class="ph ph-arrow-right m-0"></i>
             </button>
@@ -25,6 +29,8 @@ const mockDoc = `
 describe("Pagination", () => {
     let paginate_left;
     let paginate_right;
+    let paginate_1;
+    let paginate_2;
     let target;
     let paginator_text;
     let pagination_complete;
@@ -53,6 +59,8 @@ describe("Pagination", () => {
     const update_elements = () => {
         paginate_left = document.querySelector(".paginate-left");
         paginate_right = document.querySelector(".paginate-right");
+        paginate_1 = document.querySelector(".paginate-to[data-page='1']");
+        paginate_2 = document.querySelector(".paginate-to[data-page='2']");
         paginator_text = document.querySelector(".paginator-text");
     };
 
@@ -112,5 +120,22 @@ describe("Pagination", () => {
         expect(target.innerHTML.trim()).toBe("PAGE 1");
         expect(paginate_left.disabled).toBe(true);
         expect(paginate_right.disabled).toBe(false);
+    });
+
+    it("paginate_to", async () => {
+        global.fetch = vi.fn();
+        vi.mocked(global.fetch).mockResolvedValue(createMockResponse("PAGE 2"));
+        initialize_pagination();
+        await paginate_2.click();
+        await pagination_complete;
+        expect(global.fetch).toHaveBeenCalledTimes(1);
+        update_elements();
+        expect(target.innerHTML).not.toBe(undefined);
+        expect(target.innerHTML.trim()).toBe("PAGE 2");
+        expect(paginate_left.disabled).toBe(false);
+        expect(paginate_right.disabled).toBe(true);
+        expect(paginator_text.textContent).toBe("3 - 3 af 3 ${foobar}");
+        expect(paginate_1.classList).not.toContain("current");
+        expect(paginate_2.classList).toContain("current");
     });
 });

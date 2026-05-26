@@ -1641,3 +1641,35 @@ $border-radius-student-card: $spacer / 4 * 3;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+
+.paginate-counter {
+  display: flex;
+  align-items: center;
+  color: $mono-gray-dark-1;
+}
+
+.paginate-to {
+  width: 1.5rem;
+  height: 1.5rem;
+  position: relative;
+  margin: var(--bs-btn-padding-y) 0;
+
+  &:after {
+    content: "";
+    display: block;
+    padding-bottom: 100%;
+  }
+
+  &.current {
+    border-radius: 50% !important;
+    color: $blue-dark;
+    background-color: $blue-lighter-2;
+  }
+  .paginate-number {
+    position: absolute; top: 0; left: 0;
+    width: 100%; height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}

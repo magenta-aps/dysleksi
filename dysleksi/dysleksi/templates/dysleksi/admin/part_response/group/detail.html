@@ -236,10 +236,29 @@
 
     <h6>{% translate "Elevens svar" %}</h6>
     <div class="row">
-        <div class="col-12">
+        <div class="col-12" id="test-results-table">
             {% render_table responses_table %}
         </div>
     </div>
+        <div class="row mt-1" data-pagination-details="pagination" data-pagination-page-param="page" data-pagination-target="test-results-table" data-pagination-content-param="only_table">
+            {{ pagination|json_script:"pagination" }}
+            <div class="paginator-text paginate-counter col-6" data-format="{% translate '${first} - ${last} af ${total}' %}">
+                {% blocktranslate trimmed with first=pagination.current_first last=pagination.current_last total=pagination.total_count %}
+                    {{ first }} - {{ last }} af {{ total }}
+                {% endblocktranslate %}
+            </div>
+            <div class="col-6 d-flex justify-content-end">
+                <div class="btn-group">
+                    <button class="paginate-left btn btn-borderless" {% if pagination.current_page <= 1 %}disabled{% endif %}><i class="ph ph-arrow-left m-0"></i></button>
+                    {% for page in pagination.button_range %}
+                        <button class="paginate-to btn btn-borderless {% if page == pagination.current_page %}current{% endif %}" data-page="{{ page }}">
+                            <div class="paginate-number">{{ page }}</div>
+                        </button>
+                    {% endfor %}
+                    <button class="paginate-right btn btn-borderless" {% if pagination.current_page >= pagination.last_page %}disabled{% endif %}><i class="ph ph-arrow-right m-0"></i></button>
+                </div>
+            </div>
+        </div>
 
     {% endwith %}
 {% endblock %}
@@ -250,5 +269,9 @@
     <script type="module">
     import { initialize_audio_players } from '{% static 'js/admin/audioplayer.js' %}';
     document.addEventListener("DOMContentLoaded", initialize_audio_players);
+    </script>
+    <script type="module">
+        import { initialize_pagination } from '{% static 'js/admin/pagination.js' %}';
+        document.addEventListener("DOMContentLoaded", initialize_pagination);
     </script>
 {% endblock %}

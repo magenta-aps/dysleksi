@@ -29,6 +29,7 @@ from dysleksi.views import (
     AssignmentResultsView,
     AssignmentView,
     ClassListView,
+    PaginationMixin,
     PartResponseView,
     RootView,
     StudentListView,
@@ -569,6 +570,32 @@ class TestAssignmentResultsView(ResponseTest):
             self.assertEqual(pagination["page_size"], 3)
             self.assertEqual(pagination["last_page"], 1)
 
+    def test_pagination_buttons_range(self):
+        self.assertEqual(
+            PaginationMixin.pagination_buttons_range(1, 5, 5), [1, 2, 3, 4, 5]
+        )
+        self.assertEqual(
+            PaginationMixin.pagination_buttons_range(1, 20, 5), [1, 2, 3, 4, 5]
+        )
+        self.assertEqual(
+            PaginationMixin.pagination_buttons_range(3, 5, 5), [1, 2, 3, 4, 5]
+        )
+        self.assertEqual(
+            PaginationMixin.pagination_buttons_range(3, 20, 5), [1, 2, 3, 4, 5]
+        )
+        self.assertEqual(
+            PaginationMixin.pagination_buttons_range(4, 5, 5), [1, 2, 3, 4, 5]
+        )
+        self.assertEqual(
+            PaginationMixin.pagination_buttons_range(4, 20, 5), [2, 3, 4, 5, 6]
+        )
+        self.assertEqual(
+            PaginationMixin.pagination_buttons_range(5, 5, 5), [1, 2, 3, 4, 5]
+        )
+        self.assertEqual(
+            PaginationMixin.pagination_buttons_range(5, 20, 5), [3, 4, 5, 6, 7]
+        )
+
     def test_access(self):
         self.setup_view(
             AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk
@@ -1103,3 +1130,29 @@ class TestPartResponseView(ResponseTest):
                     testresponse_pk=self.group_testresponse_1.pk,
                     testpart_pk=self.group_test_part.pk,
                 )
+
+    def test_only_table(self):
+        view = self.setup_view(
+            PartResponseView,
+            self.teacher,
+            query_params={"only_table": "true"},
+            assignment_pk=self.test_assignment_class.pk,
+            testresponse_pk=self.group_testresponse_1.pk,
+            testpart_pk=self.group_test_part.pk,
+        )
+        response = view.response
+        soup = BeautifulSoup(response.content, "html.parser")
+        table = self.html_table_to_list(soup.find("table"))
+        self.assertEqual(
+            table,
+            [
+                [["Opg."], ["Billede"], ["Rigtigt svar"], ["Elevens svar"], ["Tid"]],
+                [["1"], [], [], [], ["—"]],
+                [["2"], [], ["TestOrd"], [], ["—"]],
+                [["3"], [], [], [], ["—"]],
+                [["4"], [], [], [], ["—"]],
+                [[], [], [], [], ["0 sek."]],
+            ],
+        )
+        container = soup.find("table").parent
+        self.assertEqual(container.attrs["class"], ["table-container"])

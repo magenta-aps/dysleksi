@@ -23,8 +23,8 @@ from django.db.models import (
     Value,
     When,
 )
-from django.db.models.expressions import BaseExpression, OuterRef, Subquery
-from django.db.models.functions import Coalesce, Length, Replace
+from django.db.models.expressions import BaseExpression, OuterRef, Subquery, Window
+from django.db.models.functions import Coalesce, Length, Replace, RowNumber
 from django.http import HttpResponseRedirect
 from django.http.response import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
@@ -320,41 +320,70 @@ class AdminRootView(GroupRequiredMixin, TemplateView):
     template_name = "dysleksi/admin/base.html"
 
 
-class PartPaginationMixin:
+class PaginationMixin:
 
     def get_page_size(self) -> int:
-        return settings.RESULT_TABLE_SIZE  # type: ignore[misc]
-
-    def get_parts(self) -> QuerySet[TestPart]:
         raise NotImplementedError  # pragma: no cover
 
+    def get_items(self) -> QuerySet:
+        raise NotImplementedError  # pragma: no cover
+
+    def get_pagination_buttons_count(self):
+        return 0
+
     def get_pagination(self):
-        parts_count = self.get_parts().count()
+        count = self.get_items().count()
         page = self.get_current_page()
         page_size = self.get_page_size()
         return {
             "current_page": page,
-            "current_first": min(((page - 1) * page_size) + 1, parts_count),
-            "current_last": min(page * page_size, parts_count),
-            "total_count": parts_count,
+            "current_first": min(((page - 1) * page_size) + 1, count),
+            "current_last": min(page * page_size, count),
+            "total_count": count,
             "page_size": page_size,
-            "last_page": ceil(parts_count / page_size),
+            "last_page": ceil(count / page_size),
+            "button_range": self.get_pagination_buttons_range(),
         }
 
     def get_current_page(self) -> int:
         page_str = self.request.GET.get("page")  # type: ignore[attr-defined]
         return int(page_str) if page_str is not None else 1
 
-    def get_current_parts(self) -> QuerySet[TestPart]:
+    def get_current_items(self) -> QuerySet[TestPart]:
         page = self.get_current_page()
         pagesize = self.get_page_size()
         start = (page - 1) * pagesize
         end = page * pagesize
-        return self.get_parts()[start:end]
+        return self.get_items()[start:end]
+
+    def get_pagination_buttons_range(self):
+        return self.pagination_buttons_range(
+            self.get_current_page(),
+            ceil(self.get_items().count() / self.get_page_size()),
+            self.get_pagination_buttons_count(),
+        )
+
+    @staticmethod
+    def pagination_buttons_range(current_page, pages_count_total, buttons_count):
+        if buttons_count > 0:
+            first = max(current_page - int(ceil(buttons_count - 1) / 2), 1)
+            last = first + buttons_count - 1
+            if last > pages_count_total:
+                first -= last - pages_count_total
+                last = pages_count_total
+            if first < 1:
+                first = 1
+            return list(range(first, last + 1))
+        return []
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data["pagination"] = self.get_pagination()
+        return context_data
 
 
 class AssignmentResultsView(
-    GroupRequiredMixin, PartPaginationMixin, ObjectPermissionsMixin, DetailView
+    GroupRequiredMixin, PaginationMixin, ObjectPermissionsMixin, DetailView
 ):
     groups_required = [TEACHERS]
     model = TestAssignment
@@ -408,7 +437,7 @@ class AssignmentResultsView(
             # Annotér med rangering ud fra rækkefølge
             .annotate_ordering("total_score", "rank", False)
         )
-        parts = self.get_current_parts()
+        parts = self.get_current_items()
         extra_columns = []
         for part in parts:
             key = f"part_{part.pk}_correct"
@@ -477,7 +506,10 @@ class AssignmentResultsView(
         qs = qs.order_by(*self.get_ordering())
         return self.table_class(data=qs, extra_columns=extra_columns)
 
-    def get_parts(self) -> QuerySet[TestPart]:
+    def get_page_size(self) -> int:
+        return settings.RESULT_TABLE_SIZE  # type: ignore[misc]
+
+    def get_items(self) -> QuerySet[TestPart]:
         return self.object.test.parts.all()
 
     def render_to_response(self, context, **response_kwargs):
@@ -510,7 +542,6 @@ class AssignmentResultsView(
             context_data.update(
                 {
                     "by_category": self.get_by_category(),
-                    "pagination": self.get_pagination(),
                 }
             )
         context_data.update(
@@ -643,7 +674,7 @@ class AssignmentPartResultsView(GroupRequiredMixin, ObjectPermissionsMixin, List
 
 
 class TestResponseView(
-    GroupRequiredMixin, PartPaginationMixin, ObjectPermissionsMixin, DetailView
+    GroupRequiredMixin, PaginationMixin, ObjectPermissionsMixin, DetailView
 ):
     model = TestResponse
     template_name = "dysleksi/admin/test_response/group/detail.html"
@@ -659,13 +690,16 @@ class TestResponseView(
         self.test_permissions(object)
         return object
 
-    def get_parts(self) -> QuerySet[TestPart]:
+    def get_page_size(self) -> int:
+        return settings.RESULT_TABLE_SIZE  # type: ignore[misc]
+
+    def get_items(self) -> QuerySet[TestPart]:
         return self.object.assignment.test.parts.all().order_by("pk")
 
     @cached_property
     def data(self) -> PartResponseQuerySet:
         return (
-            self.object.partresponses.filter(testpart__in=self.get_current_parts())
+            self.object.partresponses.filter(testpart__in=self.get_current_items())
             .annotate_questions_count("questions_count", Q(is_practice=False))
             .annotate_questionresponses_count(
                 "responses_count", Q(question__is_practice=False)
@@ -694,7 +728,7 @@ class TestResponseView(
 
         part_header = _("%(part_name)s (%(questions_count)s opg.)")
 
-        parts = self.get_current_parts()
+        parts = self.get_current_items()
 
         extra_columns = [
             (
@@ -766,7 +800,7 @@ class TestResponseView(
         return [item.correct_pct_of_all for item in qs]
 
     def get_part_names(self) -> Dict[int, str]:
-        return {part.pk: part.name for part in self.get_current_parts()}
+        return {part.pk: part.name for part in self.get_current_items()}
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.GET.get("only_table") == "true":
@@ -789,7 +823,9 @@ class TestResponseView(
         return context
 
 
-class PartResponseView(GroupRequiredMixin, ObjectPermissionsMixin, DetailView):
+class PartResponseView(
+    GroupRequiredMixin, ObjectPermissionsMixin, PaginationMixin, DetailView
+):
     model = PartResponse
     template_name = "dysleksi/admin/part_response/group/detail.html"
     groups_required = [TEACHERS]
@@ -966,6 +1002,26 @@ class PartResponseView(GroupRequiredMixin, ObjectPermissionsMixin, DetailView):
             return questionresponse_qs.aggregate(**aggregations)
         return {}
 
+    def get_page_size(self) -> int:
+        return settings.QUESTIONRESPONSES_TABLE_SIZE  # type: ignore[misc]
+
+    def get_pagination_buttons_count(self):
+        return 5
+
+    def get_items(self):
+        return (
+            self.get_questionresponse_qs()
+            .select_related("question", "question__challenge")
+            .annotate(row_number=Window(expression=RowNumber(), order_by=F("pk").asc()))
+            .order_by("pk")
+        )
+
+    def render_to_response(self, context, **response_kwargs):
+        if self.request.GET.get("only_table") == "true":
+            return HttpResponse(context["responses_table"].as_html(self.request))
+        else:
+            return super().render_to_response(context, **response_kwargs)
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
@@ -1056,9 +1112,7 @@ class PartResponseView(GroupRequiredMixin, ObjectPermissionsMixin, DetailView):
             exclude_columns.append("challenge_sentence")
 
         context["responses_table"] = QuestionResponsesTable(
-            data=self.get_questionresponse_qs().select_related(
-                "question", "question__challenge"
-            ),
+            data=self.get_current_items(),
             exclude=exclude_columns,
         )
 
