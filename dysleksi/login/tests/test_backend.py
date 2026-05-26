@@ -1,9 +1,11 @@
+from unittest.mock import patch
 from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib.sessions.middleware import SessionMiddleware
 from django.test import TestCase
 from django.test.client import RequestFactory
+from django.test.utils import override_settings
 from login.authentication_backend import (
     DysleksiOIDCAuthenticationBackend,
     unilogin_logout,
@@ -55,3 +57,34 @@ class DysleksiOIDCABTest(TestCase):
     def test_verify_claims(self):
         claims = {"exp": 1337, "jti": "unique", "etc": "osv"}
         self.assertTrue(self.backend.verify_claims(claims))
+
+    @patch("mozilla_django_oidc.auth.OIDCAuthenticationBackend.get_userinfo")
+    def test_get_userinfo(self, mock_backend_method):
+        mock_backend_method.return_value = {"nothing": "here"}
+        access_token = "access_token"
+        id_token = "id_token"
+        payload = "payload"
+        with (
+            patch.object(self.backend, "retrieve_matching_jwk") as mock_jwk,
+            patch.object(self.backend, "get_payload_data") as mock_payload,
+        ):
+            mock_jwk.return_value = "key"
+            mock_payload.return_value = {"uniid": "123456"}
+            claims = self.backend.get_userinfo(access_token, id_token, payload)
+            self.assertCountEqual(["uniid", "nothing"], claims.keys())
+
+    @override_settings(OIDC_RP_IDP_SIGN_KEY="key")
+    @patch("mozilla_django_oidc.auth.OIDCAuthenticationBackend.get_userinfo")
+    def test_get_userinfo_with_key(self, mock_backend_method):
+        mock_backend_method.return_value = {"nothing": "here"}
+        access_token = "access_token"
+        id_token = "id_token"
+        payload = "payload"
+        with (
+            patch.object(self.backend, "retrieve_matching_jwk") as mock_jwk,
+            patch.object(self.backend, "get_payload_data") as mock_payload,
+        ):
+            mock_jwk.return_value = "key"
+            mock_payload.return_value = {"uniid": "123456"}
+            claims = self.backend.get_userinfo(access_token, id_token, payload)
+            self.assertCountEqual(["uniid", "nothing"], claims.keys())
