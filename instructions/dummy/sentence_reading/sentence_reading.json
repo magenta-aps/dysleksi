@@ -1,21 +1,21 @@
 [
     {
         "question_type": "multiple_choice",
-        "image": "resources/dummy/sentence_reading/Opgave/Bamse.jpg",
+        "image": "dummy-resources/sentence_reading/Opgave/Bamse.jpg",
         "text": "jeg vejer over 100 kilo",
         "correct": "false",
         "wrong": ["true"]
     },
     {
         "question_type": "multiple_choice",
-        "image": "resources/dummy/sentence_reading/Opgave/Banan.jpg",
+        "image": "dummy-resources/sentence_reading/Opgave/Banan.jpg",
         "text": "Jeg er lavet af beton",
         "correct": "false",
         "wrong": ["true"]
     },
     {
         "question_type": "multiple_choice",
-        "image": "resources/dummy/sentence_reading/Opgave/Blomst.jpg",
+        "image": "dummy-resources/sentence_reading/Opgave/Blomst.jpg",
         "text": "Jeg vokser i naturen",
         "correct": "true",
         "wrong": ["false"]

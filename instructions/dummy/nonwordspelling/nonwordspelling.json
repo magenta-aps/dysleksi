@@ -1,13 +1,13 @@
 [
   {
     "question_type": "free_text",
-    "sound": "resources/dummy/nonwordspelling/Opgave/bar.mp3",
+    "sound": "dummy-resources/nonwordspelling/Opgave/bar.mp3",
     "correct": "bar",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/dummy/nonwordspelling/Opgave/foo.mp3",
+    "sound": "dummy-resources/nonwordspelling/Opgave/foo.mp3",
     "correct": "foo",
     "reminder": 20000
   }

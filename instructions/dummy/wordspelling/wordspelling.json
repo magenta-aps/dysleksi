@@ -1,13 +1,13 @@
 [
   {
     "question_type": "free_text",
-    "sound": "resources/dummy/wordspelling/Opgave/aput.mp3",
+    "sound": "dummy-resources/wordspelling/Opgave/aput.mp3",
     "correct": "aput",
     "reminder": 20000
   },
   {
     "question_type": "free_text",
-    "sound": "resources/dummy/wordspelling/Opgave/arsaq.mp3",
+    "sound": "dummy-resources/wordspelling/Opgave/arsaq.mp3",
     "correct": "arsaq",
     "reminder": 20000
   }

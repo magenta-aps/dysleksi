@@ -15,7 +15,7 @@ RUN mkdir /app && \
     mkdir -p /var/cache/idp && \
     mkdir -p /upload/instructions && \
     mkdir -p /upload/resources && \
-    mkdir -p /upload/resources/dummy && \
+    mkdir -p /upload/dummy-resources && \
     mkdir -p /static/ && \
     mkdir -p /static-copy/ && \
     #gid/uid from salt

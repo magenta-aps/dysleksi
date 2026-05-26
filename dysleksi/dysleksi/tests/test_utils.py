@@ -112,11 +112,11 @@ class UtilTest(TestCase):
         self.wordreading_1_data = [
             {
                 "text": "Cykel",
-                "correct": "resources/dummy/wordreading_1/Opgave/bike.png",
+                "correct": "dummy-resources/wordreading_1/Opgave/bike.png",
                 "wrong": [
-                    "resources/dummy/wordreading_1/Opgave/house.png",
-                    "resources/dummy/wordreading_1/Opgave/car.png",
-                    "resources/dummy/wordreading_1/Opgave/cat.png",
+                    "dummy-resources/wordreading_1/Opgave/house.png",
+                    "dummy-resources/wordreading_1/Opgave/car.png",
+                    "dummy-resources/wordreading_1/Opgave/cat.png",
                 ],
             },
         ]
@@ -124,11 +124,11 @@ class UtilTest(TestCase):
         self.wordreading_1_pratice_data = [
             {
                 "text": "Cykel",
-                "correct": "resources/dummy/wordreading_1/Opgave/bike.png",
+                "correct": "dummy-resources/wordreading_1/Opgave/bike.png",
                 "wrong": [
-                    "resources/dummy/wordreading_1/Opgave/house.png",
-                    "resources/dummy/wordreading_1/Opgave/car.png",
-                    "resources/dummy/wordreading_1/Opgave/cat.png",
+                    "dummy-resources/wordreading_1/Opgave/house.png",
+                    "dummy-resources/wordreading_1/Opgave/car.png",
+                    "dummy-resources/wordreading_1/Opgave/cat.png",
                 ],
                 "instruction_sequence": [
                     {"action": "show", "element": "challenge-text", "delayAfter": 0},
@@ -138,7 +138,7 @@ class UtilTest(TestCase):
 
         self.letter_sound_data = [
             {
-                "sound": "resources/dummy/letter_sound/Opgave/a.mp3",
+                "sound": "dummy-resources/letter_sound/Opgave/a.mp3",
                 "question_type": "multiple_choice",
                 "correct": "a",
                 "wrong": ["b", "x", "d"],
@@ -146,26 +146,26 @@ class UtilTest(TestCase):
         ]
         self.fore_sound_data = [
             {
-                "sound": "resources/dummy/fore_sound/Opgave/a.mp3",
+                "sound": "dummy-resources/fore_sound/Opgave/a.mp3",
                 "question_type": "multiple_choice",
-                "correct": "resources/dummy/fore_sound/Opgave/abe.png",
+                "correct": "dummy-resources/fore_sound/Opgave/abe.png",
                 "wrong": [
-                    "resources/dummy/fore_sound/Opgave/bjorn.png",
-                    "resources/dummy/fore_sound/Opgave/fugl.png",
-                    "resources/dummy/fore_sound/Opgave/kat.png",
+                    "dummy-resources/fore_sound/Opgave/bjorn.png",
+                    "dummy-resources/fore_sound/Opgave/fugl.png",
+                    "dummy-resources/fore_sound/Opgave/kat.png",
                 ],
             },
         ]
 
         self.fore_sound_practice_data = [
             {
-                "sound": "resources/dummy/fore_sound/Opgave/a.mp3",
+                "sound": "dummy-resources/fore_sound/Opgave/a.mp3",
                 "question_type": "multiple_choice",
-                "correct": "resources/dummy/fore_sound/Opgave/abe.png",
+                "correct": "dummy-resources/fore_sound/Opgave/abe.png",
                 "wrong": [
-                    "resources/dummy/fore_sound/Opgave/bjorn.png",
-                    "resources/dummy/fore_sound/Opgave/fugl.png",
-                    "resources/dummy/fore_sound/Opgave/kat.png",
+                    "dummy-resources/fore_sound/Opgave/bjorn.png",
+                    "dummy-resources/fore_sound/Opgave/fugl.png",
+                    "dummy-resources/fore_sound/Opgave/kat.png",
                 ],
                 "instruction_sequence": [
                     {"action": "show", "element": "challenge-text", "delayAfter": 0},
@@ -175,7 +175,7 @@ class UtilTest(TestCase):
 
         self.sentence_reading_data = [
             {
-                "image": "resources/dummy/sentence_reading/Opgave/Blomst.jpg",
+                "image": "dummy-resources/sentence_reading/Opgave/Blomst.jpg",
                 "text": "Jeg vokser i naturen",
                 "question_type": "multiple_choice",
                 "correct": "true",
@@ -185,7 +185,7 @@ class UtilTest(TestCase):
 
         self.sentence_reading_practice_data = [
             {
-                "image": "resources/dummy/sentence_reading/Opgave/Blomst.jpg",
+                "image": "dummy-resources/sentence_reading/Opgave/Blomst.jpg",
                 "text": "Jeg vokser i naturen",
                 "question_type": "multiple_choice",
                 "correct": "true",
@@ -262,7 +262,7 @@ class UtilTest(TestCase):
 
         self.assertTrue(
             TestResource.objects.filter(
-                sound="resources/dummy/letter_sound/Opgave/a.mp3"
+                sound="dummy-resources/letter_sound/Opgave/a.mp3"
             ).exists()
         )
 
@@ -271,7 +271,7 @@ class UtilTest(TestCase):
 
         self.assertTrue(
             TestResource.objects.filter(
-                image="resources/dummy/fore_sound/Opgave/abe.png"
+                image="dummy-resources/fore_sound/Opgave/abe.png"
             ).exists()
         )
 
@@ -282,7 +282,7 @@ class UtilTest(TestCase):
 
         self.assertTrue(
             TestResource.objects.filter(
-                image="resources/dummy/fore_sound/Opgave/abe.png"
+                image="dummy-resources/fore_sound/Opgave/abe.png"
             ).exists()
         )
 
@@ -291,7 +291,7 @@ class UtilTest(TestCase):
 
         self.assertTrue(
             TestResource.objects.filter(
-                image="resources/dummy/sentence_reading/Opgave/Blomst.jpg"
+                image="dummy-resources/sentence_reading/Opgave/Blomst.jpg"
             ).exists()
         )
 
@@ -302,7 +302,7 @@ class UtilTest(TestCase):
 
         self.assertTrue(
             TestResource.objects.filter(
-                image="resources/dummy/sentence_reading/Opgave/Blomst.jpg"
+                image="dummy-resources/sentence_reading/Opgave/Blomst.jpg"
             ).exists()
         )
 
