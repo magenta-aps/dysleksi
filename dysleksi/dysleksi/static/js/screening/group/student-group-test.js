@@ -381,7 +381,7 @@ export class GroupTestView extends StudentTestView {
                 this.domElements.playSound("/static/audio/7c.4.wav", this.audioContext);
             } else {
                 this.domElements.disableNextButton();
-                // Play "you guessed wrong" sound snippet
+
                 this.failedAttempts += 1;
 
                 if (isMatchPair && this.failedAttempts == 3) {
@@ -412,6 +412,7 @@ export class GroupTestView extends StudentTestView {
                 } else {
                     if (!clickedEntry.button.classList.contains("pulse")) {
                         this.domElements.makeButtonAngry(this.selectedAnswer.buttonId);
+                        // Play "you guessed wrong" sound snippet
                         this.domElements.playSound(
                             "/static/audio/7c.3.wav",
                             this.audioContext,
