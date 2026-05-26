@@ -1037,6 +1037,26 @@ describe("Teacher Individual test View", () => {
         expect(modal.classList.display).not.toBe("none");
         expect(modalBody.innerHTML).not.toBe("");
     });
+
+    it("displays an error modal if student audio input is silent", () => {
+        // Act: send "audio.silent" event
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "audio.silent",
+                    student: {
+                        displayName: "Elev E.",
+                    },
+                },
+            }),
+        );
+        // Assert: modal is displayed
+        const modal = document.querySelector("#error");
+        const modalBody = modal.querySelector(".modal-body-inner");
+        expect(modal).not.toBeNull();
+        expect(modal.classList.display).not.toBe("none");
+        expect(modalBody.innerHTML).not.toBe("");
+    });
 });
 
 describe("GroupTestContainer", () => {

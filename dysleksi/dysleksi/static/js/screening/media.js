@@ -75,14 +75,20 @@ export class AudioDetector extends EventTarget {
         stream,
         detectionLevelThreshold = 0.25,
         debounceTime = 2500.0, // 2.5 secs
+        minLevel = 0.05,
+        silenceTimeThreshold = 30000.0, // 30 secs
     ) {
         super();
 
         this.detectionLevelThreshold = detectionLevelThreshold;
         this.debounceTime = debounceTime;
+        this.minLevel = minLevel;
+        this.silenceTimeThreshold = silenceTimeThreshold;
+        this.silentDuration = 0;
 
         this.state = null;
         this.lastEventAt = null;
+        this.silenceDetectedOnce = false;
 
         // Connect analyser node to media stream source
         const context = new window.AudioContext();
@@ -92,7 +98,7 @@ export class AudioDetector extends EventTarget {
         input.connect(this.analyser);
     }
 
-    run() {
+    run(t) {
         // Take the average level of all frequency bins (scaled to 0.0-1.0)
         let avg = 0;
         for (const bin of this.getBins()) {
@@ -100,11 +106,26 @@ export class AudioDetector extends EventTarget {
         }
         avg = Math.abs(avg);
 
-        // Check if the average power across all bins exceeds threshold
         if (avg > this.detectionLevelThreshold) {
+            // Audio volume exceeds detection threshold
             this.dispatchDebounced("audio.detected");
-        } else {
+        } else if (avg < this.detectionLevelThreshold && avg > this.minLevel) {
+            // Audio volume is low but not completely silent
             this.dispatchDebounced("audio.quiet");
+        } else {
+            // Current `avg` is below minimum level.
+            // Update length of silent duration.
+            this.silentDuration = t !== undefined ? t : 0;
+        }
+
+        // Check if audio has been silent for too long
+        if (
+            this.silentDuration > this.silenceTimeThreshold &&
+            this.state !== "audio.detected" &&
+            !this.silenceDetectedOnce
+        ) {
+            this.dispatchDebounced("audio.silent");
+            this.silenceDetectedOnce = true;
         }
 
         // Process next frame
@@ -130,6 +151,8 @@ export class AudioDetector extends EventTarget {
                 dispatchIfChanged(event);
             }
         }
+
+        this.silentDuration = 0; // reset counter
     }
 
     getBins() {

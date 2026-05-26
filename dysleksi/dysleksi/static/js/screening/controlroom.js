@@ -1057,6 +1057,15 @@ export class TeacherView {
                 }
             }
 
+            if (this.test.testType === "individual" && data.event === "audio.silent") {
+                const student = new Student(data.student);
+                const error = "Mikrofonen ser ikke ud til at modtage lyd";
+                this.onStudentSetupError({
+                    studentDisplayName: student.displayName,
+                    error: error,
+                });
+            }
+
             this.messageQueue.push(data);
             this._persistQueue(); // Persistent save
         });

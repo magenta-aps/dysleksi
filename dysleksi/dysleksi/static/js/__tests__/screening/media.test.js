@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, expectTypeOf, vi, beforeEach } from "vitest";
+import { describe, it, expect, expectTypeOf, vi, beforeEach, afterEach } from "vitest";
 import { AudioDetector, TestMediaRecorder } from "../../screening/media";
 import { MockAudioContext } from "../mock_audio.js";
 
@@ -186,6 +186,11 @@ describe("AudioDetector", () => {
         global.document.timeline = {
             currentTime: 0,
         };
+        vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
     });
 
     const getInstance = (mockData = null) => {
@@ -218,10 +223,19 @@ describe("AudioDetector", () => {
 
     it("detects quietness", () => {
         const onQuiet = vi.fn();
-        const instance = getInstance([128.0]);
+        const instance = getInstance([150.0]);
         instance.addEventListener("audio.quiet", onQuiet);
         instance.run();
         expect(onQuiet).toHaveBeenCalled();
+    });
+
+    it("detects silence", () => {
+        const onSilence = vi.fn();
+        const instance = getInstance([128.0]);
+        instance.addEventListener("audio.silent", onSilence);
+        instance.run();
+        vi.advanceTimersByTime(30500.0); // Silence must last 30 secs or more
+        expect(onSilence).toHaveBeenCalled();
     });
 
     it("only dispatches events if state has changed", () => {

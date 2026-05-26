@@ -11,7 +11,7 @@ export class IndividualTestView extends StudentTestView {
         super(test, chatSocket, assignmentId, domElements, student);
         this.mediaRecorder = mediaRecorder;
         this.audioDetector = new AudioDetector(this.mediaRecorder.stream);
-        for (const event of ["audio.detected", "audio.quiet"]) {
+        for (const event of ["audio.detected", "audio.quiet", "audio.silent"]) {
             this.audioDetector.addEventListener(event, (e) => {
                 this.onAudioEvent(e.type);
             });
