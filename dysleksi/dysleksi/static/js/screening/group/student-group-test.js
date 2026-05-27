@@ -216,7 +216,12 @@ export class GroupTestView extends StudentTestView {
         // Hide the image to avoid leaking into the next question
         this.domElements.hideChallengeImage();
 
-        if (!question.instruction_sequence) {
+        if (
+            !(
+                question.continueWhenInstructionIsComplete &&
+                question.instruction_sequence
+            )
+        ) {
             if (!this.selectedAnswer && !this.textAnswer && !outOfTime) {
                 alert("Vælg et svar, før du går videre.");
                 return;
