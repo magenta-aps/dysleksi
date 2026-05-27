@@ -4,7 +4,6 @@ import { releaseWakeLock } from "./utils.js";
 import { unlockAudioOnGesture } from "./utils.js";
 import { preventDoubleTapZoom } from "./utils.js";
 import { WebRTCChannel } from "../webRTC.js";
-import { sleep } from "./utils.js";
 
 export class StudentTestView extends EventTarget {
     chatSocket;
@@ -36,6 +35,7 @@ export class StudentTestView extends EventTarget {
         });
         this.audioContext = unlockAudioOnGesture();
         this.failedAttempts = 0;
+        this.cancelAudio = false;
     }
 
     questionTitle(practice = false) {
@@ -115,7 +115,17 @@ export class StudentTestView extends EventTarget {
         });
     }
 
+    sleep(ms) {
+        return new Promise((resolve, reject) => {
+            setTimeout(() => {
+                if (this.cancelAudio) reject(new Error("cancelled"));
+                else resolve();
+            }, ms);
+        });
+    }
+
     async startSoundCalibration() {
+        this.cancelAudio = false;
         this.domElements.hideSoundCalibrationAnimation();
         this.domElements.hideElement(this.domElements.endSoundCalibrationButton);
         this.domElements.showSoundCalibration();
@@ -126,7 +136,11 @@ export class StudentTestView extends EventTarget {
         );
         this.domElements._setButtonListener(
             this.domElements.skipSoundCalibrationButton,
-            () => this.endSoundCalibration(),
+            () => {
+                this.cancelAudio = true;
+                this.domElements.interruptSound();
+                this.endSoundCalibration();
+            },
         );
 
         this.domElements._setButtonListener(
@@ -154,30 +168,47 @@ export class StudentTestView extends EventTarget {
         this.domElements.speakerIcon.classList.add("playing");
 
         // Testen starter om lidt.
-        await this.domElements.playSound("/static/audio/1t.1.wav", this.audioContext);
-        await sleep(750);
+        try {
+            await this.domElements.playSound(
+                "/static/audio/1t.1.wav",
+                this.audioContext,
+            );
+            await this.sleep(750);
 
-        // Først skal du justere lyden ved hjælp af iPadens lydknap.
-        await this.domElements.playSound("/static/audio/1t.2.wav", this.audioContext);
-        this.domElements.speakerIcon.classList.remove("playing");
+            // Først skal du justere lyden ved hjælp af iPadens lydknap.
+            await this.domElements.playSound(
+                "/static/audio/1t.2.wav",
+                this.audioContext,
+            );
+            this.domElements.speakerIcon.classList.remove("playing");
 
-        await sleep(750);
-        this.domElements.showSoundCalibrationAnimation();
-        await this.domElements.waitForClick(this.domElements.soundCalibrationAnimation);
+            await this.sleep(750);
+            this.domElements.showSoundCalibrationAnimation();
+            await this.domElements.waitForClick(
+                this.domElements.soundCalibrationAnimation,
+            );
 
-        await sleep(750);
-        this.domElements.stopSoundCalibrationAnimation();
+            await this.sleep(750);
+            this.domElements.stopSoundCalibrationAnimation();
 
-        // Tryk grøn når du er klar.
-        this.domElements.speakerIcon.classList.add("playing");
-        await this.domElements.playSound("/static/audio/1t.4.wav", this.audioContext);
-        this.domElements.speakerIcon.classList.remove("playing");
+            // Tryk grøn når du er klar.
+            this.domElements.speakerIcon.classList.add("playing");
+            await this.domElements.playSound(
+                "/static/audio/1t.4.wav",
+                this.audioContext,
+            );
+            this.domElements.speakerIcon.classList.remove("playing");
 
-        this.domElements.showElement(this.domElements.endSoundCalibrationButton);
+            this.domElements.showElement(this.domElements.endSoundCalibrationButton);
+        } catch (e) {
+            if (e.message !== "cancelled") throw e;
+            // cancelled — just exit silently
+        }
     }
 
     async startSummary() {
         console.log("Test started, showing summary");
+        this.cancelAudio = false;
         this.domElements.hideElement(this.domElements.endSummaryButton);
         this.domElements.showSummary(this.test.parts);
 
@@ -185,22 +216,38 @@ export class StudentTestView extends EventTarget {
             this.endSummary(),
         );
 
-        this.domElements._setButtonListener(this.domElements.skipSummaryButton, () =>
-            this.endSummary(),
-        );
+        this.domElements._setButtonListener(this.domElements.skipSummaryButton, () => {
+            this.cancelAudio = true;
+            this.domElements.interruptSound();
+            this.endSummary();
+        });
 
-        // Du kommer til at arbejde med forskellige opgaver.
-        await this.domElements.playSound("/static/audio/1t.5.wav", this.audioContext);
-        await sleep(750);
+        try {
+            // Du kommer til at arbejde med forskellige opgaver.
+            await this.domElements.playSound(
+                "/static/audio/1t.5.wav",
+                this.audioContext,
+            );
+            await this.sleep(750);
 
-        // Du får at vide, hvergang en ny deltests skal starte.
-        await this.domElements.playSound("/static/audio/1t.6.wav", this.audioContext);
-        await sleep(750);
+            // Du får at vide, hvergang en ny deltests skal starte.
+            await this.domElements.playSound(
+                "/static/audio/1t.6.wav",
+                this.audioContext,
+            );
+            await this.sleep(750);
 
-        // Tryk grøn når du er klar.
-        await this.domElements.playSound("/static/audio/1t.7.wav", this.audioContext);
+            // Tryk grøn når du er klar.
+            await this.domElements.playSound(
+                "/static/audio/1t.7.wav",
+                this.audioContext,
+            );
 
-        this.domElements.showElement(this.domElements.endSummaryButton);
+            this.domElements.showElement(this.domElements.endSummaryButton);
+        } catch (e) {
+            if (e.message !== "cancelled") throw e;
+            // cancelled — just exit silently
+        }
     }
 
     endSummary() {

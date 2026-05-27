@@ -599,16 +599,19 @@ describe("GroupTestFlow", () => {
     });
 
     it("Skips sound calibration if the debug button is clicked", async () => {
+        vi.useRealTimers();
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
         domElements.playSound.mockResolvedValue();
         view.start();
-        view.startSoundCalibration();
+        const calibrationPromise = view.startSoundCalibration();
         vi.spyOn(view, "endSoundCalibration").mockImplementation(() => {});
 
         domElements.skipSoundCalibrationButton.click();
         expect(view.endSoundCalibration).toHaveBeenCalled();
+        expect(view.cancelAudio).toBe(true);
+        await expect(calibrationPromise).resolves.toBeUndefined();
     });
 
     it("Guides the student through the summary", async () => {
@@ -652,16 +655,19 @@ describe("GroupTestFlow", () => {
     });
 
     it("Allows skipping the summary with the debug button", async () => {
+        vi.useRealTimers();
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
         domElements.playSound.mockResolvedValue();
         view.start();
-        view.startSummary();
+        const calibrationPromise = view.startSummary();
         vi.spyOn(view, "endSummary").mockImplementation(() => {});
 
         domElements.skipSummaryButton.click();
         expect(view.endSummary).toHaveBeenCalled();
+        expect(view.cancelAudio).toBe(true);
+        await expect(calibrationPromise).resolves.toBeUndefined();
     });
 
     it("Moves on to the summary when sound calibration is ended", () => {
@@ -690,6 +696,30 @@ describe("GroupTestFlow", () => {
         view.endSoundCalibration();
 
         expect(view.showFirstQuestion).toHaveBeenCalled();
+    });
+
+    it("re-throws non-cancellation errors during sound calibration", async () => {
+        vi.useRealTimers();
+        const testData = JSON.parse(JSON.stringify(groupTestData));
+        const test = new Test(testData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+
+        domElements.playSound.mockRejectedValue(new Error("audio decode failed"));
+        view.start();
+        await expect(view.startSoundCalibration()).rejects.toThrow(
+            "audio decode failed",
+        );
+    });
+
+    it("re-throws non-cancellation errors during summary", async () => {
+        vi.useRealTimers();
+        const testData = JSON.parse(JSON.stringify(groupTestData));
+        const test = new Test(testData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+
+        domElements.playSound.mockRejectedValue(new Error("network error"));
+        view.start();
+        await expect(view.startSummary()).rejects.toThrow("network error");
     });
 
     it("Trigger for first question reminder", () => {
