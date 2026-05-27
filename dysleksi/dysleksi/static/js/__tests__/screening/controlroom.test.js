@@ -1835,11 +1835,11 @@ describe("StudentCard", () => {
         mockStudent.progress = 45;
         mockStudent.currentPartIndex = 0;
         mockStudent.currentQuestionIndex = 1;
-        mockStudent.resultsByPart = { 0: [true, false] };
+        mockStudent.resultsByPart = { 0: ["correct", "wrong", "partial"] };
 
         mockTest = {
             parts: [
-                { name: "wordreading", questions: [{}, {}, {}] },
+                { name: "wordreading", questions: [{}, {}, {}, {}] },
                 { name: "wordspelling", questions: [{}, {}] },
             ],
         };
@@ -1888,11 +1888,12 @@ describe("StudentCard", () => {
         card.update();
 
         const dots = card.dotsContainer.querySelectorAll(".dot");
-        expect(dots.length).toBe(3);
+        expect(dots.length).toBe(4);
 
         expect(dots[0].classList.contains("correct")).toBe(true);
         expect(dots[1].classList.contains("wrong")).toBe(true);
-        expect(dots[2].classList.contains("default")).toBe(true);
+        expect(dots[2].classList.contains("partially-correct")).toBe(true);
+        expect(dots[3].classList.contains("default")).toBe(true);
     });
 
     it("disables navigation arrows at the boundaries", () => {

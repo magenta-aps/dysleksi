@@ -3,6 +3,7 @@
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.1.wav",
     "correct": "iki",
+    "partially_correct": ["igi", "iga", "ikki", "ike", "ekke", "eke", "ige"],
     "reminder": 20000,
     "continue_when_instruction_is_complete": false,
     "instruction_sequence": [
@@ -19,114 +20,133 @@
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.2.wav",
     "correct": "niu",
+    "partially_correct": ["niju", "nio", "niiu", "neju", "neo"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.3.wav",
     "correct": "aja",
+    "partially_correct": ["aaja", "aya"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.4.wav",
     "correct": "una",
+    "partially_correct": ["ona", "oona", "unaa"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.5.wav",
     "correct": "siku",
+    "partially_correct": ["sigu", "siko", "sicu", "sikku"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.6.wav",
     "correct": "aput",
+    "partially_correct": ["abut", "apput", "aaput", "apot", "aputs", "abots"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.7.wav",
     "correct": "kuuk",
+    "partially_correct": ["kuk", "kook", "kok", "guk"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.8.wav",
     "correct": "appa",
+    "partially_correct": ["apa", "aba", "apaa", "aapa", "abba"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.9.wav",
     "correct": "nasaq",
+    "partially_correct": ["nassaq", "nasarq"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.10.wav",
     "correct": "tuttu",
+    "partially_correct": ["tuttut", "tutu", "tuutu", "toto", "tudu", "dudu", "duddu", "tutuu"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.11.wav",
     "correct": "arsaq",
+    "partially_correct": ["asaq", "aessaq", "arsarq", "assaq", "asaaq", "assaaq", "aasaq"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.12.wav",
     "correct": "puisi",
+    "partially_correct": ["buisi", "puvisi", "puissi", "puese", "boiesi", "buvisi", "poisi", "puiisi"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.13.wav",
     "correct": "palasi",
+    "partially_correct": ["balasi", "palase", "palassi", "pallasi", "balassi"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.14.wav",
     "correct": "kammak",
+    "partially_correct": ["kamak", "kaamak", "gamak", "gamag", "kammaak"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.15.wav",
     "correct": "meeraq",
+    "partially_correct": ["meraq", "merak", "merraq", "meerarq"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.16.wav",
     "correct": "sorluk",
+    "partially_correct": ["solluk", "sorlluk", "soluk", "sulluk", "sillik", "suluk", "surlok"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.17.wav",
     "correct": "kiffaq",
+    "partially_correct": ["kifaq", "kifarq", "kifak", "gifak", "gifaq", "gefarq", "kivfaq", "kiiffaq", "kivvaq", "kefaq", "kiffarq"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.18.wav",
     "correct": "siuteroq",
+    "partially_correct": ["sioteroq", "siutseroq", "sijuteroq", "siuterok", "siuuteroq", "siorteroq", "siiuteroq", "siuteruq"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.19.wav",
     "correct": "tinguaraq",
+    "partially_correct": ["tinnguaraq", "tsinguaraq", "tinguvaraq", "tinguarraq", "tinguarrarq", "tinguuaraq", "tsinguvaraq"],
     "reminder": 20000
   },
   {
     "question_type": "free_text",
     "sound": "resources/wordspelling/Opgave/6f.20.wav",
     "correct": "illaagutit",
+    "partially_correct": ["illagutit", "illaggutit", "ilagutit", "illajutit", "illaagutsit", "illaangutit", "illangutit", "ilagotit", "iillagutit", "ellajutit", "illaajutit", "illanggutit"],
     "reminder": 20000
   }
 ]

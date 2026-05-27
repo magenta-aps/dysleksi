@@ -450,10 +450,12 @@ export class StudentCard {
             const dot = document.createElement("span");
             dot.classList.add("dot");
 
-            if (results[i] === true) {
+            if (results[i] === "correct") {
                 dot.classList.add("correct");
-            } else if (results[i] === false) {
+            } else if (results[i] === "wrong") {
                 dot.classList.add("wrong");
+            } else if (results[i] === "partial") {
+                dot.classList.add("partially-correct");
             } else {
                 dot.classList.add("default");
             }

@@ -39,6 +39,7 @@ from dysleksi.forms import StartClassRoomForm, StartIndividualRoomForm
 from dysleksi.models import (
     TEACHERS,
     Class,
+    Correctness,
     CorrectnessCategory,
     PartResponse,
     PartResponseQuerySet,
@@ -599,7 +600,7 @@ class AssignmentPartResultsView(GroupRequiredMixin, ObjectPermissionsMixin, List
             )
             .annotate_questionresponses_count(
                 "correct_count",
-                Q(correct=True, question__is_practice=False),
+                Q(correctness=Correctness.CORRECT, question__is_practice=False),
             )
             .annotate_proportion(
                 "responses_count", "correct_count", "correct_proportion"
@@ -705,7 +706,8 @@ class TestResponseView(
                 "responses_count", Q(question__is_practice=False)
             )
             .annotate_questionresponses_count(
-                "correct_count", Q(question__is_practice=False, correct=True)
+                "correct_count",
+                Q(question__is_practice=False, correctness=Correctness.CORRECT),
             )
             .annotate_proportion(
                 "responses_count", "correct_count", "correct_proportion_of_answered"
@@ -842,7 +844,8 @@ class PartResponseView(
             )
             .annotate_questions_count("questions_count", Q(is_practice=False))
             .annotate_questionresponses_count(
-                "correct_count", Q(question__is_practice=False, correct=True)
+                "correct_count",
+                Q(question__is_practice=False, correctness=Correctness.CORRECT),
             )
             .annotate_proportion(
                 "questions_count", "responses_count", "responses_proportion"
@@ -878,7 +881,7 @@ class PartResponseView(
                 Subquery(
                     PossibleAnswer.objects.filter(
                         question=OuterRef("pk"),
-                        is_correct=True,
+                        correctness=Correctness.CORRECT,
                     ).values("resource__text"),
                     output_field=CharField(),
                 ),
@@ -946,7 +949,7 @@ class PartResponseView(
                 Subquery(
                     PossibleAnswer.objects.filter(
                         question=OuterRef("question__pk"),
-                        is_correct=True,
+                        correctness=Correctness.CORRECT,
                     ).values("resource__text"),
                     output_field=CharField(),
                 ),
@@ -966,14 +969,14 @@ class PartResponseView(
     def get_questionresponse_qs_aggregations(self) -> Dict[str, Aggregate]:
         aggregations: Dict[str, Aggregate] = {}
         for lower, upper in self.part.answer_time_data_breakdown_ranges:
-            q = Q(correct=True)
+            q = Q(correctness=Correctness.CORRECT)
             if lower is not None:
                 q &= Q(submitted_after__gt=timedelta(minutes=lower))
             if upper is not None:
                 q &= Q(submitted_after__lt=timedelta(minutes=upper))
             aggregations[f"time_slot__{lower}_{upper}__correct"] = Count("id", filter=q)
         for lower, upper in self.part.answer_wordlength_data_ranges:
-            q = Q(correct=True)
+            q = Q(correctness=Correctness.CORRECT)
             if lower is not None:
                 q &= Q(challenge_text_length__gte=lower)
             if upper is not None:
@@ -982,7 +985,7 @@ class PartResponseView(
                 "id", filter=q
             )
         for lower, upper in self.part.answer_wordcount_data_ranges:
-            q = Q(correct=True)
+            q = Q(correctness=Correctness.CORRECT)
             if lower is not None:
                 q &= Q(challenge_word_count__gte=lower)
             if upper is not None:

@@ -770,7 +770,7 @@ describe("GroupTestFlow", () => {
             displayedAt: 0,
             answeredAt: expect.any(Number),
             duration: expect.any(Number),
-            correct: false,
+            correctness: "wrong",
             textAnswer: null,
             student: expect.any(Object),
         });
@@ -811,7 +811,7 @@ describe("GroupTestFlow", () => {
                 displayedAt: 0,
                 answeredAt: expect.any(Number),
                 duration: expect.any(Number),
-                correct: false,
+                correctness: "wrong",
                 textAnswer: null,
                 student: expect.any(Object),
             });
@@ -893,7 +893,7 @@ describe("GroupTestFlow", () => {
             answeredAt: 0,
             duration: 0,
             roomName: view.roomName,
-            correct: false,
+            correctness: "wrong",
             textAnswer: null,
             student: expect.any(Object),
         });
@@ -949,7 +949,9 @@ describe("GroupTestFlow", () => {
 
         view.showQuestion(true, 1);
         const question = view.currentQuestion;
-        const correctAnswer = question.possibleAnswers.find((a) => a.isCorrect);
+        const correctAnswer = question.possibleAnswers.find(
+            (a) => a.correctness === "correct",
+        );
         const answerButtonObj = view.answerButtons.find(
             (a) => a.answer === correctAnswer,
         );
@@ -968,7 +970,9 @@ describe("GroupTestFlow", () => {
 
         view.showQuestion(true, 1);
         const question = view.currentQuestion;
-        const incorrectAnswer = question.possibleAnswers.find((a) => !a.isCorrect);
+        const incorrectAnswer = question.possibleAnswers.find(
+            (a) => a.correctness != "correct",
+        );
         const answerButtonObj = view.answerButtons.find(
             (a) => a.answer === incorrectAnswer,
         );
@@ -988,7 +992,9 @@ describe("GroupTestFlow", () => {
         view.showQuestion(true, 2);
         view.showingInstructions = false;
         const question = view.currentQuestion;
-        const correctAnswer = question.possibleAnswers.find((a) => a.isCorrect);
+        const correctAnswer = question.possibleAnswers.find(
+            (a) => a.correctness === "correct",
+        );
         view.selectAnswer(correctAnswer);
         view.onQuestionComplete(question);
 
@@ -1035,7 +1041,7 @@ describe("GroupTestFlow", () => {
             answeredAt: 0,
             assignmentId: 1,
             choiceId: 100,
-            correct: true,
+            correctness: "correct",
             displayedAt: 0,
             duration: 0,
             event: "question.answered",
@@ -1047,6 +1053,39 @@ describe("GroupTestFlow", () => {
             questionTitle: "1/2 (Wordspelling 2B (dummy))",
             recordingBase64: null,
             textAnswer: "aput",
+            uuid: expect.any(String),
+            student: expect.any(Object),
+        });
+    });
+
+    it("Answer freetext question almost correctly", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        testSpy(view);
+        view.setPart(1);
+
+        view.showQuestion(false, 0);
+        expect(view.input).not.toBe(null);
+        const question = view.currentQuestion;
+        view.input.value = "abut";
+        view.selectFreeText();
+        view.onQuestionComplete(question);
+        expect(view.send).toHaveBeenCalledWith({
+            answeredAt: 0,
+            assignmentId: 1,
+            choiceId: 100,
+            correctness: "partial",
+            displayedAt: 0,
+            duration: 0,
+            event: "question.answered",
+            message: "Elev har gennemført spørgsmål 2.1",
+            partId: 6,
+            partIndex: 1,
+            questionId: 25,
+            questionIndex: 0,
+            questionTitle: "1/2 (Wordspelling 2B (dummy))",
+            recordingBase64: null,
+            textAnswer: "abut",
             uuid: expect.any(String),
             student: expect.any(Object),
         });
@@ -1081,7 +1120,7 @@ describe("GroupTestFlow", () => {
             answeredAt: 0,
             assignmentId: 1,
             choiceId: 100,
-            correct: false,
+            correctness: "wrong",
             displayedAt: 0,
             duration: 0,
             event: "question.answered",
@@ -1592,7 +1631,7 @@ describe("Timer and Reminder Cleanup", () => {
 
         // 2. Mock a multiple choice selection
         // This prevents the code from falling back to textAnswer logic
-        view.selectedAnswer = { id: 1, isCorrect: true, buttonId: "btn1" };
+        view.selectedAnswer = { id: 1, correctness: "correct", buttonId: "btn1" };
         view.textAnswer = null;
 
         view.onQuestionComplete(view.currentQuestion);

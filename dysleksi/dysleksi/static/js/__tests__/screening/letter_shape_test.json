@@ -27,7 +27,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "Ss",
-              "is_correct": true
+              "correctness": "correct"
             },
             {
               "id": 201,
@@ -36,7 +36,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "S",
-              "is_correct": true
+              "correctness": "correct"
             },
             {
               "id": 202,
@@ -45,7 +45,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "B",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 203,
@@ -54,7 +54,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "C",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 204,
@@ -63,7 +63,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "s",
-              "is_correct": true
+              "correctness": "correct"
             },
             {
               "id": 205,
@@ -72,7 +72,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "a",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 206,
@@ -81,7 +81,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "x",
-              "is_correct": false
+              "correctness": "wrong"
             }
 
           ]
@@ -107,7 +107,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "Ss",
-              "is_correct": true
+              "correctness": "correct"
             },
             {
               "id": 201,
@@ -116,7 +116,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "S",
-              "is_correct": true
+              "correctness": "correct"
             },
             {
               "id": 202,
@@ -125,7 +125,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "B",
-              "is_correct": false
+              "correctness": "wrong"
             },
             {
               "id": 203,
@@ -134,7 +134,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "s",
-              "is_correct": true
+              "correctness": "correct"
             },
             {
               "id": 204,
@@ -143,7 +143,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "a",
-              "is_correct": false
+              "correctness": "wrong"
             }
           ]
         }

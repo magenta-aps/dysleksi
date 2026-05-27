@@ -17,6 +17,7 @@ from dysleksi.models import (
     STUDENTS,
     TEACHERS,
     Class,
+    Correctness,
     Institution,
     PartResponse,
     PossibleAnswer,
@@ -135,12 +136,12 @@ class DysleksiTest(TestCase):
         cls.possible_correct_answer1 = PossibleAnswer.objects.create(
             question=cls.question1,
             resource=cls.resource2,
-            is_correct=True,
+            correctness=Correctness.CORRECT,
         )
         cls.possible_wrong_answer1 = PossibleAnswer.objects.create(
             question=cls.question1,
             resource=cls.resource3,
-            is_correct=False,
+            correctness=Correctness.WRONG,
         )
         cls.question2 = TestQuestion.objects.create(
             part=cls.part,
@@ -294,12 +295,12 @@ class ResponseTest(DysleksiTest):
         cls.possible_correct_answer1 = PossibleAnswer.objects.create(
             question=cls.group_question_1,
             resource=cls.resource2,
-            is_correct=True,
+            correctness=Correctness.CORRECT,
         )
         cls.possible_wrong_answer1 = PossibleAnswer.objects.create(
             question=cls.group_question_1,
             resource=cls.resource3,
-            is_correct=False,
+            correctness=Correctness.WRONG,
         )
         cls.group_question_2 = TestQuestion.objects.create(
             part=cls.group_test_part,
@@ -309,12 +310,12 @@ class ResponseTest(DysleksiTest):
         cls.possible_correct_answer2 = PossibleAnswer.objects.create(
             question=cls.group_question_2,
             resource=cls.resource3,
-            is_correct=True,
+            correctness=Correctness.CORRECT,
         )
         cls.possible_wrong_answer2 = PossibleAnswer.objects.create(
             question=cls.group_question_2,
             resource=cls.resource4,
-            is_correct=False,
+            correctness=Correctness.WRONG,
         )
         cls.group_question_3 = TestQuestion.objects.create(
             part=cls.group_test_part,
@@ -351,7 +352,7 @@ class ResponseTest(DysleksiTest):
             partresponse=cls.group_partresponse_1,
             question=cls.group_question_1,
             answer_option=cls.possible_correct_answer1,
-            correct=True,
+            correctness=Correctness.CORRECT,
         )
         cls.group_questionresponse_1_1.submitted_at = datetime(
             2026, 5, 1, 12, 0, 10, tzinfo=tz
@@ -361,7 +362,7 @@ class ResponseTest(DysleksiTest):
         cls.group_questionresponse_1_2 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_1,
             question=cls.group_question_2,
-            correct=True,
+            correctness=Correctness.CORRECT,
         )
         cls.group_questionresponse_1_2.submitted_at = datetime(
             2026, 5, 1, 12, 0, 15, tzinfo=tz
@@ -371,7 +372,7 @@ class ResponseTest(DysleksiTest):
         cls.group_questionresponse_1_3 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_1,
             question=cls.group_question_3,
-            correct=True,
+            correctness=Correctness.CORRECT,
         )
         cls.group_questionresponse_1_3.submitted_at = datetime(
             2026, 5, 1, 12, 0, 25, tzinfo=tz
@@ -381,7 +382,7 @@ class ResponseTest(DysleksiTest):
         cls.group_questionresponse_1_4 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_1,
             question=cls.group_question_4,
-            correct=True,
+            correctness=Correctness.CORRECT,
         )
         cls.group_questionresponse_1_4.submitted_at = datetime(
             2026, 5, 1, 12, 0, 40, tzinfo=tz
@@ -392,7 +393,7 @@ class ResponseTest(DysleksiTest):
             partresponse=cls.group_partresponse_2,
             question=cls.group_question_1,
             answer_option=cls.possible_correct_answer1,
-            correct=True,
+            correctness=Correctness.CORRECT,
         )
         cls.group_questionresponse_2_1.submitted_at = datetime(
             2026, 5, 1, 12, 0, 12, tzinfo=tz
@@ -402,7 +403,7 @@ class ResponseTest(DysleksiTest):
         cls.group_questionresponse_2_2 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_2,
             question=cls.group_question_2,
-            correct=False,
+            correctness=Correctness.WRONG,
         )
         cls.group_questionresponse_2_2.submitted_at = datetime(
             2026, 5, 1, 12, 0, 25, tzinfo=tz
@@ -412,7 +413,7 @@ class ResponseTest(DysleksiTest):
         cls.group_questionresponse_2_3 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_2,
             question=cls.group_question_3,
-            correct=False,
+            correctness=Correctness.WRONG,
         )
         cls.group_questionresponse_2_3.submitted_at = datetime(
             2026, 5, 1, 12, 0, 40, tzinfo=tz
@@ -422,7 +423,7 @@ class ResponseTest(DysleksiTest):
         cls.group_questionresponse_2_4 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_2,
             question=cls.group_question_4,
-            correct=False,
+            correctness=Correctness.WRONG,
         )
         cls.group_questionresponse_2_4.submitted_at = datetime(
             2026, 5, 1, 12, 0, 55, tzinfo=tz
@@ -447,7 +448,7 @@ class ResponseTest(DysleksiTest):
         cls.sentencereading_option_1 = PossibleAnswer.objects.create(
             question=cls.sentencereading_question,
             resource=cls.sentencereading_resource_1,
-            is_correct=True,
+            correctness=Correctness.CORRECT,
         )
         cls.sentencereading_resource_2 = TestResource.objects.create(
             name="TestResource5b",
@@ -456,7 +457,7 @@ class ResponseTest(DysleksiTest):
         cls.sentencereading_option_2 = PossibleAnswer.objects.create(
             question=cls.sentencereading_question,
             resource=cls.sentencereading_resource_2,
-            is_correct=False,
+            correctness=Correctness.WRONG,
         )
         cls.sentencereading_partresponse_1 = PartResponse.objects.create(
             testresponse=cls.group_testresponse_1,
@@ -467,7 +468,7 @@ class ResponseTest(DysleksiTest):
         cls.sentencereading_questionresponse_1 = QuestionResponse.objects.create(
             partresponse=cls.sentencereading_partresponse_1,
             question=cls.sentencereading_question,
-            correct=True,
+            correctness=Correctness.CORRECT,
             answer_option=cls.sentencereading_option_1,
         )
         cls.sentencereading_questionresponse_1.submitted_at = datetime(

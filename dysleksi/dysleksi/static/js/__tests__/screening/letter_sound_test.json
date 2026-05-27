@@ -28,7 +28,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "a",
-              "is_correct": null
+              "correctness": "correct"
             },
             {
               "id": 201,
@@ -37,7 +37,7 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "b",
-              "is_correct": null
+              "correctness": "wrong"
             }
           ]
         }

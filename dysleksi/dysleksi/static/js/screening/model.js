@@ -66,11 +66,11 @@ export class Student {
         }
     }
 
-    addResult(partIndex, isCorrect) {
+    addResult(partIndex, correctness) {
         if (!this.resultsByPart[partIndex]) {
             this.resultsByPart[partIndex] = [];
         }
-        this.resultsByPart[partIndex].push(isCorrect);
+        this.resultsByPart[partIndex].push(correctness);
     }
 }
 
@@ -280,7 +280,7 @@ export class PossibleAnswer {
     resourceImageUrl;
     resourceSoundUrl;
     resourceText;
-    isCorrect;
+    correctness;
     button;
     textAnswer;
 
@@ -294,7 +294,7 @@ export class PossibleAnswer {
         this.resourceImageUrl = data.resource_image_url;
         this.resourceSoundUrl = data.resource_sound_url;
         this.resourceText = data.resource_text;
-        this.isCorrect = data.is_correct;
+        this.correctness = data.correctness;
         this.textAnswer = null;
         this.buttonId = "choice-" + this.resourceName;
     }
