@@ -83,7 +83,7 @@ describe("Audioplayer", () => {
     });
 
     it("add listeners", () => {
-        initialize_audio_players();
+        initialize_audio_players(document);
         expect(audioListenerSpy).toHaveBeenCalledWith("canplay", expect.any(Function));
         audioEl.dispatchEvent(new Event("canplay"));
         expect(buttonListenerSpy).toHaveBeenCalledWith("click", expect.any(Function));
@@ -92,7 +92,7 @@ describe("Audioplayer", () => {
 
     it("add listeners ready", () => {
         audioEl.readyState = 4;
-        initialize_audio_players();
+        initialize_audio_players(document);
         expect(audioListenerSpy).not.toHaveBeenCalledWith(
             "canplay",
             expect.any(Function),
@@ -102,7 +102,7 @@ describe("Audioplayer", () => {
     });
 
     it("click play", () => {
-        initialize_audio_players();
+        initialize_audio_players(document);
         audioEl.dispatchEvent(new Event("canplay"));
         playBtnEl.dispatchEvent(new Event("click"));
         expect(audioPlaySpy).toHaveBeenCalled();
@@ -111,7 +111,7 @@ describe("Audioplayer", () => {
     });
 
     it("end play", () => {
-        initialize_audio_players();
+        initialize_audio_players(document);
         audioEl.dispatchEvent(new Event("canplay"));
         playBtnEl.dispatchEvent(new Event("click"));
         audioEl.dispatchEvent(new Event("ended"));
@@ -123,14 +123,14 @@ describe("Audioplayer", () => {
     it("show duration when loaded", () => {
         audioEl.readyState = 1;
         audioEl.duration = 72;
-        initialize_audio_players();
+        initialize_audio_players(document);
         expect(durationEl.textContent).toBe("01:12");
     });
 
     it("show duration when not loaded", () => {
         audioEl.readyState = 0;
         audioEl.duration = 83;
-        initialize_audio_players();
+        initialize_audio_players(document);
         expect(durationEl.textContent).toBe("");
         audioEl.dispatchEvent(new Event("loadedmetadata"));
         expect(durationEl.textContent).toBe("01:23");

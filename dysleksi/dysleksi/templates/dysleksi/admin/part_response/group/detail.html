@@ -267,11 +267,14 @@
 {% block js_module %}
 {{ block.super }}
     <script type="module">
-    import { initialize_audio_players } from '{% static 'js/admin/audioplayer.js' %}';
-    document.addEventListener("DOMContentLoaded", initialize_audio_players);
-    </script>
-    <script type="module">
+        import { initialize_audio_players } from '{% static 'js/admin/audioplayer.js' %}';
         import { initialize_pagination } from '{% static 'js/admin/pagination.js' %}';
+
+        const container = document.getElementById("test-results-table");
+        const init_audio = initialize_audio_players.bind(null, container);
+
         document.addEventListener("DOMContentLoaded", initialize_pagination);
+        document.addEventListener("DOMContentLoaded", init_audio);
+        container.addEventListener("pagination_resolved", init_audio);
     </script>
 {% endblock %}
