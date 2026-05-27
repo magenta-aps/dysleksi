@@ -1,5 +1,5 @@
-export function initialize_audio_players() {
-    for (let player of document.getElementsByClassName("audio")) {
+export function initialize_audio_players(parent) {
+    for (let player of parent.getElementsByClassName("audio")) {
         const audioEl = player.getElementsByTagName("audio")[0];
         const playBtnEl = player.getElementsByTagName("i")[0];
         const uiEl = player;
