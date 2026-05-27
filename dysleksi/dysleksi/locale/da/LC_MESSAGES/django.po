@@ -237,7 +237,7 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/list.html
-#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/detail.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
 msgid "Tests"
 msgstr ""
@@ -336,7 +336,7 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
-#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/detail.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
 #, python-format
 msgid "Klasse %(class_name)s - %(test_name)s"
@@ -345,7 +345,7 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/detail.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
 msgid "Resultater"
 msgstr ""
@@ -380,21 +380,21 @@ msgid "Fordeling på sætningslængde"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
-#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/detail.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
 #, python-brace-format
 msgid "${first} - ${last} af ${total}"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
-#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/detail.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
 #, python-format
 msgid "%(first)s - %(last)s af %(total)s"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
-#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/detail.html
 msgid "Tilbage til klassens resultater"
 msgstr ""
 
@@ -462,7 +462,7 @@ msgid "Læsetempo"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
-#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/detail.html
 #: dysleksi/views.py
 msgid "Normscore"
 msgstr ""
@@ -517,44 +517,44 @@ msgstr ""
 msgid "Bemærkning"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/detail.html
 #, python-format
 msgid "Elevrapport for %(name)s"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/detail.html
 msgid "Elevens resultater"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
-#: dysleksi/templates/dysleksi/admin/test_response/group/footer.html
+#: dysleksi/templates/dysleksi/admin/test_response/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/footer.html
 msgid "Se elevens svar"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/test_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/test_response/detail.html
 msgid "Deltests"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/test_response/group/footer.html
+#: dysleksi/templates/dysleksi/admin/test_response/footer.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
 msgid "Elendigt"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/test_response/group/footer.html
+#: dysleksi/templates/dysleksi/admin/test_response/footer.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
 msgid "Under middel"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/test_response/group/footer.html
+#: dysleksi/templates/dysleksi/admin/test_response/footer.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
 msgid "Middel"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/test_response/group/footer.html
+#: dysleksi/templates/dysleksi/admin/test_response/footer.html
 msgid "Over middel"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/test_response/group/footer.html
+#: dysleksi/templates/dysleksi/admin/test_response/footer.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
 msgid "Ikke fuldført"
 msgstr ""
@@ -627,6 +627,10 @@ msgstr ""
 
 #: dysleksi/views.py
 msgid "Antal forsøgte"
+msgstr ""
+
+#: dysleksi/views.py
+msgid "Antal oversprungne"
 msgstr ""
 
 #: dysleksi/views.py

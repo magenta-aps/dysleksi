@@ -127,7 +127,7 @@ class TestAssignmentView(DysleksiTest):
                     AssignmentView,
                     user,
                     room_name=room_name,
-                    test_id=self.test.id,
+                    test_id=self.individual_test.id,
                     pk=assignment.id,
                 )
                 self.assertListEqual(view.get_template_names(), [template_name])
@@ -137,7 +137,7 @@ class TestAssignmentView(DysleksiTest):
                 AssignmentView,
                 self.other_user,
                 room_name="class_123",
-                test_id=self.test.id,
+                test_id=self.individual_test.id,
                 pk=self.assignment1.id,
             )
 
@@ -146,7 +146,7 @@ class TestAssignmentView(DysleksiTest):
             AssignmentView,
             self.teacher,
             room_name="class_1",
-            test_id=self.test.id,
+            test_id=self.individual_test.id,
             pk=self.assignment1.id,
         )
         context = view.get_context_data()
@@ -159,7 +159,7 @@ class TestAssignmentView(DysleksiTest):
                     AssignmentView,
                     user,
                     room_name="class_1",
-                    test_id=self.test.id,
+                    test_id=self.individual_test.id,
                     pk=assignment.id,
                 )
             for user in (
@@ -173,14 +173,14 @@ class TestAssignmentView(DysleksiTest):
                         AssignmentView,
                         user,
                         room_name="class_1",
-                        test_id=self.test.id,
+                        test_id=self.individual_test.id,
                         pk=self.assignment1.id,
                     )
         view = self.setup_view(
             AssignmentView,
             self.admin,
             room_name="class_1",
-            test_id=self.test.id,
+            test_id=self.individual_test.id,
             pk=assignment.id,
         )
         with self.assertRaises(ImproperlyConfigured):
@@ -312,7 +312,7 @@ class TestTestAssignmentListView(DysleksiTest):
         self.assertQuerySetEqual(
             objs,
             [
-                (1, 0, "Afventer"),  # Individual student test assignment
+                (1, 1, "Gennemført"),  # Individual student test assignment
                 (3, 1, "I gang"),  # Group test assignment
             ],
             ordered=False,
@@ -329,7 +329,7 @@ class TestStartRoomView(DysleksiTest):
     def test_create_individual_room_immediate(self):
         data = {
             "student": self.student.id,
-            "test": self.test.id,
+            "test": self.individual_test.id,
             "test_parts": [],
             "is_test_part": "test",
             "is_immediate": "y",
@@ -348,7 +348,7 @@ class TestStartRoomView(DysleksiTest):
     def test_create_individual_room_planned_date_time(self):
         data = {
             "student": self.student.id,
-            "test": self.test.id,
+            "test": self.individual_test.id,
             "test_parts": [],
             "is_test_part": "test",
             "is_immediate": "n",
@@ -367,7 +367,7 @@ class TestStartRoomView(DysleksiTest):
     def test_create_individual_room_test_parts(self):
         data = {
             "student": self.student.id,
-            "test": self.test.id,
+            "test": self.individual_test.id,
             "test_parts": [str(self.part.pk)],
             "is_test_part": "part",
             "is_immediate": "y",
@@ -597,11 +597,11 @@ class TestAssignmentResultsView(ResponseTest):
         )
 
     def test_access(self):
-        self.setup_view(
-            AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk
-        )
+        for user in (self.teacher, self.student):
+            self.setup_view(
+                AssignmentResultsView, user, pk=self.test_assignment_class.pk
+            )
         for user in (
-            self.student,
             self.other_user,
             self.other_teacher,
             self.inactive_user,
@@ -611,6 +611,23 @@ class TestAssignmentResultsView(ResponseTest):
                 self.setup_view(
                     AssignmentResultsView, user, pk=self.test_assignment_class.pk
                 )
+
+    def test_redirect_individual(self):
+        view = self.setup_view(
+            AssignmentResultsView, self.teacher, pk=self.test_assignment_student.pk
+        )
+        response = view.response
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(
+            response.headers["Location"],
+            reverse(
+                "dysleksi:test_assignment_student_results",
+                kwargs={
+                    "assignment_pk": self.test_assignment_student.pk,
+                    "response_pk": self.test_response_student.pk,
+                },
+            ),
+        )
 
 
 class TestAssignmentResultsFlagView(ResponseTest):
@@ -834,6 +851,11 @@ class TestAssignmentPartResultsView(ResponseTest):
 
 class TestTestResponseView(ResponseTest):
 
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_individual_wordspelling_part()
+
     @override_settings(RESULT_TABLE_SIZE=3)
     def test_table(self):
         view = self.setup_view(
@@ -844,14 +866,14 @@ class TestTestResponseView(ResponseTest):
         )
         table = view.get_table()
         self.assertTrue(isinstance(table, StudentTestResponseTable))
-        part_pk = self.group_test_part.pk
+        part_key = f"part_{self.group_test_part.pk}"
         self.assertEqual(
             table.data.data,
             [
-                {"data_category": "Antal forsøgte", f"part_{part_pk}": 4},
-                {"data_category": "Antal rigtige", f"part_{part_pk}": 4},
-                {"data_category": "Rigtighedsprocent", f"part_{part_pk}": "100 %"},
-                {"data_category": "Normscore", f"part_{part_pk}": "100 %"},
+                {"data_category": "Antal forsøgte", part_key: 4},
+                {"data_category": "Antal rigtige", part_key: 4},
+                {"data_category": "Rigtighedsprocent", part_key: "100 %"},
+                {"data_category": "Normscore", part_key: "100 %"},
             ],
         )
         self.assertEqual(
@@ -911,13 +933,44 @@ class TestTestResponseView(ResponseTest):
                     response_pk=self.group_testresponse_1.pk,
                 )
 
+    @override_settings(RESULT_TABLE_SIZE=3)
+    def test_table_individual(self):
+        view = self.setup_view(
+            TestResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_student.pk,
+            response_pk=self.test_response_student.pk,
+        )
+        table = view.get_table()
+        self.assertTrue(isinstance(table, StudentTestResponseTable))
+        part_key = f"part_{self.part.pk}"
+        self.assertEqual(
+            table.data.data,
+            [
+                {"data_category": "Antal forsøgte", part_key: 2},
+                {"data_category": "Antal oversprungne", part_key: 1},
+                {"data_category": "Antal rigtige", part_key: 1},
+                {"data_category": "Rigtighedsprocent", part_key: "50 %"},
+                {"data_category": "Normscore", part_key: "16 %"},
+            ],
+        )
+        self.assertEqual(
+            [
+                BeautifulSoup(str(column.footer), "html.parser").get_text(
+                    separator=";", strip=True
+                )
+                for column in table.columns
+            ],
+            ["Bedømmelse", "Middel;Se elevens svar", "", ""],
+        )
+
 
 class TestPartResponseView(ResponseTest):
 
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.create_sentencereading_part()
+        cls.create_group_sentencereading_part()
 
     def test_get_object(self):
         view = self.setup_view(

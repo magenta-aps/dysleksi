@@ -389,13 +389,19 @@ class AssignmentResultsView(
     groups_required = [TEACHERS]
     model = TestAssignment
     table_class = TestResultTable
+    template_name = "dysleksi/admin/test_responses/group/list.html"
 
-    def get_template_names(self) -> list[str]:
-        if self.object.test.test_type == TestType.INDIVIDUAL:  # pragma: no cover
-            # Endnu ikke klar, kommer senere
-            return ["dysleksi/admin/test_responses/individual/list.html"]
-        else:
-            return ["dysleksi/admin/test_responses/group/list.html"]
+    def get(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.test.test_type == TestType.INDIVIDUAL:
+            return redirect(
+                "dysleksi:test_assignment_student_results",
+                assignment_pk=self.kwargs["pk"],
+                response_pk=self.object.responses.values_list("pk", flat=True)[0],
+            )
+
+        context = self.get_context_data(object=self.object)
+        return self.render_to_response(context)
 
     def get_by_category(self):
         key = "all_correct"
@@ -678,9 +684,13 @@ class TestResponseView(
     GroupRequiredMixin, PaginationMixin, ObjectPermissionsMixin, DetailView
 ):
     model = TestResponse
-    template_name = "dysleksi/admin/test_response/group/detail.html"
-    chart_template_name = "dysleksi/admin/test_response/group/chart.html"
+    template_name = "dysleksi/admin/test_response/detail.html"
+    chart_template_name = "dysleksi/admin/test_response/chart.html"
     groups_required = [TEACHERS]
+
+    @cached_property
+    def test_type(self) -> TestType:
+        return self.object.assignment.test.test_type
 
     def get_object(self, queryset=...):
         object = get_object_or_404(
@@ -699,7 +709,7 @@ class TestResponseView(
 
     @cached_property
     def data(self) -> PartResponseQuerySet:
-        return (
+        qs = (
             self.object.partresponses.filter(testpart__in=self.get_current_items())
             .annotate_questions_count("questions_count", Q(is_practice=False))
             .annotate_questionresponses_count(
@@ -719,10 +729,14 @@ class TestResponseView(
                 "questions_count", "correct_count", "correct_proportion_of_all"
             )
             .annotate_percentage("correct_proportion_of_all", "correct_pct_of_all")
-            .order_by(
-                "pk",
-            )
         )
+        if self.test_type == TestType.INDIVIDUAL:
+            qs = qs.annotate_questionresponses_count(
+                "skipped_count",
+                Q(question__is_practice=False, correctness=Correctness.PARTIAL),
+            )
+
+        return qs.order_by("pk")
 
     def get_table(self) -> StudentTestResponseTable:
 
@@ -730,21 +744,18 @@ class TestResponseView(
 
         part_header = _("%(part_name)s (%(questions_count)s opg.)")
 
-        parts = self.get_current_items()
-
         extra_columns = [
             (
-                f"part_{part.pk}",
+                f"part_{partresponse.testpart_id}",
                 StudentTestResultsColumn(
                     verbose_name=part_header
                     % {
-                        "part_name": part.name,
-                        "questions_count": part.questions.filter(
+                        "part_name": partresponse.testpart.name,
+                        "questions_count": partresponse.testpart.questions.filter(
                             is_practice=False
                         ).count(),
                     },
-                    footer_template_name="dysleksi/admin/"
-                    "test_response/group/footer.html",
+                    footer_template_name="dysleksi/admin/" "test_response/footer.html",
                     footer_value=partial(
                         lambda part, column_values: {
                             "response": self.object,
@@ -758,11 +769,11 @@ class TestResponseView(
                                 else None
                             ),
                         },
-                        part,
+                        partresponse.testpart,
                     ),
                 ),
             )
-            for part in parts
+            for partresponse in qs
         ]
 
         e = 0
@@ -774,7 +785,16 @@ class TestResponseView(
             {
                 "data_category": _("Antal forsøgte"),
                 **{f"part_{item.testpart.pk}": item.responses_count for item in qs},
-            },
+            }
+        ]
+        if self.test_type == TestType.INDIVIDUAL:
+            data += [
+                {
+                    "data_category": _("Antal oversprungne"),
+                    **{f"part_{item.testpart.pk}": item.skipped_count for item in qs},
+                }
+            ]
+        data += [
             {
                 "data_category": _("Antal rigtige"),
                 **{f"part_{item.testpart.pk}": item.correct_count for item in qs},
