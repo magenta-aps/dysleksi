@@ -16,7 +16,7 @@ def scan_static_files(folders_to_scan=["images", "audio", "vendor/fonts"]):
 
         for root, dirs, files in os.walk(folder_path):
             for file in files:
-                if file.endswith(".map") or file.count(".") > 1 or file.endswith(".gz"):
+                if file.endswith(".map") or file.endswith(".gz"):
                     continue
 
                 rel_path = os.path.relpath(
