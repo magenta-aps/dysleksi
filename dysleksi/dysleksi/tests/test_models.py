@@ -506,13 +506,13 @@ class TestTest(DysleksiTest):
         self.assertTrue(str(test) == "StrTest")
 
     def test_to_json(self):
-        json = self.test.to_json()
+        json = self.individual_test.to_json()
 
         # Test basic Test -> parts
-        self.assertEqual(self.test.parts.count(), 1)
-        self.assertEqual(len(json["parts"]), self.test.parts.count())
+        self.assertEqual(self.individual_test.parts.count(), 1)
+        self.assertEqual(len(json["parts"]), self.individual_test.parts.count())
 
-        part_model = self.test.parts.all().order_by("id")[0]
+        part_model = self.individual_test.parts.all().order_by("id")[0]
         part_json = json["parts"][0]
 
         self.assertEqual(part_model.name, "TestPart1")
@@ -607,7 +607,7 @@ class TestMessage(DysleksiTest):
     def setUpTestData(cls):
         super().setUpTestData()
         cls.individual_assignment = TestAssignment.objects.create(
-            test=cls.test,
+            test=cls.individual_test,
             teacher=cls.teacher,
             student=cls.student,
         )
@@ -1160,7 +1160,7 @@ class TestTestResponseQuerySet(ResponseTest):
         qs = self.qs.annotate_correct_count("correct_count").annotate_proportion(
             "correct_count",
             "proportion",
-            TestQuestion.objects.filter(part__tests=self.test).count(),
+            TestQuestion.objects.filter(part__tests=self.individual_test).count(),
         )
         student1_answer = qs[0]
         student2_answer = qs[1]
@@ -1173,7 +1173,7 @@ class TestTestResponseQuerySet(ResponseTest):
             .annotate_proportion(
                 "correct_count",
                 "proportion",
-                TestQuestion.objects.filter(part__tests=self.test).count(),
+                TestQuestion.objects.filter(part__tests=self.individual_test).count(),
             )
             .annotate_score_category("proportion", "category")
         )

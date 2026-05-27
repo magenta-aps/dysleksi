@@ -304,7 +304,7 @@ class StudentTestResponseTable(NonOrderableTableMixin, Table):
     def __init__(self, *args, **kwargs):
         super().__init__(
             *args,
-            template_name="dysleksi/admin/test_response/group/table.html",
+            template_name="dysleksi/admin/test_response/table.html",
             **kwargs,
         )
 
