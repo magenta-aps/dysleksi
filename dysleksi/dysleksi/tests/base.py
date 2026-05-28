@@ -349,8 +349,8 @@ class ResponseTest(DysleksiTest):
         call_command("create_result_categories")
 
         students = cls.klasse.students.all().order_by("pk")
-        student1 = students[0]
-        student2 = students[1]
+        cls.student1 = students[0]
+        cls.student2 = students[1]
 
         cls.group_question_1 = TestQuestion.objects.create(
             part=cls.group_test_part,
@@ -395,10 +395,10 @@ class ResponseTest(DysleksiTest):
         )
 
         cls.group_testresponse_1 = TestResponse.objects.create(
-            assignment=cls.test_assignment_class, student=student1, completed=True
+            assignment=cls.test_assignment_class, student=cls.student1, completed=True
         )
         cls.group_testresponse_2 = TestResponse.objects.create(
-            assignment=cls.test_assignment_class, student=student2, completed=True
+            assignment=cls.test_assignment_class, student=cls.student2, completed=True
         )
 
         cls.group_partresponse_1 = PartResponse.objects.create(

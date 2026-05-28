@@ -453,7 +453,27 @@ describe("GroupTestFlow", () => {
         expect(view.endSummary).toHaveBeenCalled();
     });
 
-    it("Render intro and startSummary", () => {
+    it("Render Summary with a couple of completed parts", () => {
+        const testData = JSON.parse(JSON.stringify(groupTestData));
+
+        // Simulate that the student has completed all questions in the first testpart
+        testData.parts[0].questions.forEach((question) => {
+            question.existing_answers = { [student.id]: { correctness: "correct" } };
+        });
+
+        const test = new Test(testData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        testSpy(view);
+
+        view.start();
+        view.startSummary();
+
+        const block = view.domElements.summaryContainer.querySelector(".summary-block");
+        expect(block.children[0].innerHTML).toContain("checkmark");
+        expect(block.children[1].innerHTML).not.toContain("checkmark");
+    });
+
+    it("Render intro and move on to startSoundCalibration", () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
 
@@ -469,6 +489,30 @@ describe("GroupTestFlow", () => {
         domElements.endIntroButton.click();
 
         expect(startSoundCalibrationSpy).toHaveBeenCalled();
+    });
+
+    it("Render intro and move on to onTestComplete", () => {
+        const testData = JSON.parse(JSON.stringify(groupTestData));
+
+        // Simulate that the student has completed all questions
+        testData.parts.forEach((part) => {
+            part.questions.forEach((question) => {
+                question.existing_answers = {
+                    [student.id]: { correctness: "correct" },
+                };
+            });
+        });
+
+        const test = new Test(testData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+
+        const onTestCompleteSpy = vi.spyOn(view, "onTestComplete");
+        view.start();
+
+        // When the user ends the intro, the test completes
+        // Because the student has already completed all questions
+        domElements.endIntroButton.click();
+        expect(onTestCompleteSpy).toHaveBeenCalled();
     });
 
     it("Ends summary and displays practice question", () => {
@@ -508,6 +552,46 @@ describe("GroupTestFlow", () => {
         expect(view.currentQuestionIndex).toBe(0);
         expect(view.isPracticing).toBe(false);
         expect(view.showFirstQuestion).toHaveBeenCalledWith(false);
+    });
+
+    it("Ends summary and displays second question", () => {
+        const testData = JSON.parse(JSON.stringify(groupTestData));
+
+        // Ensure first part has no practice questions
+        testData.parts[0].practice = [];
+
+        // Simulate that the student has completed the first question
+        testData.parts[0].questions[0].existing_answers = {
+            [student.id]: { correctness: "correct" },
+        };
+
+        const test = new Test(testData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        testSpy(view);
+        view.start();
+        view.endSummary();
+        expect(view.currentQuestionIndex).toBe(1);
+        expect(view.currentPartIndex).toBe(0);
+    });
+
+    it("Ends summary and displays second part", () => {
+        const testData = JSON.parse(JSON.stringify(groupTestData));
+
+        // Ensure first part has no practice questions
+        testData.parts[0].practice = [];
+
+        // Simulate that the student has completed all questions in the first part
+        testData.parts[0].questions.forEach((question) => {
+            question.existing_answers = { [student.id]: { correctness: "correct" } };
+        });
+
+        const test = new Test(testData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        testSpy(view);
+        view.start();
+        view.endSummary();
+        expect(view.currentQuestionIndex).toBe(0);
+        expect(view.currentPartIndex).toBe(1);
     });
 
     it("Guides the student through sound calibration", async () => {

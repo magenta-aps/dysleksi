@@ -11,7 +11,7 @@ import * as group_student from "../../screening/group/student.js";
 import { start } from "../../screening";
 import { Test, Student } from "../../screening/model.js";
 
-describe("Startup teacher test", () => {
+describe("Startup test", () => {
     let socket;
 
     let initIndividualTeacher;
@@ -227,6 +227,52 @@ describe("Startup teacher test", () => {
         expect(initIndividualStudent).not.toHaveBeenCalled();
         expect(initGroupTeacher).not.toHaveBeenCalled();
         expect(initGroupStudent).toHaveBeenCalled();
+    });
+
+    it("group student with existing answers test", async () => {
+        // Simulate that the student has completed a question in the first testpart
+        groupTestData.parts[0].questions[0].existing_answers = {
+            [1]: { correctness: "correct" },
+        };
+        groupTestData.parts[0].questions[1].existing_answers = {
+            [1]: { correctness: "wrong" },
+        };
+        groupTestData.parts[0].questions[2].existing_answers = {
+            [1]: { correctness: "partial" },
+        };
+
+        document.body.innerHTML = `
+            <div class="container" 
+                data-test-type="group" 
+                data-role="student" 
+                data-student-first-name="Jack"
+                data-student-last-name="Wilshere"
+                data-student-id="1"
+                data-room-name="room_1" 
+                data-assignment-id="1"
+            >
+                <script type="application/json" id="test_contents">
+                ${JSON.stringify(groupTestData)}
+                </script>
+                <script type="application/json" id="student_ids">
+                ${JSON.stringify(groupStudentIds)}
+                </script>
+                <h1 id="instructions-text"></h1>
+                <audio id="instructions-sound"></audio>
+                <button class="btn btn-primary" id="start-practice"></button>
+                <button class="btn btn-primary" id="start-questions"></button>
+                <button class="btn btn-primary" id="end-summary">Ok</button>
+                <h1 id="question-title"></h1>
+                <div id="question-challenge"></div>
+                <div id="choices"></div>
+                <button id="next" class="btn next-btn" style="display: none;"></button>
+            </div>
+        `;
+        await start();
+        const student = initGroupStudent.mock.calls[0][2];
+        expect(student.resultsByPart[0][0]).toEqual("correct");
+        expect(student.resultsByPart[0][1]).toEqual("wrong");
+        expect(student.resultsByPart[0][2]).toEqual("partial");
     });
 
     it("group dummy1 student test", async () => {

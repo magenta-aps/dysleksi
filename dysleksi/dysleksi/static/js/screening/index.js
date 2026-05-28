@@ -22,6 +22,7 @@ export async function start() {
     studentData.id = roleEl.dataset.studentId;
 
     const student = new Student(studentData);
+    student.populateExistingAnswers(test);
 
     if (role === "student") {
         student.initializeMockData(test);

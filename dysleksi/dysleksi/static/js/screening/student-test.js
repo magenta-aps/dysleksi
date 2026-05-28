@@ -60,7 +60,7 @@ export class StudentTestView extends EventTarget {
 
     start() {
         requestWakeLock();
-        this.setPart(0);
+        this.setPart(this.test.getFirstUnansweredTestPartIndex(this.student));
         this.startIntro();
 
         this.send({
@@ -210,7 +210,7 @@ export class StudentTestView extends EventTarget {
         console.log("Test started, showing summary");
         this.cancelAudio = false;
         this.domElements.hideElement(this.domElements.endSummaryButton);
-        this.domElements.showSummary(this.test.parts);
+        this.domElements.showSummary(this.test.parts, this.student);
 
         this.domElements._setButtonListener(this.domElements.endSummaryButton, () =>
             this.endSummary(),
@@ -262,7 +262,13 @@ export class StudentTestView extends EventTarget {
 
     endIntro() {
         this.domElements.hideIntro();
-        this.startSoundCalibration();
+
+        if (this.test.completedByStudent(this.student)) {
+            this.setPart(this.test.parts.length - 1);
+            this.onTestComplete();
+        } else {
+            this.startSoundCalibration();
+        }
     }
 
     endTestPartOutro() {
@@ -350,7 +356,10 @@ export class StudentTestView extends EventTarget {
         this.domElements.showTestContainer();
         this.domElements.hideTestPartOutro();
 
-        const result = this.showQuestion(this.isPracticing, 0);
+        const firstUnanswered = this.isPracticing
+            ? 0
+            : this.currentPart.getFirstUnansweredQuestionIndex(this.student);
+        const result = this.showQuestion(this.isPracticing, firstUnanswered);
         if (!this.isPracticing && Number(this.currentPart.timeout) > 1) {
             this.partTimeoutId = setTimeout(() => {
                 this.onPartTimeout();
@@ -382,7 +391,7 @@ export class StudentTestView extends EventTarget {
         this.domElements.hideTestContainer();
 
         if (this.test.parts.length > 1) {
-            this.domElements.showSummary(this.test.parts, true);
+            this.domElements.showSummary(this.test.parts, this.student, true);
 
             // Du er færdig med alle deltest. Tak.
             this.domElements.playSound("/static/audio/1t.10.wav", this.audioContext);

@@ -20,6 +20,7 @@
           "challenge_sound_url": "letter_sound/a.mp3",
           "challenge_text": null,
           "question_type": "multiple_choice",
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 200,

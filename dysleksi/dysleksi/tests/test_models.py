@@ -472,7 +472,7 @@ class TestTestResource(DysleksiTest):
         )
 
 
-class TestTestQuestion(DysleksiTest):
+class TestTestQuestion(ResponseTest):
     def test_str(self):
         question = TestQuestion.objects.create(part=self.part, challenge=self.resource1)
         quest_str = f"{str(question.part)} / {question.pk}"
@@ -490,6 +490,16 @@ class TestTestQuestion(DysleksiTest):
         self.assertEqual(answer1.question, question)
         self.assertEqual(answer1.resource.name, "TestResource2")
 
+    def test_get_existing_answers(self):
+
+        existing_answers = self.group_question_1.get_existing_answers(
+            self.test_assignment_class
+        )
+
+        self.assertEqual(
+            existing_answers[self.student1.id]["correctness"], Correctness.CORRECT
+        )
+
 
 class TestPossibleAnswer(DysleksiTest):
     def test_str(self):
@@ -506,7 +516,7 @@ class TestTest(DysleksiTest):
         self.assertTrue(str(test) == "StrTest")
 
     def test_to_json(self):
-        json = self.individual_test.to_json()
+        json = self.individual_test.to_json(self.test_assignment_student)
 
         # Test basic Test -> parts
         self.assertEqual(self.individual_test.parts.count(), 1)

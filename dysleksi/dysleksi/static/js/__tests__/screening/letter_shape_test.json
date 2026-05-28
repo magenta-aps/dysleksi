@@ -19,6 +19,7 @@
           "challenge_sound_url": null,
           "challenge_text": null,
           "question_type": "multiple_choice_match",
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 200,
@@ -99,6 +100,7 @@
           "challenge_sound_url": null,
           "challenge_text": null,
           "question_type": "multiple_choice_match",
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 200,

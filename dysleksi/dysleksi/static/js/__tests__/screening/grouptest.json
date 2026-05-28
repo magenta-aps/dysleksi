@@ -46,6 +46,7 @@
           "challenge_text": null,
           "question_type": "multiple_choice",
           "continue_when_instruction_is_complete": true,
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 93,
@@ -93,6 +94,7 @@
           "challenge_sound_url": null,
           "challenge_text": null,
           "question_type": "multiple_choice",
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 97,
@@ -157,6 +159,7 @@
           "challenge_sound_url": null,
           "challenge_text": null,
           "question_type": "multiple_choice",
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 73,
@@ -204,6 +207,7 @@
           "challenge_sound_url": null,
           "challenge_text": null,
           "question_type": "multiple_choice",
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 77,
@@ -251,6 +255,7 @@
           "challenge_sound_url": null,
           "challenge_text": null,
           "question_type": "multiple_choice",
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 81,
@@ -298,6 +303,7 @@
           "challenge_sound_url": null,
           "challenge_text": null,
           "question_type": "multiple_choice",
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 85,
@@ -345,6 +351,7 @@
           "challenge_sound_url": null,
           "challenge_text": null,
           "question_type": "multiple_choice",
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 89,
@@ -405,6 +412,7 @@
           "challenge_sound_url": "wordspelling_dummy/aput.mp3",
           "challenge_text": null,
           "question_type": "free_text",
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 100,
@@ -435,6 +443,7 @@
           "challenge_sound_url": "wordspelling_dummy/iki.mp3",
           "challenge_text": null,
           "question_type": "free_text",
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 101,
