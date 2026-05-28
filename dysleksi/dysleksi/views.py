@@ -864,6 +864,10 @@ class PartResponseView(
             )
             .annotate_questions_count("questions_count", Q(is_practice=False))
             .annotate_questionresponses_count(
+                "almost_correct_count",
+                Q(question__is_practice=False, correctness=Correctness.PARTIAL),
+            )
+            .annotate_questionresponses_count(
                 "correct_count",
                 Q(question__is_practice=False, correctness=Correctness.CORRECT),
             )
@@ -874,7 +878,11 @@ class PartResponseView(
             .annotate_proportion(
                 "responses_count", "correct_count", "correct_proportion"
             )
+            .annotate_proportion(
+                "responses_count", "almost_correct_count", "almost_correct_proportion"
+            )
             .annotate_percentage("correct_proportion", "correct_pct")
+            .annotate_percentage("almost_correct_proportion", "almost_correct_pct")
         )
         object = qs.first()
         if object is None:
@@ -1052,6 +1060,10 @@ class PartResponseView(
         questionresponses_counts = self.get_questionresponses_aggregated_data()
 
         context["questionresponses"] = questionresponses_counts
+
+        context["has_almost_correct"] = (
+            self.object.testpart.has_partially_correct_answers
+        )
 
         if self.part.answer_time_data_breakdown_ranges:
             context["timeslot_table"] = AnswerByTimeResultsTable(

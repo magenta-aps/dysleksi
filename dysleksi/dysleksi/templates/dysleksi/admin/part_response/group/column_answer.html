@@ -14,10 +14,8 @@
         {% endfor %}
         </div>
     {% elif question_type == QuestionType.FREE_TEXT %}
-        <div class="answer
-            {% if record.correct %}answer-correct
-            {% else %}answer-incorrect
-            {% endif %}
-        ">{{ record.answer_text|default_if_none:"&nbsp;" }}</div>
+        <div
+                class="answer {% if record.correctness == "correct" %}answer-correct{% elif record.correctness == "partial" %}answer-almost-correct{% else %}answer-incorrect{% endif %}"
+        >{{ record.answer_text|default_if_none:"&nbsp;" }}</div>
     {% endif %}
 {% endwith %}
