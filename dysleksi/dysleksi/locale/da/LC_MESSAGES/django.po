@@ -368,6 +368,21 @@ msgid "Totalt resultat"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+#, python-format
+msgid "%(part)s / %(total)s forsøgte"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+#, python-format
+msgid "%(part)s / %(total)s rigtige"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+#, python-format
+msgid "%(part)s / %(total)s næsten rigtige"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
 msgid "Fordeling på tid"
 msgstr ""
 

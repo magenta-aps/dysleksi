@@ -1482,7 +1482,7 @@ $border-radius-student-card: $spacer / 4 * 3;
 
   .answer {
     display: inline-block;
-    width: 15%;
+    min-width: 15%;
     border-radius: 5px;
     border-width: 1px;
     border-style: solid;

@@ -136,7 +136,11 @@ class Command(BaseCommand):
                     if question.question_type == QuestionType.FREE_TEXT:
                         answer_option = (
                             question.possible_answers.filter(
-                                correctness=Correctness.CORRECT
+                                correctness=(
+                                    Correctness.PARTIAL
+                                    if correctness == Correctness.PARTIAL
+                                    else Correctness.CORRECT
+                                )
                             )
                             .order_by("?")
                             .first()

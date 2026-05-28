@@ -20,8 +20,9 @@
     </li>
     <li class="breadcrumb-item">{% translate "Resultater" %}</li>
     <li class="breadcrumb-item">
-        <a href="{% url 'dysleksi:test_assignment_student_results' assignment_pk=object.testresponse.assignment.pk response_pk=object.testresponse.pk %}"
+        <a href="{% url 'dysleksi:test_assignment_student_results' assignment_pk=object.testresponse.assignment.pk response_pk=object.testresponse.pk %}">
         {{ object.student.get_full_name }}
+        </a>
     </li>
     <li class="breadcrumb-item active" aria-current="page">{{ object.testpart.name }}</li>
 {% endblock %}
@@ -29,217 +30,271 @@
 {% block inner_content %}
     {% with testresponse=object.testresponse part=object.testpart %}
 
-    <a href="{% url 'dysleksi:test_assignment_student_results' assignment_pk=testresponse.assignment.pk response_pk=testresponse.pk %}" class="ms-3">
-        <i class="ph ph-arrow-elbow-left-up"></i>
-        {% translate "Tilbage til elevrapport" %}
-    </a>
+        <a href="{% url 'dysleksi:test_assignment_student_results' assignment_pk=testresponse.assignment.pk response_pk=testresponse.pk %}" class="ms-3">
+            <i class="ph ph-arrow-elbow-left-up"></i>
+            {% translate "Tilbage til elevrapport" %}
+        </a>
 
-    <div class="row">
-        <div class="col-9">
-            <h5 class="mt-2 mb-4">
-                <i class="ph ph-chart-bar fs-5"></i>
-                {% blocktranslate trimmed with name=testresponse.student.get_full_name part_name=testpart.name %}
-                    Resultater for {{ name }} - {{ part_name }}
-                {% endblocktranslate %}
-            </h5>
-        </div>
-    </div>
-
-    <div class="row">
-        <div class="col-3">
-            {% with category=object.correctness_category_answered %}
-                <div class="result-score category-{{ category.color_key }}">
-                    {{ category.label_da }}
-                </div>
-            {% endwith %}
-        </div>
-    </div>
-
-    <h6 class="mt-4">{% translate "Oversigt" %}</h6>
-    <div class="row">
-        <div class="col-6 autocolumn-col">
-
-
-        <div id="totalt_resultat" class="card result-card autocolumn-item">
-            <div class="card-header">
-                {% translate "Totalt resultat" %}
+        <div class="row">
+            <div class="col-9">
+                <h5 class="mt-2 mb-4">
+                    <i class="ph ph-chart-bar fs-5"></i>
+                    {% blocktranslate trimmed with name=testresponse.student.get_full_name part_name=testpart.name %}
+                        Resultater for {{ name }} - {{ part_name }}
+                    {% endblocktranslate %}
+                </h5>
             </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-6 donut-container">
-                        <div class="donut-main-container">
-                        <canvas id="donut1" class="donut-canvas"></canvas>
-                        <div class="donut-center-text">
-                            <span>{{ object.responses_pct }} %</span>
-                        </div>
-                        </div>
-                        <div class="donut-bottom-text">
-                            {{ object.responses_count }} / {{ object.questions_count }} forsøgte
-                        </div>
-                    </div>
-                    <script>
-                        const chart1 = new Chart(
-                            document.getElementById("donut1"),
-                            {
-                                type: "doughnut",
-                                data: {
-                                    datasets: [
-                                        {
-                                            data: [{{ object.responses_count }}, ({{ object.questions_count }}-{{ object.responses_count }})]
-                                        }
-                                    ]
-                                },
-                                options: {
-                                    responsive: false,
-                                    animation: false,
-                                    layout: {
-                                        autoPadding: false
-                                    },
-                                    plugins: {
-                                        legend: {
-                                            display: false
-                                        }
-                                    },
-                                    elements: {
-                                        arc: {
-                                            backgroundColor: ["#91A2B2", "#D1DBE5"],
-                                            borderWidth: 0
-                                        }
-                                    }
-                                }
-                            }
-                        );
-                    </script>
+        </div>
 
-                    <div class="col-6 donut-container">
-                        <div class="donut-main-container">
-                            <canvas id="donut2" class="donut-canvas"></canvas>
-                            <div class="donut-center-text">
-                                <span>{{ object.correct_pct }} %</span>
+        <div class="row">
+            <div class="col-3">
+                {% with category=object.correctness_category_answered %}
+                    <div class="result-score category-{{ category.color_key }}">
+                        {{ category.label_da }}
+                    </div>
+                {% endwith %}
+            </div>
+        </div>
+
+        <h6 class="mt-4">{% translate "Oversigt" %}</h6>
+        <div class="row">
+            <div class="col-6 autocolumn-col">
+
+
+                <div id="totalt_resultat" class="card result-card autocolumn-item">
+                    <div class="card-header">
+                        {% translate "Totalt resultat" %}
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="{% if has_almost_correct %}col-4{% else %}col-6{% endif %} donut-container">
+                                <div class="donut-main-container">
+                                    <canvas id="donut1" class="donut-canvas"></canvas>
+                                    <div class="donut-center-text">
+                                        <span>{{ object.responses_pct }} %</span>
+                                    </div>
+                                </div>
+                                <div class="donut-bottom-text">
+                                    {% blocktranslate trimmed with part=object.responses_count total=object.questions_count %}
+                                        {{ part }} / {{ total }} forsøgte
+                                    {% endblocktranslate %}
+                                </div>
                             </div>
-                        </div>
-                        <div class="donut-bottom-text">
-                            {{ object.correct_count }} / {{ object.responses_count }} rigtige
-                        </div>
-                    </div>
-                    <script>
-                        const chart2 = new Chart(
-                            document.getElementById("donut2"),
-                            {
-                                type: "doughnut",
-                                data: {
-                                    datasets: [
-                                        {
-                                            data: [{{object.correct_count}}, ({{object.responses_count}}-{{ object.correct_count }})]
-                                        }
-                                    ]
-                                },
-                                options: {
-                                    responsive: false,
-                                    animation: false,
-                                    layout: {
-                                        autoPadding: false
-                                    },
-                                    plugins: {
-                                        legend: {
-                                            display: false
-                                        }
-                                    },
-                                    elements: {
-                                        arc: {
-                                            backgroundColor: ["#007112", "#91A2B2"],
-                                            borderWidth: 0
+                            <script>
+                                const chart1 = new Chart(
+                                    document.getElementById("donut1"),
+                                    {
+                                        type: "doughnut",
+                                        data: {
+                                            datasets: [
+                                                {
+                                                    data: [{{ object.responses_count }}, ({{ object.questions_count }}-{{ object.responses_count }})]
+                                                }
+                                            ]
+                                        },
+                                        options: {
+                                            responsive: false,
+                                            animation: false,
+                                            layout: {
+                                                autoPadding: false
+                                            },
+                                            plugins: {
+                                                legend: {
+                                                    display: false
+                                                }
+                                            },
+                                            elements: {
+                                                arc: {
+                                                    backgroundColor: ["#91A2B2", "#D1DBE5"],
+                                                    borderWidth: 0
+                                                }
+                                            }
                                         }
                                     }
-                                }
-                            }
-                        );
-                    </script>
+                                );
+                            </script>
+
+                            <div class="{% if has_almost_correct %}col-4{% else %}col-6{% endif %} donut-container">
+                                <div class="donut-main-container">
+                                    <canvas id="donut2" class="donut-canvas"></canvas>
+                                    <div class="donut-center-text">
+                                        <span>{{ object.correct_pct }} %</span>
+                                    </div>
+                                </div>
+                                <div class="donut-bottom-text">
+                                    {% blocktranslate trimmed with part=object.correct_count total=object.responses_count %}
+                                        {{ part }} / {{ total }} rigtige
+                                    {% endblocktranslate %}
+                                </div>
+                            </div>
+                            <script>
+                                const chart2 = new Chart(
+                                    document.getElementById("donut2"),
+                                    {
+                                        type: "doughnut",
+                                        data: {
+                                            datasets: [
+                                                {
+                                                    data: [{{object.correct_count}}, ({{object.responses_count}}-{{ object.correct_count }})]
+                                                }
+                                            ]
+                                        },
+                                        options: {
+                                            responsive: false,
+                                            animation: false,
+                                            layout: {
+                                                autoPadding: false
+                                            },
+                                            plugins: {
+                                                legend: {
+                                                    display: false
+                                                }
+                                            },
+                                            elements: {
+                                                arc: {
+                                                    backgroundColor: ["#007112", "#91A2B2"],
+                                                    borderWidth: 0
+                                                }
+                                            }
+                                        }
+                                    }
+                                );
+                            </script>
+
+                            {% if has_almost_correct %}
+
+                                <div class="col-4 donut-container">
+                                    <div class="donut-main-container">
+                                        <canvas id="donut3" class="donut-canvas"></canvas>
+                                        <div class="donut-center-text">
+                                            <span>{{ object.almost_correct_pct }} %</span>
+                                        </div>
+                                    </div>
+                                    <div class="donut-bottom-text">
+                                        {% blocktranslate trimmed with part=object.almost_correct_count total=object.responses_count %}
+                                        {{ part }} / {{ total }} næsten rigtige
+                                        {% endblocktranslate %}
+                                    </div>
+                                </div>
+                                <script>
+                                    const chart3 = new Chart(
+                                        document.getElementById("donut3"),
+                                        {
+                                            type: "doughnut",
+                                            data: {
+                                                datasets: [
+                                                    {
+                                                        data: [{{object.almost_correct_count}}, ({{object.responses_count}}-{{ object.almost_correct_count }})]
+                                                    }
+                                                ]
+                                            },
+                                            options: {
+                                                responsive: false,
+                                                animation: false,
+                                                layout: {
+                                                    autoPadding: false
+                                                },
+                                                plugins: {
+                                                    legend: {
+                                                        display: false
+                                                    }
+                                                },
+                                                elements: {
+                                                    arc: {
+                                                        backgroundColor: ["#E6C120", "#91A2B2"],
+                                                        borderWidth: 0
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    );
+                                </script>
+                            {% endif %}
+                        </div>
+                    </div>
                 </div>
+
+                {% if timeslot_table %}
+                    <div id="fordeling på tid" class="card result-card autocolumn-item">
+                        <div class="card-header">
+                            {% translate "Fordeling på tid" %}
+                        </div>
+                        <div class="card-body">
+                            {% render_table timeslot_table %}
+                        </div>
+                    </div>
+                {% endif %}
+
+
+                {% if wordlength_table %}
+                    <div id="fordeling_på_ordlængde" class="card result-card autocolumn-item">
+                        <div class="card-header">
+                            {% translate "Fordeling på ordlængde" %}
+                        </div>
+                        <div class="card-body">
+                            {% render_table wordlength_table %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if wordcount_table %}
+                    <div id="fordeling_på_sætningslængde" class="card result-card autocolumn-item">
+                        <div class="card-header">
+                            {% translate "Fordeling på sætningslængde" %}
+                        </div>
+                        <div class="card-body">
+                            {% render_table wordcount_table %}
+                        </div>
+                    </div>
+                {% endif %}
+
             </div>
+            <div class="col-6 autocolumn-col"></div>
         </div>
 
-        {% if timeslot_table %}
-            <div id="fordeling på tid" class="card result-card autocolumn-item">
-                <div class="card-header">
-                    {% translate "Fordeling på tid" %}
-                </div>
-                <div class="card-body">
-                    {%  render_table timeslot_table %}
-                </div>
-            </div>
-        {% endif %}
+        <script>
+            // Spread `items` as even as possible over a number of columns, maintaining order.
+            const columns = document.getElementsByClassName("autocolumn-col");
+            const items = [...document.getElementsByClassName("autocolumn-item")];
+            if (columns.length && items.length) {
+                let total_height = 0;
+                for (let item of items) {
+                    total_height += item.offsetHeight;
+                }
+                const columns_count = columns.length
+                const column_heights = new Array(columns_count).fill(0);  // Height of each column so far
+                const cutoff_size = total_height / columns_count; // At this point should we consider moving on to the next column
+                let column_index = 0;  // Which column we are filling
 
-
-        {% if wordlength_table %}
-            <div id="fordeling_på_ordlængde" class="card result-card autocolumn-item">
-                <div class="card-header">
-                    {% translate "Fordeling på ordlængde" %}
-                </div>
-                <div class="card-body">
-                    {% render_table wordlength_table %}
-                </div>
-            </div>
-        {% endif %}
-
-        {% if wordcount_table %}
-            <div id="fordeling_på_sætningslængde" class="card result-card autocolumn-item">
-                <div class="card-header">
-                    {% translate "Fordeling på sætningslængde" %}
-                </div>
-                <div class="card-body">
-                    {% render_table wordcount_table %}
-                </div>
-            </div>
-        {% endif %}
-
-        </div>
-        <div class="col-6 autocolumn-col"></div>
-    </div>
-
-    <script>
-    // Spread `items` as even as possible over a number of columns, maintaining order.
-    const columns = document.getElementsByClassName("autocolumn-col");
-    const items = [...document.getElementsByClassName("autocolumn-item")];
-    if (columns.length && items.length) {
-        let total_height = 0;
-        for (let item of items) {
-            total_height += item.offsetHeight;
-        }
-        const columns_count = columns.length
-        const column_heights = new Array(columns_count).fill(0);  // Height of each column so far
-        const cutoff_size = total_height / columns_count; // At this point should we consider moving on to the next column
-        let column_index = 0;  // Which column we are filling
-
-        for (let item of items) {
-            let item_height = item.offsetHeight;
-            let remaining_space = cutoff_size - column_heights[column_index];  // Remaining space in current column before cutoff
-            if (item_height < remaining_space) {
-                // There is room in this column for the entire item
-                column_heights[column_index] += item_height;
-                columns[column_index].append(item);
-            } else if (remaining_space >= item_height/columns_count) {
-                // There is a bit of room, and that room is more than this column's fair share of the item
-                column_heights[column_index] += item_height;
-                columns[column_index].append(item);
-                column_index++;
-            } else {
-                // Not enough room, put in next column
-                column_index++;
-                column_heights[column_index] += item_height;
-                columns[column_index].append(item);
+                for (let item of items) {
+                    let item_height = item.offsetHeight;
+                    let remaining_space = cutoff_size - column_heights[column_index];  // Remaining space in current column before cutoff
+                    if (item_height < remaining_space) {
+                        // There is room in this column for the entire item
+                        column_heights[column_index] += item_height;
+                        columns[column_index].append(item);
+                    } else if (remaining_space >= item_height/columns_count) {
+                        // There is a bit of room, and that room is more than this column's fair share of the item
+                        column_heights[column_index] += item_height;
+                        columns[column_index].append(item);
+                        column_index++;
+                    } else {
+                        // Not enough room, put in next column
+                        column_index++;
+                        column_heights[column_index] += item_height;
+                        columns[column_index].append(item);
+                    }
+                }
             }
-        }
-    }
 
-    </script>
+        </script>
 
-    <h6>{% translate "Elevens svar" %}</h6>
-    <div class="row">
-        <div class="col-12" id="test-results-table">
-            {% render_table responses_table %}
+        <h6>{% translate "Elevens svar" %}</h6>
+        <div class="row">
+            <div class="col-12" id="test-results-table">
+                {% render_table responses_table %}
+            </div>
         </div>
-    </div>
         <div class="row mt-1" data-pagination-details="pagination" data-pagination-page-param="page" data-pagination-target="test-results-table" data-pagination-content-param="only_table">
             {{ pagination|json_script:"pagination" }}
             <div class="paginator-text paginate-counter col-6" data-format="{% translate '${first} - ${last} af ${total}' %}">
