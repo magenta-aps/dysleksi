@@ -162,10 +162,14 @@ class TestDomElements {
     }
 
     stopSoundCalibrationAnimation() {
-        this.soundCalibrationAnimation.src = "/static/images/talking_face.png";
+        this.soundCalibrationAnimation.src = assetCache.fetch(
+            "/static/images/talking_face.png",
+        );
     }
     startSoundCalibrationAnimation() {
-        this.soundCalibrationAnimation.src = "/static/images/talking_face.gif";
+        this.soundCalibrationAnimation.src = assetCache.fetch(
+            "/static/images/talking_face.gif",
+        );
     }
 
     async setLogOutButtonListener(buttonEl) {

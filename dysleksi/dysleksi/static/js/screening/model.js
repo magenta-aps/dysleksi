@@ -118,11 +118,14 @@ export class Test extends EventTarget {
         for (const part of this.parts) {
             tasks.push(() => assetCache.processTestObject(part, "image"));
             tasks.push(() => assetCache.processTestObject(part, "instructionsUrl"));
+            tasks.push(() => assetCache.processTestObject(part, "completionSource"));
 
             const allQuestions = [...part.questions, ...part.practice];
             for (const q of allQuestions) {
                 tasks.push(() => assetCache.processTestObject(q, "challengeImageUrl"));
                 tasks.push(() => assetCache.processTestObject(q, "challengeSoundUrl"));
+                tasks.push(() => assetCache.processTestObject(q, "reminderSource"));
+                tasks.push(() => assetCache.processTestObject(q, "hintSource"));
 
                 for (const a of q.possibleAnswers) {
                     tasks.push(() =>
