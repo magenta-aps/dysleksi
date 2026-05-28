@@ -2,6 +2,10 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
+import os
+import shutil
+import tempfile
+
 from data_tools.utils import (
     create_fore_sound_test,
     create_letter_pronunciation_test,
@@ -14,9 +18,10 @@ from data_tools.utils import (
     create_wordreading_1_test,
     create_wordspelling_test,
 )
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
 from dysleksi.models import Test, TestResource
+from dysleksi.utils import scan_static_files
 
 
 class UtilTest(TestCase):
@@ -361,3 +366,76 @@ class UtilTest(TestCase):
             self.nonsense_word_pronunciation_practice_data,
         )
         self.assertTrue(TestResource.objects.filter(text="foo").exists())
+
+
+class ScanStaticFilesTests(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.tmp_static_root = tempfile.mkdtemp(prefix="static_test_")
+
+        cls.files_to_create = {
+            "images/logo.png": "keep",
+            "images/logo.63d9e4226d41.png": "skip",
+            "images/icon.svg": "keep",
+            "images/icon.abc12345.svg.map": "skip",
+            "images/photo.gz": "skip",
+            "images/nested/deep.png": "keep",
+            "images/nested/deep.aabbccddeeff.png": "skip",
+            "audio/beep.mp3": "keep",
+            "audio/beep.0123456789ab.mp3": "skip",
+            "vendor/fonts/myfont.woff2": "keep",
+            "vendor/fonts/myfont.fedcba987654.woff2": "skip",
+            "other/ignored.png": "skip",  # outside scanned folders
+        }
+
+        for rel_path in cls.files_to_create:
+            abs_path = os.path.join(cls.tmp_static_root, rel_path)
+            os.makedirs(os.path.dirname(abs_path), exist_ok=True)
+            with open(abs_path, "w") as f:
+                f.write("x")
+
+    @classmethod
+    def tearDownClass(cls):
+        shutil.rmtree(cls.tmp_static_root, ignore_errors=True)
+        super().tearDownClass()
+
+    def _run(self):
+        with override_settings(
+            STATIC_ROOT=self.tmp_static_root,
+            STATIC_URL="/static/",
+            STATICFILES_STORAGE=(
+                "django.contrib.staticfiles.storage.StaticFilesStorage"
+            ),
+        ):
+            return scan_static_files()
+
+    def test_keeps_unhashed_files(self):
+        urls = self._run()
+        self.assertIn("/static/images/logo.png", urls)
+        self.assertIn("/static/images/icon.svg", urls)
+        self.assertIn("/static/audio/beep.mp3", urls)
+        self.assertIn("/static/vendor/fonts/myfont.woff2", urls)
+
+    def test_skips_hashed_files(self):
+        urls = self._run()
+        self.assertNotIn("/static/images/logo.63d9e4226d41.png", urls)
+        self.assertNotIn("/static/audio/beep.0123456789ab.mp3", urls)
+        self.assertNotIn("/static/vendor/fonts/myfont.fedcba987654.woff2", urls)
+
+    def test_skips_map_and_gz_files(self):
+        urls = self._run()
+        self.assertFalse(any(u.endswith(".map") for u in urls))
+        self.assertFalse(any(u.endswith(".gz") for u in urls))
+
+    def test_recurses_into_subdirectories(self):
+        urls = self._run()
+        self.assertIn("/static/images/nested/deep.png", urls)
+        self.assertNotIn("/static/images/nested/deep.aabbccddeeff.png", urls)
+
+    def test_ignores_unlisted_folders(self):
+        urls = self._run()
+        self.assertFalse(
+            any("other/ignored.png" in u for u in urls),
+            "Files outside scanned folders should not appear",
+        )
