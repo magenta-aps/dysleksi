@@ -2,10 +2,13 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 import os
+import re
 from typing import List
 
 from django.conf import settings
 from django.templatetags.static import static
+
+HASHED_FILE_RE = re.compile(r"\.[a-f0-9]{8,}(\.[^./]+)$", re.IGNORECASE)
 
 
 def scan_static_files(folders_to_scan=["images", "audio", "vendor/fonts"]):
@@ -17,6 +20,8 @@ def scan_static_files(folders_to_scan=["images", "audio", "vendor/fonts"]):
         for root, dirs, files in os.walk(folder_path):
             for file in files:
                 if file.endswith(".map") or file.endswith(".gz"):
+                    continue
+                if HASHED_FILE_RE.search(file):
                     continue
 
                 rel_path = os.path.relpath(
