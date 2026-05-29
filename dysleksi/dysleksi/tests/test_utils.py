@@ -5,6 +5,7 @@
 import os
 import shutil
 import tempfile
+from datetime import timedelta
 
 from data_tools.utils import (
     create_fore_sound_test,
@@ -21,7 +22,7 @@ from data_tools.utils import (
 from django.test import TestCase, override_settings
 
 from dysleksi.models import Test, TestResource
-from dysleksi.utils import scan_static_files
+from dysleksi.utils import format_time, scan_static_files
 
 
 class UtilTest(TestCase):
@@ -439,3 +440,13 @@ class ScanStaticFilesTests(TestCase):
             any("other/ignored.png" in u for u in urls),
             "Files outside scanned folders should not appear",
         )
+
+
+class FormatTimeTest(TestCase):
+    def test_format_time(self):
+        self.assertEqual(format_time(42), "42 sek.")
+        self.assertEqual(format_time(60), "1 min. 0 sek.")
+        self.assertEqual(format_time(95), "1 min. 35 sek.")
+        self.assertEqual(format_time(305), "5 min. 5 sek.")
+        self.assertEqual(format_time(4000), "1 tim. 6 min. 40 sek.")
+        self.assertEqual(format_time(timedelta(days=1)), "24 tim. 0 min. 0 sek.")
