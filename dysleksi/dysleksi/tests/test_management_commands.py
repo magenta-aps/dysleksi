@@ -3,13 +3,29 @@
 # SPDX-License-Identifier: MPL-2.0
 
 import json
+import os
 import tempfile
 from pathlib import Path
 
+from django.conf import settings
+from django.contrib.auth.models import Group
+from django.core.files.base import File
 from django.core.management import call_command
-from django.test import TestCase
+from django.test import TestCase, override_settings
 
-from dysleksi.models import Test, TestPart
+from dysleksi.models import (
+    STUDENTS,
+    TEACHERS,
+    PartResponse,
+    QuestionResponse,
+    Student,
+    Teacher,
+    Test,
+    TestAssignment,
+    TestPart,
+    TestQuestion,
+    TestResponse,
+)
 
 
 class ImportTestTest(TestCase):
@@ -165,3 +181,44 @@ class ImportTestTest(TestCase):
                 str(tmp_questions_data_path),
                 "invalid_test_type",
             )
+
+
+class CleanupRecordingsTest(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        Group.objects.create(name=TEACHERS)
+        Group.objects.create(name=STUDENTS)
+        teacher = Teacher.objects.create(username="Teacher")
+        student = Student.objects.create(username="Student")
+        test = Test.objects.create(name="Test")
+        part = TestPart.objects.create(
+            name="Part", timeout=10, partial_score_after=10, reminder=10
+        )
+        part.tests.add(test)
+        question = TestQuestion.objects.create(part=part)
+        assignment = TestAssignment.objects.create(
+            test=test, teacher=teacher, student=student
+        )
+        testresponse = TestResponse.objects.create(
+            assignment=assignment, student=student
+        )
+        partresponse = PartResponse.objects.create(
+            testresponse=testresponse, testpart=part
+        )
+        with open("/app/dysleksi/tests/resources/test.mp3", "r") as file:
+            file_obj = File(file, name="answer_123.mp3")
+            cls.questionresponse = QuestionResponse.objects.create(
+                question=question, partresponse=partresponse, answer_sound=file_obj
+            )
+
+    @override_settings(RESPONSE_AUDIO_RETENTION_SECONDS=0)
+    def test_command(self):
+        file_name = self.questionresponse.answer_sound.name
+        self.assertNotEqual(file_name, "")
+        self.assertTrue(os.path.exists(os.path.join(settings.MEDIA_ROOT, file_name)))
+        call_command("cleanup_recordings", verbosity=0)
+        self.assertFalse(os.path.exists(os.path.join(settings.MEDIA_ROOT, file_name)))
+        self.questionresponse.refresh_from_db()
+        self.assertEqual(self.questionresponse.answer_sound.name, "")

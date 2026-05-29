@@ -3,10 +3,12 @@
 # SPDX-License-Identifier: MPL-2.0
 import os
 import re
+from datetime import timedelta
 from typing import List
 
 from django.conf import settings
 from django.templatetags.static import static
+from django.utils.translation import gettext_lazy as _
 
 HASHED_FILE_RE = re.compile(r"\.[a-f0-9]{8,}(\.[^./]+)$", re.IGNORECASE)
 
@@ -35,3 +37,28 @@ def scan_static_files(folders_to_scan=["images", "audio", "vendor/fonts"]):
 
 def reverse_ordering(ordering: List[str]) -> List[str]:
     return [o[1:] if o[0] == "-" else ("-" + o) for o in ordering]
+
+
+def format_time(seconds: int | timedelta) -> str:
+
+    if isinstance(seconds, timedelta):
+        seconds = int(seconds.total_seconds())
+
+    if seconds < 60:
+        return _("%(sek)s sek.") % {"sek": seconds}
+
+    elif seconds < 3600:
+        minutes = seconds // 60
+        seconds -= 60 * minutes
+        return _("%(min)s min. %(sek)s sek.") % {"min": minutes, "sek": seconds}
+
+    else:
+        hours = seconds // 3600
+        seconds -= 3600 * hours
+        minutes = seconds // 60
+        seconds -= 60 * minutes
+        return _("%(tim)s tim. %(min)s min. %(sek)s sek.") % {
+            "tim": hours,
+            "min": minutes,
+            "sek": seconds,
+        }

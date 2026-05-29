@@ -634,6 +634,21 @@ msgstr ""
 msgid "Hej %(name)s %(last_name)s"
 msgstr ""
 
+#: dysleksi/utils.py
+#, python-format
+msgid "%(sek)s sek."
+msgstr ""
+
+#: dysleksi/utils.py
+#, python-format
+msgid "%(min)s min. %(sek)s sek."
+msgstr ""
+
+#: dysleksi/utils.py
+#, python-format
+msgid "%(tim)s tim. %(min)s min. %(sek)s sek."
+msgstr ""
+
 #: dysleksi/views.py
 #, python-format
 msgid "%(part_name)s (%(questions_count)s opg.)"
