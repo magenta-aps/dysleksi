@@ -722,7 +722,7 @@ div[data-role='teacher'][data-test-type='individual'] {
 
           input {
             display: inline-block;
-            width: 2.25 * $spacer;
+            width: 2.5 * $spacer;
             padding: 0 0.75 * $spacer 0.125 * $spacer 0.75 * $spacer;
             margin: 0 0 0 0.25 * $spacer;
             border-color: $red-normal;
@@ -731,6 +731,11 @@ div[data-role='teacher'][data-test-type='individual'] {
 
             &:focus {
               box-shadow: none;
+            }
+
+            // Make input field wider during "højtlæsning" tests (words rather than letters)
+            &[class*='højtlæsning'] {
+              width: 10 * $spacer;
             }
           }
 

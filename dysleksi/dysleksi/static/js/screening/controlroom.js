@@ -634,6 +634,31 @@ export class ActionButtons {
         }
     }
 
+    setActualPronunciationFieldClass(name) {
+        /* istanbul ignore next */
+        if (this.actualPronunciation !== null) {
+            const inputField = this.#getActualPronunciationField();
+
+            // Remove any previous `test-` CSS class
+            for (const oldCls of inputField.classList) {
+                if (oldCls.search(/^test-.*$/) >= 0) {
+                    inputField.classList.toggle(oldCls, false);
+                }
+            }
+
+            // Add new `test-` CSS class
+            const newCls =
+                "test-" +
+                name
+                    .trim() // trim leading or trailing whitespace
+                    .toLowerCase() // convert to lowercase
+                    .replace(/\s+/g, "-") // replace spaces with hyphens
+                    .replace(/[\(|\)]/g, ""); // remove parentheses
+
+            inputField.classList.toggle(newCls, true);
+        }
+    }
+
     #getActualPronunciationField() {
         /* istanbul ignore next */
         if (this.actualPronunciation !== null) {
@@ -1027,6 +1052,8 @@ export class TeacherView {
         this.questionView.updatePartIndicator(
             `Deltest ${this.partIndex + 1} af ${this.test.parts.length}`,
         );
+
+        this.buttons.setActualPronunciationFieldClass(this.currentPart.name);
     }
 
     getPracticeQuestionCounts() {
