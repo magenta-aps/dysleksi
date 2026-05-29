@@ -12,8 +12,17 @@ import { Test } from "../../screening/model.js";
 import { GroupTestView } from "../../screening/group/student-group-test.js";
 import { spyAttributes } from "../utils.js";
 import * as utils from "../../screening/utils.js";
-import { Student } from "../../screening/model.js"; // wherever your Student class is defined
+import { Student } from "../../screening/model.js";
 import { InstructionSequenceRunner } from "../../screening/instruction.js";
+
+HTMLElement.prototype.checkVisibility = function () {
+    let el = this;
+    while (el) {
+        if (getComputedStyle(el).display === "none") return false;
+        el = el.parentElement;
+    }
+    return true;
+};
 
 const mockP2P = {
     connect: vi.fn(),
