@@ -126,6 +126,35 @@ describe("ActionButtons", () => {
         instance.clearActive();
         expect(buttons.classList).not.to.include(["active"]);
     });
+
+    it("shows the 'actual pronunciation' input field if 'wrong' button is selected", () => {
+        document.body.innerHTML += `
+            <div class="actual-pronunciation"><input id="actual-pronunciation-text" value="Foo" /></div>
+        `;
+        const instance = getInstance();
+        instance.setActive("wrong");
+        const elem = document.querySelector(".actual-pronunciation");
+        expect(elem.classList).not.to.include(["d-none"]);
+    });
+
+    it("can return the 'actual pronunciation' input field value", () => {
+        document.body.innerHTML += `
+            <div class="actual-pronunciation"><input id="actual-pronunciation-text" value="Foo" /></div>
+        `;
+        const instance = getInstance();
+        const value = instance.getActualPronunciationValue();
+        expect(value).toBe("Foo");
+    });
+
+    it("can reset the 'actual pronunciation' input field value", () => {
+        document.body.innerHTML += `
+            <div class="actual-pronunciation"><input id="actual-pronunciation-text" value="Foo" /></div>
+        `;
+        const instance = getInstance();
+        instance.resetActualPronunciationValue();
+        const value = instance.getActualPronunciationValue();
+        expect(value).toBe("");
+    });
 });
 
 describe("ElapsedTimeView", () => {
@@ -326,6 +355,7 @@ describe("Teacher Individual test View", () => {
             <button id="next">Næste</button>
             <button id="goto-next-result-group">Hop til næste</button>
             <textarea id="note" class="d-none"></textarea>
+            <div class="actual-pronunciation"><input id="actual-pronunciation-text" /></div>
             <div id="audio-indicator"></div>
             <div class="modal fade" id="error" tabindex="-1" aria-labelledby="error-label" aria-hidden="true">
                 <div class="modal-dialog modal-lg">
@@ -377,7 +407,7 @@ describe("Teacher Individual test View", () => {
         vi.unstubAllGlobals();
     });
 
-    it("sends null for 'correct' when the skip button is clicked", () => {
+    it("sends 'skipped' for 'correctness' when the skip button is clicked", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID-SKIP");
 
         view.setPartIndex(0);
@@ -395,8 +425,10 @@ describe("Teacher Individual test View", () => {
             questionId: 1,
             partId: 1,
             assignmentId: 1,
-            correct: null, // This hits the 'null' branch of the ternary
+            correctness: "skipped",
             note: "",
+            practice: undefined,
+            student: { id: "123" },
         });
     });
 
@@ -637,8 +669,10 @@ describe("Teacher Individual test View", () => {
             questionId: 1,
             partId: 1,
             assignmentId: 1,
-            correct: false,
+            correctness: "wrong",
             note: "Test note",
+            practice: undefined,
+            student: { id: "123" },
         });
 
         expect(wrongButton.classList.contains("disabled")).toBe(true);
@@ -651,9 +685,11 @@ describe("Teacher Individual test View", () => {
         view.setPartIndex(0);
         view.setQuestionIndex(1);
 
-        // Act: fill note and click "correct"
+        // Act: fill out fields and click "wrong"
         note.noteEl.value = "Test note";
-        buttons.correctButton().click();
+        const field = document.querySelector("#actual-pronunciation-text");
+        field.value = "Actual pronunciation";
+        buttons.wrongButton().click();
 
         // Assert: no socket message sent yet
         expect(p2pChannel.send).not.toHaveBeenCalled();
@@ -669,9 +705,26 @@ describe("Teacher Individual test View", () => {
             questionId: 2,
             partId: 1,
             assignmentId: 1,
-            correct: true,
+            correctness: "wrong",
             note: "Test note",
+            actualPronunciation: "Actual pronunciation",
+            practice: undefined,
+            student: { id: "123" },
         });
+    });
+
+    it("warns if trying to send feedback for more than one student in individual tests", () => {
+        // Arrange: pretend we are connected to two students
+        const mockChannel = { send: vi.fn() };
+        view.studentChannels = { 1: mockChannel, 2: mockChannel };
+        // Arrange: go to question and mark it correct
+        view.setPartIndex(0);
+        view.setQuestionIndex(1);
+        buttons.correctButton().click();
+        // Act: click "next"
+        buttons.nextButton().click();
+        // Assert: no socket message sent
+        expect(p2pChannel.send).not.toHaveBeenCalled();
     });
 
     it("unpauses the total elapsed time on `question.displayed`", () => {
@@ -1718,16 +1771,16 @@ describe("EventTable", () => {
             questionIndex: 0,
         };
         const expectedLabels = [
-            { correct: true, label: "Korrekt", href: "#correct" },
-            { correct: false, label: "Forkert", href: "#wrong" },
-            { correct: null, label: "Sprunget over", href: "#skipped" },
+            { correctness: "correct", label: "Korrekt", href: "#correct" },
+            { correctness: "wrong", label: "Forkert", href: "#wrong" },
+            { correctness: "skipped", label: "Sprunget over", href: "#skipped" },
         ];
 
         for (const item of expectedLabels) {
             table.updateTable({ event: "question.answered", ...data });
             table.updateTable({
                 event: "question.feedback",
-                correct: item.correct,
+                correctness: item.correctness,
                 note: "Et notat",
                 ...data,
             });

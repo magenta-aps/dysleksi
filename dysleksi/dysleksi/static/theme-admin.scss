@@ -690,6 +690,10 @@ div[data-role='teacher'][data-test-type='individual'] {
             align-self: center;
           }
 
+          &#wrong {
+            display: inline-flex;
+          }
+
           &#correct.active {
             background: $green-lightest;
             color: $green-darker;
@@ -710,6 +714,30 @@ div[data-role='teacher'][data-test-type='individual'] {
             i.ph-fill {
               display: inline-block;
             }
+          }
+        }
+
+        .actual-pronunciation {
+          padding: 0 0.5 * $spacer;
+
+          input {
+            display: inline-block;
+            width: 2.25 * $spacer;
+            padding: 0 0.75 * $spacer 0.125 * $spacer 0.75 * $spacer;
+            margin: 0 0 0 0.25 * $spacer;
+            border-color: $red-normal;
+            font-family: "Karinika", "Helvetica", sans-serif;
+            font-size: $spacer;
+
+            &:focus {
+              box-shadow: none;
+            }
+          }
+
+          label {
+            color: $mono-gray-darkest;
+            font-family: "DM Sans Medium", "Helvetica", sans-serif;
+            font-size: 0.75 * $spacer;
           }
         }
       }

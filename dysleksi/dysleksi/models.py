@@ -74,6 +74,7 @@ class Correctness(models.TextChoices):
     CORRECT = "correct"
     PARTIAL = "partial"
     WRONG = "wrong"
+    SKIPPED = "skipped"
 
 
 class QuestionType(TextChoices):
@@ -1420,6 +1421,10 @@ class QuestionResponse(PermissionsMixin, models.Model):
         null=True,
         blank=True,
     )
+    actual_pronunciation = models.TextField(
+        null=True,
+        blank=True,
+    )
 
     def __str__(self) -> str:
         return f"{str(self.question)} / {str(self.partresponse)}"
@@ -1581,6 +1586,9 @@ class Message(models.Model):
                 question_response = self.question_response
                 question_response.correctness = self.data.get("correctness")
                 question_response.note = self.data.get("note")
+                question_response.actual_pronunciation = self.data.get(
+                    "actualPronunciation"
+                )
                 question_response.save()
 
             elif self.event == HandledEvent.PART_COMPLETE:
