@@ -297,7 +297,11 @@ export class GroupTestView extends StudentTestView {
     getSelectedButtons() {
         if (!this.answerButtons) return [];
         return this.answerButtons
-            .filter((a) => a.button.classList.contains("selected"))
+            .filter(
+                (a) =>
+                    a.button.classList.contains("selected") &&
+                    a.button.checkVisibility(),
+            )
             .map((a) => a.button);
     }
 
