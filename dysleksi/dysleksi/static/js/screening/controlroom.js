@@ -145,11 +145,11 @@ export class EventTable {
         this.updateQuestionEl(questionEl, part.questions[data.questionIndex]);
 
         // Update `result` cell (teacher's assessment)
-        if (data.event === "question.feedback" && data.correct !== undefined) {
+        if (data.event === "question.feedback" && data.correctness !== undefined) {
             const template = document.querySelector("template#edit-result");
             const clone = document.importNode(template.content, true);
             const button = clone.querySelector("button");
-            this.updateResultButtonState(button, data.correct);
+            this.updateResultButtonState(button, data.correctness);
             const choices = clone.querySelectorAll("a.dropdown-item");
             for (const choice of choices) {
                 choice.addEventListener("click", (evt) => {
@@ -190,16 +190,24 @@ export class EventTable {
 
     updateResultButtonState(button, state) {
         button.textContent =
-            state === null ? "Sprunget over" : state ? "Korrekt" : "Forkert";
+            state === "skipped"
+                ? "Sprunget over"
+                : state === "correct"
+                  ? "Korrekt"
+                  : "Forkert";
         button.classList.add(
-            state === null ? "btn-secondary" : state ? "btn-success" : "btn-danger",
+            state === "skipped"
+                ? "btn-secondary"
+                : state === "correct"
+                  ? "btn-success"
+                  : "btn-danger",
         );
     }
 
     handleResultButtonChange(evt) {
         evt.preventDefault();
         const anchor = evt.target.href.match(/#\w+/)[0];
-        const state = anchor === "#skipped" ? null : anchor === "#correct";
+        const state = anchor.replace("#", "");
         const button =
             evt.target.parentElement.parentElement.parentElement.querySelector(
                 "button",
@@ -576,6 +584,7 @@ export class ActionButtons {
                 "#correct, #wrong, #cancelled, #skipped, #next",
             ),
         ];
+        this.actualPronunciation = document.querySelector(".actual-pronunciation");
         this.active = null;
     }
 
@@ -601,6 +610,37 @@ export class ActionButtons {
 
     enableNextButton() {
         this.nextButton().classList.toggle("disabled", false);
+    }
+
+    toggleActualPronunciation(state) {
+        if (this.actualPronunciation !== null) {
+            this.actualPronunciation.classList.toggle("d-none", state);
+        }
+    }
+
+    resetActualPronunciationValue() {
+        /* istanbul ignore next */
+        if (this.actualPronunciation !== null) {
+            const inputField = this.#getActualPronunciationField();
+            inputField.value = "";
+        }
+    }
+
+    getActualPronunciationValue() {
+        /* istanbul ignore next */
+        if (this.actualPronunciation !== null) {
+            const inputField = this.#getActualPronunciationField();
+            return inputField.value;
+        }
+    }
+
+    #getActualPronunciationField() {
+        /* istanbul ignore next */
+        if (this.actualPronunciation !== null) {
+            return this.actualPronunciation.querySelector(
+                "input#actual-pronunciation-text",
+            );
+        }
     }
 
     setActive(buttonId) {
@@ -659,6 +699,12 @@ export class ActionButtons {
         // Activate the specified button, if given
         if (buttonId !== null) {
             this.buttonById(buttonId).classList.toggle("active", true);
+        }
+        if (buttonId === "wrong") {
+            this.toggleActualPronunciation(false); // show
+        }
+        if (["correct", "skipped"].includes(buttonId)) {
+            this.toggleActualPronunciation(true); // hide
         }
     }
 }
@@ -1068,8 +1114,10 @@ export class TeacherView {
                 });
             }
 
-            this.messageQueue.push(data);
-            this._persistQueue(); // Persistent save
+            if (!data.event.startsWith("audio.")) {
+                this.messageQueue.push(data);
+                this._persistQueue(); // Persistent save
+            }
         });
     }
 
@@ -1183,10 +1231,15 @@ export class TeacherView {
                 ) {
                     if (val === "next") {
                         // Send feedback and go to next question
-                        this.sendQuestionFeedback(this.buttons.getActive());
+                        this.sendQuestionFeedback(
+                            this.buttons.getActive(),
+                            this.buttons.getActualPronunciationValue(),
+                        );
                         this.noteField.clearNote();
                         this.buttons.clearActive();
                         this.buttons.disableButtons();
+                        this.buttons.resetActualPronunciationValue();
+                        this.buttons.toggleActualPronunciation(true); // hide
                     } else {
                         // Delay sending feedback until teacher clicks 'Next' button
                         this.buttons.setActive(val);
@@ -1247,9 +1300,7 @@ export class TeacherView {
         });
     }
 
-    sendQuestionFeedback(val) {
-        // Map `val` as follows: true=correct, false=wrong, null=skipped
-        const correct = val === "skipped" ? null : val === "correct";
+    sendQuestionFeedback(correctness, actualPronunciationValue) {
         const data = {
             uuid: crypto.randomUUID(),
             event: "question.feedback",
@@ -1258,17 +1309,40 @@ export class TeacherView {
             questionId: this.currentQuestion.id,
             partId: this.currentPart.id,
             assignmentId: this.assignmentId,
-            correct: correct,
+            correctness: correctness,
             note: this.noteField.getNote(),
             practice: this.currentIsPractice,
         };
+        if (actualPronunciationValue) {
+            data.actualPronunciation = actualPronunciationValue;
+        }
+
         // Update student sessions
         Object.values(this.studentChannels).forEach((channel) => {
             channel.send(data);
         });
+
         // Update local UI
         if (this.table !== null) {
             this.table.updateTable(data);
+        }
+
+        // Send question feedback to the server
+        /* istanbul ignore next */
+        if (this.test.testType === "individual") {
+            // Get the student ID
+            const studentIds = Object.keys(this.studentChannels);
+            if (studentIds.length === 1) {
+                const studentId = studentIds[0];
+                data.student = { id: studentId };
+                // Persist locally and (eventually) send to server
+                this.messageQueue.push(data);
+                this._persistQueue();
+            } else {
+                console.warn(
+                    "More than one student channel active in individual test!",
+                );
+            }
         }
     }
 

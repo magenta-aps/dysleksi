@@ -53,21 +53,31 @@
             <div class="actions">
                 <p class="fw-bold">{% translate 'Markér svar som:' %}</p>
                 <div class="buttons">
-                    <button id="correct" class="btn btn-outline-success disabled d-none">
-                        <i class="ph ph-circle fs-5"></i>
-                        <i class="ph-fill ph-check-circle fs-5"></i>
-                        <span>{% translate 'Korrekt' %}</span>
-                    </button>
-                    <button id="wrong" class="btn btn-outline-danger disabled d-none">
-                        <i class="ph ph-circle fs-5"></i>
-                        <i class="ph-fill ph-x-circle fs-5"></i>
-                        <span>{% translate 'Forkert' %}</span>
-                    </button>
-                    <button id="skipped" class="btn btn-outline-secondary disabled d-none">
-                        <i class="ph ph-circle fs-5"></i>
-                        <i class="ph-fill ph-minus-circle fs-5"></i>
-                        <span>{% translate 'Sprunget over' %}</span>
-                    </button>
+                    <div>
+                        <button id="correct" class="btn btn-outline-success disabled d-none">
+                            <i class="ph ph-circle fs-5"></i>
+                            <i class="ph-fill ph-check-circle fs-5"></i>
+                            <span>{% translate 'Korrekt' %}</span>
+                        </button>
+                    </div>
+                    <div class="d-flex align-items-top">
+                        <button id="wrong" class="btn btn-outline-danger disabled d-none">
+                            <i class="ph ph-circle fs-5"></i>
+                            <i class="ph-fill ph-x-circle fs-5"></i>
+                            <span>{% translate 'Forkert' %}</span>
+                        </button>
+                        <div class="actual-pronunciation d-flex d-none align-items-baseline">
+                            <label for="actual-pronunciation-text" class="form-label">{% translate 'Eleven sagde:' %}</label>
+                            <input id="actual-pronunciation-text" class="form-control" type="text">
+                        </div>
+                    </div>
+                    <div>
+                        <button id="skipped" class="btn btn-outline-secondary disabled d-none">
+                            <i class="ph ph-circle fs-5"></i>
+                            <i class="ph-fill ph-minus-circle fs-5"></i>
+                            <span>{% translate 'Sprunget over' %}</span>
+                        </button>
+                    </div>
                 </div>
                 <button id="next" class="btn btn-primary disabled">
                     {% translate 'Næste opgave' %}
