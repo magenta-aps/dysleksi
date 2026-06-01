@@ -294,9 +294,7 @@ class StartAssignmentView(GroupRequiredMixin, CreateView):
     def create_test_from_test_parts(self, form) -> TestAssignment:
         # Create test
         test = Test.objects.create(
-            name=", ".join(
-                str(test_part) for test_part in form.cleaned_data["test_parts"]
-            ),
+            name=self._get_test_name(form),
             test_type=self.test_type,  # type: ignore
             custom=True,
         )
@@ -308,6 +306,17 @@ class StartAssignmentView(GroupRequiredMixin, CreateView):
         test_assignment.test = test
         test_assignment.save()
         return test_assignment
+
+    def _get_test_name(self, form) -> str:
+        test_parts = form.cleaned_data["test_parts"]
+        if len(test_parts) > 1:
+            return _("{num} deltests").format(num=len(test_parts))
+        elif len(test_parts) == 1:
+            return _("{test_part_name}").format(test_part_name=test_parts[0].name)
+        else:
+            raise ValueError(  # pragma: no cover
+                "cannot create test name for %d test parts", len(test_parts)
+            )
 
 
 class StartIndividualAssignmentView(StartAssignmentView):
