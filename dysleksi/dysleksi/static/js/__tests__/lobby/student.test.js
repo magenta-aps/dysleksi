@@ -48,7 +48,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
     });
 
     it("creates redirect socket", () => {
-        initStudentLobby(studentId);
+        initStudentLobby(studentId, true);
 
         expect(wsModule.getWebSocket).toHaveBeenCalledTimes(1);
         expect(wsModule.getWebSocket).toHaveBeenCalledWith();
@@ -56,7 +56,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
 
     it("sends student.ready once when socket opens", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
-        initStudentLobby(studentId);
+        initStudentLobby(studentId, true);
 
         const socket = sockets["lobby"];
 
@@ -72,7 +72,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
     });
 
     it("redirects on session.in_progress", () => {
-        initStudentLobby(studentId);
+        initStudentLobby(studentId, true);
 
         const socket = sockets["lobby"];
 
@@ -88,7 +88,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
     });
 
     it("redirects on session.start", () => {
-        initStudentLobby(studentId);
+        initStudentLobby(studentId, true);
 
         const socket = sockets["lobby"];
 
@@ -104,7 +104,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
     });
 
     it("Does not redirect if studentId does not match", () => {
-        initStudentLobby(studentId);
+        initStudentLobby(studentId, true);
 
         const socket = sockets["lobby"];
 
@@ -120,7 +120,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
     });
 
     it("does not redirect on unrelated events", () => {
-        initStudentLobby(studentId);
+        initStudentLobby(studentId, true);
 
         const socket = sockets["lobby"];
 
@@ -132,5 +132,10 @@ describe("initStudentLobby / initRedirectSocket", () => {
         });
 
         expect(window.location).not.toBe("/should-not-redirect/");
+    });
+
+    it("does not redirect if student has no open assignments", () => {
+        initStudentLobby(studentId, false);
+        expect(wsModule.getWebSocket).toHaveBeenCalledTimes(0);
     });
 });

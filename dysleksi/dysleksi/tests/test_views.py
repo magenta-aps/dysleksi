@@ -62,19 +62,26 @@ class TestRootView(DysleksiTest):
                 self.assertListEqual(view.get_template_names(), [template_name])
 
     def test_get_context_data(self):
-        cases: list[tuple[User, str | None]] = [
-            (self.teacher, None),
-            (self.student, "student"),
-            (AnonymousUser(), None),
+        cases: list[tuple[User, list[str]]] = [
+            (self.teacher, []),
+            (self.student, ["student", "open_assignments"]),
+            (AnonymousUser(), []),
         ]
-        for user, context_key in cases:
-            with self.subTest(user=user, context_key=context_key):
+        for user, context_keys in cases:
+            with self.subTest(user=user, context_keys=context_keys):
                 view = self.setup_view(RootView, user)
                 context_data = view.get_context_data()
-                if context_key is not None:
-                    self.assertIn(context_key, context_data)
+                if context_keys:
+                    for context_key in context_keys:
+                        self.assertIn(context_key, context_data)
                 else:
                     self.assertIsInstance(context_data, dict)
+
+    def test_open_assignments_for_student(self):
+        # In the default test setup, `self.student` has an open test assignment
+        view = self.setup_view(RootView, self.student)
+        open_assignments = view.get_context_data()["open_assignments"]
+        self.assertTrue(open_assignments)
 
 
 class TestAssignmentView(DysleksiTest):
