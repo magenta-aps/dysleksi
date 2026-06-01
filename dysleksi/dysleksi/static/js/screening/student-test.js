@@ -486,7 +486,10 @@ export class StudentTestView extends EventTarget {
     }
 
     setStudentHeader() {
-        if (this.currentQuestion.instruction_sequence) {
+        if (
+            this.currentQuestion.instruction_sequence &&
+            this.currentQuestion.continueWhenInstructionIsComplete != false
+        ) {
             this.domElements.setStudentHeader('<i class="ph ph-ear"></i>');
         } else if (this.isPracticing) {
             this.domElements.setStudentHeader('<i class="ph ph-pencil-line"></i>');
