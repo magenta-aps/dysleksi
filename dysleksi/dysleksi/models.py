@@ -89,6 +89,12 @@ class TestType(TextChoices):
     GROUP = "group"
 
 
+class TestAssignmentStatus(TextChoices):
+    COMPLETED = "completed", _("Gennemført")
+    IN_PROGRESS = "in_progress", _("I gang")
+    PENDING = "pending", _("Afventer")
+
+
 class User(AbstractUser):
     history = HistoricalRecords()
 

@@ -9,7 +9,14 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django_tables2 import A, Column, Table, TemplateColumn, tables
 
-from dysleksi.models import CategoryRange, Class, Student, TestAssignment, TestPart
+from dysleksi.models import (
+    CategoryRange,
+    Class,
+    Student,
+    TestAssignment,
+    TestAssignmentStatus,
+    TestPart,
+)
 
 
 class NonOrderableTableMixin:
@@ -138,16 +145,18 @@ class TestAssignmentTable(Table):
         verbose_name=_("Antal elever"),
     )
 
-    status = tables.Column(
-        accessor=A("status"),
+    status = TemplateColumn(
+        template_name="dysleksi/admin/table_columns/test_assignment_status.html",
         orderable=False,
         verbose_name=_("Status"),
+        extra_context={"TestAssignmentStatus": TestAssignmentStatus},
     )
 
     actions = TemplateColumn(
         template_name="dysleksi/admin/table_columns/test_assignment_actions.html",
         orderable=False,
         verbose_name=_("Handlinger"),
+        extra_context={"TestAssignmentStatus": TestAssignmentStatus},
     )
 
 

@@ -17,6 +17,7 @@ from dysleksi.models import (
     Student,
     Test,
     TestAssignment,
+    TestAssignmentStatus,
     TestPart,
     TestType,
     User,
@@ -319,8 +320,10 @@ class TestTestAssignmentListView(DysleksiTest):
         self.assertQuerySetEqual(
             objs,
             [
-                (1, 1, "Gennemført"),  # Individual student test assignment
-                (3, 1, "I gang"),  # Group test assignment
+                # Individual student test assignment
+                (1, 1, TestAssignmentStatus.COMPLETED),
+                # Group test assignment
+                (3, 1, TestAssignmentStatus.IN_PROGRESS),
             ],
             ordered=False,
             transform=lambda obj: (
