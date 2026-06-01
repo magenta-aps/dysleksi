@@ -50,17 +50,17 @@ class ClassTable(Table):
         verbose_name=_("Antal elever"),
     )
 
-    status = tables.Column(
-        accessor=A("status"),
-        orderable=False,
-        verbose_name=_("Status"),
-    )
-
-    actions = TemplateColumn(
-        template_name="dysleksi/admin/table_columns/class_actions.html",
-        orderable=False,
-        verbose_name=_("Handlinger"),
-    )
+    # status = tables.Column(
+    #     accessor=A("status"),
+    #     orderable=False,
+    #     verbose_name=_("Status"),
+    # )
+    #
+    # actions = TemplateColumn(
+    #     template_name="dysleksi/admin/table_columns/class_actions.html",
+    #     orderable=False,
+    #     verbose_name=_("Handlinger"),
+    # )
 
 
 class StudentTable(Table):
@@ -81,17 +81,17 @@ class StudentTable(Table):
         verbose_name=_("Klassetrin"),
     )
 
-    status = tables.Column(
-        accessor=A("status"),
-        orderable=False,
-        verbose_name=_("Status"),
-    )
-
-    actions = TemplateColumn(
-        template_name="dysleksi/admin/table_columns/student_actions.html",
-        orderable=False,
-        verbose_name=_("Handlinger"),
-    )
+    # status = tables.Column(
+    #     accessor=A("status"),
+    #     orderable=False,
+    #     verbose_name=_("Status"),
+    # )
+    #
+    # actions = TemplateColumn(
+    #     template_name="dysleksi/admin/table_columns/student_actions.html",
+    #     orderable=False,
+    #     verbose_name=_("Handlinger"),
+    # )
 
 
 def _test_assignment_title(record):
