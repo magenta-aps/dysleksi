@@ -158,3 +158,15 @@ fi
 This will checkout master on your `dysleksi-binaries` repository and perform at git-pull
 when you pull from the `dysleksi` repository. Now your dysleksi-binaries repository will
 always be up-to-date.
+
+## Dependencies
+To find out where packages come from, you can run pipdeptree. For example:
+
+```
+docker exec -it dysleksi-web bash
+pipdeptree --reverse --packages pyOpenSSL
+
+>>> pyOpenSSL==24.2.1
+>>> └── pysaml2==7.5.4 [requires: pyOpenSSL<24.3.0]
+>>>     └── gl-mitid==1.9.1 [requires: pysaml2==7.5.4]
+```
