@@ -22,6 +22,7 @@ $student-yellow-lightest: #faf2dd;
 $student-yellow-light: #f2deaa;
 $student-yellow: #cfaa4c;
 $student-yellow-dark: #685526;
+$student-blue-lightest: #ccd9e6;
 $student-blue-light: #80a1c0;
 $student-blue: #e6ecf3;
 $student-blue-dark: #004382;
@@ -538,14 +539,14 @@ body.show-instructions .sound-btn.pulse {
   top: 0;
   left: 0;
   width: 100%;
-  background: $student-yellow-light;
+  background: $student-blue-lightest;
   margin: 0;
   padding: 0.5 * $spacer;
   font-size: 2.625 * $spacer;
   line-height: 1;
   text-align: right;
   z-index: 1;
-  color: $student-yellow;
+  color: $student-blue-light;
 
   i.ph {
     font-size: 2.625 * $spacer;
