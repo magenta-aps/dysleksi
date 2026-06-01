@@ -20,18 +20,14 @@ describe("Index Entry Point", () => {
 
     it("should initialize the student lobby with data from the DOM", async () => {
         // 2. Setup the DOM element with data attributes
-        document.body.innerHTML = `
-      <div 
-        data-student-id="1"
-      ></div>
-    `;
+        document.body.innerHTML = `<div data-student-id="1" data-has-open-assignments="true"></div>`;
 
         // 3. Trigger the code execution by importing the file
         // We use a query string to cache-bust if running multiple times
         await import("../../lobby/index.js?t=" + Date.now());
 
         // 4. Assertions
-        expect(initStudentLobby).toHaveBeenCalledWith(1);
+        expect(initStudentLobby).toHaveBeenCalledWith(1, true);
     });
 
     it("should throw or fail gracefully if the element is missing", async () => {

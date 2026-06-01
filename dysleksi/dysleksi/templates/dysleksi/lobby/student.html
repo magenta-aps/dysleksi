@@ -7,16 +7,25 @@
 {% endblock %}
 
 {% block content %}
-<div
-    class="container"
-    data-student-id="{{ student.id }}"
+<div class="center-screen"
+     data-student-id="{{ student.id }}"
+     data-has-open-assignments="{{ open_assignments|yesno:"true,false" }}"
 >
-    <h1>{% translate "Elev" %} ({{ student.klasse }})</h1>
-    <p>
-        {% blocktrans trimmed with name=student.first_name %}
-        Velkommen {{ name }}
-        {% endblocktrans %}
-    </p>
-    <p>{% translate "Venter på at testen begynder ..." %}</p>
+    <div class="center-content">
+        <h1>
+            {% blocktrans trimmed with name=student.get_full_name %}
+            Hej {{ name }}
+            {% endblocktrans %}
+        </h1>
+        {% if open_assignments %}
+        <p>{% translate "Venter..." %}</p>
+        {% else %}
+        <p>{% translate "Du har ingen tests lige nu." %}</p>
+        <a href="{% url 'login:logout' %}" class="btn task-btn mt-5">
+            {% translate 'Log ud' %}
+            <i class="ph-fill ph-sign-out"></i>
+        </a>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
