@@ -72,6 +72,41 @@ export class Student {
         }
         this.resultsByPart[partIndex].push(correctness);
     }
+
+    populateExistingAnswers(test) {
+        let lastAnsweredPartIndex = null;
+        let lastAnsweredQuestionIndex = null;
+
+        for (let partIndex = 0; partIndex < test.parts.length; partIndex++) {
+            const part = test.parts[partIndex];
+
+            for (
+                let questionIndex = 0;
+                questionIndex < part.questions.length;
+                questionIndex++
+            ) {
+                const question = part.questions[questionIndex];
+
+                if (question.answeredByStudent(this)) {
+                    const correctness = question.getExistingAnswer(this);
+                    this.addResult(partIndex, correctness);
+
+                    lastAnsweredPartIndex = partIndex;
+                    lastAnsweredQuestionIndex = questionIndex;
+                }
+            }
+        }
+
+        if (lastAnsweredPartIndex !== null) {
+            this.progress = calculateStudentProgress(
+                test,
+                lastAnsweredPartIndex,
+                lastAnsweredQuestionIndex,
+            );
+            this.currentPartIndex = lastAnsweredPartIndex;
+            this.currentQuestionIndex = lastAnsweredQuestionIndex;
+        }
+    }
 }
 
 export class Test extends EventTarget {
@@ -100,6 +135,14 @@ export class Test extends EventTarget {
 
     getPartClass() {
         return TestPart;
+    }
+
+    completedByStudent(student) {
+        return this.parts.every((p) => p.completedByStudent(student) === true);
+    }
+
+    getFirstUnansweredTestPartIndex(student) {
+        return this.parts.findIndex((p) => !p.completedByStudent(student));
     }
 
     async preload() {
@@ -219,6 +262,14 @@ export class TestPart {
     getQuestionClass() {
         return Question;
     }
+
+    completedByStudent(student) {
+        return this.questions.every((q) => q.answeredByStudent(student) === true);
+    }
+
+    getFirstUnansweredQuestionIndex(student) {
+        return this.questions.findIndex((q) => !q.answeredByStudent(student));
+    }
 }
 
 export class Question {
@@ -242,6 +293,7 @@ export class Question {
     timeout;
     continueWhenInstructionIsComplete;
     resultGroup;
+    existingAnswers;
 
     constructor(data, part, index) {
         this.part = part;
@@ -267,10 +319,20 @@ export class Question {
             data.continue_when_instruction_is_complete;
         this.advanceAutomatically = data.advance_automatically;
         this.resultGroup = data.result_group;
+        this.existingAnswers = data.existing_answers;
     }
 
     getAnswerClass() {
         return PossibleAnswer;
+    }
+
+    answeredByStudent(student) {
+        return student.id in this.existingAnswers;
+    }
+
+    getExistingAnswer(student) {
+        const answer = this.existingAnswers[student.id];
+        return answer.correctness;
     }
 }
 

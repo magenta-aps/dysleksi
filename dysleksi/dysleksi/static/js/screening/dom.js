@@ -183,7 +183,7 @@ class TestDomElements {
         }
     }
 
-    async showSummary(parts, complete = false) {
+    async showSummary(parts, student, complete = false) {
         this.testSummary.style.display = "flex";
         this.summaryContainer.innerHTML = "";
 
@@ -212,7 +212,7 @@ class TestDomElements {
             // Container for text so the image is separate
             const textContainer = document.createElement("div");
 
-            if (complete) {
+            if (part.completedByStudent(student) || complete) {
                 textContainer.innerHTML =
                     part.name +
                     ' <span class="checkmark"><i class="ph-fill ph-check-fat"></i></span>';

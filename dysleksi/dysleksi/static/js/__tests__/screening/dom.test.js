@@ -146,12 +146,23 @@ describe("GroupTestDomElements.showSummary", () => {
     it("Shows test summary with multiple parts", () => {
         const test = {
             parts: [
-                { name: "Ordlæsning", questions: [1, 2], image: "/static/ol.png" },
-                { name: "Ordstavning", questions: [1], image: "/static/os.png" },
+                {
+                    name: "Ordlæsning",
+                    questions: [1, 2],
+                    image: "/static/ol.png",
+                    completedByStudent: () => false,
+                },
+                {
+                    name: "Ordstavning",
+                    questions: [1],
+                    image: "/static/os.png",
+                    completedByStudent: () => false,
+                },
                 {
                     name: "Bogstavbenævnelse",
                     questions: [1, 2, 3],
                     image: "/static/bb.png",
+                    completedByStudent: () => false,
                 },
             ],
         };
@@ -194,7 +205,15 @@ describe("GroupTestDomElements.showSummary", () => {
     });
 
     it("Handles a single part with no questions", () => {
-        const test = { parts: [{ name: "Bogstavbenævnelse", questions: [] }] };
+        const test = {
+            parts: [
+                {
+                    name: "Bogstavbenævnelse",
+                    questions: [],
+                    completedByStudent: () => false,
+                },
+            ],
+        };
         dom.showSummary(test.parts);
 
         const block = dom.summaryContainer.querySelector(".summary-block");
@@ -207,12 +226,42 @@ describe("GroupTestDomElements.showSummary", () => {
     it("Shows test summary with lots of parts and scroll-arrows", async () => {
         const test = {
             parts: [
-                { name: "Part1", questions: [1], image: "/static/1.png" },
-                { name: "Part2", questions: [1], image: "/static/2.png" },
-                { name: "Part3", questions: [1], image: "/static/3.png" },
-                { name: "Part4", questions: [1], image: "/static/4.png" },
-                { name: "Part5", questions: [1], image: "/static/5.png" },
-                { name: "Part6", questions: [1], image: "/static/6.png" },
+                {
+                    name: "Part1",
+                    questions: [1],
+                    image: "/static/1.png",
+                    completedByStudent: () => false,
+                },
+                {
+                    name: "Part2",
+                    questions: [1],
+                    image: "/static/2.png",
+                    completedByStudent: () => false,
+                },
+                {
+                    name: "Part3",
+                    questions: [1],
+                    image: "/static/3.png",
+                    completedByStudent: () => false,
+                },
+                {
+                    name: "Part4",
+                    questions: [1],
+                    image: "/static/4.png",
+                    completedByStudent: () => false,
+                },
+                {
+                    name: "Part5",
+                    questions: [1],
+                    image: "/static/5.png",
+                    completedByStudent: () => false,
+                },
+                {
+                    name: "Part6",
+                    questions: [1],
+                    image: "/static/6.png",
+                    completedByStudent: () => false,
+                },
             ],
         };
 
@@ -248,8 +297,16 @@ describe("GroupTestDomElements.showSummary", () => {
     });
 
     it("Shows summary for a completed test", async () => {
-        const test = { parts: [{ name: "Bogstavbenævnelse", questions: [] }] };
-        await dom.showSummary(test.parts, true);
+        const test = {
+            parts: [
+                {
+                    name: "Bogstavbenævnelse",
+                    questions: [],
+                    completedByStudent: () => false,
+                },
+            ],
+        };
+        await dom.showSummary(test.parts, null, true);
 
         const block = dom.summaryContainer.querySelector(".summary-block");
         expect(block).not.toBeNull();

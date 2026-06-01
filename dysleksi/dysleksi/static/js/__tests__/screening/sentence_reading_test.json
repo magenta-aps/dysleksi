@@ -19,6 +19,7 @@
           "challenge_sound_url": null,
           "challenge_text": "Jeg er en blomst",
           "question_type": "multiple_choice",
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 200,
@@ -48,6 +49,7 @@
           "challenge_sound_url": null,
           "challenge_text": "Blomst",
           "question_type": "multiple_choice",
+          "existing_answers": {},
           "possible_answers": [
             {
               "id": 200,

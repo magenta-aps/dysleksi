@@ -416,7 +416,7 @@ class Test(models.Model):
         default=False,
     )
 
-    def to_json(self) -> dict:
+    def to_json(self, assignment) -> dict:
         """
         Serialize the Test with its parts, questions, and possible answers.
         Returns a Python dict that can be converted to JSON with json.dumps().
@@ -470,6 +470,10 @@ class Test(models.Model):
                         "advance_automatically": question.advance_automatically,
                         "result_group": question.result_group,
                     }
+                    question_data["existing_answers"] = question.get_existing_answers(
+                        assignment
+                    )
+
                     if question.reminder_source:
                         question_data["reminderSource"] = question.reminder_source.url
                     if question.hint_source:
@@ -908,6 +912,18 @@ class TestQuestion(models.Model):
     @property
     def correct_answer(self) -> "PossibleAnswer|None":
         return self.possible_answers.filter(correctness=Correctness.CORRECT).first()
+
+    def get_existing_answers(self, assignment):
+
+        existing_answers = QuestionResponse.objects.filter(
+            partresponse__testresponse__assignment=assignment,
+            question=self,
+        )
+
+        existing = {}
+        for answer in existing_answers:
+            existing[answer.student.pk] = answer.to_json()
+        return dict(existing)
 
     def __str__(self) -> str:
         return f"{str(self.part)} / {self.pk}"
@@ -1428,6 +1444,13 @@ class QuestionResponse(PermissionsMixin, models.Model):
 
     def __str__(self) -> str:
         return f"{str(self.question)} / {str(self.partresponse)}"
+
+    def to_json(self):
+        return {"correctness": self.correctness}
+
+    @property
+    def student(self):
+        return self.partresponse.testresponse.student
 
 
 class HandledEvent(TextChoices):

@@ -155,7 +155,7 @@ class AssignmentView(UserTypeMixin, ObjectPermissionsMixin, DetailView):
         context = super().get_context_data(**kwargs)
         assignment = self.object
         test = Test.objects.get(pk=assignment.test_id)
-        context["test_contents"] = test.to_json()
+        context["test_contents"] = test.to_json(self.object)
         if assignment.klasse:
             context["student_ids"] = list(
                 assignment.klasse.students.values_list("id", flat=True)
