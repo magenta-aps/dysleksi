@@ -1,3 +1,4 @@
+from datetime import timedelta
 from itertools import count
 from math import ceil
 from typing import Callable, List
@@ -17,6 +18,7 @@ from dysleksi.models import (
     TestAssignmentStatus,
     TestPart,
 )
+from dysleksi.utils import format_time
 
 
 class NonOrderableTableMixin:
@@ -431,7 +433,7 @@ class QuestionResponsesTable(NonOrderableTableMixin, Table):
     student_answer_time = Column(
         verbose_name=_("Tid"),
         accessor="finished_after",
-        footer=lambda column, bound_column, table: table.render_answer_time(
+        footer=lambda column, bound_column, table: table.render_student_answer_time(
             sum(bound_column.accessor.resolve(row) or 0 for row in table.data)
         ),
         attrs={
@@ -440,6 +442,14 @@ class QuestionResponsesTable(NonOrderableTableMixin, Table):
         },
     )
 
-    def render_answer_time(self, value):
+    def render_student_answer_time(self, value):
         # Convert ms to s
-        return _("%(tid)s sek.") % {"tid": ceil(0.001 * value)}
+        return format_time(ceil(0.001 * value))
+
+
+class AnswerTimeTable(NonOrderableTableMixin, HeaderlessTableMixin, Table):
+    metric = Column()
+    answer_time = Column()
+
+    def render_answer_time(self, value: timedelta):
+        return format_time(value.seconds)

@@ -245,6 +245,7 @@ def create_letter_pronunciation_test(
             "partial_score_after": 30000,
             "image_url": "/static/images/letter_pronunciation.png",
             "completion_source": completion,
+            "show_answer_time_statistics": True,
         },
     )
     if created:  # pragma: no branch
@@ -270,6 +271,7 @@ def create_word_pronunciation_test(
             "image_url": "/static/images/word_pronunciation.png",
             "reminder_source": None,
             "completion_source": completion,
+            "show_answer_time_statistics": True,
         },
     )
     if created:  # pragma: no branch
@@ -295,6 +297,7 @@ def create_nonsense_word_pronunciation_test(
             "image_url": "/static/images/nonsense_word_pronunciation.png",
             "reminder_source": None,
             "completion_source": completion,
+            "show_answer_time_statistics": True,
         },
     )
     if created:  # pragma: no branch

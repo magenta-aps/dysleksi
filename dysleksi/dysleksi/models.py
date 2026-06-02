@@ -669,6 +669,7 @@ class TestPart(models.Model):
         related_name="completion_testpart",
     )
     show_normscore_speed_plot = models.BooleanField(default=False)
+    show_answer_time_statistics = models.BooleanField(default=False)
 
     answer_time_data_breakdown = models.ManyToManyField(
         TestPartResultsBreakdownRange,

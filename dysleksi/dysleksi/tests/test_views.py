@@ -2,6 +2,7 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 import json
+from datetime import timedelta
 from unittest.mock import patch
 
 from bs4 import BeautifulSoup
@@ -1114,7 +1115,7 @@ class TestPartResponseView(ResponseTest):
             ],
         )
 
-    def test_answer_time_table(self):
+    def test_time_slot_table(self):
         part: TestPart = self.group_test_part
         part.wordlength_data_breakdown.clear()
         part.wordcount_data_breakdown.clear()
@@ -1150,6 +1151,44 @@ class TestPartResponseView(ResponseTest):
                 [["Alle"], ["4"]],
                 [["0 minutter til 7 minutter"], ["4"]],
                 [["Sidste 5 minutter"], ["0"]],
+            ],
+        )
+
+    def test_answer_time_table(self):
+        part: TestPart = self.group_test_part
+        part.wordlength_data_breakdown.clear()
+        part.wordcount_data_breakdown.clear()
+        part.show_answer_time_statistics = True
+        part.save(update_fields=["show_answer_time_statistics"])
+        view = self.setup_view(
+            PartResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testresponse_pk=self.group_testresponse_1.pk,
+            testpart_pk=self.group_test_part.pk,
+        )
+        context = view.get_context_data()
+        table_data = [row for row in context["answer_time_table"].data]
+        self.assertEqual(
+            table_data,
+            [
+                {"metric": "Totalt tidsforbrug", "answer_time": timedelta(seconds=90)},
+                {
+                    "metric": "Gennemsnitlig svartid",
+                    "answer_time": timedelta(seconds=22, microseconds=500000),
+                },
+            ],
+        )
+
+        response = view.response
+        response.render()
+        soup = BeautifulSoup(response.content, "html.parser")
+        table = self.html_table_to_list(soup.find("table"))
+        self.assertEqual(
+            table,
+            [
+                [["Totalt tidsforbrug"], ["1 min. 30 sek."]],
+                [["Gennemsnitlig svartid"], ["22 sek."]],
             ],
         )
 
