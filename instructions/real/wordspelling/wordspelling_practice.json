@@ -459,7 +459,7 @@
     "question_type": "free_text",
     "correct": "ulu",
     "reminder": 15000,
-    "reminder_source": "resources/wordspelling/Øveopgave/6c.3.mp3",
+    "reminder_source": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6c.3.mp3",
     "continue_when_instruction_is_complete": false,
     "instruction_sequence": [
       {
@@ -482,7 +482,7 @@
     "question_type": "free_text",
     "correct": "matu",
     "reminder": 15000,
-    "reminder_source": "resources/wordspelling/Øveopgave/6c.7.mp3",
+    "reminder_source": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6c.7.mp3",
     "continue_when_instruction_is_complete": false,
     "instruction_sequence": [
       // Indsættes her for at forsinke næste trin
