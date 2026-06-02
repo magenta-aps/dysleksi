@@ -234,11 +234,6 @@ msgstr ""
 msgid "Tid"
 msgstr ""
 
-#: dysleksi/tables.py
-#, python-format
-msgid "%(tid)s sek."
-msgstr ""
-
 #: dysleksi/templates/dysleksi/admin/base.html
 #: dysleksi/templates/dysleksi/admin/modals/base.html
 msgid "Luk"
@@ -406,6 +401,10 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
 msgid "Fordeling på sætningslængde"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+msgid "Tidsforbrug og svartid"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
@@ -697,4 +696,12 @@ msgstr ""
 
 #: dysleksi/views.py
 msgid "Antal rigtige"
+msgstr ""
+
+#: dysleksi/views.py
+msgid "Totalt tidsforbrug"
+msgstr ""
+
+#: dysleksi/views.py
+msgid "Gennemsnitlig svartid"
 msgstr ""

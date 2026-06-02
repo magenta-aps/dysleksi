@@ -11,6 +11,7 @@ from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import transaction
 from django.db.models import (
     Aggregate,
+    Avg,
     Case,
     CharField,
     Count,
@@ -20,6 +21,7 @@ from django.db.models import (
     IntegerField,
     Q,
     QuerySet,
+    Sum,
     Value,
     When,
 )
@@ -63,6 +65,7 @@ from dysleksi.models import (
 )
 from dysleksi.tables import (
     AnswerByTimeResultsTable,
+    AnswerTimeTable,
     ClassTable,
     EmptyColumn,
     PartResultTable,
@@ -977,7 +980,10 @@ class PartResponseView(
 
     def get_questionresponse_qs_annotations(self) -> Dict[str, BaseExpression]:
         annotations: Dict[str, BaseExpression] = {}
-        if self.part.answer_time_data_breakdown_ranges:
+        if (
+            self.part.answer_time_data_breakdown_ranges
+            or self.part.show_answer_time_statistics
+        ):
             annotations["submitted_after"] = ExpressionWrapper(
                 F("submitted_at") - F("partresponse__started_at"),
                 output_field=DurationField(),
@@ -1035,6 +1041,11 @@ class PartResponseView(
             aggregations[f"challenge_word_count__{lower}_{upper}__correct"] = Count(
                 "id", filter=q
             )
+
+        if self.part.show_answer_time_statistics:
+            aggregations["total_answer_time"] = Sum("submitted_after")
+            aggregations["average_answer_time"] = Avg("submitted_after")
+
         return aggregations
 
     def get_questionresponses_aggregated_data(self) -> Dict[str, Any]:
@@ -1070,10 +1081,11 @@ class PartResponseView(
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
 
-        questions_counts = self.get_questions_aggregated_data()
-        questionresponses_counts = self.get_questionresponses_aggregated_data()
+        questions_data = self.get_questions_aggregated_data()
 
-        context["questionresponses"] = questionresponses_counts
+        questionresponses_data = self.get_questionresponses_aggregated_data()
+
+        context["questionresponses"] = questionresponses_data
 
         context["has_almost_correct"] = (
             self.object.testpart.has_partially_correct_answers
@@ -1084,7 +1096,7 @@ class PartResponseView(
                 data=[
                     {
                         "time_slot": (lower, upper),
-                        "correct_count": questionresponses_counts[
+                        "correct_count": questionresponses_data[
                             f"time_slot__{lower}_{upper}__correct"
                         ],
                     }
@@ -1097,10 +1109,10 @@ class PartResponseView(
                 data=[
                     {
                         "word_length": f"{lower}-{upper}",
-                        "questions_count": questions_counts[
+                        "questions_count": questions_data[
                             f"challenge_text_length__{lower}_{upper}__questions"
                         ],
-                        "correct_count": questionresponses_counts[
+                        "correct_count": questionresponses_data[
                             f"challenge_text_length__{lower}_{upper}__correct"
                         ],
                     }
@@ -1113,14 +1125,28 @@ class PartResponseView(
                 data=[
                     {
                         "word_count": f"{lower}-{upper}",
-                        "questions_count": questions_counts[
+                        "questions_count": questions_data[
                             f"challenge_word_count__{lower}_{upper}__questions"
                         ],
-                        "correct_count": questionresponses_counts[
+                        "correct_count": questionresponses_data[
                             f"challenge_word_count__{lower}_{upper}__correct"
                         ],
                     }
                     for lower, upper in self.part.answer_wordcount_data_ranges
+                ]
+            )
+
+        if self.part.show_answer_time_statistics:
+            context["answer_time_table"] = AnswerTimeTable(
+                data=[
+                    {
+                        "metric": _("Totalt tidsforbrug"),
+                        "answer_time": questionresponses_data["total_answer_time"],
+                    },
+                    {
+                        "metric": _("Gennemsnitlig svartid"),
+                        "answer_time": questionresponses_data["average_answer_time"],
+                    },
                 ]
             )
 
