@@ -1,145 +1,145 @@
 [
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.1 - f.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.1 - f.mp3",
         "correct": "f",
         "wrong": ["p", "v", "g"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.2 - a.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.2 - a.mp3",
         "correct": "a",
         "wrong": ["e", "o", "i"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.3 - v.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.3 - v.mp3",
         "correct": "v",
         "wrong": ["f", "k", "r"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.4 - rr.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.4 - rr.mp3",
         "correct": "rr",
         "wrong": ["e", "k", "a"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.5 - i.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.5 - i.mp3",
         "correct": "i",
         "wrong": ["u", "a", "o"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.6 - gg.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.6 - gg.mp3",
         "correct": "gg",
         "wrong": ["q", "m", "k"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.7 - s.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.7 - s.mp3",
         "correct": "s",
         "wrong": ["l", "n", "q"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.8 - t.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.8 - t.mp3",
         "correct": "t",
         "wrong": ["v", "s", "l"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.9 - l.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.9 - l.mp3",
         "correct": "l",
         "wrong": ["p", "s", "m"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.10 - n.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.10 - n.mp3",
         "correct": "n",
         "wrong": ["j", "t", "l"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.11 - k.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.11 - k.mp3",
         "correct": "k",
         "wrong": ["g", "h", "ng"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.12 - j.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.12 - j.mp3",
         "correct": "j",
         "wrong": ["r", "k", "i"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.13 - u.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.13 - u.mp3",
         "correct": "u",
         "wrong": ["e", "q", "a"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.14 - g.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.14 - g.mp3",
         "correct": "g",
         "wrong": ["s", "k", "t"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.15 - r.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.15 - r.mp3",
         "correct": "r",
         "wrong": ["h", "n", "p"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.16  Bogstav H.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.16  Bogstav H.mp3",
         "correct": "h",
         "wrong": ["f", "r", "l"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.17 - q.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.17 - q.mp3",
         "correct": "q",
         "wrong": ["r", "g", "k"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.18 - ll.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.18 - ll.mp3",
         "correct": "ll",
         "wrong": ["j", "n", "m"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.19 - e.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.19 - e.mp3",
         "correct": "e",
         "wrong": ["a", "v", "u"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.20 - ng.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.20 - ng.mp3",
         "correct": "ng",
         "wrong": ["j", "f", "r"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.21 - p.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.21 - p.mp3",
         "correct": "p",
         "wrong": ["g", "v", "f"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.22 - m.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.22 - m.mp3",
         "correct": "m",
         "wrong": ["p", "v", "l"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.23 - o.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.23 - o.mp3",
         "correct": "o",
         "wrong": ["e", "k", "a"]
     },
     {
         "question_type": "multiple_choice",
-        "sound": "resources/shared/Bogstavlyde/1f.24 - t[d].wav",
+        "sound": "resources/shared/Bogstavlyde/1f.24 - t[d].mp3",
         "correct": "t(d)",
         "wrong": ["j", "s", "f"]
     }

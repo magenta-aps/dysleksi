@@ -15,7 +15,7 @@
                 // "Oqaatsinik atuarneq minutsini qulini sivisussuseqassaaq ... Aallartipputit"
                 // TODO: selve opgaven skal først være synlig, når ordet "Aallartipputit" læses op
                 "action": "playSound",
-                "resource": "resources/wordreading_2/Enhanced/Deltest/7e.1.wav",
+                "resource": "resources/wordreading_2/Enhanced/Deltest/7e.1.mp3",
                 "delayAfter": 0
             }
         ]

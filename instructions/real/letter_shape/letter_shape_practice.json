@@ -18,13 +18,13 @@
             {
                 // Bogstavers form er nu ved at starte.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Indledning/3a.1.wav",
+                "resource": "resources/letter_shape/Enhanced/Indledning/3a.1.mp3",
                 "delayAfter": 250
             },
             {
                 // Men først bliver det vist, hvad du skal gøre.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Indledning/3a.2.wav",
+                "resource": "resources/letter_shape/Enhanced/Indledning/3a.2.mp3",
                 "delayAfter": 500
             },
             {
@@ -40,7 +40,7 @@
             {
                 // Tryk grøn, når du er klar.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Indledning/3a.3.wav",
+                "resource": "resources/letter_shape/Enhanced/Indledning/3a.3.mp3",
                 "delayAfter": 1250
             }
         ]
@@ -59,14 +59,14 @@
             {
                 // "Lyt godt efter"
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.1.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.1.mp3",
                 "delayAfter": 750
             },
 
             {
                 // Du kan se
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.2.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.2.mp3",
                 "delayAfter": 750
             },
             {
@@ -77,7 +77,7 @@
             {
                 // store bogstaver
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.3.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.3.mp3",
                 "delayAfter": 1250
             },
 
@@ -89,20 +89,20 @@
             {
                 // og små bogstaver
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.4.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.4.mp3",
                 "delayAfter": 1250
             },
             {
                 // "Du"
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.5.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.5.mp3",
                 "delayAfter": 0
             },
             {
                 // Skal først finde bogstaver, der hører sammen nemlig ét stort bogstav
                 // og ét lille bogstav, således:
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.6.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.6.mp3",
                 "delayAfter": 1250
             },
 
@@ -116,7 +116,7 @@
                 // Skal starte med at se på den første valgmulighed blandt de store
                 // bogstaver, f.eks.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.7-00.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.7-00.mp3",
                 "delayAfter": 0
             },
             {
@@ -127,7 +127,7 @@
             {
                 // A
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.7-01.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.7-01.mp3",
                 "delayAfter": 1250
             },
 
@@ -139,13 +139,13 @@
             {
                 // Derefter se, om det lille a er blandt de små bogstaver.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.8.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.8.mp3",
                 "delayAfter": 1250
             },
             {
                 // Da det lille a ikke er der, går du videre til den næste store bogstav.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.9.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.9.mp3",
                 "delayAfter": 1250
             },
 
@@ -157,7 +157,7 @@
             {
                 // Her er det næste: stort C.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.10.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.10.mp3",
                 "delayAfter": 1250
             },
             {
@@ -168,7 +168,7 @@
             {
                 // Så skal du se om det lille c er der.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.11.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.11.mp3",
                 "delayAfter": 1250
             },
 
@@ -176,7 +176,7 @@
             {
                 // Og da det ikke er der, skal du igen gå videre til det næste store bogstav.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.12.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.12.mp3",
                 "delayAfter": 1250
             },
             {
@@ -187,7 +187,7 @@
             {
                 // Her er det næste: stort B.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.13.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.13.mp3",
                 "delayAfter": 1250
             },
             {
@@ -198,7 +198,7 @@
             {
                 // Og her er det  lille b.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.14.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.14.mp3",
                 "delayAfter": 1250
             },
             {
@@ -214,7 +214,7 @@
             {
                 // Nu kan du se bogstaver, som hører sammen.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.15.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.15.mp3",
                 "delayAfter": 1250
             },
             {
@@ -230,7 +230,7 @@
             {
                 // Derfor skal du nu vælge det store B og det lille b.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.16.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.16.mp3",
                 "delayAfter": 1250
             },
 
@@ -239,7 +239,7 @@
                 // Hvis du vælger forkert, kan du ændre dine valg. Du må også gerne
                 // gætte, hvis du ikke kan finde ud af opgaven.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.17.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.17.mp3",
                 "delayAfter": 1250
             },
 
@@ -254,7 +254,7 @@
                 // Når du har valgt, går du videre til næste opgave ved at trykke
                 // på pilen.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.18.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.18.mp3",
                 "delayAfter": 1250
             },
 
@@ -279,13 +279,13 @@
             {
                 // "Det er sådan, du skal løse opgaverne"
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.19.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.19.mp3",
                 "delayAfter": 500
             },
             {
                 // "Nu skal du selv prøve øveopgaverne"
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.20.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.20.mp3",
                 "delayAfter": 1250
             },
 
@@ -303,7 +303,7 @@
             {
                 // "Klik grøn når du er klar"
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.21.wav",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.21.mp3",
                 "delayAfter": 0
             }
         ]
@@ -313,9 +313,9 @@
         "correct": "Cc",
         "set1": ["A","C","H","S","G","B"],
         "set2": ["d","o","v","j","c","k"],
-        "reminder_source": "/resources/letter_shape/Enhanced/Instruktion/3c.1.wav",
+        "reminder_source": "/resources/letter_shape/Enhanced/Instruktion/3c.1.mp3",
         "continue_when_instruction_is_complete": false,
-        "hint_source": "/resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.5_v2.wav",
+        "hint_source": "/resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.5_v2.mp3",
         "instruction_sequence": [
             {
                 "action": "hide",
@@ -345,13 +345,13 @@
             {
                 // Du skal vælge et stort og et lille bogstav.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.2.wav",
+                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.2.mp3",
                 "delayAfter": 1250
             },
             {
                 // Du starter nu
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.3.wav",
+                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.3.mp3",
                 "delayAfter": 1250
             },
             {
@@ -371,8 +371,8 @@
         "correct": "Aa",
         "set1": ["B","W","C","S","A","H"],
         "set2": ["d","o","a","j","v","k"],
-        "reminder_source": "/resources/letter_shape/Enhanced/Instruktion/3c.1.wav",
-        "hint_source": "/resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.5_v2.wav"
+        "reminder_source": "/resources/letter_shape/Enhanced/Instruktion/3c.1.mp3",
+        "hint_source": "/resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.5_v2.mp3"
     },
     {
         "question_type": "no_input_required",
@@ -381,7 +381,7 @@
                 // "Øvelserne er færdige" / "Sungiusarneq naammassivoq"
                 "action": "playSound",
                 "delayAfter": 1250,
-                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.9.wav"
+                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.9.mp3"
             },
 
             // "Næste" og "Gentag" vises i "fade out" tilstand
@@ -426,7 +426,7 @@
                 // Her er to valgmuligheder.
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.1.wav"
+                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.1.mp3"
             },
 
             {
@@ -439,7 +439,7 @@
                 // Så starter opgaverne.
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.2.wav"
+                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.2.mp3"
             },
 
             {
@@ -452,7 +452,7 @@
                 // grå. Så skal du øve dig igen.
                 "action": "playSound",
                 "delayAfter": 1250,
-                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.3.wav"
+                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.3.mp3"
             },
 
             {
@@ -469,7 +469,7 @@
                 // "Vælg et ikon (klik)"
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.4.wav"
+                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.4.mp3"
             }
         ]
     }
