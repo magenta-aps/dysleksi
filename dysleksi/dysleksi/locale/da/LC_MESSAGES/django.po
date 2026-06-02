@@ -549,6 +549,10 @@ msgstr ""
 msgid "Bemærkning"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Svarede:"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/test_response/detail.html
 #, python-format
 msgid "Elevrapport for %(name)s"
