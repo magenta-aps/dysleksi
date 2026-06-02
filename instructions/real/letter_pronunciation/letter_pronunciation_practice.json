@@ -7,7 +7,7 @@
       // 9a.1 - skærmen vises tydeligt/normalt
       {
         "action": "playSound",
-        "resource": "resources/letter_pronunciation/Enhanced/9a.1.wav",
+        "resource": "resources/letter_pronunciation/Enhanced/9a.1.mp3",
         "delayAfter": 0
       },
       {
@@ -24,28 +24,28 @@
       // 9a.2
       {
         "action": "playSound",
-        "resource": "resources/letter_pronunciation/Enhanced/9a.2.wav",
+        "resource": "resources/letter_pronunciation/Enhanced/9a.2.mp3",
         "delayAfter": 1250
       },
 
       // 9a.3
       {
         "action": "playSound",
-        "resource": "resources/letter_pronunciation/Enhanced/9a.3.wav",
+        "resource": "resources/letter_pronunciation/Enhanced/9a.3.mp3",
         "delayAfter": 1250
       },
 
       // 9a.4
       {
         "action": "playSound",
-        "resource": "resources/letter_pronunciation/Enhanced/9a.4.wav",
+        "resource": "resources/letter_pronunciation/Enhanced/9a.4.mp3",
         "delayAfter": 1250
       },
 
       // 9a.5 - "Næste"-knappen vises
       {
         "action": "playSound",
-        "resource": "resources/letter_pronunciation/Enhanced/9a.5.wav",
+        "resource": "resources/letter_pronunciation/Enhanced/9a.5.mp3",
         "delayAfter": 0
       },
       {

@@ -7,7 +7,7 @@
       // Højtlæsning af ord er nu ved at starte.
       {
         "action": "playSound",
-        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.1.wav",
+        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.1.mp3",
         "delayAfter": 0
       },
       {
@@ -24,28 +24,28 @@
       // Et ord, som du skal læse, vises.
       {
         "action": "playSound",
-        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.2.wav",
+        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.2.mp3",
         "delayAfter": 1250
       },
 
       // Du skal læse ordet (højt).
       {
         "action": "playSound",
-        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.3.wav",
+        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.3.mp3",
         "delayAfter": 1250
       },
 
       // Men først skal du prøve øveopagverne.
       {
         "action": "playSound",
-        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.4.wav",
+        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.4.mp3",
         "delayAfter": 1250
       },
 
       // Tryk på det grønne ikon, når du er klar.
       {
         "action": "playSound",
-        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.5.wav",
+        "resource": "resources/word_pronunciation/Enhanced/Indledning/10a.5.mp3",
         "delayAfter": 0
       },
       {

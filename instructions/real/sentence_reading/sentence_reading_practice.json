@@ -18,13 +18,13 @@
             {
                 // Sætningslæsning er nu ved at starte.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Indledning/8a.1.wav",
+                "resource": "resources/sentence_reading/Enhanced/Indledning/8a.1.mp3",
                 "delayAfter": 250
             },
             {
                 // Først vises hvad du skal gøre.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Indledning/8a.2.wav",
+                "resource": "resources/sentence_reading/Enhanced/Indledning/8a.2.mp3",
                 "delayAfter": 500
             },
             {
@@ -40,7 +40,7 @@
             {
                 // Tryk på grøn, når du er klar.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Indledning/8a.3.wav",
+                "resource": "resources/sentence_reading/Enhanced/Indledning/8a.3.mp3",
                 "delayAfter": 1250
             }
         ]
@@ -61,13 +61,13 @@
             {
                 // "Lyt godt efter"
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.1.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.1.mp3",
                 "delayAfter": 750
             },
             {
                 // Du kan se:
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.2.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.2.mp3",
                 "delayAfter": 750
             },
 
@@ -79,7 +79,7 @@
             {
                 // Et billede
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.3.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.3.mp3",
                 "delayAfter": 1250
             },
             {
@@ -90,7 +90,7 @@
             {
                 // En sætning, der skal læses.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.4.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.4.mp3",
                 "delayAfter": 750
             },
             {
@@ -101,19 +101,19 @@
             {
                 // Og to valgmuligheder.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.5.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.5.mp3",
                 "delayAfter": 1000
             },
             {
                 // Nogle sætninger passer til billedet, mens andre ikke gør.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.6.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.6.mp3",
                 "delayAfter": 1000
             },
             {
                 // Du
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.7.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.7.mp3",
                 "delayAfter": 250
             },
             {
@@ -124,7 +124,7 @@
             {
                 // Skal læse sætningen og derefter,
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.8.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.8.mp3",
                 "delayAfter": 1000
             },
             {
@@ -136,7 +136,7 @@
                 // se på billedet for at vurdere, om det, du har læst passer til
                 // billedet.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.9.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.9.mp3",
                 "delayAfter": 1000
             },
             {
@@ -147,7 +147,7 @@
             {
                 // Du vælger grøn, når sætningen du læser passer til billedet
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.10.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.10.mp3",
                 "delayAfter": 1000
             },
             {
@@ -158,7 +158,7 @@
             {
                 // og rød, når det ikke gør.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.11.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.11.mp3",
                 "delayAfter": 1000
             },
             {
@@ -169,7 +169,7 @@
             {
                 // I denne sætning står der: Bedstemor syr
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.12.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.12.mp3",
                 "delayAfter": 1000
             },
             {
@@ -180,13 +180,13 @@
             {
                 // Da du kan se på billedet, at bedstemor syr, er sætningen sand.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.13.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.13.mp3",
                 "delayAfter": 1000
             },
             {
                 // Derfor skal du vælge den grønne knap, således...
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.14.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.14.mp3",
                 "delayAfter": 500
             },
             {
@@ -216,7 +216,7 @@
             {
                 // I den næste sætning står der: Bedstemor løber
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.15.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.15.mp3",
                 "delayAfter": 750
             },
             {
@@ -227,13 +227,13 @@
             {
                 // Da bedstemor ikke løber på billedet,
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.16.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.16.mp3",
                 "delayAfter": 750
             },
             {
                 // Derfor skal du vælge den røde knap, således...
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.17.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.17.mp3",
                 "delayAfter": 500
             },
             {
@@ -245,7 +245,7 @@
                 // Hvis du vælger forkert, kan du ændre dit valg. Du må også gerne
                 // gætte, hvis du ikke kan finde ud af opgaven.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.18.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.18.mp3",
                 "delayAfter": 1000
             },
             {
@@ -257,7 +257,7 @@
                 // Når du har valgt, går du videre til næste opgave ved at trykke
                 // på pilen.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.19.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.19.mp3",
                 "delayAfter": 1000
             },
             {
@@ -278,19 +278,19 @@
             {
                 // Det er sådan, du skal løse opgaverne.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.20.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.20.mp3",
                 "delayAfter": 1000
             },
             {
                 // Nu skal du selv prøve øveopgaverne.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.21.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.21.mp3",
                 "delayAfter": 1000
             },
             {
                 // Tryk på grøn, når du er klar.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.22.wav",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.22.mp3",
                 "delayAfter": 1000
             }
         ]
@@ -301,7 +301,7 @@
         "text": "Arnaq isaruaqarpoq",
         "correct": "true",
         "wrong": ["false"],
-        "reminder_source": "resources/sentence_reading/Enhanced/Instruktion/8c.1.wav",
+        "reminder_source": "resources/sentence_reading/Enhanced/Instruktion/8c.1.mp3",
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
             {
@@ -323,13 +323,13 @@
                 // Du skal læse og vælge grøn, hvis den passer til billedet, eller rød,
                 // hvis den ikke gør.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8c.2.wav",
+                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8c.2.mp3",
                 "delayAfter": 1000
             },
             {
                // Du starter
                "action": "playSound",
-               "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8c.3.wav",
+               "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8c.3.mp3",
                "delayAfter": 0
             }
         ]
@@ -340,7 +340,7 @@
         "text": "Nujai qorsuupput",
         "correct": "false",
         "wrong": ["true"],
-        "reminder_source": "resources/sentence_reading/Enhanced/Instruktion/8c.1.wav"
+        "reminder_source": "resources/sentence_reading/Enhanced/Instruktion/8c.1.mp3"
     },
     {
         "question_type": "no_input_required",
@@ -349,7 +349,7 @@
                 // "Øvelserne er færdige" / "Sungiusarneq naammassivoq"
                 "action": "playSound",
                 "delayAfter": 1250,
-                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8c.8.wav"
+                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8c.8.mp3"
             },
 
             // "Næste" og "Gentag" vises i "fade out" tilstand
@@ -394,7 +394,7 @@
                 // Her kan du se to valgmuligheder.
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8d.1.wav"
+                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8d.1.mp3"
             },
 
             {
@@ -406,7 +406,7 @@
                 // "Hvis du har forstået, hvad du skal gøre [...]"
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8d.2.wav"
+                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8d.2.mp3"
             },
 
             {
@@ -418,7 +418,7 @@
                 // "Men, hvis du ikke har forstået [...]"
                 "action": "playSound",
                 "delayAfter": 1250,
-                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8d.3.wav"
+                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8d.3.mp3"
             },
 
             {
@@ -435,7 +435,7 @@
                 // "Vælg et ikon (klik)" / "Toorseriarit"
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8d.4.wav"
+                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8d.4.mp3"
             }
         ]
     }

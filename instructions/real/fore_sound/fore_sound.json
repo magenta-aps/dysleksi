@@ -1,6 +1,6 @@
 [
     {
-        "sound": "resources/shared/Bogstavlyde/1f.7 - s.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.7 - s.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Is_bred.jpg",
         "wrong": [
@@ -10,7 +10,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.21 - p.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.21 - p.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Tallerken 2.jpg",
         "wrong": [
@@ -20,7 +20,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.13 - u.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.13 - u.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Julestjerne.jpg",
         "wrong": [
@@ -30,7 +30,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.24 - t[d].wav",
+        "sound": "resources/shared/Bogstavlyde/1f.24 - t[d].mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Rensdyr.jpg",
         "wrong": [
@@ -40,7 +40,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.10 - n.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.10 - n.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Isbjørn.jpg",
         "wrong": [
@@ -50,7 +50,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.2 - a.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.2 - a.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Blyant.jpg",
         "wrong": [
@@ -60,7 +60,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.17 - q.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.17 - q.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Kajak.jpg",
         "wrong": [
@@ -70,7 +70,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.11 - k.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.11 - k.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Tommeltot.jpg",
         "wrong": [
@@ -80,7 +80,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.5 - i.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.5 - i.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Bål_-_inneq.jpg",
         "wrong": [
@@ -90,7 +90,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.22 - m.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.22 - m.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/æg_mannik.jpg",
         "wrong": [
@@ -100,7 +100,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.19 - e.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.19 - e.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Vaskemaskine.jpg",
         "wrong": [
@@ -110,7 +110,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.15 - r.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.15 - r.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Reje.jpg",
         "wrong": [
@@ -120,7 +120,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.23 - o.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.23 - o.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Træ.jpg",
         "wrong": [
@@ -130,7 +130,7 @@
         ]
     },
     {
-        "sound": "resources/shared/Bogstavlyde/1f.8 - t.wav",
+        "sound": "resources/shared/Bogstavlyde/1f.8 - t.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Kop.jpg",
         "wrong": [
