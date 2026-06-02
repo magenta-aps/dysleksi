@@ -16,7 +16,7 @@ export class StudentTestView extends EventTarget {
     currentPartIndex = null;
     currentQuestion = null;
     currentQuestionIndex = null;
-    showingIntro = false;
+    showingOutro = false;
     showingInstructions = false;
     isPracticing = false;
     repeatQuestionIndex = null;
@@ -77,7 +77,7 @@ export class StudentTestView extends EventTarget {
     }
 
     startTestPartOutro() {
-        this.showingIntro = true;
+        this.showingOutro = true;
         this.domElements.showTestPartOutro();
         this.domElements.hideTestContainer();
 
@@ -273,7 +273,7 @@ export class StudentTestView extends EventTarget {
 
     endTestPartOutro() {
         this.domElements.hideTestPartOutro();
-        this.showingIntro = false;
+        this.showingOutro = false;
         this.startBreak();
     }
 
@@ -311,7 +311,7 @@ export class StudentTestView extends EventTarget {
                 return;
             }
 
-            if (this.showingIntro) {
+            if (this.showingOutro) {
                 // Viser introduktion
                 this.domElements.setNextButtonClass("start-btn"); // Rund knap
                 return;
