@@ -109,14 +109,6 @@ msgid "Antal elever"
 msgstr ""
 
 #: dysleksi/tables.py
-msgid "Status"
-msgstr ""
-
-#: dysleksi/tables.py
-msgid "Handlinger"
-msgstr ""
-
-#: dysleksi/tables.py
 msgid "Navn"
 msgstr ""
 
@@ -126,6 +118,14 @@ msgstr ""
 
 #: dysleksi/tables.py
 msgid "Type"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Status"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Handlinger"
 msgstr ""
 
 #: dysleksi/tables.py
@@ -657,6 +657,16 @@ msgstr ""
 #: dysleksi/utils.py
 #, python-format
 msgid "%(tim)s tim. %(min)s min. %(sek)s sek."
+msgstr ""
+
+#: dysleksi/views.py
+#, python-brace-format
+msgid "{num} deltests"
+msgstr ""
+
+#: dysleksi/views.py
+#, python-brace-format
+msgid "{test_part_name}"
 msgstr ""
 
 #: dysleksi/views.py
