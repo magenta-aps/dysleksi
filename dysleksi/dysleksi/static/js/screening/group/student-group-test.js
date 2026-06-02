@@ -212,6 +212,7 @@ export class GroupTestView extends StudentTestView {
 
     onQuestionComplete(question, outOfTime = false) {
         const questionAnsweredAt = document.timeline.currentTime;
+        this.domElements.interruptSound();
 
         // Hide the image to avoid leaking into the next question
         this.domElements.hideChallengeImage();
