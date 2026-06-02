@@ -346,6 +346,7 @@ describe("Teacher Individual test View", () => {
                         <li><a class="dropdown-item" href="#skipped">Sprunget over</a></li>
                     </ul>
                 </div>
+                <div class="actual-pronunciation"><input type="text"></div>
             </template>
             <table id="events"><tbody></tbody></table>
             <button id="correct"><span>Korrekt</span></button>
@@ -1110,6 +1111,20 @@ describe("Teacher Individual test View", () => {
         expect(modal.classList.display).not.toBe("none");
         expect(modalBody.innerHTML).not.toBe("");
     });
+
+    it("listens for 'questionFeedbackEdited' events from `EventTable`", () => {
+        // Arrange
+        const spySendQuestionFeedbackToServer = vi.spyOn(
+            view,
+            "sendQuestionFeedbackToServer",
+        );
+        // Act
+        view.table.dispatchEvent(
+            new CustomEvent("questionFeedbackEdited", { detail: null }),
+        );
+        // Assert
+        expect(spySendQuestionFeedbackToServer).toHaveBeenCalled();
+    });
 });
 
 describe("GroupTestContainer", () => {
@@ -1606,6 +1621,7 @@ describe("EventTable", () => {
                         <li><a class="dropdown-item" href="#skipped">Sprunget over</a></li>
                     </ul>
                 </div>
+                <div class="actual-pronunciation"><input type="text"></div>
             </template>
             <table id="events">
                 <tbody></tbody>
@@ -1796,6 +1812,43 @@ describe("EventTable", () => {
             );
             dropdownItem.dispatchEvent(new Event("click"));
             expect(button.textContent).toBe(item.label);
+        }
+    });
+
+    it("dispatches 'questionFeedbackEdited' event when row values are changed", () => {
+        // Arrange: add row to table
+        const data = {
+            partIndex: 0,
+            questionIndex: 0,
+        };
+        table.updateTable({ event: "question.answered", ...data });
+        table.updateTable({
+            event: "question.feedback",
+            correctness: "skipped",
+            note: "Et notat",
+            ...data,
+        });
+        // Assert: add event listener verifying event data
+        table.addEventListener("questionFeedbackEdited", (evt) => {
+            expect(evt.detail).not.toBeUndefined();
+            expect(evt.detail.correctness).toBe("wrong");
+            expect(evt.detail.note).toBe("En anden værdi");
+            expect(evt.actualPronunciation.note).toBe("En anden værdi");
+        });
+        // Arrange: edit value of each relevant form element
+        for (const selector of [
+            "td.result button",
+            "td.result input",
+            "td.note input",
+        ]) {
+            const elem = document.querySelector(selector);
+            if (elem.tagName === "button") {
+                elem.dataset.correctness = "wrong";
+            } else {
+                elem.value = "En anden værdi";
+            }
+            // Act: dispatch 'blur' event on the user-editable fields on the new row
+            elem.dispatchEvent(new Event("blur"));
         }
     });
 

@@ -83,8 +83,9 @@ export class AudioIndicator {
     }
 }
 
-export class EventTable {
+export class EventTable extends EventTarget {
     constructor(test, tableSelector = "table#events tbody") {
+        super();
         this.test = test;
         this.eventsEl = document.querySelector(tableSelector);
         this.prevAnswer = null;
@@ -118,7 +119,7 @@ export class EventTable {
             rowEl = document.createElement("tr");
             partNameEl = this.createTd("part-name");
             questionEl = this.createTd("question");
-            resultEl = this.createTd("result");
+            resultEl = this.createTd("result d-flex");
             answerEl = this.createTd("answer");
             noteEl = this.createTd("note");
             rowEl.append(partNameEl, questionEl, resultEl, answerEl, noteEl);
@@ -149,6 +150,8 @@ export class EventTable {
             const template = document.querySelector("template#edit-result");
             const clone = document.importNode(template.content, true);
             const button = clone.querySelector("button");
+            const input = clone.querySelector("input");
+            input.value = data.actualPronunciation || "";
             this.updateResultButtonState(button, data.correctness);
             const choices = clone.querySelectorAll("a.dropdown-item");
             for (const choice of choices) {
@@ -171,6 +174,41 @@ export class EventTable {
         inputEl.classList.add("form-control");
         if (data.event === "question.feedback" && data.note !== undefined) {
             inputEl.value = data.note;
+        }
+
+        // Hook "blur" events after adding all row elements
+        if (data.event === "question.feedback") {
+            this.addBlurEventListener(rowEl, data);
+        }
+    }
+
+    addBlurEventListener(rowEl, data) {
+        const formElems = rowEl.querySelectorAll("input, button");
+        for (const formElem of formElems) {
+            formElem.addEventListener("blur", () => {
+                const correctnessBtn = rowEl.querySelector("button");
+                const correctness = correctnessBtn.dataset.correctness;
+                const noteField = rowEl.querySelector("td.note input");
+                const note = noteField.value;
+                const actualPronunciationField = rowEl.querySelector("td.result input");
+                const actualPronunciation = actualPronunciationField.value;
+                const detail = {
+                    uuid: crypto.randomUUID(),
+                    event: "question.feedback",
+                    assignmentId: data.assignmentId,
+                    partIndex: data.partIndex,
+                    partId: data.partId,
+                    questionIndex: data.questionIndex,
+                    questionId: data.questionId,
+                    practice: false,
+                    correctness: correctness,
+                    note: note,
+                    actualPronunciation: actualPronunciation,
+                };
+                this.dispatchEvent(
+                    new CustomEvent("questionFeedbackEdited", { detail: detail }),
+                );
+            });
         }
     }
 
@@ -202,6 +240,9 @@ export class EventTable {
                   ? "btn-success"
                   : "btn-danger",
         );
+        button.dataset.correctness = state;
+        const actualPronunciationEl = button.parentElement.nextElementSibling;
+        actualPronunciationEl.classList.toggle("d-none", !(state === "wrong"));
     }
 
     handleResultButtonChange(evt) {
@@ -282,7 +323,9 @@ export class EventTable {
 
     createTd(cls) {
         const td = document.createElement("td");
-        td.classList.add(cls);
+        for (const cl of cls.split(" ")) {
+            td.classList.add(cl);
+        }
         return td;
     }
 
@@ -942,9 +985,17 @@ export class TeacherView {
         this.currentIsPractice = null;
 
         this.table = table || new EventTable();
+        /* istanbul ignore next */
+        if (this.table !== null) {
+            this.table.addEventListener("questionFeedbackEdited", (evt) => {
+                this.sendQuestionFeedbackToServer(evt.detail);
+            });
+        }
+
         if (this.test.testType === "group") {
             this.groupTestContainer = new GroupTestContainer(test);
         }
+
         this.buttons = buttons || new ActionButtons();
         this.noteField = noteField || new NoteField();
         this.questionView = questionView || new QuestionView();
@@ -1354,6 +1405,10 @@ export class TeacherView {
             this.table.updateTable(data);
         }
 
+        this.sendQuestionFeedbackToServer(data);
+    }
+
+    sendQuestionFeedbackToServer(data) {
         // Send question feedback to the server
         /* istanbul ignore next */
         if (this.test.testType === "individual") {

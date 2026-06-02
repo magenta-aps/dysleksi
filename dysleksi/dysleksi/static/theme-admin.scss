@@ -629,6 +629,28 @@ td.note input {
   }
 }
 
+td.result {
+  .actual-pronunciation {
+    margin: 0 0.5 * $spacer;
+
+    input {
+      width: 5 * $spacer;
+      padding: 0.25 * $spacer 0.375 * $spacer;
+      font-family: "Karinika", "Helvetica", sans-serif;
+      font-size: 0.875 * $spacer;
+      line-height: 1;
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+
+    label {
+      margin: 0 0.5 * $spacer;
+    }
+  }
+}
+
 // Teacher UI for running individual tests
 div[data-role='teacher'][data-test-type='individual'] {
   .card-header {
