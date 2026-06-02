@@ -544,7 +544,7 @@ describe("Teacher Individual test View", () => {
         // Assert
         expect(partName.innerText).toBe(view.test.parts[0].name);
         expect(partNumber.innerText).toBe("Deltest 1 af 2");
-        expect(questionNumber.innerText).toBe("Instruktion 1 af 1");
+        expect(questionNumber.innerText).toBe("Instruktion 1 af 2");
 
         // Act: go to practice question
         view.setQuestionIndex(1, true);
@@ -595,28 +595,56 @@ describe("Teacher Individual test View", () => {
                     event: "question.displayed",
                     partIndex: 0,
                     questionIndex: 0,
-                    questionTitle: "Q1",
-                    displayedAt: 1000,
                 },
             }),
         );
-
         const btn = document.querySelector("button");
         expect(btn.classList.contains("disabled")).toBe(false);
 
-        // trigger another question.displayed event - this time the question type is "no_input_required"
+        // Trigger another `question.displayed` event - this time the question type is
+        // "no_input_required" and it is a practice question, and the instructions are
+        // currently displaying.
+        view.showingInstructions = true;
         p2pChannel.dispatchEvent(
             new CustomEvent("message", {
                 detail: {
                     event: "question.displayed",
+                    practice: true,
                     partIndex: 0,
-                    questionIndex: 1,
-                    questionTitle: "Q2",
-                    displayedAt: 2000,
+                    questionIndex: 2,
                 },
             }),
         );
+        expect(buttons.nextButton().classList).to.include(["disabled"]);
 
+        // Trigger another `question.displayed` event - this time the question type is
+        // "no_input_required" and it is a practice question, and the instructions are
+        // completed.
+        view.showingInstructions = false;
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "question.displayed",
+                    practice: true,
+                    partIndex: 0,
+                    questionIndex: 2,
+                },
+            }),
+        );
+        expect(buttons.nextButton().classList).not.to.include(["disabled"]);
+
+        // Trigger another `question.displayed` event - this time the question type is
+        // "no_input_required" and it is an actual question.
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "question.displayed",
+                    practice: false,
+                    partIndex: 0,
+                    questionIndex: 1,
+                },
+            }),
+        );
         expect(buttons.nextButton().classList).to.include(["disabled"]);
     });
 
@@ -1124,6 +1152,30 @@ describe("Teacher Individual test View", () => {
         );
         // Assert
         expect(spySendQuestionFeedbackToServer).toHaveBeenCalled();
+    });
+
+    it("listens for `instructions.started` student events", () => {
+        // Arrange
+        const spyDisableNextButton = vi.spyOn(view.buttons, "disableNextButton");
+        // Act
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", { detail: { event: "instructions.started" } }),
+        );
+        // Assert
+        expect(view.showingInstructions).toBeTruthy();
+        expect(spyDisableNextButton).toHaveBeenCalled();
+    });
+
+    it("listens for `instructions.completed` student events", () => {
+        // Arrange
+        const spyEnableNextButton = vi.spyOn(view.buttons, "enableNextButton");
+        // Act
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", { detail: { event: "instructions.completed" } }),
+        );
+        // Assert
+        expect(view.showingInstructions).toBeFalsy();
+        expect(spyEnableNextButton).toHaveBeenCalled();
     });
 });
 
