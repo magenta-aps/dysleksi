@@ -53,6 +53,7 @@ from dysleksi.models import (
     Student,
     Test,
     TestAssignment,
+    TestAssignmentStatus,
     TestPart,
     TestQuestion,
     TestResponse,
@@ -246,15 +247,15 @@ class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
             status=Case(
                 When(
                     number_of_students_responded=F("number_of_students"),
-                    then=Value("Gennemført"),
+                    then=Value(TestAssignmentStatus.COMPLETED),
                 ),
                 When(
                     number_of_students_responded__gt=0,
                     number_of_students_responded__lt=F("number_of_students"),
-                    then=Value("I gang"),
+                    then=Value(TestAssignmentStatus.IN_PROGRESS),
                 ),
-                default=Value("Afventer"),
-            )
+                default=Value(TestAssignmentStatus.PENDING),
+            ),
         )
         return qs
 

@@ -45,6 +45,7 @@ msgid "Planlæg"
 msgstr ""
 
 #: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_base.html
+#: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
 msgid "Start"
 msgstr ""
 
@@ -66,6 +67,18 @@ msgstr ""
 
 #: dysleksi/forms.py
 msgid "Vælg klasse"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Gennemført"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "I gang"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Afventer"
 msgstr ""
 
 #: dysleksi/models.py

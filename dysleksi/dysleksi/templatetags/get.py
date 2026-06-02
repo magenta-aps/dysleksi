@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: 2026 Magenta ApS <info@magenta.dk>
+#
+# SPDX-License-Identifier: MPL-2.0
+from django.db.models import TextChoices
 from django.template.defaultfilters import register
 
 
@@ -19,3 +23,9 @@ def get(item, attribute):
     except (KeyError, TypeError, IndexError):
         pass
     return None
+
+
+@register.filter
+def label_from_choices(value, choices: TextChoices):
+    choice = choices(value)  # type: ignore[operator]
+    return choice.label
