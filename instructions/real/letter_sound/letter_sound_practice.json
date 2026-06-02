@@ -49,6 +49,7 @@
         "sound": "resources/letter_sound/Instruktion/1b.9.mp3",
         "question_type": "multiple_choice",
         "correct": "c",
+        "correct_index": 2,
         "wrong": ["j", "d", "g"],
         "instruction_sequence": [
             {

@@ -629,6 +629,10 @@ class TestDomElements {
                 const letterBtns = document.querySelectorAll(".letter-btn");
                 letterBtns.forEach((b) => (b.disabled = false));
 
+                this.choicesEl
+                    .querySelectorAll("button")
+                    .forEach((b) => (b.disabled = false));
+
                 const displayField = document.querySelector(".display-field");
                 if (displayField) {
                     displayField.disabled = false;

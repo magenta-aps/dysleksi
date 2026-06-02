@@ -112,6 +112,9 @@ export class GroupTestView extends StudentTestView {
                         answers.length < 6 &&
                             answers.some((a) => a.resourceText?.length === 1),
                     );
+                    if (this.currentQuestion.challengeSoundUrl) {
+                        button.disabled = true;
+                    }
                     this.answerButtons.push({ button: button, answer: answer });
                 });
             } else if (this.currentQuestion.type === "free_text") {
