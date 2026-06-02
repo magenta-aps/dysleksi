@@ -1792,10 +1792,10 @@ describe("StudentTestView - updateNextButtonClass", () => {
         expect(domElements.nextBtn.classList).toContain("start-btn");
     });
 
-    it("Set button to round class on playing intro", () => {
+    it("Set button to round class on playing outro", () => {
         view.setPart(0);
         view.setQuestion(true, 1);
-        view.showingIntro = true;
+        view.showingOutro = true;
         view.updateNextButtonClass();
         expect(domElements.nextBtn.classList).toContain("start-btn");
     });
@@ -1815,18 +1815,18 @@ describe("StudentTestView - updateNextButtonClass", () => {
         view.isPracticing = true;
         view.setQuestion(true, 0);
 
-        // Ensure showingIntro is false to hit this specific block
-        view.showingIntro = false;
+        // Ensure showingOutro is false to hit this specific block
+        view.showingOutro = false;
 
         view.updateNextButtonClass();
 
         expect(domElements.setNextButtonClass).toHaveBeenCalledWith("start-btn");
     });
 
-    it("should set 'start-btn' (Round) when showingIntro is true", () => {
+    it("should set 'start-btn' (Round) when showingOutro is true", () => {
         view.isPracticing = true;
         view.setQuestion(true, 1); // Middle question
-        view.showingIntro = true;
+        view.showingOutro = true;
 
         view.updateNextButtonClass();
 
@@ -1860,7 +1860,7 @@ describe("StudentTestView - updateNextButtonClass", () => {
 
     it("should set 'start-btn' via the instruction-to-task transition logic", () => {
         view.isPracticing = true;
-        view.showingIntro = false;
+        view.showingOutro = false;
         view.showingInstructions = false;
 
         // We need at least 3 questions to avoid hitting the "First" or "Last" checks
