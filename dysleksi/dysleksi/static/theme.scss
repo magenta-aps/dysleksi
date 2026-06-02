@@ -27,7 +27,6 @@ $student-blue-light: #80a1c0;
 $student-blue: #e6ecf3;
 $student-blue-dark: #004382;
 $student-blue-darkest: #003668;
-$checkmark-green: #306025;
 
 // Map "design names" to known Bootstrap variables
 $body-bg: $student-grey-lightest;
@@ -616,6 +615,12 @@ body.show-instructions .sound-btn.pulse {
     margin-top: 2rem;
 }
 
+.inline-image {
+    height: 75px;
+    width: auto;
+    margin: 0;
+}
+
 .smiley-button {
     @extend .smiley-image;
     cursor: pointer;
@@ -781,7 +786,7 @@ body.show-instructions .sound-btn.pulse {
 }
 
 .checkmark {
-    color: $checkmark-green;
+    color: $student-green;
 }
 
 .button-icon {
