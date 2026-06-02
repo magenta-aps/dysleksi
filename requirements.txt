@@ -62,7 +62,7 @@ django-split-settings==1.3.2
 django-extended-makemessages==1.9.0
 
 ## Redis cache backend
-django-redis==6.0.0
+django-redis==7.0.0
 
 ## Tabulex SOAP client
 zeep==4.3.2
