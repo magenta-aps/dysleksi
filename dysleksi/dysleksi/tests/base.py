@@ -43,7 +43,7 @@ class DysleksiTest(TestCase):
         Group.objects.get_or_create(name=TEACHERS)
         Group.objects.get_or_create(name=STUDENTS)
         cls.school = cls.create_school(number="test123", name="TestSkolen")
-        cls.klasse = cls.create_class(2025, "1.A")
+        cls.klasse = cls.create_class(2025, "1.A", is_main=True)
         cls.student = cls.create_student(
             "TestStudent", cpr=1234567890, first_name="Test", last_name="Elev"
         )
@@ -284,12 +284,13 @@ class DysleksiTest(TestCase):
         return school
 
     @classmethod
-    def create_class(cls, school_year_start: int, name: str) -> Class:
+    def create_class(cls, school_year_start: int, name: str, **kwargs) -> Class:
         klasse, _ = Class.objects.get_or_create(
             institution=cls.school,
             school_year_start=school_year_start,
             name=name,
             group_id=name,
+            **kwargs,
         )
         return klasse
 

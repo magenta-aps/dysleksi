@@ -94,7 +94,12 @@ class StartRoomForm(forms.ModelForm):
 
 class StudentChoiceField(ModelChoiceField):
     def label_from_instance(self, obj: Student) -> str:
-        return f"{obj.first_name} {obj.last_name} ({obj.classes})"
+        # Join all student "main" class names (only one "main" class is expected for
+        # each student.)
+        main_class_name = ", ".join(
+            obj.classes.filter(is_main=True).values_list("name", flat=True)
+        )
+        return f"{obj.first_name} {obj.last_name} ({main_class_name})"
 
 
 class StartIndividualRoomForm(DynamicFormMixin, StartRoomForm):
