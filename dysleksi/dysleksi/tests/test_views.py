@@ -332,6 +332,15 @@ class TestTestAssignmentListView(DysleksiTest):
 
 
 class TestStartRoomView(DysleksiTest):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.group_test_part_2, _ = TestPart.objects.get_or_create(
+            name="GroupTestPart2",
+            timeout=60000,
+            partial_score_after=30000,
+        )
+        cls.group_test.parts.add(cls.group_test_part_2)
 
     def test_create_individual_room_immediate(self):
         data = {
@@ -432,7 +441,10 @@ class TestStartRoomView(DysleksiTest):
         data = {
             "klasse": self.klasse.id,
             "test": self.group_test.id,
-            "test_parts": [str(self.group_test_part.pk)],
+            "test_parts": [
+                str(self.group_test_part.pk),
+                str(self.group_test_part_2.pk),
+            ],
             "is_test_part": "part",
             "is_immediate": "y",
             "start_datetime": "",
