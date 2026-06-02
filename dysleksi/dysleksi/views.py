@@ -131,7 +131,7 @@ class RootView(UserTypeMixin, TemplateView):
             context_data["student"] = self.user
             context_data["open_assignments"] = TestAssignment.objects.filter(
                 Q(responses__isnull=True) | Q(responses__completed=False),
-                student=self.user,
+                Q(student=self.user) | Q(klasse__in=self.user.classes.all()),
             ).exists()
         return context_data
 
