@@ -44,12 +44,12 @@ def create_wordreading_1_test(
 ):
 
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/wordreading_1/Deltest/5e.2.wav",
-        sound="resources/wordreading_1/Deltest/5e.2.wav",
+        name="resources/wordreading_1/Enhanced/Deltest/5e.2.wav",
+        sound="resources/wordreading_1/Enhanced/Deltest/5e.2.wav",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/wordreading_1/Deltest/5e.3.wav",
-        sound="resources/wordreading_1/Deltest/5e.3.wav",
+        name="resources/wordreading_1/Enhanced/Deltest/5e.3.wav",
+        sound="resources/wordreading_1/Enhanced/Deltest/5e.3.wav",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -113,12 +113,12 @@ def create_letter_sound_test(
 ):
 
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/letter_sound/Deltest/1e.2.wav",
-        sound="resources/letter_sound/Deltest/1e.2.wav",
+        name="resources/letter_sound/Enhanced/Deltests/1e.2.wav",
+        sound="resources/letter_sound/Enhanced/Deltests/1e.2.wav",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/letter_sound/Deltest/1e.3.wav",
-        sound="resources/letter_sound/Deltest/1e.3.wav",
+        name="resources/letter_sound/Enhanced/Deltests/1e.3.wav",
+        sound="resources/letter_sound/Enhanced/Deltests/1e.3.wav",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -174,12 +174,12 @@ def create_wordspelling_test(
     test, questions_data, practice_questions_data=None, name="Ordstavning"
 ):
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/wordspelling/Deltest/6e.2.wav",
-        sound="resources/wordspelling/Deltest/6e.2.wav",
+        name="resources/wordspelling/Enhanced/Deltest/6e.2.wav",
+        sound="resources/wordspelling/Enhanced/Deltest/6e.2.wav",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/wordspelling/Deltest/6e.3.wav",
-        sound="resources/wordspelling/Deltest/6e.3.wav",
+        name="resources/wordspelling/Enhanced/Deltest/6e.3.wav",
+        sound="resources/wordspelling/Enhanced/Deltest/6e.3.wav",
     )
 
     part, created = TestPart.objects.get_or_create(
