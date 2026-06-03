@@ -49,6 +49,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.16  Bogstav H.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Hest.jpg",
+        "correct_index": 2,
         "wrong": [
             "resources/fore_sound/Opgave/Lampe.jpg",
             "resources/fore_sound/Opgave/Får.jpg",
