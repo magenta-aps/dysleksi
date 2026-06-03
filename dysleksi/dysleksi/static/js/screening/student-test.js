@@ -506,6 +506,7 @@ export class StudentTestView extends EventTarget {
         );
         this.showingInstructions = true;
         this.endedInstructions = false;
+        this.send({ event: "instructions.started" });
         this.updateNextButtonClass();
         this.domElements.lockInput();
         this.domElements.toggleBodyClass("show-instructions", true);
@@ -539,6 +540,7 @@ export class StudentTestView extends EventTarget {
             this.endedInstructions = true;
             this.showingInstructions = false;
             this.updateNextButtonClass();
+            this.send({ event: "instructions.completed" });
             onCompleted();
             if (this.currentQuestion.advanceAutomatically) {
                 this.showNextQuestion();

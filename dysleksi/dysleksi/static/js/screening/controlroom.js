@@ -655,6 +655,18 @@ export class ActionButtons {
         this.nextButton().classList.toggle("disabled", false);
     }
 
+    toggleCorrectnessChoices(state) {
+        this.clearActive();
+
+        for (const btn of [
+            this.correctButton(),
+            this.wrongButton(),
+            this.skipButton(),
+        ]) {
+            btn.classList.toggle("disabled", !state);
+        }
+    }
+
     toggleActualPronunciation(state) {
         if (this.actualPronunciation !== null) {
             this.actualPronunciation.classList.toggle("d-none", state);
@@ -983,6 +995,7 @@ export class TeacherView {
         this.currentPart = null;
         this.currentQuestion = null;
         this.currentIsPractice = null;
+        this.showingInstructions = null;
 
         this.table = table || new EventTable();
         /* istanbul ignore next */
@@ -1121,9 +1134,27 @@ export class TeacherView {
         return { instructions: instructions, nonInstructions: nonInstructions };
     }
 
+    currentQuestionRequiresNoStudentInput() {
+        return (
+            this.currentQuestion !== null &&
+            this.currentQuestion.type === "no_input_required"
+        );
+    }
+
     _initP2PSocket(p2p) {
         p2p.addEventListener("message", (e) => {
             const data = e.detail;
+
+            if (this.test.testType === "individual") {
+                if (data.event === "instructions.started") {
+                    this.showingInstructions = true;
+                    this.buttons.disableNextButton();
+                }
+                if (data.event === "instructions.completed") {
+                    this.showingInstructions = false;
+                    this.buttons.enableNextButton();
+                }
+            }
 
             if (
                 ["question.answered", "question.displayed"].includes(data.event) &&
@@ -1133,11 +1164,21 @@ export class TeacherView {
                 this.setQuestionIndex(data.questionIndex, data.practice);
                 if (data.event === "question.displayed") {
                     this.buttons.enableButtons();
-                    if (
-                        this.currentQuestion !== null &&
-                        this.currentQuestion.type === "no_input_required"
-                    ) {
-                        this.buttons.disableNextButton();
+                    if (this.currentQuestionRequiresNoStudentInput()) {
+                        // Disable "correct", "wrong", "skipped" buttons during practice questions
+                        this.buttons.toggleCorrectnessChoices(!data.practice);
+                        // Let teacher continue flow using "next" button in practice questions.
+                        // (In real questions, teacher must first select "correct", "wrong" or "skipped".)
+                        if (data.practice) {
+                            this.buttons.enableNextButton();
+                        } else {
+                            this.buttons.disableNextButton();
+                        }
+                        // In any case, if student is currently showing instructions, disable the "next"
+                        // button.
+                        if (this.showingInstructions) {
+                            this.buttons.disableNextButton();
+                        }
                     }
                     this.showQuestion();
                 }
@@ -1303,10 +1344,7 @@ export class TeacherView {
                     this.buttons.disableButtons();
                 }
             } else {
-                if (
-                    this.currentQuestion !== null &&
-                    this.currentQuestion.type === "no_input_required"
-                ) {
+                if (this.currentQuestionRequiresNoStudentInput()) {
                     if (val === "next") {
                         // Send feedback and go to next question
                         this.sendQuestionFeedback(
