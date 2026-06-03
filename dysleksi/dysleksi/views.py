@@ -34,7 +34,8 @@ from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
 from django.views.generic.edit import UpdateView
-from django_tables2 import SingleTableView
+from django_stubs_ext import StrOrPromise
+from django_tables2 import Column, SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
 
 from dysleksi.forms import StartClassRoomForm, StartIndividualRoomForm
@@ -78,6 +79,7 @@ from dysleksi.tables import (
     TestAssignmentTable,
     TestResultColumn,
     TestResultTable,
+    column_group,
 )
 from dysleksi.utils import reverse_ordering, scan_static_files
 
@@ -725,53 +727,144 @@ class TestResponseView(
         return self.object.assignment.test.parts.all().order_by("pk")
 
     @cached_property
-    def data(self) -> PartResponseQuerySet:
-        qs = (
-            self.object.partresponses.filter(testpart__in=self.get_current_items())
-            .annotate_questions_count("questions_count", Q(is_practice=False))
-            .annotate_questionresponses_count(
-                "responses_count", Q(question__is_practice=False)
-            )
-            .annotate_questionresponses_count(
-                "correct_count",
-                Q(question__is_practice=False, correctness=Correctness.CORRECT),
-            )
-            .annotate_proportion(
-                "responses_count", "correct_count", "correct_proportion_of_answered"
-            )
-            .annotate_percentage(
-                "correct_proportion_of_answered", "correct_pct_of_answered"
-            )
-            .annotate_proportion(
-                "questions_count", "correct_count", "correct_proportion_of_all"
-            )
-            .annotate_percentage("correct_proportion_of_all", "correct_pct_of_all")
-        )
-        if self.test_type == TestType.INDIVIDUAL:
-            qs = qs.annotate_questionresponses_count(
-                "skipped_count",
-                Q(question__is_practice=False, correctness=Correctness.PARTIAL),
-            )
+    def group_map(self) -> Dict[int, Dict[str | None, Dict[str | None, str | None]]]:
+        # {part.pk: {group_name: {"group_label": ..., "group_key": ... etc.}}}
+        part_map: Dict[int, Dict[str | None, Dict[str | None, str | None]]] = {}
+        for part in self.get_current_items():
+            part_groups: Dict[str | None, Dict[str | None, str | None]] = {}
+            for name in part.questions.result_groups_names():
+                key = str(name or "").strip().lower().replace(" ", "_")
+                key_suffix = "" if name is None else f"_{key}"
+                part_groups[name] = {
+                    "group_label": name,
+                    "group_key": key,
+                    "part_pk_key": f"part_{part.pk}{key_suffix}",
+                    "key_suffix": key_suffix,
+                }
+            part_map[part.pk] = part_groups
+        return part_map
 
+    @cached_property
+    def data(self) -> PartResponseQuerySet:
+
+        # We will annotate part responses such that the value in a given field
+        # (e.g. `questions_count`) will be listed under the field name for
+        # the whole partresponse, and with a suffix for groupings.
+        # For example, the annotation `questions_count` will hold the number
+        # of questions for the part, and `questions_count_large` holds the
+        # number of questions with the grouping "large"
+
+        # Get a set of all unique (group_name, key_suffix) pairs in self.group_map
+        full_group_map = set()
+        for group_dict_list in self.group_map.values():
+            for group_dict in group_dict_list.values():
+                full_group_map.add(
+                    (group_dict["group_label"], group_dict["key_suffix"])
+                )
+
+        qs = self.object.partresponses.filter(testpart__in=self.get_current_items())
+
+        for group_name, suffix in full_group_map:
+            # For one iteration, group_name will be None and suffix will be "",
+            # signifying extraction of data for the whole testpart
+            # Other iterations hold group_name and group_dict here, and will
+            # apply filters to the TestQuestions and QuestionResponses to be counted
+            if group_name is not None:
+                # Processing a group of questions
+                question_q = Q(result_group=group_name)
+                response_q = Q(question__result_group=group_name)
+                # suffix is e.g. "_store_bogstaver"
+            else:
+                # Processing whole testpart
+                question_q = response_q = Q()
+                # suffix is ""
+
+            qs = (
+                qs.annotate_questions_count(
+                    f"questions_count{suffix}", Q(is_practice=False) & question_q
+                )
+                .annotate_questionresponses_count(
+                    f"responses_count{suffix}",
+                    Q(question__is_practice=False) & response_q,
+                )
+                .annotate_questionresponses_count(
+                    f"correct_count{suffix}",
+                    Q(question__is_practice=False, correctness=Correctness.CORRECT)
+                    & response_q,
+                )
+                .annotate_proportion(
+                    f"responses_count{suffix}",
+                    f"correct_count{suffix}",
+                    f"correct_proportion_of_answered{suffix}",
+                )
+                .annotate_percentage(
+                    f"correct_proportion_of_answered{suffix}",
+                    f"correct_pct_of_answered{suffix}",
+                )
+                .annotate_proportion(
+                    f"questions_count{suffix}",
+                    f"correct_count{suffix}",
+                    f"correct_proportion_of_all{suffix}",
+                )
+                .annotate_percentage(
+                    f"correct_proportion_of_all{suffix}", f"correct_pct_of_all{suffix}"
+                )
+            )
+            if self.test_type == TestType.INDIVIDUAL:
+                qs = qs.annotate_questionresponses_count(
+                    f"skipped_count{suffix}",
+                    Q(question__is_practice=False, correctness=Correctness.PARTIAL)
+                    & response_q,
+                )
+
+        # qs now holds a row for each PartResponse, with a lot of annotations.
+        # Some with summations etc. for the whole part,
+        # others for groupings of TestQuestions
         return qs.order_by("pk")
 
     def get_table(self) -> StudentTestResponseTable:
 
         qs: PartResponseQuerySet = self.data
-
         part_header = _("%(part_name)s (%(questions_count)s opg.)")
+        extra_columns = []
+        supercolumns_count = 0
 
-        extra_columns = [
-            (
-                f"part_{partresponse.testpart_id}",
-                StudentTestResultsColumn(
-                    verbose_name=part_header
-                    % {
-                        "part_name": partresponse.testpart.name,
-                        "questions_count": partresponse.testpart.questions.filter(
-                            is_practice=False
-                        ).count(),
-                    },
+        for partresponse in qs:
+            part = partresponse.testpart
+            key = f"part_{part.pk}"
+
+            supercolumn_header = part_header % {
+                "part_name": part.name,
+                "questions_count": part.questions.filter(is_practice=False).count(),
+            }
+
+            question_groups = part.questions.filter(
+                is_practice=False
+            ).result_groups_map()
+
+            # Figure out which columns to show, including their groupings
+            # (grouped columns will be joined in the output table by
+            # having a row above with a colspan)
+            part_columns: List[Tuple[str, Column]] = []
+            for group_name, questions in question_groups.items():
+                column_key = self.group_map[part.pk][group_name]["part_pk_key"]
+                assert column_key is not None  # to make mypy happy
+                # column_key is e.g "part_42_store_bogstaver" if processing a group,
+                # or just "part_42" if processing a whole part
+                if group_name is not None:
+                    # Get a column header for each column in the group
+                    # e.g. "Store Bogstaver (20 opg.)"
+                    column_header = part_header % {
+                        "part_name": group_name,
+                        "questions_count": questions.count(),
+                    }
+                else:
+                    # No supercolumn, column header is just the part name and task count
+                    # e.g. "Højtlæsning af ord (30 opg.)
+                    column_header = supercolumn_header
+
+                column = StudentTestResultsColumn(
+                    verbose_name=column_header,
                     footer_template_name="dysleksi/admin/" "test_response/footer.html",
                     footer_value=partial(
                         lambda part, column_values: {
@@ -786,60 +879,81 @@ class TestResponseView(
                                 else None
                             ),
                         },
-                        partresponse.testpart,
+                        part,
                     ),
-                ),
-            )
-            for partresponse in qs
-        ]
+                )
+                part_columns.append((column_key, column))
 
-        e = 0
-        while len(extra_columns) % self.get_page_size() != 0:
-            extra_columns.append((f"empty_{e}", EmptyColumn()))
-            e += 1
+            if len(part_columns) > 1:
+                # Columns are grouped, set metadata and apply a supercolumn header
+                # containing the part name
+                for column_key, column in column_group(
+                    supercolumn_header, *part_columns
+                ):
+                    extra_columns.append((column_key, column))
+            else:
+                extra_columns.append((key, part_columns[0][1]))
 
-        data = [
-            {
-                "data_category": _("Antal forsøgte"),
-                **{f"part_{item.testpart.pk}": item.responses_count for item in qs},
-            }
+            supercolumns_count += 1
+
+        # If number of columns is not large enough (grouped columns count together as 1)
+        # append empty columns to fill the table
+        if supercolumns_count < self.get_page_size():
+            for i in range(self.get_page_size() - supercolumns_count):
+                extra_columns.append((f"empty_{i}", EmptyColumn()))
+
+        # Extract data for the table. This repeats for each row,
+        # so do it in a loop based on specification here
+        field_spec: List[Tuple[StrOrPromise, str, str | None]] = [
+            (_("Antal forsøgte"), "responses_count", None)
         ]
         if self.test_type == TestType.INDIVIDUAL:
-            data += [
-                {
-                    "data_category": _("Antal oversprungne"),
-                    **{f"part_{item.testpart.pk}": item.skipped_count for item in qs},
-                }
+            field_spec += [
+                (_("Antal oversprungne"), "skipped_count", None),
             ]
-        data += [
-            {
-                "data_category": _("Antal rigtige"),
-                **{f"part_{item.testpart.pk}": item.correct_count for item in qs},
-            },
-            {
-                "data_category": _("Rigtighedsprocent"),
-                **{
-                    f"part_{item.testpart.pk}": f"{item.correct_pct_of_answered} %"
-                    for item in qs
-                },
-            },
-            {
-                "data_category": _("Normscore"),
-                **{
-                    f"part_{item.testpart.pk}": f"{item.correct_pct_of_all} %"
-                    for item in qs
-                },
-            },
+        field_spec += [
+            (_("Antal rigtige"), "correct_count", None),
+            (_("Rigtighedsprocent"), "correct_pct_of_answered", "%(value)s %%"),
+            (_("Normscore"), "correct_pct_of_all", "%(value)s %%"),
         ]
+
+        data = []
+        for label, value_key, value_fmt in field_spec:
+            row = {"data_category": label}
+            for item in qs:  # Each item is an annotated PartResponse
+                for group_dict in self.group_map[item.testpart.pk].values():
+                    # `column_key` is "" for non-grouped columns,
+                    # and the shortened key for grouped columns
+                    item_key = group_dict["part_pk_key"]
+                    assert item_key is not None  # To make mypy happy
+                    # `item_key` corresponds to a table column key
+                    # extract value from queryset row
+                    suffix = group_dict["key_suffix"]
+                    # value_key is e.g. "correct_count",
+                    # and suffix is e.g. "_store_bogstaver"
+                    value = getattr(item, f"{value_key}{suffix}")
+                    if value_fmt:
+                        # format as necessary, e.g. append a "%" sign
+                        value = value_fmt % {"value": value}
+                    row[item_key] = value
+            data.append(row)
 
         return StudentTestResponseTable(data=data, extra_columns=extra_columns)
 
     def get_plot_data(self) -> List[int]:
-        qs: PartResponseQuerySet = self.data
-        return [item.correct_pct_of_all for item in qs]
+        data = []
+        group_map = self.group_map
+        for partresponse in self.data:
+            for group_dict in group_map[partresponse.testpart.pk].values():
+                suffix = group_dict["key_suffix"]
+                data.append(getattr(partresponse, f"correct_pct_of_all{suffix}"))
+        return data
 
-    def get_part_names(self) -> Dict[int, str]:
-        return {part.pk: part.name for part in self.get_current_items()}
+    def get_part_names(self) -> Dict[int, Tuple[str, List[str | None]]]:
+        return {
+            part.pk: (part.name, part.questions.result_groups_names())
+            for part in self.get_current_items()
+        }
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.GET.get("only_table") == "true":

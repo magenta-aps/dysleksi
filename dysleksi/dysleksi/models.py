@@ -33,7 +33,7 @@ from django.db.models import (
     Window,
 )
 from django.db.models.expressions import OuterRef, Subquery
-from django.db.models.functions import Cast, Coalesce, RowNumber
+from django.db.models.functions import Cast, Coalesce, NullIf, RowNumber
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -863,7 +863,27 @@ class TestPart(models.Model):
         return [r.as_tuple for r in self.wordcount_data_breakdown.all()]
 
 
+class TestQuestionQuerySet(QuerySet):
+
+    def result_groups_names(self) -> List[str | None]:
+        return list(
+            self.filter(result_group__isnull=False)
+            .distinct("result_group")
+            .values_list("result_group", flat=True)
+        ) or [None]
+
+    def result_groups_q(self) -> Dict[str | None, Q]:
+        keys = self.result_groups_names()
+        return {key: Q(result_group=key) if key else Q() for key in keys}
+
+    def result_groups_map(self) -> "Dict[str|None, TestQuestionQuerySet]":
+        return {key: self.filter(q) for key, q in self.result_groups_q().items()}
+
+
 class TestQuestion(models.Model):
+
+    objects = TestQuestionQuerySet.as_manager()
+
     part = models.ForeignKey(
         TestPart,
         on_delete=models.CASCADE,
@@ -1146,7 +1166,8 @@ class TestResponseQuerySet(PermissionsQuerySet):
         return self.annotate(
             **{
                 output_key: ExpressionWrapper(
-                    F(count_key) / Value(questions_count, output_field=FloatField()),
+                    F(count_key)
+                    / NullIf(Value(questions_count, output_field=FloatField()), 0.0),
                     output_field=FloatField(),
                 )
             }
@@ -1308,7 +1329,8 @@ class PartResponseQuerySet(PermissionsQuerySet):
         return self.annotate(
             **{
                 output_key: ExpressionWrapper(
-                    Cast(count_key, output_field=FloatField()) / F(total_key),
+                    Cast(count_key, output_field=FloatField())
+                    / NullIf(F(total_key), 0),
                     output_field=FloatField(),
                 )
             }
