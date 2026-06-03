@@ -49,6 +49,7 @@
         "text": "Naasoq",
         "question_type": "multiple_choice",
         "correct": "resources/wordreading_1/Opgave/Blomst.jpg",
+        "correct_index": 2,
         "wrong": [
           "resources/wordreading_1/Opgave/Politi.jpg",
           "resources/wordreading_1/Opgave/Bamse.jpg",

@@ -393,7 +393,8 @@ body.show-instructions {
     max-width: 222px;
     width: 100%;
     aspect-ratio: 1 / 1;
-    height: auto;
+    height: auto !important;
+    padding: 32px !important;
 
 
     img {
@@ -471,8 +472,8 @@ body.show-instructions {
   display: block;
   margin: 0 auto 0 auto;
   
-  background-color: #ffffff;
-  border: 1px solid $student-grey-light;
+  background-color: none;
+  border: none;
   border-radius: 16px !important;
 
   height: auto;
