@@ -9,12 +9,12 @@ def create_wordreading_2_test(
     test, questions_data, practice_questions_data=None, name="Ordlæsning 2"
 ):
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/wordreading_2/Enhanced/Deltest/7e.2.wav",
-        sound="resources/wordreading_2/Enhanced/Deltest/7e.2.wav",
+        name="resources/wordreading_2/Enhanced/Deltest/7e.2.mp3",
+        sound="resources/wordreading_2/Enhanced/Deltest/7e.2.mp3",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/wordreading_2/Enhanced/Deltest/7e.3.wav",
-        sound="resources/wordreading_2/Enhanced/Deltest/7e.3.wav",
+        name="resources/wordreading_2/Enhanced/Deltest/7e.3.mp3",
+        sound="resources/wordreading_2/Enhanced/Deltest/7e.3.mp3",
     )
     part, created = TestPart.objects.get_or_create(
         name=name,
@@ -44,12 +44,12 @@ def create_wordreading_1_test(
 ):
 
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/wordreading_1/Enhanced/Deltest/5e.2.wav",
-        sound="resources/wordreading_1/Enhanced/Deltest/5e.2.wav",
+        name="resources/wordreading_1/Enhanced/Deltest/5e.2.mp3",
+        sound="resources/wordreading_1/Enhanced/Deltest/5e.2.mp3",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/wordreading_1/Enhanced/Deltest/5e.3.wav",
-        sound="resources/wordreading_1/Enhanced/Deltest/5e.3.wav",
+        name="resources/wordreading_1/Enhanced/Deltest/5e.3.mp3",
+        sound="resources/wordreading_1/Enhanced/Deltest/5e.3.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -81,13 +81,13 @@ def create_fore_sound_test(
 ):
 
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.wav",
-        sound="resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.wav",
+        name="resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.mp3",
+        sound="resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.mp3",
     )
 
     completion, created = TestResource.objects.get_or_create(
-        name="resources/fore_sound/Enhanced/Deltests/2e.3.wav",
-        sound="resources/fore_sound/Enhanced/Deltests/2e.3.wav",
+        name="resources/fore_sound/Enhanced/Deltests/2e.3.mp3",
+        sound="resources/fore_sound/Enhanced/Deltests/2e.3.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -113,12 +113,12 @@ def create_letter_sound_test(
 ):
 
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/letter_sound/Enhanced/Deltests/1e.2.wav",
-        sound="resources/letter_sound/Enhanced/Deltests/1e.2.wav",
+        name="resources/letter_sound/Enhanced/Deltests/1e.2.mp3",
+        sound="resources/letter_sound/Enhanced/Deltests/1e.2.mp3",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/letter_sound/Enhanced/Deltests/1e.3.wav",
-        sound="resources/letter_sound/Enhanced/Deltests/1e.3.wav",
+        name="resources/letter_sound/Enhanced/Deltests/1e.3.mp3",
+        sound="resources/letter_sound/Enhanced/Deltests/1e.3.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -144,12 +144,12 @@ def create_letter_shape_test(
 ):
 
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/letter_shape/Enhanced/Deltests/3e.2.wav",
-        sound="resources/letter_shape/Enhanced/Deltests/3e.2.wav",
+        name="resources/letter_shape/Enhanced/Deltests/3e.2.mp3",
+        sound="resources/letter_shape/Enhanced/Deltests/3e.2.mp3",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/letter_shape/Enhanced/Deltests/3e.3.wav",
-        sound="resources/letter_shape/Enhanced/Deltests/3e.3.wav",
+        name="resources/letter_shape/Enhanced/Deltests/3e.3.mp3",
+        sound="resources/letter_shape/Enhanced/Deltests/3e.3.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -174,12 +174,12 @@ def create_wordspelling_test(
     test, questions_data, practice_questions_data=None, name="Ordstavning"
 ):
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/wordspelling/Enhanced/Deltest/6e.2.wav",
-        sound="resources/wordspelling/Enhanced/Deltest/6e.2.wav",
+        name="resources/wordspelling/Enhanced/Deltest/6e.2.mp3",
+        sound="resources/wordspelling/Enhanced/Deltest/6e.2.mp3",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/wordspelling/Enhanced/Deltest/6e.3.wav",
-        sound="resources/wordspelling/Enhanced/Deltest/6e.3.wav",
+        name="resources/wordspelling/Enhanced/Deltest/6e.3.mp3",
+        sound="resources/wordspelling/Enhanced/Deltest/6e.3.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -204,12 +204,12 @@ def create_nonwordspelling_test(
     test, questions_data, practice_questions_data=None, name="Nonordstavning"
 ):
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/nonwordspelling/Enhanced/Deltests/4e.4.wav",
-        sound="resources/nonwordspelling/Enhanced/Deltests/4e.4.wav",
+        name="resources/nonwordspelling/Enhanced/Deltests/4e.4.mp3",
+        sound="resources/nonwordspelling/Enhanced/Deltests/4e.4.mp3",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/nonwordspelling/Enhanced/Deltests/4e.5.wav",
-        sound="resources/nonwordspelling/Enhanced/Deltests/4e.5.wav",
+        name="resources/nonwordspelling/Enhanced/Deltests/4e.5.mp3",
+        sound="resources/nonwordspelling/Enhanced/Deltests/4e.5.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -234,8 +234,8 @@ def create_letter_pronunciation_test(
     test, questions_data, practice_questions_data=None, name="Bogstavbenævnelse"
 ):
     completion, created = TestResource.objects.get_or_create(
-        name="resources/letter_pronunciation/Enhanced/9c.2.wav",
-        sound="resources/letter_pronunciation/Enhanced/9c.2.wav",
+        name="resources/letter_pronunciation/Enhanced/9c.2.mp3",
+        sound="resources/letter_pronunciation/Enhanced/9c.2.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -259,8 +259,8 @@ def create_word_pronunciation_test(
     test, questions_data, practice_questions_data=None, name="Højtlæsning af ord"
 ):
     completion, created = TestResource.objects.get_or_create(
-        name="resources/word_pronunciation/Enhanced/Deltests/10c.2.wav",
-        sound="resources/word_pronunciation/Enhanced/Deltests/10c.2.wav",
+        name="resources/word_pronunciation/Enhanced/Deltests/10c.2.mp3",
+        sound="resources/word_pronunciation/Enhanced/Deltests/10c.2.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -285,8 +285,8 @@ def create_nonsense_word_pronunciation_test(
     test, questions_data, practice_questions_data=None, name="Højtlæsning af nonord"
 ):
     completion, created = TestResource.objects.get_or_create(
-        name="resources/nonsense_word_pronunciation/Enhanced/Deltests/11c.2.wav",
-        sound="resources/nonsense_word_pronunciation/Enhanced/Deltests/11c.2.wav",
+        name="resources/nonsense_word_pronunciation/Enhanced/Deltests/11c.2.mp3",
+        sound="resources/nonsense_word_pronunciation/Enhanced/Deltests/11c.2.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(
@@ -311,12 +311,12 @@ def create_sentence_reading_test(
     test, questions_data, practice_questions_data=None, name="Sætningslæsning"
 ):
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/sentence_reading/Enhanced/Deltests/8e.5.wav",
-        sound="resources/sentence_reading/Enhanced/Deltests/8e.5.wav",
+        name="resources/sentence_reading/Enhanced/Deltests/8e.5.mp3",
+        sound="resources/sentence_reading/Enhanced/Deltests/8e.5.mp3",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/sentence_reading/Enhanced/Deltests/8e.6.wav",
-        sound="resources/sentence_reading/Enhanced/Deltests/8e.6.wav",
+        name="resources/sentence_reading/Enhanced/Deltests/8e.6.mp3",
+        sound="resources/sentence_reading/Enhanced/Deltests/8e.6.mp3",
     )
 
     part, created = TestPart.objects.get_or_create(
