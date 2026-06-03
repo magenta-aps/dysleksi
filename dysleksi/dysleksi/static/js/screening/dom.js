@@ -1,5 +1,6 @@
 import { getCursorIndex, serverOnline } from "./utils.js";
 import { assetCache } from "./cache.js";
+import { setResponsiveFontSize } from "./utils.js";
 
 class TestDomElements {
     instructionsSoundEl;
@@ -849,7 +850,7 @@ export class GroupTestDomElements extends TestDomElements {
             if (squareButton) {
                 btn.style.fontSize = "72px";
             } else {
-                btn.style.fontSize = "32px";
+                setResponsiveFontSize(btn, 32);
             }
         }
         if (imageUrl) {
@@ -868,6 +869,7 @@ export class GroupTestDomElements extends TestDomElements {
         if (listener) {
             btn.addEventListener("click", listener);
         }
+
         return btn;
     }
 

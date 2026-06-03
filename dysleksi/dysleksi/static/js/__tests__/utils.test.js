@@ -7,6 +7,7 @@ import * as wsModule from "../ws.js";
 import { calculateStudentProgress } from "../screening/utils";
 import { preventDoubleTapZoom } from "../screening/utils";
 import { getCursorIndex, serverOnline } from "../screening/utils";
+import { setResponsiveFontSize } from "../screening/utils";
 
 // Mock getWebSocket
 vi.mock("../ws.js", () => ({
@@ -591,5 +592,48 @@ describe("serverOnline", () => {
 
         const fetchArgs = fetch.mock.calls[0][1];
         expect(fetchArgs.signal.aborted).toBe(true);
+    });
+});
+
+describe("setResponsiveFontSize", () => {
+    let observeSpy;
+
+    beforeEach(() => {
+        observeSpy = vi.fn();
+        global.ResizeObserver = class ResizeObserver {
+            constructor(_cb) {}
+            observe(el) {
+                observeSpy(el);
+            }
+            unobserve() {}
+            disconnect() {}
+        };
+    });
+
+    afterEach(() => {
+        document.body.innerHTML = "";
+        vi.restoreAllMocks();
+    });
+
+    it("shrinks font size for long text when it does not fit on the button", () => {
+        const btn = document.createElement("button");
+        btn.textContent = "super lang ord som er meget lang";
+        document.body.appendChild(btn);
+        Object.defineProperty(btn, "clientWidth", { value: 200, configurable: true });
+
+        setResponsiveFontSize(btn, 32);
+
+        expect(parseInt(btn.style.fontSize)).toBeLessThan(32);
+    });
+
+    it("never shrinks below 10px", () => {
+        const btn = document.createElement("button");
+        btn.textContent = "x".repeat(200);
+        document.body.appendChild(btn);
+        Object.defineProperty(btn, "clientWidth", { value: 200, configurable: true });
+
+        setResponsiveFontSize(btn, 32);
+
+        expect(parseInt(btn.style.fontSize)).toBeGreaterThanOrEqual(10);
     });
 });

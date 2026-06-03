@@ -9,12 +9,12 @@ def create_wordreading_2_test(
     test, questions_data, practice_questions_data=None, name="Ordlæsning 2"
 ):
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/wordreading_2/Deltests/7e.2.wav",
-        sound="resources/wordreading_2/Deltests/7e.2.wav",
+        name="resources/wordreading_2/Enhanced/Deltest/7e.2.wav",
+        sound="resources/wordreading_2/Enhanced/Deltest/7e.2.wav",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/wordreading_2/Deltests/7e.3.wav",
-        sound="resources/wordreading_2/Deltests/7e.3.wav",
+        name="resources/wordreading_2/Enhanced/Deltest/7e.3.wav",
+        sound="resources/wordreading_2/Enhanced/Deltest/7e.3.wav",
     )
     part, created = TestPart.objects.get_or_create(
         name=name,

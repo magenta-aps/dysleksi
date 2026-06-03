@@ -438,19 +438,20 @@ body.show-instructions {
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  width: 80vw;
+  width: 90vw;
   padding: 0;
   list-style: none;
-  gap: 1rem;
+  gap: 24px;
 
   button {
     flex: 1;  // all buttons in #choices have equal width
-    padding: 1rem 3rem;
+    padding: 16px 8px;
     border: 1px solid #ccc;
     border-radius: 0.5rem;
     border-width: 0px !important;
     box-shadow: $button-shadow;
     transition: filter 0.2s ease-out;
+    height: 100px;
   }
 
   &.true-false-layout {

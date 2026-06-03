@@ -138,6 +138,13 @@ global.WebSocket = class {
     }
 };
 
+global.ResizeObserver = class ResizeObserver {
+    constructor(_cb) {}
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
+
 // Mock window.location correctly
 global.window = {
     location: { protocol: "https:", host: "example.com" },
@@ -186,7 +193,7 @@ describe("GroupTestFlow", () => {
         expect(test.parts[0].test).toBe(test);
         expect(test.parts[0].id).toBe(5);
         expect(test.parts[0].index).toBe(0);
-        expect(test.parts[0].name).toBe("Wordreading 2A (dummy)");
+        expect(test.parts[0].name).toBe("Wordreading 2 (dummy)");
         expect(test.parts[0].instructionsUrl).toBe(null);
         expect(test.parts[0].timeout).toBe(60000);
         expect(test.parts[0].partialScoreAfter).toBe(30000);
@@ -212,7 +219,7 @@ describe("GroupTestFlow", () => {
         expect(test.parts[0].test).toBe(test);
         expect(test.parts[0].id).toBe(5);
         expect(test.parts[0].index).toBe(0);
-        expect(test.parts[0].name).toBe("Wordreading 2A (dummy)");
+        expect(test.parts[0].name).toBe("Wordreading 2 (dummy)");
         expect(test.parts[0].instructionsUrl).toBe(null);
         expect(test.parts[0].timeout).toBe(60000);
         expect(test.parts[0].partialScoreAfter).toBe(30000);
@@ -981,7 +988,7 @@ describe("GroupTestFlow", () => {
             partId: part.id,
             questionIndex: question.index,
             questionId: question.id,
-            questionTitle: "1/5 (Wordreading 2A (dummy))",
+            questionTitle: "1/5 (Wordreading 2 (dummy))",
             displayedAt: 0,
             answeredAt: 0,
             duration: 0,
@@ -1053,6 +1060,20 @@ describe("GroupTestFlow", () => {
 
         expect(view.showNextQuestion).toHaveBeenCalled();
         expect(view.domElements.makeButtonHappy).toHaveBeenCalled();
+    });
+
+    it("Always has correct answer on the same index for practice question", () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        testSpy(view);
+        view.setPart(0);
+
+        view.showQuestion(true, 1);
+
+        const choices = document.getElementById("choices");
+        // We expect this button to be the third button
+        // Because index = 2 in the json data
+        expect(choices.children[2].innerHTML).toBe("hund");
     });
 
     it("Answer practice question incorrectly", () => {

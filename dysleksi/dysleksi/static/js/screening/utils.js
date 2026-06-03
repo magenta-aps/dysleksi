@@ -2,6 +2,31 @@ import { getWebSocket } from "../ws.js";
 
 let wakeLock = null;
 
+export function setResponsiveFontSize(button, maxFontSize) {
+    // Sets font size on a button but scales down if the text does not fit on the button
+    button.style.fontSize = `${maxFontSize}px`;
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+
+    function getSize() {
+        const availableWidth = button.clientWidth - 16; // minus 8px padding each side
+        let size = maxFontSize;
+        ctx.font = `${size}px ${getComputedStyle(button).fontFamily}`;
+        while (
+            ctx.measureText(button.textContent).width > availableWidth &&
+            size > 10
+        ) {
+            size--;
+            ctx.font = `${size}px ${getComputedStyle(button).fontFamily}`;
+        }
+        button.style.fontSize = `${size}px`;
+    }
+
+    getSize();
+    // Re-run on resize
+    new ResizeObserver(getSize).observe(button);
+}
+
 export function startSession(studentIds) {
     const chatSocket = getWebSocket();
 

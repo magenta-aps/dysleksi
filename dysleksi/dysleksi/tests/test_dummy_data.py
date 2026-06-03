@@ -27,13 +27,11 @@ class DummyDataTest(TestCase):
         # across the four available group tests ("Midt 2. klasse", "Slut 2. klasse",
         # "Midt 3. klasse", "Slut 3. klasse".) In actual test data, we would expect the
         # different tests to have different test parts.
-        word_reading_2_test_parts = TestPart.objects.filter(
-            name="Ordlæsning 2A (dummy)"
-        )
+        word_reading_2_test_parts = TestPart.objects.filter(name="Ordlæsning 2 (dummy)")
         self.assertEqual(word_reading_2_test_parts.count(), 1)
 
     def test_real_dummy_data_creation(self):
-        word_reading_2_test = TestPart.objects.filter(name="Ordlæsning 2A").first()
+        word_reading_2_test = TestPart.objects.filter(name="Ordlæsning 2").first()
         wordspelling_test = TestPart.objects.filter(name="Ordstavning").first()
 
         self.assertEqual(word_reading_2_test.questions.count(), 105)
@@ -52,7 +50,7 @@ class DummyDataTest(TestCase):
 
     def test_dummy_test_answers_creation(self):
         word_reading_2_test: TestPart = TestPart.objects.filter(
-            name="Ordlæsning 2A"
+            name="Ordlæsning 2"
         ).first()
 
         students_participating: int = sum(
@@ -75,7 +73,7 @@ class DummyDataTest(TestCase):
 
     def test_dummy_test_answers_creation_no_classes_or_students(self):
         word_reading_2_test: TestPart = TestPart.objects.filter(
-            name="Ordlæsning 2A"
+            name="Ordlæsning 2"
         ).first()
 
         self.assertEqual(word_reading_2_test.partresponses.count(), 0)

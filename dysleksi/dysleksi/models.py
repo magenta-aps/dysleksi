@@ -508,6 +508,7 @@ class Test(models.Model):
                             "id": answer.id,
                             "resource_id": answer.resource.id,
                             "resource_name": answer.resource.name,
+                            "index": answer.index,
                             "resource_image_url": (
                                 answer.resource.image.url
                                 if answer.resource.image
@@ -764,6 +765,7 @@ class TestPart(models.Model):
                     question=question,
                     resource=correct_resource,
                     defaults={"correctness": Correctness.CORRECT},
+                    index=data.get("correct_index"),
                 )
 
             # Almost correct answer
@@ -1081,6 +1083,13 @@ class PossibleAnswer(models.Model):
         default=Correctness.WRONG,
         blank=False,
         null=False,
+    )
+
+    index = models.IntegerField(
+        default=None,
+        null=True,
+        blank=True,
+        help_text="index where this answer should be shown in mutiple-choice questions",
     )
 
     def __str__(self) -> str:
