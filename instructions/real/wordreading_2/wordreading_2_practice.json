@@ -49,6 +49,7 @@
         "image": "resources/wordreading_2/Instruktion/Øje.png",
         "question_type": "multiple_choice",
         "correct": "isi",
+        "correct_index": 2,
         "wrong": ["isigak", "illu", "immuk"],
         "instruction_sequence": [
             {
@@ -147,7 +148,7 @@
             },
             {
                 "action": "highlight",
-                "element": "choice-isi",
+                "element": "choice-isigak",
                 "delayAfter": 500
             },
             {
@@ -158,7 +159,7 @@
             },
             {
                 "action": "highlight",
-                "element": "choice-isigak",
+                "element": "choice-illu",
                 "delayAfter": 500
             },
             {
@@ -169,7 +170,7 @@
             },
             {
                 "action": "highlight",
-                "element": "choice-illu",
+                "element": "choice-isi",
                 "delayAfter": 1000
             },
             {
@@ -310,7 +311,7 @@
         "image": "resources/wordreading_2/Øveopgave/Fod.png",
         "correct": "isigak",
         "wrong": ["isi", "immuk", "ini"],
-        "reminder_source": "resources/wordreading_2/Øveopgave/7c.2.mp3",
+        "reminder_source": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7c.2.mp3",
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
             // Sørg for at "challenge" og "næste" faktisk er synlige
@@ -337,7 +338,7 @@
         "image": "resources/wordreading_2/Øveopgave/Mælk.png",
         "correct": "immuk",
         "wrong": ["imaq", "illu", "imeq"],
-        "reminder_source": "resources/wordreading_2/Øveopgave/7c.2.mp3"
+        "reminder_source": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7c.2.mp3"
     },
     {
         "question_type": "no_input_required",

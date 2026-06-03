@@ -5,7 +5,7 @@
   "parts": [
     {
       "id": 5,
-      "name": "Wordreading 2A (dummy)",
+      "name": "Wordreading 2 (dummy)",
       "instructions_url": null,
       "timeout": 60000,
       "partial_score_after": 30000,
@@ -55,7 +55,8 @@
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "hund",
-              "correctness": "correct"
+              "correctness": "correct",
+              "index": 2
             },
             {
               "id": 94,
@@ -467,9 +468,5 @@
         }
       ]
     }
-  ],
-  "summary": [
-    "Wordreading 2A (dummy)",
-    "Wordspelling 2B (dummy)"
   ]
 }

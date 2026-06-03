@@ -86,7 +86,7 @@ export class GroupTestView extends StudentTestView {
                 const falseAnswer = answers.find((a) => a.resourceText === "false");
                 const trueAnswer = answers.find((a) => a.resourceText === "true");
                 answers = [falseAnswer, trueAnswer];
-            } else if (!this.isPracticing) {
+            } else if (!isPracticing) {
                 answers = shuffleArray(answers);
             }
 

@@ -10,6 +10,13 @@ import * as utils from "../../screening/utils.js";
 
 import { spyAttributes } from "../utils.js";
 
+global.ResizeObserver = class ResizeObserver {
+    constructor(_cb) {}
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+};
+
 describe("GroupTestDomElements.showInstructions (sound only)", () => {
     let dom;
 

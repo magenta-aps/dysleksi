@@ -4,6 +4,7 @@
   },
   "devDependencies": {
     "@vitest/coverage-istanbul": "^4.0.17",
+    "canvas": "^3.2.3",
     "jsdom": "^29.0.0",
     "vitest": "^4.0.17"
   }

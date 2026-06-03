@@ -3,7 +3,7 @@
         "image": "dummy-resources/wordreading_2/Opgave/dog.png",
         "question_type": "multiple_choice",
         "correct": "hund",
-        "wrong": ["kat", "ko", "hest"]
+        "wrong": ["kat", "igutileriffik", "super lang ord som er meget lang"]
     },
     {
         "question_type": "multiple_choice",

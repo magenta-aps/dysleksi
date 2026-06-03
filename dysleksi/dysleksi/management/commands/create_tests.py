@@ -40,7 +40,7 @@ def create_group_test(
     if dummy:
         wordreading_data_path = (
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
-            / "dummy/wordreading_2/wordreading_2a.json",
+            / "dummy/wordreading_2/wordreading_2.json",
         )
         wordreading_1_data_path = (
             Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
@@ -71,7 +71,7 @@ def create_group_test(
             / "dummy/letter_shape/letter_shape.json",
         )
 
-        wordreading_test_name = "Ordlæsning 2A (dummy)"
+        wordreading_test_name = "Ordlæsning 2 (dummy)"
         wordreading_1_test_name = "Ordlæsning 1 (dummy)"
         wordspelling_test_name = "Ordstavning (dummy)"
         nonwordspelling_test_name = "Nonordstavning (dummy)"
@@ -113,7 +113,7 @@ def create_group_test(
             / "real/letter_shape/letter_shape.json",
         )
 
-        wordreading_test_name = "Ordlæsning 2A"
+        wordreading_test_name = "Ordlæsning 2"
         wordreading_1_test_name = "Ordlæsning 1"
         wordspelling_test_name = "Ordstavning"
         nonwordspelling_test_name = "Nonordstavning"
@@ -206,7 +206,7 @@ def create_group_test(
             "wordreading_2",
             practice_json_path=(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
-                / "real/wordreading_2/wordreading_2a_practice.json"
+                / "real/wordreading_2/wordreading_2_practice.json"
             ),
         )
 
