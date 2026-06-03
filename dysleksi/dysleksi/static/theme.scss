@@ -88,6 +88,7 @@ $dark-red-button-shadow:
 @import "./vendor/scss/bootstrap";
 @import "./vendor/fonts/phosphor/regular/style.css";
 @import "./vendor/fonts/phosphor/fill/style.css";
+@import "./vendor/fonts/phosphor/bold/style.css";
 
 @font-face {
   font-family: "Karinika";
@@ -166,7 +167,6 @@ h1, h2, h3, h4, h5, h6 {
   color: black !important;
   background-color: white !important;
 
-  font-size: 1.1rem;
   border-radius: 16px !important;
   width: 200px !important;
   flex: none !important;
@@ -186,6 +186,7 @@ h1, h2, h3, h4, h5, h6 {
 
     i {
       color: $student-green;
+      font-size: 68px;
     }
 
     &.selected,
@@ -203,6 +204,7 @@ h1, h2, h3, h4, h5, h6 {
 
     i {
       color: $student-red;
+      font-size: 68px;
     }
 
     &.selected,
