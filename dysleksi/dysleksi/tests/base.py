@@ -183,21 +183,20 @@ class DysleksiTest(TestCase):
         )
 
     @classmethod
-    def create_wordspelling_part(cls):
+    def create_wordspelling_part(cls, individual: bool = False):
         cls.wordspelling_part, _ = TestPart.objects.get_or_create(
             name="TestPart1",
             timeout=60000,
             partial_score_after=30000,
         )
+        test = cls.individual_test if individual else cls.group_test
+        test.parts.add(cls.wordspelling_part)
+
         cls.wordspelling_question_1 = TestQuestion.objects.create(
             part=cls.part,
             challenge=cls.resource1,
             question_type=QuestionType.FREE_TEXT,
-        )
-        cls.wordspelling_question_2 = TestQuestion.objects.create(
-            part=cls.part,
-            challenge=cls.resource2,
-            question_type=QuestionType.FREE_TEXT,
+            result_group="Nemme ord",
         )
         cls.wordspelling_option_1_1 = PossibleAnswer.objects.create(
             question=cls.wordspelling_question_1,
@@ -208,6 +207,12 @@ class DysleksiTest(TestCase):
             question=cls.wordspelling_question_1,
             resource=cls.resource4,
             correctness=Correctness.PARTIAL,
+        )
+        cls.wordspelling_question_2 = TestQuestion.objects.create(
+            part=cls.part,
+            challenge=cls.resource2,
+            question_type=QuestionType.FREE_TEXT,
+            result_group="Lette ord",
         )
         cls.wordspelling_option_2_1 = PossibleAnswer.objects.create(
             question=cls.wordspelling_question_2,
@@ -221,7 +226,7 @@ class DysleksiTest(TestCase):
         )
 
     @classmethod
-    def create_sentencereading_part(cls):
+    def create_sentencereading_part(cls, individual: bool = False):
         # TODO: Move other test creations into methods like this,
         # and let individual Test classes decide what to initialize
         cls.sentencereading_part, _ = TestPart.objects.get_or_create(
@@ -229,6 +234,9 @@ class DysleksiTest(TestCase):
             timeout=60000,
             partial_score_after=30000,
         )
+        test = cls.individual_test if individual else cls.group_test
+        test.parts.add(cls.sentencereading_part)
+
         cls.sentencereading_question = TestQuestion.objects.create(
             part=cls.sentencereading_part,
             challenge=cls.resource1,
@@ -498,40 +506,46 @@ class ResponseTest(DysleksiTest):
         cls.group_questionresponse_2_4.save()
 
     @classmethod
-    def create_individual_wordspelling_part(cls):
-        super().create_wordspelling_part()
-        cls.individual_test.parts.add(cls.wordspelling_part)
+    def create_wordspelling_part(cls, individual: bool = False):
+        super().create_wordspelling_part(individual)
         tz = timezone.get_current_timezone()
-        cls.individual_partresponse_1 = PartResponse.objects.create(
-            testresponse=cls.test_response_student,
+        testresponse = (
+            cls.test_response_student if individual else cls.group_testresponse_1
+        )
+
+        cls.wordspelling_partresponse = PartResponse.objects.create(
+            testresponse=testresponse,
             testpart=cls.wordspelling_part,
             completed=True,
             started_at=datetime(2026, 5, 1, 12, 0, 0, tzinfo=tz),
         )
-        cls.individual_questionresponse_1_1 = QuestionResponse.objects.create(
-            partresponse=cls.individual_partresponse_1,
+        cls.wordspelling_questionresponse_1_1 = QuestionResponse.objects.create(
+            partresponse=cls.wordspelling_partresponse,
             question=cls.wordspelling_question_1,
             answer_option=cls.wordspelling_option_1_1,
             correctness=Correctness.CORRECT,
         )
-        cls.individual_questionresponse_2_1 = QuestionResponse.objects.create(
-            partresponse=cls.individual_partresponse_1,
+        cls.wordspelling_questionresponse_2_1 = QuestionResponse.objects.create(
+            partresponse=cls.wordspelling_partresponse,
             question=cls.wordspelling_question_2,
             answer_option=cls.wordspelling_option_2_2,
             correctness=Correctness.PARTIAL,
         )
-        cls.individual_questionresponse_1_1.submitted_at = datetime(
+        cls.wordspelling_questionresponse_1_1.submitted_at = datetime(
             2026, 5, 1, 12, 0, 10, tzinfo=tz
         )
-        cls.individual_questionresponse_1_1.save()
+        cls.wordspelling_questionresponse_1_1.save()
 
     @classmethod
-    def create_group_sentencereading_part(cls):
-        super().create_sentencereading_part()
+    def create_sentencereading_part(cls, individual: bool = False):
+        super().create_sentencereading_part(individual)
         tz = timezone.get_current_timezone()
-        cls.group_test.parts.add(cls.sentencereading_part)
+        testresponse = (
+            cls.test_response_student if individual else cls.group_testresponse_1
+        )
+
         cls.sentencereading_partresponse_1 = PartResponse.objects.create(
-            testresponse=cls.group_testresponse_1,
+            testresponse=testresponse,
             testpart=cls.sentencereading_part,
             completed=True,
             started_at=datetime(2026, 5, 1, 12, 0, 0, tzinfo=tz),

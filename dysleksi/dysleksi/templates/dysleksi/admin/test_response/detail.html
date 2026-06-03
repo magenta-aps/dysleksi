@@ -113,30 +113,44 @@
                 {% localize off %}
                     {% for pk, category in CorrectnessCategories.items reversed %}
                         <tr style="height: {{ category.width_pct }}%">
-                            {% for item in plot %}
-                                <td
-                                        class="plot-table-x-category-cell category-{{ category.color_key }}"
-                                ></td>
+                            {% for part_pk, part_naming in part_names.items %}
+                                {% with part_name=part_naming.0 subpart_names=part_naming.1 %}
+                                <td class="plot-table-x-category-cell category-{{ category.color_key }}" colspan="{{ subpart_names|length }}"></td>
+                                {% endwith %}
                             {% endfor %}
                         </tr>
                     {% endfor %}
                 {% endlocalize %}
                 </tbody>
                 <tfoot>
+                {% localize off %}
                 <tr>
-                    {% localize off %}
-                        {% for part_pk, part_name in part_names.items %}
-                            <td class="plot-x-scale-text">
-                                <div>{{ part_name }}</div>
-                                <a href="{% url 'dysleksi:test_assignment_part_result' assignment_pk=object.assignment_id testpart_pk=part_pk testresponse_pk=object.pk %}">
-                                    {% translate "Se elevens svar" %}
-                                </a>
-                            </td>
-                        {% endfor %}
-                    {% endlocalize %}
+                    {% for part_pk, part_naming in part_names.items %}
+                        {% with part_name=part_naming.0 subpart_names=part_naming.1 %}
+                            {% for subpart_name in subpart_names %}
+                                <td class="plot-x-scale-text-sub">
+                                <div>{{ subpart_name|default_if_none:"" }}</div>
+                                </td>
+                            {% endfor %}
+                        {% endwith %}
+                    {% endfor %}
                 </tr>
                 <tr>
-                    <td class="plot-x-label-text" colspan="{{ part_names|length }}">
+                    {% for part_pk, part_naming in part_names.items %}
+                        {% with part_name=part_naming.0 subpart_names=part_naming.1 %}
+                        <td class="plot-x-scale-text" colspan="{{ subpart_names|length }}">
+                            <div>{{ part_name }}</div>
+                            <a href="{% url 'dysleksi:test_assignment_part_result' assignment_pk=object.assignment_id testpart_pk=part_pk testresponse_pk=object.pk %}">
+                                {% translate "Se elevens svar" %}
+                            </a>
+                        </td>
+                        {% endwith %}
+                    {% endfor %}
+                    </tr>
+
+                {% endlocalize %}
+                <tr>
+                    <td class="plot-x-label-text" colspan="{{ plot|length }}">
                         {% translate "Deltests" %}
                     </td>
                 </tr>
@@ -149,6 +163,20 @@
         <script>
             const data = JSON.parse(document.getElementById("plot_data").textContent);
             const part_names = JSON.parse(document.getElementById("part_names").textContent);
+            const labels = [];
+            for (let pk in part_names) {
+                let labels_map = part_names[pk];
+                let primary_label = labels_map[0];
+                let secondaries = labels_map[1];
+                for (let secondary_label of secondaries) {
+                    if (secondary_label !== null) {
+                        labels.push(`${primary_label} (${secondary_label})`);
+                    } else {
+                        labels.push(primary_label);
+                    }
+                }
+            }
+
             const chart = new Chart(
                 document.getElementById("chart"),
                 {
@@ -159,7 +187,7 @@
                                 data: data
                             }
                         ],
-                        "labels": Object.keys(part_names).map((key) => part_names[key])
+                        "labels": labels
                     },
                     options: {
                         responsive: false,

@@ -877,7 +877,8 @@ class TestTestResponseView(ResponseTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.create_individual_wordspelling_part()
+        cls.create_wordspelling_part(True)
+        cls.create_sentencereading_part(True)
 
     @override_settings(RESULT_TABLE_SIZE=3)
     def test_table(self):
@@ -911,6 +912,7 @@ class TestTestResponseView(ResponseTest):
 
     @override_settings(RESULT_TABLE_SIZE=3)
     def test_only_table(self):
+        print("test_only_table")
         view = self.setup_view(
             TestResponseView,
             self.teacher,
@@ -956,7 +958,7 @@ class TestTestResponseView(ResponseTest):
                     response_pk=self.group_testresponse_1.pk,
                 )
 
-    @override_settings(RESULT_TABLE_SIZE=3)
+    @override_settings(RESULT_TABLE_SIZE=2)
     def test_table_individual(self):
         view = self.setup_view(
             TestResponseView,
@@ -966,17 +968,55 @@ class TestTestResponseView(ResponseTest):
         )
         table = view.get_table()
         self.assertTrue(isinstance(table, StudentTestResponseTable))
-        part_key = f"part_{self.part.pk}"
+        part_key_a = f"part_{self.wordspelling_part.pk}_lette_ord"
+        part_key_b = f"part_{self.wordspelling_part.pk}_nemme_ord"
+        part_key_c = f"part_{self.sentencereading_part.pk}"
         self.assertEqual(
-            table.data.data,
-            [
-                {"data_category": "Antal forsøgte", part_key: 2},
-                {"data_category": "Antal oversprungne", part_key: 1},
-                {"data_category": "Antal rigtige", part_key: 1},
-                {"data_category": "Rigtighedsprocent", part_key: "50 %"},
-                {"data_category": "Normscore", part_key: "16 %"},
-            ],
+            table.data.data[0],
+            {
+                "data_category": "Antal forsøgte",
+                part_key_a: 1,
+                part_key_b: 1,
+                part_key_c: 1,
+            },
         )
+        self.assertEqual(
+            table.data.data[1],
+            {
+                "data_category": "Antal oversprungne",
+                part_key_a: 1,
+                part_key_b: 0,
+                part_key_c: 0,
+            },
+        )
+        self.assertEqual(
+            table.data.data[2],
+            {
+                "data_category": "Antal rigtige",
+                part_key_a: 0,
+                part_key_b: 1,
+                part_key_c: 1,
+            },
+        )
+        self.assertEqual(
+            table.data.data[3],
+            {
+                "data_category": "Rigtighedsprocent",
+                part_key_a: "0 %",
+                part_key_b: "100 %",
+                part_key_c: "100 %",
+            },
+        )
+        self.assertEqual(
+            table.data.data[4],
+            {
+                "data_category": "Normscore",
+                part_key_a: "0 %",
+                part_key_b: "100 %",
+                part_key_c: "100 %",
+            },
+        )
+
         self.assertEqual(
             [
                 BeautifulSoup(str(column.footer), "html.parser").get_text(
@@ -984,7 +1024,36 @@ class TestTestResponseView(ResponseTest):
                 )
                 for column in table.columns
             ],
-            ["Bedømmelse", "Middel;Se elevens svar", "", ""],
+            [
+                "Bedømmelse",
+                "Over middel;Se elevens svar",
+                "Elendigt;Se elevens svar",
+                "Elendigt;Se elevens svar",
+            ],
+        )
+
+    def test_get_plot_data(self):
+        view = self.setup_view(
+            TestResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_student.pk,
+            response_pk=self.test_response_student.pk,
+        )
+        self.assertEqual(view.get_plot_data(), [0, 100, 100])
+
+    def test_get_part_names(self):
+        view = self.setup_view(
+            TestResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_student.pk,
+            response_pk=self.test_response_student.pk,
+        )
+        self.assertEqual(
+            view.get_part_names(),
+            {
+                self.wordspelling_part.pk: ("TestPart1", ["Lette ord", "Nemme ord"]),
+                self.sentencereading_part.pk: ("GroupTestPart2", [None]),
+            },
         )
 
 
@@ -993,7 +1062,7 @@ class TestPartResponseView(ResponseTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        cls.create_group_sentencereading_part()
+        cls.create_sentencereading_part(False)
 
     def test_get_object(self):
         view = self.setup_view(

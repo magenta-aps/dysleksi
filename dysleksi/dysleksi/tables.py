@@ -1,7 +1,8 @@
+from copy import copy
 from datetime import timedelta
 from itertools import count
 from math import ceil
-from typing import Callable, List
+from typing import Callable, Collection, List, Tuple
 
 from django.db.models import QuerySet
 from django.template import Context
@@ -320,13 +321,15 @@ class StudentTestResponseTable(NonOrderableTableMixin, Table):
         )
 
 
-# def column_group(group_label: str, *columns: Column):
-#     group_dict = {"label": group_label, "count": len(columns), "first": False}
-#     for key, column in columns:
-#         column.group = copy(group_dict)
-#     first_column = columns[0][1]
-#     first_column.group["first"] = True
-#     return columns
+def column_group(
+    group_label: str, *columns: Tuple[str, Column]
+) -> Collection[Tuple[str, Column]]:
+    group_dict = {"label": group_label, "count": len(columns), "first": False}
+    for key, column in columns:
+        column.group = copy(group_dict)
+    first_column = columns[0][1]
+    first_column.group["first"] = True
+    return columns
 
 
 class StudentTestResultsColumn(FooterColumnMixin, Column):
