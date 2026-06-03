@@ -698,6 +698,7 @@ class TestDomElements {
         }
 
         const wrapper = document.createElement("div");
+        wrapper.style.width = "90%";
 
         // --- Button rows ---
         const buttonRows = [
