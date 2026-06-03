@@ -233,7 +233,9 @@ body.show-instructions {
   background-color: $student-grey-light !important;
   color: black;
   border: 0px !important;
-  height: 4rem;
+  height: 80px !important;
+  width: 140px !important;
+  flex: none !important;
   padding: 0 2rem;
   display: flex;
   align-items: center;
@@ -261,6 +263,7 @@ body.show-instructions {
     }
   }
   .letter-btn {
+    height: 80px;
     &:disabled {
       color: black !important;
       border-color: $student-grey !important;
@@ -422,7 +425,7 @@ body.show-instructions {
   padding: 0 0.75rem;
   white-space: pre;    // preserve spaces
   flex-grow: 1;
-  height: 4rem;
+  height: 80px;
   margin: 0 0.5rem 0.5rem 0.5rem;
   font-size: 2rem;
   caret-animation: manual;
