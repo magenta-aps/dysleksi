@@ -32,6 +32,7 @@ python manage.py create_groups
 if [ "${CREATE_DUMMY_DATA,,}" = true ]; then
   python manage.py create_dummy_classes_and_users
   python manage.py create_tests --dummy --answer &
+  wait $!
   python manage.py create_tests --answer &
 fi
 
