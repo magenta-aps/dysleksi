@@ -56,6 +56,7 @@ class TestDomElements {
         this.speakerIcon = document.querySelector("#speaker");
 
         this.currentAudioSource = null;
+        this.inputLocked = false;
     }
 
     setBodyBackground(color) {
@@ -443,6 +444,7 @@ class TestDomElements {
     }
 
     _updateInputState(inputLocked) {
+        this.inputLocked = inputLocked;
         const buttons = document.querySelectorAll("button:not(.debug-button)");
         buttons.forEach((btn) => {
             if (inputLocked) {
