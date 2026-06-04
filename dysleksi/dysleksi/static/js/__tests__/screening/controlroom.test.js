@@ -41,6 +41,125 @@ vi.mock("../../webRTC.js", () => {
     };
 });
 
+const GROUP_DOM_HTML = `
+<template id="student-card-template">
+    <div class="student-card">
+        <div class="student-top-row">
+            <div class="progress-fill" style="width: 0%"></div>
+            <div class="student-text">
+                <span class="student-name"></span>
+                <span class="student-current-part">-</span>
+            </div>
+        <div class="student-controls">
+            <span class="status-icon">
+                <i class="ph-fill ph-check-circle"></i>
+            </span>
+            <span class="student-control-button mark-button">
+                <i class="ph-fill ph-flag-pennant"></i>
+            </span>
+            <span class="student-control-button">
+                <i class="ph ph-dots-three"></i>
+            </span>
+            <span class="student-control-button">
+                <i id="foldout-arrow" class="ph-fill ph-caret-down"></i>
+            </span>
+        </div>
+        </div>
+        <div class="folded-area" style="display: none;">
+            <div class="parts-progress"></div>
+            <div class="part-navigation">
+                <div class="nav-group-left">
+                    <i class="ph ph-caret-left nav-arrow"></i>
+                    <span class="part-index"></span>
+                </div>
+                <i class="ph ph-caret-right nav-arrow"></i>
+            </div>
+            <span class="part-label"></span>
+            <span class="question-index"></span>
+            <div class="dots-container"></div>
+        </div>
+    </div>
+</template>
+
+<button id="all-students-button" class="btn btn-outline-primary">
+  Alle (<span id="all-students-count">0</span>)
+</button>
+
+<button id="ongoing-students-button" class="btn btn-outline-primary">
+  I gang (<span id="ongoing-students-count">0</span>)
+</button>
+
+<button id="finished-students-button" class="btn btn-outline-primary">
+  <i class="ph-fill ph-check-circle green"></i>
+  Færdige (<span id="finished-students-count">0</span>)
+</button>
+
+<button id="marked-students-button" class="btn btn-outline-primary">
+  <i class="ph-fill ph-flag-pennant orange"></i>
+  Mærket (<span id="marked-students-count">0</span>)
+</button>
+
+<button id="problem-students-button" class="btn btn-outline-primary">
+  <i class="ph-fill ph-warning-circle red"></i>
+  Problemer/offline (<span id="problem-students-count">0</span>)
+</button>
+
+<div class="group-test-body"></div>
+`;
+
+const INDIVIDUAL_DOM_HTML = `
+<div id="question-container">
+    <h1 id="question-title"></h1>
+    <div id="question-content"></div>
+    <div id="part-name"></div>
+    <div id="part-number"></div>
+    <div id="question-number"></div>
+</div>
+<template id="edit-result">
+    <div class="btn-group">
+        <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        </button>
+        <ul class="dropdown-menu">
+            <li><a class="dropdown-item" href="#correct">Korrekt</a></li>
+            <li><a class="dropdown-item" href="#wrong">Forkert</a></li>
+            <li><a class="dropdown-item" href="#skipped">Sprunget over</a></li>
+        </ul>
+    </div>
+    <div class="actual-pronunciation"><input type="text"></div>
+</template>
+<table id="events"><tbody></tbody></table>
+<button id="correct"><span>Korrekt</span></button>
+<button id="wrong">Forkert</button>
+<button id="cancelled">Afslut test</button>
+<button id="skipped">Sprunget over</button>
+<button id="next">Næste</button>
+<button id="goto-next-result-group">Hop til næste</button>
+<textarea id="note" class="d-none"></textarea>
+<div class="actual-pronunciation"><input id="actual-pronunciation-text" /></div>
+<div id="audio-indicator"></div>
+<div class="modal fade" id="error" tabindex="-1" aria-labelledby="error-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content"><div class="modal-body"><div class="modal-body-inner"></div></div></div>
+    </div>
+</div>
+
+
+<div class="details-wrapper">
+    <button id="details-toggle" class="details-button" type="button" aria-expanded="false">
+        <span>Se detaljer</span>
+        <i class="ph-fill ph-caret-down"></i>
+    </button>
+    <div id="details-popup" class="details-popup" hidden>
+        <div class="details-row">
+            <span class="details-label">Testtype:</span>
+            <span class="details-value">Individuel</span>
+        </div>
+    </div>
+</div>
+<div id="outside-element">Outside content</div>
+
+`;
+
 describe("ActionButtons", () => {
     const mockDoc = `
         <button id="correct"></button>
@@ -328,42 +447,7 @@ describe("Teacher Individual test View", () => {
 
         wsGetter = vi.fn().mockReturnValue(socket);
 
-        document.body.innerHTML = `
-            <div id="question-container">
-                <h1 id="question-title"></h1>
-                <div id="question-content"></div>
-                <div id="part-name"></div>
-                <div id="part-number"></div>
-                <div id="question-number"></div>
-            </div>
-            <template id="edit-result">
-                <div class="btn-group">
-                    <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#correct">Korrekt</a></li>
-                        <li><a class="dropdown-item" href="#wrong">Forkert</a></li>
-                        <li><a class="dropdown-item" href="#skipped">Sprunget over</a></li>
-                    </ul>
-                </div>
-                <div class="actual-pronunciation"><input type="text"></div>
-            </template>
-            <table id="events"><tbody></tbody></table>
-            <button id="correct"><span>Korrekt</span></button>
-            <button id="wrong">Forkert</button>
-            <button id="cancelled">Afslut test</button>
-            <button id="skipped">Sprunget over</button>
-            <button id="next">Næste</button>
-            <button id="goto-next-result-group">Hop til næste</button>
-            <textarea id="note" class="d-none"></textarea>
-            <div class="actual-pronunciation"><input id="actual-pronunciation-text" /></div>
-            <div id="audio-indicator"></div>
-            <div class="modal fade" id="error" tabindex="-1" aria-labelledby="error-label" aria-hidden="true">
-                <div class="modal-dialog modal-lg">
-                    <div class="modal-content"><div class="modal-body"><div class="modal-body-inner"></div></div></div>
-                </div>
-            </div>
-        `;
+        document.body.innerHTML = INDIVIDUAL_DOM_HTML;
 
         // Mock out asset preloader
         vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
@@ -1183,71 +1267,7 @@ describe("GroupTestContainer", () => {
     let instance;
 
     beforeEach(() => {
-        document.body.innerHTML = `
-            <template id="student-card-template">
-                <div class="student-card">
-                    <div class="student-top-row">
-                        <div class="progress-fill" style="width: 0%"></div>
-                        <div class="student-text">
-                            <span class="student-name"></span>
-                            <span class="student-current-part">-</span>
-                        </div>
-                    <div class="student-controls">
-                        <span class="status-icon">
-                            <i class="ph-fill ph-check-circle"></i>
-                        </span>
-                        <span class="student-control-button mark-button">
-                            <i class="ph-fill ph-flag-pennant"></i>
-                        </span>
-                        <span class="student-control-button">
-                            <i class="ph ph-dots-three"></i>
-                        </span>
-                        <span class="student-control-button">
-                            <i id="foldout-arrow" class="ph-fill ph-caret-down"></i>
-                        </span>
-                    </div>
-                    </div>
-                    <div class="folded-area" style="display: none;">
-                        <div class="parts-progress"></div>
-                        <div class="part-navigation">
-                            <div class="nav-group-left">
-                                <i class="ph ph-caret-left nav-arrow"></i>
-                                <span class="part-index"></span>
-                            </div>
-                            <i class="ph ph-caret-right nav-arrow"></i>
-                        </div>
-                        <span class="part-label"></span>
-                        <span class="question-index"></span>
-                        <div class="dots-container"></div>
-                    </div>
-                </div>
-            </template>
-
-            <button id="all-students-button" class="btn btn-outline-primary">
-              Alle (<span id="all-students-count">0</span>)
-            </button>
-            
-            <button id="ongoing-students-button" class="btn btn-outline-primary">
-              I gang (<span id="ongoing-students-count">0</span>)
-            </button>
-            
-            <button id="finished-students-button" class="btn btn-outline-primary">
-              <i class="ph-fill ph-check-circle green"></i>
-              Færdige (<span id="finished-students-count">0</span>)
-            </button>
-            
-            <button id="marked-students-button" class="btn btn-outline-primary">
-              <i class="ph-fill ph-flag-pennant orange"></i>
-              Mærket (<span id="marked-students-count">0</span>)
-            </button>
-            
-            <button id="problem-students-button" class="btn btn-outline-primary">
-              <i class="ph-fill ph-warning-circle red"></i>
-              Problemer/offline (<span id="problem-students-count">0</span>)
-            </button>
-
-            <div class="group-test-body"></div>
-        `;
+        document.body.innerHTML = GROUP_DOM_HTML;
         document.querySelector(".group-test-body");
 
         const test = {
@@ -1525,72 +1545,7 @@ describe("TeacherView socket 'test.started' handling", () => {
             clear: vi.fn(),
         };
 
-        document.body.innerHTML = `
-
-            <template id="student-card-template">
-                <div class="student-card">
-                    <div class="student-top-row">
-                        <div class="progress-fill" style="width: 0%"></div>
-                        <div class="student-text">
-                            <span class="student-name"></span>
-                            <span class="student-current-part">-</span>
-                        </div>
-                    <div class="student-controls">
-                        <span class="status-icon">
-                            <i class="ph-fill ph-check-circle"></i>
-                        </span>
-                        <span class="student-control-button mark-button">
-                            <i class="ph-fill ph-flag-pennant"></i>
-                        </span>
-                        <span class="student-control-button">
-                            <i class="ph ph-dots-three"></i>
-                        </span>
-                        <span class="student-control-button">
-                            <i id="foldout-arrow" class="ph-fill ph-caret-down"></i>
-                        </span>
-                    </div>
-                    </div>
-                    <div class="folded-area">
-                        <div class="parts-progress"></div>
-                        <div class="part-navigation">
-                            <div class="nav-group-left">
-                                <i class="ph ph-caret-left nav-arrow"></i>
-                                <span class="part-index"></span>
-                            </div>
-                            <i class="ph ph-caret-right nav-arrow"></i>
-                        </div>
-                        <span class="part-label"></span>
-                        <span class="question-index"></span>
-                        <div class="dots-container"></div>
-                    </div>
-                </div>
-            </template>
-
-            <button id="all-students-button" class="btn btn-outline-primary">
-              Alle (<span id="all-students-count">0</span>)
-            </button>
-            
-            <button id="ongoing-students-button" class="btn btn-outline-primary">
-              I gang (<span id="ongoing-students-count">0</span>)
-            </button>
-            
-            <button id="finished-students-button" class="btn btn-outline-primary">
-              <i class="ph-fill ph-check-circle green"></i>
-              Færdige (<span id="finished-students-count">0</span>)
-            </button>
-            
-            <button id="marked-students-button" class="btn btn-outline-primary">
-              <i class="ph-fill ph-flag-pennant orange"></i>
-              Mærket (<span id="marked-students-count">0</span>)
-            </button>
-            
-            <button id="problem-students-button" class="btn btn-outline-primary">
-              <i class="ph-fill ph-warning-circle red"></i>
-              Problemer/offline (<span id="problem-students-count">0</span>)
-            </button>
-
-            <div class="group-test-body"></div>
-        `;
+        document.body.innerHTML = GROUP_DOM_HTML;
 
         socket = {
             addEventListener: vi.fn(),
@@ -1668,23 +1623,7 @@ describe("EventTable", () => {
 
     beforeEach(() => {
         // Set up a standard DOM for the table
-        document.body.innerHTML = `
-            <template id="edit-result">
-                <div class="btn-group">
-                    <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                    </button>
-                    <ul class="dropdown-menu">
-                        <li><a class="dropdown-item" href="#correct">Korrekt</a></li>
-                        <li><a class="dropdown-item" href="#wrong">Forkert</a></li>
-                        <li><a class="dropdown-item" href="#skipped">Sprunget over</a></li>
-                    </ul>
-                </div>
-                <div class="actual-pronunciation"><input type="text"></div>
-            </template>
-            <table id="events">
-                <tbody></tbody>
-            </table>
-        `;
+        document.body.innerHTML = INDIVIDUAL_DOM_HTML;
 
         // Mock out "preload" functionality
         vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
@@ -1930,68 +1869,7 @@ describe("StudentCard", () => {
     let mockTest;
 
     beforeEach(() => {
-        document.body.innerHTML = `
-            <template id="student-card-template">
-                <div class="student-card">
-                    <div class="student-top-row">
-                        <div class="progress-fill"></div>
-                        <div class="student-text">
-                            <span class="student-name"></span>
-                            <span class="student-current-part">-</span>
-                        </div>
-                    <div class="student-controls">
-                        <span class="status-icon">
-                            <i class="ph-fill ph-check-circle"></i>
-                        </span>
-                        <span class="student-control-button mark-button">
-                            <i class="ph-fill ph-flag-pennant"></i>
-                        </span>
-                        <span class="student-control-button">
-                            <i class="ph ph-dots-three"></i>
-                        </span>
-                        <span class="student-control-button">
-                            <i id="foldout-arrow" class="ph-fill ph-caret-down"></i>
-                        </span>
-                    </div>
-                    </div>
-                    <div class="folded-area" style="display: none;">
-                        <div class="parts-progress"></div>
-                        <div class="part-navigation">
-                            <i class="ph-caret-left"></i>
-                            <span class="part-index"></span>
-                            <i class="ph-caret-right"></i>
-                        </div>
-                        <span class="part-label"></span>
-                        <span class="question-index"></span>
-                        <div class="dots-container"></div>
-                    </div>
-                </div>
-            </template>
-
-            <button id="all-students-button" class="btn btn-outline-primary">
-              Alle (<span id="all-students-count">0</span>)
-            </button>
-            
-            <button id="ongoing-students-button" class="btn btn-outline-primary">
-              I gang (<span id="ongoing-students-count">0</span>)
-            </button>
-            
-            <button id="finished-students-button" class="btn btn-outline-primary">
-              <i class="ph-fill ph-check-circle green"></i>
-              Færdige (<span id="finished-students-count">0</span>)
-            </button>
-            
-            <button id="marked-students-button" class="btn btn-outline-primary">
-              <i class="ph-fill ph-flag-pennant orange"></i>
-              Mærket (<span id="marked-students-count">0</span>)
-            </button>
-            
-            <button id="problem-students-button" class="btn btn-outline-primary">
-              <i class="ph-fill ph-warning-circle red"></i>
-              Problemer/offline (<span id="problem-students-count">0</span>)
-            </button>
-
-        `;
+        document.body.innerHTML = GROUP_DOM_HTML;
 
         mockStudent = new Student({
             id: 1,
@@ -2403,66 +2281,7 @@ describe("GroupTestContainer Filtering", () => {
 
     beforeEach(() => {
         // Setup minimal DOM for filtering
-        document.body.innerHTML = `
-            <template id="student-card-template">
-                <div class="student-card">
-                    <div class="student-top-row">
-                        <div class="progress-fill"></div>
-                        <div class="student-text">
-                            <span class="student-name"></span>
-                            <span class="student-current-part">-</span>
-                        </div>
-
-                        <div class="student-controls">
-                            <span class="status-icon">
-                                <i class="ph-fill ph-check-circle"></i>
-                            </span>
-                            <span class="student-control-button mark-button">
-                                <i class="ph-fill ph-flag-pennant"></i>
-                            </span>
-                            <span class="student-control-button">
-                                <i class="ph ph-dots-three"></i>
-                            </span>
-                            <span class="student-control-button">
-                                <i id="foldout-arrow" class="ph-fill ph-caret-down"></i>
-                            </span>
-                        </div>
-                    </div>
-                    <div class="folded-area" style="display: none;">
-                        <div class="parts-progress"></div>
-                        <div class="dots-container"></div>
-                        <span class="part-label"></span>
-                        <span class="part-index"></span>
-                        <span class="question-index"></span>
-                        <i class="ph-caret-left"></i>
-                        <i class="ph-caret-right"></i>
-                    </div>
-                </div>
-            </template>
-            <button id="all-students-button" class="btn btn-outline-primary">
-              Alle (<span id="all-students-count">0</span>)
-            </button>
-            
-            <button id="ongoing-students-button" class="btn btn-outline-primary">
-              I gang (<span id="ongoing-students-count">0</span>)
-            </button>
-            
-            <button id="finished-students-button" class="btn btn-outline-primary">
-              <i class="ph-fill ph-check-circle green"></i>
-              Færdige (<span id="finished-students-count">0</span>)
-            </button>
-            
-            <button id="marked-students-button" class="btn btn-outline-primary">
-              <i class="ph-fill ph-flag-pennant orange"></i>
-              Mærket (<span id="marked-students-count">0</span>)
-            </button>
-            
-            <button id="problem-students-button" class="btn btn-outline-primary">
-              <i class="ph-fill ph-warning-circle red"></i>
-              Problemer/offline (<span id="problem-students-count">0</span>)
-            </button>
-            <div class="group-test-body"></div>
-        `;
+        document.body.innerHTML = GROUP_DOM_HTML;
         container = new GroupTestContainer(test);
 
         this.createStudent = (id, name, progress, problem) => ({
@@ -2549,21 +2368,7 @@ describe("DetailsPopup", () => {
     let detailsPopup;
 
     beforeEach(() => {
-        document.body.innerHTML = `
-            <div class="details-wrapper">
-                <button id="details-toggle" class="details-button" type="button" aria-expanded="false">
-                    <span>Se detaljer</span>
-                    <i class="ph-fill ph-caret-down"></i>
-                </button>
-                <div id="details-popup" class="details-popup" hidden>
-                    <div class="details-row">
-                        <span class="details-label">Testtype:</span>
-                        <span class="details-value">Individuel</span>
-                    </div>
-                </div>
-            </div>
-            <div id="outside-element">Outside content</div>
-        `;
+        document.body.innerHTML = INDIVIDUAL_DOM_HTML;
         detailsPopup = new DetailsPopup();
     });
 
