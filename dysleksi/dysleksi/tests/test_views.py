@@ -507,22 +507,22 @@ class TestAssignmentResultsView(ResponseTest):
 
         part1_key = f"part_{self.group_test_part.pk}_correct"
 
-        best = qs[0]
-        self.assertEqual(best.rank, 1)
-        self.assertEqual(getattr(best, f"{part1_key}_count"), 4)
-        self.assertEqual(getattr(best, f"{part1_key}_proportion"), 1.0)
+        first = qs[0]
+        self.assertEqual(first.rank, 2)
+        self.assertEqual(getattr(first, f"{part1_key}_count"), 1)
+        self.assertEqual(getattr(first, f"{part1_key}_proportion"), 0.25)
         self.assertEqual(
-            getattr(best, f"{part1_key}_category"),
-            CorrectnessCategory.objects.get(color_key="blue").pk,
+            getattr(first, f"{part1_key}_category"),
+            CorrectnessCategory.objects.get(color_key="yellow").pk,
         )
 
-        secondbest = qs[1]
-        self.assertEqual(secondbest.rank, 2)
-        self.assertEqual(getattr(secondbest, f"{part1_key}_count"), 1)
-        self.assertEqual(getattr(secondbest, f"{part1_key}_proportion"), 0.25)
+        second = qs[1]
+        self.assertEqual(second.rank, 1)
+        self.assertEqual(getattr(second, f"{part1_key}_count"), 4)
+        self.assertEqual(getattr(second, f"{part1_key}_proportion"), 1.0)
         self.assertEqual(
-            getattr(secondbest, f"{part1_key}_category"),
-            CorrectnessCategory.objects.get(color_key="yellow").pk,
+            getattr(second, f"{part1_key}_category"),
+            CorrectnessCategory.objects.get(color_key="blue").pk,
         )
 
     @override_settings(RESULT_TABLE_SIZE=3)
@@ -538,9 +538,9 @@ class TestAssignmentResultsView(ResponseTest):
             table,
             [
                 [["Elev"], ["GroupTestPart1", "0-0", "1-1", "2-3", "4-4"], [], []],
-                [["1.", "Test Elev"], ["4"], [], []],
-                [["2."], ["1"], [], []],
-                [["3.", "Test Elev"], ["0"], [], []],
+                [[], ["1"], [], []],
+                [["Test Elev"], ["4"], [], []],
+                [["Test Elev"], ["0"], [], []],
                 [["Gennemsnit"], ["Middel", "Se detaljer"], [], []],
             ],
         )
@@ -561,9 +561,9 @@ class TestAssignmentResultsView(ResponseTest):
             table,
             [
                 [["Elev"], ["GroupTestPart1", "0-0", "1-1", "2-3", "4-4"], [], []],
-                [["1.", "Test Elev"], ["4"], [], []],
-                [["2."], ["1"], [], []],
-                [["3.", "Test Elev"], ["0"], [], []],
+                [[], ["1"], [], []],
+                [["Test Elev"], ["4"], [], []],
+                [["Test Elev"], ["0"], [], []],
                 [["Gennemsnit"], ["Middel", "Se detaljer"], [], []],
             ],
         )
@@ -714,7 +714,9 @@ class TestAssignmentResultsFlagView(ResponseTest):
             pk=self.test_assignment_class.pk,
             query_params={"sort": "student"},
         )
-        self.assertEqual(view.get_ordering(), ["rank"])
+        self.assertEqual(
+            view.get_ordering(), ["student__first_name", "student__last_name"]
+        )
 
         view = self.setup_view(
             AssignmentResultsView,
@@ -722,14 +724,18 @@ class TestAssignmentResultsFlagView(ResponseTest):
             pk=self.test_assignment_class.pk,
             query_params={"sort": "-student"},
         )
-        self.assertEqual(view.get_ordering(), ["-rank"])
+        self.assertEqual(
+            view.get_ordering(), ["-student__first_name", "-student__last_name"]
+        )
 
         view = self.setup_view(
             AssignmentResultsView,
             self.teacher,
             pk=self.test_assignment_class.pk,
         )
-        self.assertEqual(view.get_ordering(), ["rank"])
+        self.assertEqual(
+            view.get_ordering(), ["student__first_name", "student__last_name"]
+        )
 
     def test_access(self):
         self.assertEqual(
@@ -844,8 +850,8 @@ class TestAssignmentPartResultsView(ResponseTest):
                     ["Rigtighedsprocent"],
                     ["Normscore (0-100)"],
                 ],
-                [["2."], ["4"], ["1"], ["25%"], ["25"]],
-                [["1. Test Elev"], ["4"], ["4"], ["100%"], ["100"]],
+                [[], ["4"], ["1"], ["25%"], ["25"]],
+                [["Test Elev"], ["4"], ["4"], ["100%"], ["100"]],
             ],
         )
 
