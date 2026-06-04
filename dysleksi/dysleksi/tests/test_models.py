@@ -50,7 +50,7 @@ class TestUser(DysleksiTest):
         )
         cases: list[tuple[User, str]] = [
             (self.admin, f"Test Admin (type=Administrator, pk={self.admin.pk})"),
-            (self.student, f"Test Elev (type=Elev, pk={self.student.pk})"),
+            (self.student1, f"Test1 Elev (type=Elev, pk={self.student1.pk})"),
             (self.teacher, f"Test Lærer (type=Lærer, pk={self.teacher.pk})"),
             (
                 self.other_user,
@@ -64,7 +64,7 @@ class TestUser(DysleksiTest):
 
     def test_group(self):
         cases: list[tuple[User, str]] = [
-            (self.student, STUDENTS),
+            (self.student1, STUDENTS),
             (self.teacher, TEACHERS),
         ]
         for user, expected_groupname in cases:
@@ -99,7 +99,7 @@ class TestClass(DysleksiTest):
             self.inactive_user,
             self.not_logged_in_user,
             self.other_teacher,
-            self.student,
+            self.student1,
         ):
             self.assertQuerySetEqual(
                 Class.objects.filter_user_permissions(user, "view"),
@@ -113,16 +113,22 @@ class TestClass(DysleksiTest):
 
 
 class TestPartResponse(ResponseTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_parts()
+
     def test_str(self):
         test = Test.objects.create(name="Test")
         assignment = TestAssignment.objects.create(
             test=test,
             teacher=self.teacher,
-            student=self.student,
+            student=self.student1,
         )
         response = TestResponse(
             assignment=assignment,
-            student=self.student,
+            student=self.student1,
         )
         pr = PartResponse(testresponse=response)
         pr.finished_after = "World"
@@ -151,7 +157,7 @@ class TestPartResponse(ResponseTest):
             self.inactive_user,
             self.not_logged_in_user,
             self.other_teacher,
-            self.student,
+            self.student1,
         ):
             self.assertQuerySetEqual(
                 PartResponse.objects.filter_user_permissions(user, "view"),
@@ -169,16 +175,22 @@ class TestPartResponse(ResponseTest):
 
 
 class TestQuestionResponse(ResponseTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_parts()
+
     def test_str(self):
         test = Test.objects.create(name="Test")
         assignment = TestAssignment.objects.create(
             test=test,
             teacher=self.teacher,
-            student=self.student,
+            student=self.student1,
         )
         response = TestResponse(
             assignment=assignment,
-            student=self.student,
+            student=self.student1,
         )
         pr = PartResponse(testresponse=response)
         question = TestQuestion.objects.create(part=self.part, challenge=self.resource1)
@@ -199,7 +211,7 @@ class TestQuestionResponse(ResponseTest):
             self.inactive_user,
             self.not_logged_in_user,
             self.other_teacher,
-            self.student,
+            self.student1,
         ):
             self.assertQuerySetEqual(
                 QuestionResponse.objects.filter_user_permissions(user, "view"),
@@ -279,9 +291,15 @@ class TestPlannedDateTime(DysleksiTest):
 
 
 class TestTestAssignment(ResponseTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_parts()
+
     def test_str(self):
         test = Test.objects.create(name="Test")
-        ta = TestAssignment(test=test, teacher=self.teacher, student=self.student)
+        ta = TestAssignment(test=test, teacher=self.teacher, student=self.student1)
         self.assertTrue(
             str(ta) == f"{ta.test.name}/{str(ta.teacher)} ({str(ta.student)})"
         )
@@ -314,7 +332,7 @@ class TestTestAssignment(ResponseTest):
             self.inactive_user,
             self.not_logged_in_user,
             self.other_teacher,
-            self.student,
+            self.student1,
         ):
             self.assertQuerySetEqual(
                 PartResponse.objects.filter_user_permissions(user, "view"),
@@ -337,14 +355,14 @@ class TestTestResponse(ResponseTest):
         assignment = TestAssignment.objects.create(
             test=test,
             teacher=self.teacher,
-            student=self.student,
+            student=self.student1,
         )
         response = TestResponse(
             assignment=assignment,
-            student=self.student,
+            student=self.student1,
         )
         self.assertEqual(
-            str(response), f"{str(response.assignment)} / {str(self.student)}"
+            str(response), f"{str(response.assignment)} / {str(self.student1)}"
         )
 
     def test_validation_1(self):
@@ -352,7 +370,7 @@ class TestTestResponse(ResponseTest):
         assignment = TestAssignment.objects.create(
             test=test,
             teacher=self.teacher,
-            student=self.student,
+            student=self.student1,
         )
         student2 = self.create_student("TestStudent2")
 
@@ -376,7 +394,7 @@ class TestTestResponse(ResponseTest):
             klasse=self.klasse,
         )
         klasse2 = self.create_class(2025, "1.B")
-        student2 = self.create_student("TestStudent2")
+        student2 = self.create_student("SomeOtherStudent")
         klasse2.students.add(student2)
 
         with self.assertRaises(ValidationError) as cm:
@@ -402,12 +420,12 @@ class TestTestResponse(ResponseTest):
         assignment = TestAssignment.objects.create(
             test=test,
             teacher=self.teacher,
-            student=self.student,
+            student=self.student1,
         )
 
         response = TestResponse(
             assignment=assignment,
-            student=self.student,
+            student=self.student1,
         )
         response.full_clean()
 
@@ -421,7 +439,7 @@ class TestTestResponse(ResponseTest):
 
         response = TestResponse(
             assignment=assignment,
-            student=self.student,
+            student=self.student1,
         )
         response.full_clean()
 
@@ -438,7 +456,7 @@ class TestTestResponse(ResponseTest):
             self.inactive_user,
             self.not_logged_in_user,
             self.other_teacher,
-            self.student,
+            self.student1,
         ):
             self.assertQuerySetEqual(
                 TestResponse.objects.filter_user_permissions(user, "view"),
@@ -473,6 +491,12 @@ class TestTestResource(DysleksiTest):
 
 
 class TestTestQuestion(ResponseTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_parts()
+
     def test_str(self):
         question = TestQuestion.objects.create(part=self.part, challenge=self.resource1)
         quest_str = f"{str(question.part)} / {question.pk}"
@@ -502,6 +526,12 @@ class TestTestQuestion(ResponseTest):
 
 
 class TestPossibleAnswer(DysleksiTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_parts()
+
     def test_str(self):
         question = TestQuestion.objects.create(part=self.part, challenge=self.resource1)
         pa = PossibleAnswer.objects.create(
@@ -511,6 +541,11 @@ class TestPossibleAnswer(DysleksiTest):
 
 
 class TestTest(DysleksiTest):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_parts()
+
     def test_str(self):
         test = Test(name="StrTest")
         self.assertTrue(str(test) == "StrTest")
@@ -616,10 +651,11 @@ class TestMessage(DysleksiTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        cls.create_parts()
         cls.individual_assignment = TestAssignment.objects.create(
             test=cls.individual_test,
             teacher=cls.teacher,
-            student=cls.student,
+            student=cls.student1,
         )
         cls.group_assignment = TestAssignment.objects.create(
             test=cls.group_test,
@@ -638,12 +674,12 @@ class TestMessage(DysleksiTest):
                 "choiceId": self.possible_correct_answer1.pk,
                 "duration": 10000,
             },
-            user=self.student,
+            user=self.student1,
         )
         message.handle()
         testresponse = TestResponse.objects.filter(
             assignment__pk=self.individual_assignment.pk,
-            student__pk=self.student.pk,
+            student__pk=self.student1.pk,
         ).first()
         self.assertIsNotNone(testresponse)
 
@@ -681,12 +717,12 @@ class TestMessage(DysleksiTest):
                     f'data:audio/mp3; codecs="mpeg, mp4a.40.2";base64,{sound_base64}'
                 ),
             },
-            user=self.student,
+            user=self.student1,
         )
         message.handle()
         testresponse = TestResponse.objects.filter(
             assignment__pk=self.individual_assignment.pk,
-            student__pk=self.student.pk,
+            student__pk=self.student1.pk,
         ).first()
         self.assertIsNotNone(testresponse)
 
@@ -698,7 +734,7 @@ class TestMessage(DysleksiTest):
 
         questionresponse = QuestionResponse.objects.filter(
             partresponse__testresponse__assignment__pk=self.individual_assignment.pk,
-            partresponse__testresponse__student__pk=self.student.pk,
+            partresponse__testresponse__student__pk=self.student1.pk,
             partresponse__testpart=self.part,
             question__pk=self.question1.pk,
         ).first()
@@ -721,7 +757,7 @@ class TestMessage(DysleksiTest):
                 "choiceId": self.possible_correct_answer1.pk,
                 "duration": 10000,
             },
-            user=self.student,
+            user=self.student1,
         )
         message.handle()
         self.assertEqual(message.error, f"No questionId in message {message.uuid}")
@@ -736,12 +772,12 @@ class TestMessage(DysleksiTest):
                 "partId": self.part.pk,
                 "duration": 10000,
             },
-            user=self.student,
+            user=self.student1,
         )
         message.handle()
         testresponse = TestResponse.objects.filter(
             assignment=self.individual_assignment,
-            student=self.student,
+            student=self.student1,
         ).first()
         self.assertIsNotNone(testresponse)
 
@@ -761,7 +797,7 @@ class TestMessage(DysleksiTest):
                 "partIndex": 0,
                 "duration": 10000,
             },
-            user=self.student,
+            user=self.student1,
         )
         message.handle()
         self.assertEqual(message.error, f"No partId in message {message.uuid}")
@@ -773,12 +809,12 @@ class TestMessage(DysleksiTest):
             data={
                 "assignmentId": self.individual_assignment.pk,
             },
-            user=self.student,
+            user=self.student1,
         )
         message.handle()
         testresponse = TestResponse.objects.filter(
             assignment=self.individual_assignment,
-            student=self.student,
+            student=self.student1,
         ).first()
         self.assertIsNotNone(testresponse)
         self.assertTrue(testresponse.completed)
@@ -788,7 +824,7 @@ class TestMessage(DysleksiTest):
             uuid=uuid4(),
             event="test.complete",
             data={},
-            user=self.student,
+            user=self.student1,
         )
         message.handle()
         self.assertEqual(message.error, f"No assignmentId in message {message.uuid}")
@@ -800,16 +836,16 @@ class TestMessage(DysleksiTest):
             data={"assignmentId": self.individual_assignment.pk},
             user=self.teacher,
         )
-        self.assertEqual(message.student, self.student)
+        self.assertEqual(message.student, self.student1)
 
     def test_student_from_message(self):
         message = Message.objects.create(
             uuid=uuid4(),
             event="test.event",
             data={"assignmentId": self.group_assignment.pk},
-            user=self.student,
+            user=self.student1,
         )
-        self.assertEqual(message.student, self.student)
+        self.assertEqual(message.student, self.student1)
 
     def test_no_student(self):
         message = Message.objects.create(
@@ -822,6 +858,12 @@ class TestMessage(DysleksiTest):
 
 
 class TestInstructionSequence(DysleksiTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_parts()
+
     def test_str(self):
         seq = InstructionSequence.objects.create(question=self.question1)
 
@@ -866,6 +908,12 @@ class TestInstructionSequence(DysleksiTest):
 
 
 class TestInstruction(DysleksiTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_parts()
+
     def test_str(self):
         seq = InstructionSequence.objects.create(question=self.question1)
 
@@ -1129,9 +1177,10 @@ class TestTestResponseQuerySet(ResponseTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        cls.create_parts()
 
         cls.qs = TestResponse.objects.filter(
-            pk__in=(cls.group_testresponse_1.pk, cls.group_testresponse_2.pk)
+            pk__in=(cls.test_response_class_1.pk, cls.test_response_class_2.pk)
         ).order_by("student__pk")
 
     def test_annotate_correct_count(self):
@@ -1251,6 +1300,7 @@ class TestPartResponseQuerySet(ResponseTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        cls.create_parts()
 
         cls.qs: TestPartResponseQuerySet = PartResponse.objects.filter(
             pk__in=(cls.group_partresponse_1.pk, cls.group_partresponse_2.pk)

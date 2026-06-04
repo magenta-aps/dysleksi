@@ -137,12 +137,14 @@
                 </tr>
                 <tr>
                     {% for part_pk, part_naming in part_names.items %}
-                        {% with part_name=part_naming.0 subpart_names=part_naming.1 %}
+                        {% with part_name=part_naming.0 subpart_names=part_naming.1 answered=part_naming.2 %}
                         <td class="plot-x-scale-text" colspan="{{ subpart_names|length }}">
                             <div>{{ part_name }}</div>
-                            <a href="{% url 'dysleksi:test_assignment_part_result' assignment_pk=object.assignment_id testpart_pk=part_pk testresponse_pk=object.pk %}">
-                                {% translate "Se elevens svar" %}
-                            </a>
+                            {% if answered %}
+                                <a href="{% url 'dysleksi:test_assignment_part_result' assignment_pk=object.assignment_id testpart_pk=part_pk testresponse_pk=object.pk %}">
+                                    {% translate "Se elevens svar" %}
+                                </a>
+                            {% endif %}
                         </td>
                         {% endwith %}
                     {% endfor %}

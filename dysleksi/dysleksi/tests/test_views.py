@@ -46,7 +46,7 @@ class TestUserTypeMixin(DysleksiTest):
         class UserTypeView(UserTypeMixin, View):
             pass
 
-        view = self.setup_view(UserTypeView, self.student, False)
+        view = self.setup_view(UserTypeView, self.student1, False)
         self.assertEqual(view.get_template_names(), ["dysleksi/student.html"])
 
 
@@ -54,7 +54,7 @@ class TestRootView(DysleksiTest):
     def test_get_template_names(self):
         cases: list[tuple[User, str | None]] = [
             (self.teacher, "dysleksi/lobby/teacher.html"),
-            (self.student, "dysleksi/lobby/student.html"),
+            (self.student1, "dysleksi/lobby/student.html"),
             (self.admin, "dysleksi/lobby/staff.html"),
             (self.other_user, "dysleksi/lobby/other.html"),
         ]
@@ -66,7 +66,7 @@ class TestRootView(DysleksiTest):
     def test_get_context_data(self):
         cases: list[tuple[User, list[str]]] = [
             (self.teacher, []),
-            (self.student, ["student", "open_assignments"]),
+            (self.student1, ["student", "open_assignments"]),
             (AnonymousUser(), []),
         ]
         for user, context_keys in cases:
@@ -80,8 +80,8 @@ class TestRootView(DysleksiTest):
                     self.assertIsInstance(context_data, dict)
 
     def test_open_assignments_for_student(self):
-        # In the default test setup, `self.student` has an open test assignment
-        view = self.setup_view(RootView, self.student)
+        # In the default test setup, `self.student1` has an open test assignment
+        view = self.setup_view(RootView, self.student1)
         open_assignments = view.get_context_data()["open_assignments"]
         self.assertTrue(open_assignments)
 
@@ -100,11 +100,11 @@ class TestAssignmentView(DysleksiTest):
             test=cls.test, teacher=cls.teacher, klasse=cls.klasse
         )
         cls.assignment2 = TestAssignment.objects.create(
-            test=cls.test2, teacher=cls.teacher, student=cls.student
+            test=cls.test2, teacher=cls.teacher, student=cls.student1
         )
 
     def test_get_template_names(self):
-        cases: list[tuple[User, str | None, TestAssignment]] = [
+        cases: list[tuple[User, str, str, TestAssignment]] = [
             (
                 self.teacher,
                 "dysleksi/admin/test_assignment/detail_individual.html",
@@ -112,7 +112,7 @@ class TestAssignmentView(DysleksiTest):
                 self.assignment2,
             ),
             (
-                self.student,
+                self.student1,
                 "dysleksi/screening/student.html",
                 "student_123",
                 self.assignment2,
@@ -124,7 +124,7 @@ class TestAssignmentView(DysleksiTest):
                 self.assignment1,
             ),
             (
-                self.student,
+                self.student1,
                 "dysleksi/screening/student.html",
                 "class_123",
                 self.assignment1,
@@ -163,7 +163,7 @@ class TestAssignmentView(DysleksiTest):
 
     def test_access(self):
         for assignment in (self.assignment1, self.assignment2):
-            for user in (self.admin, self.teacher, self.student, self.privileged_user):
+            for user in (self.admin, self.teacher, self.student1, self.privileged_user):
                 self.setup_view(
                     AssignmentView,
                     user,
@@ -217,7 +217,7 @@ class TestClassListView(DysleksiTest):
         )
 
     def test_student_view(self):
-        self.client.force_login(self.student)
+        self.client.force_login(self.student1)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
@@ -254,12 +254,17 @@ class TestStudentListView(DysleksiTest):
         )
 
     def test_student_view(self):
-        self.client.force_login(self.student)
+        self.client.force_login(self.student1)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
 
-class TestTestAssignmentListView(DysleksiTest):
+class TestTestAssignmentListView(ResponseTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_parts()
 
     url = reverse("dysleksi:test_assignment_list")
 
@@ -309,12 +314,14 @@ class TestTestAssignmentListView(DysleksiTest):
         )
 
     def test_student_view(self):
-        self.client.force_login(self.student)
+        self.client.force_login(self.student1)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
     def test_queryset_annotations(self):
         # Arrange
+        # Let there be only one TestResponse to group assignment
+        self.test_response_class_2.delete()
         view = self.setup_view(TestAssignmentListView, self.teacher)
         objs = view.get_context_data()["object_list"]
         # Assert
@@ -324,7 +331,7 @@ class TestTestAssignmentListView(DysleksiTest):
                 # Individual student test assignment
                 (1, 1, TestAssignmentStatus.COMPLETED),
                 # Group test assignment
-                (3, 1, TestAssignmentStatus.IN_PROGRESS),
+                (2, 1, TestAssignmentStatus.IN_PROGRESS),
             ],
             ordered=False,
             transform=lambda obj: (
@@ -339,6 +346,7 @@ class TestStartRoomView(DysleksiTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        super().create_parts()
         cls.group_test_part_2, _ = TestPart.objects.get_or_create(
             name="GroupTestPart2",
             timeout=60000,
@@ -348,7 +356,7 @@ class TestStartRoomView(DysleksiTest):
 
     def test_create_individual_room_immediate(self):
         data = {
-            "student": self.student.id,
+            "student": self.student1.id,
             "test": self.individual_test.id,
             "test_parts": [],
             "is_test_part": "test",
@@ -367,7 +375,7 @@ class TestStartRoomView(DysleksiTest):
 
     def test_create_individual_room_planned_date_time(self):
         data = {
-            "student": self.student.id,
+            "student": self.student1.id,
             "test": self.individual_test.id,
             "test_parts": [],
             "is_test_part": "test",
@@ -386,7 +394,7 @@ class TestStartRoomView(DysleksiTest):
 
     def test_create_individual_room_test_parts(self):
         data = {
-            "student": self.student.id,
+            "student": self.student1.id,
             "test": self.individual_test.id,
             "test_parts": [str(self.part.pk)],
             "is_test_part": "part",
@@ -468,6 +476,11 @@ class TestStartRoomView(DysleksiTest):
 
 class TestAssignmentResultsView(ResponseTest):
 
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_parts()
+
     def test_by_category(self):
         view = self.setup_view(
             AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk
@@ -491,11 +504,11 @@ class TestAssignmentResultsView(ResponseTest):
             ),
         )
         self.assertIn(
-            self.group_testresponse_1, by_category[3]["items"]
-        )  # group_testresponse_1 er over middel
+            self.test_response_class_1, by_category[3]["items"]
+        )  # test_response_class_1 er over middel
         self.assertIn(
-            self.group_testresponse_2, by_category[1]["items"]
-        )  # group_testresponse_2 er under middel
+            self.test_response_class_2, by_category[1]["items"]
+        )  # test_response_class_2 er under middel
 
     def test_table(self):
         view = self.setup_view(
@@ -506,23 +519,19 @@ class TestAssignmentResultsView(ResponseTest):
         qs = table.data.data
 
         part1_key = f"part_{self.group_test_part.pk}_correct"
-
         first = qs[0]
-        self.assertEqual(first.rank, 2)
-        self.assertEqual(getattr(first, f"{part1_key}_count"), 1)
-        self.assertEqual(getattr(first, f"{part1_key}_proportion"), 0.25)
+        self.assertEqual(getattr(first, f"{part1_key}_count"), 4)
+        self.assertEqual(getattr(first, f"{part1_key}_proportion"), 1.0)
         self.assertEqual(
             getattr(first, f"{part1_key}_category"),
-            CorrectnessCategory.objects.get(color_key="yellow").pk,
+            CorrectnessCategory.objects.get(color_key="blue").pk,
         )
-
         second = qs[1]
-        self.assertEqual(second.rank, 1)
-        self.assertEqual(getattr(second, f"{part1_key}_count"), 4)
-        self.assertEqual(getattr(second, f"{part1_key}_proportion"), 1.0)
+        self.assertEqual(getattr(second, f"{part1_key}_count"), 1)
+        self.assertEqual(getattr(second, f"{part1_key}_proportion"), 0.25)
         self.assertEqual(
             getattr(second, f"{part1_key}_category"),
-            CorrectnessCategory.objects.get(color_key="blue").pk,
+            CorrectnessCategory.objects.get(color_key="yellow").pk,
         )
 
     @override_settings(RESULT_TABLE_SIZE=3)
@@ -538,9 +547,8 @@ class TestAssignmentResultsView(ResponseTest):
             table,
             [
                 [["Elev"], ["GroupTestPart1", "0-0", "1-1", "2-3", "4-4"], [], []],
-                [[], ["1"], [], []],
-                [["Test Elev"], ["4"], [], []],
-                [["Test Elev"], ["0"], [], []],
+                [["Test1 Elev"], ["4"], [], []],
+                [["Test2 Elev"], ["1"], [], []],
                 [["Gennemsnit"], ["Middel", "Se detaljer"], [], []],
             ],
         )
@@ -561,9 +569,8 @@ class TestAssignmentResultsView(ResponseTest):
             table,
             [
                 [["Elev"], ["GroupTestPart1", "0-0", "1-1", "2-3", "4-4"], [], []],
-                [[], ["1"], [], []],
-                [["Test Elev"], ["4"], [], []],
-                [["Test Elev"], ["0"], [], []],
+                [["Test1 Elev"], ["4"], [], []],
+                [["Test2 Elev"], ["1"], [], []],
                 [["Gennemsnit"], ["Middel", "Se detaljer"], [], []],
             ],
         )
@@ -620,7 +627,7 @@ class TestAssignmentResultsView(ResponseTest):
         )
 
     def test_access(self):
-        for user in (self.teacher, self.student):
+        for user in (self.teacher, self.student1):
             self.setup_view(
                 AssignmentResultsView, user, pk=self.test_assignment_class.pk
             )
@@ -655,6 +662,11 @@ class TestAssignmentResultsView(ResponseTest):
 
 class TestAssignmentResultsFlagView(ResponseTest):
 
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        super().create_parts()
+
     def request(self, user: User, method: str, pk: int, data: dict | None = None):
         request_factory = RequestFactory()
         path = reverse("dysleksi:test_response_flag", kwargs={"pk": pk})
@@ -671,23 +683,23 @@ class TestAssignmentResultsFlagView(ResponseTest):
         return view
 
     def test_set_true(self):
-        self.group_testresponse_1.flagged = False
-        self.group_testresponse_1.save()
+        self.test_response_class_1.flagged = False
+        self.test_response_class_1.save()
         view = self.request(
-            self.teacher, "post", self.group_testresponse_1.pk, {"flagged": "true"}
+            self.teacher, "post", self.test_response_class_1.pk, {"flagged": "true"}
         )
-        self.group_testresponse_1.refresh_from_db()
-        self.assertTrue(self.group_testresponse_1.flagged)
+        self.test_response_class_1.refresh_from_db()
+        self.assertTrue(self.test_response_class_1.flagged)
         self.assertEqual(json.loads(view.response.content), {"flagged": True})
 
     def test_set_false(self):
-        self.group_testresponse_1.flagged = True
-        self.group_testresponse_1.save()
+        self.test_response_class_1.flagged = True
+        self.test_response_class_1.save()
         view = self.request(
-            self.teacher, "post", self.group_testresponse_1.pk, {"flagged": "false"}
+            self.teacher, "post", self.test_response_class_1.pk, {"flagged": "false"}
         )
-        self.group_testresponse_1.refresh_from_db()
-        self.assertFalse(self.group_testresponse_1.flagged)
+        self.test_response_class_1.refresh_from_db()
+        self.assertFalse(self.test_response_class_1.flagged)
         self.assertEqual(json.loads(view.response.content), {"flagged": False})
 
     def test_get_ordering(self):
@@ -740,32 +752,37 @@ class TestAssignmentResultsFlagView(ResponseTest):
     def test_access(self):
         self.assertEqual(
             self.request(
-                self.teacher, "get", self.group_testresponse_1.pk
+                self.teacher, "get", self.test_response_class_1.pk
             ).response.status_code,
             200,
         )
         self.assertEqual(
             self.request(
-                self.teacher, "post", self.group_testresponse_1.pk, {"flagged": "true"}
+                self.teacher, "post", self.test_response_class_1.pk, {"flagged": "true"}
             ).response.status_code,
             200,
         )
         for user in (
-            self.student,
+            self.student1,
             self.other_user,
             self.other_teacher,
             self.inactive_user,
         ):
             with self.assertRaises(PermissionDenied, msg=user.username):
-                self.request(user, "get", self.group_testresponse_1.pk)
+                self.request(user, "get", self.test_response_class_1.pk)
 
             with self.assertRaises(PermissionDenied):
                 self.request(
-                    user, "post", self.group_testresponse_1.pk, {"flagged": "true"}
+                    user, "post", self.test_response_class_1.pk, {"flagged": "true"}
                 )
 
 
 class TestAssignmentPartResultsView(ResponseTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        super().create_parts()
 
     def test_table(self):
         view = self.setup_view(
@@ -781,14 +798,14 @@ class TestAssignmentPartResultsView(ResponseTest):
         answer2 = qs[1]
 
         self.assertEqual(answer1.responses_count, 4)
-        self.assertEqual(answer1.correct_count, 1)
-        self.assertEqual(answer1.correct_proportion, 0.25)
-        self.assertEqual(answer1.correct_percentage, 25)
+        self.assertEqual(answer1.correct_count, 4)
+        self.assertEqual(answer1.correct_proportion, 1.0)
+        self.assertEqual(answer1.correct_percentage, 100)
 
         self.assertEqual(answer2.responses_count, 4)
-        self.assertEqual(answer2.correct_count, 4)
-        self.assertEqual(answer2.correct_proportion, 1.0)
-        self.assertEqual(answer2.correct_percentage, 100)
+        self.assertEqual(answer2.correct_count, 1)
+        self.assertEqual(answer2.correct_proportion, 0.25)
+        self.assertEqual(answer2.correct_percentage, 25)
 
     def test_get_ordering(self):
         view = self.setup_view(
@@ -850,8 +867,8 @@ class TestAssignmentPartResultsView(ResponseTest):
                     ["Rigtighedsprocent"],
                     ["Normscore (0-100)"],
                 ],
-                [[], ["4"], ["1"], ["25%"], ["25"]],
-                [["Test Elev"], ["4"], ["4"], ["100%"], ["100"]],
+                [["Test1 Elev"], ["4"], ["4"], ["100%"], ["100"]],
+                [["Test2 Elev"], ["4"], ["1"], ["25%"], ["25"]],
             ],
         )
 
@@ -863,7 +880,7 @@ class TestAssignmentPartResultsView(ResponseTest):
             testpart_pk=self.group_test_part.pk,
         )
         for user in (
-            self.student,
+            self.student1,
             self.other_user,
             self.other_teacher,
             self.inactive_user,
@@ -887,23 +904,48 @@ class TestTestResponseView(ResponseTest):
         cls.create_sentencereading_part(True)
 
     @override_settings(RESULT_TABLE_SIZE=3)
-    def test_table(self):
+    def test_table_group(self):
+
+        self.create_wordspelling_part(False)
+        self.create_sentencereading_part(False)
+
         view = self.setup_view(
             TestResponseView,
             self.teacher,
             assignment_pk=self.test_assignment_class.pk,
-            response_pk=self.group_testresponse_1.pk,
+            response_pk=self.test_response_class_1.pk,
         )
         table = view.get_table()
         self.assertTrue(isinstance(table, StudentTestResponseTable))
-        part_key = f"part_{self.group_test_part.pk}"
+        part_key_1 = f"part_{self.wordspelling_part.pk}"
+        part_key_2 = f"part_{self.sentencereading_part.pk}"
         self.assertEqual(
             table.data.data,
             [
-                {"data_category": "Antal forsøgte", part_key: 4},
-                {"data_category": "Antal rigtige", part_key: 4},
-                {"data_category": "Rigtighedsprocent", part_key: "100 %"},
-                {"data_category": "Normscore", part_key: "100 %"},
+                {
+                    "data_category": "Antal forsøgte",
+                    f"{part_key_1}_lette_ord": 1,
+                    f"{part_key_1}_nemme_ord": 1,
+                    part_key_2: 1,
+                },
+                {
+                    "data_category": "Antal rigtige",
+                    f"{part_key_1}_lette_ord": 0,
+                    f"{part_key_1}_nemme_ord": 1,
+                    part_key_2: 1,
+                },
+                {
+                    "data_category": "Rigtighedsprocent",
+                    f"{part_key_1}_lette_ord": "0 %",
+                    f"{part_key_1}_nemme_ord": "100 %",
+                    part_key_2: "100 %",
+                },
+                {
+                    "data_category": "Normscore",
+                    f"{part_key_1}_lette_ord": "0 %",
+                    f"{part_key_1}_nemme_ord": "50 %",
+                    part_key_2: "50 %",
+                },
             ],
         )
         self.assertEqual(
@@ -913,18 +955,87 @@ class TestTestResponseView(ResponseTest):
                 )
                 for column in table.columns
             ],
-            ["Bedømmelse", "Over middel;Se elevens svar", "", ""],
+            [
+                "Bedømmelse",
+                "Elendigt;Se elevens svar",
+                "Over middel;Se elevens svar",
+                "Over middel;Se elevens svar",
+                "",
+            ],
+        )
+
+    @override_settings(RESULT_TABLE_SIZE=3)
+    def test_table_individual_unanswered(self):
+        self.sentencereading_part.partresponses.all().delete()
+        view = self.setup_view(
+            TestResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_student.pk,
+            response_pk=self.test_response_student.pk,
+        )
+        table = view.get_table()
+        self.assertTrue(isinstance(table, StudentTestResponseTable))
+        part_key_1 = f"part_{self.wordspelling_part.pk}"
+        part_key_2 = f"part_{self.sentencereading_part.pk}"
+        self.assertEqual(
+            table.data.data,
+            [
+                {
+                    "data_category": "Antal forsøgte",
+                    f"{part_key_1}_lette_ord": 1,
+                    f"{part_key_1}_nemme_ord": 1,
+                    part_key_2: None,
+                },
+                {
+                    "data_category": "Antal oversprungne",
+                    f"{part_key_1}_lette_ord": 1,
+                    f"{part_key_1}_nemme_ord": 0,
+                    part_key_2: None,
+                },
+                {
+                    "data_category": "Antal rigtige",
+                    f"{part_key_1}_lette_ord": 0,
+                    f"{part_key_1}_nemme_ord": 1,
+                    part_key_2: None,
+                },
+                {
+                    "data_category": "Rigtighedsprocent",
+                    f"{part_key_1}_lette_ord": "0 %",
+                    f"{part_key_1}_nemme_ord": "100 %",
+                    part_key_2: None,
+                },
+                {
+                    "data_category": "Normscore",
+                    f"{part_key_1}_lette_ord": "0 %",
+                    f"{part_key_1}_nemme_ord": "100 %",
+                    part_key_2: None,
+                },
+            ],
+        )
+        self.assertEqual(
+            [
+                BeautifulSoup(str(column.footer), "html.parser").get_text(
+                    separator=";", strip=True
+                )
+                for column in table.columns
+            ],
+            [
+                "Bedømmelse",
+                "Over middel;Se elevens svar",
+                "Elendigt;Se elevens svar",
+                "Ikke fuldført;Se elevens svar",
+                "",
+            ],
         )
 
     @override_settings(RESULT_TABLE_SIZE=3)
     def test_only_table(self):
-        print("test_only_table")
         view = self.setup_view(
             TestResponseView,
             self.teacher,
             query_params={"only_table": "true"},
-            assignment_pk=self.test_assignment_class.pk,
-            response_pk=self.group_testresponse_1.pk,
+            assignment_pk=self.test_assignment_student.pk,
+            response_pk=self.test_response_student.pk,
         )
         response = view.response
         soup = BeautifulSoup(response.content, "html.parser")
@@ -932,13 +1043,20 @@ class TestTestResponseView(ResponseTest):
         self.assertEqual(
             table,
             [
-                [[], ["GroupTestPart1 (4 opg.)"], [], []],
-                [],
-                [["Antal forsøgte"], ["4"], [], []],
-                [["Antal rigtige"], ["4"], [], []],
-                [["Rigtighedsprocent"], ["100 %"], [], []],
-                [["Normscore"], ["100 %"], [], []],
-                [["Bedømmelse"], ["Over middel", "Se elevens svar"], [], []],
+                [[], ["WordSpelling (2 opg.)"], ["SentenceReading (1 opg.)"], []],
+                [["Lette ord (1 opg.)"], ["Nemme ord (1 opg.)"]],
+                [["Antal forsøgte"], ["1"], ["1"], ["1"], []],
+                [["Antal oversprungne"], ["1"], ["0"], ["0"], []],
+                [["Antal rigtige"], ["0"], ["1"], ["1"], []],
+                [["Rigtighedsprocent"], ["0 %"], ["100 %"], ["100 %"], []],
+                [["Normscore"], ["0 %"], ["100 %"], ["100 %"], []],
+                [
+                    ["Bedømmelse"],
+                    ["Over middel", "Se elevens svar"],
+                    ["Elendigt", "Se elevens svar"],
+                    ["Elendigt", "Se elevens svar"],
+                    [],
+                ],
             ],
         )
 
@@ -946,11 +1064,11 @@ class TestTestResponseView(ResponseTest):
         self.setup_view(
             TestResponseView,
             self.teacher,
-            assignment_pk=self.test_assignment_class.pk,
-            response_pk=self.group_testresponse_1.pk,
+            assignment_pk=self.test_assignment_student.pk,
+            response_pk=self.test_response_student.pk,
         )
         for user in (
-            self.student,
+            self.student1,
             self.other_user,
             self.other_teacher,
             self.inactive_user,
@@ -960,8 +1078,8 @@ class TestTestResponseView(ResponseTest):
                 self.setup_view(
                     TestResponseView,
                     user,
-                    assignment_pk=self.test_assignment_class.pk,
-                    response_pk=self.group_testresponse_1.pk,
+                    assignment_pk=self.test_assignment_student.pk,
+                    response_pk=self.test_response_student.pk,
                 )
 
     @override_settings(RESULT_TABLE_SIZE=2)
@@ -1057,10 +1175,26 @@ class TestTestResponseView(ResponseTest):
         self.assertEqual(
             view.get_part_names(),
             {
-                self.wordspelling_part.pk: ("TestPart1", ["Lette ord", "Nemme ord"]),
-                self.sentencereading_part.pk: ("GroupTestPart2", [None]),
+                self.wordspelling_part.pk: (
+                    "WordSpelling",
+                    ["Lette ord", "Nemme ord"],
+                    True,
+                ),
+                self.sentencereading_part.pk: ("SentenceReading", [None], True),
             },
         )
+
+    # def test_unanswered(self):
+    #     # self.sentencereading_partresponse_1.delete()
+    #     view = self.setup_view(
+    #         TestResponseView,
+    #         self.teacher,
+    #         assignment_pk=self.test_assignment_student.pk,
+    #         response_pk=self.test_response_student.pk,
+    #     )
+    #     print(view.get_plot_data())
+    #     print(view.get_table().data)
+    #     self.assertEqual(view.get_plot_data(), [0, 100, 100])
 
 
 class TestPartResponseView(ResponseTest):
@@ -1068,6 +1202,7 @@ class TestPartResponseView(ResponseTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        super().create_parts()
         cls.create_sentencereading_part(False)
 
     def test_get_object(self):
@@ -1075,7 +1210,7 @@ class TestPartResponseView(ResponseTest):
             PartResponseView,
             self.teacher,
             assignment_pk=self.test_assignment_class.pk,
-            testresponse_pk=self.group_testresponse_1.pk,
+            testresponse_pk=self.test_response_class_1.pk,
             testpart_pk=self.group_test_part.pk,
         )
         object = view.get_object()
@@ -1091,7 +1226,7 @@ class TestPartResponseView(ResponseTest):
             PartResponseView,
             self.teacher,
             assignment_pk=self.test_assignment_class.pk,
-            testresponse_pk=self.group_testresponse_2.pk,
+            testresponse_pk=self.test_response_class_2.pk,
             testpart_pk=self.group_test_part.pk,
         )
         object = view.get_object()
@@ -1109,7 +1244,7 @@ class TestPartResponseView(ResponseTest):
                 PartResponseView,
                 self.teacher,
                 assignment_pk=self.test_assignment_class.pk,
-                testresponse_pk=self.group_testresponse_1.pk,
+                testresponse_pk=self.test_response_class_1.pk,
                 testpart_pk=self.group_test_part.pk + 100,
             )
 
@@ -1124,7 +1259,7 @@ class TestPartResponseView(ResponseTest):
             PartResponseView,
             self.teacher,
             assignment_pk=self.test_assignment_class.pk,
-            testresponse_pk=self.group_testresponse_1.pk,
+            testresponse_pk=self.test_response_class_1.pk,
             testpart_pk=self.group_test_part.pk,
         )
         context = view.get_context_data()
@@ -1165,7 +1300,7 @@ class TestPartResponseView(ResponseTest):
             PartResponseView,
             self.teacher,
             assignment_pk=self.test_assignment_class.pk,
-            testresponse_pk=self.group_testresponse_1.pk,
+            testresponse_pk=self.test_response_class_1.pk,
             testpart_pk=self.group_test_part.pk,
         )
         context = view.get_context_data()
@@ -1201,7 +1336,7 @@ class TestPartResponseView(ResponseTest):
             PartResponseView,
             self.teacher,
             assignment_pk=self.test_assignment_class.pk,
-            testresponse_pk=self.group_testresponse_1.pk,
+            testresponse_pk=self.test_response_class_1.pk,
             testpart_pk=self.group_test_part.pk,
         )
         context = view.get_context_data()
@@ -1239,7 +1374,7 @@ class TestPartResponseView(ResponseTest):
             PartResponseView,
             self.teacher,
             assignment_pk=self.test_assignment_class.pk,
-            testresponse_pk=self.group_testresponse_1.pk,
+            testresponse_pk=self.test_response_class_1.pk,
             testpart_pk=self.group_test_part.pk,
         )
         context = view.get_context_data()
@@ -1276,7 +1411,7 @@ class TestPartResponseView(ResponseTest):
             PartResponseView,
             self.teacher,
             assignment_pk=self.test_assignment_class.pk,
-            testresponse_pk=self.group_testresponse_1.pk,
+            testresponse_pk=self.test_response_class_1.pk,
             testpart_pk=self.group_test_part.pk,
         )
         context = view.get_context_data()
@@ -1289,7 +1424,7 @@ class TestPartResponseView(ResponseTest):
             PartResponseView,
             self.teacher,
             assignment_pk=self.test_assignment_class.pk,
-            testresponse_pk=self.group_testresponse_1.pk,
+            testresponse_pk=self.test_response_class_1.pk,
             testpart_pk=self.sentencereading_part.pk,
         )
         context = view.get_context_data()
@@ -1301,11 +1436,11 @@ class TestPartResponseView(ResponseTest):
             PartResponseView,
             self.teacher,
             assignment_pk=self.test_assignment_class.pk,
-            testresponse_pk=self.group_testresponse_1.pk,
+            testresponse_pk=self.test_response_class_1.pk,
             testpart_pk=self.group_test_part.pk,
         )
         for user in (
-            self.student,
+            self.student1,
             self.other_user,
             self.other_teacher,
             self.inactive_user,
@@ -1316,7 +1451,7 @@ class TestPartResponseView(ResponseTest):
                     PartResponseView,
                     user,
                     assignment_pk=self.test_assignment_class.pk,
-                    testresponse_pk=self.group_testresponse_1.pk,
+                    testresponse_pk=self.test_response_class_1.pk,
                     testpart_pk=self.group_test_part.pk,
                 )
 
@@ -1326,7 +1461,7 @@ class TestPartResponseView(ResponseTest):
             self.teacher,
             query_params={"only_table": "true"},
             assignment_pk=self.test_assignment_class.pk,
-            testresponse_pk=self.group_testresponse_1.pk,
+            testresponse_pk=self.test_response_class_1.pk,
             testpart_pk=self.group_test_part.pk,
         )
         response = view.response
