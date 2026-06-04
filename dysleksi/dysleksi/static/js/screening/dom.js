@@ -840,13 +840,13 @@ export class GroupTestDomElements extends TestDomElements {
         btn.className = "btn btn-outline-primary";
         if (text) {
             if (text === "true") {
-                btn.innerHTML = '<i class="ph-fill ph-check-circle"></i>';
+                btn.innerHTML = '<i class="ph-bold ph-check"></i>';
                 btn.classList.remove("btn-outline-primary");
                 btn.classList.add("btn-true-false");
                 btn.classList.add("true");
                 this.choicesEl.classList.add("true-false-layout");
             } else if (text === "false") {
-                btn.innerHTML = '<i class="ph-fill ph-x-circle"></i>';
+                btn.innerHTML = '<i class="ph-bold ph-x"></i>';
                 btn.classList.remove("btn-outline-primary");
                 btn.classList.add("btn-true-false");
                 btn.classList.add("false");
