@@ -756,6 +756,8 @@ class TestDomElements {
             },
             { passive: false },
         );
+        displayField.addEventListener("keydown", (e) => e.preventDefault());
+        displayField.addEventListener("keypress", (e) => e.preventDefault());
 
         // --- Erase button ---
         const eraseBtn = document.createElement("button");

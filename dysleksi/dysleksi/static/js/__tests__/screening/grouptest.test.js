@@ -1982,6 +1982,17 @@ describe("GroupTestDomElements - FreeText Touch Interaction", () => {
         expect(selectionSpy).toHaveBeenCalledWith(5, 5);
     });
 
+    it("keydown and keypress on display field are ignored", () => {
+        const keyDownEvent = new Event("keydown", { cancelable: true });
+        const keyPressEvent = new Event("keypress", { cancelable: true });
+
+        displayField.dispatchEvent(keyDownEvent);
+        displayField.dispatchEvent(keyPressEvent);
+
+        expect(keyDownEvent.defaultPrevented).toBe(true);
+        expect(keyPressEvent.defaultPrevented).toBe(true);
+    });
+
     it("defaults paddingLeft to 0 if getComputedStyle returns an invalid value", () => {
         const getCursorIndexSpy = vi.spyOn(utils, "getCursorIndex").mockReturnValue(0);
         vi.spyOn(window, "getComputedStyle").mockReturnValue({
