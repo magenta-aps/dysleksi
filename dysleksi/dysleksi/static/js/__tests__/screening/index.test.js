@@ -311,7 +311,7 @@ describe("Startup test", () => {
         expect(initMockDataSpy).toHaveBeenCalled();
 
         const studentArg = initGroupStudent.mock.calls[0][2];
-        expect(studentArg.problem).toBe(true);
+        expect(studentArg.progress).not.toBe(100);
     });
 
     it("group dummy0 student test", async () => {

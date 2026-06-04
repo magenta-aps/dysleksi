@@ -99,11 +99,6 @@ const GROUP_DOM_HTML = `
   Mærket (<span id="marked-students-count">0</span>)
 </button>
 
-<button id="problem-students-button" class="btn btn-outline-primary">
-  <i class="ph-fill ph-warning-circle red"></i>
-  Problemer/offline (<span id="problem-students-count">0</span>)
-</button>
-
 <div class="group-test-body"></div>
 `;
 
@@ -2284,22 +2279,21 @@ describe("GroupTestContainer Filtering", () => {
         document.body.innerHTML = GROUP_DOM_HTML;
         container = new GroupTestContainer(test);
 
-        this.createStudent = (id, name, progress, problem) => ({
+        this.createStudent = (id, name, progress) => ({
             student: {
                 id,
                 firstName: name,
                 lastName: "User",
                 progress: progress,
-                problem: problem,
                 currentPartIndex: 0,
                 currentQuestionIndex: 0,
                 resultsByPart: { 0: [] },
             },
         });
 
-        container.updateData(this.createStudent(1, "Ongoing", 50, false));
-        container.updateData(this.createStudent(2, "Finished", 100, false));
-        container.updateData(this.createStudent(3, "Problem", 10, true));
+        container.updateData(this.createStudent(1, "Ongoing", 50));
+        container.updateData(this.createStudent(2, "Finished", 100));
+        container.updateData(this.createStudent(3, "Ongoing", 70));
     });
 
     const getDisplay = (studentId) => container.cards.get(studentId).el.style.display;
@@ -2328,14 +2322,6 @@ describe("GroupTestContainer Filtering", () => {
         expect(getDisplay(3)).toBe("none");
     });
 
-    it("only shows students with problems when criteria is 'problem'", () => {
-        const btn = document.getElementById("problem-students-button");
-        btn.click();
-        expect(getDisplay(1)).toBe("none");
-        expect(getDisplay(2)).toBe("none");
-        expect(getDisplay(3)).toBe("flex");
-    });
-
     it("only shows marked students when criteria is 'marked'", () => {
         // Manually mark student 1
         const student1 = container.students.get(1);
@@ -2350,14 +2336,13 @@ describe("GroupTestContainer Filtering", () => {
     });
 
     it("updates counts correctly when new data arrives", () => {
-        // Initially 3 students (2 ongoing, 1 finished, 1 problem)
+        // Initially 3 students (2 ongoing, 1 finished)
         expect(document.getElementById("all-students-count").innerHTML).toBe("3");
         expect(document.getElementById("ongoing-students-count").innerHTML).toBe("2");
         expect(document.getElementById("finished-students-count").innerHTML).toBe("1");
-        expect(document.getElementById("problem-students-count").innerHTML).toBe("1");
 
         // Update student 1 to be finished
-        container.updateData(this.createStudent(1, "Ongoing", 100, false));
+        container.updateData(this.createStudent(1, "Ongoing", 100));
 
         expect(document.getElementById("ongoing-students-count").innerHTML).toBe("1");
         expect(document.getElementById("finished-students-count").innerHTML).toBe("2");

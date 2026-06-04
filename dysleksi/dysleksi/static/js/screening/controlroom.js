@@ -462,11 +462,6 @@ export class StudentCard {
             this.statusIcon.style.display = "block";
             this.statusIcon.className = "ph-fill ph-check-circle green";
             this.currentPartText.textContent = "-";
-        } else if (this.student.problem) {
-            this.progressFill.classList.add("has-problem");
-            this.topRow.classList.add("has-problem");
-            this.statusIcon.style.display = "block";
-            this.statusIcon.className = "ph-fill ph-warning-circle red";
         } else {
             this.statusIcon.style.display = "none";
         }
@@ -529,7 +524,6 @@ export class GroupTestContainer {
         this.allStudentsCount = document.getElementById("all-students-count");
         this.ongoingStudentsCount = document.getElementById("ongoing-students-count");
         this.finishedStudentsCount = document.getElementById("finished-students-count");
-        this.problemStudentsCount = document.getElementById("problem-students-count");
 
         this.allStudentsButton = document.getElementById("all-students-button");
         this.ongoingStudentsButton = document.getElementById("ongoing-students-button");
@@ -537,13 +531,11 @@ export class GroupTestContainer {
             "finished-students-button",
         );
         this.markedStudentsButton = document.getElementById("marked-students-button");
-        this.problemStudentsButton = document.getElementById("problem-students-button");
 
         this.allStudentsButton.onclick = () => this.filterCards("all");
         this.ongoingStudentsButton.onclick = () => this.filterCards("ongoing");
         this.finishedStudentsButton.onclick = () => this.filterCards("finished");
         this.markedStudentsButton.onclick = () => this.filterCards("marked");
-        this.problemStudentsButton.onclick = () => this.filterCards("problem");
     }
 
     filterCards(criteria) {
@@ -566,9 +558,6 @@ export class GroupTestContainer {
                 case "marked":
                     shouldShow = !!student.marked;
                     break;
-                case "problem":
-                    shouldShow = !!student.problem;
-                    break;
             }
 
             if (shouldShow) {
@@ -580,14 +569,10 @@ export class GroupTestContainer {
     }
 
     updateCounts() {
-        let problemStudents = 0;
         let finishedStudents = 0;
         let ongoingStudents = 0;
 
         this.students.forEach((student) => {
-            if (student.problem) {
-                problemStudents += 1;
-            }
             if (student.progress == 100) {
                 finishedStudents += 1;
             } else {
@@ -596,7 +581,6 @@ export class GroupTestContainer {
         });
 
         this.allStudentsCount.innerHTML = this.students.size;
-        this.problemStudentsCount.innerHTML = problemStudents;
         this.finishedStudentsCount.innerHTML = finishedStudents;
         this.ongoingStudentsCount.innerHTML = ongoingStudents;
     }
@@ -615,7 +599,6 @@ export class GroupTestContainer {
         }
 
         student.progress = studentData.progress;
-        student.problem = studentData.problem;
         student.currentPartIndex = studentData.currentPartIndex;
         student.currentQuestionIndex = studentData.currentQuestionIndex;
         student.resultsByPart = studentData.resultsByPart;
