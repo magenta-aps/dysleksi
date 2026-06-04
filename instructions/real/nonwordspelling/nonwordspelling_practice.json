@@ -51,7 +51,10 @@
         // Tryk grøn, når du er klar.
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Enhanced/Indledning/4a.4.mp3"
+        // `4a.4.mp3` says "Aallartipputit" which is the wrong content.
+        // "resource": "resources/nonwordspelling/Enhanced/Indledning/4a.4.mp3"
+        // This file says "Piareeruit qorsuk tooruk" which is the expected content.
+        "resource": "resources/wordspelling/Enhanced/Indledning/6a.3.mp3"
       }
     ]
   },
@@ -76,7 +79,7 @@
       },
       {
         "action": "show",
-        "delayAfter": 1500,
+        "delayAfter": 500,
         "element": "next"
       },
       {
@@ -119,7 +122,7 @@
       {
         // Dem, der skal klikkes på, når man skriver.
         "action": "playSound",
-        "delayAfter": 500,
+        "delayAfter": 1250,
         "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.3.mp3"
       },
       {
@@ -140,7 +143,7 @@
       },
       {
         "action": "clickButton",
-        "delayAfter": 1500,
+        "delayAfter": 2250,
         "element": "challenge-sound-btn"
       },
       {
@@ -162,19 +165,19 @@
       },
       {
         "action": "clickButton",
-        "delayAfter": 750,
+        "delayAfter": 1250,
         "element": "free-text-q"
       },
       {
         "action": "clickButton",
-        "delayAfter": 750,
+        "delayAfter": 2000,
         "element": "free-text-a"
       },
       {
         // Hvis du ikke helt forstod nonordet, du skal skrive, kan du trykke på
         // lydikonet for at høre det igen.
         "action": "playSound",
-        "delayAfter": 500,
+        "delayAfter": 0,
         "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.8.mp3"
       },
       {
@@ -202,12 +205,12 @@
       },
       {
         "action": "clickButton",
-        "delayAfter": 750,
+        "delayAfter": 1250,
         "element": "free-text-s"
       },
       {
         "action": "clickButton",
-        "delayAfter": 750,
+        "delayAfter": 2000,
         "element": "free-text-u"
       },
       {
@@ -218,12 +221,12 @@
       },
       {
         "action": "clickButton",
-        "delayAfter": 750,
+        "delayAfter": 1250,
         "element": "free-text-erase-btn"
       },
       {
         "action": "clickButton",
-        "delayAfter": 750,
+        "delayAfter": 1250,
         "element": "free-text-erase-btn"
       },
       {
@@ -234,12 +237,12 @@
       },
       {
         "action": "clickButton",
-        "delayAfter": 750,
+        "delayAfter": 1250,
         "element": "free-text-q"
       },
       {
         "action": "clickButton",
-        "delayAfter": 750,
+        "delayAfter": 2000,
         "element": "free-text-a"
       },
       {
@@ -379,7 +382,7 @@
         // Øvelserne er færdige.
         "action": "playSound",
         "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4c.8.mp3",
-        "delayAfter": 1000
+        "delayAfter": 1500
       },
       {
         "action": "showFaded",
@@ -435,11 +438,6 @@
         "action": "playSound",
         "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.4.mp3",
         "delayAfter": 500
-      },
-      {
-        "action": "setButtonSoundOnce",
-        "element": "next",
-        "resource": "resources/nonwordspelling/Enhanced/Deltests/4e.3.mp3"
       }
     ]
   }

@@ -4,7 +4,28 @@
     "sound": "dummy-resources/nonwordspelling/Opgave/bar.mp3",
     "correct": "bar",
     "partially_correct": ["baar", "barr"],
-    "reminder": 20000
+    "reminder": 20000,
+    "continue_when_instruction_is_complete": false,
+    "instruction_sequence": [
+      {
+        // Nonordet, som du skal skrive, vil kun blive angivet.
+        "action": "playSound",
+        "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4e.1.mp3",
+        "delayAfter": 750
+      },
+      {
+        // Du skal svare opgaverne så godt du kan.
+        "action": "playSound",
+        "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4e.2.mp3",
+        "delayAfter": 1250
+      },
+      {
+        // Du starter nu.
+        "action": "playSound",
+        "resource": "resources/nonwordspelling/Enhanced/Deltests/4e.3.mp3",
+        "delayAfter": 1250
+      }
+    ]
   },
   {
     "question_type": "free_text",
