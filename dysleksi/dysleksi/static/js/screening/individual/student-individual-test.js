@@ -11,7 +11,7 @@ export class IndividualTestView extends StudentTestView {
         super(test, chatSocket, assignmentId, domElements, student);
         this.mediaRecorder = mediaRecorder;
         this.audioDetector = new AudioDetector(this.mediaRecorder.stream);
-        for (const event of ["audio.detected", "audio.quiet", "audio.silent"]) {
+        for (const event of ["audio.detected", "audio.quiet"]) {
             this.audioDetector.addEventListener(event, (e) => {
                 this.onAudioEvent(e.type);
             });
@@ -102,6 +102,10 @@ export class IndividualTestView extends StudentTestView {
                 displayedAt: this.displayedAt,
                 questionTitle: this.questionTitle(this.isPracticing),
                 practice: this.isPracticing,
+            });
+
+            this.audioDetector.addEventListener("audio.silent", (e) => {
+                this.onAudioEvent(e.type);
             });
 
             //this.domElements.toggleAudioIndicator(true);

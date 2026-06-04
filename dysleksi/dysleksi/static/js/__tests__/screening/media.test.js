@@ -234,7 +234,7 @@ describe("AudioDetector", () => {
         const instance = getInstance([128.0]);
         instance.addEventListener("audio.silent", onSilence);
         instance.run();
-        vi.advanceTimersByTime(30500.0); // Silence must last 30 secs or more
+        vi.advanceTimersByTime(2 * 60000.0 + 500); // Silence must last at least 2 mins
         expect(onSilence).toHaveBeenCalled();
     });
 
