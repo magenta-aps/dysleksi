@@ -819,6 +819,9 @@ export class GroupTestDomElements extends TestDomElements {
             this.multipleChoiceMatchContainer,
         ]) {
             el.style.display = state;
+            if (state == "flex") {
+                this.showElement(el);
+            }
         }
     }
 
