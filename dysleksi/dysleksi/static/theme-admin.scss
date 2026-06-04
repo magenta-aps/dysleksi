@@ -1041,6 +1041,27 @@ $border-radius-student-card: $spacer / 4 * 3;
   .student-text {
     position: relative;
     z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+
+    .student-name {
+      font-weight: normal;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 14px;
+    }
+
+    .student-current-part {
+      font-size: 12px;
+      font-weight: normal;
+      color: $mono-gray-dark-1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
   }
 
   /* Folded area below */
@@ -1117,6 +1138,10 @@ $border-radius-student-card: $spacer / 4 * 3;
 
       &.completed {
         background-color: $blue-lighter-1;
+
+        &.selected {
+          background-color: #609CD1 !important;
+        }
       }
 
       &.current {
@@ -1125,6 +1150,10 @@ $border-radius-student-card: $spacer / 4 * 3;
 
       &.future {
         background-color: $mono-gray-lightest;
+
+        &.selected {
+          background-color: $mono-gray-light !important;
+        }
       }
     }
   }

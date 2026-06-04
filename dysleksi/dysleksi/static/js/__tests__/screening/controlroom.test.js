@@ -1188,7 +1188,10 @@ describe("GroupTestContainer", () => {
                 <div class="student-card">
                     <div class="student-top-row">
                         <div class="progress-fill" style="width: 0%"></div>
-                        <span class="student-text"></span>
+                        <div class="student-text">
+                            <span class="student-name"></span>
+                            <span class="student-current-part">-</span>
+                        </div>
                     <div class="student-controls">
                         <span class="status-icon">
                             <i class="ph-fill ph-check-circle"></i>
@@ -1200,7 +1203,7 @@ describe("GroupTestContainer", () => {
                             <i class="ph ph-dots-three"></i>
                         </span>
                         <span class="student-control-button">
-                            <i id="foldout-arrow" class="ph-fill ph-caret-up"></i>
+                            <i id="foldout-arrow" class="ph-fill ph-caret-down"></i>
                         </span>
                     </div>
                     </div>
@@ -1275,7 +1278,7 @@ describe("GroupTestContainer", () => {
 
         const card = instance.cards.get(5);
         const folded = card.el.querySelector(".folded-area");
-        const nameSpan = card.el.querySelector(".student-text");
+        const nameSpan = card.el.querySelector(".student-name");
 
         // Ensure it's hidden initially
         folded.style.display = "none";
@@ -1332,7 +1335,7 @@ describe("GroupTestContainer", () => {
         const card = instance.cards.get(1);
         expect(card).not.toBeNull();
 
-        const text = card.el.querySelector(".student-text").textContent;
+        const text = card.el.querySelector(".student-name").textContent;
         expect(text).toBe("Alice S.");
 
         const fill = card.el.querySelector(".progress-fill");
@@ -1358,7 +1361,7 @@ describe("GroupTestContainer", () => {
         instance.updateData(studentData);
 
         const card = instance.cards.get(1);
-        const text = card.el.querySelector(".student-text").textContent;
+        const text = card.el.querySelector(".student-name").textContent;
         expect(text).toBe("Alice");
     });
 
@@ -1528,7 +1531,10 @@ describe("TeacherView socket 'test.started' handling", () => {
                 <div class="student-card">
                     <div class="student-top-row">
                         <div class="progress-fill" style="width: 0%"></div>
-                        <span class="student-text"></span>
+                        <div class="student-text">
+                            <span class="student-name"></span>
+                            <span class="student-current-part">-</span>
+                        </div>
                     <div class="student-controls">
                         <span class="status-icon">
                             <i class="ph-fill ph-check-circle"></i>
@@ -1540,7 +1546,7 @@ describe("TeacherView socket 'test.started' handling", () => {
                             <i class="ph ph-dots-three"></i>
                         </span>
                         <span class="student-control-button">
-                            <i id="foldout-arrow" class="ph-fill ph-caret-up"></i>
+                            <i id="foldout-arrow" class="ph-fill ph-caret-down"></i>
                         </span>
                     </div>
                     </div>
@@ -1929,7 +1935,10 @@ describe("StudentCard", () => {
                 <div class="student-card">
                     <div class="student-top-row">
                         <div class="progress-fill"></div>
-                        <span class="student-text"></span>
+                        <div class="student-text">
+                            <span class="student-name"></span>
+                            <span class="student-current-part">-</span>
+                        </div>
                     <div class="student-controls">
                         <span class="status-icon">
                             <i class="ph-fill ph-check-circle"></i>
@@ -1941,7 +1950,7 @@ describe("StudentCard", () => {
                             <i class="ph ph-dots-three"></i>
                         </span>
                         <span class="student-control-button">
-                            <i id="foldout-arrow" class="ph-fill ph-caret-up"></i>
+                            <i id="foldout-arrow" class="ph-fill ph-caret-down"></i>
                         </span>
                     </div>
                     </div>
@@ -2019,7 +2028,7 @@ describe("StudentCard", () => {
         card.el.click();
         expect(card.foldedArea.style.display).toBe("flex");
         expect(card.el.classList.contains("is-expanded")).toBe(true);
-        expect(card.arrowIcon.className).toBe("ph-fill ph-caret-down");
+        expect(card.arrowIcon.className).toBe("ph-fill ph-caret-up");
 
         card.el.click();
         expect(card.foldedArea.style.display).toBe("none");
@@ -2399,7 +2408,11 @@ describe("GroupTestContainer Filtering", () => {
                 <div class="student-card">
                     <div class="student-top-row">
                         <div class="progress-fill"></div>
-                        <span class="student-text"></span>
+                        <div class="student-text">
+                            <span class="student-name"></span>
+                            <span class="student-current-part">-</span>
+                        </div>
+
                         <div class="student-controls">
                             <span class="status-icon">
                                 <i class="ph-fill ph-check-circle"></i>
@@ -2411,7 +2424,7 @@ describe("GroupTestContainer Filtering", () => {
                                 <i class="ph ph-dots-three"></i>
                             </span>
                             <span class="student-control-button">
-                                <i id="foldout-arrow" class="ph-fill ph-caret-up"></i>
+                                <i id="foldout-arrow" class="ph-fill ph-caret-down"></i>
                             </span>
                         </div>
                     </div>
