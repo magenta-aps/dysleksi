@@ -58,6 +58,13 @@ class TestDomElements {
         this.currentAudioSource = null;
     }
 
+    setBodyBackground(color) {
+        document.documentElement.style.setProperty("--bs-body-bg", color);
+    }
+
+    resetBodyBackground() {
+        document.documentElement.style.removeProperty("--bs-body-bg");
+    }
     updateSummaryArrows() {
         const { scrollTop, scrollHeight, clientHeight } = this.summaryContainer;
 

@@ -125,6 +125,7 @@ export class StudentTestView extends EventTarget {
     }
 
     async startSoundCalibration() {
+        this.domElements.setBodyBackground("#E5ECF2"); // Light blue
         this.cancelAudio = false;
         this.domElements.hideSoundCalibrationAnimation();
         this.domElements.hideElement(this.domElements.endSoundCalibrationButton);
@@ -278,6 +279,7 @@ export class StudentTestView extends EventTarget {
     }
 
     endSoundCalibration() {
+        this.domElements.resetBodyBackground();
         this.domElements.hideSoundCalibration();
         if (this.test.parts.length > 1) {
             this.startSummary();
