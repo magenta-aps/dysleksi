@@ -13,6 +13,6 @@ class TestStudentChoiceField(DysleksiTest):
 
     def test_label_from_instance_includes_main_class_name(self):
         self.assertEqual(
-            self.instance.label_from_instance(self.student),
-            "Test Elev (1.A)",
+            self.instance.label_from_instance(self.student1),
+            "Test1 Elev (1.A)",
         )

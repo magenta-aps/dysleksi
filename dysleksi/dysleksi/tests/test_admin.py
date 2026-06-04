@@ -13,6 +13,7 @@ class InstructionDysleksiTest(DysleksiTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        cls.create_parts()
         cls.seq, _ = InstructionSequence.objects.get_or_create(question=cls.question1)
         cls.obj, _ = Instruction.objects.get_or_create(
             sequence=cls.seq,

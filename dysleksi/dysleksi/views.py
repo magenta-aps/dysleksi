@@ -4,7 +4,7 @@
 from datetime import timedelta
 from functools import cached_property, partial
 from math import ceil
-from typing import Any, Dict, List, Tuple
+from typing import Any, Dict, List, Set, Tuple
 
 from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -31,6 +31,7 @@ from django.http import HttpResponseRedirect
 from django.http.response import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
+from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
 from django.views.generic.edit import UpdateView
@@ -246,6 +247,7 @@ class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
                     then=Value(1),
                 ),
             ),
+            # TODO: do we need to look at responses__completed?
             number_of_students_responded=Count("responses__student__pk", distinct=True),
         )
         qs = qs.annotate(
@@ -821,15 +823,17 @@ class TestResponseView(
         return qs.order_by("pk")
 
     def get_table(self) -> StudentTestResponseTable:
-
         qs: PartResponseQuerySet = self.data
         part_header = _("%(part_name)s (%(questions_count)s opg.)")
         extra_columns = []
         supercolumns_count = 0
 
-        for partresponse in qs:
-            part = partresponse.testpart
+        # for partresponse in qs:
+        part_pks = set()
+        for part in self.get_current_items():
+            # part = partresponse.testpart
             key = f"part_{part.pk}"
+            part_pks.add(part.pk)
 
             supercolumn_header = part_header % {
                 "part_name": part.name,
@@ -846,6 +850,7 @@ class TestResponseView(
             part_columns: List[Tuple[str, Column]] = []
             for group_name, questions in question_groups.items():
                 column_key = self.group_map[part.pk][group_name]["part_pk_key"]
+
                 assert column_key is not None  # to make mypy happy
                 # column_key is e.g "part_42_store_bogstaver" if processing a group,
                 # or just "part_42" if processing a whole part
@@ -873,13 +878,14 @@ class TestResponseView(
                                 # For at regne kategorien ud deler vi antal rigtige
                                 # (række 1) med antal besvarelser (række 0)
                                 (column_values[1] / column_values[0])
-                                if column_values[0] != 0
+                                if column_values[0] not in (0, None)
                                 else None
                             ),
                         },
                         part,
                     ),
                 )
+
                 part_columns.append((column_key, column))
 
             if len(part_columns) > 1:
@@ -917,9 +923,12 @@ class TestResponseView(
 
         data = []
         for label, value_key, value_fmt in field_spec:
-            row = {"data_category": label}
+            row: Dict[str, int | str | Promise | None] = {"data_category": label}
+            answered_part_pks: Set[int] = set()
             for item in qs:  # Each item is an annotated PartResponse
-                for group_dict in self.group_map[item.testpart.pk].values():
+                part_pk = item.testpart.pk
+                answered_part_pks.add(part_pk)
+                for group_dict in self.group_map[part_pk].values():
                     # `column_key` is "" for non-grouped columns,
                     # and the shortened key for grouped columns
                     item_key = group_dict["part_pk_key"]
@@ -934,8 +943,12 @@ class TestResponseView(
                         # format as necessary, e.g. append a "%" sign
                         value = value_fmt % {"value": value}
                     row[item_key] = value
+            for pk in part_pks.difference(answered_part_pks):
+                for group_dict in self.group_map[pk].values():
+                    item_key = group_dict["part_pk_key"]
+                    assert item_key is not None  # To make mypy happy
+                    row[item_key] = None
             data.append(row)
-
         return StudentTestResponseTable(data=data, extra_columns=extra_columns)
 
     def get_plot_data(self) -> List[int]:
@@ -947,9 +960,18 @@ class TestResponseView(
                 data.append(getattr(partresponse, f"correct_pct_of_all{suffix}"))
         return data
 
-    def get_part_names(self) -> Dict[int, Tuple[str, List[str | None]]]:
+    def get_part_names(self) -> Dict[int, Tuple[str, List[str | None], bool]]:
+        answered_parts = set(
+            self.object.partresponses.filter(
+                testpart__in=self.get_current_items()
+            ).values_list("testpart__pk", flat=True)
+        )
         return {
-            part.pk: (part.name, part.questions.result_groups_names())
+            part.pk: (
+                part.name,
+                part.questions.result_groups_names(),
+                part.pk in answered_parts,
+            )
             for part in self.get_current_items()
         }
 

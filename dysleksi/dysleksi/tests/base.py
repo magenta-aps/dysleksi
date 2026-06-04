@@ -44,10 +44,14 @@ class DysleksiTest(TestCase):
         Group.objects.get_or_create(name=STUDENTS)
         cls.school = cls.create_school(number="test123", name="TestSkolen")
         cls.klasse = cls.create_class(2025, "1.A", is_main=True)
-        cls.student = cls.create_student(
-            "TestStudent", cpr=1234567890, first_name="Test", last_name="Elev"
+        cls.student1 = cls.create_student(
+            "TestStudent1", cpr=1234567890, first_name="Test1", last_name="Elev"
         )
-        cls.klasse.students.add(cls.student)
+        cls.student2 = cls.create_student(
+            "TestStudent2", cpr=1234567891, first_name="Test2", last_name="Elev"
+        )
+        cls.klasse.students.add(cls.student1)
+        cls.klasse.students.add(cls.student2)
         cls.teacher = cls.create_teacher(
             "TestTeacher",
             cpr=2233445566,
@@ -88,24 +92,25 @@ class DysleksiTest(TestCase):
         cls.individual_test, _ = Test.objects.get_or_create(
             name="Test1", test_type=TestType.INDIVIDUAL
         )
-        cls.part, _ = TestPart.objects.get_or_create(
-            name="TestPart1",
-            timeout=60000,
-            partial_score_after=30000,
-        )
-        cls.individual_test.parts.add(cls.part)
         cls.group_test, _ = Test.objects.get_or_create(
             name="Test2", test_type=TestType.GROUP
         )
-        cls.group_test_part, _ = TestPart.objects.get_or_create(
-            name="GroupTestPart1",
-            timeout=60000,
-            partial_score_after=30000,
+
+        cls.teacher.classes.add(cls.klasse)
+
+        cls.test_assignment_student, _ = TestAssignment.objects.get_or_create(
+            test=cls.individual_test,
+            teacher=cls.teacher,
+            student=cls.student1,
         )
-        cls.group_test_part.set_data_breakdown_ranges(
-            "wordlength_data_breakdown", [(3, 4), (5, 6), (7, 8), (9, 11), (12, 15)]
+        cls.test_assignment_class, _ = TestAssignment.objects.get_or_create(
+            test=cls.group_test,
+            teacher=cls.teacher,
+            klasse=cls.klasse,
         )
-        cls.group_test.parts.add(cls.group_test_part)
+
+    @classmethod
+    def create_resources(cls):
         cls.resource1, _ = TestResource.objects.get_or_create(
             name="TestResource1",
             text="TestOrd",
@@ -116,14 +121,33 @@ class DysleksiTest(TestCase):
                 open("/app/dysleksi/tests/resources/test1.jpg", "rb"), name="test1.jpg"
             ),
         )
-        cls.resource3 = TestResource.objects.create(
+        cls.resource3, _ = TestResource.objects.get_or_create(
             name="TestResource3",
             text="TestOrd",
         )
-        cls.resource4 = TestResource.objects.create(
+        cls.resource4, _ = TestResource.objects.get_or_create(
             name="TestResource4",
             sound="foo.mp3",
         )
+
+    @classmethod
+    def create_parts(cls):
+        cls.create_resources()
+        cls.part, _ = TestPart.objects.get_or_create(
+            name="TestPart1",
+            timeout=60000,
+            partial_score_after=30000,
+        )
+        cls.individual_test.parts.add(cls.part)
+        cls.group_test_part, _ = TestPart.objects.get_or_create(
+            name="GroupTestPart1",
+            timeout=60000,
+            partial_score_after=30000,
+        )
+        cls.group_test_part.set_data_breakdown_ranges(
+            "wordlength_data_breakdown", [(3, 4), (5, 6), (7, 8), (9, 11), (12, 15)]
+        )
+        cls.group_test.parts.add(cls.group_test_part)
 
         cls.question1 = TestQuestion.objects.create(
             part=cls.part,
@@ -159,33 +183,11 @@ class DysleksiTest(TestCase):
             question_type=QuestionType.FREE_TEXT,
         )
 
-        cls.teacher.classes.add(cls.klasse)
-        for student in ("elev1", "elev2"):
-            cls.klasse.students.add(cls.create_student(student))
-
-        cls.test_assignment_student, _ = TestAssignment.objects.get_or_create(
-            test=cls.individual_test,
-            teacher=cls.teacher,
-            student=cls.student,
-        )
-        cls.test_response_student, _ = TestResponse.objects.get_or_create(
-            assignment=cls.test_assignment_student,
-            student=cls.klasse.students.first(),
-        )
-        cls.test_assignment_class, _ = TestAssignment.objects.get_or_create(
-            test=cls.group_test,
-            teacher=cls.teacher,
-            klasse=cls.klasse,
-        )
-        cls.test_response_class, _ = TestResponse.objects.get_or_create(
-            assignment=cls.test_assignment_class,
-            student=cls.klasse.students.first(),
-        )
-
     @classmethod
     def create_wordspelling_part(cls, individual: bool = False):
+        cls.create_resources()
         cls.wordspelling_part, _ = TestPart.objects.get_or_create(
-            name="TestPart1",
+            name="WordSpelling",
             timeout=60000,
             partial_score_after=30000,
         )
@@ -193,7 +195,7 @@ class DysleksiTest(TestCase):
         test.parts.add(cls.wordspelling_part)
 
         cls.wordspelling_question_1 = TestQuestion.objects.create(
-            part=cls.part,
+            part=cls.wordspelling_part,
             challenge=cls.resource1,
             question_type=QuestionType.FREE_TEXT,
             result_group="Nemme ord",
@@ -209,7 +211,7 @@ class DysleksiTest(TestCase):
             correctness=Correctness.PARTIAL,
         )
         cls.wordspelling_question_2 = TestQuestion.objects.create(
-            part=cls.part,
+            part=cls.wordspelling_part,
             challenge=cls.resource2,
             question_type=QuestionType.FREE_TEXT,
             result_group="Lette ord",
@@ -227,10 +229,11 @@ class DysleksiTest(TestCase):
 
     @classmethod
     def create_sentencereading_part(cls, individual: bool = False):
+        cls.create_resources()
         # TODO: Move other test creations into methods like this,
         # and let individual Test classes decide what to initialize
         cls.sentencereading_part, _ = TestPart.objects.get_or_create(
-            name="GroupTestPart2",
+            name="SentenceReading",
             timeout=60000,
             partial_score_after=30000,
         )
@@ -353,7 +356,6 @@ class ResponseTest(DysleksiTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        tz = timezone.get_current_timezone()
 
         call_command("create_result_categories")
 
@@ -361,18 +363,37 @@ class ResponseTest(DysleksiTest):
         cls.student1 = students[0]
         cls.student2 = students[1]
 
+        cls.test_response_student, _ = TestResponse.objects.get_or_create(
+            assignment=cls.test_assignment_student,
+            student=cls.klasse.students.first(),
+        )
+        cls.test_response_class_1, _ = TestResponse.objects.get_or_create(
+            assignment=cls.test_assignment_class,
+            student=cls.student1,
+            completed=True,
+        )
+        cls.test_response_class_2, _ = TestResponse.objects.get_or_create(
+            assignment=cls.test_assignment_class,
+            student=cls.student2,
+            completed=True,
+        )
+
+    @classmethod
+    def create_parts(cls):
+        super().create_parts()
+        tz = timezone.get_current_timezone()
         cls.group_question_1 = TestQuestion.objects.create(
             part=cls.group_test_part,
             challenge=cls.resource1,
             reminder=5000,
             reminder_source=cls.resource4,
         )
-        cls.possible_correct_answer1 = PossibleAnswer.objects.create(
+        possible_correct_answer1 = PossibleAnswer.objects.create(
             question=cls.group_question_1,
             resource=cls.resource2,
             correctness=Correctness.CORRECT,
         )
-        cls.possible_wrong_answer1 = PossibleAnswer.objects.create(
+        PossibleAnswer.objects.create(
             question=cls.group_question_1,
             resource=cls.resource3,
             correctness=Correctness.WRONG,
@@ -382,12 +403,12 @@ class ResponseTest(DysleksiTest):
             challenge=cls.resource2,
             question_type=QuestionType.MULTIPLE_CHOICE,
         )
-        cls.possible_correct_answer2 = PossibleAnswer.objects.create(
+        PossibleAnswer.objects.create(
             question=cls.group_question_2,
             resource=cls.resource3,
             correctness=Correctness.CORRECT,
         )
-        cls.possible_wrong_answer2 = PossibleAnswer.objects.create(
+        PossibleAnswer.objects.create(
             question=cls.group_question_2,
             resource=cls.resource4,
             correctness=Correctness.WRONG,
@@ -403,21 +424,14 @@ class ResponseTest(DysleksiTest):
             question_type=QuestionType.FREE_TEXT,
         )
 
-        cls.group_testresponse_1 = TestResponse.objects.create(
-            assignment=cls.test_assignment_class, student=cls.student1, completed=True
-        )
-        cls.group_testresponse_2 = TestResponse.objects.create(
-            assignment=cls.test_assignment_class, student=cls.student2, completed=True
-        )
-
         cls.group_partresponse_1 = PartResponse.objects.create(
-            testresponse=cls.group_testresponse_1,
+            testresponse=cls.test_response_class_1,
             testpart=cls.group_test_part,
             completed=True,
             started_at=datetime(2026, 5, 1, 12, 0, 0, tzinfo=tz),
         )
         cls.group_partresponse_2 = PartResponse.objects.create(
-            testresponse=cls.group_testresponse_2,
+            testresponse=cls.test_response_class_2,
             testpart=cls.group_test_part,
             completed=True,
             started_at=datetime(2026, 5, 1, 14, 0, 0, tzinfo=tz),
@@ -426,7 +440,7 @@ class ResponseTest(DysleksiTest):
         cls.group_questionresponse_1_1 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_1,
             question=cls.group_question_1,
-            answer_option=cls.possible_correct_answer1,
+            answer_option=possible_correct_answer1,
             correctness=Correctness.CORRECT,
         )
         cls.group_questionresponse_1_1.submitted_at = datetime(
@@ -467,7 +481,7 @@ class ResponseTest(DysleksiTest):
         cls.group_questionresponse_2_1 = QuestionResponse.objects.create(
             partresponse=cls.group_partresponse_2,
             question=cls.group_question_1,
-            answer_option=cls.possible_correct_answer1,
+            answer_option=possible_correct_answer1,
             correctness=Correctness.CORRECT,
         )
         cls.group_questionresponse_2_1.submitted_at = datetime(
@@ -510,7 +524,7 @@ class ResponseTest(DysleksiTest):
         super().create_wordspelling_part(individual)
         tz = timezone.get_current_timezone()
         testresponse = (
-            cls.test_response_student if individual else cls.group_testresponse_1
+            cls.test_response_student if individual else cls.test_response_class_1
         )
 
         cls.wordspelling_partresponse = PartResponse.objects.create(
@@ -541,7 +555,7 @@ class ResponseTest(DysleksiTest):
         super().create_sentencereading_part(individual)
         tz = timezone.get_current_timezone()
         testresponse = (
-            cls.test_response_student if individual else cls.group_testresponse_1
+            cls.test_response_student if individual else cls.test_response_class_1
         )
 
         cls.sentencereading_partresponse_1 = PartResponse.objects.create(
