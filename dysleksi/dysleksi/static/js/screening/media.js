@@ -76,7 +76,7 @@ export class AudioDetector extends EventTarget {
         detectionLevelThreshold = 0.25,
         debounceTime = 2500.0, // 2.5 secs
         minLevel = 0.05,
-        silenceTimeThreshold = 30000.0, // 30 secs
+        silenceTimeThreshold = 2 * 60000.0, // 2 mins
     ) {
         super();
 

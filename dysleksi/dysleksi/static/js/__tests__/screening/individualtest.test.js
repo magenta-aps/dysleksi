@@ -558,6 +558,17 @@ describe("IndividualTestFlow", () => {
             expect(view.send).toHaveBeenCalled();
         }
     });
+
+    it("passes 'audio.silent' events on to teacher's session once instructions are completed", () => {
+        // Arrange: complete the instructions by showing the first question
+        view.setPart(0);
+        view.showQuestion(true, 0); // first practice question
+        // Act: pretend the audio detector dispatches an event
+        view.audioDetector.dispatchEvent(new Event("audio.silent"));
+        // Assert that we pass the audio event on
+        expect(view.onAudioEvent).toHaveBeenCalledWith("audio.silent");
+        expect(view.send).toHaveBeenCalled();
+    });
 });
 
 describe("Individual Test - Timer and Reminder Cleanup", () => {
