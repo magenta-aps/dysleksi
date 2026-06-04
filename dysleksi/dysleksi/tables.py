@@ -179,6 +179,7 @@ class TestResultTable(Table):
         template_name="dysleksi/admin/test_responses/group/student_name.html",
         verbose_name=_("Elev"),
         footer=_("Gennemsnit"),
+        order_by=["student__first_name", "student__last_name"],
     )
 
     def as_html(self, request):
@@ -269,6 +270,10 @@ class PartResultTable(Table):
                 "testresponse_pk": record.testresponse_id,
             },
         ),
+        order_by=[
+            "testresponse__student__first_name",
+            "testresponse__student__last_name",
+        ],
     )
     responses_count = Column(
         verbose_name=_("Forsøgte"),
@@ -289,7 +294,7 @@ class PartResultTable(Table):
     )
 
     def render_student(self, value, record):
-        return f"{record.rank}. {value.get_full_name()}"
+        return value.get_full_name()
 
     def render_correct_proportion(self, value):
         return f"{int(value * 100)}%"

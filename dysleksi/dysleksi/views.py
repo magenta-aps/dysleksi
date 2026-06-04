@@ -522,6 +522,7 @@ class AssignmentResultsView(
                         ),
                         assignment=self.object,
                         part=part,
+                        orderable=False,
                     ),
                 )
             )
@@ -545,22 +546,19 @@ class AssignmentResultsView(
             return super().render_to_response(context, **response_kwargs)
 
     def get_ordering(self):
-        sort = self.request.GET.get("sort")
+        sort = self.request.GET.get("sort", "student")
         desc = False
-        if sort is not None:
-            if sort.startswith("-"):
-                desc = True
-                sort = sort[1:]
-            if sort == "student":
-                ordering = "rank"
-            else:
-                ordering = f"{sort}_count"
+        if sort.startswith("-"):
+            desc = True
+            sort = sort[1:]
+        if sort == "student":
+            ordering = [
+                "student__first_name",
+                "student__last_name",
+            ]
         else:
-            ordering = "rank"
-        if desc:
-            return ["-" + ordering]
-        else:
-            return [ordering]
+            ordering = [f"{sort}_count"]
+        return reverse_ordering(ordering) if desc else ordering
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
