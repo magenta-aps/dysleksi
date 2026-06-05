@@ -214,9 +214,15 @@
                 "delayAfter": 750,
                 "resource": "resources/letter_sound/Enhanced/Instruktion/1b.12.mp3"
             },
+
+            {
+                "action": "highlight",
+                "delayAfter": 500,
+                "element": "choice-c"
+            },
             {
                 "action": "select",
-                "delayAfter": 0,
+                "delayAfter": 750,
                 "element": "choice-c"
             },
 
@@ -305,7 +311,18 @@
         "sound": "resources/shared/Bogstavlyde/1f.2 - a.mp3",
         "correct": "a",
         "correct_index": 0,
-        "wrong": ["c", "d", "g"]
+        "wrong": ["c", "d", "g"],
+        "continue_when_instruction_is_complete": false,
+        "instruction_sequence": [
+            {
+                // Sungiusarnermi taamaallaat akissutit eqqortuunersoq paasitinneqartassaatit...
+                // Bogstavlyden vil kun blive angivet under opgaverne.
+                // Du vil få besked, hvis du vælger forkert under kun øveopgaverne.
+                "action": "playSound",
+                "delayAfter": 1250,
+                "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1c.1.mp3"
+            }
+        ]
     },
     {
         "question_type": "multiple_choice",
@@ -327,27 +344,36 @@
                 "delayAfter": 0,
                 "element": "repeat"
             },
-            // Se. To kasser (?)
             {
+                // Sungiusarneq naammassivoq / Øvelserne er færdige
+                "action": "playSound",
+                "delayAfter": 1250,
+                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5c.6.mp3"
+            },
+            {
+                // Gentag-knappen skal gå tilbage til trin 1b.1 (øveopgaven med c, j, d, g.)
+                "action": "setRepeatButtonDestination",
+                "delayAfter": 0,
+                "data": "1"
+            },
+
+            {
+                // Aaku tuugassat marluk.
                 "action": "playSound",
                 "delayAfter": 0,
                 "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.1.mp3"
             },
             {
-                "action": "setRepeatButtonDestination",
-                "delayAfter": 0,
-                "data": "0"
-            },
-            {
-                "action": "show",
+                "action": "showFaded",
                 "delayAfter": 0,
                 "element": "repeat"
             },
             {
-                "action": "show",
+                "action": "showFaded",
                 "delayAfter": 1,
                 "element": "next"
             },
+
             {
                 "action": "fadeIn",
                 "delayAfter": 0,
@@ -357,9 +383,10 @@
             // at starte opgaverne.
             {
                 "action": "playSound",
-                "delayAfter": 0,
+                "delayAfter": 1250,
                 "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.2.mp3"
             },
+
             {
                 "action": "fadeIn",
                 "delayAfter": 0,
@@ -372,12 +399,12 @@
                 "delayAfter": 1250,
                 "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.3.mp3"
             },
-            // Vælg ikon (klik).
+
+            // Vælg ikon (klik) / Toorseriarit
             {
-                "action": "setButtonSoundOnce",
-                "delayAfter": 0,
-                "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.4.mp3",
-                "element": "next"
+                "action": "playSound",
+                "delayAfter": 750,
+                "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.4.mp3"
             }
         ]
     }

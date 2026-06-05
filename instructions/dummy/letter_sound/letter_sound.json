@@ -7,6 +7,16 @@
             "b",
             "x",
             "d"
+        ],
+        "continue_when_instruction_is_complete": false,
+        "instruction_sequence": [
+            {
+                // Naqinnerup nipaa taamaallaat taaneqartassaaq...... Aallartipputit.
+                // Bogstavlyden vil kun blive angivet under opgaverne. Du starter nu.
+                "action": "playSound",
+                "delayAfter": 0,
+                "resource": "resources/letter_sound/Enhanced/Deltests/1e.1.mp3"
+            }
         ]
     },
     {
