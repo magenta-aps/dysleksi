@@ -356,7 +356,7 @@ class Class(PermissionsMixin, models.Model):
     def school_year(self) -> str:
         return f"{self.school_year_start} - {self.school_year_end}"
 
-    name = models.CharField(max_length=32, null=False, blank=False, default="")
+    name = models.CharField(max_length=256, null=False, blank=False, default="")
     teachers = models.ManyToManyField(
         Teacher,
         related_name="classes",
