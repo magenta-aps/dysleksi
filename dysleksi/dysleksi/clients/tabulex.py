@@ -311,6 +311,7 @@ class DysleksiTabulexClient(TabulexClient):
                         "institution": institution_object,
                         "first_name": institution_person.Person.FirstName,
                         "last_name": institution_person.Person.FamilyName,
+                        "uniid": institution_person.Person.UserId,
                     },
                 )
                 if verbose:  # pragma: no branch
@@ -362,6 +363,7 @@ class DysleksiTabulexClient(TabulexClient):
                         "institution": institution_object,
                         "first_name": institution_person.Person.FirstName,
                         "last_name": institution_person.Person.FamilyName,
+                        "uniid": institution_person.Person.UserId,
                     },
                 )
                 if verbose:  # pragma: no branch
