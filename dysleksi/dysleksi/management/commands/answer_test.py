@@ -160,7 +160,8 @@ class Command(BaseCommand):
                             .order_by("?")
                             .first()
                         )
-                    time = time + timedelta(seconds=random.randint(3, 20))
+                    answer_time = timedelta(seconds=random.randint(3, 20))
+                    time = time + answer_time
 
                     response = QuestionResponse.objects.create(
                         question=question,
@@ -168,6 +169,7 @@ class Command(BaseCommand):
                         correctness=correctness,
                         answer_option=answer_option,
                         answer_text=answer_text,
+                        finished_after=answer_time.seconds * 1000,
                     )
                     response.submitted_at = time
                     response.save()

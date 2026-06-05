@@ -8,6 +8,7 @@ import re
 from base64 import b64decode
 from dataclasses import dataclass
 from datetime import date
+from functools import partial
 from math import floor
 from typing import Any, Dict, List, Self, Tuple
 
@@ -27,6 +28,7 @@ from django.db.models import (
     IntegerField,
     Q,
     QuerySet,
+    Sum,
     TextChoices,
     Value,
     When,
@@ -49,6 +51,23 @@ TEACHERS = "Lærere"
 STUDENTS = "Elever"
 
 logger = logging.getLogger(__name__)
+
+
+class Proxy:
+    # Wraps an object and applies extra properties to the wrapper
+    # The Proxy acts like the wrapped object,
+    # but can have additional methods and attributes
+    def __init__(self, wrapped, **kwargs):
+        self.wrapped = wrapped
+        # Set additional attributes and methods on the Proxy
+        for key, value in kwargs.items():
+            setattr(self, key, value)
+
+    def __getattr__(self, attr):
+        # Called when trying to get an attribute on the proxy that wasn't found
+        # (i.e. not in kwargs to the constructor)
+        # Look in wrapped object
+        return getattr(self.wrapped, attr)
 
 
 class InstructionAction(TextChoices):
@@ -1374,6 +1393,40 @@ class PartResponseQuerySet(PermissionsQuerySet):
 
         return self.annotate(**{output_key: Case(*cases, default=Value(default_key))})
 
+    def annotate_question_sum_answer_time(self, output_key, filter: Q | None = None):
+        # output_key will be annotated with the sum of answer time in milliseconds
+        if filter is None:
+            filter = Q()
+        return self.annotate(
+            **{
+                output_key: ExpressionWrapper(
+                    Subquery(
+                        QuestionResponse.objects.filter(
+                            partresponse=OuterRef("pk"),
+                        )
+                        .filter(filter)
+                        .values("partresponse")
+                        .annotate(total_finished_after=Sum("finished_after"))
+                        .values("total_finished_after")
+                    ),
+                    output_field=IntegerField(),
+                )
+            }
+        )
+
+    def annotate_question_average_answers_per_minute(
+        self, count_key, time_key, output_key
+    ):
+        return self.annotate(
+            **{
+                output_key: ExpressionWrapper(
+                    (Cast(count_key, output_field=FloatField()) / F(time_key))
+                    * Value(60000),  # Convert milliseconds to minutes
+                    output_field=FloatField(),
+                )
+            }
+        )
+
 
 class PartResponse(PermissionsMixin, models.Model):
 
@@ -1838,4 +1891,32 @@ class CategoryRange:
 
 
 class ReadingSpeedCategory(Category):
-    pass
+    @classmethod
+    def validate_categories(cls):
+        pass
+
+    def scaled(self, scale):
+        return Proxy(
+            self,
+            scaled_width=partial(lambda scale: scale * self.width, scale),
+        )
+
+    @classmethod
+    def pk_map(cls, reverse: bool = False, scale_max: float | None = None):
+        if scale_max is None:
+            return super().pk_map(reverse)
+        qs = cls.with_proportion()
+        if reverse:
+            qs = qs.order_by("-upper_proportion_limit")
+        items = list(qs)
+        scale_max = max(scale_max, *[x.upper_proportion_limit for x in items])
+        pk_map = {}
+        first = True
+        lower_scale = 1.0 / scale_max
+        lower_size = sum([x.width for x in items[1:]])
+        upper_scale = (1.0 - lower_scale * lower_size) / items[0].width
+
+        for category in qs:  # pragma: no branch
+            pk_map[category.pk] = category.scaled(upper_scale if first else lower_scale)
+            first = False
+        return pk_map

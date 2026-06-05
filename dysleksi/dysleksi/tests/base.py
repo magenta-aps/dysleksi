@@ -442,6 +442,7 @@ class ResponseTest(DysleksiTest):
             question=cls.group_question_1,
             answer_option=possible_correct_answer1,
             correctness=Correctness.CORRECT,
+            finished_after=3000,
         )
         cls.group_questionresponse_1_1.submitted_at = datetime(
             2026, 5, 1, 12, 0, 10, tzinfo=tz
@@ -452,6 +453,7 @@ class ResponseTest(DysleksiTest):
             partresponse=cls.group_partresponse_1,
             question=cls.group_question_2,
             correctness=Correctness.CORRECT,
+            finished_after=4000,
         )
         cls.group_questionresponse_1_2.submitted_at = datetime(
             2026, 5, 1, 12, 0, 15, tzinfo=tz
@@ -462,6 +464,7 @@ class ResponseTest(DysleksiTest):
             partresponse=cls.group_partresponse_1,
             question=cls.group_question_3,
             correctness=Correctness.CORRECT,
+            finished_after=5000,
         )
         cls.group_questionresponse_1_3.submitted_at = datetime(
             2026, 5, 1, 12, 0, 25, tzinfo=tz
@@ -472,6 +475,7 @@ class ResponseTest(DysleksiTest):
             partresponse=cls.group_partresponse_1,
             question=cls.group_question_4,
             correctness=Correctness.CORRECT,
+            finished_after=6000,
         )
         cls.group_questionresponse_1_4.submitted_at = datetime(
             2026, 5, 1, 12, 0, 40, tzinfo=tz
@@ -483,6 +487,7 @@ class ResponseTest(DysleksiTest):
             question=cls.group_question_1,
             answer_option=possible_correct_answer1,
             correctness=Correctness.CORRECT,
+            finished_after=5000,
         )
         cls.group_questionresponse_2_1.submitted_at = datetime(
             2026, 5, 1, 12, 0, 12, tzinfo=tz
@@ -493,6 +498,7 @@ class ResponseTest(DysleksiTest):
             partresponse=cls.group_partresponse_2,
             question=cls.group_question_2,
             correctness=Correctness.WRONG,
+            finished_after=4000,
         )
         cls.group_questionresponse_2_2.submitted_at = datetime(
             2026, 5, 1, 12, 0, 25, tzinfo=tz
@@ -503,6 +509,7 @@ class ResponseTest(DysleksiTest):
             partresponse=cls.group_partresponse_2,
             question=cls.group_question_3,
             correctness=Correctness.WRONG,
+            finished_after=3000,
         )
         cls.group_questionresponse_2_3.submitted_at = datetime(
             2026, 5, 1, 12, 0, 40, tzinfo=tz
@@ -513,6 +520,7 @@ class ResponseTest(DysleksiTest):
             partresponse=cls.group_partresponse_2,
             question=cls.group_question_4,
             correctness=Correctness.WRONG,
+            finished_after=4000,
         )
         cls.group_questionresponse_2_4.submitted_at = datetime(
             2026, 5, 1, 12, 0, 55, tzinfo=tz
@@ -544,6 +552,7 @@ class ResponseTest(DysleksiTest):
             question=cls.wordspelling_question_2,
             answer_option=cls.wordspelling_option_2_2,
             correctness=Correctness.PARTIAL,
+            finished_after=5000,
         )
         cls.wordspelling_questionresponse_1_1.submitted_at = datetime(
             2026, 5, 1, 12, 0, 10, tzinfo=tz
@@ -569,6 +578,7 @@ class ResponseTest(DysleksiTest):
             question=cls.sentencereading_question,
             correctness=Correctness.CORRECT,
             answer_option=cls.sentencereading_option_1,
+            finished_after=5000,
         )
         cls.sentencereading_questionresponse_1.submitted_at = datetime(
             2026, 5, 1, 12, 0, 40, tzinfo=tz

@@ -485,6 +485,10 @@ msgid "Normscore og læsetempo"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
+msgid "Bemærk: Kategorisering af læsetempo er endnu ikke vedtaget"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
 msgid "Læsetempo"
 msgstr ""
 
@@ -604,6 +608,10 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
 msgid "Klassens resultater"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
+msgid "Klassens fordeling"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
