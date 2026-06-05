@@ -32,6 +32,7 @@ from dysleksi.models import (
     PlannedDateTime,
     PossibleAnswer,
     QuestionResponse,
+    ReadingSpeedCategory,
     Test,
     TestAssignment,
     TestPart,
@@ -1172,6 +1173,135 @@ class TestResultCategory(TestCase):
         )
 
 
+class TestReadingSpeedCategory(TestCase):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        ReadingSpeedCategory.objects.get_or_create(
+            id=1,
+            defaults={
+                "color_key": CategoryColorChoice.RED,
+                "upper_proportion_limit": 1,
+                "label_da": "Meget lavt",
+            },
+        )
+        ReadingSpeedCategory.objects.get_or_create(
+            id=2,
+            defaults={
+                "color_key": CategoryColorChoice.YELLOW,
+                "upper_proportion_limit": 3.5,
+                "label_da": "Lavt",
+            },
+        )
+        ReadingSpeedCategory.objects.get_or_create(
+            id=3,
+            defaults={
+                "color_key": CategoryColorChoice.GREEN,
+                "upper_proportion_limit": 7.5,
+                "label_da": "Middel",
+            },
+        )
+        ReadingSpeedCategory.objects.get_or_create(
+            id=4,
+            defaults={
+                "color_key": CategoryColorChoice.BLUE,
+                "upper_proportion_limit": 10,
+                "label_da": "Højt",
+            },
+        )
+
+    def test_pk_map_unscaled(self):
+        pk_map = ReadingSpeedCategory.pk_map()
+        self.assertEqual(len(pk_map), 4)
+        self.assertEqual(pk_map[1], ReadingSpeedCategory.objects.get(pk=1))
+        self.assertEqual(pk_map[2], ReadingSpeedCategory.objects.get(pk=2))
+        self.assertEqual(pk_map[3], ReadingSpeedCategory.objects.get(pk=3))
+        self.assertEqual(pk_map[4], ReadingSpeedCategory.objects.get(pk=4))
+        self.assertEqual(pk_map[1].width, 1)
+        self.assertEqual(pk_map[2].width, 2.5)
+        self.assertEqual(pk_map[3].width, 4)
+        self.assertEqual(pk_map[4].width, 2.5)
+        self.assertEqual(list(pk_map.keys()), [1, 2, 3, 4])
+
+    def test_pk_map_unscaled_reversed(self):
+        pk_map = ReadingSpeedCategory.pk_map(reverse=True)
+        self.assertEqual(len(pk_map), 4)
+        self.assertEqual(pk_map[1], ReadingSpeedCategory.objects.get(pk=1))
+        self.assertEqual(pk_map[2], ReadingSpeedCategory.objects.get(pk=2))
+        self.assertEqual(pk_map[3], ReadingSpeedCategory.objects.get(pk=3))
+        self.assertEqual(pk_map[4], ReadingSpeedCategory.objects.get(pk=4))
+        self.assertEqual(pk_map[1].width, 1)
+        self.assertEqual(pk_map[2].width, 2.5)
+        self.assertEqual(pk_map[3].width, 4)
+        self.assertEqual(pk_map[4].width, 2.5)
+        self.assertEqual(list(pk_map.keys()), [4, 3, 2, 1])
+
+    def test_pk_map_scaled(self):
+        pk_map = ReadingSpeedCategory.pk_map(scale_max=4)
+        self.assertEqual(len(pk_map), 4)
+        self.assertEqual(pk_map[1].width, 1)
+        self.assertEqual(pk_map[2].width, 2.5)
+        self.assertEqual(pk_map[3].width, 4)
+        self.assertEqual(pk_map[4].width, 2.5)
+        self.assertAlmostEqual(pk_map[1].scaled_width(), 0.1)
+        self.assertAlmostEqual(pk_map[2].scaled_width(), 0.25)
+        self.assertAlmostEqual(pk_map[3].scaled_width(), 0.4)
+        self.assertAlmostEqual(pk_map[4].scaled_width(), 0.25)
+
+        pk_map = ReadingSpeedCategory.pk_map(scale_max=10)
+        self.assertEqual(len(pk_map), 4)
+        self.assertAlmostEqual(pk_map[1].scaled_width(), 0.1)
+        self.assertAlmostEqual(pk_map[2].scaled_width(), 0.25)
+        self.assertAlmostEqual(pk_map[3].scaled_width(), 0.4)
+        self.assertAlmostEqual(pk_map[4].scaled_width(), 0.25)
+
+        pk_map = ReadingSpeedCategory.pk_map(scale_max=20)
+        self.assertEqual(len(pk_map), 4)
+        self.assertEqual(pk_map[1].width, 1)
+        self.assertEqual(pk_map[2].width, 2.5)
+        self.assertEqual(pk_map[3].width, 4)
+        self.assertEqual(pk_map[4].width, 2.5)
+        self.assertAlmostEqual(pk_map[1].scaled_width(), 0.55)
+        self.assertAlmostEqual(pk_map[2].scaled_width(), 0.125)
+        self.assertAlmostEqual(pk_map[3].scaled_width(), 0.2)
+        self.assertAlmostEqual(pk_map[4].scaled_width(), 0.125)
+
+    def test_pk_map_scaled_reversed(self):
+        # Scale by less than max category value - no impact
+        pk_map = ReadingSpeedCategory.pk_map(reverse=True, scale_max=4)
+        self.assertEqual(len(pk_map), 4)
+        self.assertEqual(pk_map[1].width, 1)
+        self.assertEqual(pk_map[2].width, 2.5)
+        self.assertEqual(pk_map[3].width, 4)
+        self.assertEqual(pk_map[4].width, 2.5)
+        self.assertAlmostEqual(pk_map[1].scaled_width(), 0.1)
+        self.assertAlmostEqual(pk_map[2].scaled_width(), 0.25)
+        self.assertAlmostEqual(pk_map[3].scaled_width(), 0.4)
+        self.assertAlmostEqual(pk_map[4].scaled_width(), 0.25)
+
+        # Scale by same as max category value - no impact
+        pk_map = ReadingSpeedCategory.pk_map(reverse=True, scale_max=10)
+        self.assertEqual(len(pk_map), 4)
+        self.assertAlmostEqual(pk_map[1].scaled_width(), 0.1)
+        self.assertAlmostEqual(pk_map[2].scaled_width(), 0.25)
+        self.assertAlmostEqual(pk_map[3].scaled_width(), 0.4)
+        self.assertAlmostEqual(pk_map[4].scaled_width(), 0.25)
+
+        # Scale by more than max category value
+        # topmost category stretches and the others shrink
+        pk_map = ReadingSpeedCategory.pk_map(reverse=True, scale_max=20)
+        self.assertEqual(len(pk_map), 4)
+        self.assertEqual(pk_map[1].width, 1)
+        self.assertEqual(pk_map[2].width, 2.5)
+        self.assertEqual(pk_map[3].width, 4)
+        self.assertEqual(pk_map[4].width, 2.5)
+        self.assertAlmostEqual(pk_map[1].scaled_width(), 0.05)
+        self.assertAlmostEqual(pk_map[2].scaled_width(), 0.125)
+        self.assertAlmostEqual(pk_map[3].scaled_width(), 0.2)
+        self.assertAlmostEqual(pk_map[4].scaled_width(), 0.625)
+
+
 class TestTestResponseQuerySet(ResponseTest):
 
     @classmethod
@@ -1462,3 +1592,33 @@ class TestPartResponseQuerySet(ResponseTest):
             CorrectnessCategory.partition_question_count(0)
         with self.assertRaises(ValueError):
             CorrectnessCategory.partition_question_count(-1)
+
+    def test_annotate_question_sum_answer_time(self):
+        qs = self.qs.annotate_question_sum_answer_time("total_answer_time")
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.total_answer_time, 18000)
+        self.assertEqual(student2_answer.total_answer_time, 16000)
+
+        qs = self.qs.annotate_question_sum_answer_time(
+            "total_answer_time", Q(question__is_practice=False)
+        )
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertEqual(student1_answer.total_answer_time, 18000)
+        self.assertEqual(student2_answer.total_answer_time, 16000)
+
+    def annotate_question_average_answers_per_minute(self):
+        qs = self.qs.annotate_questions_count("questions_count")
+        qs = qs.annotate_question_sum_answer_time("total_answer_time")
+        qs = qs.annotate_question_average_answers_per_minute(
+            "questions_count", "total_answer_time", "average_answers_per_minute"
+        )
+        student1_answer = qs[0]
+        student2_answer = qs[1]
+        self.assertAlmostEqual(
+            student1_answer.average_answers_per_minute, 60.0 * 4.0 / 18.0
+        )
+        self.assertAlmostEqual(
+            student2_answer.average_answers_per_minute, 60.0 * 4.0 / 16.0
+        )

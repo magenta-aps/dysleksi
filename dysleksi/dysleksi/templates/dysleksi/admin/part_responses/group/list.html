@@ -90,13 +90,13 @@
     {% if plot %}
     <div class="normscore-readingspeed-plot mt-4">
         <h6>{% translate 'Normscore og læsetempo' %}</h6>
+        <p>{% translate "Bemærk: Kategorisering af læsetempo er endnu ikke vedtaget" %}</p>
 
         <div class="plot-y-label-container">
             <div class="plot-y-label-text">{% translate 'Læsetempo' %}</div>
         </div>
 
         <div class="plot-table-container">
-
         {% localize off %}
             <canvas id="chart" class="plot-canvas" style="
                     {# I samarbejde med min og max-specifikationen nede i chartjs-setuppet #}
@@ -110,18 +110,19 @@
 
             <table class="table table-bordered plot-table">
             <tbody>
-            {% for pk, reading_category in ReadingSpeeedCategories.items %}
+            {% for pk, reading_category in ReadingSpeedCategories.items %}
+
                 <tr>
                     <td
                             class="plot-table-y-category-cell category-{{ reading_category.color_key }}"
-                            style="height: calc({{ reading_category.width }} * var(--plot-canvas-height)); "
+                            style="height: calc({{ reading_category.scaled_width }} * var(--plot-canvas-height)); "
                     >
                         <div
                                 class="plot-table-y-category-label"
                                 style="
-                                        width: calc({{ reading_category.width }} * var(--plot-canvas-height));
-                                        left: calc(var(--plot-y-label-width) - 0.75rem - ({{ reading_category.width }} * 20rem));
-                                        top: calc(({{ reading_category.width }} * var(--plot-canvas-height) / 2) - var(--plot-y-label-width) / 2)
+                                        width: calc({{ reading_category.scaled_width }} * var(--plot-canvas-height));
+                                        left: calc(var(--plot-y-label-width) - 0.75rem - ({{ reading_category.scaled_width }} * 20rem));
+                                        top: calc(({{ reading_category.scaled_width }} * var(--plot-canvas-height) / 2) - var(--plot-y-label-width) / 2)
                                 "
                         >{{ reading_category.label_da }}</div>
                     </td>
@@ -152,13 +153,14 @@
 
     <style>
         .normscore-readingspeed-plot .plot-table-container {
-            --vertical-category-count: {{ ReadingSpeeedCategories|length }};
+            --vertical-category-count: {{ ReadingSpeedCategories|length }};
         }
     </style>
-
-
         {{ plot|json_script:"plot_data" }}
+        {{ y_scale|json_script:"y_scale" }}
         <script>
+            const plot_data = JSON.parse(document.getElementById("plot_data").textContent);
+            const y_scale = JSON.parse(document.getElementById("y_scale").textContent);
             const chart = new Chart(
                 document.getElementById("chart"),
                 {
@@ -166,7 +168,7 @@
                     data: {
                         datasets: [
                             {
-                                data: JSON.parse(document.getElementById("plot_data").textContent)
+                                data: plot_data
                             }
                         ]
                     },
@@ -196,7 +198,7 @@
                             y: {
                                 display: false,
                                 min: -0.01,
-                                max: 1.01,
+                                max: 1.01 * y_scale,
                                 ticks: {
                                     display:false
                                 },

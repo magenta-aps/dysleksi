@@ -632,6 +632,12 @@ class AssignmentPartResultsView(GroupRequiredMixin, ObjectPermissionsMixin, List
             )
             .annotate_percentage("correct_proportion", "correct_percentage")
             .annotate_ordering("correct_count", "rank", False)
+            .annotate_question_sum_answer_time(
+                "total_answer_time", Q(question__is_practice=False)
+            )
+            .annotate_question_average_answers_per_minute(
+                "responses_count", "total_answer_time", "answers_per_minute"
+            )
         ).order_by(*self.get_ordering())
 
     def get_ordering(self) -> List[str]:
@@ -651,6 +657,21 @@ class AssignmentPartResultsView(GroupRequiredMixin, ObjectPermissionsMixin, List
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+
+        # Figure out which is bigger: The normal upper limit of the categories,
+        # or the largest data point
+        # Category axis and chart will be scaled by this value, the axis so that
+        # the upper category stretches to include this value, shrinking the others.
+        # A value that falls into one category will still remain in that category,
+        # but move down in the graph as the category shrinks.
+        readingspeedcategory_max = (
+            ReadingSpeedCategory.objects.order_by("-upper_proportion_limit")
+            .values_list("upper_proportion_limit", flat=True)
+            .first()
+        )
+        result_max = max(self.object_list.values_list("answers_per_minute", flat=True))
+        y_scale = max(readingspeedcategory_max, result_max)
+
         context.update(
             {
                 "assignment": self.assignment,
@@ -658,7 +679,10 @@ class AssignmentPartResultsView(GroupRequiredMixin, ObjectPermissionsMixin, List
                 "table": self.get_table(),
                 "CorrectnessCategories": CorrectnessCategory.pk_map(),
                 "sort": self.request.GET.get("sort", "student"),
-                "ReadingSpeeedCategories": ReadingSpeedCategory.pk_map(reverse=True),
+                "ReadingSpeedCategories": ReadingSpeedCategory.pk_map(
+                    reverse=True, scale_max=y_scale
+                ),
+                "y_scale": y_scale,
             }
         )
         if self.part.show_normscore_speed_plot:  # pragma: no cover
@@ -669,34 +693,9 @@ class AssignmentPartResultsView(GroupRequiredMixin, ObjectPermissionsMixin, List
         return PartResultTable(data=self.object_list)
 
     def get_plot_data(self) -> List[Tuple[float, float]]:  # pragma: no cover
-        # Til demonstration af hvor godt renderingen rammer
-        return [
-            (0.0, 0.0),
-            (0.0, 0.1),
-            (0.0, 0.35),
-            (0.0, 0.75),
-            (0.0, 1.0),
-            (0.1, 0.0),
-            (0.1, 0.1),
-            (0.1, 0.35),
-            (0.1, 0.75),
-            (0.1, 1.0),
-            (0.35, 0.0),
-            (0.35, 0.1),
-            (0.35, 0.35),
-            (0.35, 0.75),
-            (0.35, 1.0),
-            (0.75, 0.0),
-            (0.75, 0.1),
-            (0.75, 0.35),
-            (0.75, 0.75),
-            (0.75, 1.0),
-            (1.0, 0.0),
-            (1.0, 0.1),
-            (1.0, 0.35),
-            (1.0, 0.75),
-            (1.0, 1.0),
-        ]
+        # x-værdier: normscore (correct_proportion)
+        # y-værdier: svar pr. minut
+        return [(x.correct_proportion, x.answers_per_minute) for x in self.object_list]
 
 
 class TestResponseView(

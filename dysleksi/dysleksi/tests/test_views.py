@@ -1471,11 +1471,11 @@ class TestPartResponseView(ResponseTest):
             table,
             [
                 [["Opg."], ["Billede"], ["Rigtigt svar"], ["Elevens svar"], ["Tid"]],
-                [["1"], [], [], [], ["—"]],
-                [["2"], [], ["TestOrd"], [], ["—"]],
-                [["3"], [], [], [], ["—"]],
-                [["4"], [], [], [], ["—"]],
-                [[], [], [], [], ["0 sek."]],
+                [["1"], [], [], [], ["3 sek."]],
+                [["2"], [], ["TestOrd"], [], ["4 sek."]],
+                [["3"], [], [], [], ["5 sek."]],
+                [["4"], [], [], [], ["6 sek."]],
+                [[], [], [], [], ["18 sek."]],
             ],
         )
         container = soup.find("table").parent

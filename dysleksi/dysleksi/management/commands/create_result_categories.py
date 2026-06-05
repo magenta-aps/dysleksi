@@ -63,11 +63,12 @@ class Command(BaseCommand):
         CorrectnessCategory.validate_categories()
 
     def create_readingspeed_categories(self):
+        # Values represent number of answered questions per minute
         ReadingSpeedCategory.objects.get_or_create(
             id=1,
             color_key=CategoryColorChoice.RED,
             defaults={
-                "upper_proportion_limit": 0.1,
+                "upper_proportion_limit": 1,
                 "label_da": "Meget lavt",
             },
         )
@@ -75,7 +76,7 @@ class Command(BaseCommand):
             id=2,
             color_key=CategoryColorChoice.YELLOW,
             defaults={
-                "upper_proportion_limit": 0.35,
+                "upper_proportion_limit": 3.5,
                 "label_da": "Lavt",
             },
         )
@@ -83,7 +84,7 @@ class Command(BaseCommand):
             id=3,
             color_key=CategoryColorChoice.GREEN,
             defaults={
-                "upper_proportion_limit": 0.75,
+                "upper_proportion_limit": 7.5,
                 "label_da": "Middel",
             },
         )
@@ -91,7 +92,7 @@ class Command(BaseCommand):
             id=4,
             color_key=CategoryColorChoice.BLUE,
             defaults={
-                "upper_proportion_limit": 1,
+                "upper_proportion_limit": 10,
                 "label_da": "Højt",
             },
         )
