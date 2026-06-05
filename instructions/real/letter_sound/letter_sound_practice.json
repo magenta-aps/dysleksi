@@ -304,12 +304,14 @@
         "question_type": "multiple_choice",
         "sound": "resources/shared/Bogstavlyde/1f.2 - a.mp3",
         "correct": "a",
+        "correct_index": 0,
         "wrong": ["c", "d", "g"]
     },
     {
         "question_type": "multiple_choice",
         "sound": "resources/shared/Bogstavlyde/1f.24 - t[d].mp3",
         "correct": "t",
+        "correct_index": 3,
         "wrong": ["c", "j", "g"]
     },
     {

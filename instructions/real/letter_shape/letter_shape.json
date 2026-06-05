@@ -2,127 +2,127 @@
   {
     "question_type": "multiple_choice_match",
     "correct": "Ss",
-    "set1": ["S", "C", "M", "Z", "T", "F"],
-    "set2": ["s", "q", "n", "e", "l", "æ"]
+    "set1": ["C", "S", "M", "Z", "T", "F"],
+    "set2": ["q", "n", "e", "s", "l", "æ"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Aa",
-    "set1": ["A", "M", "U", "L", "V", "I"],
-    "set2": ["a", "e", "p", "o", "k", "t"]
+    "set1": ["M", "U", "L", "V", "A", "I"],
+    "set2": ["e", "p", "o", "k", "t", "a"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Rr",
-    "set1": ["R", "S", "E", "P", "K", "C"],
-    "set2": ["r", "t", "h", "u", "n", "l"]
+    "set1": ["S", "E", "P", "R", "K", "C"],
+    "set2": ["t", "r", "h", "u", "n", "l"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Mm",
-    "set1": ["M", "Q", "A", "T", "E", "W"],
-    "set2": ["m", "n", "u", "o", "s", "i"]
+    "set1": ["Q", "A", "T", "E", "W", "M"],
+    "set2": ["n", "u", "m", "o", "s", "i"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Kk",
-    "set1": ["K", "N", "C", "I", "R", "J"],
-    "set2": ["k", "a", "q", "g", "h", "å"]
+    "set1": ["N", "C", "I", "R", "K", "J"],
+    "set2": ["a", "q", "k", "g", "h", "å"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Vv",
-    "set1": ["V", "Z", "L", "M", "T", "N"],
-    "set2": ["v", "i", "u", "w", "f", "p"]
+    "set1": ["Z", "L", "V", "M", "T", "N"],
+    "set2": ["i", "u", "w", "f", "p", "v"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Uu",
     "set1": ["U", "E", "J", "Y", "Å", "R"],
-    "set2": ["u", "q", "m", "a", "i", "n"]
+    "set2": ["q", "m", "a", "i", "u", "n"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Pp",
-    "set1": ["P", "R", "L", "E", "K", "A"],
+    "set1": ["R", "L", "P", "E", "K", "A"],
     "set2": ["p", "g", "f", "s", "v", "i"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Ii",
-    "set1": ["I", "J", "F", "T", "Æ", "G"],
-    "set2": ["i", "o", "l", "u", "a", "s"]
+    "set1": ["J", "F", "T", "I", "Æ", "G"],
+    "set2": ["o", "i", "l", "u", "a", "s"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Qq",
-    "set1": ["Q", "L", "O", "G", "H", "Å"],
-    "set2": ["q", "j", "r", "a", "k", "p"]
+    "set1": ["L", "Q", "O", "G", "H", "Å"],
+    "set2": ["j", "r", "q", "a", "k", "p"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Hh",
     "set1": ["H", "M", "K", "G", "A", "J"],
-    "set2": ["h", "å", "l", "r", "f", "t"]
+    "set2": ["å", "l", "r", "h", "f", "t"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Ff",
-    "set1": ["F", "K", "J", "I", "V", "R"],
+    "set1": ["K", "J", "I", "V", "R", "F"],
     "set2": ["f", "n", "l", "e", "p", "s"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Tt",
-    "set1": ["T", "I", "Q", "G", "P", "E"],
-    "set2": ["t", "v", "u", "d", "s", "l"]
+    "set1": ["I", "T", "Q", "G", "P", "E"],
+    "set2": ["v", "u", "d", "s", "t", "l"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Ee",
-    "set1": ["E", "M", "Æ", "O", "F", "L"],
-    "set2": ["e", "a", "v", "u", "j", "s"]
+    "set1": ["M", "Æ", "O", "F", "E", "L"],
+    "set2": ["a", "e", "v", "u", "j", "s"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Ll",
-    "set1": ["L", "K", "U", "I", "F", "R"],
-    "set2": ["l", "t", "p", "s", "m", "j"]
+    "set1": ["K", "U", "I", "L", "F", "R"],
+    "set2": ["t", "p", "s", "m", "l", "j"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Gg",
-    "set1": ["G", "F", "Q", "O", "V", "C"],
-    "set2": ["g", "s", "i", "k", "j", "t"]
+    "set1": ["F", "Q", "G", "O", "V", "C"],
+    "set2": ["s", "i", "k", "j", "t", "g"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Nn",
-    "set1": ["N", "A", "E", "V", "H", "Z"],
-    "set2": ["n", "l", "j", "t", "m", "u"]
+    "set1": ["A", "E", "V", "H", "Z", "N"],
+    "set2": ["l", "j", "n", "t", "m", "u"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Jj",
     "set1": ["J", "H", "F", "E", "L", "P"],
-    "set2": ["j", "k", "u", "g", "i", "r"]
+    "set2": ["k", "u", "g", "j", "i", "r"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Aa",
-    "set1": ["A", "I", "V", "E", "M", "U"],
-    "set2": ["a", "s", "p", "o", "k", "t"]
+    "set1": ["I", "V", "E", "A", "M", "U"],
+    "set2": ["s", "p", "o", "k", "t", "a"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Oo",
-    "set1": ["O", "V", "Q", "Å", "I", "G"],
+    "set1": ["V", "Q", "Å", "I", "O", "G"],
     "set2": ["o", "e", "k", "d", "p", "s"]
   },
   {
     "question_type": "multiple_choice_match",
     "correct": "Gg",
-    "set1": ["G", "F", "Q", "U", "V", "C"],
-    "set2": ["g", "k", "i", "s", "j", "t"]
+    "set1": ["F", "G", "Q", "U", "V", "C"],
+    "set2": ["k", "i", "s", "j", "g", "t"]
   }
 ]
