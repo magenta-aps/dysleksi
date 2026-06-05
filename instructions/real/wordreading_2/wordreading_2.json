@@ -8,6 +8,7 @@
             "igalaaq"
         ],
         "correct": "iga",
+        "correct_index": 0,
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
             {
@@ -28,7 +29,8 @@
             "umiaq",
             "ulloriaq"
         ],
-        "correct": "ulu"
+        "correct": "ulu",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/3-_Skur.jpg",
@@ -38,7 +40,8 @@
             "qisuk",
             "qajaq"
         ],
-        "correct": "qui"
+        "correct": "qui",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/4_-_Blod.jpg",
@@ -48,7 +51,8 @@
             "aapakaaq",
             "aaqqatit"
         ],
-        "correct": "aak"
+        "correct": "aak",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/5_-Dør.jpg",
@@ -58,7 +62,8 @@
             "matuersaat",
             "mannik"
         ],
-        "correct": "matu"
+        "correct": "matu",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/6-_Sabel.jpg",
@@ -68,7 +73,8 @@
             "paarnat",
             "pisisseq"
         ],
-        "correct": "pana"
+        "correct": "pana",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/7_-_Sælskin.jpg",
@@ -78,7 +84,8 @@
             "arsaq",
             "aaveq"
         ],
-        "correct": "ameq"
+        "correct": "ameq",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/8_-Hus.jpg",
@@ -88,7 +95,8 @@
             "illuigaq",
             "iluliaq"
         ],
-        "correct": "illu"
+        "correct": "illu",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/9-_Øre.jpg",
@@ -98,7 +106,8 @@
             "siku",
             "sikkili"
         ],
-        "correct": "siut"
+        "correct": "siut",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/10_-_Foto.jpg",
@@ -108,7 +117,8 @@
             "assak",
             "aqisseq"
         ],
-        "correct": "assi"
+        "correct": "assi",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/11-_vandløb.jpg",
@@ -118,7 +128,8 @@
             "kikiak",
             "kulloq"
         ],
-        "correct": "kuuk"
+        "correct": "kuuk",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/12_-_Mave.jpg",
@@ -128,7 +139,8 @@
             "naasoq",
             "nateq"
         ],
-        "correct": "naat"
+        "correct": "naat",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/13_-_Svamp.jpg",
@@ -138,7 +150,8 @@
             "palasi",
             "puisi"
         ],
-        "correct": "pupik"
+        "correct": "pupik",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/14_-_Vinge.jpg",
@@ -148,7 +161,8 @@
             "sukkulaat",
             "saaneq"
         ],
-        "correct": "suluk"
+        "correct": "suluk",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/15_-_Anker.jpg",
@@ -158,7 +172,8 @@
             "kikiak",
             "kuanneq"
         ],
-        "correct": "kisaq"
+        "correct": "kisaq",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/16_-_Ror.jpg",
@@ -168,7 +183,8 @@
             "aqerluusaq",
             "aalisaat"
         ],
-        "correct": "aquut"
+        "correct": "aquut",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/17_-_Skæg.jpg",
@@ -178,7 +194,8 @@
             "ukaleq",
             "umiarsuaq"
         ],
-        "correct": "umiit"
+        "correct": "umiit",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/18_-_Knap.jpg",
@@ -188,7 +205,8 @@
             "arsaq",
             "atuagaq"
         ],
-        "correct": "attat"
+        "correct": "attat",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/19_-_Hånd.jpg",
@@ -198,7 +216,8 @@
             "allarut",
             "aasiak"
         ],
-        "correct": "assak"
+        "correct": "assak",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/20_-_Hvalros.jpg",
@@ -208,7 +227,8 @@
             "aapakaaq",
             "arfeq"
         ],
-        "correct": "aaveq"
+        "correct": "aaveq",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/21_-_Violin.jpg",
@@ -218,7 +238,8 @@
             "aalaterut",
             "aallaat"
         ],
-        "correct": "agiaq"
+        "correct": "agiaq",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/22_-_Mand.jpg",
@@ -228,7 +249,8 @@
             "arnaq",
             "alersit"
         ],
-        "correct": "angut"
+        "correct": "angut",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/23_-_Træ.jpg",
@@ -238,7 +260,8 @@
             "oqaluffik",
             "oorit"
         ],
-        "correct": "orpik"
+        "correct": "orpik",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/24_-_Konebåd.jpg",
@@ -248,7 +271,8 @@
             "umimmak",
             "umiit"
         ],
-        "correct": "umiaq"
+        "correct": "umiaq",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/25_-_Kat.jpg",
@@ -258,7 +282,8 @@
             "qajaq",
             "qiuutit"
         ],
-        "correct": "qitsuk"
+        "correct": "qitsuk",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/26_-_Baby.jpg",
@@ -268,7 +293,8 @@
             "megqoq",
             "meqqut"
         ],
-        "correct": "meeraq"
+        "correct": "meeraq",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/27-_Gardin.jpg",
@@ -278,7 +304,8 @@
             "savik",
             "siku"
         ],
-        "correct": "saagut"
+        "correct": "saagut",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/28_-_Knogle.jpg",
@@ -288,7 +315,8 @@
             "sanigutit",
             "saaniluk"
         ],
-        "correct": "saaneq"
+        "correct": "saaneq",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/29_-Hund.jpg",
@@ -298,7 +326,8 @@
             "qisuk",
             "qillerut"
         ],
-        "correct": "qimmeq"
+        "correct": "qimmeq",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/30_-_Æg.jpg",
@@ -308,7 +337,8 @@
             "mamakujuttut",
             "matu"
         ],
-        "correct": "mannik"
+        "correct": "mannik",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/31_-_Skyggebillede.jpg",
@@ -318,7 +348,8 @@
             "terianniaq",
             "taleq"
         ],
-        "correct": "tarraq"
+        "correct": "tarraq",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/32_-_Lampe.jpg",
@@ -328,7 +359,8 @@
             "qungasequt",
             "quligut"
         ],
-        "correct": "qulleq"
+        "correct": "qulleq",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/33-_Søm.jpg",
@@ -338,7 +370,8 @@
             "kiinarpak",
             "kisaq"
         ],
-        "correct": "kikiak"
+        "correct": "kikiak",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/34_-_Præst.jpg",
@@ -348,7 +381,8 @@
             "pana",
             "papikuujuk"
         ],
-        "correct": "palasi"
+        "correct": "palasi",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/35_-_Hale.jpg",
@@ -358,7 +392,8 @@
             "paarnat",
             "pilutaq"
         ],
-        "correct": "pamioq"
+        "correct": "pamioq",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/36_-Ble.jpg",
@@ -368,7 +403,8 @@
             "naasoq",
             "nujaq"
         ],
-        "correct": "nangeq"
+        "correct": "nangeq",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/37_-_Bukser.jpg",
@@ -378,7 +414,8 @@
             "qajaq",
             "qaammat"
         ],
-        "correct": "qarliit"
+        "correct": "qarliit",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/38_-_Slæde.jpg",
@@ -388,7 +425,8 @@
             "qalipaatit",
             "qitsuk"
         ],
-        "correct": "qamutit"
+        "correct": "qamutit",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/39_-_Frø.jpg",
@@ -398,7 +436,8 @@
             "nassut",
             "nanoq"
         ],
-        "correct": "naraseq"
+        "correct": "naraseq",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/40_-_Sok.jpg",
@@ -408,7 +447,8 @@
             "alersit",
             "assak"
         ],
-        "correct": "alerseq"
+        "correct": "alerseq",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/41-_Dukke.jpg",
@@ -418,7 +458,8 @@
             "illu",
             "inneq"
         ],
-        "correct": "inuusaq"
+        "correct": "inuusaq",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/42_-_Gris.jpg",
@@ -428,7 +469,8 @@
             "puussiaq",
             "pupik"
         ],
-        "correct": "puuluki"
+        "correct": "puuluki",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/43_-_Æbler.jpg",
@@ -438,7 +480,8 @@
             "iipili",
             "iput"
         ],
-        "correct": "iipilit"
+        "correct": "iipilit",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/44-_Håndklæde.jpg",
@@ -448,7 +491,8 @@
             "allakkat",
             "angut"
         ],
-        "correct": "allarut"
+        "correct": "allarut",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/45-_Rype.jpg",
@@ -458,7 +502,8 @@
             "agerluusaq",
             "aquut"
         ],
-        "correct": "aqisseq"
+        "correct": "aqisseq",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/46-_Kvan.jpg",
@@ -468,7 +513,8 @@
             "kaffit",
             "kaagi"
         ],
-        "correct": "kuanneq"
+        "correct": "kuanneq",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/47-_BI.jpg",
@@ -478,7 +524,8 @@
             "ikitsit",
             "igalaaq"
         ],
-        "correct": "igutsak"
+        "correct": "igutsak",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/48_-_Regn.jpg",
@@ -488,7 +535,8 @@
             "suluk",
             "sianeq"
         ],
-        "correct": "sialuit"
+        "correct": "sialuit",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/49_-_Badeværelse.jpg",
@@ -498,7 +546,8 @@
             "ulu",
             "umiaq"
         ],
-        "correct": "uffarfik"
+        "correct": "uffarfik",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/50-_Myg.jpg",
@@ -508,7 +557,8 @@
             "iperaataq",
             "iput"
         ],
-        "correct": "ippernaq"
+        "correct": "ippernaq",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/51-_Brev.jpg",
@@ -518,7 +568,8 @@
             "aallaat",
             "atuagaasivik"
         ],
-        "correct": "allakkat"
+        "correct": "allakkat",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/52-_Anorak.jpg",
@@ -528,7 +579,8 @@
             "appa",
             "arnaq"
         ],
-        "correct": "annoraaq"
+        "correct": "annoraaq",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/53-_Skraldespand.jpg",
@@ -538,7 +590,8 @@
             "eertat",
             "equutissiaq"
         ],
-        "correct": "eqqaavik"
+        "correct": "eqqaavik",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/54_-_Igdlo.jpg",
@@ -548,7 +601,8 @@
             "illaagutit",
             "iisartakkat"
         ],
-        "correct": "illuigaq"
+        "correct": "illuigaq",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/55-_Ammasæt.jpg",
@@ -558,7 +612,8 @@
             "ameq",
             "amaroq"
         ],
-        "correct": "ammassak"
+        "correct": "ammassak",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/56_-_Stol.jpg",
@@ -568,7 +623,8 @@
             "isarussat",
             "isigak"
         ],
-        "correct": "issiavik"
+        "correct": "issiavik",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/57-_Flue.jpg",
@@ -578,7 +634,8 @@
             "niviarsiaraq",
             "nivaataq"
         ],
-        "correct": "niviugak"
+        "correct": "niviugak",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/58_-_Bord.jpg",
@@ -588,7 +645,8 @@
             "nerivoq",
             "nerleq"
         ],
-        "correct": "nerrivik"
+        "correct": "nerrivik",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/59_-_Stjerne.jpg",
@@ -598,7 +656,8 @@
             "ullaaq",
             "ulloq"
         ],
-        "correct": "ulloriaq"
+        "correct": "ulloriaq",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/60_-_Skildpadde.jpg",
@@ -608,7 +667,8 @@
             "sianeq",
             "saagut"
         ],
-        "correct": "saaniluk"
+        "correct": "saaniluk",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/61_-_Sav.jpg",
@@ -618,7 +678,8 @@
             "puussiaq",
             "paarnat"
         ],
-        "correct": "pilattuut"
+        "correct": "pilattuut",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/62_-Nattøj.jpg",
@@ -628,7 +689,8 @@
             "siatsivik",
             "sianeq"
         ],
-        "correct": "sinngusit"
+        "correct": "sinngusit",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/63_-_Maske.jpg",
@@ -638,7 +700,8 @@
             "kikiak",
             "kimmikkaat"
         ],
-        "correct": "kiinarpak"
+        "correct": "kiinarpak",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/64_-_Stok.jpg",
@@ -648,7 +711,8 @@
             "agiaq",
             "assagiarsuk"
         ],
-        "correct": "ajaappiaq"
+        "correct": "ajaappiaq",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/65_-_Fejekost.jpg",
@@ -658,7 +722,8 @@
             "sarpik",
             "savimineq"
         ],
-        "correct": "sanigutit"
+        "correct": "sanigutit",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/66_-_Piskeris.jpg",
@@ -668,7 +733,8 @@
             "aapakaaq",
             "aasiak"
         ],
-        "correct": "aalaterut"
+        "correct": "aalaterut",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/67_-_Kirke.jpg",
@@ -678,7 +744,8 @@
             "oqaq",
             "orsoq"
         ],
-        "correct": "oqaluffik"
+        "correct": "oqaluffik",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/68_-_Lange_underbukser.jpg",
@@ -688,7 +755,8 @@
             "kammak",
             "kavaajaq"
         ],
-        "correct": "kamaasiat"
+        "correct": "kamaasiat",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/69_-_Kop.jpg",
@@ -698,7 +766,8 @@
             "timmiaq",
             "timmisartoq"
         ],
-        "correct": "tiitorfik"
+        "correct": "tiitorfik",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/70_-_Chokolade.jpg",
@@ -708,7 +777,8 @@
             "sukkuaraq",
             "suluk"
         ],
-        "correct": "sukkulaat"
+        "correct": "sukkulaat",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/71_-_Sommerfugl.jpg",
@@ -718,7 +788,8 @@
             "pamioq",
             "pappiaraq"
         ],
-        "correct": "pakkaluaq"
+        "correct": "pakkaluaq",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/72_-_Fanger.jpg",
@@ -728,7 +799,8 @@
             "panersaat",
             "piniutit"
         ],
-        "correct": "piniartoq"
+        "correct": "piniartoq",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/73_-_Blyant.jpg",
@@ -738,7 +810,8 @@
             "aquttoq",
             "lagerluusaasivik"
         ],
-        "correct": "aqerluusaq"
+        "correct": "aqerluusaq",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/74_-_Papegøje.jpg",
@@ -748,7 +821,8 @@
             "pupik",
             "pappiala"
         ],
-        "correct": "papikuujuk"
+        "correct": "papikuujuk",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/75_-_Hjul_fra_fil.jpg",
@@ -758,7 +832,8 @@
             "assak",
             "asseq"
         ],
-        "correct": "assakaasoq"
+        "correct": "assakaasoq",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/76_-_Farver.jpg",
@@ -768,7 +843,8 @@
             "qaammat",
             "qarliit"
         ],
-        "correct": "qalipaatit"
+        "correct": "qalipaatit",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/77_-_Kamera.jpg",
@@ -778,7 +854,8 @@
             "asaat",
             "assiliaq"
         ],
-        "correct": "assiliivik"
+        "correct": "assiliivik",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/78_-_Nøgle.jpg",
@@ -788,7 +865,8 @@
             "mittarfik",
             "mamakujuttut"
         ],
-        "correct": "matuersaat"
+        "correct": "matuersaat",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/79_-_T-shirt.jpg",
@@ -798,7 +876,8 @@
             "tummeqqat",
             "tungujortoq"
         ],
-        "correct": "tujuuluaraq"
+        "correct": "tujuuluaraq",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/80_-_4-kant_hvid.jpg",
@@ -808,7 +887,8 @@
             "kimmikkaat",
             "kisaq"
         ],
-        "correct": "kipparissoq"
+        "correct": "kipparissoq",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/81_-_Piller.jpg",
@@ -818,7 +898,8 @@
             "iipilit",
             "inuusaq"
         ],
-        "correct": "iisartakkat"
+        "correct": "iisartakkat",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/82_-_Elefant.jpg",
@@ -828,7 +909,8 @@
             "nakorsaq",
             "naasoq"
         ],
-        "correct": "nagguaatsoq"
+        "correct": "nagguaatsoq",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/83_-_Tvillinger.jpg",
@@ -838,7 +920,8 @@
             "marneq",
             "maralluk"
         ],
-        "correct": "marlulissat"
+        "correct": "marlulissat",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/84_-_Julehjerte.jpg",
@@ -848,7 +931,8 @@
             "uumasuagqat",
             "umiarsuaq"
         ],
-        "correct": "uummataasaq"
+        "correct": "uummataasaq",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/85_-_Ur.jpg",
@@ -858,7 +942,8 @@
             "inalunnguartarfik",
             "naraseq"
         ],
-        "correct": "nalunaaqutaq"
+        "correct": "nalunaaqutaq",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/86_-_Slik.jpg",
@@ -868,7 +953,8 @@
             "mattak",
             "marlulissat"
         ],
-        "correct": "mamakujuttut"
+        "correct": "mamakujuttut",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/87_-_Striktrøje.jpg",
@@ -878,7 +964,8 @@
             "tumerparpaaq",
             "tuapaat"
         ],
-        "correct": "tujuulussuaq"
+        "correct": "tujuulussuaq",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/88_-_Jolle.jpg",
@@ -888,7 +975,8 @@
             "umiaq",
             "umimmak"
         ],
-        "correct": "umiatsiaaraq"
+        "correct": "umiatsiaaraq",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/89_-_Fiskekutter.jpg",
@@ -898,7 +986,8 @@
             "pujorsiut",
             "pujoq"
         ],
-        "correct": "pujortuleeraq"
+        "correct": "pujortuleeraq",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/90_-_Gråspurv.jpg",
@@ -908,7 +997,8 @@
             "quppaq",
             "qupperneq"
         ],
-        "correct": "qupaloraarsuk"
+        "correct": "qupaloraarsuk",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/91_-_Havn_Umiarsualivik.jpg",
@@ -918,7 +1008,8 @@
             "umiit",
             "umiaq"
         ],
-        "correct": "umiarsualivik"
+        "correct": "umiarsualivik",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/92_-_Trappe.jpg",
@@ -928,7 +1019,8 @@
             "manisivik",
             "mittarfik"
         ],
-        "correct": "majuartarfiit"
+        "correct": "majuartarfiit",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/93_-_Sygehus.jpg",
@@ -938,7 +1030,8 @@
             "nagguaatsoq",
             "nakorsaq"
         ],
-        "correct": "napparsimmavik"
+        "correct": "napparsimmavik",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/94_-_Legeplads.jpg",
@@ -948,7 +1041,8 @@
             "piniartoq",
             "pinnersaatit"
         ],
-        "correct": "pinnguartarfik"
+        "correct": "pinnguartarfik",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/95_-_Flodhest.jpg",
@@ -958,7 +1052,8 @@
             "immussuaq",
             "imeqarfik"
         ],
-        "correct": "imermiutarsuaq"
+        "correct": "imermiutarsuaq",
+        "correct_index": 0
     },
     {
         "image": "resources/wordreading_2/Opgave/96_-_Puslespil.jpg",
@@ -968,7 +1063,8 @@
             "immiartorfik",
             "ikusik"
         ],
-        "correct": "ikkussortakkat"
+        "correct": "ikkussortakkat",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/97_-_Tavle.jpg",
@@ -978,7 +1074,8 @@
             "allagartaq",
             "allarut"
         ],
-        "correct": "allattarfissuaq"
+        "correct": "allattarfissuaq",
+        "correct_index": 1
     },
     {
         "image": "resources/wordreading_2/Opgave/98_-_Gynge.jpg",
@@ -988,7 +1085,8 @@
             "isarukitsoq",
             "igalaamineq"
         ],
-        "correct": "issakatsiaarfik"
+        "correct": "issakatsiaarfik",
+        "correct_index": 3
     },
     {
         "image": "resources/wordreading_2/Opgave/99_-_2_Tandbørster.jpg",
@@ -998,7 +1096,8 @@
             "kaffiliorfik",
             "kigutit"
         ],
-        "correct": "kigutigissaatit"
+        "correct": "kigutigissaatit",
+        "correct_index": 2
     },
     {
         "image": "resources/wordreading_2/Opgave/100_-_Penalhus.jpg",
@@ -1008,6 +1107,7 @@
             "aqisseq",
             "aquut"
         ],
-        "correct": "aqerluusaasivik"
+        "correct": "aqerluusaasivik",
+        "correct_index": 2
     }
 ]

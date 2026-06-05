@@ -316,6 +316,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.10 - n.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Bord.jpg",
+        "correct_index": 3,
         "wrong": [
             "resources/fore_sound/Opgave/Næse.jpg",
             "resources/fore_sound/Opgave/Ørn.jpg",
@@ -386,6 +387,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.2 - a.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Hånd.jpg",
+        "correct_index": 1,
         "wrong": [
             "resources/fore_sound/Opgave/Fejekost.jpg",
             "resources/fore_sound/Opgave/Frø.jpg",

@@ -321,6 +321,7 @@
       "text": "Isi",
       "question_type": "multiple_choice",
       "correct": "resources/wordreading_1/Opgave/Øje.jpg",
+      "correct_index": 1,
       "wrong": [
         "resources/wordreading_1/Opgave/Blod.jpg",
         "resources/wordreading_1/Opgave/Hund.jpg",
@@ -331,6 +332,7 @@
       "text": "Matu",
       "question_type": "multiple_choice",
       "correct": "resources/wordreading_1/Opgave/Dør.jpg",
+      "correct_index": 3,
       "wrong": [
         "resources/wordreading_1/Opgave/Bil.jpg",
         "resources/wordreading_1/Opgave/Børn.jpg",

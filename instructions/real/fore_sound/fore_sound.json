@@ -3,6 +3,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.7 - s.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Is_bred.jpg",
+        "correct_index": 3,
         "wrong": [
             "resources/fore_sound/Opgave/Træ-stykke.jpg",
             "resources/fore_sound/Opgave/Kage.jpg",
@@ -13,6 +14,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.21 - p.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Tallerken 2.jpg",
+        "correct_index": 1,
         "wrong": [
             "resources/fore_sound/Opgave/Bog.jpg",
             "resources/fore_sound/Opgave/Kniv.jpg",
@@ -23,6 +25,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.13 - u.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Julestjerne.jpg",
+        "correct_index": 2,
         "wrong": [
             "resources/fore_sound/Opgave/Hus.jpg",
             "resources/fore_sound/Opgave/Violin.jpg",
@@ -33,6 +36,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.24 - t[d].mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Rensdyr.jpg",
+        "correct_index": 1,
         "wrong": [
             "resources/fore_sound/Opgave/Moskusokse.jpg",
             "resources/fore_sound/Opgave/Hest.jpg",
@@ -43,6 +47,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.10 - n.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Isbjørn.jpg",
+        "correct_index": 3,
         "wrong": [
             "resources/fore_sound/Opgave/Hare.jpg",
             "resources/fore_sound/Opgave/Tunge.jpg",
@@ -53,6 +58,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.2 - a.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Blyant.jpg",
+        "correct_index": 0,
         "wrong": [
             "resources/fore_sound/Opgave/Dukke.jpg",
             "resources/fore_sound/Opgave/Nøgle.jpg",
@@ -63,6 +69,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.17 - q.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Kajak.jpg",
+        "correct_index": 2,
         "wrong": [
             "resources/fore_sound/Opgave/Fly.jpg",
             "resources/fore_sound/Opgave/Fiskekutter.jpg",
@@ -73,6 +80,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.11 - k.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Tommeltot.jpg",
+        "correct_index": 3,
         "wrong": [
             "resources/fore_sound/Opgave/Fod.jpg",
             "resources/fore_sound/Opgave/Sok.jpg",
@@ -83,6 +91,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.5 - i.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Bål_-_inneq.jpg",
+        "correct_index": 2,
         "wrong": [
             "resources/fore_sound/Opgave/Sol_2.jpg",
             "resources/fore_sound/Opgave/Skovl.jpg",
@@ -93,6 +102,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.22 - m.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/æg_mannik.jpg",
+        "correct_index": 2,
         "wrong": [
             "resources/fore_sound/Opgave/Æble.jpg",
             "resources/fore_sound/Opgave/Fodbold.jpg",
@@ -103,6 +113,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.19 - e.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Vaskemaskine.jpg",
+        "correct_index": 0,
         "wrong": [
             "resources/fore_sound/Opgave/Fjernsyn.jpg",
             "resources/fore_sound/Opgave/Symaskine.jpg",
@@ -113,6 +124,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.15 - r.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Reje.jpg",
+        "correct_index": 3,
         "wrong": [
             "resources/fore_sound/Opgave/Fisk.jpg",
             "resources/fore_sound/Opgave/Hammer.jpg",
@@ -123,6 +135,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.23 - o.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Træ.jpg",
+        "correct_index": 1,
         "wrong": [
             "resources/fore_sound/Opgave/Blomst.jpg",
             "resources/fore_sound/Opgave/Hus.jpg",
@@ -133,6 +146,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.8 - t.mp3",
         "question_type": "multiple_choice",
         "correct": "resources/fore_sound/Opgave/Kop.jpg",
+        "correct_index": 0,
         "wrong": [
             "resources/fore_sound/Opgave/Gaffel.jpg",
             "resources/fore_sound/Opgave/Symaskine.jpg",

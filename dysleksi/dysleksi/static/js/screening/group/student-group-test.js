@@ -1,4 +1,3 @@
-import { shuffleArray } from "../utils.js";
 import { StudentTestView } from "../student-test.js";
 import { calculateStudentProgress } from "../utils.js";
 
@@ -87,8 +86,6 @@ export class GroupTestView extends StudentTestView {
                 const falseAnswer = answers.find((a) => a.resourceText === "false");
                 const trueAnswer = answers.find((a) => a.resourceText === "true");
                 answers = [falseAnswer, trueAnswer];
-            } else if (!isPracticing) {
-                answers = shuffleArray(answers);
             }
 
             if (this.currentQuestion.type === "multiple_choice_match") {

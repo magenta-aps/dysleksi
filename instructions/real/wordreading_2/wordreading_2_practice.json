@@ -310,6 +310,7 @@
         "question_type": "multiple_choice",
         "image": "resources/wordreading_2/Øveopgave/Fod.png",
         "correct": "isigak",
+        "correct_index": 0,
         "wrong": ["isi", "immuk", "ini"],
         "reminder_source": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7c.2.mp3",
         "continue_when_instruction_is_complete": false,
@@ -337,6 +338,7 @@
         "question_type": "multiple_choice",
         "image": "resources/wordreading_2/Øveopgave/Mælk.png",
         "correct": "immuk",
+        "correct_index": 3,
         "wrong": ["imaq", "illu", "imeq"],
         "reminder_source": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7c.2.mp3"
     },
