@@ -77,6 +77,7 @@ export class GroupTestView extends StudentTestView {
             );
             this.selectedAnswer = null;
             this.textAnswer = null;
+            this.isMatchPair = false;
             let answers = this.currentQuestion.possibleAnswers;
             if (
                 answers.some((a) => a.resourceText === "true") &&
@@ -123,6 +124,7 @@ export class GroupTestView extends StudentTestView {
                 );
             } else if (this.currentQuestion.type === "multiple_choice_match") {
                 this.answerButtons = [];
+                this.isMatchPair = true;
 
                 const set1Answers = answers.filter((a) =>
                     a.resourceName.endsWith("set1"),
@@ -135,7 +137,7 @@ export class GroupTestView extends StudentTestView {
                     for (let answer of groupAnswers) {
                         const button = this.domElements.showQuestionChoice(
                             answer,
-                            () => this.selectAnswer(answer, true),
+                            () => this.selectAnswer(answer),
                             groupAnswers.length,
                             container,
                         );
@@ -213,12 +215,9 @@ export class GroupTestView extends StudentTestView {
         }
     }
 
-    onQuestionComplete(question, outOfTime = false) {
+    async onQuestionComplete(question, outOfTime = false) {
         const questionAnsweredAt = document.timeline.currentTime;
         this.domElements.interruptSound();
-
-        // Hide the image to avoid leaking into the next question
-        this.domElements.hideChallengeImage();
 
         if (
             !(
@@ -233,10 +232,58 @@ export class GroupTestView extends StudentTestView {
 
             this.clearReminder();
 
-            if (this.isPracticing) {
-                if (!this.textAnswer && !this.answerIsCorrect()) {
-                    // Wrong answer
-                    this.domElements.makeButtonAngry("next");
+            if (this.isPracticing && (!this.textAnswer || this.isMatchPair)) {
+                if (this.answerIsCorrect()) {
+                    this.domElements.lockInput();
+                    this.getSelectedButtons().forEach((btn) =>
+                        this.domElements.makeButtonHappy(btn.id),
+                    );
+
+                    // Play "you guessed correct" sound snippet
+                    await this.domElements.playSound(
+                        "/static/audio/7c.4.wav",
+                        this.audioContext,
+                    );
+                    this.domElements.unlockInput();
+                } else {
+                    this.failedAttempts += 1;
+
+                    if (this.isMatchPair && this.failedAttempts == 3) {
+                        const correctLeft = this.answerButtons.find(
+                            (a) =>
+                                this.domElements.choicesElLeft.contains(a.button) &&
+                                a.answer.correctness === "correct",
+                        );
+                        const correctRight = this.answerButtons.find(
+                            (a) =>
+                                this.domElements.choicesElRight.contains(a.button) &&
+                                a.answer.correctness === "correct",
+                        );
+
+                        console.log("Playing hint audio");
+                        this.domElements.playSound(
+                            this.currentQuestion.hintSource,
+                            this.audioContext,
+                        );
+
+                        console.log("Highlighting correct answer");
+                        if (!correctLeft.button.classList.contains("selected")) {
+                            correctLeft.button.classList.add("pulse");
+                        }
+                        if (!correctRight.button.classList.contains("selected")) {
+                            correctRight.button.classList.add("pulse");
+                        }
+                    } else {
+                        this.getSelectedButtons().forEach((btn) =>
+                            this.domElements.makeButtonAngry(btn.id),
+                        );
+                        // Play "you guessed wrong" sound snippet
+                        this.domElements.playSound(
+                            "/static/audio/7c.3.wav",
+                            this.audioContext,
+                        );
+                    }
+
                     return;
                 }
             } else {
@@ -275,6 +322,9 @@ export class GroupTestView extends StudentTestView {
 
         this.clearTimeout();
 
+        // Hide the image to avoid leaking into the next question
+        this.domElements.hideChallengeImage();
+
         if (this.showNextQuestion()) {
             // Next question is being shown
         } else {
@@ -310,7 +360,11 @@ export class GroupTestView extends StudentTestView {
     }
 
     handleOutsideClick(e) {
-        if (!e.target.closest("button") && !this.showingInstructions) {
+        if (
+            !e.target.closest("button") &&
+            !this.showingInstructions &&
+            !this.domElements.inputLocked
+        ) {
             this.getSelectedButtons().forEach((btn) => this.unselectAnswer(btn));
         }
     }
@@ -331,7 +385,7 @@ export class GroupTestView extends StudentTestView {
         });
     }
 
-    selectAnswer(answer, isMatchPair = false) {
+    selectAnswer(answer) {
         this.selectedAnswer = answer;
         let leftSelectedEntry;
         let rightSelectedEntry;
@@ -344,7 +398,7 @@ export class GroupTestView extends StudentTestView {
             return;
         }
 
-        if (isMatchPair) {
+        if (this.isMatchPair) {
             const parentColumn = clickedEntry.button.parentElement;
 
             this.answerButtons.forEach((a) => {
@@ -383,60 +437,9 @@ export class GroupTestView extends StudentTestView {
                 );
             }
         }
-        const isSelectionComplete =
-            !isMatchPair || (leftSelectedEntry && rightSelectedEntry);
 
-        if (this.isPracticing && isSelectionComplete && !this.showingInstructions) {
-            if (this.answerIsCorrect()) {
-                this.domElements.makeButtonHappy(this.selectedAnswer.buttonId);
-                this.domElements.enableNextButton();
-                // Play "you guessed correct" sound snippet
-                this.domElements.playSound("/static/audio/7c.4.wav", this.audioContext);
-            } else {
-                this.domElements.disableNextButton();
-
-                this.failedAttempts += 1;
-
-                if (isMatchPair && this.failedAttempts == 3) {
-                    const correctLeft = this.answerButtons.find(
-                        (a) =>
-                            this.domElements.choicesElLeft.contains(a.button) &&
-                            a.answer.correctness === "correct",
-                    );
-                    const correctRight = this.answerButtons.find(
-                        (a) =>
-                            this.domElements.choicesElRight.contains(a.button) &&
-                            a.answer.correctness === "correct",
-                    );
-
-                    console.log("Playing hint audio");
-                    this.domElements.playSound(
-                        this.currentQuestion.hintSource,
-                        this.audioContext,
-                    );
-
-                    console.log("Highlighting correct answer");
-                    if (!correctLeft.button.classList.contains("selected")) {
-                        correctLeft.button.classList.add("pulse");
-                    }
-                    if (!correctRight.button.classList.contains("selected")) {
-                        correctRight.button.classList.add("pulse");
-                    }
-                } else {
-                    if (!clickedEntry.button.classList.contains("pulse")) {
-                        this.domElements.makeButtonAngry(this.selectedAnswer.buttonId);
-                        // Play "you guessed wrong" sound snippet
-                        this.domElements.playSound(
-                            "/static/audio/7c.3.wav",
-                            this.audioContext,
-                        );
-                    }
-                }
-            }
-            clickedEntry.button.classList.remove("pulse");
-        } else {
-            this.domElements.makeButtonGlow(this.selectedAnswer.buttonId);
-        }
+        clickedEntry.button.classList.remove("pulse");
+        this.domElements.makeButtonGlow(this.selectedAnswer.buttonId);
 
         if (answer.resourceText === "true" || answer.resourceText === "false") {
             this.answerButtons.forEach((a) => {

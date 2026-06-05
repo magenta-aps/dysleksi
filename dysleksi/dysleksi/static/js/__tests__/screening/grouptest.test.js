@@ -1041,9 +1041,10 @@ describe("GroupTestFlow", () => {
         expect(global.alert).toHaveBeenCalledWith("Vælg et svar, før du går videre.");
     });
 
-    it("Answer practice question correctly", () => {
+    it("Answer practice question correctly", async () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
+        domElements.playSound.mockResolvedValue();
         testSpy(view);
         view.setPart(0);
 
@@ -1058,7 +1059,9 @@ describe("GroupTestFlow", () => {
         answerButtonObj.button.click();
         view.onQuestionComplete(question);
 
-        expect(view.showNextQuestion).toHaveBeenCalled();
+        await vi.waitFor(() => {
+            expect(view.showNextQuestion).toHaveBeenCalled();
+        });
         expect(view.domElements.makeButtonHappy).toHaveBeenCalled();
     });
 
@@ -1097,9 +1100,10 @@ describe("GroupTestFlow", () => {
         expect(view.domElements.makeButtonAngry).toHaveBeenCalled();
     });
 
-    it("Answer last practice question in part", () => {
+    it("Answer last practice question in part", async () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
+        domElements.playSound.mockResolvedValue();
         testSpy(view);
         view.setPart(0);
 
@@ -1112,7 +1116,9 @@ describe("GroupTestFlow", () => {
         view.selectAnswer(correctAnswer);
         view.onQuestionComplete(question);
 
-        expect(view.showNextQuestion).toHaveBeenCalled();
+        await vi.waitFor(() => {
+            expect(view.showNextQuestion).toHaveBeenCalled();
+        });
         expect(view.domElements.makeButtonHappy).toHaveBeenCalled();
     });
 
@@ -2296,7 +2302,10 @@ describe("Letter Shape Test", () => {
         const test = new Test(letterShapeTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
         view.setPart(0);
+        view.start();
+        domElements.playSound.mockResolvedValue();
         view.showFirstQuestion(true);
+        const showNextQuestionSpy = vi.spyOn(view, "showNextQuestion");
 
         const leftRow = document.getElementById("choices-left");
         const rightRow = document.getElementById("choices-right");
@@ -2319,19 +2328,26 @@ describe("Letter Shape Test", () => {
         lowerABtn.click();
 
         // Validate that the next button is not clickable
-        expect(nextButton.disabled).toBe(true);
+        nextButton.click();
+        expect(showNextQuestionSpy).not.toHaveBeenCalled();
+        expect(domElements.makeButtonAngry).toHaveBeenCalledWith("choice-S_set1");
+        expect(domElements.makeButtonAngry).toHaveBeenCalledWith("choice-a_set2");
 
         // CLick the s button
         lowerSBtn.click();
 
         // Validate that the next button is now clickable
-        expect(nextButton.disabled).toBe(false);
+        nextButton.click();
+        await vi.waitFor(() => {
+            expect(showNextQuestionSpy).toHaveBeenCalled();
+        });
     });
 
     it("Helps student after three failed attempts", async () => {
         const test = new Test(letterShapeTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
         view.setPart(0);
+        view.start();
         view.showFirstQuestion(true);
 
         const leftRow = document.getElementById("choices-left");
@@ -2352,17 +2368,21 @@ describe("Letter Shape Test", () => {
         const lowerXBtn = Array.from(rightRow.children).find(
             (btn) => btn.textContent === "x",
         );
+        const nextButton = document.getElementById("next");
 
         bBtn.click();
 
         // first failed attempt
         lowerABtn.click();
+        nextButton.click();
 
         // second failed attempt
         lowerXBtn.click();
+        nextButton.click();
 
         // third failed attempt
         lowerABtn.click();
+        nextButton.click();
 
         // The correct buttons now starts pulsating
         expect(lowerSBtn.classList).toContain("pulse");
@@ -2379,6 +2399,7 @@ describe("Letter Shape Test", () => {
         const test = new Test(letterShapeTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
         view.setPart(0);
+        view.start();
         view.showFirstQuestion(true);
 
         const leftRow = document.getElementById("choices-left");
@@ -2396,17 +2417,21 @@ describe("Letter Shape Test", () => {
         const lowerXBtn = Array.from(rightRow.children).find(
             (btn) => btn.textContent === "x",
         );
+        const nextButton = document.getElementById("next");
 
         sBtn.click();
 
         // first failed attempt
         lowerABtn.click();
+        nextButton.click();
 
         // second failed attempt
         lowerXBtn.click();
+        nextButton.click();
 
         // third failed attempt
         lowerABtn.click();
+        nextButton.click();
 
         // The correct button now starts pulsating
         expect(lowerSBtn.classList).toContain("pulse");
@@ -2417,6 +2442,7 @@ describe("Letter Shape Test", () => {
         const test = new Test(letterShapeTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
         view.setPart(0);
+        view.start();
         view.showFirstQuestion(true);
 
         const leftRow = document.getElementById("choices-left");
@@ -2434,28 +2460,34 @@ describe("Letter Shape Test", () => {
         const lowerSBtn = Array.from(rightRow.children).find(
             (btn) => btn.textContent === "s",
         );
+        const nextButton = document.getElementById("next");
 
         lowerSBtn.click();
 
         // first failed attempt
         bBtn.click();
+        nextButton.click();
 
         // second failed attempt
         cBtn.click();
+        nextButton.click();
 
         // third failed attempt
         bBtn.click();
+        nextButton.click();
 
         // The correct button now starts pulsating
         expect(lowerSBtn.classList).not.toContain("pulse");
         expect(sBtn.classList).toContain("pulse");
     });
 
-    it("Disabled next button when both answers are wrong", async () => {
+    it("Unable to press next button when both answers are wrong", async () => {
         const test = new Test(letterShapeTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
         view.setPart(0);
+        view.start();
         view.showFirstQuestion(true);
+        const showNextQuestionSpy = vi.spyOn(view, "showNextQuestion");
 
         const leftRow = document.getElementById("choices-left");
         const rightRow = document.getElementById("choices-right");
@@ -2475,6 +2507,9 @@ describe("Letter Shape Test", () => {
         lowerABtn.click();
 
         // Validate that the next button is not clickable
-        expect(nextButton.disabled).toBe(true);
+        nextButton.click();
+        expect(domElements.makeButtonAngry).toHaveBeenCalledWith("choice-B_set1");
+        expect(domElements.makeButtonAngry).toHaveBeenCalledWith("choice-a_set2");
+        expect(showNextQuestionSpy).not.toHaveBeenCalled();
     });
 });
