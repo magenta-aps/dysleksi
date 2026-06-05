@@ -212,24 +212,9 @@
                 "element": "choice-Blomst.jpg"
             },
             {
-                "action": "highlight",
-                "delayAfter": 0,
-                "element": "choice-Politi.jpg"
-            },
-            {
-                "action": "highlight",
-                "delayAfter": 0,
-                "element": "choice-Bamse.jpg"
-            },
-            {
-                "action": "highlight",
-                "delayAfter": 0,
-                "element": "choice-Mælk.jpg"
-            },
-            {
                 // Vælger det billede, som passer til ordet.
                 "action": "playSound",
-                "delayAfter": 0,
+                "delayAfter": 750,
                 "resource": "resources/wordreading_1/Enhanced/Instruktion/5b.7.mp3"
             },
             {
@@ -295,7 +280,7 @@
             {
                 // Det er sådan, du skal løse opgaverne.
                 "action": "playSound",
-                "delayAfter": 750,
+                "delayAfter": 1250,
                 "resource": "resources/wordreading_1/Enhanced/Instruktion/5b.10.mp3"
             },
             {
@@ -326,7 +311,17 @@
         "resources/wordreading_1/Opgave/Blod.jpg",
         "resources/wordreading_1/Opgave/Hund.jpg",
         "resources/wordreading_1/Opgave/Hus.jpg"
-      ]
+      ],
+        "continue_when_instruction_is_complete": false,
+        "instruction_sequence": [
+            {
+                // Du vil få besked, hvis du vælger forkert under øveopgaverne.
+                // Sungiusarnermi taamaallaat akissutit eqqortuunersoq paasitinneqartassaatit... Aallartipputit
+                "action": "playSound",
+                "delayAfter": 0,
+                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5c.1.mp3"
+            }
+        ]
     },
     {
       "text": "Matu",
@@ -359,8 +354,14 @@
             },
             {
                 "action": "show",
-                "delayAfter": 1,
+                "delayAfter": 750,
                 "element": "next"
+            },
+            {
+                // Sungiusarneq naammassivoq / Øvelserne er færdige
+                "action": "playSound",
+                "delayAfter": 1250,
+                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5c.6.mp3"
             },
             // Her kan du se to valgmuligheder.
             {
@@ -369,13 +370,14 @@
                 "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.1.mp3"
             },
             {
+                // Gentag-knappen skal gå tilbage til trin 5b.1 (blomst)
                 "action": "setRepeatButtonDestination",
                 "delayAfter": 0,
-                "data": "0"
+                "data": "1"
             },
             {
                 "action": "fadeIn",
-                "delayAfter": 250,
+                "delayAfter": 750,
                 "element": "next"
             },
             // Hvis du har forstået, hvad du skal gøre, skal du klikke på den blå. Så
@@ -387,22 +389,21 @@
             },
             {
                 "action": "fadeIn",
-                "delayAfter": 250,
+                "delayAfter": 750,
                 "element": "repeat"
             },
             // Men hvis du ikke har forstået, hvad du skal gøre, skal du klikke på
             // den grå. Så skal du øve dig igen.
             {
                 "action": "playSound",
-                "delayAfter": 0,
+                "delayAfter": 1250,
                 "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.3.mp3"
             },
             // Vælg ikon (klik).
             {
-                "action": "setButtonSoundOnce",
+                "action": "playSound",
                 "delayAfter": 0,
-                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.4.mp3",
-                "element": "next"
+                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.4.mp3"
             }
         ]
     }
