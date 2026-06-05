@@ -7,6 +7,16 @@
             "dummy-resources/wordreading_1/Opgave/house.png",
             "dummy-resources/wordreading_1/Opgave/car.png",
             "dummy-resources/wordreading_1/Opgave/cat.png"
+        ],
+        "continue_when_instruction_is_complete": false,
+        "instruction_sequence": [
+            {
+                // Oqaatsinik atuarneq minutsini arfinilinni sivisussuseqassaaq.... Aallartipputit.
+                // Ordlæsning starter nu.
+                "action": "playSound",
+                "delayAfter": 0,
+                "resource": "resources/wordreading_1/Enhanced/Deltest/5e.1.mp3"
+            }
         ]
     },
     {
