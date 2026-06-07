@@ -77,7 +77,7 @@ django-admin-sortable2
 # Used for testing & linting
 
 ## Parses HTML and lets us query the DOM
-beautifulsoup4==4.14.3
+beautifulsoup4==4.15.0
 
 ## Code coverage
 coverage==7.14.1
