@@ -16,6 +16,7 @@ from django.utils import timezone
 from dysleksi.models import (
     STUDENTS,
     TEACHERS,
+    CategoryColorChoice,
     Class,
     Correctness,
     Institution,
@@ -23,6 +24,7 @@ from dysleksi.models import (
     PossibleAnswer,
     QuestionResponse,
     QuestionType,
+    ReadingSpeedCategory,
     Student,
     Teacher,
     Test,
@@ -267,6 +269,46 @@ class DysleksiTest(TestCase):
         )
 
     @classmethod
+    def create_wordreading_part(cls, individual: bool = False):
+        cls.create_resources()
+        # TODO: Move other test creations into methods like this,
+        # and let individual Test classes decide what to initialize
+        cls.wordreading_part, _ = TestPart.objects.get_or_create(
+            name="wordreading",
+            timeout=60000,
+            partial_score_after=30000,
+            show_normscore_speed_plot=True,
+        )
+        test = cls.individual_test if individual else cls.group_test
+        test.parts.add(cls.wordreading_part)
+
+        cls.wordreading_question = TestQuestion.objects.create(
+            part=cls.wordreading_part,
+            challenge=cls.resource1,
+            reminder=5000,
+            reminder_source=cls.resource4,
+            hint_source=cls.resource4,
+        )
+        cls.wordreading_resource_1 = TestResource.objects.create(
+            name="TestResource6a",
+            text="true",
+        )
+        cls.wordreading_option_1 = PossibleAnswer.objects.create(
+            question=cls.wordreading_question,
+            resource=cls.wordreading_resource_1,
+            correctness=Correctness.CORRECT,
+        )
+        cls.wordreading_resource_2 = TestResource.objects.create(
+            name="TestResource6b",
+            text="false",
+        )
+        cls.wordreading_option_2 = PossibleAnswer.objects.create(
+            question=cls.wordreading_question,
+            resource=cls.wordreading_resource_2,
+            correctness=Correctness.WRONG,
+        )
+
+    @classmethod
     def setUpClass(cls):
         super().setUpClass()
 
@@ -349,6 +391,41 @@ class DysleksiTest(TestCase):
             ]
             for row in soup_element.find_all("tr")
         ]
+
+    @classmethod
+    def create_readingspeed_categories(cls):
+        ReadingSpeedCategory.objects.get_or_create(
+            id=1,
+            defaults={
+                "color_key": CategoryColorChoice.RED,
+                "upper_proportion_limit": 1,
+                "label_da": "Meget lavt",
+            },
+        )
+        ReadingSpeedCategory.objects.get_or_create(
+            id=2,
+            defaults={
+                "color_key": CategoryColorChoice.YELLOW,
+                "upper_proportion_limit": 3.5,
+                "label_da": "Lavt",
+            },
+        )
+        ReadingSpeedCategory.objects.get_or_create(
+            id=3,
+            defaults={
+                "color_key": CategoryColorChoice.GREEN,
+                "upper_proportion_limit": 7.5,
+                "label_da": "Middel",
+            },
+        )
+        ReadingSpeedCategory.objects.get_or_create(
+            id=4,
+            defaults={
+                "color_key": CategoryColorChoice.BLUE,
+                "upper_proportion_limit": 10,
+                "label_da": "Højt",
+            },
+        )
 
 
 class ResponseTest(DysleksiTest):
@@ -584,3 +661,29 @@ class ResponseTest(DysleksiTest):
             2026, 5, 1, 12, 0, 40, tzinfo=tz
         )
         cls.sentencereading_questionresponse_1.save()
+
+    @classmethod
+    def create_wordreading_part(cls, individual: bool = False):
+        super().create_wordreading_part(individual)
+        tz = timezone.get_current_timezone()
+        testresponse = (
+            cls.test_response_student if individual else cls.test_response_class_1
+        )
+
+        cls.wordreading_partresponse_1 = PartResponse.objects.create(
+            testresponse=testresponse,
+            testpart=cls.wordreading_part,
+            completed=True,
+            started_at=datetime(2026, 5, 1, 12, 0, 0, tzinfo=tz),
+        )
+        cls.wordreading_questionresponse_1 = QuestionResponse.objects.create(
+            partresponse=cls.wordreading_partresponse_1,
+            question=cls.wordreading_question,
+            answer_option=cls.wordreading_option_1,
+            correctness=Correctness.CORRECT,
+            finished_after=5000,
+        )
+        cls.wordreading_questionresponse_1.submitted_at = datetime(
+            2026, 5, 1, 12, 0, 10, tzinfo=tz
+        )
+        cls.wordreading_questionresponse_1.save()

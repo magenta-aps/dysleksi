@@ -1184,18 +1184,6 @@ class TestTestResponseView(ResponseTest):
             },
         )
 
-    # def test_unanswered(self):
-    #     # self.sentencereading_partresponse_1.delete()
-    #     view = self.setup_view(
-    #         TestResponseView,
-    #         self.teacher,
-    #         assignment_pk=self.test_assignment_student.pk,
-    #         response_pk=self.test_response_student.pk,
-    #     )
-    #     print(view.get_plot_data())
-    #     print(view.get_table().data)
-    #     self.assertEqual(view.get_plot_data(), [0, 100, 100])
-
 
 class TestPartResponseView(ResponseTest):
 
@@ -1204,6 +1192,7 @@ class TestPartResponseView(ResponseTest):
         super().setUpTestData()
         super().create_parts()
         cls.create_sentencereading_part(False)
+        cls.create_readingspeed_categories()
 
     def test_get_object(self):
         view = self.setup_view(
@@ -1480,3 +1469,37 @@ class TestPartResponseView(ResponseTest):
         )
         container = soup.find("table").parent
         self.assertEqual(container.attrs["class"], ["table-container"])
+
+    def test_normscore_plot_higher(self):
+        self.create_wordreading_part(False)
+        view = self.setup_view(
+            PartResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testresponse_pk=self.test_response_class_1.pk,
+            testpart_pk=self.wordreading_part.pk,
+        )
+        context = view.get_context_data()
+        self.assertIn("ReadingSpeedCategories", context)
+        self.assertAlmostEqual(
+            context["ReadingSpeedCategories"][1].scaled_width(), 1 / 12
+        )
+        self.assertAlmostEqual(context["y_scale"], 12.0)
+        self.assertEqual(context["plot"], [(1.0, 12.0)])
+
+    def test_normscore_plot_lower(self):
+        self.create_wordreading_part(False)
+        self.wordreading_questionresponse_1.finished_after = 10000
+        self.wordreading_questionresponse_1.save()
+        view = self.setup_view(
+            PartResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testresponse_pk=self.test_response_class_1.pk,
+            testpart_pk=self.wordreading_part.pk,
+        )
+        context = view.get_context_data()
+        self.assertIn("ReadingSpeedCategories", context)
+        self.assertAlmostEqual(context["ReadingSpeedCategories"][1].scaled_width(), 0.1)
+        self.assertAlmostEqual(context["y_scale"], 10.0)
+        self.assertEqual(context["plot"], [(1.0, 6.0)])
