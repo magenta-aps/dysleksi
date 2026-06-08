@@ -1009,6 +1009,12 @@ export class TeacherView {
             "#goto-next-result-group",
         );
 
+        try {
+            this.errorModal = Modal.getOrCreateInstance("#error");
+        } catch {
+            console.info("could not create bootstrap modal for #error");
+        }
+
         this.studentChannels = {};
 
         const savedQueue = localStorage.getItem(`msg_queue_${this.assignmentId}`);
@@ -1260,14 +1266,16 @@ export class TeacherView {
     }
 
     onStudentSetupError(data) {
-        const errorModal = new Modal("#error");
-        const modalBody = document.querySelector("#error .modal-body-inner");
-        modalBody.innerHTML = `
-            <p class="fw-bold">Fejl på ${data.studentDisplayName}'s computer.</p>
-            <p>Der er problemer med at afspille eller optage lyd på elevens computer.</p>
-            <p>(Systemfejlen er <code>${data.error}</code>)</p>
-        `;
-        errorModal.show();
+        /* istanbul ignore next */
+        if (this.errorModal !== null) {
+            const modalBody = document.querySelector("#error .modal-body-inner");
+            modalBody.innerHTML = `
+                <p class="fw-bold">Fejl på ${data.studentDisplayName}'s computer.</p>
+                <p>Der er problemer med at afspille eller optage lyd på elevens computer.</p>
+                <p>(Systemfejlen er <code>${data.error}</code>)</p>
+            `;
+            this.errorModal.show();
+        }
     }
 
     _persistQueue() {
