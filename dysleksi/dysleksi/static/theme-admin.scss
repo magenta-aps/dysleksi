@@ -823,13 +823,18 @@ div[data-role='teacher'][data-test-type='individual'] {
   color: $mono-gray-dark-3;
   border-radius: 0.75 * $spacer;
 
-  // Play button
-  i.ph-play { color: $mono-gray-dark-3; }
+  i.ph-play, i.ph-pause {
+    color: $mono-gray-dark-3;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-  // Duration
   span {
     font-size: 0.75 * $spacer;
     color: $mono-gray-dark-1;
+    font-family: monospace;
   }
 
   // "Playing" state (inverted colors)
@@ -837,7 +842,7 @@ div[data-role='teacher'][data-test-type='individual'] {
     background: $mono-gray-dark-3;
     color: $mono-gray-lightest;
 
-    i.ph-play { color: $mono-gray-lightest }
+    i.ph-play, i.ph-pause { color: $mono-gray-lightest }
     span { color: $mono-gray-light }
   }
 }

@@ -282,22 +282,48 @@ export class EventTable extends EventTarget {
         uiEl.append(playBtnEl);
         uiEl.append(durationEl);
 
-        // Wait until audio is loaded before attaching "play" event handler
-        audioEl.addEventListener("canplay", (_evt) => {
-            playBtnEl.addEventListener("click", (_evt) => {
-                audioEl.play();
-                uiEl.classList.add("playing");
-                this.updateAudioDuration(audioEl, durationEl);
+        let tickInterval = null;
+
+        const startTick = () => {
+            tickInterval = setInterval(() => {
+                const s = Math.floor(audioEl.currentTime);
+                durationEl.innerText = formatDuration(new Date(s * 1000));
+            }, 250);
+        };
+
+        const stopTick = () => {
+            clearInterval(tickInterval);
+            tickInterval = null;
+        };
+
+        audioEl.addEventListener("canplay", () => {
+            playBtnEl.addEventListener("click", () => {
+                if (audioEl.paused) {
+                    audioEl.play();
+                    playBtnEl.classList.replace("ph-play", "ph-pause");
+                    uiEl.classList.add("playing");
+                    startTick();
+                } else {
+                    audioEl.pause();
+                    playBtnEl.classList.replace("ph-pause", "ph-play");
+                    uiEl.classList.remove("playing");
+                    stopTick();
+                }
             });
         });
 
         // Restore normal look once audio is done playing
-        audioEl.addEventListener("ended", (_evt) => {
+
+        audioEl.addEventListener("ended", () => {
+            playBtnEl.classList.replace("ph-pause", "ph-play");
             uiEl.classList.remove("playing");
+            stopTick();
+            this.updateAudioDuration(audioEl, durationEl); // restore total duration
         });
 
         // Wait until metadata is loaded before displaying duration
-        audioEl.addEventListener("loadedmetadata", (_evt) => {
+
+        audioEl.addEventListener("loadedmetadata", () => {
             this.updateAudioDuration(audioEl, durationEl);
         });
 

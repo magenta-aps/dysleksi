@@ -1859,6 +1859,126 @@ describe("EventTable", () => {
     });
 });
 
+describe("EventTable audio element", () => {
+    let individualTest;
+    let table;
+    let data;
+    let answerCell;
+    let uiEl;
+    let playBtnEl;
+    let audioEl;
+    let durationEl;
+    let currentTime;
+
+    beforeEach(() => {
+        // Set up a standard DOM for the table
+        document.body.innerHTML = INDIVIDUAL_DOM_HTML;
+
+        // Mock out "preload" functionality
+        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
+
+        individualTest = new Test(individualTestData);
+        table = new EventTable(individualTest);
+
+        data = {
+            recordingBase64: "data:audio/wav;base64,UklGR...",
+            partIndex: 0,
+            questionIndex: 0,
+        };
+
+        table.updateTable({ event: "question.answered", ...data });
+        table.updateTable({ event: "question.feedback", ...data });
+
+        answerCell = document.querySelector("td.answer");
+        uiEl = answerCell.querySelector("div.audio");
+        playBtnEl = answerCell.querySelector("i");
+        audioEl = answerCell.querySelector("audio");
+        durationEl = answerCell.querySelector("span");
+
+        let playing = false;
+        Object.defineProperty(audioEl, "paused", { get: () => !playing });
+        audioEl.play = vi.fn(() => {
+            playing = true;
+        });
+        audioEl.pause = vi.fn(() => {
+            playing = false;
+        });
+
+        currentTime = 3;
+        Object.defineProperty(audioEl, "currentTime", { get: () => currentTime });
+
+        vi.useFakeTimers();
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+    });
+
+    it("toggles to pause icon and adds 'playing' class when play is clicked", () => {
+        audioEl.dispatchEvent(new Event("canplay"));
+
+        // Initially shows play icon
+        expect(playBtnEl.classList.contains("ph-play")).toBe(true);
+        expect(playBtnEl.classList.contains("ph-pause")).toBe(false);
+
+        // Click play
+        playBtnEl.dispatchEvent(new Event("click"));
+        expect(playBtnEl.classList.contains("ph-pause")).toBe(true);
+        expect(playBtnEl.classList.contains("ph-play")).toBe(false);
+        expect(uiEl.classList.contains("playing")).toBe(true);
+    });
+
+    it("toggles back to play icon and removes 'playing' class when pause is clicked", () => {
+        audioEl.dispatchEvent(new Event("canplay"));
+
+        // Click play, then pause
+        playBtnEl.dispatchEvent(new Event("click"));
+        expect(uiEl.classList.contains("playing")).toBe(true);
+
+        playBtnEl.dispatchEvent(new Event("click"));
+        expect(playBtnEl.classList.contains("ph-play")).toBe(true);
+        expect(playBtnEl.classList.contains("ph-pause")).toBe(false);
+        expect(uiEl.classList.contains("playing")).toBe(false);
+    });
+
+    it("restores play icon and removes 'playing' class when audio ends", () => {
+        audioEl.dispatchEvent(new Event("canplay"));
+        playBtnEl.dispatchEvent(new Event("click"));
+        expect(uiEl.classList.contains("playing")).toBe(true);
+
+        // Simulate audio finishing
+        audioEl.dispatchEvent(new Event("ended"));
+        expect(playBtnEl.classList.contains("ph-play")).toBe(true);
+        expect(playBtnEl.classList.contains("ph-pause")).toBe(false);
+        expect(uiEl.classList.contains("playing")).toBe(false);
+    });
+
+    it("updates the timer while audio is playing", () => {
+        audioEl.dispatchEvent(new Event("canplay"));
+        playBtnEl.dispatchEvent(new Event("click"));
+
+        vi.advanceTimersByTime(250);
+        expect(durationEl.innerText).toContain("03");
+    });
+
+    it("stops updating the timer when audio is paused", () => {
+        audioEl.dispatchEvent(new Event("canplay"));
+
+        // Play and let the timer tick
+        playBtnEl.dispatchEvent(new Event("click"));
+        vi.advanceTimersByTime(250);
+        const textWhilePlaying = durationEl.innerText;
+
+        // Pause and advance time further
+        currentTime = 99;
+        playBtnEl.dispatchEvent(new Event("click"));
+        vi.advanceTimersByTime(250);
+
+        // Timer should NOT have updated after pause
+        expect(durationEl.innerText).toBe(textWhilePlaying);
+    });
+});
+
 describe("StudentCard", () => {
     let mockStudent;
     let mockTest;
