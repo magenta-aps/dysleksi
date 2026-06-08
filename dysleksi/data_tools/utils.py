@@ -142,7 +142,6 @@ def create_letter_sound_test(
 def create_letter_shape_test(
     test, questions_data, practice_questions_data=None, name="Bogstavers form"
 ):
-
     reminder, created = TestResource.objects.get_or_create(
         name="resources/letter_shape/Enhanced/Deltests/3e.2.mp3",
         sound="resources/letter_shape/Enhanced/Deltests/3e.2.mp3",
@@ -151,6 +150,14 @@ def create_letter_shape_test(
         name="resources/letter_shape/Enhanced/Deltests/3e.3.mp3",
         sound="resources/letter_shape/Enhanced/Deltests/3e.3.mp3",
     )
+    practice_correct_feedback, created = TestResource.objects.get_or_create(
+        name="resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.6.mp3",
+        sound="resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.6.mp3",
+    )
+    practice_wrong_feedback, created = TestResource.objects.get_or_create(
+        name="resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.4.mp3",
+        sound="resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.4.mp3",
+    )
 
     part, created = TestPart.objects.get_or_create(
         name=name,
@@ -158,9 +165,11 @@ def create_letter_shape_test(
             "timeout": 0,
             "partial_score_after": 0,
             "image_url": "/static/images/letter_shape.png",
-            "reminder": 10000,  # 15 seconds
+            "reminder": 15000,  # 15 seconds
             "reminder_source": reminder,
             "completion_source": completion,
+            "practice_correct_feedback_source": practice_correct_feedback,
+            "practice_wrong_feedback_source": practice_wrong_feedback,
         },
     )
     if created:

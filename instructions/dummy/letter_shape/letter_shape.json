@@ -3,6 +3,30 @@
     "question_type": "multiple_choice_match",
     "correct": "Ss",
     "set1": ["S", "C", "M", "Z", "T", "F"],
-    "set2": ["s", "q", "n", "e", "l", "æ"]
+    "set2": ["s", "q", "n", "e", "l", "æ"],
+    "continue_when_instruction_is_complete": false,
+    "instruction_sequence": [
+      {
+        // Sapinngisamik suliassat akiniarsarisassavatit.
+        // Du skal svare opgaverne så godt du kan.
+        "action": "playSound",
+        "delayAfter": 750,
+        "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.5.mp3"
+      },
+      {
+        // Maanna akissutit eqqortuunersoq paasitinneqartassanngilatit.
+        // Nu får du ikke længere at vide om du har svaret rigtigt.
+        "action": "playSound",
+        "delayAfter": 1250,
+        "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.6.mp3"
+      },
+      {
+        // Aallartipputit.
+        // Du starter nu..
+        "action": "playSound",
+        "delayAfter": 750,
+        "resource": "resources/letter_shape/Enhanced/Deltests/3e.1.mp3"
+      }
+    ]
   }
 ]

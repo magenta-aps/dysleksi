@@ -238,7 +238,8 @@ export class GroupTestView extends StudentTestView {
 
                     // Play "you guessed correct" sound snippet
                     await this.domElements.playSound(
-                        "/static/audio/7c.4.wav",
+                        this.currentPart.practiceCorrectFeedbackSource ||
+                            "/static/audio/7c.4.wav",
                         this.audioContext,
                     );
                     this.domElements.unlockInput();
@@ -276,7 +277,8 @@ export class GroupTestView extends StudentTestView {
                         );
                         // Play "you guessed wrong" sound snippet
                         this.domElements.playSound(
-                            "/static/audio/7c.3.wav",
+                            this.currentPart.practiceWrongFeedbackSource ||
+                                "/static/audio/7c.3.wav",
                             this.audioContext,
                         );
                     }

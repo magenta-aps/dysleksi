@@ -25,12 +25,12 @@
                 // Men først bliver det vist, hvad du skal gøre.
                 "action": "playSound",
                 "resource": "resources/letter_shape/Enhanced/Indledning/3a.2.mp3",
-                "delayAfter": 500
+                "delayAfter": 250
             },
             {
                 "action": "fadeOut",
                 "element": "challenge-image",
-                "delayAfter": 1000
+                "delayAfter": 750
             },
             {
                 "action": "show",
@@ -377,13 +377,6 @@
     {
         "question_type": "no_input_required",
         "instruction_sequence": [
-            {
-                // "Øvelserne er færdige" / "Sungiusarneq naammassivoq"
-                "action": "playSound",
-                "delayAfter": 1250,
-                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.9.mp3"
-            },
-
             // "Næste" og "Gentag" vises i "fade out" tilstand
             {
                 "action": "show",
@@ -402,14 +395,21 @@
             },
             {
                 "action": "fadeOut",
-                "delayAfter": 0,
+                "delayAfter": 750,
                 "element": "repeat"
+            },
+            {
+                // "Øvelserne er færdige" / "Sungiusarneq naammassivoq"
+                "action": "playSound",
+                "delayAfter": 1250,
+                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.9.mp3"
             },
 
             {
+                // Gentag-knappen skal gå til trin 3b.1 ("Bb")
                 "action": "setRepeatButtonDestination",
                 "delayAfter": 0,
-                "data": "0"
+                "data": "1"
             },
 
             {
