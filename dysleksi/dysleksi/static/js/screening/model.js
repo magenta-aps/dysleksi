@@ -158,6 +158,12 @@ export class Test extends EventTarget {
             tasks.push(() => assetCache.processTestObject(part, "image"));
             tasks.push(() => assetCache.processTestObject(part, "instructionsUrl"));
             tasks.push(() => assetCache.processTestObject(part, "completionSource"));
+            tasks.push(() =>
+                assetCache.processTestObject(part, "practiceCorrectFeedbackSource"),
+            );
+            tasks.push(() =>
+                assetCache.processTestObject(part, "practiceWrongFeedbackSource"),
+            );
 
             const allQuestions = [...part.questions, ...part.practice];
             for (const q of allQuestions) {
@@ -240,6 +246,8 @@ export class TestPart {
         this.timeout = data.timeout;
         this.partialScoreAfter = data.partial_score_after;
         this.completionSource = data.completion_source;
+        this.practiceCorrectFeedbackSource = data.practice_correct_feedback_source;
+        this.practiceWrongFeedbackSource = data.practice_wrong_feedback_source;
         this.questionIndex = 0;
         this.currentQuestion = null;
         const questionClass = this.getQuestionClass();

@@ -446,6 +446,10 @@ class Test(models.Model):
         Serialize the Test with its parts, questions, and possible answers.
         Returns a Python dict that can be converted to JSON with json.dumps().
         """
+
+        def url_or_none(resource: TestResource | None) -> str | None:
+            return resource.url if resource else None
+
         test_data: Dict[str, Any] = {
             "id": self.id,
             "name": self.name,
@@ -465,8 +469,12 @@ class Test(models.Model):
                 "partial_score_after": part.partial_score_after,
                 "practice": [],
                 "questions": [],
-                "completion_source": (
-                    part.completion_source.url if part.completion_source else None
+                "completion_source": url_or_none(part.completion_source),
+                "practice_correct_feedback_source": url_or_none(
+                    part.practice_correct_feedback_source
+                ),
+                "practice_wrong_feedback_source": url_or_none(
+                    part.practice_wrong_feedback_source
                 ),
             }
 
@@ -688,6 +696,21 @@ class TestPart(models.Model):
         null=True,
         related_name="completion_testpart",
     )
+    practice_correct_feedback_source = models.ForeignKey(
+        TestResource,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="practice_correct_feedback_testpart",
+    )
+    practice_wrong_feedback_source = models.ForeignKey(
+        TestResource,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name="practice_wrong_feedback_testpart",
+    )
+
     show_normscore_speed_plot = models.BooleanField(default=False)
     show_answer_time_statistics = models.BooleanField(default=False)
 
