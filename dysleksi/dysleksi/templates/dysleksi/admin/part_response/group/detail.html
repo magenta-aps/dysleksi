@@ -21,7 +21,7 @@
     <li class="breadcrumb-item">{% translate "Resultater" %}</li>
     <li class="breadcrumb-item">
         <a href="{% url 'dysleksi:test_assignment_student_results' assignment_pk=object.testresponse.assignment.pk response_pk=object.testresponse.pk %}">
-        {{ object.student.get_full_name }}
+        {{ object.testresponse.student.get_full_name }}
         </a>
     </li>
     <li class="breadcrumb-item active" aria-current="page">{{ object.testpart.name }}</li>
@@ -114,7 +114,7 @@
                         );
                     </script>
 
-                            <div class="{% if has_almost_correct %}col-4{% else %}col-6{% endif %} donut-container">
+                    <div class="{% if has_almost_correct %}col-4{% else %}col-6{% endif %} donut-container">
                         <div class="donut-main-container">
                             <canvas id="donut2" class="donut-canvas"></canvas>
                             <div class="donut-center-text">
@@ -325,6 +325,10 @@
                 </div>
             </div>
         </div>
+
+        {% if plot %}
+            {% include "dysleksi/admin/part_responses/group/normscore_plot.html" with plot=plot y_scale=y_scale %}
+        {% endif %}
 
     {% endwith %}
 {% endblock %}

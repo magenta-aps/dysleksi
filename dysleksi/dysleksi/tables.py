@@ -289,7 +289,7 @@ class PartResultTable(Table):
     )
     normscore = TemplateColumn(
         verbose_name=_("Normscore (0-100)"),
-        template_name="dysleksi/admin/part_responses/group/normscore.html",
+        template_name="dysleksi/admin/part_responses/group/normscore_bar.html",
         accessor=A("correct_percentage"),
     )
 

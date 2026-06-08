@@ -1,0 +1,135 @@
+{% load i18n %}
+{% load l10n %}
+<div class="normscore-readingspeed-plot mt-4">
+    <h6>{% translate 'Normscore og læsetempo' %}</h6>
+    <p>{% translate "Bemærk: Kategorisering af læsetempo er endnu ikke vedtaget" %}</p>
+
+    <div class="plot-y-label-container">
+        <div class="plot-y-label-text">{% translate 'Læsetempo' %}</div>
+    </div>
+
+    <div class="plot-table-container">
+        {% localize off %}
+            <canvas id="chart" class="plot-canvas" style="
+                    {# I samarbejde med min og max-specifikationen nede i chartjs-setuppet #}
+                    {# Vi gør canvasset lidt større end dens plads i tabellen,  #}
+                    {# således at prikker i yderområderne (f.eks. (1.0, 1.0) ikke skæres af og renderes som en halv- eller kvartcirkel #}
+                    left: calc(var(--plot-y-label-width) - 16px);
+                    top: -16px;
+                    width: calc(var(--plot-canvas-width) + 33px);
+                    height: calc(var(--plot-canvas-height) + 33px);
+                    "></canvas>
+
+            <table class="table table-bordered plot-table">
+                <tbody>
+                {% for pk, reading_category in ReadingSpeedCategories.items %}
+
+                    <tr>
+                        <td
+                                class="plot-table-y-category-cell category-{{ reading_category.color_key }}"
+                                style="height: calc({{ reading_category.scaled_width }} * var(--plot-canvas-height)); "
+                        >
+                            <div
+                                    class="plot-table-y-category-label"
+                                    style="
+                                            width: calc({{ reading_category.scaled_width }} * var(--plot-canvas-height));
+                                            left: calc(var(--plot-y-label-width) - 0.75rem - ({{ reading_category.scaled_width }} * 20rem));
+                                            top: calc(({{ reading_category.scaled_width }} * var(--plot-canvas-height) / 2) - var(--plot-y-label-width) / 2)
+                                            "
+                            >{{ reading_category.label_da }}</div>
+                        </td>
+                        {% for pk, category in CorrectnessCategories.items %}
+                            <td style="width: calc(({{ category.width }}) * var(--plot-canvas-width))"></td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <th class="plot-table-x-category-cell category-red"></th>
+                    {% localize off %}
+                        {% for pk, category in CorrectnessCategories.items %}
+                            <td
+                                    class="plot-table-x-category-cell category-{{ category.color_key }}"
+                                    style="width: calc(({{ category.width }}) * var(--plot-canvas-width))"
+                            >
+                                {{ category.label_da }}
+                            </td>
+                        {% endfor %}
+                    {% endlocalize %}
+                </tr>
+                </tbody>
+            </table>
+        {% endlocalize %}
+        <div class="plot-x-label-text">{% translate 'Normscore' %}</div>
+    </div>
+</div>
+
+<style>
+    .normscore-readingspeed-plot .plot-table-container {
+        --vertical-category-count: {{ ReadingSpeedCategories|length }};
+    }
+</style>
+{{ plot|json_script:"plot_data" }}
+{{ y_scale|json_script:"y_scale" }}
+<script>
+    const plot_data = JSON.parse(document.getElementById("plot_data").textContent);
+    const y_scale = JSON.parse(document.getElementById("y_scale").textContent);
+    const chart = new Chart(
+        document.getElementById("chart"),
+        {
+            type: "scatter",
+            data: {
+                datasets: [
+                    {
+                        data: plot_data
+                    }
+                ]
+            },
+            options: {
+                responsive: false,
+                animation: false,
+                layout: {
+                    padding: {
+                        left: 10,
+                        right: 10,
+                        top: 10,
+                        bottom: 10
+                    },
+                    autoPadding: false,
+                },
+                scales: {
+                    x: {
+                        display: false,
+                        {# Lav plads til at et punkt på grænsen, f.eks. (1.0, 1.0) ikke ligger lige #}
+                        {# der hvor vi stopper med at rendere #}
+                        min: -0.01,
+                        max: 1.01,
+                        ticks: {
+                            display:false,
+                        },
+                    },
+                    y: {
+                        display: false,
+                        min: -0.01,
+                        max: 1.01 * y_scale,
+                        ticks: {
+                            display:false
+                        },
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                },
+                elements: {
+                    point: {
+                        borderWidth: 0,
+                        backgroundColor: "#000",
+                    }
+                }
+            }
+
+        }
+    )
+
+</script>

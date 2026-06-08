@@ -1173,43 +1173,12 @@ class TestResultCategory(TestCase):
         )
 
 
-class TestReadingSpeedCategory(TestCase):
+class TestReadingSpeedCategory(DysleksiTest):
 
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
-        ReadingSpeedCategory.objects.get_or_create(
-            id=1,
-            defaults={
-                "color_key": CategoryColorChoice.RED,
-                "upper_proportion_limit": 1,
-                "label_da": "Meget lavt",
-            },
-        )
-        ReadingSpeedCategory.objects.get_or_create(
-            id=2,
-            defaults={
-                "color_key": CategoryColorChoice.YELLOW,
-                "upper_proportion_limit": 3.5,
-                "label_da": "Lavt",
-            },
-        )
-        ReadingSpeedCategory.objects.get_or_create(
-            id=3,
-            defaults={
-                "color_key": CategoryColorChoice.GREEN,
-                "upper_proportion_limit": 7.5,
-                "label_da": "Middel",
-            },
-        )
-        ReadingSpeedCategory.objects.get_or_create(
-            id=4,
-            defaults={
-                "color_key": CategoryColorChoice.BLUE,
-                "upper_proportion_limit": 10,
-                "label_da": "Højt",
-            },
-        )
+        cls.create_readingspeed_categories()
 
     def test_pk_map_unscaled(self):
         pk_map = ReadingSpeedCategory.pk_map()

@@ -481,19 +481,19 @@ msgstr ""
 msgid "Rigtighedsprocent (Faldende)"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
+#: dysleksi/templates/dysleksi/admin/part_responses/group/normscore_plot.html
 msgid "Normscore og læsetempo"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
+#: dysleksi/templates/dysleksi/admin/part_responses/group/normscore_plot.html
 msgid "Bemærk: Kategorisering af læsetempo er endnu ikke vedtaget"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
+#: dysleksi/templates/dysleksi/admin/part_responses/group/normscore_plot.html
 msgid "Læsetempo"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
+#: dysleksi/templates/dysleksi/admin/part_responses/group/normscore_plot.html
 #: dysleksi/templates/dysleksi/admin/test_response/detail.html
 #: dysleksi/views.py
 msgid "Normscore"

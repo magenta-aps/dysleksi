@@ -407,6 +407,7 @@ class PaginationMixin:
 class AssignmentResultsView(
     GroupRequiredMixin, PaginationMixin, ObjectPermissionsMixin, DetailView
 ):
+    # Results view of as Class' responses to an entire Test
     groups_required = [TEACHERS]
     model = TestAssignment
     table_class = TestResultTable
@@ -600,6 +601,7 @@ class AssignmentResultsFlagView(GroupRequiredMixin, ObjectPermissionsMixin, Upda
 
 
 class AssignmentPartResultsView(GroupRequiredMixin, ObjectPermissionsMixin, ListView):
+    # Results view of as Class' responses to a single TestPart
     groups_required = [TEACHERS]
     model = PartResponse
     table_class = PartResultTable
@@ -701,6 +703,7 @@ class AssignmentPartResultsView(GroupRequiredMixin, ObjectPermissionsMixin, List
 class TestResponseView(
     GroupRequiredMixin, PaginationMixin, ObjectPermissionsMixin, DetailView
 ):
+    # Results view of as Student's responses to an entire Test
     model = TestResponse
     template_name = "dysleksi/admin/test_response/detail.html"
     chart_template_name = "dysleksi/admin/test_response/chart.html"
@@ -998,6 +1001,7 @@ class TestResponseView(
 class PartResponseView(
     GroupRequiredMixin, ObjectPermissionsMixin, PaginationMixin, DetailView
 ):
+    # Results view of as Student's responses to a single TestPart
     model = PartResponse
     template_name = "dysleksi/admin/part_response/group/detail.html"
     groups_required = [TEACHERS]
@@ -1033,6 +1037,12 @@ class PartResponseView(
             )
             .annotate_percentage("correct_proportion", "correct_pct")
             .annotate_percentage("almost_correct_proportion", "almost_correct_pct")
+            .annotate_question_sum_answer_time(
+                "total_answer_time", Q(question__is_practice=False)
+            )
+            .annotate_question_average_answers_per_minute(
+                "responses_count", "total_answer_time", "answers_per_minute"
+            )
         )
         object = qs.first()
         if object is None:
@@ -1282,6 +1292,26 @@ class PartResponseView(
                     },
                 ]
             )
+
+        if self.part.show_normscore_speed_plot:
+            readingspeedcategory_max = (
+                ReadingSpeedCategory.objects.order_by("-upper_proportion_limit")
+                .values_list("upper_proportion_limit", flat=True)
+                .first()
+            )
+            result_max = self.object.answers_per_minute
+            y_scale = readingspeedcategory_max
+            if result_max is not None and result_max > y_scale:
+                y_scale = result_max
+
+            context["ReadingSpeedCategories"] = ReadingSpeedCategory.pk_map(
+                reverse=True, scale_max=y_scale
+            )
+            context["CorrectnessCategories"] = CorrectnessCategory.pk_map()
+            context["y_scale"] = y_scale
+            context["plot"] = [
+                (self.object.correct_proportion, self.object.answers_per_minute)
+            ]
 
         # Find ud af hvilken kolonne vi skal vise for "challenge"
         # (billede, tekst eller lyd)
