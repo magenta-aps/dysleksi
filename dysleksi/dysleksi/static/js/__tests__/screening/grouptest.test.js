@@ -400,13 +400,14 @@ describe("GroupTestFlow", () => {
         // 2. Show the question
         // This executes: this.input = this.domElements.showQuestionFreeText(() => this.selectFreeText());
         view.showQuestion(false, 0);
+        expect(domElements.nextBtn.disabled).toBe(true);
 
         // 3. Clear previous calls to ensure clean assertions
         domElements.toggleNextButton.mockClear();
 
-        // 4. Simulate user typing "ab"
+        // 4. Simulate user typing "a"
         // In your DOM implementation, the listener is called on every letter update
-        view.input.value = "ab";
+        view.input.value = "a";
 
         // 5. Trigger the listener manually
         // This simulates what happens when a letter button is clicked in showQuestionFreeText
@@ -416,14 +417,15 @@ describe("GroupTestFlow", () => {
         // --- Assertions ---
 
         // verify selectFreeText logic:
-        // This.textAnswer should be updated because "ab" is not empty
-        expect(view.textAnswer).toBe("ab");
+        // This.textAnswer should be updated because "a" is not empty
+        expect(view.textAnswer).toBe("a");
 
         // selectedAnswer should be set to the first possible answer (resource reference)
         expect(view.selectedAnswer).toEqual(view.currentQuestion.possibleAnswers[0]);
 
-        // toggleNextButton should be called with true (because length >= 2)
-        expect(domElements.toggleNextButton).toHaveBeenCalledWith(true);
+        // toggleNextButton should be called with true (because length >= 1)
+        expect(domElements.toggleNextButton).toHaveBeenCalledWith(true, true);
+        expect(domElements.nextBtn.disabled).toBe(false);
     });
 
     it("Test complain when there are no parts", () => {
