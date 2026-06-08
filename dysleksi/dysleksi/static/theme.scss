@@ -265,7 +265,6 @@ body.show-instructions {
     }
   }
   .letter-btn {
-    height: 80px;
     &:disabled {
       color: black !important;
       border-color: $student-grey !important;
@@ -380,7 +379,7 @@ body.show-instructions {
 .letter-btn {
     font-size: 2rem !important;
     margin: 0;
-    height: 80px;
+    height: 80px !important;
     text-align: center;
     display: inline-flex;
     align-items: center;
