@@ -269,6 +269,48 @@ class DysleksiTest(TestCase):
         )
 
     @classmethod
+    def create_lettershape_part(cls, individual: bool = False):
+        cls.lettershape_part, _ = TestPart.objects.get_or_create(
+            name="LetterShape",
+            timeout=60000,
+            partial_score_after=30000,
+        )
+        test = cls.individual_test if individual else cls.group_test
+        test.parts.add(cls.lettershape_part)
+
+        cls.lettershape_question_1 = TestQuestion.objects.create(
+            part=cls.lettershape_part,
+            reminder=5000,
+            reminder_source=cls.resource4,
+            hint_source=cls.resource4,
+            question_type=QuestionType.MULTIPLE_CHOICE_MATCH,
+        )
+        PossibleAnswer.objects.create(
+            resource=TestResource.objects.create(
+                name="Aa",
+                text="Aa",
+            ),
+            question=cls.lettershape_question_1,
+            correctness=Correctness.CORRECT,
+        )
+
+        cls.lettershape_question_2 = TestQuestion.objects.create(
+            part=cls.lettershape_part,
+            reminder=5000,
+            reminder_source=cls.resource4,
+            hint_source=cls.resource4,
+            question_type=QuestionType.MULTIPLE_CHOICE_MATCH,
+        )
+        PossibleAnswer.objects.create(
+            resource=TestResource.objects.create(
+                name="Bb",
+                text="Bb",
+            ),
+            question=cls.lettershape_question_2,
+            correctness=Correctness.CORRECT,
+        )
+
+    @classmethod
     def create_wordreading_part(cls, individual: bool = False):
         cls.create_resources()
         # TODO: Move other test creations into methods like this,
@@ -661,6 +703,43 @@ class ResponseTest(DysleksiTest):
             2026, 5, 1, 12, 0, 40, tzinfo=tz
         )
         cls.sentencereading_questionresponse_1.save()
+
+    @classmethod
+    def create_lettershape_part(cls, individual: bool = False):
+        super().create_lettershape_part(individual)
+        tz = timezone.get_current_timezone()
+        testresponse = (
+            cls.test_response_student if individual else cls.test_response_class_1
+        )
+        cls.lettershape_partresponse_1 = PartResponse.objects.create(
+            testresponse=testresponse,
+            testpart=cls.lettershape_part,
+            completed=True,
+            started_at=datetime(2026, 5, 1, 12, 0, 0, tzinfo=tz),
+        )
+        cls.lettershape_questionresponse_1 = QuestionResponse.objects.create(
+            partresponse=cls.lettershape_partresponse_1,
+            question=cls.lettershape_question_1,
+            correctness=Correctness.CORRECT,
+            answer_text="Aa",
+            finished_after=5000,
+        )
+        cls.lettershape_questionresponse_1.submitted_at = datetime(
+            2026, 5, 1, 12, 0, 20, tzinfo=tz
+        )
+        cls.lettershape_questionresponse_1.save()
+
+        cls.lettershape_questionresponse_2 = QuestionResponse.objects.create(
+            partresponse=cls.lettershape_partresponse_1,
+            question=cls.lettershape_question_2,
+            correctness=Correctness.WRONG,
+            answer_text="Cc",
+            finished_after=5000,
+        )
+        cls.lettershape_questionresponse_2.submitted_at = datetime(
+            2026, 5, 1, 12, 0, 40, tzinfo=tz
+        )
+        cls.lettershape_questionresponse_2.save()
 
     @classmethod
     def create_wordreading_part(cls, individual: bool = False):

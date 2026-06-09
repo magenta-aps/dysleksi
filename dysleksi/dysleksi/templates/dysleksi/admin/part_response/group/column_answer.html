@@ -13,9 +13,22 @@
             {% endif %}
         {% endfor %}
         </div>
+
+    {% elif question_type == QuestionType.MULTIPLE_CHOICE_MATCH %}
+        {% with record.answer_text|make_list as sides %}
+        <div
+                class="answer {% if record.correctness == "correct" %}answer-correct{% else %}answer-incorrect{% endif %}"
+        >{{ sides.0 }}</div>
+        /
+        <div
+                class="answer {% if record.correctness == "correct" %}answer-correct{% else %}answer-incorrect{% endif %}"
+        >{{ sides.1 }}</div>
+        {% endwith %}
+
     {% elif question_type == QuestionType.FREE_TEXT %}
         <div
                 class="answer {% if record.correctness == "correct" %}answer-correct{% elif record.correctness == "partial" %}answer-almost-correct{% else %}answer-incorrect{% endif %}"
         >{{ record.answer_text|default_if_none:"&nbsp;" }}</div>
     {% endif %}
+
 {% endwith %}

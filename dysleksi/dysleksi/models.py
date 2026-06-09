@@ -99,6 +99,7 @@ class Correctness(models.TextChoices):
 class QuestionType(TextChoices):
     MULTIPLE_CHOICE = "multiple_choice"
     MULTIPLE_CHOICE_WITH_DISPLAY_FIELD = "multiple_choice_with_display_field"
+    MULTIPLE_CHOICE_MATCH = "multiple_choice_match"
     FREE_TEXT = "free_text"
     NO_INPUT_REQUIRED = "no_input_required"
 

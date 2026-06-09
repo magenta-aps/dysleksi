@@ -1192,6 +1192,7 @@ class TestPartResponseView(ResponseTest):
         super().setUpTestData()
         super().create_parts()
         cls.create_sentencereading_part(False)
+        cls.create_lettershape_part(False)
         cls.create_readingspeed_categories()
 
     def test_get_object(self):
@@ -1419,6 +1420,37 @@ class TestPartResponseView(ResponseTest):
         context = view.get_context_data()
         table = context["responses_table"]
         self.assertNotIn("challenge_sentence", table.exclude)
+
+    def test_answer_table_letter_shape(self):
+        view = self.setup_view(
+            PartResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_class.pk,
+            testresponse_pk=self.test_response_class_1.pk,
+            testpart_pk=self.lettershape_part.pk,
+        )
+        context = view.get_context_data()
+        table = context["responses_table"]
+        self.assertIn("challenge_image", table.exclude)
+        self.assertIn("challenge_text", table.exclude)
+        self.assertIn("challenge_sound", table.exclude)
+        self.assertIn("challenge_sentence", table.exclude)
+
+        response = view.response
+        response.render()
+        soup = BeautifulSoup(response.content, "html.parser")
+        table = self.html_table_to_list(
+            soup.find("div", id="test-results-table").find("table")
+        )
+        self.assertEqual(
+            table,
+            [
+                [["Opg."], ["Rigtigt svar"], ["Elevens svar"], ["Tid"]],
+                [["1"], ["A / a"], ["A", "/", "a"], ["5 sek."]],
+                [["2"], ["B / b"], ["C", "/", "c"], ["5 sek."]],
+                [[], [], [], ["10 sek."]],
+            ],
+        )
 
     def test_access(self):
         self.setup_view(
