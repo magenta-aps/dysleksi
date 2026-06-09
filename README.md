@@ -30,8 +30,7 @@ well. Log in using the student's credentials:
 | Method            | Teacher username   | Teacher password   | Student username | Student password |
 |-------------------|--------------------|--------------------|------------------|------------------|
 | Username/password | `lærer`            | `lærer`            | `elev`           | `elev`           |
-| MitID             | `lærer`            | `lærer`            | `elev`           | `elev`           |
-| UniLogin          | Ikke implementeret | Ikke implementeret | `elev@elev.gl`   | `elev`           |
+| UniLogin/MitID    | `lærer@dys.gl`     | `lærer`            | `elev@dys.gl`    | `elev`           |
 
 
 To begin a screening session, click "Start individueltest" in the teacher window. The "student window" should now automatically switch to a screening session.

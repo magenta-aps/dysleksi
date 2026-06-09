@@ -9,7 +9,6 @@
 {% endblock %}
 
 {% block card_content %}
-<a href="{% url 'login:login' provider="unilogin" %}" class="btn btn-outline-primary">{% translate "Log ind med UniLogin" %}</a>
-<a href="{% url 'login:login' provider="mitid" %}" class="btn btn-outline-primary">{% translate "Log ind med MitID" %}</a>
+<a href="{% url 'login:login' provider="unilogin" %}" class="btn btn-outline-primary">{% translate "Log ind med UniLogin/MitID" %}</a>
 <a href="{% url 'login:login' %}" class="btn btn-outline-primary">{% translate "Log ind med brugernavn/kodeord" %}</a>
 {% endblock %}

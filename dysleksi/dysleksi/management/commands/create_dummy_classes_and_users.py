@@ -26,6 +26,7 @@ class Command(BaseCommand):
                 "last_name": "Lærersen",
                 "cpr": "0222222222",
                 "institution": school,
+                "uniid": "0222222222",
             },
         )
         if created:
@@ -43,6 +44,7 @@ class Command(BaseCommand):
                 "last_name": "Lærersen",
                 "cpr": "0222222223",
                 "institution": school,
+                "uniid": "0222222223",
             },
         )
         if created:
@@ -60,6 +62,7 @@ class Command(BaseCommand):
                 "last_name": "Adminsen",
                 "cpr": "0222222224",
                 "institution": school,
+                "uniid": "0222222224",
             },
         )
         if created:
@@ -94,6 +97,7 @@ class Command(BaseCommand):
                 "last_name": "Elevsen",
                 "cpr": "0111111112",
                 "institution": school,
+                "uniid": "1a3b5c7d9e",
             },
         )
         if created:
