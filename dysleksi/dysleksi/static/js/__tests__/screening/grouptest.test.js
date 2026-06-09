@@ -43,6 +43,23 @@ vi.mock("../../webRTC.js", () => {
 const testSpy = (test) => {
     spyAttributes(test, ["chatSocket", "domElements", "summary"]);
 };
+
+// Like vi.waitFor, but advances fake timers instead of polling in real time.
+// vi.waitFor paces every poll at real wall-clock time, so a flow gated behind
+// fake setTimeout() sleeps (e.g. the voice-over sequences) burns real seconds.
+// Advancing fake time settles the same flow instantly.
+const advanceUntil = async (assertion, { step = 250, max = 10000 } = {}) => {
+    let elapsed = 0;
+    for (;;) {
+        try {
+            return assertion();
+        } catch (err) {
+            if (elapsed >= max) throw err;
+        }
+        await vi.advanceTimersByTimeAsync(step);
+        elapsed += step;
+    }
+};
 const createMockAudioContext = () => {
     const mockSource = {
         connect: vi.fn(),
@@ -620,7 +637,7 @@ describe("GroupTestFlow", () => {
 
         // The speaker icon is animated and voice-over audio starts playing
         expect(domElements.speakerIcon.classList.contains("playing")).toBe(true);
-        await vi.waitFor(() => {
+        await advanceUntil(() => {
             expect(domElements.playSound).toHaveBeenCalledWith(
                 "/static/audio/1t.1.wav",
                 mockAudioContextInstance,
@@ -635,7 +652,7 @@ describe("GroupTestFlow", () => {
         expect(domElements.speakerIcon.classList.contains("playing")).toBe(false);
 
         // The smiley appears, ready for the student to click. It is not talking
-        await vi.waitFor(() => {
+        await advanceUntil(() => {
             expect(domElements.soundCalibrationAnimation.style.visibility).toBe(
                 "visible",
             );
@@ -648,7 +665,7 @@ describe("GroupTestFlow", () => {
         domElements.soundCalibrationAnimation.click();
 
         // The smiley now starts talking
-        await vi.waitFor(() => {
+        await advanceUntil(() => {
             expect(domElements.startSoundCalibrationAnimation).toHaveBeenCalled();
             expect(domElements.playSound).toHaveBeenCalledWith(
                 "/static/audio/1t.3.wav",
@@ -660,7 +677,7 @@ describe("GroupTestFlow", () => {
         });
 
         // The smiley stops talking when the audio is finished
-        await vi.waitFor(() => {
+        await advanceUntil(() => {
             expect(domElements.stopSoundCalibrationAnimation).toHaveBeenCalled();
             expect(domElements.soundCalibrationAnimation.src.endsWith("png")).toBe(
                 true,
@@ -668,7 +685,7 @@ describe("GroupTestFlow", () => {
         });
 
         // The voice-over starts talking again.
-        await vi.waitFor(() => {
+        await advanceUntil(() => {
             expect(domElements.playSound).toHaveBeenCalledWith(
                 "/static/audio/1t.4.wav",
                 mockAudioContextInstance,
@@ -683,7 +700,7 @@ describe("GroupTestFlow", () => {
         domElements.playSound.mockClear();
         domElements.soundCalibrationAnimation.click();
 
-        await vi.waitFor(() => {
+        await advanceUntil(() => {
             expect(domElements.startSoundCalibrationAnimation).toHaveBeenCalled();
             expect(domElements.playSound).toHaveBeenCalledWith(
                 "/static/audio/1t.3.wav",
@@ -701,7 +718,6 @@ describe("GroupTestFlow", () => {
     });
 
     it("Skips sound calibration if the debug button is clicked", async () => {
-        vi.useRealTimers();
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
@@ -713,6 +729,8 @@ describe("GroupTestFlow", () => {
         domElements.skipSoundCalibrationButton.click();
         expect(view.endSoundCalibration).toHaveBeenCalled();
         expect(view.cancelAudio).toBe(true);
+        // Advance past the voice-over sleep() so the cancelled flow settles.
+        await vi.runAllTimersAsync();
         await expect(calibrationPromise).resolves.toBeUndefined();
     });
 
@@ -729,19 +747,19 @@ describe("GroupTestFlow", () => {
         expect(domElements.endSummaryButton.style.visibility).toBe("hidden");
 
         // The voice-over audio starts playing
-        await vi.waitFor(() => {
+        await advanceUntil(() => {
             expect(domElements.playSound).toHaveBeenCalledWith(
                 "/static/audio/1t.5.wav",
                 mockAudioContextInstance,
             );
         });
-        await vi.waitFor(() => {
+        await advanceUntil(() => {
             expect(domElements.playSound).toHaveBeenCalledWith(
                 "/static/audio/1t.6.wav",
                 mockAudioContextInstance,
             );
         });
-        await vi.waitFor(() => {
+        await advanceUntil(() => {
             expect(domElements.playSound).toHaveBeenCalledWith(
                 "/static/audio/1t.7.wav",
                 mockAudioContextInstance,
@@ -757,7 +775,6 @@ describe("GroupTestFlow", () => {
     });
 
     it("Allows skipping the summary with the debug button", async () => {
-        vi.useRealTimers();
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
@@ -769,6 +786,8 @@ describe("GroupTestFlow", () => {
         domElements.skipSummaryButton.click();
         expect(view.endSummary).toHaveBeenCalled();
         expect(view.cancelAudio).toBe(true);
+        // Advance past the voice-over sleep() so the cancelled flow settles.
+        await vi.runAllTimersAsync();
         await expect(calibrationPromise).resolves.toBeUndefined();
     });
 
