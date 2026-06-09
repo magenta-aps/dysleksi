@@ -547,6 +547,9 @@ export class StudentTestView extends EventTarget {
             if (this.currentQuestion.advanceAutomatically) {
                 this.showNextQuestion();
             }
+            if (this.currentQuestion.continueWhenInstructionIsComplete) {
+                this.domElements.enableNextButton();
+            }
         });
     }
 

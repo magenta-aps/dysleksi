@@ -475,7 +475,8 @@ export class GroupTestView extends StudentTestView {
             this.selectedAnswer = this.currentQuestion.possibleAnswers[0];
         }
         this.domElements.toggleNextButton(
-            this.showingInstructions || answer.length >= 2,
+            this.showingInstructions || answer.length >= 1,
+            true,
         );
     }
 

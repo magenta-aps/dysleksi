@@ -302,8 +302,14 @@ class TestDomElements {
         this.testPartOutro.style.display = "flex";
     }
 
-    toggleNextButton(show) {
-        this.nextBtn.style.visibility = show ? "visible" : "hidden";
+    toggleNextButton(show, alwaysVisible = false) {
+        this.nextBtn.style.visibility = show || alwaysVisible ? "visible" : "hidden";
+
+        if (show) {
+            this.enableNextButton();
+        } else {
+            this.disableNextButton();
+        }
     }
 
     toggleRepeatButton(show) {
@@ -804,6 +810,8 @@ class TestDomElements {
         wrapper.append(textFieldWrapper);
 
         this.choicesEl.append(wrapper);
+        this.toggleNextButton(true);
+        this.disableNextButton();
 
         return displayField;
     }

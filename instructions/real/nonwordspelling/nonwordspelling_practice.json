@@ -316,11 +316,6 @@
     "continue_when_instruction_is_complete": false,
     "instruction_sequence": [
         {
-            "action": "hide",
-            "element": "next",
-            "delayAfter": 0
-        },
-        {
             "action": "show",
             "element": "choices",
             "delayAfter": 0
