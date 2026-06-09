@@ -38,15 +38,11 @@ services:
       - ./dev-environment/cert:/ssl:ro
       - ./data:/data:ro
       - ./mypy.ini:/mypy.ini:ro
-      #- ./file-data:/upload:rw
       - ./instructions:/upload/instructions/:ro
-      - ../dysleksi-binaries/real-data:/upload/resources/:ro
-      - ../dysleksi-binaries/dummy-data:/upload/dummy-resources/:ro
       - idp-data:/app/idp:rw
       # Note: Use /static/ instead of /static-copy/ to allow hot-reloading
       # In a production environment we would use /static-copy/
       - staticfiles-data:/static/
-      - mediafiles-data:/upload/
       - static-copy:/static-copy
     environment:
       - PULL_IDP_METADATA=true
@@ -189,7 +185,8 @@ services:
     environment:
       - URL_PREFIX=/media
     volumes:
-      - mediafiles-data:/web:ro
+      - ../dysleksi-binaries/real-data:/web/resources/:ro
+      - ../dysleksi-binaries/dummy-data:/web/dummy-resources/:ro
     networks:
       - default
     restart: unless-stopped
@@ -222,7 +219,6 @@ volumes:
   file-data:
   idp-data:
   staticfiles-data:
-  mediafiles-data:
   vitest-coverage:
   lobby-bots-modules:
   static-copy:
