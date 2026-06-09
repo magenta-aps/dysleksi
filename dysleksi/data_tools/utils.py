@@ -21,7 +21,7 @@ def create_wordreading_2_test(
         defaults={
             "timeout": 600000,  # 600 seconds / 10 minutes
             "partial_score_after": 300000,  # 300 seconds / 5 minutes
-            "reminder": 20000,  # 20 seconds
+            "reminder": 15000,  # 15 seconds
             "image_url": "/static/images/wordreading_2.png",
             "reminder_source": reminder,
             "completion_source": completion,

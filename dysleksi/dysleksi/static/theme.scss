@@ -507,6 +507,25 @@ body.show-instructions {
   animation: highlight-pulse 1s ease-in-out forwards;
 }
 
+@keyframes highlight-pulse-explicit {
+  0% {
+    transform: scale(1);
+    filter: none;
+  }
+  30% {
+    transform: scale(1.4);
+    filter: drop-shadow(0 $spacer $spacer $student-grey);
+  }
+  100% {
+    transform: scale(1);
+    filter: none;
+  }
+}
+
+.highlight-explicit {
+  animation: highlight-pulse-explicit 1.8s ease-in-out forwards;
+}
+
 .logbox {
   position: fixed;
   bottom: 10px;

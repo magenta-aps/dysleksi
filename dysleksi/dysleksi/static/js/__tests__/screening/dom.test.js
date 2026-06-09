@@ -619,6 +619,15 @@ describe("GroupTestDomElements DOM utilities", () => {
         vi.useRealTimers();
     });
 
+    it("explicit highlight adds highlight-explicit class temporarily", async () => {
+        vi.useFakeTimers();
+        dom.explicitHighlight(el);
+        expect(el.classList.contains("highlight-explicit")).toBe(true);
+        vi.advanceTimersByTime(2000);
+        expect(el.classList.contains("highlight-explicit")).toBe(false);
+        vi.useRealTimers();
+    });
+
     it("lockInput disables all choice buttons and next button, and sets readonly on all inputs", () => {
         const btn1 = document.createElement("button");
         const btn2 = document.createElement("button");

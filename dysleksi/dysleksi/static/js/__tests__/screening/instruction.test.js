@@ -53,7 +53,7 @@ describe("InstructionSequenceRunner", () => {
             setMarker: vi.fn(),
             addText: vi.fn(),
             removeText: vi.fn(),
-            setNextButtonClass: vi.fn(),
+            explicitHighlight: vi.fn(),
         };
         fakeContext = createFakeAudioContext();
 
@@ -88,7 +88,7 @@ describe("InstructionSequenceRunner", () => {
             { action: "highlight", element: "el1" },
             { action: "select", element: "btn1" },
             { action: "showFaded", element: "btn1" },
-            { action: "setNextButtonClass", data: "foo" },
+            { action: "explicitHighlight", element: "el1" },
         ];
 
         for (const instr of actions) {
@@ -115,7 +115,9 @@ describe("InstructionSequenceRunner", () => {
         expect(domElements.showFaded).toHaveBeenCalledWith(
             document.getElementById("btn1"),
         );
-        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("foo");
+        expect(domElements.explicitHighlight).toHaveBeenCalledWith(
+            document.getElementById("el1"),
+        );
     });
 
     it("executeInstruction throws error on incorrect action", async () => {
