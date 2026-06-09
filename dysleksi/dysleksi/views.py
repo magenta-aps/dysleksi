@@ -876,7 +876,8 @@ class TestResponseView(
                             "response": self.object,
                             "part": part,
                             "category": CorrectnessCategory.categorize_proportion(
-                                # Matcher rækkefølgen af linjer i `data` ovenfor.
+                                # Matcher rækkefølgen af linjer i data,
+                                # specificeret nedenunder i `field_spec`
                                 # For at regne kategorien ud deler vi antal rigtige
                                 # (række 1) med antal besvarelser (række 0)
                                 (column_values[1] / column_values[0])
@@ -1336,10 +1337,18 @@ class PartResponseView(
                         question__possible_answers__resource__text__in=("true", "false")
                     ),
                 ),
+                multiple_match=Count(
+                    "id",
+                    filter=Q(
+                        question__question_type=QuestionType.MULTIPLE_CHOICE_MATCH
+                    ),
+                ),
             )
         )
         if count_type_qs["teacher_judged"] > 0:
             show_type = "image"
+        elif count_type_qs["multiple_match"] > 0:
+            show_type = None
         else:
             show_type = max(count_type_qs, key=lambda t: count_type_qs[t])
 

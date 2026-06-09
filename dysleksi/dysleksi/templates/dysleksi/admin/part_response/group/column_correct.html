@@ -1,1 +1,5 @@
-{% include "dysleksi/admin/part_response/group/column_resource.html" with resource=record.question.correct_answer.resource %}
+{% if record.question.question_type == QuestionType.MULTIPLE_CHOICE_MATCH %}
+    {% include "dysleksi/admin/part_response/group/column_resource.html" with resource=record.question.correct_answer.resource split=True %}
+{% else %}
+    {% include "dysleksi/admin/part_response/group/column_resource.html" with resource=record.question.correct_answer.resource %}
+{% endif %}

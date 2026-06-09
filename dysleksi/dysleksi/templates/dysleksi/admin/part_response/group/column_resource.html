@@ -8,6 +8,8 @@
     {% if only_type is None or only_type == "text" %}
         {% if resource.text == "true" or resource.text == "false" %}
             <span class="answer-true {% if resource.text == "true" %}answer-selected{% endif %}">{% translate "Korrekt" %}</span><span class="answer-false {% if resource.text == "false" %}answer-selected{% endif %}">{% translate "Forkert" %}</span>
+        {% elif split %}
+            {{ resource.text|make_list|join:" / " }}
         {% else %}
             {{ resource.text }}
         {% endif %}
