@@ -2,7 +2,6 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
-import shutil
 from pathlib import Path
 from typing import Literal
 
@@ -12,16 +11,6 @@ from django.core.management.base import BaseCommand
 from django.db.models import Count
 
 from dysleksi.models import Class, Student, Test, TestType
-
-
-def copy_dummy_files():
-    for item in Path(settings.DUMMY_DATA_DIR).iterdir():
-        dest = Path(settings.DUMMY_RESOURCE_ROOT) / item.name
-        shutil.copytree(item, dest, dirs_exist_ok=True)
-
-    for item in Path(settings.REAL_DATA_DIR).iterdir():
-        dest = Path(settings.RESOURCE_ROOT) / item.name
-        shutil.copytree(item, dest, dirs_exist_ok=True)
 
 
 def create_group_test(
@@ -347,7 +336,6 @@ class Command(BaseCommand):
         )
 
     def handle(self, *args, **options):
-        copy_dummy_files()
         dummy = options["dummy"]
         create_answers = options["answer"]
         for grade in (1, 2, 3):
