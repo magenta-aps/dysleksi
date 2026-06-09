@@ -303,7 +303,9 @@ export class GroupTestView extends StudentTestView {
                 this.send({
                     event: "question.answered",
                     message: messageText,
-                    choiceId: outOfTime ? null : this.selectedAnswer.id,
+                    choiceId: outOfTime
+                        ? null
+                        : this.selectedAnswer && this.selectedAnswer.id,
                     recordingBase64: null,
                     partIndex: this.currentPartIndex,
                     partId: this.currentPart.id,
@@ -426,6 +428,7 @@ export class GroupTestView extends StudentTestView {
                 this.textAnswer =
                     leftSelectedEntry.answer.resourceText +
                     rightSelectedEntry.answer.resourceText;
+                this.selectedAnswer = null;
             }
         } else {
             this.domElements.toggleNextButton(true);
@@ -438,7 +441,9 @@ export class GroupTestView extends StudentTestView {
         }
 
         clickedEntry.button.classList.remove("pulse");
-        this.domElements.makeButtonGlow(this.selectedAnswer.buttonId);
+        if (this.selectedAnswer !== null) {
+            this.domElements.makeButtonGlow(this.selectedAnswer.buttonId);
+        }
 
         if (answer.resourceText === "true" || answer.resourceText === "false") {
             this.answerButtons.forEach((a) => {
