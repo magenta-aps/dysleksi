@@ -95,8 +95,8 @@ export class InstructionSequenceRunner {
                 this.domElements.highlight(this.getEl(element));
                 break;
 
-            case "setNextButtonClass":
-                this.domElements.setNextButtonClass(data);
+            case "explicitHighlight":
+                this.domElements.explicitHighlight(this.getEl(element));
                 break;
 
             case "select":

@@ -398,6 +398,13 @@ class TestDomElements {
         setTimeout(() => el.classList.remove("highlight"), 2000);
     }
 
+    explicitHighlight(el) {
+        // A more explicit version of "highlight". It takes a bit longer and the element
+        // grows larger than it does during a regular highlight
+        el.classList.add("highlight-explicit");
+        setTimeout(() => el.classList.remove("highlight-explicit"), 2000);
+    }
+
     setText(el, text) {
         if (el.tagName === "INPUT" || el.tagName === "TEXTAREA") {
             el.value = text;

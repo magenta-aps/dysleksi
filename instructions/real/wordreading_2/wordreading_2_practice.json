@@ -71,7 +71,7 @@
             },
 
             {
-                "action": "highlight",
+                "action": "explicitHighlight",
                 "element": "challenge-image",
                 "delayAfter": 0
             },
@@ -123,7 +123,7 @@
                 "delayAfter": 1000
             },
             {
-                "action": "highlight",
+                "action": "explicitHighlight",
                 "element": "choice-immuk",
                 "delayAfter": 0
             },
@@ -176,15 +176,35 @@
             {
                 "action": "highlight",
                 "element": "choice-immuk",
-                "delayAfter": 500
+                "delayAfter": 1500
             },
             {
-                // "... vælge det ord, som passer til tegningen" / "Oqaaseq assimut [...]"
+                // Vælge det ord
                 "action": "playSound",
-                "resource": "resources/wordreading_2/Enhanced/Instruktion/7b.11.mp3",
-                "delayAfter": 1250
+                "resource": "resources/wordreading_2/Enhanced/Instruktion/7b.11-00.mp3",
+                "delayAfter": 0
             },
-
+            {
+                "action": "highlight",
+                "element": "challenge-image",
+                "delayAfter": 0
+            },
+            {
+                // som passer til tegningen.
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Enhanced/Instruktion/7b.11-01.mp3",
+                "delayAfter": 0
+            },
+            {
+                "action": "highlight",
+                "element": "choice-isi",
+                "delayAfter": 0
+            },
+            {
+                "action": "select",
+                "element": "choice-isi",
+                "delayAfter": 2000
+            },
             {
                 // "Hvis du vælger forkert, kan du ændre dit valg [...]" / "Kukkusooruit [...]"
                 // (lang lydfil)
@@ -192,28 +212,32 @@
                 "resource": "resources/wordreading_2/Enhanced/Instruktion/7b.12.mp3",
                 "delayAfter": 1250
             },
-
-            {
-                "action": "select",
-                "element": "choice-isi",
-                "delayAfter": 0
-            },
             {
                 // "Når du har valgt ..." / "Toqqaareeraangavit"
                 "action": "playSound",
                 "resource": "resources/wordreading_2/Enhanced/Instruktion/7b.13.mp3",
                 "delayAfter": 250
             },
-
+            {
+                // går du videre til næste opgave
+                "action": "playSound",
+                "resource": "resources/wordreading_2/Enhanced/Instruktion/7b.14-00.mp3",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeIn",
+                "element": "next",
+                "delayAfter": 0
+            },
             {
                 "action": "highlight",
                 "element": "next",
                 "delayAfter": 0
             },
             {
-                // "... går du videre til næste opgave ved at trykke på pilen" / "tikkuut toorlugu [...]"
+                // ved at trykke  på pilen.
                 "action": "playSound",
-                "resource": "resources/wordreading_2/Enhanced/Instruktion/7b.14.mp3",
+                "resource": "resources/wordreading_2/Enhanced/Instruktion/7b.14-01.mp3",
                 "delayAfter": 1250
             },
 
@@ -252,7 +276,7 @@
                 // "Det er sådan, du skal løse opgaverne" / "Tassa taamatut [...]"
                 "action": "playSound",
                 "resource": "resources/wordreading_2/Enhanced/Instruktion/7b.15.mp3",
-                "delayAfter": 500
+                "delayAfter": 1500
             },
             {
                 // "Nu skal du selv prøve øveopgaverne" / "Massakkut [...]"
@@ -260,49 +284,16 @@
                 "resource": "resources/wordreading_2/Enhanced/Instruktion/7b.16.mp3",
                 "delayAfter": 1250
             },
-
-            // Skjul alle opgave-elementer
-            {
-                "action": "hide",
-                "element": "challenge-image",
-                "delayAfter": 0
-            },
-            {
-                "action": "hide",
-                "element": "choice-isi",
-                "delayAfter": 0
-            },
-            {
-                "action": "hide",
-                "element": "choice-isigak",
-                "delayAfter": 0
-            },
-            {
-                "action": "hide",
-                "element": "choice-illu",
-                "delayAfter": 0
-            },
-            {
-                "action": "hide",
-                "element": "choice-immuk",
-                "delayAfter": 0
-            },
-            // Skift udseende på "Næste"-knappen til rund grøn knap
-            {
-                "action": "setNextButtonClass",
-                "data": "start-btn",
-                "delayAfter": 0
-            },
-            {
-                "action": "fadeIn",
-                "element": "next",
-                "delayAfter": 0
-            },
             {
                 // "Klik grøn når du er klar" / "Piareeruit qorsuk tooruk"
                 "action": "playSound",
                 "resource": "resources/wordreading_2/Enhanced/Instruktion/7b.17.mp3",
-                "delayAfter": 0
+                "delayAfter": 1250
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 0,
+                "element": "next"
             }
         ]
     },
@@ -345,6 +336,16 @@
     {
         "question_type": "no_input_required",
         "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 1000,
+                "element": "repeat"
+            },
             {
                 // "Øvelserne er færdige" / "Sungiusarneq naammassivoq"
                 "action": "playSound",
@@ -396,31 +397,40 @@
                 "delayAfter": 750,
                 "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7d.1.mp3"
             },
-
+            {
+                // Hvis du har forstået, hvad du skal gøre
+                "action": "playSound",
+                "delayAfter": 0,
+                "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7d.2-00.mp3"
+            },
             {
                 "action": "highlight",
                 "delayAfter": 0,
                 "element": "next"
             },
             {
-                // "Hvis du har forstået, hvad du skal gøre [...]" / "Qanoq iliornissat [...]"
+                // skal du klikke på blåikon for at starte opgaverne.
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7d.2.mp3"
+                "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7d.2-01.mp3"
             },
-
+            {
+                // Men, hvis du ikke har forstået hvad du skal gøre,
+                "action": "playSound",
+                "delayAfter": 0,
+                "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7d.3-00.mp3"
+            },
             {
                 "action": "highlight",
                 "delayAfter": 0,
                 "element": "repeat"
             },
             {
-                // "Men, hvis du ikke har forstået [...]" / "Suliassatilli paasilluanngitsoorukkit [...]"
+                // skal du klikke på øret grå ikon for at lytte til instruktionen igen
                 "action": "playSound",
                 "delayAfter": 1250,
-                "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7d.3.mp3"
+                "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7d.3-01.mp3"
             },
-
             {
                 "action": "highlight",
                 "delayAfter": 0,
@@ -434,7 +444,7 @@
             {
                 // "Vælg et ikon (klik)" / "Toorseriarit"
                 "action": "playSound",
-                "delayAfter": 750,
+                "delayAfter": 1250,
                 "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7d.4.mp3"
             }
         ]
