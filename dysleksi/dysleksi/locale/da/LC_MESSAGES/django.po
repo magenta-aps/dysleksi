@@ -534,10 +534,6 @@ msgid "Markér svar som:"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Eleven sagde:"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Sprunget over"
 msgstr ""
 

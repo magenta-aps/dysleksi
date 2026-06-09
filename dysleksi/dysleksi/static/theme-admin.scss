@@ -738,35 +738,6 @@ div[data-role='teacher'][data-test-type='individual'] {
             }
           }
         }
-
-        .actual-pronunciation {
-          padding: 0 0.5 * $spacer;
-
-          input {
-            display: inline-block;
-            width: 2.5 * $spacer;
-            padding: 0 0.75 * $spacer 0.125 * $spacer 0.75 * $spacer;
-            margin: 0 0 0 0.25 * $spacer;
-            border-color: $red-normal;
-            font-family: "Karinika", "Helvetica", sans-serif;
-            font-size: $spacer;
-
-            &:focus {
-              box-shadow: none;
-            }
-
-            // Make input field wider during "højtlæsning" tests (words rather than letters)
-            &[class*='højtlæsning'] {
-              width: 10 * $spacer;
-            }
-          }
-
-          label {
-            color: $mono-gray-darkest;
-            font-family: "DM Sans Medium", "Helvetica", sans-serif;
-            font-size: 0.75 * $spacer;
-          }
-        }
       }
     }
   }
