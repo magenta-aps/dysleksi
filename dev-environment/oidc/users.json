@@ -1,10 +1,28 @@
 [
   {
+    "id": "lærer",
+    "email": "laerer@dys.gl",
+    "email_verified": false,
+    "name": "Lærer Lærersen",
+    "uniid": "0222222222",
+    "password": "laerer",
+    "groups": [ "Lærere" ]
+  },
+  {
     "id": "elevelevsen",
-    "email": "elev@elev.gl",
+    "email": "elev@dys.gl",
     "email_verified": true,
     "name": "Elev Elevsen",
     "uniid": "1a2b3c4d5e",
+    "password": "elev",
+    "groups": [ "Elever" ]
+  },
+  {
+    "id": "elev2elevsen",
+    "email": "elev2@dys.gl",
+    "email_verified": true,
+    "name": "Elev2 Elevsen",
+    "uniid": "1a3b5c7d9e",
     "password": "elev",
     "groups": [ "Elever" ]
   }

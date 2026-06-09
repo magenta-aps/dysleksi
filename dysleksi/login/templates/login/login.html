@@ -11,8 +11,7 @@
 {% block card_content %}
 <form action="" method="post">
     {% csrf_token %}
-    <button type="submit" name="provider" value="unilogin">UniLogin</button>
-    <button type="submit" name="provider" value="mitid">MitID</button>
+    <button type="submit" name="provider" value="unilogin">UniLogin/MitID</button>
     <button type="submit" name="provider" value="django">Brugernavn/Password</button>
 </form>
 {% endblock %}

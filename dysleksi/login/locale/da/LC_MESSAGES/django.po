@@ -42,11 +42,7 @@ msgid "Vælg Login Metode"
 msgstr ""
 
 #: login/templates/login/login_choice.html
-msgid "Log ind med UniLogin"
-msgstr ""
-
-#: login/templates/login/login_choice.html
-msgid "Log ind med MitID"
+msgid "Log ind med UniLogin/MitID"
 msgstr ""
 
 #: login/templates/login/login_choice.html

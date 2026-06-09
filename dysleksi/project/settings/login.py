@@ -77,7 +77,6 @@ LOGIN_WHITELISTED_URLS = [
     # Whitelist the Django "set_language" view, so it works even outside
     # authenticated contexts.
     reverse_lazy("set_language"),
-    reverse_lazy("login:login_forward", kwargs={"provider": "mitid"}),
     reverse_lazy("login:login_forward", kwargs={"provider": "unilogin"}),
     reverse_lazy("login:login_forward", kwargs={"provider": "django"}),
     reverse_lazy("login:unilogin:oidc_authentication_init"),

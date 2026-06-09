@@ -39,13 +39,11 @@ services:
       - ./data:/data:ro
       - ./mypy.ini:/mypy.ini:ro
       - ./instructions:/upload/instructions/:ro
-      - idp-data:/app/idp:rw
       # Note: Use /static/ instead of /static-copy/ to allow hot-reloading
       # In a production environment we would use /static-copy/
       - staticfiles-data:/static/
       - static-copy:/static-copy
     environment:
-      - PULL_IDP_METADATA=true
       - MAKE_MIGRATIONS=true
       - MIGRATE=true
       - MAKEMESSAGES=true
@@ -83,29 +81,6 @@ services:
     image: redis:8
     networks:
       - database
-
-  dysleksi-idp:
-    user: "1000:1000"  # Override in docker-compose.override.yml if your local user is different
-    image: kenchan0130/simplesamlphp
-    container_name: dysleksi-idp
-    environment:
-      HTTP_PORT: 8142
-      SIMPLESAMLPHP_SP_ENTITY_ID: https://dysleksi-web:8140/mitid/saml/metadata/
-      SIMPLESAMLPHP_SP_ASSERTION_CONSUMER_SERVICE: https://dysleksi-web/mitid/login/callback/
-      SIMPLESAMLPHP_SP_SINGLE_LOGOUT_SERVICE: https://dysleksi-web/mitid/logout/callback/
-      SIMPLESAMLPHP_IDP_CERTIFICATE: /var/www/simplesamlphp/cert/selfsigned.crt
-      SIMPLESAMLPHP_IDP_PRIVATEKEY: /var/www/simplesamlphp/cert/selfsigned.key
-    volumes:
-      - ./dev-environment/cert/idp/selfsigned.crt:/var/www/simplesamlphp/cert/server.crt:ro
-      - ./dev-environment/cert/idp/selfsigned.key:/var/www/simplesamlphp/cert/server.pem:ro
-      - ./dev-environment/idp/authsources.php:/var/www/simplesamlphp/config/authsources.php:ro
-      - ./dev-environment/idp/saml20-sp-remote.php:/var/www/simplesamlphp/metadata/saml20-sp-remote.php:ro
-      - ./dev-environment/idp/ports.conf:/etc/apache2/ports.conf:ro
-      - ./dev-environment/idp/site.conf:/etc/apache2/sites-available/simplesamlphp.conf:ro
-    ports:
-      - "8142:8142"
-    networks:
-      - default
 
   dysleksi-hosts-updater:
     container_name: dysleksi-hosts-updater
@@ -217,7 +192,6 @@ services:
 volumes:
   postgres-data:
   file-data:
-  idp-data:
   staticfiles-data:
   vitest-coverage:
   lobby-bots-modules:

@@ -44,13 +44,6 @@ class LoginGeneralTest(LoginTest):
         )
 
     def test_choose_login_provider(self):
-        response = self.client.post(reverse("login:login"), {"provider": "mitid"})
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(
-            response.headers["Location"],
-            reverse("login:login_forward", kwargs={"provider": "mitid"}),
-        )
-
         response = self.client.post(reverse("login:login"), {"provider": "unilogin"})
         self.assertEqual(response.status_code, 302)
         self.assertEqual(
@@ -79,9 +72,15 @@ class LoginGeneralTest(LoginTest):
         self.assertEqual(response.headers["Location"], settings.LOGOUT_REDIRECT_URL)
         self.assertNotIn("_auth_user_id", dict(self.client.session).keys())
 
-    def test_not_logged_in(self):
+    @override_settings(PUBLIC=False)
+    def test_not_logged_in_private(self):
         response = self.client.get(reverse("login:login"))
         self.assertEqual(response.status_code, 200)
+
+    @override_settings(PUBLIC=True)
+    def test_not_logged_in(self):
+        response = self.client.get(reverse("login:login"))
+        self.assertEqual(response.status_code, 302)
 
     def test_login_already_logged_in(self):
         self.client.force_login(self.staff_user)
@@ -97,130 +96,12 @@ class LoginGeneralTest(LoginTest):
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], "/")
 
-
-@override_settings(PUBLIC=True)
-class SamlLoginTest(LoginTest):
-    def test_invalid_saml_data(self):
-        session = self.client.session
-        session.update(
-            {
-                "saml": {
-                    "this config": "is invalid",
-                }
-            }
-        )
-        session.save()
-        response = self.client.get(reverse("login:login"))
-        self.assertEqual(response.status_code, 200)
-
-    def test_postlogin(self):
-        session = self.client.session
-        session.update(
-            {
-                "saml": {
-                    "ava": {
-                        "cpr": ["1234567890"],
-                        "firstname": ["Test"],
-                        "lastname": ["Testersen"],
-                        "email": ["test@example.com"],
-                    }
-                }
-            }
-        )
-        session.save()
+    def test_login_forward_invalid_provider(self):
         response = self.client.get(
-            reverse("login:login_forward", kwargs={"provider": "mitid"})
+            reverse("login:login_forward", kwargs={"provider": "TrustMeImADolphin"})
         )
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], "/")
-
-    def test_already_logged_in(self):
-        url = reverse("dysleksi:root")
-        session = self.client.session
-        session.update(
-            {
-                "saml": {
-                    "ava": {
-                        "cpr": ["1234567890"],
-                        "firstname": ["Test"],
-                        "lastname": ["Testersen"],
-                        "email": ["test@example.com"],
-                    }
-                }
-            }
-        )
-        session.save()
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(
-            response.headers["Location"],
-            reverse("login:login") + "?next=/",
-        )
-
-    def test_login_back(self):
-        session = self.client.session
-        session.update(
-            {
-                "saml": {
-                    "ava": {
-                        "cpr": ["1234567890"],
-                        "firstname": ["Test"],
-                        "lastname": ["Testersen"],
-                        "email": ["test@example.com"],
-                    }
-                },
-            }
-        )
-        session.save()
-        self.client.cookies["back"] = "/foobar"
-        response = self.client.get(reverse("login:login"))
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], "/foobar")
-
-    def test_login_forward_back(self):
-        session = self.client.session
-        session.update(
-            {
-                "saml": {
-                    "ava": {
-                        "cpr": ["1234567890"],
-                        "firstname": ["Test"],
-                        "lastname": ["Testersen"],
-                        "email": ["test@example.com"],
-                    }
-                },
-            }
-        )
-        session.save()
-        self.client.cookies["back"] = "/foobar"
-        response = self.client.get(
-            reverse("login:login_forward", kwargs={"provider": "mitid"})
-        )
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], "/foobar")
-
-    def test_redirect(self):
-        session = self.client.session
-        session["saml"] = {"cpr": "1234567890"}
-        session.save()
-        response = self.client.get(
-            reverse("login:login_forward", kwargs={"provider": "mitid"})
-        )
-        self.assertEqual(response.status_code, 302)
-        self.assertEqual(response.headers["Location"], reverse("login:mitid:login"))
-
-    def test_logout_redirect(self):
-        self.client.login(username="test", password="test")
-        session = self.client.session
-        session.update(
-            {
-                BACKEND_SESSION_KEY: "django_mitid_auth.saml.backend.Saml2Backend",
-                "saml": {"cpr": "1234567890"},
-            }
-        )
-        session.save()
-        response = self.client.get(reverse("login:logout"))
-        self.assertEqual(response.headers["Location"], reverse("login:mitid:logout"))
+        self.assertStartsWith(response.headers["Location"], reverse("login:login"))
 
 
 @override_settings(PUBLIC=True)

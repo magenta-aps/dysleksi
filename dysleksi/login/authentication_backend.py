@@ -9,6 +9,8 @@ from dysleksi.models import User
 if settings.TESTLOGGING:  # type: ignore
     logger = logging.getLogger(__name__)  # pragma: no cover
 
+# TODO: Override store_tokens-method, to also save refresh token.
+
 
 class DysleksiOIDCAuthenticationBackend(OIDCAuthenticationBackend):
     def get_userinfo(self, access_token, id_token, payload):
