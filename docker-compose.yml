@@ -40,7 +40,8 @@ services:
       - ./mypy.ini:/mypy.ini:ro
       #- ./file-data:/upload:rw
       - ./instructions:/upload/instructions/:ro
-      - ../dysleksi-binaries/:/upload/dev-data/:ro
+      - ../dysleksi-binaries/real-data:/upload/resources/:ro
+      - ../dysleksi-binaries/dummy-data:/upload/dummy-resources/:ro
       - idp-data:/app/idp:rw
       # Note: Use /static/ instead of /static-copy/ to allow hot-reloading
       # In a production environment we would use /static-copy/
@@ -55,8 +56,6 @@ services:
       - CREATE_DUMMY_USERS=true
       - CREATE_DUMMY_DATA=true
       - TEST=true
-      - DUMMY_DATA_DIR=/upload/dev-data/dummy-data
-      - REAL_DATA_DIR=/upload/dev-data/real-data
       - ECHO_INTERFACE=https://dysleksi-web
       - STATICFILES_DESTINATION_DIR=/static-copy
     networks:
