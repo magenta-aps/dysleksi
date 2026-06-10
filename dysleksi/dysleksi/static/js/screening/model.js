@@ -47,7 +47,7 @@ export class Student {
                     : this.currentQuestionIndex;
 
             for (let q = 0; q < limit; q++) {
-                this.addResult(p, Math.random() > 0.5);
+                this.addResult(p, Math.random() > 0.5 ? "correct" : "wrong");
             }
         }
 
