@@ -123,7 +123,7 @@ class Command(BaseCommand):
 
         # create some more students for group-test-testing
         group_test_students = []
-        for student_id in range(4):
+        for student_id in range(5):
 
             group_test_student, created = Student.objects.update_or_create(
                 username=f"elev{student_id}",
@@ -182,3 +182,4 @@ class Command(BaseCommand):
 
         for group_test_student in group_test_students:
             klasse.students.add(group_test_student)
+            secondary_class.students.add(group_test_student)
