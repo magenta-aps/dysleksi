@@ -43,6 +43,7 @@ services:
       # In a production environment we would use /static-copy/
       - staticfiles-data:/static/
       - static-copy:/static-copy
+      - file-data:/upload:rw
     environment:
       - MAKE_MIGRATIONS=true
       - MIGRATE=true

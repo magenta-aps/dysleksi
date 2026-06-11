@@ -19,12 +19,10 @@ INSTALLED_APPS = [
     "adminsortable2",
     "simple_history",
     "login",
-    "django_mitid_auth",
     "compressor",
     "csp_helpers",
     "two_factor",
     "django_bootstrap5",
     "django_tables2",
-    "mitid_test",
     "dysleksi",
 ]
