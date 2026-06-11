@@ -130,7 +130,6 @@ const INDIVIDUAL_DOM_HTML = `
 <button id="next">Næste</button>
 <button id="goto-next-result-group">Hop til næste</button>
 <textarea id="note" class="d-none"></textarea>
-<div class="actual-pronunciation"><input id="actual-pronunciation-text" /></div>
 <div id="audio-indicator"></div>
 <div class="modal fade" id="error" tabindex="-1" aria-labelledby="error-label" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -239,35 +238,6 @@ describe("ActionButtons", () => {
         instance.setActive("correct");
         instance.clearActive();
         expect(buttons.classList).not.to.include(["active"]);
-    });
-
-    it("shows the 'actual pronunciation' input field if 'wrong' button is selected", () => {
-        document.body.innerHTML += `
-            <div class="actual-pronunciation"><input id="actual-pronunciation-text" value="Foo" /></div>
-        `;
-        const instance = getInstance();
-        instance.setActive("wrong");
-        const elem = document.querySelector(".actual-pronunciation");
-        expect(elem.classList).not.to.include(["d-none"]);
-    });
-
-    it("can return the 'actual pronunciation' input field value", () => {
-        document.body.innerHTML += `
-            <div class="actual-pronunciation"><input id="actual-pronunciation-text" value="Foo" /></div>
-        `;
-        const instance = getInstance();
-        const value = instance.getActualPronunciationValue();
-        expect(value).toBe("Foo");
-    });
-
-    it("can reset the 'actual pronunciation' input field value", () => {
-        document.body.innerHTML += `
-            <div class="actual-pronunciation"><input id="actual-pronunciation-text" value="Foo" /></div>
-        `;
-        const instance = getInstance();
-        instance.resetActualPronunciationValue();
-        const value = instance.getActualPronunciationValue();
-        expect(value).toBe("");
     });
 });
 
@@ -795,8 +765,6 @@ describe("Teacher Individual test View", () => {
 
         // Act: fill out fields and click "wrong"
         note.noteEl.value = "Test note";
-        const field = document.querySelector("#actual-pronunciation-text");
-        field.value = "Actual pronunciation";
         buttons.wrongButton().click();
 
         // Assert: no socket message sent yet
@@ -815,7 +783,6 @@ describe("Teacher Individual test View", () => {
             assignmentId: 1,
             correctness: "wrong",
             note: "Test note",
-            actualPronunciation: "Actual pronunciation",
             practice: undefined,
             student: { id: "123" },
         });

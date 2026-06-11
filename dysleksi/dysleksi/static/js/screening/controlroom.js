@@ -641,7 +641,6 @@ export class ActionButtons {
                 "#correct, #wrong, #cancelled, #skipped, #next",
             ),
         ];
-        this.actualPronunciation = document.querySelector(".actual-pronunciation");
         this.active = null;
     }
 
@@ -678,62 +677,6 @@ export class ActionButtons {
             this.skipButton(),
         ]) {
             btn.classList.toggle("disabled", !state);
-        }
-    }
-
-    toggleActualPronunciation(state) {
-        if (this.actualPronunciation !== null) {
-            this.actualPronunciation.classList.toggle("d-none", state);
-        }
-    }
-
-    resetActualPronunciationValue() {
-        /* istanbul ignore next */
-        if (this.actualPronunciation !== null) {
-            const inputField = this.#getActualPronunciationField();
-            inputField.value = "";
-        }
-    }
-
-    getActualPronunciationValue() {
-        /* istanbul ignore next */
-        if (this.actualPronunciation !== null) {
-            const inputField = this.#getActualPronunciationField();
-            return inputField.value;
-        }
-    }
-
-    setActualPronunciationFieldClass(name) {
-        /* istanbul ignore next */
-        if (this.actualPronunciation !== null) {
-            const inputField = this.#getActualPronunciationField();
-
-            // Remove any previous `test-` CSS class
-            for (const oldCls of inputField.classList) {
-                if (oldCls.search(/^test-.*$/) >= 0) {
-                    inputField.classList.toggle(oldCls, false);
-                }
-            }
-
-            // Add new `test-` CSS class
-            const newCls =
-                "test-" +
-                name
-                    .trim() // trim leading or trailing whitespace
-                    .toLowerCase() // convert to lowercase
-                    .replace(/\s+/g, "-") // replace spaces with hyphens
-                    .replace(/[\(|\)]/g, ""); // remove parentheses
-
-            inputField.classList.toggle(newCls, true);
-        }
-    }
-
-    #getActualPronunciationField() {
-        /* istanbul ignore next */
-        if (this.actualPronunciation !== null) {
-            return this.actualPronunciation.querySelector(
-                "input#actual-pronunciation-text",
-            );
         }
     }
 
@@ -793,12 +736,6 @@ export class ActionButtons {
         // Activate the specified button, if given
         if (buttonId !== null) {
             this.buttonById(buttonId).classList.toggle("active", true);
-        }
-        if (buttonId === "wrong") {
-            this.toggleActualPronunciation(false); // show
-        }
-        if (["correct", "skipped"].includes(buttonId)) {
-            this.toggleActualPronunciation(true); // hide
         }
     }
 }
@@ -1136,8 +1073,6 @@ export class TeacherView {
         this.questionView.updatePartIndicator(
             `Deltest ${this.partIndex + 1} af ${this.test.parts.length}`,
         );
-
-        this.buttons.setActualPronunciationFieldClass(this.currentPart.name);
     }
 
     getPracticeQuestionCounts() {
@@ -1369,15 +1304,10 @@ export class TeacherView {
                 if (this.currentQuestionRequiresNoStudentInput()) {
                     if (val === "next") {
                         // Send feedback and go to next question
-                        this.sendQuestionFeedback(
-                            this.buttons.getActive(),
-                            this.buttons.getActualPronunciationValue(),
-                        );
+                        this.sendQuestionFeedback(this.buttons.getActive());
                         this.noteField.clearNote();
                         this.buttons.clearActive();
                         this.buttons.disableButtons();
-                        this.buttons.resetActualPronunciationValue();
-                        this.buttons.toggleActualPronunciation(true); // hide
                     } else {
                         // Delay sending feedback until teacher clicks 'Next' button
                         this.buttons.setActive(val);
@@ -1438,7 +1368,7 @@ export class TeacherView {
         });
     }
 
-    sendQuestionFeedback(correctness, actualPronunciationValue) {
+    sendQuestionFeedback(correctness) {
         const data = {
             uuid: crypto.randomUUID(),
             event: "question.feedback",
@@ -1451,9 +1381,6 @@ export class TeacherView {
             note: this.noteField.getNote(),
             practice: this.currentIsPractice,
         };
-        if (actualPronunciationValue) {
-            data.actualPronunciation = actualPronunciationValue;
-        }
 
         // Update student sessions
         Object.values(this.studentChannels).forEach((channel) => {
