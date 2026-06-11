@@ -1772,7 +1772,7 @@ class Category(models.Model):
 
     upper_proportion_limit = models.FloatField(
         default=1.0,
-        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        validators=[MinValueValidator(0.0)],
         null=True,
     )
     color_key = models.CharField(
@@ -1843,6 +1843,12 @@ class Category(models.Model):
 
 class CorrectnessCategory(Category):
     is_default = models.BooleanField()
+    history = HistoricalRecords()
+    upper_proportion_limit = models.FloatField(
+        default=1.0,
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        null=True,
+    )
 
     class Meta:
         constraints = [
@@ -1852,6 +1858,7 @@ class CorrectnessCategory(Category):
                 name="Only color_key: GRAY may have null upper limit",
             )
         ]
+        verbose_name_plural = "CorrectnessCategories"
 
     @property
     def lower_proportion_limit(self) -> float | None:
@@ -1915,6 +1922,11 @@ class CategoryRange:
 
 
 class ReadingSpeedCategory(Category):
+    history = HistoricalRecords()
+
+    class Meta:
+        verbose_name_plural = "ReadingSpeedCategories"
+
     @classmethod
     def validate_categories(cls):
         pass
