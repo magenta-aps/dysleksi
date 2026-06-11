@@ -1238,10 +1238,53 @@ describe("GroupTestContainer", () => {
                     name: "part1",
                     questions: [{}],
                 },
+                {
+                    name: "part2",
+                    questions: [{}],
+                },
             ],
         };
 
         instance = new GroupTestContainer(test);
+    });
+
+    it("Updates current view part when a student changes part", () => {
+        let studentData = {
+            student: {
+                id: 5,
+                firstName: "Eve",
+                lastName: "Online",
+                progress: 20,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
+        };
+
+        // Simulate a student starting the test
+        instance.updateData(studentData);
+        let card = instance.cards.get(5);
+
+        // The teacher is shown the results for part 1
+        expect(card.currentViewPartIndex).toBe(0);
+
+        // Simulate a student completing the first question
+        studentData.student.currentQuestionIndex = 1;
+        instance.updateData(studentData);
+        card = instance.cards.get(5);
+
+        // The teacher is stil being shown the results for part 1
+        expect(card.currentViewPartIndex).toBe(0);
+
+        // Simulate a student finishing the first part
+        studentData.student.currentQuestionIndex = 0;
+        studentData.student.currentPartIndex = 1;
+        instance.updateData(studentData);
+        card = instance.cards.get(5);
+
+        // The student has now completed the first part and is viewing the next part
+        // The teacher's card follows the student progress and shows part 1
+        expect(card.currentViewPartIndex).toBe(1);
     });
 
     it("toggles folded area even when clicking on child elements (name text)", () => {
