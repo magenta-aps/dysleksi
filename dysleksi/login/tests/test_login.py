@@ -1,21 +1,17 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
-import time
 from binascii import unhexlify
 from http import HTTPStatus
-from unittest.mock import patch
 
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
-from django.test import RequestFactory, TestCase
+from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from django_otp.oath import totp
 from django_otp.util import random_hex
-from login import views
-from login.views import on_session_expired
 from two_factor.utils import totp_digits
 
 from dysleksi.models import User
@@ -100,8 +96,9 @@ class LoginGeneralTest(LoginTest):
         response = self.client.get(
             reverse("login:login_forward", kwargs={"provider": "TrustMeImADolphin"})
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertStartsWith(response.headers["Location"], reverse("login:login"))
+        self.assertEqual(response.status_code, 200)
+        soup = BeautifulSoup(response.content, "html.parser")
+        self.assertIsNotNone(soup.find("input", type="password"))
 
 
 @override_settings(PUBLIC=True)
@@ -355,35 +352,3 @@ class Django2FaLoginTest(LoginTest):
 
         self.assertTemplateUsed(response, "two_factor/core/otp_required.html")
         self.assertEqual(response.status_code, HTTPStatus.FORBIDDEN)
-
-
-class LoginTimeoutTest(LoginTest):
-    def test_session_expired_call(self):
-        self.client.login(username="test", password="test")
-        session = self.client.session
-        session["_session_init_timestamp_"] = time.time() - 10
-        session.save()
-        with self.settings(SESSION_EXPIRE_SECONDS=1):
-            with patch.object(views, "on_session_expired") as mock_method:
-                mock_method.return_value = None
-                self.client.get("/")
-                mock_method.assert_called()
-
-    def test_on_session_expired(self):
-        request_factory = RequestFactory()
-        self.assertIsNone(
-            on_session_expired(
-                request_factory.get(reverse("login:mitid:logout-callback"))
-            )
-        )
-        with self.settings(SESSION_TIMEOUT_REDIRECT=reverse("dysleksi:root")):
-            response = on_session_expired(request_factory.get("/foobar"))
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(response.headers.get("location"), reverse("dysleksi:root"))
-        with self.settings(SESSION_TIMEOUT_REDIRECT=None):
-            response = on_session_expired(request_factory.get("/foobar"))
-            self.assertEqual(response.status_code, 302)
-            self.assertEqual(
-                response.headers.get("location"),
-                reverse("login:login") + "?next=" + "/foobar",
-            )

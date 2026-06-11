@@ -11,10 +11,8 @@ MIDDLEWARE = [
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
-    "django_mitid_auth.middleware.LoginManager",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "csp.middleware.CSPMiddleware",
-    "django_session_timeout.middleware.SessionTimeoutMiddleware",
     "django_otp.middleware.OTPMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
 ]

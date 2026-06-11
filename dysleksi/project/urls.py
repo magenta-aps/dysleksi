@@ -31,9 +31,5 @@ urlpatterns = [
     path("", include(two_factor_urls)),
     path("metrics/", include(metrics_urls)),
 ]
-if settings.MITID_TEST_ENABLED:  # type: ignore[misc]
-    urlpatterns.append(
-        path("mitid_test/", include("mitid_test.urls", namespace="mitid_test"))
-    )
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
