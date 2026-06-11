@@ -140,15 +140,27 @@
                 "delayAfter": 1000
             },
             {
+                // Du vælger grøn,
+                "action": "playSound",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.10-00.mp3",
+                "delayAfter": 0
+            },
+            {
                 "action": "highlight",
                 "element": "choice-true",
                 "delayAfter": 0
             },
             {
-                // Du vælger grøn, når sætningen du læser passer til billedet
+                // når sætningen du læser passer til billedet
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.10.mp3",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.10-01.mp3",
                 "delayAfter": 1000
+            },
+            {
+                // og rød,
+                "action": "playSound",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.11-00.mp3",
+                "delayAfter": 0
             },
             {
                 "action": "highlight",
@@ -156,9 +168,9 @@
                 "delayAfter": 0
             },
             {
-                // og rød, når det ikke gør.
+                // når det ikke gør.
                 "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.11.mp3",
+                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.11-01.mp3",
                 "delayAfter": 1000
             },
             {
@@ -377,7 +389,7 @@
             {
                 "action": "setRepeatButtonDestination",
                 "delayAfter": 0,
-                "data": "0"
+                "data": "1"
             },
 
             {
