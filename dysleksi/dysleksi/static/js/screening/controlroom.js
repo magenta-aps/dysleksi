@@ -447,10 +447,13 @@ export class StudentCard {
             : "ph-fill ph-caret-down";
     }
 
-    changePart(step) {
-        const newIndex = this.currentViewPartIndex + step;
-        this.currentViewPartIndex = newIndex;
+    setPart(partIndex) {
+        this.currentViewPartIndex = partIndex;
         this.update();
+    }
+
+    changePart(step) {
+        this.setPart(this.currentViewPartIndex + step);
     }
 
     _renderPartsProgress() {
@@ -614,6 +617,7 @@ export class GroupTestContainer {
     updateData(data) {
         const studentData = data.student;
         let student = this.students.get(studentData.id);
+        let newStudent = false;
 
         if (!student) {
             student = new Student(studentData);
@@ -622,6 +626,7 @@ export class GroupTestContainer {
             const card = new StudentCard(student, this.test);
             this.cards.set(student.id, card);
             this.container.appendChild(card.el);
+            newStudent = true;
         }
 
         student.progress = studentData.progress;
@@ -630,6 +635,13 @@ export class GroupTestContainer {
         student.resultsByPart = studentData.resultsByPart;
 
         this.cards.get(student.id).update();
+
+        if (
+            (student.currentQuestionIndex == 0 || newStudent) &&
+            student.currentPartIndex != null
+        ) {
+            this.cards.get(student.id).setPart(student.currentPartIndex);
+        }
         this.updateCounts();
     }
 }
