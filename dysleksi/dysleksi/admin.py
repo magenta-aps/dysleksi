@@ -4,11 +4,14 @@ from adminsortable2.admin import SortableAdminBase, SortableTabularInline
 from django.contrib import admin
 from django.http import HttpResponse
 from django.utils.safestring import mark_safe
+from simple_history.admin import SimpleHistoryAdmin
 
 from dysleksi.models import (
+    CorrectnessCategory,
     Instruction,
     InstructionSequence,
     Message,
+    ReadingSpeedCategory,
     Test,
     TestPart,
     TestResource,
@@ -128,3 +131,45 @@ class MessageAdmin(admin.ModelAdmin):
     search_fields = ["uuid", "user__username"]
     date_hierarchy = "processed"
     ordering = ["-processed"]
+
+
+@admin.register(CorrectnessCategory)
+class CorrectnessCategoryAdmin(SimpleHistoryAdmin):
+    list_display = [
+        "id",
+        "lower_proportion_limit",
+        "upper_proportion_limit",
+        "color_key",
+        "label_da",
+    ]
+    history_list_display = [
+        "id",
+        "upper_proportion_limit",
+        "color_key",
+        "label_da",
+    ]
+    ordering = ["upper_proportion_limit"]
+
+    def lower_proportion_limit(self, obj: CorrectnessCategory):
+        return obj.lower_proportion_limit  # pragma: no cover
+
+
+@admin.register(ReadingSpeedCategory)
+class ReadingSpeedCategoryAdmin(SimpleHistoryAdmin):
+    list_display = [
+        "id",
+        "lower_proportion_limit",
+        "upper_proportion_limit",
+        "color_key",
+        "label_da",
+    ]
+    history_list_display = [
+        "id",
+        "upper_proportion_limit",
+        "color_key",
+        "label_da",
+    ]
+    ordering = ["upper_proportion_limit"]
+
+    def lower_proportion_limit(self, obj: ReadingSpeedCategory):
+        return obj.lower_proportion_limit  # pragma: no cover
