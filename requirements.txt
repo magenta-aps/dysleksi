@@ -142,7 +142,7 @@ sqlparse==0.5.5
 Twisted==25.5.0
 txaio==25.12.2
 typing_extensions==4.15.0
-ujson==5.12.1
+ujson==5.13.0
 urllib3==2.7.0
 xmlschema==2.5.1
 xmltodict==1.0.4
