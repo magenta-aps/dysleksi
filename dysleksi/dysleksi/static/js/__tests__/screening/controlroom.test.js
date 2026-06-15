@@ -586,27 +586,27 @@ describe("Teacher Individual test View", () => {
         view.setPartIndex(0);
         // Assert
         expect(partName.innerText).toBe(view.test.parts[0].name);
-        expect(partNumber.innerText).toBe("Deltest 1 af 2");
+        expect(partNumber.innerText).toBe("Deltest 1 af 3");
 
         // Act: go to instruction question
         view.setQuestionIndex(0, true);
         // Assert
         expect(partName.innerText).toBe(view.test.parts[0].name);
-        expect(partNumber.innerText).toBe("Deltest 1 af 2");
+        expect(partNumber.innerText).toBe("Deltest 1 af 3");
         expect(questionNumber.innerText).toBe("Instruktion 1 af 2");
 
         // Act: go to practice question
         view.setQuestionIndex(1, true);
         // Assert
         expect(partName.innerText).toBe(view.test.parts[0].name);
-        expect(partNumber.innerText).toBe("Deltest 1 af 2");
+        expect(partNumber.innerText).toBe("Deltest 1 af 3");
         expect(questionNumber.innerText).toBe("Øveopgave 1 af 1");
 
         // Act: go to real question
         view.setQuestionIndex(0, false);
         // Assert
         expect(partName.innerText).toBe(view.test.parts[0].name);
-        expect(partNumber.innerText).toBe("Deltest 1 af 2");
+        expect(partNumber.innerText).toBe("Deltest 1 af 3");
         expect(questionNumber.innerText).toBe("Opgave 1 af 3");
     });
 
@@ -1131,6 +1131,43 @@ describe("Teacher Individual test View", () => {
 
     it("finds the 'goto next result group' button in DOM", () => {
         expect(view.gotoNextResultGroupButton).not.toBeNull();
+        // Initial button state is disabled
+        expect(view.gotoNextResultGroupButton.classList).include(["disabled"]);
+    });
+
+    it("updates the enabled/disabled state of the 'go to next result group' button", () => {
+        const gotoQuestion = (practice, questionIndex, partIndex) => {
+            p2pChannel.dispatchEvent(
+                new CustomEvent("message", {
+                    detail: {
+                        event: "question.displayed",
+                        partIndex: partIndex,
+                        questionIndex: questionIndex,
+                        practice: practice,
+                    },
+                }),
+            );
+        };
+
+        // Act: go to practice question
+        gotoQuestion(true, 0, 0);
+        // Assert: button is disabled
+        expect(view.gotoNextResultGroupButton.classList).include(["disabled"]);
+
+        // Act: go to non-practice question
+        gotoQuestion(false, 0, 0);
+        // Assert: button is enabled
+        expect(view.gotoNextResultGroupButton.classList).not.include(["disabled"]);
+
+        // Act: go to first non-practice question in part with result groups
+        gotoQuestion(false, 0, 1);
+        // Assert: button is enabled
+        expect(view.gotoNextResultGroupButton.classList).not.include(["disabled"]);
+
+        // Act: go to last result group in last part
+        gotoQuestion(false, 1, 2);
+        // Assert: button is disabled
+        expect(view.gotoNextResultGroupButton.classList).include(["disabled"]);
     });
 
     it("handles click events on the 'goto next result group button'", () => {
@@ -1146,11 +1183,24 @@ describe("Teacher Individual test View", () => {
         // Arrange: go to second test part (which has result groups)
         view.setPartIndex(1);
         view.setQuestionIndex(0);
-        // Act
+        // Act: go to next result group in *this* test part
         view.gotoNextResultGroup();
         // Assert: we are at the first question in result group 'B'
+        expect(view.currentPart.index).toBe(1); // unchanged
         expect(view.currentQuestion.index).toBe(2);
         expect(view.currentQuestion.resultGroup).toBe("B");
+        // Act: try to go to next result group again. Since we are at the last
+        // result group, this means that we end the current test part and send
+        // the student to the next test part (if any.)
+        view.gotoNextResultGroup();
+        expect(view.currentPart.index).toBe(2); // changed
+        expect(view.currentQuestion.index).toBe(0);
+        expect(view.currentQuestion.resultGroup).toBeUndefined();
+        // Act: go to next result group in the new test part. As there are no
+        // result groups defined in this test part, this does nothing.
+        view.gotoNextResultGroup();
+        expect(view.currentPart.index).toBe(2); // unchanged
+        expect(view.currentQuestion.index).toBe(0); // unchanged
     });
 
     it("displays an error modal if student audio setup fails", () => {

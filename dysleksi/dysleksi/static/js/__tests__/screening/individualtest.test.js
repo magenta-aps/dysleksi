@@ -122,7 +122,7 @@ describe("IndividualTestFlow", () => {
         // Test that the instance with subinstances is correctly created from json
         const test = new Test(individualTestData);
         expect(test.name).toBe("Individuel test");
-        expect(test.parts.length).toBe(2);
+        expect(test.parts.length).toBe(3);
         expect(test.parts[0].test).toBe(test);
         expect(test.parts[0].id).toBe(1);
         expect(test.parts[0].index).toBe(0);
@@ -198,7 +198,7 @@ describe("IndividualTestFlow", () => {
 
     it("complete test", () => {
         vi.spyOn(StudentTestView.prototype, "onPartComplete");
-        view.setPart(1);
+        view.setPart(2);
         view.onPartComplete();
         expect(view.onTestComplete).toHaveBeenCalled();
     });
@@ -549,6 +549,27 @@ describe("IndividualTestFlow", () => {
         expect(view.showQuestion).toHaveBeenCalledWith(isPractice, newQuestionIndex);
     });
 
+    it("handles 'question.changed' events that change part index", () => {
+        // Arrange
+        const newPartIndex = 1;
+        const newQuestionIndex = 1;
+        const isPractice = false;
+        view.setPart(0);
+        // Act
+        view.onChatMessage({
+            uuid: crypto.randomUUID(),
+            event: "question.changed",
+            partIndex: newPartIndex,
+            partId: 1,
+            questionIndex: newQuestionIndex,
+            questionId: 2,
+            assignmentId: 1,
+            practice: isPractice,
+        });
+        // Assert
+        expect(view.setPart).toHaveBeenCalledWith(newPartIndex);
+        expect(view.showQuestion).toHaveBeenCalledWith(isPractice, newQuestionIndex);
+    });
     it("passes 'audio.detected' and 'audio.quiet' events on to teacher's session", () => {
         for (const event of ["audio.detected", "audio.quiet"]) {
             // Act: pretend the audio detector dispatches an event

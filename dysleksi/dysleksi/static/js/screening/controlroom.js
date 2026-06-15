@@ -1012,6 +1012,7 @@ export class TeacherView {
         this.gotoNextResultGroupButton = document.querySelector(
             "#goto-next-result-group",
         );
+        this.updateGotoNextResultGroupButtonState();
 
         try {
             this.errorModal = Modal.getOrCreateInstance("#error");
@@ -1078,9 +1079,6 @@ export class TeacherView {
         let total;
         let current;
         const counts = this.getPracticeQuestionCounts();
-        const clamp = (number, min, max) => {
-            return Math.max(min, Math.min(number, max));
-        };
 
         if (practice) {
             this.currentQuestion = this.currentPart.practice[questionIndex];
@@ -1088,7 +1086,7 @@ export class TeacherView {
             if (instructionSequence !== null && instructionSequence !== undefined) {
                 label = "Instruktion";
                 total = counts.instructions;
-                current = clamp(
+                current = this.clamp(
                     this.questionIndex + counts.instructions - counts.nonInstructions,
                     1,
                     total,
@@ -1096,7 +1094,7 @@ export class TeacherView {
             } else {
                 label = "Øveopgave";
                 total = counts.nonInstructions;
-                current = clamp(
+                current = this.clamp(
                     this.questionIndex + counts.nonInstructions - counts.instructions,
                     1,
                     total,
@@ -1114,6 +1112,10 @@ export class TeacherView {
         this.questionView.updatePartIndicator(
             `Deltest ${this.partIndex + 1} af ${this.test.parts.length}`,
         );
+    }
+
+    clamp(number, min, max) {
+        return Math.max(min, Math.min(number, max));
     }
 
     getPracticeQuestionCounts() {
@@ -1175,6 +1177,11 @@ export class TeacherView {
                         if (this.showingInstructions) {
                             this.buttons.disableNextButton();
                         }
+                    }
+                    // Update enabled/disabled state of "go to next result group" button
+                    /* istanbul ignore next */
+                    if (this.gotoNextResultGroupButton !== null) {
+                        this.updateGotoNextResultGroupButtonState();
                     }
                     this.showQuestion();
                 }
@@ -1369,13 +1376,27 @@ export class TeacherView {
         }
     }
 
-    gotoNextResultGroup() {
-        if (this.currentQuestion === null || this.currentIsPractice) {
+    updateGotoNextResultGroupButtonState() {
+        if (this.gotoNextResultGroupButton === null) {
             return;
         }
+        if (this.currentQuestion === null || this.currentPart === null) {
+            this.gotoNextResultGroupButton.classList.toggle("disabled", true);
+            return;
+        }
+        const inLastPart = this.currentPart.index === this.test.parts.length - 1;
+        const { inLastResultGroup, _questionIndex } = this.getNextResultGroup();
+        const buttonDisabled =
+            this.currentIsPractice || (inLastPart && inLastResultGroup);
+        this.gotoNextResultGroupButton.classList.toggle("disabled", buttonDisabled);
+    }
+
+    getNextResultGroup() {
         // Find next result group (if any)
+        let inLastResultGroup = null;
+        let q = null;
         for (
-            let q = this.currentQuestion.index;
+            q = this.currentQuestion.index;
             q < this.currentPart.questions.length;
             q++
         ) {
@@ -1384,13 +1405,44 @@ export class TeacherView {
                 question.resultGroup &&
                 question.resultGroup !== this.currentQuestion.resultGroup
             ) {
-                // Go to next result group
-                console.log(`Jumping to next result group (question ${q})`);
-                this.setQuestionIndex(q, false);
-                this.showQuestion(); // update local UI
-                this.sendQuestionChanged(); // update remote UIs (student sessions)
+                inLastResultGroup = false;
                 break;
+            } else {
+                inLastResultGroup = true;
             }
+        }
+        return { inLastResultGroup: inLastResultGroup, questionIndex: q };
+    }
+
+    gotoNextResultGroup() {
+        if (this.currentQuestion === null || this.currentIsPractice) {
+            return;
+        }
+        const { inLastResultGroup, questionIndex } = this.getNextResultGroup();
+        if (inLastResultGroup) {
+            // Teacher clicked 'go to next result group' but we are already in the last
+            // result group. Send the student to the next test part, if available, or
+            // to the "end screen" if it's the last test part.
+            const nextPartIndex = this.clamp(
+                this.currentPart.index + 1,
+                0,
+                this.test.parts.length,
+            );
+            try {
+                this.setPartIndex(nextPartIndex);
+                this.setQuestionIndex(0, false);
+                this.sendQuestionChanged();
+            } catch {
+                console.debug(
+                    `could not go to next result group (part index ${nextPartIndex})`,
+                );
+            }
+        } else /* istanbul ignore else */ if (questionIndex !== null) {
+            // Go to next result group in current test part
+            console.debug(`Jumping to next result group (question ${questionIndex})`);
+            this.setQuestionIndex(questionIndex, false);
+            this.showQuestion(); // update local UI
+            this.sendQuestionChanged(); // update remote UIs (student sessions)
         }
     }
 
