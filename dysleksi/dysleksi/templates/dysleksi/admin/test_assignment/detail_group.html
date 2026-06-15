@@ -95,6 +95,12 @@
         <div class="group-test-body">
         </div>
 
+        <div class="group-test-footer">
+            <div id="result-link-disabled" class="d-inline" title="{% translate 'Testen skal gennemføres først' %}">
+                <button class="btn btn-outline-secondary" disabled="disabled" aria-disabled="true">{% translate "Se resultater" %}</button>
+            </div>
+            <a id="result-link-enabled" class="btn btn-outline-secondary d-none" href="{% url 'dysleksi:test_assignment_results' pk=object.pk %}">{% translate "Se resultater" %}</a>
+        </div>
     </div>
 </div>
 {% endblock %}

@@ -109,6 +109,13 @@ const GROUP_DOM_HTML = `
 </button>
 
 <div class="group-test-body"></div>
+    
+<div class="group-test-footer">
+    <div id="result-link-disabled" class="d-inline">
+        <button class="btn btn-outline-secondary" disabled="disabled">Se resultater</button>
+    </div>
+    <a id="result-link-enabled" class="btn btn-outline-secondary d-none" href="/assignment/1/result/">Se resultater</a>
+</div>
 `;
 
 const INDIVIDUAL_DOM_HTML = `
@@ -1289,7 +1296,6 @@ describe("GroupTestContainer", () => {
 
     beforeEach(() => {
         document.body.innerHTML = GROUP_DOM_HTML;
-        document.querySelector(".group-test-body");
 
         const test = {
             parts: [
@@ -1516,6 +1522,48 @@ describe("GroupTestContainer", () => {
         card.el.click();
         expect(folded.style.display).toBe("none");
         expect(arrowSpan.className).toBe(initialArrowClass);
+    });
+
+    it("onTestComplete called when progress is filled", () => {
+        const spy = vi.spyOn(instance, "onTestComplete");
+        const studentData1 = {
+            student: {
+                id: 4,
+                firstName: "James",
+                lastName: "Bend",
+                progress: 50,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
+        };
+        instance.updateData(studentData1);
+        const studentData2 = {
+            student: {
+                id: 5,
+                firstName: "Jason",
+                lastName: "Barne",
+                progress: 100,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
+        };
+        instance.updateData(studentData2);
+        expect(spy).not.toHaveBeenCalled();
+        studentData1.student.progress = 100;
+        instance.updateData(studentData1);
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it("onTestComplete toggles button", () => {
+        const resultLinkDisabled = document.getElementById("result-link-disabled");
+        const resultLinkEnabled = document.getElementById("result-link-enabled");
+        expect(resultLinkDisabled.classList).not.toContain("d-none");
+        expect(resultLinkEnabled.classList).toContain("d-none");
+        instance.onTestComplete();
+        expect(resultLinkDisabled.classList).toContain("d-none");
+        expect(resultLinkEnabled.classList).not.toContain("d-none");
     });
 });
 

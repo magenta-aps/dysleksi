@@ -860,6 +860,12 @@ div[data-role='teacher'][data-test-type='individual'] {
     }
   }
 }
+.group-test-footer {
+  background: $mono-gray-lightest;
+  display: flex;
+  padding: 0.5rem;
+  justify-content: flex-end;
+}
 
 .group-test-toolbar {
   display: flex;
