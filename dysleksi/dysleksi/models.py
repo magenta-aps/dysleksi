@@ -1470,7 +1470,7 @@ class PartResponse(PermissionsMixin, models.Model):
         null=True,
     )
     finished_after = models.IntegerField(
-        verbose_name=_("Completion time in milliseconds"),
+        verbose_name=_("Gennemførselstid i millisekunder"),
         blank=True,
         null=True,
     )

@@ -94,7 +94,7 @@ msgid "Student must match assignment."
 msgstr ""
 
 #: dysleksi/models.py
-msgid "Completion time in milliseconds"
+msgid "Gennemførselstid i millisekunder"
 msgstr ""
 
 #: dysleksi/models.py
@@ -107,6 +107,10 @@ msgstr ""
 
 #: dysleksi/models.py
 msgid "Svar indtalt af testdeltageren"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Completion time in milliseconds"
 msgstr ""
 
 #: dysleksi/tables.py
@@ -644,7 +648,7 @@ msgid "Start test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/start_room.html
-msgid "Cancel"
+msgid "Annullér"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/student.html
@@ -687,11 +691,6 @@ msgstr ""
 #: dysleksi/views.py
 #, python-brace-format
 msgid "{num} deltests"
-msgstr ""
-
-#: dysleksi/views.py
-#, python-brace-format
-msgid "{test_part_name}"
 msgstr ""
 
 #: dysleksi/views.py
