@@ -1084,6 +1084,8 @@ $border-radius-student-card: $spacer / 4 * 3;
     flex-wrap: wrap;
     gap: $spacer / 4;
     justify-content: flex-start;
+    align-content: flex-start;
+    width: 100%;
   }
 
   .question-index {

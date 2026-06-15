@@ -2015,6 +2015,27 @@ describe("StudentCard", () => {
         };
     });
 
+    afterEach(() => {
+        vi.restoreAllMocks();
+    });
+
+    // Pretend the dots-container is laid out so that dots have a fixed size and
+    // the container has a fixed width. jsdom has no layout engine, so without
+    // this _updateDotsHeight() always early-returns on a zero width.
+    const stubDotsLayout = (card, { containerWidth, dotSize, gap }) => {
+        Object.defineProperty(card.dotsContainer, "clientWidth", {
+            value: containerWidth,
+            configurable: true,
+        });
+        vi.spyOn(window, "getComputedStyle").mockReturnValue({
+            rowGap: `${gap}px`,
+        });
+        vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({
+            width: dotSize,
+            height: dotSize,
+        });
+    };
+
     it("initializes with correct student name and progress", () => {
         const card = new StudentCard(mockStudent, mockTest);
 
@@ -2095,6 +2116,41 @@ describe("StudentCard", () => {
         card.changePart(1);
 
         expect(card.questionIndex.textContent).toContain("-/2");
+    });
+
+    it("reserves dots-container height for the testpart with the most dots", () => {
+        mockTest.parts = [
+            { name: "many", questions: Array.from({ length: 12 }, () => ({})) },
+            { name: "few", questions: [{}, {}] },
+        ];
+        const card = new StudentCard(mockStudent, mockTest);
+        stubDotsLayout(card, { containerWidth: 70, dotSize: 10, gap: 5 });
+
+        card.update();
+
+        // dotsPerRow = floor((70 + 5) / (10 + 5)) = 5
+        // rows for the biggest part = ceil(12 / 5) = 3
+        // height = 3 * 10 + (3 - 1) * 5 = 40
+        expect(card.dotsContainer.style.minHeight).toBe("40px");
+    });
+
+    it("keeps the same dots-container height when switching to a smaller part", () => {
+        mockTest.parts = [
+            { name: "many", questions: Array.from({ length: 12 }, () => ({})) },
+            { name: "few", questions: [{}, {}] },
+        ];
+        const card = new StudentCard(mockStudent, mockTest);
+        stubDotsLayout(card, { containerWidth: 70, dotSize: 10, gap: 5 });
+
+        card.update();
+        const heightOnBigPart = card.dotsContainer.style.minHeight;
+
+        // Navigate to the part with only two dots.
+        card.changePart(1);
+
+        expect(card.dotsContainer.querySelectorAll(".dot").length).toBe(2);
+        expect(card.dotsContainer.style.minHeight).toBe(heightOnBigPart);
+        expect(card.dotsContainer.style.minHeight).toBe("40px");
     });
 
     it("allows marking and unmarking a student", () => {

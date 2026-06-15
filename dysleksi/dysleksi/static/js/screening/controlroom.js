@@ -441,6 +441,7 @@ export class StudentCard {
         this.foldedArea.style.display = isHidden ? "flex" : "none";
 
         this.el.classList.toggle("is-expanded", isHidden);
+        if (isHidden) this._updateDotsHeight();
 
         this.arrowIcon.className = isHidden
             ? "ph-fill ph-caret-up"
@@ -541,6 +542,34 @@ export class StudentCard {
             }
             this.dotsContainer.appendChild(dot);
         }
+
+        this._updateDotsHeight();
+    }
+
+    _updateDotsHeight() {
+        // Reserve room for the testpart with the most dots so the expanded card
+        // keeps a constant height when switching parts. The number of dots per
+        // row depends on the rendered width, so this can only be measured while
+        // the folded area is visible.
+        const containerWidth = this.dotsContainer.clientWidth;
+        const sampleDot = this.dotsContainer.querySelector(".dot");
+        if (containerWidth === 0 || !sampleDot) return;
+
+        const gap = parseFloat(getComputedStyle(this.dotsContainer).rowGap);
+        const { width: dotWidth, height: dotHeight } =
+            sampleDot.getBoundingClientRect();
+
+        const dotsPerRow = Math.max(
+            1,
+            Math.floor((containerWidth + gap) / (dotWidth + gap)),
+        );
+        const maxDots = this.testParts.reduce(
+            (max, part) => Math.max(max, part.questions.length),
+            0,
+        );
+
+        const rows = Math.ceil(maxDots / dotsPerRow);
+        this.dotsContainer.style.minHeight = `${rows * dotHeight + (rows - 1) * gap}px`;
     }
 }
 
