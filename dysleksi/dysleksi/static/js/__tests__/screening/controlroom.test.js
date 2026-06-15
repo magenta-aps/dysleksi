@@ -41,6 +41,15 @@ vi.mock("../../webRTC.js", () => {
     };
 });
 
+let resizeObserverCallback;
+
+global.ResizeObserver = function (cb) {
+    resizeObserverCallback = cb;
+    this.observe = vi.fn();
+    this.unobserve = vi.fn();
+    this.disconnect = vi.fn();
+};
+
 const GROUP_DOM_HTML = `
 <template id="student-card-template">
     <div class="student-card">
@@ -2214,6 +2223,27 @@ describe("StudentCard", () => {
 
         expect(card.student.marked).toBe(false);
         expect(card.markedStudentsCount.innerHTML).toBe("0");
+    });
+
+    it("sets up a ResizeObserver on the folded area", () => {
+        const card = new StudentCard(mockStudent, mockTest);
+        expect(card.resizeObserver.observe).toHaveBeenCalledWith(card.foldedArea);
+    });
+
+    it("calls _updateDotsHeight via ResizeObserver when folded area is visible", () => {
+        const card = new StudentCard(mockStudent, mockTest);
+        const spy = vi.spyOn(card, "_updateDotsHeight");
+
+        // We expect _updateDotsHeight to be called when the window is resized AND
+        // The card is folded out
+        card.foldedArea.style.display = "flex";
+        resizeObserverCallback();
+        expect(spy).toHaveBeenCalledTimes(1);
+
+        // When the card is not folded out. Nothing should happen.
+        card.foldedArea.style.display = "none";
+        resizeObserverCallback();
+        expect(spy).toHaveBeenCalledTimes(1);
     });
 });
 

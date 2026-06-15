@@ -426,6 +426,14 @@ export class StudentCard {
             e.stopPropagation();
             this.changePart(1);
         });
+
+        // Recalculate dot grid height when the card is resized
+        this.resizeObserver = new ResizeObserver(() => {
+            if (this.foldedArea.style.display !== "none") {
+                this._updateDotsHeight();
+            }
+        });
+        this.resizeObserver.observe(this.foldedArea);
     }
 
     _createMarkup() {
@@ -569,7 +577,22 @@ export class StudentCard {
         );
 
         const rows = Math.ceil(maxDots / dotsPerRow);
-        this.dotsContainer.style.minHeight = `${rows * dotHeight + (rows - 1) * gap}px`;
+
+        const dotsMinHeight = rows * dotHeight + (rows - 1) * gap;
+
+        // Account for partLabel potentially wrapping to multiple lines
+        this.partLabel.style.minHeight = "";
+        const tallestLabelHeight = Math.max(
+            ...this.testParts.map((part) => {
+                this.partLabel.textContent = part.name;
+                return this.partLabel.getBoundingClientRect().height;
+            }),
+        );
+        // Restore current label text
+        this.partLabel.textContent = this.testParts[this.currentViewPartIndex].name;
+
+        this.dotsContainer.style.minHeight = `${dotsMinHeight}px`;
+        this.partLabel.style.minHeight = `${tallestLabelHeight}px`;
     }
 }
 
