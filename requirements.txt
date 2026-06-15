@@ -111,7 +111,7 @@ cffi==2.0.0
 charset-normalizer==3.4.7
 click==8.4.1
 constantly==23.10.4
-cryptography==48.0.1
+cryptography==49.0.0
 defusedxml==0.7.1
 django-appconf==1.2.0
 django-formtools==2.6.1
@@ -127,7 +127,7 @@ mypy_extensions==1.1.0
 packaging==26.2
 py-ubjson==0.16.1
 pycparser==3.0
-pyOpenSSL==26.2.0
+pyOpenSSL==26.3.0
 python-dateutil==2.9.0.post0
 qrcode==8.2
 rcssmin==1.2.2
