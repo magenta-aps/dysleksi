@@ -30,6 +30,11 @@ export class IndividualTestView extends StudentTestView {
             this.teacherFeedback(data.correct);
         }
         if (data.event === "question.changed") {
+            // If teacher changes current test part, tell the student that this
+            // test part is complete and the next test part will begin shortly.
+            if (data.partIndex !== this.currentPartIndex) {
+                this.onPartComplete();
+            }
             this.showQuestion(data.practice, data.questionIndex);
         }
         if (data.event === "test.cancelled") {

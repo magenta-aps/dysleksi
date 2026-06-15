@@ -153,6 +153,110 @@
           "result_group": "B"
         }
       ]
+    },
+    {
+      "id": 3,
+      "name": "Individuel deltest",
+      "instructions_url": null,
+      "timeout": 60000,
+      "partial_score_after": 30000,
+      "completion_source": "/static/foo.mp3",
+      "practice": [
+        {
+          "id": 0,
+          "question_type": "free_text",
+          "challenge_id": 30,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "s",
+          "possible_answers": [],
+          "instruction_sequence": {
+            "instructions": [
+              {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "challenge-image"
+              },
+              {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+              }
+            ]
+          }
+        },
+        {
+          "id": 1,
+          "question_type": "free_text",
+          "challenge_id": 30,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "s",
+          "possible_answers": [],
+          "existing_answers": {}
+        },
+        {
+          "id": 2,
+          "question_type": "no_input_required",
+          "challenge_id": 31,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "s",
+          "possible_answers": [],
+          "instruction_sequence": {
+            "instructions": [
+              {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "challenge-image"
+              },
+              {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+              }
+            ]
+          }
+        }
+      ],
+      "questions": [
+        {
+          "id": 1,
+          "question_type": "free_text",
+          "challenge_id": 30,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "s",
+          "existing_answers": {},
+          "possible_answers": []
+        },
+        {
+          "id": 2,
+          "question_type": "no_input_required",
+          "challenge_id": 31,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "v",
+          "existing_answers": {},
+          "possible_answers": []
+        },
+        {
+          "id": 3,
+          "question_type": "free_text",
+          "challenge_id": 32,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": null,
+          "challenge_text": "k",
+          "existing_answers": {},
+          "possible_answers": []
+        }
+      ]
     }
   ],
   "summary": [
