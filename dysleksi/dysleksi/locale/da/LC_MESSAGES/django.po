@@ -23,7 +23,7 @@ msgid "Vælg testtype"
 msgstr ""
 
 #: dysleksi/forms.py dysleksi/tables.py
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html dysleksi/views.py
 msgid "Test"
 msgstr ""
 
@@ -69,11 +69,51 @@ msgstr ""
 msgid "Vælg klasse"
 msgstr ""
 
+#: dysleksi/management/commands/create_result_categories.py
+#: dysleksi/templates/dysleksi/admin/test_response/footer.html
+#: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
+msgid "Ikke fuldført"
+msgstr ""
+
+#: dysleksi/management/commands/create_result_categories.py
+msgid "Betydeligt under middel"
+msgstr ""
+
+#: dysleksi/management/commands/create_result_categories.py
+#: dysleksi/templates/dysleksi/admin/test_response/footer.html
+#: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
+msgid "Under middel"
+msgstr ""
+
+#: dysleksi/management/commands/create_result_categories.py
+#: dysleksi/templates/dysleksi/admin/test_response/footer.html
+#: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
+msgid "Middel"
+msgstr ""
+
+#: dysleksi/management/commands/create_result_categories.py
+#: dysleksi/templates/dysleksi/admin/test_response/footer.html
+msgid "Over middel"
+msgstr ""
+
+#: dysleksi/management/commands/create_result_categories.py
+msgid "Meget lavt"
+msgstr ""
+
+#: dysleksi/management/commands/create_result_categories.py
+msgid "Lavt"
+msgstr ""
+
+#: dysleksi/management/commands/create_result_categories.py
+msgid "Højt"
+msgstr ""
+
 #: dysleksi/models.py
 msgid "Gennemført"
 msgstr ""
 
 #: dysleksi/models.py
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
 msgid "I gang"
 msgstr ""
 
@@ -174,6 +214,7 @@ msgid "Bedømmelse"
 msgstr ""
 
 #: dysleksi/tables.py
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
 msgid "Alle"
 msgstr ""
 
@@ -275,6 +316,7 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/base.html
 #: dysleksi/templates/dysleksi/lobby/student.html
+#: dysleksi/templates/dysleksi/screening/student.html
 msgid "Log ud"
 msgstr ""
 
@@ -514,6 +556,83 @@ msgstr ""
 msgid "Se resultater"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
+#: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
+msgid "Se detaljer"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
+msgid "Deltagere:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
+#, python-format
+msgid "Klasse %(class_name)s (%(student_count)s elever)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
+#, python-format
+msgid "%(full_name)s (Klasse %(class_name)s)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
+msgid "Testtype:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
+msgid "Test:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
+msgid "Deltests:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
+#, python-format
+msgid "%(part_name)s (%(question_count)s opgaver)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+#, python-format
+msgid "Klasse %(class_name)s - Screening %(test_name)s"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+msgid "Færdige"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+msgid "Mærket"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+msgid "Sortering: Navn (A-Å)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+msgid "Fold alle ud/sammen"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+msgid "Visning:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+msgid "Tegnforklaring:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+msgid "Korrekt svar"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+msgid "Forkert svar"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+msgid "Delvist korrekt svar"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
 msgid "Testen skal gennemføres først"
 msgstr ""
@@ -585,31 +704,8 @@ msgstr ""
 msgid "Elendigt"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/test_response/footer.html
-#: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
-msgid "Under middel"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_response/footer.html
-#: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
-msgid "Middel"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_response/footer.html
-msgid "Over middel"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_response/footer.html
-#: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
-msgid "Ikke fuldført"
-msgstr ""
-
 #: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
 msgid "Fantastisk"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
-msgid "Se detaljer"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
@@ -623,6 +719,10 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
 #, python-format
 msgid "Vis %(count)s mere"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
+msgid "Samlet overblik over score i deltest"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/base.html
@@ -671,6 +771,10 @@ msgstr ""
 #: dysleksi/templates/dysleksi/screening/student.html
 #, python-format
 msgid "Hej %(name)s %(last_name)s"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/screening/student.html
+msgid "Du er færdig med opgaverne"
 msgstr ""
 
 #: dysleksi/utils.py

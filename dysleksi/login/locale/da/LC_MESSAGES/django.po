@@ -33,8 +33,16 @@ msgstr ""
 msgid "Husk mig på denne maskine i {days} dage"
 msgstr ""
 
+#: login/templates/login/logged_out.html
+msgid "Du er nu logget ud"
+msgstr ""
+
 #: login/templates/login/login.html
 msgid "Vælg Login"
+msgstr ""
+
+#: login/templates/login/login.html
+msgid "Brugernavn/Password"
 msgstr ""
 
 #: login/templates/login/login_choice.html

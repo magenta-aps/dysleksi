@@ -12,6 +12,6 @@
 <form action="" method="post">
     {% csrf_token %}
     <button type="submit" name="provider" value="unilogin">UniLogin/MitID</button>
-    <button type="submit" name="provider" value="django">Brugernavn/Password</button>
+    <button type="submit" name="provider" value="django">{% translate "Brugernavn/Password" %}</button>
 </form>
 {% endblock %}

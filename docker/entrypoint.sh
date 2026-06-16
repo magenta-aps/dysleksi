@@ -45,7 +45,7 @@ python manage.py create_result_categories
 if [ "${MAKEMESSAGES,,}" = true ]; then
   echo 'making messages'
   python manage.py extendedmakemessages --locale=kl --locale=da --keep-header --no-obsolete --add-location file
-  python manage.py extendedmakemessages --locale=kl --locale=da --keep-header --no-obsolete --add-location file --domain djangojs
+  python manage.py extendedmakemessages --locale=kl --locale=da --keep-header --no-obsolete --add-location file --domain djangojs --ignore '*/__tests__/*'
   python manage.py compilemessages --locale=da --locale=kl --verbosity=2
 fi
 

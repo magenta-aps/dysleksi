@@ -174,7 +174,7 @@ class AssignmentView(UserTypeMixin, ObjectPermissionsMixin, DetailView):
         else:
             context["student_ids"] = [assignment.student.id]
         context["test_type"] = self.get_room_type()
-        context["test_type_label"] = "Test"
+        context["test_type_label"] = _("Test")
         context["student"] = self.user
         context["room_type"] = self.get_room_type()
         context["test_name"] = test.name
@@ -449,7 +449,7 @@ class AssignmentResultsView(
         return [
             {
                 "color": category.color_key,
-                "label": category.label_da,
+                "label": category.label,
                 "items": qs.filter(**{category_key: category.pk}).order_by(count_key),
             }
             for category in CorrectnessCategory.objects.all().order_by(

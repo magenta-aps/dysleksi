@@ -40,6 +40,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.translation import gettext
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
@@ -1783,6 +1784,10 @@ class Category(models.Model):
         unique=True,
     )
     label_da = models.CharField(max_length=30, null=False, blank=False)
+
+    @property
+    def label(self) -> str:
+        return gettext(self.label_da)
 
     @classmethod
     def with_proportion(cls):

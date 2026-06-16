@@ -36,7 +36,7 @@
                                             left: calc(var(--plot-y-label-width) - 0.75rem - ({{ reading_category.scaled_width }} * 20rem));
                                             top: calc(({{ reading_category.scaled_width }} * var(--plot-canvas-height) / 2) - var(--plot-y-label-width) / 2)
                                             "
-                            >{{ reading_category.label_da }}</div>
+                            >{{ reading_category.label }}</div>
                         </td>
                         {% for pk, category in CorrectnessCategories.items %}
                             <td style="width: calc(({{ category.width }}) * var(--plot-canvas-width))"></td>
@@ -51,7 +51,7 @@
                                     class="plot-table-x-category-cell category-{{ category.color_key }}"
                                     style="width: calc(({{ category.width }}) * var(--plot-canvas-width))"
                             >
-                                {{ category.label_da }}
+                                {{ category.label }}
                             </td>
                         {% endfor %}
                     {% endlocalize %}
