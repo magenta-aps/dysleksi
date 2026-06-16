@@ -505,7 +505,12 @@ msgid "Åbn"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
 msgid "Se resultater"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+msgid "Testen skal gennemføres først"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html

@@ -515,7 +515,7 @@ class AssignmentResultsView(
                                 # "total": part_questions_count,
                                 # "proportion": average_count / part_questions_count,
                                 "category": CorrectnessCategory.categorize_proportion(
-                                    average_count / part_questions_count
+                                    (average_count or 0) / part_questions_count
                                 ),
                             },
                             part_questions_count=part_questions_count,

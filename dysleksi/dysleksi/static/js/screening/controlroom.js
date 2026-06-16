@@ -617,6 +617,8 @@ export class GroupTestContainer {
         this.ongoingStudentsButton.onclick = () => this.filterCards("ongoing");
         this.finishedStudentsButton.onclick = () => this.filterCards("finished");
         this.markedStudentsButton.onclick = () => this.filterCards("marked");
+        this.resultLinkDisabled = document.getElementById("result-link-disabled");
+        this.resultLinkEnabled = document.getElementById("result-link-enabled");
     }
 
     filterCards(criteria) {
@@ -654,7 +656,7 @@ export class GroupTestContainer {
         let ongoingStudents = 0;
 
         this.students.forEach((student) => {
-            if (student.progress == 100) {
+            if (student.progress === 100) {
                 finishedStudents += 1;
             } else {
                 ongoingStudents += 1;
@@ -695,6 +697,16 @@ export class GroupTestContainer {
             this.cards.get(student.id).setPart(student.currentPartIndex);
         }
         this.updateCounts();
+        if (this.students.values().every((student) => student.progress === 100)) {
+            // Alle studerende som vi har fået beskeder fra er nu på progress==100
+            // Dette kan ske selvom vi kun har fået fra én
+            this.onTestComplete();
+        }
+    }
+
+    onTestComplete() {
+        this.resultLinkDisabled.classList.add("d-none");
+        this.resultLinkEnabled.classList.remove("d-none");
     }
 }
 
@@ -1476,8 +1488,8 @@ export class TeacherView {
                 event: "test.cancelled",
                 partIndex: this.partIndex,
                 questionIndex: this.questionIndex,
-                questionId: this.currentQuestion.id,
-                partId: this.currentPart.id,
+                questionId: this.currentQuestion && this.currentQuestion.id,
+                partId: this.currentPart && this.currentPart.id,
                 assignmentId: this.assignmentId,
                 note: this.noteField.getNote(),
             });
