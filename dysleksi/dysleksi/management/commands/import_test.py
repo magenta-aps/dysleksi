@@ -79,9 +79,14 @@ class Command(BaseCommand):
             help="Path to the JSON file with questions",
         )
         parser.add_argument(
+            "test_code_name",
+            type=str,
+            help="Codename of the test to create (e.g. 'wordreading_2')",
+        )
+        parser.add_argument(
             "test_type",
             type=str,
-            help="Type of the test to create",
+            help="Type of the test to create (e.g. 'group')",
         )
         parser.add_argument(
             "practice_json_path",
@@ -95,8 +100,9 @@ class Command(BaseCommand):
         name: str = options["name"]
         testpart_name: str = options["testpart_name"]
         json_path: Path = options["json_path"]
-        practice_json_path: Path | None = options["practice_json_path"]
+        test_code_name: str = options["test_code_name"]
         test_type: str = options["test_type"]
+        practice_json_path: Path | None = options["practice_json_path"]
 
         # Load JSON data
         with json_path.open("r", encoding="utf-8") as f:
@@ -111,48 +117,49 @@ class Command(BaseCommand):
                 content = remove_json_comments(content)
                 practice_data = json.loads(content)
 
-        test = Test.objects.get(name=name)
-        if test_type == "wordreading_2":
+        test = Test.objects.get(name=name, test_type=test_type)
+
+        if test_code_name == "wordreading_2":
             create_wordreading_2_test(
                 test, questions_data, practice_data, name=testpart_name
             )
-        elif test_type == "wordreading_1":
+        elif test_code_name == "wordreading_1":
             create_wordreading_1_test(
                 test, questions_data, practice_data, name=testpart_name
             )
-        elif test_type == "wordspelling":
+        elif test_code_name == "wordspelling":
             create_wordspelling_test(
                 test, questions_data, practice_data, name=testpart_name
             )
-        elif test_type == "nonwordspelling":
+        elif test_code_name == "nonwordspelling":
             create_nonwordspelling_test(
                 test, questions_data, practice_data, name=testpart_name
             )
-        elif test_type == "letter_pronunciation":
+        elif test_code_name == "letter_pronunciation":
             create_letter_pronunciation_test(
                 test, questions_data, practice_data, name=testpart_name
             )
-        elif test_type == "word_pronunciation":
+        elif test_code_name == "word_pronunciation":
             create_word_pronunciation_test(
                 test, questions_data, practice_data, name=testpart_name
             )
-        elif test_type == "nonsense_word_pronunciation":
+        elif test_code_name == "nonsense_word_pronunciation":
             create_nonsense_word_pronunciation_test(
                 test, questions_data, practice_data, name=testpart_name
             )
-        elif test_type == "letter_sound":
+        elif test_code_name == "letter_sound":
             create_letter_sound_test(
                 test, questions_data, practice_data, name=testpart_name
             )
-        elif test_type == "fore_sound":
+        elif test_code_name == "fore_sound":
             create_fore_sound_test(
                 test, questions_data, practice_data, name=testpart_name
             )
-        elif test_type == "sentence_reading":
+        elif test_code_name == "sentence_reading":
             create_sentence_reading_test(
                 test, questions_data, practice_data, name=testpart_name
             )
-        elif test_type == "letter_shape":
+        elif test_code_name == "letter_shape":
             create_letter_shape_test(
                 test, questions_data, practice_data, name=testpart_name
             )
