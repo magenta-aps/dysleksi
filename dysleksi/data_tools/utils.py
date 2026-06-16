@@ -228,7 +228,7 @@ def create_nonwordspelling_test(
             "partial_score_after": 0,  # no partial score (?)
             "image_url": "/static/images/nonwordspelling.png",
             "reminder_source": reminder,
-            "reminder": 10000,  # 10 seconds
+            "reminder": 15000,  # 15 seconds
             "completion_source": completion,
         },
     )
@@ -336,7 +336,7 @@ def create_sentence_reading_test(
             "image_url": "/static/images/sentence_reading.png",
             "reminder_source": reminder,
             "completion_source": completion,
-            "reminder": 10000,  # 10 seconds
+            "reminder": 15000,  # 15 seconds
         },
     )
     if created:
