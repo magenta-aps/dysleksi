@@ -108,6 +108,37 @@ const GROUP_DOM_HTML = `
   Mærket (<span id="marked-students-count">0</span>)
 </button>
 
+<div class="group-test-toolbar">
+    <div class="toolbar-left">
+        <button class="toolbar-btn" id="sort-button">
+            Sortering: Navn (A-Å)
+            <i id="sort-icon" class="ph ph-sort-ascending"></i>
+        </button>
+        <button class="toolbar-btn borderless" id="fold-all-button">
+            <i class="ph ph-arrows-out-simple"></i>
+            Fold alle ud/sammen
+        </button>
+        <div class="toolbar-view-switcher">
+            <span class="view-label">Visning:</span>
+            <button class="view-btn" data-columns="2">2</button>
+            <button class="view-btn" data-columns="3">3</button>
+            <button class="view-btn active" data-columns="4">4</button>
+        </div>
+    </div>
+    <div class="toolbar-right">
+        <span>Tegnforklaring:</span>
+        <span class="dot-legend">
+            <span class="dot correct"></span> Korrekt svar
+        </span>
+        <span class="dot-legend">
+            <span class="dot wrong"></span> Forkert svar
+        </span>
+        <span class="dot-legend">
+            <span class="dot partially-correct"></span> Delvist korrekt svar
+        </span>
+    </div>
+</div>
+
 <div class="group-test-body"></div>
     
 <div class="group-test-footer">
@@ -2714,5 +2745,191 @@ describe("DetailsPopup", () => {
         innerLabel.dispatchEvent(new Event("click", { bubbles: true }));
 
         expect(detailsPopup.isOpen()).toBe(true);
+    });
+});
+
+describe("GroupTestContainer sortCards", () => {
+    let container;
+    const test = {
+        parts: [{ name: "Part 1", questions: [{}, {}] }],
+    };
+    let btn;
+
+    const createStudent = (id, firstName, lastName = "User") => ({
+        student: {
+            id,
+            firstName,
+            lastName,
+            progress: 0,
+            currentPartIndex: 0,
+            currentQuestionIndex: 0,
+            resultsByPart: {},
+        },
+    });
+
+    beforeEach(() => {
+        document.body.innerHTML = GROUP_DOM_HTML;
+        container = new GroupTestContainer(test);
+
+        HTMLElement.prototype.animate = vi.fn().mockReturnValue({});
+
+        container.updateData(createStudent(1, "Søren"));
+        container.updateData(createStudent(2, "Alice"));
+        container.updateData(createStudent(3, "Børge"));
+        btn = document.querySelector("#sort-button");
+    });
+
+    const getCardOrder = () =>
+        [...container.container.children].map(
+            (el) => el.querySelector(".student-name").textContent,
+        );
+
+    it("sorts cards when the sort button is clicked", () => {
+        btn.click();
+        expect(container.sortOrder).toBe("ascending");
+        let order = getCardOrder();
+        expect(order).toEqual(["Alice U.", "Børge U.", "Søren U."]);
+
+        btn.click();
+        expect(container.sortOrder).toBe("descending");
+        order = getCardOrder();
+        expect(order).toEqual(["Søren U.", "Børge U.", "Alice U."]);
+    });
+
+    it("calls animate on cards that changed position", () => {
+        let callCount = 0;
+        vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockImplementation(
+            function () {
+                // Return different positions on successive calls per element
+                // so that dx/dy are non-zero
+                callCount++;
+                return { left: callCount * 10, top: callCount * 10 };
+            },
+        );
+
+        container.sortCards();
+        expect(HTMLElement.prototype.animate).toHaveBeenCalled();
+    });
+});
+
+describe("GroupTestContainer setCardColumns", () => {
+    let container;
+    const test = {
+        parts: [{ name: "Part 1", questions: [{}, {}] }],
+    };
+    let view2Btn;
+    let view3Btn;
+    let view4Btn;
+
+    const createStudent = (id, firstName) => ({
+        student: {
+            id,
+            firstName,
+            lastName: "User",
+            progress: 0,
+            currentPartIndex: 0,
+            currentQuestionIndex: 0,
+            resultsByPart: {},
+        },
+    });
+
+    beforeEach(() => {
+        document.body.innerHTML = GROUP_DOM_HTML;
+        container = new GroupTestContainer(test);
+        container.updateData(createStudent(1, "Alice"));
+        container.updateData(createStudent(2, "Bob"));
+
+        view2Btn = document.querySelector('.view-btn[data-columns="2"]');
+        view3Btn = document.querySelector('.view-btn[data-columns="3"]');
+        view4Btn = document.querySelector('.view-btn[data-columns="4"]');
+    });
+
+    it("sets correct width on all cards for 4 columns", () => {
+        view4Btn.click();
+        container.cards.forEach((card) => {
+            expect(card.el.style.width).toBe("calc(25% - 12px)");
+        });
+        expect(container.view4Btn.classList.contains("active")).toBe(true);
+    });
+
+    it("sets correct width on all cards for 3 columns", () => {
+        view3Btn.click();
+        container.cards.forEach((card) => {
+            expect(card.el.style.width).toBe("calc(33.3333% - 10.6666px)");
+        });
+        expect(container.view3Btn.classList.contains("active")).toBe(true);
+    });
+
+    it("sets correct width on all cards for 2 columns", () => {
+        view2Btn.click();
+        container.cards.forEach((card) => {
+            expect(card.el.style.width).toBe("calc(50% - 8px)");
+        });
+        expect(container.view2Btn.classList.contains("active")).toBe(true);
+    });
+
+    it("logs an error for invalid column count", () => {
+        const spyError = vi.spyOn(console, "error").mockImplementation(() => {});
+        container.setCardColumns(200);
+        expect(spyError).toHaveBeenCalledWith("Invalid number of columns: ", 200);
+    });
+});
+
+describe("GroupTestContainer foldAllCards", () => {
+    let container;
+    const test = {
+        parts: [{ name: "Part 1", questions: [{}, {}] }],
+    };
+    let btn;
+
+    const createStudent = (id, firstName) => ({
+        student: {
+            id,
+            firstName,
+            lastName: "User",
+            progress: 0,
+            currentPartIndex: 0,
+            currentQuestionIndex: 0,
+            resultsByPart: {},
+        },
+    });
+
+    beforeEach(() => {
+        document.body.innerHTML = GROUP_DOM_HTML;
+        container = new GroupTestContainer(test);
+        container.updateData(createStudent(1, "Alice"));
+        container.updateData(createStudent(2, "Bob"));
+        container.updateData(createStudent(3, "Carol"));
+        btn = document.querySelector("#fold-all-button");
+    });
+
+    it("folds all cards out when all are folded in", () => {
+        // All cards start folded in by default
+        btn.click();
+        container.cards.forEach((card) => {
+            expect(card.foldedArea.style.display).toBe("flex");
+            expect(card.isHidden).toBe(false);
+        });
+    });
+
+    it("folds all cards in when all are folded out", () => {
+        container.cards.forEach((card) => card.foldOut());
+        btn.click();
+        container.cards.forEach((card) => {
+            expect(card.foldedArea.style.display).toBe("none");
+            expect(card.isHidden).toBe(true);
+        });
+    });
+
+    it("folds all cards in when only some are folded out", () => {
+        // Open just one card — anyCardIsFoldedOut should be true
+        const firstCard = container.cards.values().next().value;
+        firstCard.foldOut();
+
+        btn.click();
+        container.cards.forEach((card) => {
+            expect(card.foldedArea.style.display).toBe("none");
+            expect(card.isHidden).toBe(true);
+        });
     });
 });

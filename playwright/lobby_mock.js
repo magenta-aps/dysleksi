@@ -43,9 +43,12 @@ const students = Array.from({ length: 5 }, (_, i) => ({
                 // Node-side callback, invoked from inside the lobby page
                 // every time a matching session.start arrives
                 await lobby.exposeFunction('onSessionStart', async (roomUrl) => {
-                    if (roomTabs.has(roomUrl)) {
-                        console.log(`[SKIP] ${student.user}: ${roomUrl} already open, ignoring.`);
-                        return;
+                    // Close all existing room tabs
+                    for (const [url, page] of roomTabs) {
+                        try {
+                            await page.close();
+                        } catch (_) {console.log("Error while closing page", _)}
+                        roomTabs.delete(url);
                     }
                     try {
                         console.log(`[SESSION] ${student.user} got session.start, opening tab for ${roomUrl}`);

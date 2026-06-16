@@ -391,6 +391,7 @@ export class StudentCard {
         this.markedStudentsCount = document.getElementById("marked-students-count");
 
         this.currentViewPartIndex = 0;
+        this.isHidden = true;
 
         // Initial setup
         this.nameText.textContent = this.student.displayName;
@@ -442,18 +443,29 @@ export class StudentCard {
         return clone.querySelector(".student-card");
     }
 
+    foldIn() {
+        this.foldedArea.style.display = "none";
+        this.el.classList.toggle("is-expanded", false);
+        this.isHidden = true;
+        this.arrowIcon.className = "ph-fill ph-caret-down";
+    }
+
+    foldOut() {
+        this.foldedArea.style.display = "flex";
+        this.el.classList.toggle("is-expanded", true);
+        this._updateDotsHeight();
+        this.isHidden = false;
+        this.arrowIcon.className = "ph-fill ph-caret-up";
+    }
+
     toggleFold(e) {
         if (e.target.closest(".folded-area")) return;
 
-        const isHidden = this.foldedArea.style.display === "none";
-        this.foldedArea.style.display = isHidden ? "flex" : "none";
-
-        this.el.classList.toggle("is-expanded", isHidden);
-        if (isHidden) this._updateDotsHeight();
-
-        this.arrowIcon.className = isHidden
-            ? "ph-fill ph-caret-up"
-            : "ph-fill ph-caret-down";
+        if (this.isHidden) {
+            this.foldOut();
+        } else {
+            this.foldIn();
+        }
     }
 
     setPart(partIndex) {
@@ -612,6 +624,11 @@ export class GroupTestContainer {
             "finished-students-button",
         );
         this.markedStudentsButton = document.getElementById("marked-students-button");
+        this.foldAllBtn = document.querySelector("#fold-all-button");
+        this.sortBtn = document.querySelector("#sort-button");
+        this.view2Btn = document.querySelector('.view-btn[data-columns="2"]');
+        this.view3Btn = document.querySelector('.view-btn[data-columns="3"]');
+        this.view4Btn = document.querySelector('.view-btn[data-columns="4"]');
 
         this.allStudentsButton.onclick = () => this.filterCards("all");
         this.ongoingStudentsButton.onclick = () => this.filterCards("ongoing");
@@ -619,6 +636,101 @@ export class GroupTestContainer {
         this.markedStudentsButton.onclick = () => this.filterCards("marked");
         this.resultLinkDisabled = document.getElementById("result-link-disabled");
         this.resultLinkEnabled = document.getElementById("result-link-enabled");
+
+        this.foldAllBtn.onclick = () => this.foldAllCards();
+        this.sortBtn.onclick = () => this.sortCards();
+        this.view2Btn.onclick = () => this.setCardColumns(2);
+        this.view3Btn.onclick = () => this.setCardColumns(3);
+        this.view4Btn.onclick = () => this.setCardColumns(4);
+
+        this.sortOrder = null;
+        this.sortIcon = document.querySelector("#sort-icon");
+    }
+
+    foldAllCards() {
+        const anyCardIsFoldedOut = Array.from(this.cards.values()).some(
+            (card) => card.isHidden === false,
+        );
+        this.cards.forEach((card) => {
+            if (anyCardIsFoldedOut) {
+                card.foldIn();
+            } else {
+                card.foldOut();
+            }
+        });
+    }
+
+    sortCards() {
+        this.sortOrder = this.sortOrder === "ascending" ? "descending" : "ascending";
+        this.sortIcon.className = `ph ph-sort-${this.sortOrder}`;
+
+        // First: record positions before sort
+        const firstPositions = new Map();
+        this.cards.forEach((card, id) => {
+            firstPositions.set(id, card.el.getBoundingClientRect());
+        });
+
+        // Sort and re-insert (Last)
+        const sorted = Array.from(this.cards.entries()).sort(([idA], [idB]) => {
+            const nameA = this.students.get(idA).displayName.toLowerCase();
+            const nameB = this.students.get(idB).displayName.toLowerCase();
+            return this.sortOrder === "ascending"
+                ? nameA.localeCompare(nameB, "da")
+                : nameB.localeCompare(nameA, "da");
+        });
+
+        sorted.forEach(([_id, card]) => {
+            this.container.appendChild(card.el);
+        });
+
+        // Invert + Play: animate each card from its old position to its new one
+        this.cards.forEach((card, id) => {
+            const first = firstPositions.get(id);
+            const last = card.el.getBoundingClientRect();
+
+            const dx = first.left - last.left;
+            const dy = first.top - last.top;
+
+            if (dx === 0 && dy === 0) return;
+
+            card.el.animate(
+                [
+                    { transform: `translate(${dx}px, ${dy}px)` },
+                    { transform: "translate(0, 0)" },
+                ],
+                {
+                    duration: 400,
+                    easing: "cubic-bezier(0.25, 0.46, 0.45, 0.94)",
+                },
+            );
+        });
+    }
+
+    setCardColumns(columns) {
+        console.log(`Setting card grid to ${columns} columns`);
+
+        // Set the width to accomodate the desired amount of cards in each row
+        // Taking into accound the gap of 16px between the cards
+        this.cards.forEach((card) => {
+            if (columns === 4) {
+                card.el.style.width = "calc(25% - 12px)"; // 16*3/4 = 12
+                this.view2Btn.classList.remove("active");
+                this.view3Btn.classList.remove("active");
+                this.view4Btn.classList.add("active");
+            } else if (columns === 3) {
+                card.el.style.width = "calc(33.3333% - 10.6666px)"; // 16*2/3 = 10.66
+                this.view2Btn.classList.remove("active");
+                this.view3Btn.classList.add("active");
+                this.view4Btn.classList.remove("active");
+            } else if (columns === 2) {
+                card.el.style.width = "calc(50% - 8px)"; // 16*1/2 = 8
+                this.view2Btn.classList.add("active");
+                this.view3Btn.classList.remove("active");
+                this.view4Btn.classList.remove("active");
+            } else {
+                console.error("Invalid number of columns: ", columns);
+            }
+        });
     }
 
     filterCards(criteria) {

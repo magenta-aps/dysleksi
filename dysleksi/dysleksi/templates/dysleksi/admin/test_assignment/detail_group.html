@@ -84,10 +84,34 @@
         </div>
 
         <div class="group-test-toolbar">
-          Tegnforklaring: 
-          <span class="dot correct"></span> Korrekt svar
-          <span class="dot wrong"></span> Forkert svar
-          <span class="dot partially-correct"></span> Delvist korrekt svar
+            <div class="toolbar-left">
+                <button class="toolbar-btn" id="sort-button">
+                    Sortering: Navn (A-Å)
+                    <i id="sort-icon" class="ph ph-sort-ascending"></i>
+                </button>
+                <button class="toolbar-btn borderless" id="fold-all-button">
+                    <i class="ph ph-caret-up-down"></i>
+                    Fold alle ud/sammen
+                </button>
+                <div class="toolbar-view-switcher">
+                    <span class="view-label">Visning:</span>
+                    <button class="view-btn" data-columns="2">2</button>
+                    <button class="view-btn" data-columns="3">3</button>
+                    <button class="view-btn active" data-columns="4">4</button>
+                </div>
+            </div>
+            <div class="toolbar-right">
+                <span>Tegnforklaring:</span>
+                <span class="dot-legend">
+                    <span class="dot correct"></span> Korrekt svar
+                </span>
+                <span class="dot-legend">
+                    <span class="dot wrong"></span> Forkert svar
+                </span>
+                <span class="dot-legend">
+                    <span class="dot partially-correct"></span> Delvist korrekt svar
+                </span>
+            </div>
         </div>
 
         <div class="group-test-divider"></div>
