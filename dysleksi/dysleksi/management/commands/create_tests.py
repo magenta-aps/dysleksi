@@ -13,18 +13,25 @@ from django.db.models import Count
 from dysleksi.models import Class, Student, Test, TestType
 
 
+def get_or_create_test(
+    grade: Literal[1, 2, 3],
+    period: Literal["midt", "slut"],
+    test_type: TestType,
+    dummy=False,
+):
+    name = f"{period} {grade}. klasse".capitalize()
+    if dummy:
+        name += " (dummy)"
+    test, _ = Test.objects.get_or_create(name=name, test_type=test_type)
+    return test
+
+
 def create_group_test(
     grade: Literal[1, 2, 3],
     period: Literal["midt", "slut"],
     dummy=False,
 ):
-
-    name = f"{period} {grade}. klasse".capitalize()
-
-    if dummy:
-        name += " (dummy)"
-
-    test, created = Test.objects.get_or_create(name=name, test_type=TestType.GROUP)
+    test = get_or_create_test(grade, period, TestType.GROUP, dummy=dummy)
 
     if dummy:
         wordreading_data_path = (
@@ -114,10 +121,11 @@ def create_group_test(
     if grade == 1:
         call_command(
             "import_test",
-            name,
+            test.name,
             letter_sound_test_name,
             letter_sound_data_path,
             "letter_sound",
+            TestType.GROUP,
             practice_json_path=(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/letter_sound/letter_sound_practice.json"
@@ -126,10 +134,11 @@ def create_group_test(
 
         call_command(
             "import_test",
-            name,
+            test.name,
             fore_sound_test_name,
             fore_sound_data_path,
             "fore_sound",
+            TestType.GROUP,
             practice_json_path=(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/fore_sound/fore_sound_practice.json"
@@ -138,10 +147,11 @@ def create_group_test(
 
         call_command(
             "import_test",
-            name,
+            test.name,
             letter_shape_test_name,
             letter_shape_data_path,
             "letter_shape",
+            TestType.GROUP,
             practice_json_path=(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/letter_shape/letter_shape_practice.json"
@@ -151,10 +161,11 @@ def create_group_test(
     if (grade == 1 and period == "slut") or (grade == 2 and period == "midt"):
         call_command(
             "import_test",
-            name,
+            test.name,
             nonwordspelling_test_name,
             nonwordspelling_data_path,
             "nonwordspelling",
+            TestType.GROUP,
             practice_json_path=(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/nonwordspelling/nonwordspelling_practice.json"
@@ -164,10 +175,11 @@ def create_group_test(
     if grade == 1 and period == "slut":
         call_command(
             "import_test",
-            name,
+            test.name,
             wordreading_1_test_name,
             wordreading_1_data_path,
             "wordreading_1",
+            TestType.GROUP,
             practice_json_path=(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/wordreading_1/wordreading_1_practice.json"
@@ -177,10 +189,11 @@ def create_group_test(
     if grade >= 2:
         call_command(
             "import_test",
-            name,
+            test.name,
             wordspelling_test_name,
             wordspelling_data_path,
             "wordspelling",
+            TestType.GROUP,
             practice_json_path=(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/wordspelling/wordspelling_practice.json"
@@ -189,10 +202,11 @@ def create_group_test(
 
         call_command(
             "import_test",
-            name,
+            test.name,
             wordreading_test_name,
             wordreading_data_path,
             "wordreading_2",
+            TestType.GROUP,
             practice_json_path=(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/wordreading_2/wordreading_2_practice.json"
@@ -202,16 +216,18 @@ def create_group_test(
     if (grade == 2 and period == "slut") or grade == 3:
         call_command(
             "import_test",
-            name,
+            test.name,
             sentence_reading_test_name,
             sentence_reading_data_path,
             "sentence_reading",
+            TestType.GROUP,
             practice_json_path=(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/sentence_reading/sentence_reading_practice.json"
             ),
         )
-        return test
+
+    return test
 
 
 def create_individual_test(
@@ -219,13 +235,7 @@ def create_individual_test(
     period: Literal["midt", "slut"],
     dummy=False,
 ):
-
-    test_name = "Individuel test"
-    if dummy:
-        test_name += " (dummy)"
-    test, created = Test.objects.get_or_create(
-        name=test_name, test_type=TestType.INDIVIDUAL
-    )
+    test = get_or_create_test(grade, period, TestType.INDIVIDUAL, dummy=dummy)
 
     if dummy:
         letter_pronunciation_data_path = (
@@ -260,13 +270,23 @@ def create_individual_test(
         word_pronunciation_test_name = "Højtlæsning af ord"
         nonsense_word_pronunciation_test_name = "Højtlæsning af nonsensord"
 
+    # Test packages:
+    # Midt 1. klasse: Bogstavbenævnelse
+    # Slut 1. klasse: Bogstavbenævnelse + Højtlæsning af ord + Højtlæsning af nonsensord
+    # Midt 2. klasse: Højtlæsning af ord + Højtlæsning af nonsensord
+    # Slut 2. klasse: Højtlæsning af ord + Højtlæsning af nonsensord
+    # Midt 3. klasse: Højtlæsning af ord + Højtlæsning af nonsensord
+    # Slut 3. klasse: Højtlæsning af ord + Højtlæsning af nonsensord
+
     if grade == 1:
+        # Bogstavbenævnelse
         call_command(
             "import_test",
-            test_name,
+            test.name,
             letter_pronunciation_test_name,
             letter_pronunciation_data_path,
             "letter_pronunciation",
+            TestType.INDIVIDUAL,
             practice_json_path=(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/letter_pronunciation/letter_pronunciation_practice.json"
@@ -274,25 +294,28 @@ def create_individual_test(
         )
 
     if (grade == 1 and period == "slut") or grade >= 2:
-
+        # Højtlæsning af ord
         call_command(
             "import_test",
-            test_name,
+            test.name,
             word_pronunciation_test_name,
             word_pronunciation_data_path,
             "word_pronunciation",
+            TestType.INDIVIDUAL,
             practice_json_path=(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / "real/word_pronunciation/word_pronunciation_practice.json"
             ),
         )
 
+        # Højtlæsning af nonsensord
         call_command(
             "import_test",
-            test_name,
+            test.name,
             nonsense_word_pronunciation_test_name,
             nonsense_word_pronunciation_data_path,
             "nonsense_word_pronunciation",
+            TestType.INDIVIDUAL,
             practice_json_path=(
                 Path(settings.INSTRUCTIONS_ROOT)  # type:ignore
                 / (
@@ -301,6 +324,7 @@ def create_individual_test(
                 )
             ),
         )
+
     return test
 
 

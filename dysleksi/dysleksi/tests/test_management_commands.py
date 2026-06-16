@@ -25,15 +25,11 @@ from dysleksi.models import (
     TestPart,
     TestQuestion,
     TestResponse,
+    TestType,
 )
 
 
 class ImportTestTest(TestCase):
-    def setUp(self):
-        # Create a Test object for the test
-        self.test_name = "Test1"
-        self.test = Test.objects.create(name=self.test_name)
-
     def test_import_wordreading_2_test(self):
         questions_data = [
             {
@@ -68,6 +64,10 @@ class ImportTestTest(TestCase):
             json.dump(questions_data, tmp_file, ensure_ascii=False)
             tmp_file_path = Path(tmp_file.name)
 
+        # Create a Test object for the test
+        self.test_name = "Test1"
+        self.test = Test.objects.create(name=self.test_name, test_type=TestType.GROUP)
+
         # Call the management command with name and JSON path
         call_command(
             "import_test",
@@ -75,6 +75,7 @@ class ImportTestTest(TestCase):
             "Ordlæsning 2",
             str(tmp_file_path),
             "wordreading_2",
+            TestType.GROUP,
         )
 
         # Fetch the created TestPart
@@ -105,6 +106,12 @@ class ImportTestTest(TestCase):
             json.dump(practice_data, tmp_file, ensure_ascii=False)
             tmp_practice_data_path = Path(tmp_file.name)
 
+        # Create a Test object for the test
+        self.test_name = "Test1"
+        self.test = Test.objects.create(
+            name=self.test_name, test_type=TestType.INDIVIDUAL
+        )
+
         # Call the management command with name and JSON path
         call_command(
             "import_test",
@@ -112,6 +119,7 @@ class ImportTestTest(TestCase):
             "Bogstavsbenævnelse",
             str(tmp_questions_data_path),
             "letter_pronunciation",
+            TestType.INDIVIDUAL,
             practice_json_path=str(tmp_practice_data_path),
         )
 
@@ -139,6 +147,12 @@ class ImportTestTest(TestCase):
             json.dump(questions_data, tmp_file, ensure_ascii=False)
             tmp_questions_data_path = Path(tmp_file.name)
 
+        # Create a Test object for the test
+        self.test_name = "Test1"
+        self.test = Test.objects.create(
+            name=self.test_name, test_type=TestType.INDIVIDUAL
+        )
+
         # Call the management command with name and JSON path
         call_command(
             "import_test",
@@ -146,6 +160,7 @@ class ImportTestTest(TestCase):
             "Bogstavsbenævnelse",
             str(tmp_questions_data_path),
             "letter_pronunciation",
+            TestType.INDIVIDUAL,
             practice_json_path=None,
         )
 
@@ -172,14 +187,18 @@ class ImportTestTest(TestCase):
             json.dump(questions_data, tmp_file, ensure_ascii=False)
             tmp_questions_data_path = Path(tmp_file.name)
 
-        with self.assertRaises(ValueError):
+        # Create a Test object for the test
+        self.test_name = "Test1"
+        self.test = Test.objects.create(name=self.test_name, test_type=TestType.GROUP)
 
+        with self.assertRaises(ValueError):
             call_command(
                 "import_test",
                 self.test_name,
                 "Bogstavsbenævnelse",
                 str(tmp_questions_data_path),
                 "invalid_test_type",
+                TestType.GROUP,
             )
 
 
