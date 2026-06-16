@@ -310,8 +310,8 @@ body.show-instructions {
 .sound-btn {
   @extend .svg-btn;
   background-image: var(--bg-sound-btn);
-  width: 7.5rem;
-  height: 5rem;
+  width: 112px;
+  height: 64px;
   display: flex;
   margin: 0;
 
@@ -341,8 +341,8 @@ body.show-instructions {
 .next-btn {
   @extend .svg-btn;
   background-image: var(--bg-next-btn);
-  width: 180px;
-  height: 80px;
+  width: 144px;
+  height: 64px;
   align-self: flex-end;
   margin-right: 48px;
 
