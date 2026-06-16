@@ -84,11 +84,13 @@ describe("Test.preload", () => {
         expect(assetCache.processTestObject).toHaveBeenCalledWith(
             expect.objectContaining({ challengeImageUrl: "q1.png" }),
             "challengeImageUrl",
+            true,
         );
 
         expect(assetCache.processTestObject).toHaveBeenCalledWith(
             expect.objectContaining({ resourceImageUrl: "a1.png" }),
             "resourceImageUrl",
+            true,
         );
         expect(assetCache.applyCssVariables).toHaveBeenCalled();
         expect(assetCache.applyCachedFonts).toHaveBeenCalled();

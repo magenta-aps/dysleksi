@@ -80,6 +80,16 @@ describe("AssetCache", () => {
             expect(global.fetch).toHaveBeenCalledWith(mockUrl);
             expect(cache.map.get(mockUrl)).toBe(mockBlobUrl);
         });
+
+        it("Calls _removeWhiteBackground if parameter is true", async () => {
+            const mockProcessedBlob = new Blob(["processed"], { type: "image/png" });
+            vi.spyOn(cache, "_removeWhiteBackground").mockResolvedValue(
+                mockProcessedBlob,
+            );
+
+            await cache.fetchAndCache(mockUrl, true);
+            expect(cache._removeWhiteBackground).toHaveBeenCalled();
+        });
     });
 
     describe("processTestObject", () => {
@@ -251,6 +261,77 @@ describe("AssetCache", () => {
             expect(strippedPath2).toBe("/static/file.png");
             expect(strippedPath3).toBe("/static/1a.2.wav");
             expect(strippedPath4).toBe("/static/1a.2.wav");
+        });
+    });
+
+    describe("_removeWhiteBackground", () => {
+        let mockCtx;
+        let mockImageData;
+
+        beforeEach(() => {
+            // 2x2 pixel image: white, near-white, red, transparent
+            mockImageData = {
+                data: new Uint8ClampedArray([
+                    255,
+                    255,
+                    255,
+                    255, // pure white -> should become transparent
+                    255,
+                    255,
+                    255,
+                    128, // white but semi-transparent -> should become transparent
+                    255,
+                    0,
+                    0,
+                    255, // red -> should stay
+                    0,
+                    0,
+                    0,
+                    0, // already transparent -> should stay
+                ]),
+            };
+
+            mockCtx = {
+                drawImage: vi.fn(),
+                getImageData: vi.fn().mockReturnValue(mockImageData),
+                putImageData: vi.fn(),
+            };
+
+            const ctx = mockCtx; // capture for use inside class
+            global.OffscreenCanvas = vi.fn().mockImplementation(function () {
+                this.getContext = vi.fn().mockReturnValue(ctx);
+                this.convertToBlob = vi
+                    .fn()
+                    .mockResolvedValue(new Blob(["out"], { type: "image/png" }));
+            });
+
+            global.createImageBitmap = vi
+                .fn()
+                .mockResolvedValue({ width: 2, height: 2 });
+        });
+
+        it("makes pure white pixels transparent", async () => {
+            await cache._removeWhiteBackground(new Blob());
+
+            const data = mockImageData.data;
+            expect(data[3]).toBe(0); // white pixel alpha -> 0
+        });
+
+        it("leaves non-white pixels unchanged", async () => {
+            await cache._removeWhiteBackground(new Blob());
+
+            const data = mockImageData.data;
+            expect(data[8]).toBe(255); // red pixel R unchanged
+            expect(data[9]).toBe(0); // red pixel G unchanged
+            expect(data[10]).toBe(0); // red pixel B unchanged
+            expect(data[11]).toBe(255); // red pixel alpha unchanged
+        });
+
+        it("leaves already-transparent pixels unchanged", async () => {
+            await cache._removeWhiteBackground(new Blob());
+
+            const data = mockImageData.data;
+            expect(data[15]).toBe(0); // already-transparent pixel stays 0
         });
     });
 });
