@@ -38,22 +38,47 @@ export class AssetCache {
         return blobUrl;
     }
 
-    async fetchAndCache(url) {
+    async _removeWhiteBackground(blob, threshold = 30) {
+        const bitmap = await createImageBitmap(blob);
+        const canvas = new OffscreenCanvas(bitmap.width, bitmap.height);
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(bitmap, 0, 0);
+
+        const imageData = ctx.getImageData(0, 0, bitmap.width, bitmap.height);
+        const data = imageData.data;
+        for (let i = 0; i < data.length; i += 4) {
+            const r = data[i],
+                g = data[i + 1],
+                b = data[i + 2];
+            if (r > 255 - threshold && g > 255 - threshold && b > 255 - threshold) {
+                data[i + 3] = 0;
+            }
+        }
+        ctx.putImageData(imageData, 0, 0);
+        return canvas.convertToBlob({ type: "image/png" });
+    }
+
+    async fetchAndCache(url, removeWhiteBg = false) {
         // Creates a blob-url given a static or media URL, and returns it
         if (this.map.has(url)) return this.fetch(url);
 
         const response = await fetch(url);
-        const blob = await response.blob();
+        let blob = await response.blob();
+
+        if (removeWhiteBg) {
+            blob = await this._removeWhiteBackground(blob);
+        }
+
         const blobUrl = URL.createObjectURL(blob);
         this.map.set(url, blobUrl);
         return blobUrl;
     }
 
-    async processTestObject(obj, key) {
+    async processTestObject(obj, key, removeWhiteBg = false) {
         // Creates a blob-url for a test-object URL and replaces the original URL
         const url = obj[key];
         if (!url) return;
-        const result = await this.fetchAndCache(url);
+        const result = await this.fetchAndCache(url, removeWhiteBg);
         obj[key] = result; // Overwrite in-place
     }
 

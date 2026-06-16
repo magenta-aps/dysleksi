@@ -167,14 +167,16 @@ export class Test extends EventTarget {
 
             const allQuestions = [...part.questions, ...part.practice];
             for (const q of allQuestions) {
-                tasks.push(() => assetCache.processTestObject(q, "challengeImageUrl"));
+                tasks.push(() =>
+                    assetCache.processTestObject(q, "challengeImageUrl", true),
+                );
                 tasks.push(() => assetCache.processTestObject(q, "challengeSoundUrl"));
                 tasks.push(() => assetCache.processTestObject(q, "reminderSource"));
                 tasks.push(() => assetCache.processTestObject(q, "hintSource"));
 
                 for (const a of q.possibleAnswers) {
                     tasks.push(() =>
-                        assetCache.processTestObject(a, "resourceImageUrl"),
+                        assetCache.processTestObject(a, "resourceImageUrl", true),
                     );
                     tasks.push(() =>
                         assetCache.processTestObject(a, "resourceSoundUrl"),
