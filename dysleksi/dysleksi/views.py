@@ -320,7 +320,7 @@ class StartAssignmentView(GroupRequiredMixin, CreateView):
         if len(test_parts) > 1:
             return _("{num} deltests").format(num=len(test_parts))
         elif len(test_parts) == 1:
-            return _("{test_part_name}").format(test_part_name=test_parts[0].name)
+            return "{test_part_name}".format(test_part_name=test_parts[0].name)
         else:
             raise ValueError(  # pragma: no cover
                 "cannot create test name for %d test parts", len(test_parts)
