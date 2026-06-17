@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 
 from django.core.management.base import BaseCommand
+from django.utils.translation import gettext_noop
 
 from dysleksi.models import (
     CategoryColorChoice,
@@ -20,7 +21,7 @@ class Command(BaseCommand):
             color_key=CategoryColorChoice.GRAY,
             defaults={
                 "upper_proportion_limit": None,
-                "label_da": "Ikke fuldført",
+                "label_da": gettext_noop("Ikke fuldført"),
             },
         )
         CorrectnessCategory.objects.get_or_create(
@@ -29,7 +30,7 @@ class Command(BaseCommand):
             color_key=CategoryColorChoice.RED,
             defaults={
                 "upper_proportion_limit": 0.1,
-                "label_da": "Betydeligt under middel",
+                "label_da": gettext_noop("Betydeligt under middel"),
             },
         )
         CorrectnessCategory.objects.get_or_create(
@@ -38,7 +39,7 @@ class Command(BaseCommand):
             color_key=CategoryColorChoice.YELLOW,
             defaults={
                 "upper_proportion_limit": 0.35,
-                "label_da": "Under middel",
+                "label_da": gettext_noop("Under middel"),
             },
         )
         CorrectnessCategory.objects.get_or_create(
@@ -47,7 +48,7 @@ class Command(BaseCommand):
             color_key=CategoryColorChoice.GREEN,
             defaults={
                 "upper_proportion_limit": 0.75,
-                "label_da": "Middel",
+                "label_da": gettext_noop("Middel"),
             },
         )
         CorrectnessCategory.objects.get_or_create(
@@ -56,7 +57,7 @@ class Command(BaseCommand):
             color_key=CategoryColorChoice.BLUE,
             defaults={
                 "upper_proportion_limit": 1,
-                "label_da": "Over middel",
+                "label_da": gettext_noop("Over middel"),
             },
         )
 
@@ -69,7 +70,7 @@ class Command(BaseCommand):
             color_key=CategoryColorChoice.RED,
             defaults={
                 "upper_proportion_limit": 1,
-                "label_da": "Meget lavt",
+                "label_da": gettext_noop("Meget lavt"),
             },
         )
         ReadingSpeedCategory.objects.get_or_create(
@@ -77,7 +78,7 @@ class Command(BaseCommand):
             color_key=CategoryColorChoice.YELLOW,
             defaults={
                 "upper_proportion_limit": 3.5,
-                "label_da": "Lavt",
+                "label_da": gettext_noop("Lavt"),
             },
         )
         ReadingSpeedCategory.objects.get_or_create(
@@ -85,7 +86,7 @@ class Command(BaseCommand):
             color_key=CategoryColorChoice.GREEN,
             defaults={
                 "upper_proportion_limit": 7.5,
-                "label_da": "Middel",
+                "label_da": gettext_noop("Middel"),
             },
         )
         ReadingSpeedCategory.objects.get_or_create(
@@ -93,7 +94,7 @@ class Command(BaseCommand):
             color_key=CategoryColorChoice.BLUE,
             defaults={
                 "upper_proportion_limit": 10,
-                "label_da": "Højt",
+                "label_da": gettext_noop("Højt"),
             },
         )
 

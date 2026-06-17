@@ -5,7 +5,9 @@
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'dysleksi:test_assignment_list' %}">{% translate 'Tests' %}</a></li>
 <li class="breadcrumb-item active" aria-current="page">
-    Klasse {{class_name}} - Screening {{ test_name }}
+    {% blocktranslate trimmed with class_name=class_name test_name=test_name %}
+        Klasse {{ class_name }} - Screening {{ test_name }}
+    {% endblocktranslate %}
 </li>
 {% endblock %}
 
@@ -59,57 +61,57 @@
      data-assignment-id="{{ object.pk }}">
 
     <div class="screening-header">
-        <h2 class="mt-2 mb-4">Klasse {{class_name}} - Screening {{ test_name }}</h2>
+        <h2 class="mt-2 mb-4">{% blocktranslate trimmed with class_name=class_name test_name=test_name %}Klasse {{ class_name }} - Screening {{ test_name }}{% endblocktranslate %}</h2>
         {% details_popup %}
     </div>
     <div class="group-test-container">
         <div class="group-test-header">
             <button id="all-students-button" class="btn btn-outline-primary">
-              Alle (<span id="all-students-count">0</span>)
+              {% translate "Alle" %} (<span id="all-students-count">0</span>)
             </button>
-            
+
             <button id="ongoing-students-button" class="btn btn-outline-primary">
-              I gang (<span id="ongoing-students-count">0</span>)
+              {% translate "I gang" %} (<span id="ongoing-students-count">0</span>)
             </button>
-            
+
             <button id="finished-students-button" class="btn btn-outline-primary">
               <i class="ph-fill ph-check-circle green"></i>
-              Færdige (<span id="finished-students-count">0</span>)
+              {% translate "Færdige" %} (<span id="finished-students-count">0</span>)
             </button>
-            
+
             <button id="marked-students-button" class="btn btn-outline-primary">
               <i class="ph-fill ph-flag-pennant orange"></i>
-              Mærket (<span id="marked-students-count">0</span>)
+              {% translate "Mærket" %} (<span id="marked-students-count">0</span>)
             </button>
         </div>
 
         <div class="group-test-toolbar">
             <div class="toolbar-left">
                 <button class="toolbar-btn" id="sort-button">
-                    Sortering: Navn (A-Å)
+                    {% translate "Sortering: Navn (A-Å)" %}
                     <i id="sort-icon" class="ph ph-sort-ascending"></i>
                 </button>
                 <button class="toolbar-btn borderless" id="fold-all-button">
                     <i class="ph ph-caret-up-down"></i>
-                    Fold alle ud/sammen
+                    {% translate "Fold alle ud/sammen" %}
                 </button>
                 <div class="toolbar-view-switcher">
-                    <span class="view-label">Visning:</span>
+                    <span class="view-label">{% translate "Visning:" %}</span>
                     <button class="view-btn" data-columns="2">2</button>
                     <button class="view-btn" data-columns="3">3</button>
                     <button class="view-btn active" data-columns="4">4</button>
                 </div>
             </div>
             <div class="toolbar-right">
-                <span>Tegnforklaring:</span>
+                <span>{% translate "Tegnforklaring:" %}</span>
                 <span class="dot-legend">
-                    <span class="dot correct"></span> Korrekt svar
+                    <span class="dot correct"></span> {% translate "Korrekt svar" %}
                 </span>
                 <span class="dot-legend">
-                    <span class="dot wrong"></span> Forkert svar
+                    <span class="dot wrong"></span> {% translate "Forkert svar" %}
                 </span>
                 <span class="dot-legend">
-                    <span class="dot partially-correct"></span> Delvist korrekt svar
+                    <span class="dot partially-correct"></span> {% translate "Delvist korrekt svar" %}
                 </span>
             </div>
         </div>

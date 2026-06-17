@@ -1,13 +1,14 @@
 {# SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk> #}
 {# SPDX-License-Identifier: MPL-2.0 #}
 {% extends "dysleksi/base.html" %}
+{% load i18n %}
 {% load static %}
 
 {% block content %}
 <div class="center-screen">
     <div class="center-content">
         <h1>
-            Du er nu logget ud <i class="ph-fill ph-hand-waving"></i>
+            {% translate "Du er nu logget ud" %} <i class="ph-fill ph-hand-waving"></i>
         </h1>
     </div>
 </div>

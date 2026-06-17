@@ -1,5 +1,6 @@
 import { StudentTestView } from "../student-test.js";
 import { calculateStudentProgress } from "../utils.js";
+import { gettext } from "../../i18n.js";
 
 export class GroupTestView extends StudentTestView {
     questionDisplayedAt;
@@ -223,7 +224,7 @@ export class GroupTestView extends StudentTestView {
             )
         ) {
             if (!this.selectedAnswer && !this.textAnswer && !outOfTime) {
-                alert("Vælg et svar, før du går videre.");
+                alert(gettext("Vælg et svar, før du går videre."));
                 return;
             }
 

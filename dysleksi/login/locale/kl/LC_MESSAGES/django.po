@@ -33,9 +33,19 @@ msgstr "Isissutissaq"
 msgid "Husk mig på denne maskine i {days} dage"
 msgstr ""
 
+#: login/templates/login/logged_out.html
+msgid "Du er nu logget ud"
+msgstr ""
+
 #: login/templates/login/login.html
 msgid "Vælg Login"
 msgstr ""
+
+#: login/templates/login/login.html
+#, fuzzy
+#| msgid "Brugernavn"
+msgid "Brugernavn/Password"
+msgstr "Atuisup aqqa"
 
 #: login/templates/login/login_choice.html
 msgid "Vælg Login Metode"

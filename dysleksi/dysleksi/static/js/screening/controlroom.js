@@ -1,6 +1,7 @@
 import { Student } from "./model.js";
 import { WebRTCChannel } from "../webRTC.js";
 import { serverOnline } from "./utils.js";
+import { gettext, blocktranslate } from "../i18n.js";
 import { Modal } from "bootstrap";
 
 const formatDuration = (duration) => {
@@ -534,11 +535,15 @@ export class StudentCard {
 
         const part = this.testParts[this.currentViewPartIndex];
         this.partLabel.textContent = part.name;
-        this.partIndex.textContent = `Deltest ${this.currentViewPartIndex + 1}/${this.testParts.length}`;
+
+        this.partIndex.textContent = gettext("Deltest");
+        this.partIndex.textContent += ` ${this.currentViewPartIndex + 1}/${this.testParts.length}`;
+
+        this.questionIndex.textContent = gettext("Opgave");
         if (isCurrentPart) {
-            this.questionIndex.textContent = `Opgave ${this.student.currentQuestionIndex + 1}/${part.questions.length}`;
+            this.questionIndex.textContent += ` ${this.student.currentQuestionIndex + 1}/${part.questions.length}`;
         } else {
-            this.questionIndex.textContent = `Opgave -/${part.questions.length}`;
+            this.questionIndex.textContent += ` -/${part.questions.length}`;
         }
         // Render Dots
         this.dotsContainer.innerHTML = "";
@@ -1194,7 +1199,10 @@ export class TeacherView {
         this.currentPart = this.test.parts[partIndex];
         this.questionView.updatePartName(this.currentPart.name);
         this.questionView.updatePartIndicator(
-            `Deltest ${this.partIndex + 1} af ${this.test.parts.length}`,
+            blocktranslate(gettext("Deltest %(current)s af %(total)s"), {
+                current: this.partIndex + 1,
+                total: this.test.parts.length,
+            }),
         );
     }
 
@@ -1222,7 +1230,7 @@ export class TeacherView {
         this.currentIsPractice = practice;
         this.questionIndex = questionIndex;
 
-        let label;
+        let questionType;
         let total;
         let current;
         const counts = this.getPracticeQuestionCounts();
@@ -1231,7 +1239,7 @@ export class TeacherView {
             this.currentQuestion = this.currentPart.practice[questionIndex];
             const instructionSequence = this.currentQuestion.instruction_sequence;
             if (instructionSequence !== null && instructionSequence !== undefined) {
-                label = "Instruktion";
+                questionType = gettext("Instruktion");
                 total = counts.instructions;
                 current = this.clamp(
                     this.questionIndex + counts.instructions - counts.nonInstructions,
@@ -1239,7 +1247,7 @@ export class TeacherView {
                     total,
                 );
             } else {
-                label = "Øveopgave";
+                questionType = gettext("Øveopgave");
                 total = counts.nonInstructions;
                 current = this.clamp(
                     this.questionIndex + counts.nonInstructions - counts.instructions,
@@ -1249,15 +1257,24 @@ export class TeacherView {
             }
         } else {
             this.currentQuestion = this.currentPart.questions[questionIndex];
-            label = "Opgave";
+            questionType = gettext("Opgave");
             total = this.currentPart.questions.length;
             current = this.questionIndex + 1;
         }
 
-        this.questionView.updateQuestionIndicator(`${label} ${current} af ${total}`);
+        this.questionView.updateQuestionIndicator(
+            blocktranslate(gettext("%(questionType)s %(current)s af %(total)s"), {
+                questionType: questionType,
+                current: current,
+                total: total,
+            }),
+        );
         this.questionView.updatePartName(this.currentPart.name);
         this.questionView.updatePartIndicator(
-            `Deltest ${this.partIndex + 1} af ${this.test.parts.length}`,
+            blocktranslate(gettext("Deltest %(current)s af %(total)s"), {
+                current: this.partIndex + 1,
+                total: this.test.parts.length,
+            }),
         );
     }
 
@@ -1426,9 +1443,9 @@ export class TeacherView {
         if (this.errorModal !== null) {
             const modalBody = document.querySelector("#error .modal-body-inner");
             modalBody.innerHTML = `
-                <p class="fw-bold">Fejl på ${data.studentDisplayName}'s computer.</p>
-                <p>Der er problemer med at afspille eller optage lyd på elevens computer.</p>
-                <p>(Systemfejlen er <code>${data.error}</code>)</p>
+                <p class="fw-bold">${blocktranslate(gettext("Fejl på %(name)s's computer."), { name: data.studentDisplayName })}</p>
+                <p>${gettext("Der er problemer med at afspille eller optage lyd på elevens computer.")}</p>
+                <p>${blocktranslate(gettext("(Systemfejlen er %(error)s)"), { error: `<code>${data.error}</code>` })}</p>
             `;
             this.errorModal.show();
         }
@@ -1491,7 +1508,7 @@ export class TeacherView {
         this.buttons.addClickListener((e) => {
             const val = e.target.id || e.target.parentElement.id;
             if (val === "cancelled") {
-                if (confirm("Er du sikker på at du vil afbryde testen")) {
+                if (confirm(gettext("Er du sikker på at du vil afbryde testen"))) {
                     this.sendTestCancelled();
                     this.buttons.disableButtons();
                 }

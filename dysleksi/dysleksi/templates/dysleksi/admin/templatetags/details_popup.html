@@ -1,32 +1,45 @@
+{% load i18n %}
 <div class="details-wrapper">
     <button id="details-toggle" class="details-button" type="button" aria-expanded="false">
-        <span>Se detaljer</span>
+        <span>{% translate "Se detaljer" %}</span>
         <i class="ph-fill ph-caret-down"></i>
     </button>
 
     <div id="details-popup" class="details-popup" hidden>
         <div class="details-row">
-            <span class="details-label">Deltagere:</span>
+            <span class="details-label">{% translate "Deltagere:" %}</span>
             {% if student_count %}
-                <span class="details-value">Klasse {{ class_name }} ({{ student_count }} elever)</span>
+                <span class="details-value">
+                    {% blocktranslate trimmed with class_name=class_name student_count=student_count %}
+                        Klasse {{ class_name }} ({{ student_count }} elever)
+                    {% endblocktranslate %}
+                </span>
             {% else %}
-                <span class="details-value">{{ test_assignment.student.get_full_name }} (Klasse {{ class_name }})</span>
+                <span class="details-value">
+                    {% blocktranslate trimmed with full_name=test_assignment.student.get_full_name class_name=class_name %}
+                        {{ full_name }} (Klasse {{ class_name }})
+                    {% endblocktranslate %}
+                </span>
             {% endif %}
         </div>
         <div class="details-row">
-            <span class="details-label">Testtype:</span>
+            <span class="details-label">{% translate "Testtype:" %}</span>
             <span class="details-value">{{ test_type_label }}</span>
         </div>
         <div class="details-row">
-            <span class="details-label">Test:</span>
+            <span class="details-label">{% translate "Test:" %}</span>
             <span class="details-value">{{ test_name }}</span>
         </div>
         <div class="details-row">
-            <span class="details-label">Deltests:</span>
+            <span class="details-label">{% translate "Deltests:" %}</span>
             <div class="details-value">
                 <ol>
                     {% for part in test_contents.parts %}
-                        <li>{{ part.name }} ({{ part.questions|length }} opgaver)</li>
+                        <li>
+                            {% blocktranslate trimmed with part_name=part.name question_count=part.questions|length %}
+                                {{ part_name }} ({{ question_count }} opgaver)
+                            {% endblocktranslate %}
+                        </li>
                     {% endfor %}
                 </ol>
             </div>
