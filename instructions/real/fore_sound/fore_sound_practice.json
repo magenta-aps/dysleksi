@@ -430,7 +430,7 @@
             {
                 "action": "setRepeatButtonDestination",
                 "delayAfter": 0,
-                "data": "0"
+                "data": "1"
             },
 
             {
