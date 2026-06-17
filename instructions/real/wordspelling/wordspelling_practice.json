@@ -488,7 +488,7 @@
       // Indsættes her for at forsinke næste trin
       {
         "action": "setRepeatButtonDestination",
-        "data": 2,  // Spørgsmål 2 (0-indekseret) er "ulu"
+        "data": 1,  
         "delayAfter": 1250
       },
       {
