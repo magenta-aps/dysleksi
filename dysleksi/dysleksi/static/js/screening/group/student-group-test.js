@@ -230,61 +230,64 @@ export class GroupTestView extends StudentTestView {
 
             this.clearReminder();
 
-            if (this.isPracticing && (!this.textAnswer || this.isMatchPair)) {
-                if (this.answerIsCorrect()) {
-                    this.domElements.lockInput();
-                    this.getSelectedButtons().forEach((btn) =>
-                        this.domElements.makeButtonHappy(btn.id),
-                    );
-
-                    // Play "you guessed correct" sound snippet
-                    await this.domElements.playSound(
-                        this.currentPart.practiceCorrectFeedbackSource ||
-                            "/static/audio/7c.4.wav",
-                        this.audioContext,
-                    );
-                    this.domElements.unlockInput();
-                } else {
-                    this.failedAttempts += 1;
-
-                    if (this.isMatchPair && this.failedAttempts == 3) {
-                        const correctLeft = this.answerButtons.find(
-                            (a) =>
-                                this.domElements.choicesElLeft.contains(a.button) &&
-                                a.answer.correctness === "correct",
-                        );
-                        const correctRight = this.answerButtons.find(
-                            (a) =>
-                                this.domElements.choicesElRight.contains(a.button) &&
-                                a.answer.correctness === "correct",
-                        );
-
-                        console.log("Playing hint audio");
-                        this.domElements.playSound(
-                            this.currentQuestion.hintSource,
-                            this.audioContext,
-                        );
-
-                        console.log("Highlighting correct answer");
-                        if (!correctLeft.button.classList.contains("selected")) {
-                            correctLeft.button.classList.add("pulse");
-                        }
-                        if (!correctRight.button.classList.contains("selected")) {
-                            correctRight.button.classList.add("pulse");
-                        }
-                    } else {
+            if (this.isPracticing) {
+                if (!this.textAnswer || this.isMatchPair) {
+                    if (this.answerIsCorrect()) {
+                        this.domElements.lockInput();
                         this.getSelectedButtons().forEach((btn) =>
-                            this.domElements.makeButtonAngry(btn.id),
+                            this.domElements.makeButtonHappy(btn.id),
                         );
-                        // Play "you guessed wrong" sound snippet
-                        this.domElements.playSound(
-                            this.currentPart.practiceWrongFeedbackSource ||
-                                "/static/audio/7c.3.wav",
+
+                        // Play "you guessed correct" sound snippet
+                        await this.domElements.playSound(
+                            this.currentPart.practiceCorrectFeedbackSource ||
+                                "/static/audio/7c.4.wav",
                             this.audioContext,
                         );
-                    }
+                        this.domElements.unlockInput();
+                    } else {
+                        this.failedAttempts += 1;
 
-                    return;
+                        if (this.isMatchPair && this.failedAttempts == 3) {
+                            const correctLeft = this.answerButtons.find(
+                                (a) =>
+                                    this.domElements.choicesElLeft.contains(a.button) &&
+                                    a.answer.correctness === "correct",
+                            );
+                            const correctRight = this.answerButtons.find(
+                                (a) =>
+                                    this.domElements.choicesElRight.contains(
+                                        a.button,
+                                    ) && a.answer.correctness === "correct",
+                            );
+
+                            console.log("Playing hint audio");
+                            this.domElements.playSound(
+                                this.currentQuestion.hintSource,
+                                this.audioContext,
+                            );
+
+                            console.log("Highlighting correct answer");
+                            if (!correctLeft.button.classList.contains("selected")) {
+                                correctLeft.button.classList.add("pulse");
+                            }
+                            if (!correctRight.button.classList.contains("selected")) {
+                                correctRight.button.classList.add("pulse");
+                            }
+                        } else {
+                            this.getSelectedButtons().forEach((btn) =>
+                                this.domElements.makeButtonAngry(btn.id),
+                            );
+                            // Play "you guessed wrong" sound snippet
+                            this.domElements.playSound(
+                                this.currentPart.practiceWrongFeedbackSource ||
+                                    "/static/audio/7c.3.wav",
+                                this.audioContext,
+                            );
+                        }
+
+                        return;
+                    }
                 }
             } else {
                 let messageText = `Elev har gennemført spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1}`;

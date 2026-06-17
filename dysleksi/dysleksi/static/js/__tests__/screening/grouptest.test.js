@@ -1166,6 +1166,38 @@ describe("GroupTestFlow", () => {
         expect(view.showFirstQuestion).toHaveBeenCalled();
     });
 
+    it("Answer freetext practice question correctly", async () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, ws, 1, domElements, student);
+        testSpy(view);
+        view.setPart(1);
+
+        view.showQuestion(true, 0);
+        expect(view.input).not.toBe(null);
+        const question = view.currentQuestion;
+        view.input.value = "aput";
+        view.selectFreeText();
+        view.send.mockClear();
+        view.onQuestionComplete(question);
+        // The only call to send is that the next question was displayed
+        expect(view.send).toHaveBeenCalledOnce();
+        expect(view.send).toHaveBeenCalledWith({
+            event: "question.displayed",
+            partIndex: 1,
+            partId: 6,
+            questionIndex: 0,
+            questionId: 25,
+            displayedAt: 0,
+            questionTitle: "1/2 (Wordspelling 2B (dummy))",
+            assignmentId: 1,
+            uuid: expect.any(String),
+            student: expect.any(Object),
+        });
+        await vi.waitFor(() => {
+            expect(view.showNextQuestion).toHaveBeenCalled();
+        });
+    });
+
     it("Answer freetext question correctly", () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);

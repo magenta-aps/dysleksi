@@ -402,7 +402,37 @@
       "partial_score_after": 30000,
       "completion_source": "/static/foo.mp3",
       "practice": [
-
+        {
+          "id": 24,
+          "challenge_id": 5,
+          "challenge_name": "challenge",
+          "challenge_image_url": null,
+          "challenge_sound_url": "wordspelling_dummy/aput.mp3",
+          "challenge_text": null,
+          "question_type": "free_text",
+          "existing_answers": {},
+          "possible_answers": [
+            {
+              "id": 100,
+              "resource_id": 100,
+              "resource_name": "aput",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "aput",
+              "correctness": "correct"
+            },
+            {
+              "id": 100,
+              "resource_id": 100,
+              "resource_name": "aput",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "abut",
+              "correctness": "partial"
+            }
+          ],
+          "instruction_sequence": null
+        }
       ],
       "questions": [
         {
