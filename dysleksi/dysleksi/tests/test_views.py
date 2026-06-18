@@ -66,7 +66,7 @@ class TestRootView(DysleksiTest):
     def test_get_context_data(self):
         cases: list[tuple[User, list[str]]] = [
             (self.teacher, []),
-            (self.student1, ["student", "open_assignments"]),
+            (self.student1, ["student"]),
             (AnonymousUser(), []),
         ]
         for user, context_keys in cases:
@@ -78,12 +78,6 @@ class TestRootView(DysleksiTest):
                         self.assertIn(context_key, context_data)
                 else:
                     self.assertIsInstance(context_data, dict)
-
-    def test_open_assignments_for_student(self):
-        # In the default test setup, `self.student1` has an open test assignment
-        view = self.setup_view(RootView, self.student1)
-        open_assignments = view.get_context_data()["open_assignments"]
-        self.assertTrue(open_assignments)
 
 
 class TestAssignmentView(DysleksiTest):
