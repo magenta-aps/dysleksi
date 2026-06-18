@@ -30,10 +30,6 @@ function initRedirectSocket(studentId) {
     return chatSocket;
 }
 
-export function initStudentLobby(studentId, hasOpenAssignments) {
-    if (hasOpenAssignments) {
-        initRedirectSocket(studentId);
-    } else {
-        console.log("No open assignments for student - not listening for redirects");
-    }
+export function initStudentLobby(studentId) {
+    initRedirectSocket(studentId);
 }

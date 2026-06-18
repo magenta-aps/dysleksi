@@ -27,7 +27,7 @@ describe("Index Entry Point", () => {
         await import("../../lobby/index.js?t=" + Date.now());
 
         // 4. Assertions
-        expect(initStudentLobby).toHaveBeenCalledWith(1, true);
+        expect(initStudentLobby).toHaveBeenCalledWith(1);
     });
 
     it("should throw or fail gracefully if the element is missing", async () => {

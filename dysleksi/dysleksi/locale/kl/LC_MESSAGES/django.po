@@ -314,7 +314,6 @@ msgid "Søg"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/base.html
-#: dysleksi/templates/dysleksi/lobby/student.html
 #: dysleksi/templates/dysleksi/screening/student.html
 msgid "Log ud"
 msgstr ""
@@ -748,19 +747,6 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/start_room.html
 msgid "Annullér"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/lobby/student.html
-#, python-format
-msgid "Hej %(name)s"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/lobby/student.html
-msgid "Venter..."
-msgstr ""
-
-#: dysleksi/templates/dysleksi/lobby/student.html
-msgid "Du har ingen tests lige nu."
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/teacher.html
