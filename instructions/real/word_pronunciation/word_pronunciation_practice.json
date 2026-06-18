@@ -2,7 +2,7 @@
   // 9a.1-9a.5 - indledning
   {
     "question_type": "no_input_required",
-    "image": "/resources/shared/Læsning.png",
+    "image": "/resources/word_pronunciation/word_pronunciation.png",
     "instruction_sequence": [
       // Højtlæsning af ord er nu ved at starte.
       {

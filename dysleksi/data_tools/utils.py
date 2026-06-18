@@ -22,7 +22,7 @@ def create_wordreading_2_test(
             "timeout": 600000,  # 600 seconds / 10 minutes
             "partial_score_after": 300000,  # 300 seconds / 5 minutes
             "reminder": 15000,  # 15 seconds
-            "image_url": "/static/images/wordreading_2.png",
+            "image_url": "/media/resources/wordreading_2/wordreading_2.png",
             "reminder_source": reminder,
             "completion_source": completion,
             "show_normscore_speed_plot": True,
@@ -57,7 +57,7 @@ def create_wordreading_1_test(
         defaults={
             "timeout": 360000,  # 360 seconds / 6 minutes
             "partial_score_after": 120000,  # 120 seconds / 2 minutes
-            "image_url": "/static/images/wordreading_1.png",
+            "image_url": "/media/resources/wordreading_1/wordreading_1.png",
             "reminder": 15000,  # 15 seconds
             "reminder_source": reminder,
             "completion_source": completion,
@@ -95,7 +95,7 @@ def create_fore_sound_test(
         defaults={
             "timeout": 360000,  # 360 seconds / 6 minutes
             "partial_score_after": 120000,  # 120 seconds / 2 minutes
-            "image_url": "/static/images/fore_sound.png",
+            "image_url": "/media/resources/fore_sound/fore_sound.png",
             "reminder": 15000,  # 15 seconds
             "reminder_source": reminder,
             "completion_source": completion,
@@ -126,7 +126,7 @@ def create_letter_sound_test(
         defaults={
             "timeout": 0,
             "partial_score_after": 0,
-            "image_url": "/static/images/letter_sound.png",
+            "image_url": "/media/resources/letter_sound/letter_sound.png",
             "reminder": 15000,  # 15 seconds
             "reminder_source": reminder,
             "completion_source": completion,
@@ -164,7 +164,7 @@ def create_letter_shape_test(
         defaults={
             "timeout": 0,
             "partial_score_after": 0,
-            "image_url": "/static/images/letter_shape.png",
+            "image_url": "/media/resources/letter_shape/letter_shape.png",
             "reminder": 15000,  # 15 seconds
             "reminder_source": reminder,
             "completion_source": completion,
@@ -196,7 +196,7 @@ def create_wordspelling_test(
         defaults={
             "timeout": 0,  # no timeout
             "partial_score_after": 0,  # no partial score (?)
-            "image_url": "/static/images/wordspelling.png",
+            "image_url": "/media/resources/wordspelling/wordspelling.png",
             "reminder_source": reminder,
             "reminder": 15000,  # 15 seconds
             "completion_source": completion,
@@ -226,7 +226,7 @@ def create_nonwordspelling_test(
         defaults={
             "timeout": 0,  # no timeout
             "partial_score_after": 0,  # no partial score (?)
-            "image_url": "/static/images/nonwordspelling.png",
+            "image_url": "/media/resources/nonwordspelling/nonwordspelling.png",
             "reminder_source": reminder,
             "reminder": 15000,  # 15 seconds
             "completion_source": completion,
@@ -252,7 +252,9 @@ def create_letter_pronunciation_test(
         defaults={
             "timeout": 0,
             "partial_score_after": 30000,
-            "image_url": "/static/images/letter_pronunciation.png",
+            "image_url": (
+                "/media/resources/letter_pronunciation/letter_pronunciation.png"
+            ),
             "completion_source": completion,
             "show_answer_time_statistics": True,
         },
@@ -277,7 +279,7 @@ def create_word_pronunciation_test(
         defaults={
             "timeout": 0,
             "partial_score_after": 30000,
-            "image_url": "/static/images/word_pronunciation.png",
+            "image_url": "/media/resources/images/word_pronunciation.png",
             "reminder_source": None,
             "completion_source": completion,
             "show_answer_time_statistics": True,
@@ -303,7 +305,10 @@ def create_nonsense_word_pronunciation_test(
         defaults={
             "timeout": 0,
             "partial_score_after": 30000,
-            "image_url": "/static/images/nonsense_word_pronunciation.png",
+            "image_url": (
+                "/media/resources/nonsense_word_pronunciation/"
+                "nonsense_word_pronunciation.png"
+            ),
             "reminder_source": None,
             "completion_source": completion,
             "show_answer_time_statistics": True,
@@ -333,7 +338,7 @@ def create_sentence_reading_test(
         defaults={
             "timeout": 8 * 60 * 1000,  # 8 minutes
             "partial_score_after": 4 * 60 * 1000,  # 4 minutes
-            "image_url": "/static/images/sentence_reading.png",
+            "image_url": "/media/resources/sentence_reading/sentence_reading.png",
             "reminder_source": reminder,
             "completion_source": completion,
             "reminder": 15000,  # 15 seconds
