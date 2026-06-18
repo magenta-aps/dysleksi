@@ -1,6 +1,6 @@
 [
     {
-        "image": "resources/sentence_reading/Indledning/Læsning.png",
+        "image": "resources/sentence_reading/sentence_reading.png",
         "question_type": "multiple_choice",
         "correct": "",
         "wrong": [],

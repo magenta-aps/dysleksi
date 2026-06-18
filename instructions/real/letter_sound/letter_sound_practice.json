@@ -1,6 +1,6 @@
 [
     {
-        "image": "resources/letter_sound/Indledning/ikon_for_bogstaver.png",
+        "image": "resources/letter_sound/letter_sound.png",
         "question_type": "multiple_choice",
         "correct": "",
         "wrong": [],

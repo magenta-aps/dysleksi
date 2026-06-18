@@ -2,7 +2,7 @@
   // 9a.1-9a.5 - indledning
   {
     "question_type": "no_input_required",
-    "image": "/resources/fore_sound/Indledning/Læsning.png",
+    "image": "/resources/nonsense_word_pronunciation/nonsense_word_pronunciation.png",
     "instruction_sequence": [
       // Højtlæsning af nonord er nu ved at starte.
       {

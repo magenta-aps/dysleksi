@@ -1,6 +1,6 @@
 [
     {
-        "image": "/resources/letter_shape/Indledning/Læsning.png",
+        "image": "/resources/letter_shape/letter_shape.png",
         "question_type": "multiple_choice",
         "correct": "",
         "wrong": [],

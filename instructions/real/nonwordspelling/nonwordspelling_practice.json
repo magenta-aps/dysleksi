@@ -1,7 +1,7 @@
 [
   {
     // No input required
-    "image": "resources/nonwordspelling/Indledning/Stavning.png",
+    "image": "resources/nonwordspelling/nonwordspelling.png",
     "question_type": "no_input_required",
     "instruction_sequence": [
       {
