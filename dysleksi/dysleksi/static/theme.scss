@@ -743,7 +743,7 @@ body.show-instructions .sound-btn.pulse {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 1rem;
+    gap: 0.5rem;
     max-height: 50vh;
     overflow-y: auto;
     overflow-x: hidden;
@@ -798,9 +798,9 @@ body.show-instructions .sound-btn.pulse {
 .summary-block {
     background-color: white;
     color: black;
-    font-size: 2rem;
+    font-size: 26px;
     width: 80vw;
-    padding: 1rem 2rem;
+    padding: 8px 32px;
     border-radius: 8px;
     text-align: left;
     pointer-events: none;

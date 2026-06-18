@@ -233,8 +233,7 @@ class TestDomElements {
             const img = document.createElement("img");
             img.src = part.image;
             img.alt = "TestPart icon";
-            img.style.width = "5rem";
-            img.style.height = "100%";
+            img.style.height = "50px";
 
             // Append text and image to block
             block.appendChild(textContainer);
