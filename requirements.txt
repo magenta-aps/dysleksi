@@ -61,7 +61,7 @@ django-extended-makemessages==1.9.0
 django-redis==7.0.0
 
 ## Tabulex SOAP client
-zeep==4.3.2
+zeep==4.3.3
 zeep[xmlsec]
 xmlsec
 ## Load tabulex demo data from file
