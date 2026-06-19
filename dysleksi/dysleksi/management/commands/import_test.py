@@ -7,17 +7,17 @@ import re
 from pathlib import Path
 
 from data_tools.utils import (
-    create_fore_sound_test,
-    create_letter_pronunciation_test,
-    create_letter_shape_test,
-    create_letter_sound_test,
-    create_nonsense_word_pronunciation_test,
-    create_nonwordspelling_test,
-    create_sentence_reading_test,
-    create_word_pronunciation_test,
-    create_wordreading_1_test,
-    create_wordreading_2_test,
-    create_wordspelling_test,
+    update_or_create_fore_sound_test,
+    update_or_create_letter_pronunciation_test,
+    update_or_create_letter_shape_test,
+    update_or_create_letter_sound_test,
+    update_or_create_nonsense_word_pronunciation_test,
+    update_or_create_nonwordspelling_test,
+    update_or_create_sentence_reading_test,
+    update_or_create_word_pronunciation_test,
+    update_or_create_wordreading_1_test,
+    update_or_create_wordreading_2_test,
+    update_or_create_wordspelling_test,
 )
 from django.core.management.base import BaseCommand
 
@@ -32,34 +32,7 @@ def remove_json_comments(text):
 
 class Command(BaseCommand):
     """
-    Creates a Word Reading 2 test from a JSON definition
-
-    Parameters
-    -----------------
-    name : str
-        Name of the test to add a wordreading 2 subtest to
-    json_path : str
-        Path to json file which contains the test definition
-
-    Notes
-    -----------
-    The json-file has the following structure:
-
-    >>> [
-    >>>     {
-    >>>         "image": "wordreading_2/image4_row_1_icon.png",
-    >>>         "wrong": [
-    >>>             "isi",
-    >>>             "illu",
-    >>>             "igalaaq"
-    >>>         ],
-    >>>         "correct": "iga"
-    >>>     },
-    >>>     (...)
-    >>> ]
-
-    A json file based on real data as well as images are attached to
-    https://redmine.magenta.dk/documents/382
+    Creates or updates a test from a JSON definition
     """
 
     def add_arguments(self, parser):
@@ -95,6 +68,13 @@ class Command(BaseCommand):
             default=None,
             help="Path to the JSON file with practice questions",
         )
+        parser.add_argument(
+            "update_contents",
+            type=bool,
+            nargs="?",
+            default=True,
+            help="Whether to update test-contents",
+        )
 
     def handle(self, *args, **options):
         name: str = options["name"]
@@ -103,6 +83,7 @@ class Command(BaseCommand):
         test_code_name: str = options["test_code_name"]
         test_type: str = options["test_type"]
         practice_json_path: Path | None = options["practice_json_path"]
+        update_contents: bool = options["update_contents"]
 
         # Load JSON data
         with json_path.open("r", encoding="utf-8") as f:
@@ -120,48 +101,92 @@ class Command(BaseCommand):
         test = Test.objects.get(name=name, test_type=test_type)
 
         if test_code_name == "wordreading_2":
-            create_wordreading_2_test(
-                test, questions_data, practice_data, name=testpart_name
+            update_or_create_wordreading_2_test(
+                test,
+                questions_data,
+                practice_data,
+                name=testpart_name,
+                update_contents=update_contents,
             )
         elif test_code_name == "wordreading_1":
-            create_wordreading_1_test(
-                test, questions_data, practice_data, name=testpart_name
+            update_or_create_wordreading_1_test(
+                test,
+                questions_data,
+                practice_data,
+                name=testpart_name,
+                update_contents=update_contents,
             )
         elif test_code_name == "wordspelling":
-            create_wordspelling_test(
-                test, questions_data, practice_data, name=testpart_name
+            update_or_create_wordspelling_test(
+                test,
+                questions_data,
+                practice_data,
+                name=testpart_name,
+                update_contents=update_contents,
             )
         elif test_code_name == "nonwordspelling":
-            create_nonwordspelling_test(
-                test, questions_data, practice_data, name=testpart_name
+            update_or_create_nonwordspelling_test(
+                test,
+                questions_data,
+                practice_data,
+                name=testpart_name,
+                update_contents=update_contents,
             )
         elif test_code_name == "letter_pronunciation":
-            create_letter_pronunciation_test(
-                test, questions_data, practice_data, name=testpart_name
+            update_or_create_letter_pronunciation_test(
+                test,
+                questions_data,
+                practice_data,
+                name=testpart_name,
+                update_contents=update_contents,
             )
         elif test_code_name == "word_pronunciation":
-            create_word_pronunciation_test(
-                test, questions_data, practice_data, name=testpart_name
+            update_or_create_word_pronunciation_test(
+                test,
+                questions_data,
+                practice_data,
+                name=testpart_name,
+                update_contents=update_contents,
             )
         elif test_code_name == "nonsense_word_pronunciation":
-            create_nonsense_word_pronunciation_test(
-                test, questions_data, practice_data, name=testpart_name
+            update_or_create_nonsense_word_pronunciation_test(
+                test,
+                questions_data,
+                practice_data,
+                name=testpart_name,
+                update_contents=update_contents,
             )
         elif test_code_name == "letter_sound":
-            create_letter_sound_test(
-                test, questions_data, practice_data, name=testpart_name
+            update_or_create_letter_sound_test(
+                test,
+                questions_data,
+                practice_data,
+                name=testpart_name,
+                update_contents=update_contents,
             )
         elif test_code_name == "fore_sound":
-            create_fore_sound_test(
-                test, questions_data, practice_data, name=testpart_name
+            update_or_create_fore_sound_test(
+                test,
+                questions_data,
+                practice_data,
+                name=testpart_name,
+                update_contents=update_contents,
             )
         elif test_code_name == "sentence_reading":
-            create_sentence_reading_test(
-                test, questions_data, practice_data, name=testpart_name
+            update_or_create_sentence_reading_test(
+                test,
+                questions_data,
+                practice_data,
+                name=testpart_name,
+                update_contents=update_contents,
             )
         elif test_code_name == "letter_shape":
-            create_letter_shape_test(
-                test, questions_data, practice_data, name=testpart_name
+            update_or_create_letter_shape_test(
+                test,
+                questions_data,
+                practice_data,
+                name=testpart_name,
+                update_contents=update_contents,
             )
 
         else:

@@ -26,9 +26,37 @@ def get_or_create_test(
     return test
 
 
+def make_import_test():
+    """
+    Returns an "import_test" method which keeps track of whether a tests contents
+    were already updated while running this management command.
+
+    This way we don't update a testparts contents multiple times in case it is featured
+    in multiple tests
+    """
+    seen: set[str] = set()
+
+    def import_test(test_name, sub_test_name, data_path, key, test_type, **kwargs):
+        update_contents = key not in seen
+        seen.add(key)
+        call_command(
+            "import_test",
+            test_name,
+            sub_test_name,
+            data_path,
+            key,
+            test_type,
+            update_contents=update_contents,
+            **kwargs,
+        )
+
+    return import_test
+
+
 def create_group_test(
     grade: Literal[1, 2, 3],
     period: Literal["midt", "slut"],
+    import_test,
     dummy=False,
 ):
     test = get_or_create_test(grade, period, TestType.GROUP, dummy=dummy)
@@ -119,8 +147,7 @@ def create_group_test(
         letter_shape_test_name = "Bogstavers form"
 
     if grade == 1:
-        call_command(
-            "import_test",
+        import_test(
             test.name,
             letter_sound_test_name,
             letter_sound_data_path,
@@ -132,8 +159,7 @@ def create_group_test(
             ),
         )
 
-        call_command(
-            "import_test",
+        import_test(
             test.name,
             fore_sound_test_name,
             fore_sound_data_path,
@@ -145,8 +171,7 @@ def create_group_test(
             ),
         )
 
-        call_command(
-            "import_test",
+        import_test(
             test.name,
             letter_shape_test_name,
             letter_shape_data_path,
@@ -159,8 +184,7 @@ def create_group_test(
         )
 
     if (grade == 1 and period == "slut") or (grade == 2 and period == "midt"):
-        call_command(
-            "import_test",
+        import_test(
             test.name,
             nonwordspelling_test_name,
             nonwordspelling_data_path,
@@ -173,8 +197,7 @@ def create_group_test(
         )
 
     if grade == 1 and period == "slut":
-        call_command(
-            "import_test",
+        import_test(
             test.name,
             wordreading_1_test_name,
             wordreading_1_data_path,
@@ -187,8 +210,7 @@ def create_group_test(
         )
 
     if grade >= 2:
-        call_command(
-            "import_test",
+        import_test(
             test.name,
             wordspelling_test_name,
             wordspelling_data_path,
@@ -200,8 +222,7 @@ def create_group_test(
             ),
         )
 
-        call_command(
-            "import_test",
+        import_test(
             test.name,
             wordreading_test_name,
             wordreading_data_path,
@@ -214,8 +235,7 @@ def create_group_test(
         )
 
     if (grade == 2 and period == "slut") or grade == 3:
-        call_command(
-            "import_test",
+        import_test(
             test.name,
             sentence_reading_test_name,
             sentence_reading_data_path,
@@ -233,6 +253,7 @@ def create_group_test(
 def create_individual_test(
     grade: Literal[1, 2, 3],
     period: Literal["midt", "slut"],
+    import_test,
     dummy=False,
 ):
     test = get_or_create_test(grade, period, TestType.INDIVIDUAL, dummy=dummy)
@@ -280,8 +301,7 @@ def create_individual_test(
 
     if grade == 1:
         # Bogstavbenævnelse
-        call_command(
-            "import_test",
+        import_test(
             test.name,
             letter_pronunciation_test_name,
             letter_pronunciation_data_path,
@@ -295,8 +315,7 @@ def create_individual_test(
 
     if (grade == 1 and period == "slut") or grade >= 2:
         # Højtlæsning af ord
-        call_command(
-            "import_test",
+        import_test(
             test.name,
             word_pronunciation_test_name,
             word_pronunciation_data_path,
@@ -309,8 +328,7 @@ def create_individual_test(
         )
 
         # Højtlæsning af nonsensord
-        call_command(
-            "import_test",
+        import_test(
             test.name,
             nonsense_word_pronunciation_test_name,
             nonsense_word_pronunciation_data_path,
@@ -362,12 +380,13 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         dummy = options["dummy"]
         create_answers = options["answer"]
+        import_test = make_import_test()
         for grade in (1, 2, 3):
             for period in ("midt", "slut"):
-                test = create_group_test(grade, period, dummy=dummy)
+                test = create_group_test(grade, period, import_test, dummy=dummy)
                 if create_answers and test is not None:
                     answer_test(test)
 
-                test = create_individual_test(grade, period, dummy=dummy)
+                test = create_individual_test(grade, period, import_test, dummy=dummy)
                 if create_answers and test is not None:
                     answer_test(test)
