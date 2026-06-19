@@ -344,7 +344,6 @@ body.show-instructions {
   width: 144px;
   height: 64px;
   align-self: flex-end;
-  margin-right: 48px;
 
 }
 
@@ -397,7 +396,7 @@ body.show-instructions {
     padding: 32px;
 
     max-width: 222px;
-    width: 100%;
+    width: 222px;
     aspect-ratio: 1 / 1;
     height: auto !important;
     padding: 32px !important;
@@ -448,7 +447,7 @@ body.show-instructions {
   width: 90vw;
   padding: 0;
   list-style: none;
-  gap: 24px;
+  gap: 32px;
 
   button {
     flex: 1;  // all buttons in #choices have equal width
@@ -463,6 +462,11 @@ body.show-instructions {
 
   &.true-false-layout {
       gap: 32px;
+  }
+
+  &:has(.square-btn) {
+    width: fit-content;
+    max-width: 90vw;
   }
 }
 
@@ -600,12 +604,11 @@ body.show-instructions .sound-btn.pulse {
 
 .center-content {
   flex: 1;
-  width: 100%;
-
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  width: fit-content;
 }
 
 
