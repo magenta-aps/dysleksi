@@ -148,6 +148,18 @@ class TestAssignmentTable(Table):
         verbose_name=_("Antal elever"),
     )
 
+    start_date = TemplateColumn(
+        template_name="dysleksi/admin/table_columns/test_assignment_period.html",
+        verbose_name=_("Startdato"),
+        extra_context={"attr": "lower"},
+    )
+
+    end_date = TemplateColumn(
+        template_name="dysleksi/admin/table_columns/test_assignment_period.html",
+        verbose_name=_("Startdato"),
+        extra_context={"attr": "upper"},
+    )
+
     status = TemplateColumn(
         template_name="dysleksi/admin/table_columns/test_assignment_status.html",
         orderable=False,
