@@ -43,7 +43,7 @@ django_compressor==4.6.0
 pillow==12.2.0
 
 ## History on model instances
-django-simple-history==3.11.0
+django-simple-history==3.12.0
 
 ## Dynamic forms (lets us use lambdas in form field attributes)
 django-forms-dynamic==1.0.0
