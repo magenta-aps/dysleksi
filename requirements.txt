@@ -76,7 +76,7 @@ django-admin-sortable2
 beautifulsoup4==4.15.0
 
 ## Code coverage
-coverage==7.14.2
+coverage==7.14.3
 
 ## For specifying a given run time in tests (lets us define the return value of datetime.now etc.)
 freezegun==1.5.5
