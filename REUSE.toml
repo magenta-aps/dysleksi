@@ -49,7 +49,7 @@ SPDX-FileCopyrightText = "(c) 2025 Chart.js Contributors"
 SPDX-License-Identifier = "MIT"
 
 [[annotations]]
-path = "dysleksi/dysleksi/static/fonts/Karinika-Regular.otf**"
+path = "dysleksi/dysleksi/static/fonts/Karinika-Regular.ttf**"
 precedence = "aggregate"
 SPDX-FileCopyrightText = "Copyright 2026 Magenta ApS and SIL Global"
 SPDX-License-Identifier = "OFL-1.1"
