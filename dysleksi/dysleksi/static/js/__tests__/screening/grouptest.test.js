@@ -1447,7 +1447,7 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
         // Letter buttons exist
         const letterButtons = document.querySelectorAll(".letter-btn");
         letterButtons.forEach((b) => (b.disabled = false));
-        expect(letterButtons.length).toBe(18); // 3 rows * 6 letters
+        expect(letterButtons.length).toBe(22);
 
         // Erase button exists
         const eraseBtn = document.querySelector(".erase-btn");
@@ -1455,9 +1455,9 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
         expect(eraseBtn.disabled).toBe(true); // initially disabled
 
         // Click a letter button
-        letterButtons[0].click(); // should append "a" to display
-        expect(displayField.value).toBe("a");
-        expect(listenerMock).toHaveBeenCalledWith({ target: { value: "a" } });
+        letterButtons[0].click(); // should append "q" to display
+        expect(displayField.value).toBe("q");
+        expect(listenerMock).toHaveBeenCalledWith({ target: { value: "q" } });
         expect(eraseBtn.disabled).toBe(false);
 
         // Click erase button
@@ -1477,12 +1477,12 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
         letterButtons[0].click();
         letterButtons[1].click();
         letterButtons[2].click();
-        expect(displayField.value).toBe("aef"); // first row letters: a, e, f, g, i, j
+        expect(displayField.value).toBe("qer"); // first row letters: q, e, r, t, u, i, o, p
         expect(listenerMock).toHaveBeenCalledTimes(3);
 
         // Erase last letter
         eraseBtn.click();
-        expect(displayField.value).toBe("ae");
+        expect(displayField.value).toBe("qe");
     });
 
     it("returns the display field element", () => {
