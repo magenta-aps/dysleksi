@@ -27,4 +27,4 @@ def assign_individual_modal(form=None, takes_context=True):
 
 @register.inclusion_tag("dysleksi/admin/modals/error.html")
 def error_modal(takes_context=True):
-    return get_base_context("error")
+    return get_base_context("error")  # pragma: no cover

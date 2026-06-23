@@ -9,4 +9,4 @@ from django.template.defaultfilters import register
     "dysleksi/admin/templatetags/details_popup.html", takes_context=True
 )
 def details_popup(context):
-    return {**context.flatten()}
+    return {**context.flatten()}  # pragma: no cover

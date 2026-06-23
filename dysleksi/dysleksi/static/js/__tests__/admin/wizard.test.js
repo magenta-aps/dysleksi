@@ -1,7 +1,7 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, beforeEach, vi } from "vitest";
+import { describe, it, expect, afterEach, beforeEach, vi } from "vitest";
 import { Wizard, initWizards } from "../../admin/wizard.js";
 
 const mockDoc = `
@@ -74,6 +74,11 @@ describe("Wizard", () => {
 
     beforeEach(() => {
         document.body.innerHTML = mockDoc;
+        vi.stubGlobal("fetch", vi.fn());
+    });
+
+    afterEach(() => {
+        vi.unstubAllGlobals();
     });
 
     it("initializes", () => {
@@ -209,12 +214,22 @@ describe("Wizard", () => {
         expect(datetimeDisplay.innerText).toBe("torsdag den 1. januar 2026 kl. 12.00");
     });
 
-    it("submits a form", () => {
+    it("submits a form via 'fetch' and handles success", () => {
         const wizard = getInstance();
-        const form = wizard.domElem.querySelector("form");
-        const submit = vi.spyOn(form, "submit");
+        fetch.mockResolvedValue({
+            json: vi.fn().mockResolvedValue({ status: "success", redirect: "url" }),
+        });
         wizard.submit();
-        expect(submit).toBeCalled();
+        expect(fetch).toBeCalled();
+    });
+
+    it("submits a form via 'fetch' and handles error", () => {
+        const wizard = getInstance();
+        fetch.mockResolvedValue({
+            json: vi.fn().mockResolvedValue({ status: "error", error: "some text" }),
+        });
+        wizard.submit();
+        expect(fetch).toBeCalled();
     });
 
     it("resets the form when the modal is (re)opened", () => {

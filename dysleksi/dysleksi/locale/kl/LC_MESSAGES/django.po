@@ -53,6 +53,18 @@ msgid "Slut"
 msgstr ""
 
 #: dysleksi/forms.py
+msgid "Startdato kan ikke være i fortiden"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Slutdato kan ikke være i fortiden"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Slutdato kan ikke være før startdato"
+msgstr ""
+
+#: dysleksi/forms.py
 msgid "Vælg elev"
 msgstr ""
 
