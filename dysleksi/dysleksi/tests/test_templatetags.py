@@ -1,9 +1,16 @@
-from django.test import TestCase
+# SPDX-FileCopyrightText: 2026 Magenta ApS <info@magenta.dk>
+#
+# SPDX-License-Identifier: MPL-2.0
+import datetime
 
-from dysleksi.templatetags.get import get
+from django.test import SimpleTestCase
+from django.utils import timezone
+from psycopg.types.range import Range
+
+from dysleksi.templatetags.get import get, range_attr
 
 
-class TestTagGet(TestCase):
+class TestTagGet(SimpleTestCase):
 
     def test_none(self):
         self.assertIsNone(get(None, "a"))
@@ -34,3 +41,15 @@ class TestTagGet(TestCase):
 
     def test_string(self):
         self.assertIsNone(get("abc", "a"))
+
+
+class TestTagRangeAttr(SimpleTestCase):
+    def test_range_attr_valid_input(self):
+        start, end = timezone.now(), timezone.now() + datetime.timedelta(hours=1)
+        datetime_range = Range(start, end)
+        self.assertEqual(range_attr(datetime_range, "lower"), start)
+        self.assertEqual(range_attr(datetime_range, "upper"), end)
+
+    def test_range_attr_invalid_input(self):
+        self.assertEqual(range_attr(None, "lower"), "-")
+        self.assertEqual(range_attr(None, "invalid"), "-")

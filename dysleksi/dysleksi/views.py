@@ -27,7 +27,6 @@ from django.db.models import (
 )
 from django.db.models.expressions import BaseExpression, OuterRef, Subquery, Window
 from django.db.models.functions import Coalesce, Length, Replace, RowNumber
-from django.http import HttpResponseRedirect
 from django.http.response import Http404, HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -287,12 +286,25 @@ class StartAssignmentView(GroupRequiredMixin, CreateView):
         else:
             return reverse("dysleksi:room", kwargs={"pk": self.object.pk})
 
+    def form_invalid(self, form):
+        return JsonResponse(
+            {
+                "status": "error",
+                "error": "\n\n".join(
+                    ", ".join(str(error.message) for error in errors)
+                    for field, errors in form.errors.as_data().items()
+                ),
+            }
+        )
+
     def form_valid(self, form):
         if form.cleaned_data["test_parts"]:
             self.object = self.create_test_from_test_parts(form)
-            return HttpResponseRedirect(self.get_success_url())
         else:
-            return super().form_valid(form)
+            # Implicitly sets `self.object` to the created `TestAssignment`
+            super().form_valid(form)
+        # Note: our `get_success_url` depends on `self.object` being set
+        return JsonResponse({"status": "success", "redirect": self.get_success_url()})
 
     @transaction.atomic
     def create_test_from_test_parts(self, form) -> TestAssignment:

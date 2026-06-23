@@ -24,7 +24,10 @@ export class Wizard {
         // Hook events for buttons
         this.nextBtn.addEventListener("click", () => this.gotoNextStep());
         this.prevBtn.addEventListener("click", () => this.gotoPrevStep());
-        this.confirmBtn.addEventListener("click", () => this.submit());
+        this.confirmBtn.addEventListener("click", (evt) => {
+            evt.preventDefault();
+            this.submit();
+        });
 
         // Hook events for `data-show` and `data-hide` attributes
         for (const showBtn of this.showBtns) {
@@ -91,7 +94,27 @@ export class Wizard {
 
     submit() {
         const form = this.domElem.querySelector("form");
-        form.submit();
+
+        async function sendData() {
+            const formData = new FormData(form);
+            try {
+                const response = await fetch(form.action, {
+                    method: "POST",
+                    body: formData,
+                });
+                const doc = await response.json();
+                if (doc.status === "error") {
+                    alert(doc.error);
+                } else /* istanbul ignore if */ if (doc.status === "success") {
+                    window.location = doc.redirect;
+                }
+            } catch (e) {
+                /* istanbul ignore next */
+                console.error(e);
+            }
+        }
+
+        sendData();
     }
 
     isFormStepCompleted() {

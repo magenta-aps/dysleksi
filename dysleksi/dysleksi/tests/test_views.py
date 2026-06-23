@@ -8,9 +8,10 @@ from unittest.mock import patch
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import AnonymousUser
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
-from django.http.response import Http404
+from django.http.response import Http404, JsonResponse
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 from django.views import View
 
 from dysleksi.models import (
@@ -364,8 +365,7 @@ class TestStartRoomView(DysleksiTest):
         )
         assignment = TestAssignment.objects.order_by("-pk").first()
         expected_url = reverse("dysleksi:room", kwargs={"pk": assignment.pk})
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, expected_url)
+        self._assert_json_response_contains_redirect(response, expected_url)
 
     def test_create_individual_room_planned_date_time(self):
         data = {
@@ -374,16 +374,17 @@ class TestStartRoomView(DysleksiTest):
             "test_parts": [],
             "is_test_part": "test",
             "is_immediate": "n",
-            "start_datetime": "2026-01-01T12:00",
-            "end_datetime": "2026-01-01T13:00",
+            "start_datetime": "2030-01-01T12:00",
+            "end_datetime": "2030-01-01T13:00",
         }
         self.client.force_login(self.teacher)
         response = self.client.post(
             reverse("dysleksi:start_individual_room"), data=data
         )
+        self._assert_json_response_contains_redirect(
+            response, reverse("dysleksi:test_assignment_list")
+        )
         assignment = TestAssignment.objects.latest("pk")
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("dysleksi:test_assignment_list"))
         self.assertIsNotNone(assignment.planned_date_time)
 
     def test_create_individual_room_test_parts(self):
@@ -404,8 +405,7 @@ class TestStartRoomView(DysleksiTest):
         test_count_after = Test.objects.count()
         assignment = TestAssignment.objects.order_by("-pk").first()
         expected_url = reverse("dysleksi:room", kwargs={"pk": assignment.pk})
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, expected_url)
+        self._assert_json_response_contains_redirect(response, expected_url)
         self.assertTrue(test_count_after == test_count_before + 1)
         self.assertTrue(assignment.test, Test.objects.latest("pk"))
 
@@ -423,8 +423,7 @@ class TestStartRoomView(DysleksiTest):
         response = self.client.post(reverse("dysleksi:start_group_room"), data=data)
         assignment = TestAssignment.objects.order_by("-pk").first()
         expected_url = reverse("dysleksi:room", kwargs={"pk": assignment.pk})
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, expected_url)
+        self._assert_json_response_contains_redirect(response, expected_url)
 
     def test_create_group_room_planned_date_time(self):
         data = {
@@ -433,13 +432,14 @@ class TestStartRoomView(DysleksiTest):
             "test_parts": [],
             "is_test_part": "test",
             "is_immediate": "n",
-            "start_datetime": "2026-01-01T12:00",
-            "end_datetime": "2026-01-01T13:00",
+            "start_datetime": "2030-01-01T12:00",
+            "end_datetime": "2030-01-01T13:00",
         }
         self.client.force_login(self.teacher)
         response = self.client.post(reverse("dysleksi:start_group_room"), data=data)
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("dysleksi:test_assignment_list"))
+        self._assert_json_response_contains_redirect(
+            response, reverse("dysleksi:test_assignment_list")
+        )
         assignment = TestAssignment.objects.latest("pk")
         self.assertIsNotNone(assignment.planned_date_time)
 
@@ -462,10 +462,31 @@ class TestStartRoomView(DysleksiTest):
         test_count_after = Test.objects.count()
         assignment = TestAssignment.objects.order_by("-pk").first()
         expected_url = reverse("dysleksi:room", kwargs={"pk": assignment.pk})
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, expected_url)
+        self._assert_json_response_contains_redirect(response, expected_url)
         self.assertTrue(test_count_after == test_count_before + 1)
         self.assertTrue(assignment.test, Test.objects.latest("pk"))
+
+    def test_json_response_on_invalid_form(self):
+        data = {
+            "klasse": self.klasse.id,
+            "test": self.group_test.id,
+            "is_test_part": "test",
+            "is_immediate": "n",
+            "start_datetime": "2025-01-01T00:00",
+            "end_datetime": "",
+        }
+        self.client.force_login(self.teacher)
+        response = self.client.post(reverse("dysleksi:start_group_room"), data=data)
+        self.assertIsInstance(response, JsonResponse)
+        doc = response.json()
+        self.assertEqual(doc["status"], "error")
+        self.assertEqual(doc["error"], _("Startdato kan ikke være i fortiden"))
+
+    def _assert_json_response_contains_redirect(self, response, redirect):
+        self.assertIsInstance(response, JsonResponse)
+        doc = response.json()
+        self.assertEqual(doc["status"], "success")
+        self.assertEqual(doc["redirect"], redirect)
 
 
 class TestAssignmentResultsView(ResponseTest):

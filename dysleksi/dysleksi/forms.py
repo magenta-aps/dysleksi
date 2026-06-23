@@ -1,5 +1,11 @@
 from django import forms
-from django.forms import ModelChoiceField, ModelMultipleChoiceField, widgets
+from django.forms import (
+    ModelChoiceField,
+    ModelMultipleChoiceField,
+    ValidationError,
+    widgets,
+)
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from dynamic_forms import DynamicField, DynamicFormMixin
 
@@ -71,13 +77,24 @@ class StartRoomForm(forms.ModelForm):
 
     def clean_start_datetime(self):
         start_datetime = self.cleaned_data["start_datetime"]
+        if start_datetime is not None and start_datetime < timezone.now():
+            raise ValidationError(_("Startdato kan ikke være i fortiden"))
         self.period = (start_datetime, self.period[1])
         return start_datetime
 
     def clean_end_datetime(self):
         end_datetime = self.cleaned_data["end_datetime"]
+        if end_datetime is not None and end_datetime < timezone.now():
+            raise ValidationError(_("Slutdato kan ikke være i fortiden"))
         self.period = (self.period[0], end_datetime)
         return end_datetime
+
+    def clean(self):
+        cleaned_data = super().clean()
+        start_datetime = cleaned_data.get("start_datetime")
+        end_datetime = cleaned_data.get("end_datetime")
+        if start_datetime and end_datetime and (end_datetime <= start_datetime):
+            raise ValidationError(_("Slutdato kan ikke være før startdato"))
 
     def save(self, commit=True):
         if self.period is None or self.cleaned_data["start_datetime"] is None:
