@@ -720,20 +720,18 @@ class TestDomElements {
         }
 
         const wrapper = document.createElement("div");
-        wrapper.style.width = "90%";
+        wrapper.classList.toggle("keyboard-wrapper", true);
 
         // --- Button rows ---
         const buttonRows = [
-            ["a", "e", "f", "g", "i", "j"],
-            ["k", "l", "m", "n", "o", "p"],
-            ["q", "r", "s", "t", "u", "v"],
+            ["q", "e", "r", "t", "u", "i", "o", "p"],
+            ["a", "s", "d", "f", "g", "h", "j", "k", "l"],
+            ["c", "v", "b", "n", "m"],
         ];
 
         // --- Display field (label-only feel) ---
         const textFieldWrapper = document.createElement("div");
-        textFieldWrapper.style.display = "flex";
-        textFieldWrapper.style.alignItems = "center";
-        textFieldWrapper.style.gap = "20px";
+        textFieldWrapper.classList.toggle("display-field-wrapper", true);
 
         const displayField = document.createElement("input");
         displayField.className = "form-control display-field";
@@ -788,12 +786,12 @@ class TestDomElements {
             this.makeButtonGlow(eraseBtn.id);
         });
 
-        textFieldWrapper.append(displayField, eraseBtn);
+        textFieldWrapper.append(displayField);
 
         // --- Letter buttons ---
         const buttonsWrapper = document.createElement("div");
         buttonsWrapper.id = "free-text-buttons";
-        buttonRows.forEach((rowLetters) => {
+        buttonRows.forEach((rowLetters, rowIndex) => {
             const rowDiv = document.createElement("div");
             rowDiv.className = "letter-row";
             rowLetters.forEach((letter) => {
@@ -810,11 +808,16 @@ class TestDomElements {
                     this.makeButtonGlow(btn.id);
                 });
                 rowDiv.appendChild(btn);
+                // On the last letter button row, append the erase button
+                if (rowIndex === buttonRows.length - 1) {
+                    rowDiv.appendChild(eraseBtn);
+                }
             });
             buttonsWrapper.append(rowDiv);
         });
-        wrapper.append(buttonsWrapper); // below display
+
         wrapper.append(textFieldWrapper);
+        wrapper.append(buttonsWrapper); // below display
 
         this.choicesEl.append(wrapper);
         this.toggleNextButton(true);
