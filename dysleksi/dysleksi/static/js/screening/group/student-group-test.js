@@ -83,10 +83,10 @@ export class GroupTestView extends StudentTestView {
                 answers.some((a) => a.resourceText === "true") &&
                 answers.some((a) => a.resourceText === "false")
             ) {
-                // Order True/False such that False always appears first
-                const falseAnswer = answers.find((a) => a.resourceText === "false");
+                // Order True/False such that True always appears first
                 const trueAnswer = answers.find((a) => a.resourceText === "true");
-                answers = [falseAnswer, trueAnswer];
+                const falseAnswer = answers.find((a) => a.resourceText === "false");
+                answers = [trueAnswer, falseAnswer];
             }
 
             if (this.currentQuestion.type === "multiple_choice_match") {
