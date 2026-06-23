@@ -11,10 +11,12 @@ $student-purple-light: #bd94af;
 $student-purple: #7b295e;
 $student-purple-dark: #3d142f;
 $student-green-lightest: #DDF5D4;
+$student-green-lighter: #9DD890;
 $student-green-light: #8CCB7F;
 $student-green: #2B8019;
 $student-green-dark: #183012;
 $student-red-lightest: #FFE0E0;
+$student-red-lighter: #FA8E90;
 $student-red-light: #F27C7E;
 $student-red: #8C1B1B;
 $student-red-dark: #500a0b;
@@ -166,13 +168,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .btn-true-false {
-  color: black !important;
-  background-color: white !important;
-
-  border-radius: 16px !important;
   width: 200px !important;
   flex: none !important;
-
+  color: black !important;
+  background-color: white !important;
+  border-radius: 16px !important;
+  filter: drop-shadow(0 0.25 * $spacer 0.25 * $spacer $student-grey);
   transition: opacity 0.2s ease-out !important;
 
   &.dimmed {
@@ -181,8 +182,8 @@ h1, h2, h3, h4, h5, h6 {
 
   &.true {
     border-color: $student-green !important;
-    background-color: $student-green-lightest !important;
-    color: $student-green-lightest !important;
+    background-color: $student-green-lighter !important;
+    color: $student-green-lighter !important;
     box-shadow: $green-button-shadow;
     outline: 8px solid $student-green !important;
 
@@ -195,13 +196,16 @@ h1, h2, h3, h4, h5, h6 {
     &:not(.no-hover):hover {
       background-color: $student-green-light !important;
       box-shadow: $dark-green-button-shadow;
+      width: 210px !important;
+      height: 105px !important;
     }
   }
 
   &.false {
     border-color: $student-red !important;
-    background-color: $student-red-lightest !important;
-    color: $student-red-lightest !important;
+    background-color: $student-red-lighter !important;
+    color: $student-red-lighter !important;
+    box-shadow: $red-button-shadow;
     outline: 8px solid $student-red !important;
 
     i {
@@ -213,10 +217,11 @@ h1, h2, h3, h4, h5, h6 {
     &:not(.no-hover):hover {
       background-color: $student-red-light !important;
       box-shadow: $dark-red-button-shadow;
+      width: 210px !important;
+      height: 105px !important;
     }
   }
 }
-
 
 body.show-instructions {
   .btn-outline-primary {
@@ -405,7 +410,7 @@ body.show-instructions {
     img {
         max-width: 100%;
         max-height: 100%;
-        object-fit: contain; 
+        object-fit: contain;
         display: block;
     }
 
@@ -461,7 +466,8 @@ body.show-instructions {
   }
 
   &.true-false-layout {
-      gap: 32px;
+    min-height: 105px;  // adjust for buttons growing from 100px to 105px height on hover+select
+    gap: 32px;
   }
 
   &:has(.square-btn) {
@@ -469,7 +475,6 @@ body.show-instructions {
     max-width: 90vw;
   }
 }
-
 
 #challenge-image {
   display: block;
@@ -481,7 +486,7 @@ body.show-instructions {
 #challenge-text {
   display: block;
   margin: 0 auto 0 auto;
-  
+
   background-color: none;
   border: none;
   border-radius: 16px !important;
@@ -490,7 +495,7 @@ body.show-instructions {
   min-height: 100px;
   width: fit-content;
   padding: 24px 40px 32px 40px;
-  
+
   text-align: center;
 }
 
@@ -858,7 +863,7 @@ body.show-instructions .sound-btn.pulse {
         flex-direction: column;
         width: auto;
         gap: 24px;
-        
+
         button {
             width: 200px;
             height: calc(50vh / 6);
