@@ -52,15 +52,15 @@ msgstr ""
 msgid "Slut"
 msgstr ""
 
-#: dysleksi/forms.py
+#: dysleksi/forms.py dysleksi/tests/test_forms.py dysleksi/tests/test_views.py
 msgid "Startdato kan ikke være i fortiden"
 msgstr ""
 
-#: dysleksi/forms.py
+#: dysleksi/forms.py dysleksi/tests/test_forms.py
 msgid "Slutdato kan ikke være i fortiden"
 msgstr ""
 
-#: dysleksi/forms.py
+#: dysleksi/forms.py dysleksi/tests/test_forms.py
 msgid "Slutdato kan ikke være før startdato"
 msgstr ""
 
@@ -189,6 +189,10 @@ msgid "Type"
 msgstr ""
 
 #: dysleksi/tables.py
+msgid "Startdato"
+msgstr ""
+
+#: dysleksi/tables.py
 msgid "Status"
 msgstr ""
 
@@ -310,7 +314,7 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/class/list.html
 #: dysleksi/templates/dysleksi/class/list.html
 msgid "Klasser"
-msgstr ""
+msgstr "Klassit"
 
 #: dysleksi/templates/dysleksi/admin/base.html
 #: dysleksi/templates/dysleksi/admin/student/list.html

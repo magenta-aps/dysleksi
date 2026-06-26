@@ -53,15 +53,15 @@ msgstr ""
 msgid "Slut"
 msgstr ""
 
-#: dysleksi/forms.py
+#: dysleksi/forms.py dysleksi/tests/test_forms.py dysleksi/tests/test_views.py
 msgid "Startdato kan ikke være i fortiden"
 msgstr ""
 
-#: dysleksi/forms.py
+#: dysleksi/forms.py dysleksi/tests/test_forms.py
 msgid "Slutdato kan ikke være i fortiden"
 msgstr ""
 
-#: dysleksi/forms.py
+#: dysleksi/forms.py dysleksi/tests/test_forms.py
 msgid "Slutdato kan ikke være før startdato"
 msgstr ""
 
@@ -187,6 +187,10 @@ msgstr ""
 
 #: dysleksi/tables.py
 msgid "Type"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Startdato"
 msgstr ""
 
 #: dysleksi/tables.py
