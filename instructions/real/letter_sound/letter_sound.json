@@ -8,11 +8,13 @@
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
             {
-                // Naqinnerup nipaa taamaallaat taaneqartassaaq...... Aallartipputit.
-                // Bogstavlyden vil kun blive angivet under opgaverne. Du starter nu.
+                // Aallartipputit.
+                // Du starter nu.
+                // (Lånt fra "Sætningslæsning")
                 "action": "playSound",
                 "delayAfter": 0,
-                "resource": "resources/letter_sound/Enhanced/Deltests/1e.1.mp3"
+                //"resource": "resources/letter_sound/Enhanced/Deltests/1e.1.mp3"
+                "resource": "resources/sentence_reading/Enhanced/Deltests/8e.4.mp3"
             }
         ]
     },
