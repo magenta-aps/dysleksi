@@ -225,6 +225,31 @@ h6 {
       }
     }
 
+    .language-picker {
+      flex-direction: row;
+      justify-content: space-between;
+      align-items: anchor-center;
+      padding: $spacer;
+      color: $mono-white;
+
+      i.ph {
+        margin: 0 0.25 * $spacer 0 0;
+      }
+
+      form {
+        flex: 1 1 0;
+      }
+
+      select {
+        flex: 1 1 0;
+        padding: 0.25 * $spacer;
+        background: transparent;
+        border: none;
+        color: $mono-white;
+      }
+    }
+
+
     .about {
       flex-direction: column;
       padding: $spacer;
