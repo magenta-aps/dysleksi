@@ -127,18 +127,7 @@
                 "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.8.mp3",
                 "delayAfter": 1000
             },
-            {
-                "action": "highlight",
-                "element": "challenge-image",
-                "delayAfter": 0
-            },
-            {
-                // se på billedet for at vurdere, om det, du har læst passer til
-                // billedet.
-                "action": "playSound",
-                "resource": "resources/sentence_reading/Enhanced/Instruktion/8b.9.mp3",
-                "delayAfter": 1000
-            },
+            // Audio and highlight for step 8b.9 has been removed due to customer feedback
             {
                 // Du vælger grøn,
                 "action": "playSound",
