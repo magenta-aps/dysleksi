@@ -191,18 +191,6 @@
                 "element": "challenge-sound-btn"
             },
             {
-                // Hvis du ikke hører bogstavlyden så godt, kan du høre det igen ved at
-                // trykke på lydikonet. Prøv at trykke.
-                "action": "playSound",
-                "delayAfter": 750,
-                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.10.mp3"
-            },
-            {
-                "action": "waitForUserClick",
-                "element": "challenge-sound-btn",
-                "delayAfter": 1250
-            },
-            {
                 // Du
                 "action": "playSound",
                 "delayAfter": 0,
@@ -214,7 +202,18 @@
                 "delayAfter": 750,
                 "resource": "resources/letter_sound/Enhanced/Instruktion/1b.12.mp3"
             },
-
+            {
+                // Hvis du ikke hører bogstavlyden så godt, kan du høre det igen ved at
+                // trykke på lydikonet. Prøv at trykke.
+                "action": "playSound",
+                "delayAfter": 750,
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.10.mp3"
+            },
+            {
+                "action": "waitForUserClick",
+                "element": "challenge-sound-btn",
+                "delayAfter": 1250
+            },
             {
                 "action": "highlight",
                 "delayAfter": 500,
@@ -307,6 +306,7 @@
         ]
     },
     {
+        // Øveopgave 1
         "question_type": "multiple_choice",
         "sound": "resources/shared/Bogstavlyde/1f.2 - a.mp3",
         "correct": "a",
@@ -314,6 +314,37 @@
         "wrong": ["c", "d", "g"],
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
+            // Øveopgave 1 vises sløret (fadet ud)
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "question-challenge"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "choice-a"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "choice-c"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "choice-d"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "choice-g"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "next"
+            },
             {
                 // Sungiusarnermi taamaallaat akissutit eqqortuunersoq paasitinneqartassaatit...
                 // Bogstavlyden vil kun blive angivet under opgaverne.
@@ -321,10 +352,50 @@
                 "action": "playSound",
                 "delayAfter": 1250,
                 "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1c.1.mp3"
+            },
+
+            // Øveopgave 1 vises tydeligt – øveopgaverne starter.
+            {
+                "action": "fadeIn",
+                "delayAfter": 0,
+                "element": "question-challenge"
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 0,
+                "element": "choice-a"
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 0,
+                "element": "choice-c"
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 0,
+                "element": "choice-d"
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 0,
+                "element": "choice-g"
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                // Aallartipputit / Du starter nu
+                // (Lånt fra "Forlyd")
+                "action": "playSound",
+                "delayAfter": 1250,
+                "resource": "resources/fore_sound/Enhanced/Øveopgave 1 og 2/2c.2.mp3"
             }
         ]
     },
     {
+        // Øveoopgave 2
         "question_type": "multiple_choice",
         "sound": "resources/shared/Bogstavlyde/1f.24 - t[d].mp3",
         "correct": "t",
@@ -356,12 +427,14 @@
                 "delayAfter": 0,
                 "data": "1"
             },
-
             {
-                // Aaku tuugassat marluk.
+                // Aaku takusinnaavatit tuugassat marluk.
+                // Her kan du se to valgmuligheder.
+                // (Lånt fra "Ordlæsning 1")
                 "action": "playSound",
-                "delayAfter": 0,
-                "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.1.mp3"
+                "delayAfter": 1250,
+                //"resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.1.mp3",
+                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.1.mp3"
             },
             {
                 "action": "showFaded",
@@ -379,6 +452,7 @@
                 "delayAfter": 0,
                 "element": "next"
             },
+
             // Hvis du har forstået, hvad du skal gøre, skal du klikke på blåikon for
             // at starte opgaverne.
             {
@@ -386,12 +460,12 @@
                 "delayAfter": 1250,
                 "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.2.mp3"
             },
-
             {
                 "action": "fadeIn",
                 "delayAfter": 0,
                 "element": "repeat"
             },
+
             // Men, hvis du ikke har forstået hvad du skal gøre, skal du klikke på øret
             // grå ikon for at lytte til instruktionen igen
             {
@@ -403,8 +477,25 @@
             // Vælg ikon (klik) / Toorseriarit
             {
                 "action": "playSound",
-                "delayAfter": 750,
+                "delayAfter": 1250,
                 "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.4.mp3"
+            },
+
+            // Sapinngisamik suliassat akiniarsarisassavatit.
+            // Du skal svare opgaverne så godt du kan.
+            // (Lånt fra "Forlyd")
+            {
+                "action": "playSound",
+                "delayAfter": 750,
+                "resource": "resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.1.mp3"
+            },
+
+            // Maanna akissutit eqqortuunersoq paasitinneqartassanngilatit.
+            // Nu får du ikke længere at vide om du har svaret rigtigt.
+            {
+                "action": "playSound",
+                "delayAfter": 750,
+                "resource": "resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.mp3"
             }
         ]
     }
