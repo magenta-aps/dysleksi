@@ -11,12 +11,75 @@
         "correct_index": 0,
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
+            // Skjul næste-knappen
             {
-                // "Ordlæsningen varer i 10minutter ... Du starter nu"
-                // "Oqaatsinik atuarneq minutsini qulini sivisussuseqassaaq ... Aallartipputit"
-                // TODO: selve opgaven skal først være synlig, når ordet "Aallartipputit" læses op
+                "action": "hide",
+                "element": "next",
+                "delayAfter": 0
+            },
+
+            // Opgave 1 er skjult
+            {
+                "action": "hide",
+                "element": "challenge-image",
+                "delayAfter": 0
+            },
+            {
+                "action": "hide",
+                "element": "choices",
+                "delayAfter": 0
+            },
+            {
+                // "Ordlæsningen varer i 10 minutter"
+                // "Oqaatsinik atuarneq minutsini qulini sivisussuseqassaaq"
                 "action": "playSound",
                 "resource": "resources/wordreading_2/Enhanced/Deltest/7e.1.mp3",
+                "delayAfter": 1250
+            },
+            {
+                // Sapinngisamik suliassat amerlanerpaat akiniarsarissavatit
+                // Du skal besvare så mange opgaver som muligt
+                // (Lånt fra "Sætningslæsning")
+                "action": "playSound",
+                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8e.2.mp3",
+                "delayAfter": 1250
+            },
+            {
+                // Nu får du ikke længere, at vide om du har svaret rigtigt
+                // Maanna akissutit eqqortuunersoq paasitinneqartassanngilatit
+                // (Lånt fra "Sætningslæsning")
+                "action": "playSound",
+                "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8e.3.mp3",
+                "delayAfter": 1250
+            },
+
+            // Opgave 1 fader ind
+            {
+                "action": "show",
+                "element": "challenge-image",
+                "delayAfter": 0
+            },
+            {
+                "action": "show",
+                "element": "choices",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeIn",
+                "element": "challenge-image",
+                "delayAfter": 0
+            },
+            {
+                "action": "fadeIn",
+                "element": "choices",
+                "delayAfter": 0
+            },
+            {
+                // Du starter nu
+                // Aallartipputit
+                // (Lånt fra "Sætningslæsning")
+                "action": "playSound",
+                "resource": "resources/sentence_reading/Enhanced/Deltests/8e.4.mp3",
                 "delayAfter": 0
             }
         ]
