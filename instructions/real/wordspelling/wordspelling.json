@@ -4,14 +4,17 @@
     "sound": "resources/wordspelling/Opgave/6f.1.mp3",
     "correct": "iki",
     "partially_correct": ["igi", "iga", "ikki", "ike", "ekke", "eke", "ige"],
-    "reminder": 20000,
+    "reminder": 15000,
+    // TOOD: specify new audio file "6e.2a" as `reminder_source` when we receive it
     "continue_when_instruction_is_complete": false,
     "instruction_sequence": [
       {
-        // "Ordet, som du skal skrive, vil kun blive angivet under opgaverne. Du starter nu"
-        // "Oqaatsinik allannermi oqaaseq allatassat taamaallaat taaneqartassaaq.... Aallartipputit"
+        // Aallartipputit.
+        // Du starter nu.
+        // (Lånt fra "Nonordstavning")
         "action": "playSound",
-        "resource": "resources/wordspelling/Enhanced/Deltest/6e.1.mp3",
+        //"resource": "resources/wordspelling/Enhanced/Deltest/6e.1.mp3",
+        "resource": "resources/nonwordspelling/Enhanced/Deltests/4e.3.mp3",
         "delayAfter": 0
       }
     ]
