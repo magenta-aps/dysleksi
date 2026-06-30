@@ -55,6 +55,7 @@
           "resources/wordreading_1/Opgave/Bamse.jpg",
           "resources/wordreading_1/Opgave/Mælk.jpg"
         ],
+        // TODO: use new reminder audio "5b.13" when we receive the file
         "instruction_sequence": [
             {
                 "action": "show",
@@ -222,7 +223,16 @@
                 "delayAfter": 750,
                 "element": "choice-Blomst.jpg"
             },
-
+            {
+                // Kukkusooruit toqqakkat allanngortissinnaavat. Aamma nalulertooruit eqqoriaasinnaavutit.
+                // Hvis du vælger forkert, kan du ændre dit valg. Du må også gerne gætte, hvis du ikke kan finde ud af opgaven.
+                // (Lånt fra "Bogstavlyde")
+                // (Flyttet op før 5b.8 pga. kundens ønske)
+                "action": "playSound",
+                "delayAfter": 250,
+                //"resource": "resources/wordreading_1/Enhanced/Instruktion/5b.9.mp3",
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.13.mp3"
+            },
             {
                 "action": "fadeIn",
                 "delayAfter": 0,
@@ -239,13 +249,6 @@
                 "action": "playSound",
                 "delayAfter": 250,
                 "resource": "resources/wordreading_1/Enhanced/Instruktion/5b.8.mp3"
-            },
-            {
-                // Hvis du vælger forkert, kan du ændre dit valg, inden du trykker på
-                //pilen. Du må også gerne gætte, hvis du ikke kan finde ud af opgaven
-                "action": "playSound",
-                "delayAfter": 250,
-                "resource": "resources/wordreading_1/Enhanced/Instruktion/5b.9.mp3"
             },
             {
                 "action": "fadeOut",
@@ -303,6 +306,7 @@
         ]
     },
     {
+      // Øveopgave 1
       "text": "Isi",
       "question_type": "multiple_choice",
       "correct": "resources/wordreading_1/Opgave/Øje.jpg",
@@ -314,16 +318,75 @@
       ],
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
+            // Øveopgave 1 vises sløret
             {
-                // Du vil få besked, hvis du vælger forkert under øveopgaverne.
-                // Sungiusarnermi taamaallaat akissutit eqqortuunersoq paasitinneqartassaatit... Aallartipputit
+                "action": "show",
+                "delayAfter": 0,
+                "element": "challenge-text"
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "choices"
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "challenge-text"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "choices"
+            },
+            {
+                "action": "fadeOut",
+                "delayAfter": 0,
+                "element": "next"
+            },
+
+            {
+                // TOOD: make sure the audio file 5c.1 is replaced by a new version saying:
+                // Atuariarlutit asseq atuakkannut tulluartoq toqqartassavat.
+                // Du skal læse og vælge det billede, der passer til ordet.
+                "action": "playSound",
+                "delayAfter": 1250,
+                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5c.1.mp3"
+            },
+            {
+                // Aallartipputit.
+                // Du starter.
+                // (Lånt fra "Sætningslæsning")
                 "action": "playSound",
                 "delayAfter": 0,
-                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5c.1.mp3"
+                "resource": "resources/sentence_reading/Enhanced/Deltests/8e.4.mp3"
+            },
+
+            // Øveopgave 1 vises tydeligt - øveopgaverne starter
+            {
+                "action": "fadeIn",
+                "delayAfter": 0,
+                "element": "challenge-text"
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 0,
+                "element": "choices"
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 0,
+                "element": "next"
             }
         ]
     },
     {
+      // Øveopgave 2
       "text": "Matu",
       "question_type": "multiple_choice",
       "correct": "resources/wordreading_1/Opgave/Dør.jpg",
@@ -392,12 +455,14 @@
                 "delayAfter": 750,
                 "element": "repeat"
             },
-            // Men hvis du ikke har forstået, hvad du skal gøre, skal du klikke på
-            // den grå. Så skal du øve dig igen.
+            // Suliassatilli paasilluanngitsoorukkit, qasertoq tuussavat. Taava sungiusaqqissaatit.
+            // Men, hvis du ikke har forstået hvad du skal gøre, skal du klikke på øret grå ikon for at lytte til instruktionen igen
+            // (Lånt fra "Ordlæsning 2")
             {
                 "action": "playSound",
                 "delayAfter": 1250,
-                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.3.mp3"
+                //"resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.3.mp3"
+                    "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7d.3.mp3"
             },
             // Vælg ikon (klik).
             {
