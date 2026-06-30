@@ -9,14 +9,80 @@
       "resources/wordreading_1/Opgave/Stjerne.jpg",
       "resources/wordreading_1/Opgave/Træ.jpg"
     ],
+    // TODO: update reminder audio 5e.2
     "continue_when_instruction_is_complete": false,
     "instruction_sequence": [
+      // Skjul næste-knappen
       {
-        // Oqaatsinik atuarneq minutsini arfinilinni sivisussuseqassaaq.... Aallartipputit.
-        // Ordlæsning starter nu.
+        "action": "hide",
+        "element": "next",
+        "delayAfter": 0
+      },
+      // Opgave 1 er skjult
+      {
+        "action": "hide",
+        "element": "challenge-text",
+        "delayAfter": 0
+      },
+      {
+        "action": "hide",
+        "element": "choices",
+        "delayAfter": 0
+      },
+
+      {
+        // Oqaatsinik atuarneq minutsini arfinilinni sivisussuseqassaaq
+        // Ordlæsningen varer i 6 minutter
+        "action": "playSound",
+        "delayAfter": 1250,
+        "resource": "resources/wordreading_1/Enhanced/Deltest/5e.1.mp3"
+      },
+      {
+        // Sapinngisamik suliassat amerlanerpaat akiniarsarissavatit.
+        // Du skal besvare så mange opgaver som muligt.,
+        // (Lånt fra "Sætningslæsning")
+        "action": "playSound",
+        "delayAfter": 1250,
+        "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8e.2.mp3"
+      },
+      {
+        // Maanna akissutit eqqortuunersoq paasitinneqartassanngilatit.
+        // Nu får du ikke længere, at vide om du har svaret rigtigt.
+        // (Lånt fra "Sætningslæsning")
+        "action": "playSound",
+        "delayAfter": 1250,
+        "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8e.3.mp3"
+      },
+
+      // Opgave 1 fader ind
+      {
+        "action": "show",
+        "element": "challenge-text",
+        "delayAfter": 0
+      },
+      {
+        "action": "show",
+        "element": "choices",
+        "delayAfter": 0
+      },
+      {
+        "action": "fadeIn",
+        "element": "challenge-text",
+        "delayAfter": 0
+      },
+      {
+        "action": "fadeIn",
+        "element": "choices",
+        "delayAfter": 0
+      },
+
+      {
+        // Aallartipputit.
+        // Du starter nu.
+        // (Lånt fra "Sætningslæsning")
         "action": "playSound",
         "delayAfter": 0,
-        "resource": "resources/wordreading_1/Enhanced/Deltest/5e.1.mp3"
+        "resource": "resources/sentence_reading/Enhanced/Deltests/8e.4.mp3"
       }
     ]
   },
