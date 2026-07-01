@@ -27,6 +27,8 @@ const mockDoc = `
                     <input type="text" name="invisible" id="invisible" />
                 </div>
                 <div class="example2"></div>
+                <div class="test-choice"></div>
+                <div class="test-part-choice"></div>
             </fieldset>
             <fieldset data-step="2">
                 <input type="text" name="bar" id="bar" />
@@ -49,6 +51,8 @@ const mockDoc = `
                 <div class="d-none">
                     <input type="text" name="hidden" id="hidden" />
                 </div>
+                <div class="row d-none end-datetime"></div>
+                <div class="row d-none start-datetime"></div>
             </fieldset>
             <fieldset data-step="3" class="d-none">
                 <div class="summary">
