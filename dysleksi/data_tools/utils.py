@@ -332,7 +332,7 @@ def update_or_create_word_pronunciation_test(
         defaults={
             "timeout": 0,
             "partial_score_after": 30000,
-            "image_url": "/media/resources/images/word_pronunciation.png",
+            "image_url": "/media/resources/word_pronunciation/word_pronunciation.png",
             "reminder_source": None,
             "completion_source": completion,
             "show_answer_time_statistics": True,
