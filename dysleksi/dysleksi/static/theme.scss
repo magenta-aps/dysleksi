@@ -699,7 +699,17 @@ body.show-instructions .sound-btn.pulse {
 
 .angry-btn {
     animation: angry-shake 0.35s ease-in-out 0s 2;
-    filter: drop-shadow(0 0 0.6rem $student-red);
+    position: relative;
+    overflow: visible;
+
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        box-shadow: 0 0 0.6rem 0.1rem $student-red;
+    }
 }
 
 @keyframes angry-shake {
@@ -717,35 +727,49 @@ body.show-instructions .sound-btn.pulse {
 }
 
 .happy-btn {
-    animation: happy-flash 0.5s ease-in-out;
+    position: relative;
+    overflow: visible;
+
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        box-shadow: 0 0 0.9rem 0.15rem rgba($student-green, 0.9);
+        opacity: 0;
+        will-change: opacity;
+        animation: happy-flash 0.5s ease-in-out;
+    }
 }
 
 @keyframes happy-flash {
-    0% {
-        filter: drop-shadow(0 0 0.3rem rgba($student-green, 0.6));
-    }
-    50% {
-        filter: drop-shadow(0 0 0.9rem rgba($student-green, 0.9));
-    }
-    100% {
-        filter: drop-shadow(0 0 0.3rem rgba($student-green, 0));
-    }
+    0%   { opacity: 0.6; }
+    50%  { opacity: 1; }
+    100% { opacity: 0; }
 }
 
 .pressed-btn {
-    animation: button-press-flash 0.5s ease-in-out;
+    position: relative;
+    overflow: visible;
+
+    &::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: inherit;
+        pointer-events: none;
+        box-shadow: 0 0 0.4rem 0.15rem rgba($student-grey-darkest, 0.9);
+        opacity: 0;
+        will-change: opacity;
+        animation: button-press-flash 0.5s ease-in-out;
+    }
 }
 
 @keyframes button-press-flash {
-    0% {
-        filter: drop-shadow(0 0 0.3rem rgba($student-grey-darkest, 0));
-    }
-    50% {
-        filter: drop-shadow(0 0 0.4rem rgba($student-grey-darkest, 0.9));
-    }
-    100% {
-        filter: drop-shadow(0 0 0.3rem rgba($student-grey-darkest, 0));
-    }
+    0%   { opacity: 0; }
+    50%  { opacity: 1; }
+    100% { opacity: 0; }
 }
 
 .scroll-wrapper {
