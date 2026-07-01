@@ -40,7 +40,7 @@ django-libsass==0.9
 django_compressor==4.6.0
 
 ## Image field
-pillow==12.2.0
+pillow==12.3.0
 
 ## History on model instances
 django-simple-history==3.12.0
