@@ -661,10 +661,6 @@ msgid "Hop til næste del"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Pause test"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Afslut test"
 msgstr ""
 
