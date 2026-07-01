@@ -8,16 +8,16 @@ import tempfile
 from datetime import timedelta
 
 from data_tools.utils import (
-    create_fore_sound_test,
-    create_letter_pronunciation_test,
-    create_letter_shape_test,
-    create_letter_sound_test,
-    create_nonsense_word_pronunciation_test,
-    create_nonwordspelling_test,
-    create_sentence_reading_test,
-    create_word_pronunciation_test,
-    create_wordreading_1_test,
-    create_wordspelling_test,
+    update_or_create_fore_sound_test,
+    update_or_create_letter_pronunciation_test,
+    update_or_create_letter_shape_test,
+    update_or_create_letter_sound_test,
+    update_or_create_nonsense_word_pronunciation_test,
+    update_or_create_nonwordspelling_test,
+    update_or_create_sentence_reading_test,
+    update_or_create_word_pronunciation_test,
+    update_or_create_wordreading_1_test,
+    update_or_create_wordspelling_test,
 )
 from django.test import TestCase, override_settings
 
@@ -225,46 +225,57 @@ class UtilTest(TestCase):
 
         self.test = Test.objects.create(name="test test")
 
-    def test_create_wordspelling_test(self):
+    def test_update_or_create_wordspelling_test(self):
         self.assertFalse(
             TestResource.objects.filter(sound="wordspelling_dummy/iki.mp3").exists()
         )
-        create_wordspelling_test(self.test, self.wordspelling_data)
+        update_or_create_wordspelling_test(self.test, self.wordspelling_data)
         self.assertTrue(
             TestResource.objects.filter(sound="wordspelling_dummy/iki.mp3").exists()
         )
 
-    def test_create_nonwordspelling_test(self):
-        create_nonwordspelling_test(
+    def test_update_or_create_nonwordspelling_test(self):
+        update_or_create_nonwordspelling_test(
             self.test, self.nonwordspelling_data, self.nonwordspelling_practice_data
         )
         self.assertTrue(
             TestResource.objects.filter(sound="nonwordspelling_dummy/foo.mp3").exists()
         )
 
-    def test_create_nonwordspelling_test_without_practice_run(self):
-        create_nonwordspelling_test(self.test, self.nonwordspelling_data)
+    def test_update_or_create_nonwordspelling_test_without_practice_run(self):
+        update_or_create_nonwordspelling_test(self.test, self.nonwordspelling_data)
         self.assertTrue(
             TestResource.objects.filter(sound="nonwordspelling_dummy/foo.mp3").exists()
         )
 
-    def test_create_wordreading_1_test_with_practice_data(self):
-        create_wordreading_1_test(
+    def test_update_or_create_wordreading_1_test_with_practice_data(self):
+        update_or_create_wordreading_1_test(
             self.test, self.wordreading_1_data, self.wordreading_1_pratice_data
         )
         self.assertTrue(TestResource.objects.filter(text="Cykel").exists())
 
-    def test_create_wordreading_1_test(self):
-        create_wordreading_1_test(self.test, self.wordreading_1_data)
+    def test_update_or_create_wordreading_1_test(self):
+        update_or_create_wordreading_1_test(self.test, self.wordreading_1_data)
         self.assertTrue(TestResource.objects.filter(text="Cykel").exists())
 
         # Validate that the resource only exists once. Also when we call the command
         # again
-        create_wordreading_1_test(self.test, self.wordreading_1_data)
+        update_or_create_wordreading_1_test(self.test, self.wordreading_1_data)
         self.assertEqual(TestResource.objects.filter(text="Cykel").count(), 1)
 
-    def test_create_letter_sound_test(self):
-        create_letter_sound_test(self.test, self.letter_sound_data)
+    def test_update_or_create_wordreading_1_test_without_updating_contents(self):
+        update_or_create_wordreading_1_test(
+            self.test, self.wordreading_1_data, update_contents=False
+        )
+        self.assertFalse(TestResource.objects.filter(text="Cykel").exists())
+
+        update_or_create_wordreading_1_test(
+            self.test, self.wordreading_1_data, update_contents=True
+        )
+        self.assertTrue(TestResource.objects.filter(text="Cykel").exists())
+
+    def test_update_or_create_letter_sound_test(self):
+        update_or_create_letter_sound_test(self.test, self.letter_sound_data)
 
         self.assertTrue(
             TestResource.objects.filter(
@@ -272,8 +283,8 @@ class UtilTest(TestCase):
             ).exists()
         )
 
-    def test_create_fore_sound_test(self):
-        create_fore_sound_test(self.test, self.fore_sound_data)
+    def test_update_or_create_fore_sound_test(self):
+        update_or_create_fore_sound_test(self.test, self.fore_sound_data)
 
         self.assertTrue(
             TestResource.objects.filter(
@@ -281,8 +292,8 @@ class UtilTest(TestCase):
             ).exists()
         )
 
-    def test_create_fore_sound_test_with_practice_run(self):
-        create_fore_sound_test(
+    def test_update_or_create_fore_sound_test_with_practice_run(self):
+        update_or_create_fore_sound_test(
             self.test, self.fore_sound_data, self.fore_sound_practice_data
         )
 
@@ -292,8 +303,8 @@ class UtilTest(TestCase):
             ).exists()
         )
 
-    def test_create_sentence_reading_test(self):
-        create_sentence_reading_test(self.test, self.sentence_reading_data)
+    def test_update_or_create_sentence_reading_test(self):
+        update_or_create_sentence_reading_test(self.test, self.sentence_reading_data)
 
         self.assertTrue(
             TestResource.objects.filter(
@@ -301,8 +312,8 @@ class UtilTest(TestCase):
             ).exists()
         )
 
-    def test_create_sentence_reading_test_with_practice_data(self):
-        create_sentence_reading_test(
+    def test_update_or_create_sentence_reading_test_with_practice_data(self):
+        update_or_create_sentence_reading_test(
             self.test, self.sentence_reading_data, self.sentence_reading_practice_data
         )
 
@@ -312,56 +323,60 @@ class UtilTest(TestCase):
             ).exists()
         )
 
-    def test_create_letter_shape_data_test(self):
-        create_letter_shape_test(self.test, self.letter_shape_data)
+    def test_update_or_create_letter_shape_data_test(self):
+        update_or_create_letter_shape_test(self.test, self.letter_shape_data)
 
         self.assertTrue(TestResource.objects.filter(text="Ss").exists())
 
-    def test_create_letter_shape_data_test_with_practice_data(self):
-        create_letter_shape_test(
+    def test_update_or_create_letter_shape_data_test_with_practice_data(self):
+        update_or_create_letter_shape_test(
             self.test, self.letter_shape_data, self.letter_shape_practice_data
         )
 
         self.assertTrue(TestResource.objects.filter(text="Ss").exists())
 
-    def test_create_letter_pronunciation_test(self):
+    def test_update_or_create_letter_pronunciation_test(self):
 
-        create_letter_pronunciation_test(self.test, self.letter_pronunciation_data)
+        update_or_create_letter_pronunciation_test(
+            self.test, self.letter_pronunciation_data
+        )
         self.assertTrue(TestResource.objects.filter(text="s").exists())
 
-    def test_create_letter_pronunciation_test_with_practice_run(self):
+    def test_update_or_create_letter_pronunciation_test_with_practice_run(self):
 
-        create_letter_pronunciation_test(
+        update_or_create_letter_pronunciation_test(
             self.test,
             self.letter_pronunciation_data,
             self.letter_pronunciation_practice_data,
         )
         self.assertTrue(TestResource.objects.filter(text="s").exists())
 
-    def test_create_word_pronunciation_test(self):
+    def test_update_or_create_word_pronunciation_test(self):
 
-        create_word_pronunciation_test(self.test, self.word_pronunciation_data)
+        update_or_create_word_pronunciation_test(
+            self.test, self.word_pronunciation_data
+        )
         self.assertTrue(TestResource.objects.filter(text="iput").exists())
 
-    def test_create_word_pronunciation_test_with_practice_run(self):
+    def test_update_or_create_word_pronunciation_test_with_practice_run(self):
 
-        create_word_pronunciation_test(
+        update_or_create_word_pronunciation_test(
             self.test,
             self.word_pronunciation_data,
             self.word_pronunciation_practice_data,
         )
         self.assertTrue(TestResource.objects.filter(text="iput").exists())
 
-    def test_create_nonsense_word_pronunciation_test(self):
+    def test_update_or_create_nonsense_word_pronunciation_test(self):
 
-        create_nonsense_word_pronunciation_test(
+        update_or_create_nonsense_word_pronunciation_test(
             self.test, self.nonsense_word_pronunciation_data
         )
         self.assertTrue(TestResource.objects.filter(text="foo").exists())
 
-    def test_create_nonsense_word_pronunciation_test_with_practice_run(self):
+    def test_update_or_create_nonsense_word_pronunciation_test_with_practice_run(self):
 
-        create_nonsense_word_pronunciation_test(
+        update_or_create_nonsense_word_pronunciation_test(
             self.test,
             self.nonsense_word_pronunciation_data,
             self.nonsense_word_pronunciation_practice_data,

@@ -449,9 +449,6 @@ class Test(models.Model):
         Returns a Python dict that can be converted to JSON with json.dumps().
         """
 
-        def url_or_none(resource: TestResource | None) -> str | None:
-            return resource.url if resource else None
-
         test_data: Dict[str, Any] = {
             "id": self.id,
             "name": self.name,
@@ -460,103 +457,7 @@ class Test(models.Model):
         }
 
         for part in self.parts.all().order_by("id"):
-            part_data: dict = {
-                "id": part.id,
-                "name": part.name,
-                "image": part.image_url,
-                "instructions_url": (
-                    part.instructions.url if part.instructions else None
-                ),
-                "timeout": part.timeout,
-                "partial_score_after": part.partial_score_after,
-                "practice": [],
-                "questions": [],
-                "completion_source": url_or_none(part.completion_source),
-                "practice_correct_feedback_source": url_or_none(
-                    part.practice_correct_feedback_source
-                ),
-                "practice_wrong_feedback_source": url_or_none(
-                    part.practice_wrong_feedback_source
-                ),
-            }
-
-            for practice, questions in (
-                (True, part.questions.filter(is_practice=True)),
-                (False, part.questions.filter(is_practice=False)),
-            ):
-                for question in questions.order_by("id"):
-                    question_data: dict[str, Any] = {
-                        "id": question.id,
-                        "question_type": question.question_type,
-                        "possible_answers": [],
-                        "instruction_sequence": (
-                            question.instruction_sequence.to_json()
-                            if hasattr(question, "instruction_sequence")
-                            else None
-                        ),
-                        "reminder": question.reminder,
-                        "reminderSource": str(
-                            settings.REMINDER_FALLBACK  # type: ignore
-                        ),
-                        "timeout": question.timeout,
-                        "continue_when_instruction_is_complete": (
-                            question.continue_when_instruction_is_complete
-                        ),
-                        "advance_automatically": question.advance_automatically,
-                        "result_group": question.result_group,
-                    }
-                    question_data["existing_answers"] = question.get_existing_answers(
-                        assignment
-                    )
-
-                    if question.reminder_source:
-                        question_data["reminderSource"] = question.reminder_source.url
-                    if question.hint_source:
-                        question_data["hintSource"] = question.hint_source.url
-                    if question.challenge:
-                        question_data.update(
-                            {
-                                "challenge_id": question.challenge.id,
-                                "challenge_name": question.challenge.name,
-                                "challenge_text": question.challenge.text,
-                                "challenge_image_url": None,
-                                "challenge_sound_url": None,
-                            }
-                        )
-                        if question.challenge.sound:
-                            question_data["challenge_sound_url"] = (
-                                question.challenge.sound.url
-                            )
-                        if question.challenge.image:
-                            question_data["challenge_image_url"] = (
-                                question.challenge.image.url
-                            )
-
-                    for answer in question.possible_answers.all().order_by("id"):
-                        answer_data = {
-                            "id": answer.id,
-                            "resource_id": answer.resource.id,
-                            "resource_name": answer.resource.name,
-                            "index": answer.index,
-                            "resource_image_url": (
-                                answer.resource.image.url
-                                if answer.resource.image
-                                else None
-                            ),
-                            "resource_sound_url": (
-                                answer.resource.sound.url
-                                if answer.resource.sound
-                                else None
-                            ),
-                            "resource_text": answer.resource.text,
-                            "correctness": answer.correctness,
-                        }
-                        question_data["possible_answers"].append(answer_data)
-
-                    key = "practice" if practice else "questions"
-                    part_data[key].append(question_data)
-
-            test_data["parts"].append(part_data)
+            test_data["parts"].append(part.to_json(assignment))
 
         return test_data
 
@@ -739,16 +640,116 @@ class TestPart(models.Model):
             correctness=Correctness.PARTIAL,
         ).exists()
 
-    def create_test_resources(self, questions_data, is_practice=False):
-        for data in questions_data:
+    def to_json(self, assignment):
+
+        def url_or_none(resource: TestResource | None) -> str | None:
+            return resource.url if resource else None
+
+        part_data: dict = {
+            "id": self.id,
+            "name": self.name,
+            "image": self.image_url,
+            "instructions_url": (self.instructions.url if self.instructions else None),
+            "timeout": self.timeout,
+            "partial_score_after": self.partial_score_after,
+            "practice": [],
+            "questions": [],
+            "completion_source": url_or_none(self.completion_source),
+            "practice_correct_feedback_source": url_or_none(
+                self.practice_correct_feedback_source
+            ),
+            "practice_wrong_feedback_source": url_or_none(
+                self.practice_wrong_feedback_source
+            ),
+        }
+
+        for practice, questions in (
+            (True, self.questions.filter(is_practice=True)),
+            (False, self.questions.filter(is_practice=False)),
+        ):
+            for question in questions.order_by("order"):
+                question_data: dict[str, Any] = {
+                    "id": question.id,
+                    "question_type": question.question_type,
+                    "possible_answers": [],
+                    "instruction_sequence": (
+                        question.instruction_sequence.to_json()
+                        if hasattr(question, "instruction_sequence")
+                        else None
+                    ),
+                    "reminder": question.reminder,
+                    "reminderSource": str(settings.REMINDER_FALLBACK),  # type: ignore
+                    "timeout": question.timeout,
+                    "continue_when_instruction_is_complete": (
+                        question.continue_when_instruction_is_complete
+                    ),
+                    "advance_automatically": question.advance_automatically,
+                    "result_group": question.result_group,
+                }
+                question_data["existing_answers"] = question.get_existing_answers(
+                    assignment
+                )
+
+                if question.reminder_source:
+                    question_data["reminderSource"] = question.reminder_source.url
+                if question.hint_source:
+                    question_data["hintSource"] = question.hint_source.url
+                if question.challenge:
+                    question_data.update(
+                        {
+                            "challenge_id": question.challenge.id,
+                            "challenge_name": question.challenge.name,
+                            "challenge_text": question.challenge.text,
+                            "challenge_image_url": None,
+                            "challenge_sound_url": None,
+                        }
+                    )
+                    if question.challenge.sound:
+                        question_data["challenge_sound_url"] = (
+                            question.challenge.sound.url
+                        )
+                    if question.challenge.image:
+                        question_data["challenge_image_url"] = (
+                            question.challenge.image.url
+                        )
+
+                for answer in question.possible_answers.all().order_by("id"):
+                    answer_data = {
+                        "id": answer.id,
+                        "resource_id": answer.resource.id,
+                        "resource_name": answer.resource.name,
+                        "index": answer.index,
+                        "resource_image_url": (
+                            answer.resource.image.url if answer.resource.image else None
+                        ),
+                        "resource_sound_url": (
+                            answer.resource.sound.url if answer.resource.sound else None
+                        ),
+                        "resource_text": answer.resource.text,
+                        "correctness": answer.correctness,
+                    }
+                    question_data["possible_answers"].append(answer_data)
+
+                key = "practice" if practice else "questions"
+                part_data[key].append(question_data)
+
+        return part_data
+
+    def update_or_create_test_resources(self, questions_data, is_practice=False):
+        for order, data in enumerate(questions_data):
             # Initialize new dict to avoid carry-over from previous question
-            question = {"part": self, "is_practice": is_practice}
+            question = {}
 
             # Challenge resource (image)
             test_resource_kwargs = {"name": "challenge"}
-            test_resource_kwargs["image"] = data.get("image", None)
-            test_resource_kwargs["sound"] = data.get("sound", None)
-            test_resource_kwargs["text"] = data.get("text", None)
+
+            if "image" in data:
+                test_resource_kwargs["image"] = data["image"]
+            if "sound" in data:
+                test_resource_kwargs["sound"] = data["sound"]
+            if "text" in data:
+                test_resource_kwargs["text"] = data["text"]
+
             if "image" in data or "sound" in data or "text" in data:
                 question["challenge"], created = TestResource.objects.get_or_create(
                     **test_resource_kwargs
@@ -783,7 +784,9 @@ class TestPart(models.Model):
             if "result_group" in data:
                 question["result_group"] = data["result_group"]
 
-            question = TestQuestion.objects.create(**question)
+            question, _ = TestQuestion.objects.update_or_create(
+                part=self, is_practice=is_practice, order=order, defaults=question
+            )
 
             if "instruction_sequence" in data:
                 question.create_instruction_sequence(data["instruction_sequence"])
@@ -877,6 +880,13 @@ class TestPart(models.Model):
                         defaults={"correctness": correctness},
                     )
 
+        # Remove questions that no longer exist in the JSON definition.
+        # Questions are keyed by their order (0..len-1), so any question with an
+        # order beyond the current question count has been removed from the JSON.
+        self.questions.filter(
+            is_practice=is_practice, order__gte=len(questions_data)
+        ).delete()
+
     def set_data_breakdown_ranges(self, field_name, ranges: List[Tuple[int, int]]):
         if field_name not in (
             "answer_time_data_breakdown",
@@ -933,6 +943,12 @@ class TestQuestion(models.Model):
         on_delete=models.CASCADE,
         related_name="questions",
         null=False,
+    )
+    order = models.PositiveSmallIntegerField(
+        default=0,
+        blank=False,
+        null=False,
+        db_index=True,
     )
     challenge = models.ForeignKey(
         TestResource,
@@ -1012,7 +1028,7 @@ class TestQuestion(models.Model):
                     name=data["resource"], sound=data["resource"]
                 )
 
-            Instruction.objects.get_or_create(
+            Instruction.objects.update_or_create(
                 sequence=sequence,
                 order=order,
                 defaults={

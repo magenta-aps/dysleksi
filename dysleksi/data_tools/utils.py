@@ -5,8 +5,12 @@
 from dysleksi.models import TestPart, TestResource
 
 
-def create_wordreading_2_test(
-    test, questions_data, practice_questions_data=None, name="Ordlæsning 2"
+def update_or_create_wordreading_2_test(
+    test,
+    questions_data,
+    practice_questions_data=None,
+    name="Ordlæsning 2",
+    update_contents=True,
 ):
     reminder, created = TestResource.objects.get_or_create(
         name="resources/wordreading_2/Enhanced/Deltest/7e.2.mp3",
@@ -16,7 +20,7 @@ def create_wordreading_2_test(
         name="resources/wordreading_2/Enhanced/Deltest/7e.3.mp3",
         sound="resources/wordreading_2/Enhanced/Deltest/7e.3.mp3",
     )
-    part, created = TestPart.objects.get_or_create(
+    part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
             "timeout": 600000,  # 600 seconds / 10 minutes
@@ -28,19 +32,27 @@ def create_wordreading_2_test(
             "show_normscore_speed_plot": True,
         },
     )
-    if created:
-        part.create_test_resources(questions_data, False)
+
+    if update_contents:
+        part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
-            part.create_test_resources(practice_questions_data, True)
-    part.set_data_breakdown_ranges("answer_time_data_breakdown", [(None, 5), (5, None)])
-    part.set_data_breakdown_ranges(
-        "wordlength_data_breakdown", [(3, 4), (5, 6), (7, 8), (9, 11), (12, 15)]
-    )
-    test.parts.add(part)
+            part.update_or_create_test_resources(practice_questions_data, True)
+        part.set_data_breakdown_ranges(
+            "answer_time_data_breakdown", [(None, 5), (5, None)]
+        )
+        part.set_data_breakdown_ranges(
+            "wordlength_data_breakdown", [(3, 4), (5, 6), (7, 8), (9, 11), (12, 15)]
+        )
+    if created:
+        test.parts.add(part)
 
 
-def create_wordreading_1_test(
-    test, questions_data, practice_questions_data=None, name="Ordlæsning 1"
+def update_or_create_wordreading_1_test(
+    test,
+    questions_data,
+    practice_questions_data=None,
+    name="Ordlæsning 1",
+    update_contents=True,
 ):
 
     reminder, created = TestResource.objects.get_or_create(
@@ -52,7 +64,7 @@ def create_wordreading_1_test(
         sound="resources/wordreading_1/Enhanced/Deltest/5e.3.mp3",
     )
 
-    part, created = TestPart.objects.get_or_create(
+    part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
             "timeout": 360000,  # 360 seconds / 6 minutes
@@ -64,20 +76,27 @@ def create_wordreading_1_test(
             "show_normscore_speed_plot": True,
         },
     )
-    if created:
-        part.create_test_resources(questions_data, False)
+    if update_contents:
+        part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
-            part.create_test_resources(practice_questions_data, True)
+            part.update_or_create_test_resources(practice_questions_data, True)
 
-    part.set_data_breakdown_ranges("answer_time_data_breakdown", [(None, 5), (5, None)])
-    part.set_data_breakdown_ranges(
-        "wordlength_data_breakdown", [(3, 4), (5, 6), (7, 8), (9, 11), (12, 15)]
-    )
-    test.parts.add(part)
+        part.set_data_breakdown_ranges(
+            "answer_time_data_breakdown", [(None, 5), (5, None)]
+        )
+        part.set_data_breakdown_ranges(
+            "wordlength_data_breakdown", [(3, 4), (5, 6), (7, 8), (9, 11), (12, 15)]
+        )
+    if created:
+        test.parts.add(part)
 
 
-def create_fore_sound_test(
-    test, questions_data, practice_questions_data=None, name="Forlyd"
+def update_or_create_fore_sound_test(
+    test,
+    questions_data,
+    practice_questions_data=None,
+    name="Forlyd",
+    update_contents=True,
 ):
 
     reminder, created = TestResource.objects.get_or_create(
@@ -90,7 +109,7 @@ def create_fore_sound_test(
         sound="resources/fore_sound/Enhanced/Deltests/2e.3.mp3",
     )
 
-    part, created = TestPart.objects.get_or_create(
+    part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
             "timeout": 360000,  # 360 seconds / 6 minutes
@@ -101,15 +120,20 @@ def create_fore_sound_test(
             "completion_source": completion,
         },
     )
-    if created:
-        part.create_test_resources(questions_data, False)
+    if update_contents:
+        part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
-            part.create_test_resources(practice_questions_data, True)
-    test.parts.add(part)
+            part.update_or_create_test_resources(practice_questions_data, True)
+    if created:
+        test.parts.add(part)
 
 
-def create_letter_sound_test(
-    test, questions_data, practice_questions_data=None, name="Bogstavlyde"
+def update_or_create_letter_sound_test(
+    test,
+    questions_data,
+    practice_questions_data=None,
+    name="Bogstavlyde",
+    update_contents=True,
 ):
 
     reminder, created = TestResource.objects.get_or_create(
@@ -121,7 +145,7 @@ def create_letter_sound_test(
         sound="resources/letter_sound/Enhanced/Deltests/1e.3.mp3",
     )
 
-    part, created = TestPart.objects.get_or_create(
+    part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
             "timeout": 0,
@@ -132,15 +156,20 @@ def create_letter_sound_test(
             "completion_source": completion,
         },
     )
-    if created:
-        part.create_test_resources(questions_data, False)
+    if update_contents:
+        part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
-            part.create_test_resources(practice_questions_data, True)
-    test.parts.add(part)
+            part.update_or_create_test_resources(practice_questions_data, True)
+    if created:
+        test.parts.add(part)
 
 
-def create_letter_shape_test(
-    test, questions_data, practice_questions_data=None, name="Bogstavers form"
+def update_or_create_letter_shape_test(
+    test,
+    questions_data,
+    practice_questions_data=None,
+    name="Bogstavers form",
+    update_contents=True,
 ):
     reminder, created = TestResource.objects.get_or_create(
         name="resources/letter_shape/Enhanced/Deltests/3e.2.mp3",
@@ -159,7 +188,7 @@ def create_letter_shape_test(
         sound="resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.4.mp3",
     )
 
-    part, created = TestPart.objects.get_or_create(
+    part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
             "timeout": 0,
@@ -172,15 +201,21 @@ def create_letter_shape_test(
             "practice_wrong_feedback_source": practice_wrong_feedback,
         },
     )
-    if created:
-        part.create_test_resources(questions_data, False)
+    if update_contents:
+        part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
-            part.create_test_resources(practice_questions_data, True)
-    test.parts.add(part)
+            part.update_or_create_test_resources(practice_questions_data, True)
+
+    if created:
+        test.parts.add(part)
 
 
-def create_wordspelling_test(
-    test, questions_data, practice_questions_data=None, name="Ordstavning"
+def update_or_create_wordspelling_test(
+    test,
+    questions_data,
+    practice_questions_data=None,
+    name="Ordstavning",
+    update_contents=True,
 ):
     reminder, created = TestResource.objects.get_or_create(
         name="resources/wordspelling/Enhanced/Deltest/6e.2.mp3",
@@ -191,7 +226,7 @@ def create_wordspelling_test(
         sound="resources/wordspelling/Enhanced/Deltest/6e.3.mp3",
     )
 
-    part, created = TestPart.objects.get_or_create(
+    part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
             "timeout": 0,  # no timeout
@@ -202,15 +237,21 @@ def create_wordspelling_test(
             "completion_source": completion,
         },
     )
-    if created:
-        part.create_test_resources(questions_data, False)
+    if update_contents:
+        part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
-            part.create_test_resources(practice_questions_data, True)
-    test.parts.add(part)
+            part.update_or_create_test_resources(practice_questions_data, True)
+
+    if created:
+        test.parts.add(part)
 
 
-def create_nonwordspelling_test(
-    test, questions_data, practice_questions_data=None, name="Nonordstavning"
+def update_or_create_nonwordspelling_test(
+    test,
+    questions_data,
+    practice_questions_data=None,
+    name="Nonordstavning",
+    update_contents=True,
 ):
     reminder, created = TestResource.objects.get_or_create(
         name="resources/nonwordspelling/Enhanced/Deltests/4e.4.mp3",
@@ -221,7 +262,7 @@ def create_nonwordspelling_test(
         sound="resources/nonwordspelling/Enhanced/Deltests/4e.5.mp3",
     )
 
-    part, created = TestPart.objects.get_or_create(
+    part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
             "timeout": 0,  # no timeout
@@ -232,22 +273,28 @@ def create_nonwordspelling_test(
             "completion_source": completion,
         },
     )
-    if created:
-        part.create_test_resources(questions_data, False)
+
+    if update_contents:
+        part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
-            part.create_test_resources(practice_questions_data, True)
-    test.parts.add(part)
+            part.update_or_create_test_resources(practice_questions_data, True)
+    if created:
+        test.parts.add(part)
 
 
-def create_letter_pronunciation_test(
-    test, questions_data, practice_questions_data=None, name="Bogstavbenævnelse"
+def update_or_create_letter_pronunciation_test(
+    test,
+    questions_data,
+    practice_questions_data=None,
+    name="Bogstavbenævnelse",
+    update_contents=True,
 ):
     completion, created = TestResource.objects.get_or_create(
         name="resources/letter_pronunciation/Enhanced/9c.2.mp3",
         sound="resources/letter_pronunciation/Enhanced/9c.2.mp3",
     )
 
-    part, created = TestPart.objects.get_or_create(
+    part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
             "timeout": 0,
@@ -259,22 +306,28 @@ def create_letter_pronunciation_test(
             "show_answer_time_statistics": True,
         },
     )
-    if created:  # pragma: no branch
-        part.create_test_resources(questions_data, False)
+    if update_contents:
+        part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
-            part.create_test_resources(practice_questions_data, True)
-    test.parts.add(part)
+            part.update_or_create_test_resources(practice_questions_data, True)
+
+    if created:
+        test.parts.add(part)
 
 
-def create_word_pronunciation_test(
-    test, questions_data, practice_questions_data=None, name="Højtlæsning af ord"
+def update_or_create_word_pronunciation_test(
+    test,
+    questions_data,
+    practice_questions_data=None,
+    name="Højtlæsning af ord",
+    update_contents=True,
 ):
     completion, created = TestResource.objects.get_or_create(
         name="resources/word_pronunciation/Enhanced/Deltests/10c.2.mp3",
         sound="resources/word_pronunciation/Enhanced/Deltests/10c.2.mp3",
     )
 
-    part, created = TestPart.objects.get_or_create(
+    part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
             "timeout": 0,
@@ -285,22 +338,27 @@ def create_word_pronunciation_test(
             "show_answer_time_statistics": True,
         },
     )
-    if created:  # pragma: no branch
-        part.create_test_resources(questions_data, False)
+    if update_contents:
+        part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
-            part.create_test_resources(practice_questions_data, True)
-    test.parts.add(part)
+            part.update_or_create_test_resources(practice_questions_data, True)
+    if created:
+        test.parts.add(part)
 
 
-def create_nonsense_word_pronunciation_test(
-    test, questions_data, practice_questions_data=None, name="Højtlæsning af nonord"
+def update_or_create_nonsense_word_pronunciation_test(
+    test,
+    questions_data,
+    practice_questions_data=None,
+    name="Højtlæsning af nonord",
+    update_contents=True,
 ):
     completion, created = TestResource.objects.get_or_create(
         name="resources/nonsense_word_pronunciation/Enhanced/Deltests/11c.2.mp3",
         sound="resources/nonsense_word_pronunciation/Enhanced/Deltests/11c.2.mp3",
     )
 
-    part, created = TestPart.objects.get_or_create(
+    part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
             "timeout": 0,
@@ -314,15 +372,21 @@ def create_nonsense_word_pronunciation_test(
             "show_answer_time_statistics": True,
         },
     )
-    if created:  # pragma: no branch
-        part.create_test_resources(questions_data, False)
+    if update_contents:
+        part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
-            part.create_test_resources(practice_questions_data, True)
-    test.parts.add(part)
+            part.update_or_create_test_resources(practice_questions_data, True)
+
+    if created:
+        test.parts.add(part)
 
 
-def create_sentence_reading_test(
-    test, questions_data, practice_questions_data=None, name="Sætningslæsning"
+def update_or_create_sentence_reading_test(
+    test,
+    questions_data,
+    practice_questions_data=None,
+    name="Sætningslæsning",
+    update_contents=True,
 ):
     reminder, created = TestResource.objects.get_or_create(
         name="resources/sentence_reading/Enhanced/Deltests/8e.5.mp3",
@@ -333,7 +397,7 @@ def create_sentence_reading_test(
         sound="resources/sentence_reading/Enhanced/Deltests/8e.6.mp3",
     )
 
-    part, created = TestPart.objects.get_or_create(
+    part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
             "timeout": 8 * 60 * 1000,  # 8 minutes
@@ -344,11 +408,15 @@ def create_sentence_reading_test(
             "reminder": 15000,  # 15 seconds
         },
     )
-    if created:
-        part.create_test_resources(questions_data, False)
+    if update_contents:
+        part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
-            part.create_test_resources(practice_questions_data, True)
+            part.update_or_create_test_resources(practice_questions_data, True)
 
-    part.set_data_breakdown_ranges("answer_time_data_breakdown", [(None, 4), (4, None)])
-    part.set_data_breakdown_ranges("wordcount_data_breakdown", [(1, 2), (3, 4)])
-    test.parts.add(part)
+        part.set_data_breakdown_ranges(
+            "answer_time_data_breakdown", [(None, 4), (4, None)]
+        )
+        part.set_data_breakdown_ranges("wordcount_data_breakdown", [(1, 2), (3, 4)])
+
+    if created:
+        test.parts.add(part)
