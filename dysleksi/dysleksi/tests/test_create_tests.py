@@ -14,8 +14,8 @@ from django.core import serializers
 from django.core.management import call_command
 from django.test.utils import override_settings
 
-from dysleksi.management.commands.create_tests import answer_test
 from dysleksi.management.commands.import_test import remove_json_comments
+from dysleksi.management.commands.update_or_create_tests import answer_test
 from dysleksi.models import Class, QuestionResponse, Student, Test, TestPart, TestType
 from dysleksi.tests.base import DysleksiTest
 
@@ -40,8 +40,8 @@ class CreateTests(DysleksiTest):
 
         call_command("create_groups")
         call_command("create_dummy_classes_and_users")
-        call_command("create_tests")
-        call_command("create_tests", dummy=True, answer=True)
+        call_command("update_or_create_tests")
+        call_command("update_or_create_tests", dummy=True, answer=True)
 
         base_json_path = cls.instruction_path / "real"
 
@@ -174,7 +174,7 @@ class CreateTests(DysleksiTest):
         before = self.snapshot()
 
         # Run the create_tests management command again
-        call_command("create_tests")
+        call_command("update_or_create_tests")
 
         # Validate that NOTHING has changed
         after = self.snapshot()
@@ -183,7 +183,10 @@ class CreateTests(DysleksiTest):
             self.assertEqual(
                 before[label],
                 after[label],
-                msg=f"create_tests is not idempotent: {label} changed on re-run",
+                msg=(
+                    "update_or_create_tests is not idempotent: "
+                    f"{label} changed on re-run"
+                ),
             )
 
     def test_update_test(self):
@@ -213,7 +216,7 @@ class CreateTests(DysleksiTest):
         self.save_json_files()
 
         # Create tests again
-        call_command("create_tests")
+        call_command("update_or_create_tests")
 
         # 1. Assert that the timing changed
         self.assertEqual(
@@ -271,7 +274,7 @@ class CreateTests(DysleksiTest):
                 "Must specify --student for an individual test"
             )
 
-    @patch("dysleksi.management.commands.create_tests.call_command")
+    @patch("dysleksi.management.commands.update_or_create_tests.call_command")
     def test_answer_test_if_no_student(self, mock_call_command):
         Student.objects.all().delete()
         test = Test.objects.filter(test_type=TestType.INDIVIDUAL).first()
@@ -279,7 +282,7 @@ class CreateTests(DysleksiTest):
         answer_test(test)
         mock_call_command.assert_not_called()
 
-    @patch("dysleksi.management.commands.create_tests.call_command")
+    @patch("dysleksi.management.commands.update_or_create_tests.call_command")
     def test_answer_test_if_no_class(self, mock_call_command):
         Class.objects.all().delete()
         test = Test.objects.filter(test_type=TestType.GROUP).first()
