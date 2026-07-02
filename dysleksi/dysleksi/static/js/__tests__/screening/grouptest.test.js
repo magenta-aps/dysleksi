@@ -1096,7 +1096,7 @@ describe("GroupTestFlow", () => {
 
         const choices = document.getElementById("choices");
         // We expect this button to be the third button
-        // Because index = 2 in the json data
+        // Because it is the third element in the list
         expect(choices.children[2].innerHTML).toBe("hund");
     });
 

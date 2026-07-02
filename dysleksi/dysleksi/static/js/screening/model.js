@@ -326,16 +326,6 @@ export class Question {
         this.advanceAutomatically = data.advance_automatically;
         this.resultGroup = data.result_group;
         this.existingAnswers = data.existing_answers;
-
-        // Place answers with an index at their designated position
-        const withIndex = this.possibleAnswers.filter(
-            (a) => a.index !== null && a.index !== undefined,
-        );
-        for (const answer of withIndex) {
-            const current = this.possibleAnswers.indexOf(answer);
-            this.possibleAnswers.splice(current, 1);
-            this.possibleAnswers.splice(answer.index, 0, answer);
-        }
     }
 
     getAnswerClass() {

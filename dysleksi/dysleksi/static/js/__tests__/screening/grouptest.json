@@ -49,6 +49,26 @@
           "existing_answers": {},
           "possible_answers": [
             {
+              "id": 94,
+              "resource_id": 3,
+              "resource_name": "kat",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "kat",
+              "correctness": "wrong",
+              "index": 0
+            },
+            {
+              "id": 95,
+              "resource_id": 4,
+              "resource_name": "ko",
+              "resource_image_url": null,
+              "resource_sound_url": null,
+              "resource_text": "ko",
+              "correctness": "wrong",
+              "index": 1
+            },
+            {
               "id": 93,
               "resource_id": 2,
               "resource_name": "hund",
@@ -59,31 +79,14 @@
               "index": 2
             },
             {
-              "id": 94,
-              "resource_id": 3,
-              "resource_name": "kat",
-              "resource_image_url": null,
-              "resource_sound_url": null,
-              "resource_text": "kat",
-              "correctness": "wrong"
-            },
-            {
-              "id": 95,
-              "resource_id": 4,
-              "resource_name": "ko",
-              "resource_image_url": null,
-              "resource_sound_url": null,
-              "resource_text": "ko",
-              "correctness": "wrong"
-            },
-            {
               "id": 96,
               "resource_id": 5,
               "resource_name": "hest",
               "resource_image_url": null,
               "resource_sound_url": null,
               "resource_text": "hest",
-              "correctness": "wrong"
+              "correctness": "wrong",
+              "index": 3
             }
           ]
         },

@@ -213,6 +213,38 @@ class CreateTests(DysleksiTest):
         # 6. Remove a bunch of questions from a test
         self.json_data["sentence_reading"] = self.json_data["sentence_reading"][:10]
 
+        # 7. Change the order of multiple-choice answers
+        self.assertEqual(self.json_data["wordreading_2"][1]["wrong"][0], "ukaleq")
+        self.assertEqual(self.json_data["wordreading_2"][1]["wrong"][1], "umiaq")
+        self.assertEqual(
+            self.get_json_part("wordreading_2")["questions"][1]["possible_answers"][0][
+                "resource_text"
+            ],
+            "ukaleq",
+        )
+        self.assertEqual(
+            self.get_json_part("wordreading_2")["questions"][1]["possible_answers"][1][
+                "resource_text"
+            ],
+            "umiaq",
+        )
+        self.json_data["wordreading_2"][1]["wrong"][0] = "umiaq"
+        self.json_data["wordreading_2"][1]["wrong"][1] = "ukaleq"
+
+        # 8. Change the index of the correct answer
+        self.assertEqual(self.json_data["wordreading_2"][2]["correct_index"], 2)
+        self.assertEqual(
+            self.get_json_part("wordreading_2")["questions"][2]["possible_answers"][0][
+                "correctness"
+            ],
+            "wrong",
+        )
+        self.json_data["wordreading_2"][2]["correct_index"] = 0
+
+        # 9. Correct a typo
+        self.assertEqual(self.json_data["wordreading_2"][3]["wrong"][0], "appa")
+        self.json_data["wordreading_2"][3]["wrong"][0] = "apa"
+
         self.save_json_files()
 
         # Create tests again
@@ -242,6 +274,12 @@ class CreateTests(DysleksiTest):
                 ]
             ],
         )
+        self.assertEqual(
+            len(
+                self.get_json_part("wordreading_1")["questions"][0]["possible_answers"]
+            ),
+            4,
+        )
 
         # 4. Assert that the sound file was replaced
         self.assertEqual(
@@ -259,6 +297,42 @@ class CreateTests(DysleksiTest):
 
         # 6. Validate that the questions were removed
         self.assertEqual(len(self.get_json_part("sentence_reading")["questions"]), 10)
+
+        # 7. Validate that the multiple-choice answer order was updated
+        self.assertEqual(
+            self.get_json_part("wordreading_2")["questions"][1]["possible_answers"][0][
+                "resource_text"
+            ],
+            "umiaq",
+        )
+        self.assertEqual(
+            self.get_json_part("wordreading_2")["questions"][1]["possible_answers"][1][
+                "resource_text"
+            ],
+            "ukaleq",
+        )
+
+        # 8. Validate that the correct answer is the first answer now
+        self.assertEqual(
+            self.get_json_part("wordreading_2")["questions"][2]["possible_answers"][0][
+                "correctness"
+            ],
+            "correct",
+        )
+
+        # 9. Validate that the typo was corrected
+        self.assertEqual(
+            self.get_json_part("wordreading_2")["questions"][3]["possible_answers"][0][
+                "resource_text"
+            ],
+            "apa",
+        )
+        self.assertEqual(
+            len(
+                self.get_json_part("wordreading_2")["questions"][3]["possible_answers"]
+            ),
+            4,
+        )
 
     def test_answer_test(self):
 
