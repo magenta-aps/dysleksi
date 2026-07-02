@@ -96,41 +96,6 @@
         </div>
     </fieldset>
 </form>
-
-<script>
-// Clear selections from hidden checkboxes and dropdowns.
-// To avoid that they are submitted when sending the form.
-(function () {
-    const modal = document.getElementById("{{ modal_id }}");
-    if (modal === null) {
-        return;
-    }
-
-    function clearFields(container) {
-        if (container === null) {
-            return;
-        }
-        for (const select of container.querySelectorAll("select")) {
-            select.value = "";
-        }
-        for (const checkable of container.querySelectorAll(
-            "input[type='checkbox'], input[type='radio']",
-        )) {
-            checkable.checked = false;
-        }
-    }
-
-    for (const radio of modal.querySelectorAll("input[name='is_test_part']")) {
-        radio.addEventListener("change", (evt) => {
-            if (evt.target.value === "test") {
-                clearFields(modal.querySelector(".test-part-choice"));
-            } else if (evt.target.value === "part") {
-                clearFields(modal.querySelector(".test-choice"));
-            }
-        });
-    }
-})();
-</script>
 {% endblock %}
 
 {% block modal_footer %}

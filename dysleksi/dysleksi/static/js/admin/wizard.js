@@ -299,9 +299,23 @@ export class Wizard {
                 if (all[0] === value) {
                     for (const elem of elems) {
                         elem.classList.toggle("d-none", hide);
+                        if (hide) {
+                            this.#clearFields(elem);
+                        }
                     }
                 }
             }
+        }
+    }
+
+    #clearFields(container) {
+        for (const select of container.querySelectorAll("select")) {
+            select.value = "";
+        }
+        for (const checkable of container.querySelectorAll(
+            "input[type='checkbox'], input[type='radio']",
+        )) {
+            checkable.checked = false;
         }
     }
 }

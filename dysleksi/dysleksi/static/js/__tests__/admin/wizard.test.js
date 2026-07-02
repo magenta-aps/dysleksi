@@ -26,7 +26,13 @@ const mockDoc = `
                 <div class="d-none example1">
                     <input type="text" name="invisible" id="invisible" />
                 </div>
-                <div class="example2"></div>
+                <div class="example2">
+                    <select name="clearme" id="clearme">
+                        <option value="">-</option>
+                        <option value="1" selected>One</option>
+                    </select>
+                    <input type="checkbox" name="clearme-check" id="clearme-check" checked />
+                </div>
                 <div class="test-choice"></div>
                 <div class="test-part-choice"></div>
             </fieldset>
@@ -279,6 +285,17 @@ describe("Wizard", () => {
         no.dispatchEvent(new Event("click", { bubbles: true }));
         const example2 = wizard.domElem.querySelector("div.example2");
         expect(example2.classList).toContain("d-none");
+    });
+
+    it("clears fields in containers hidden via 'data-toggle'", () => {
+        const wizard = getInstance();
+        const no = wizard.domElem.querySelector("input[type='radio'][value='no']");
+        no.checked = true;
+        no.dispatchEvent(new Event("click", { bubbles: true }));
+        const select = wizard.domElem.querySelector("select#clearme");
+        const checkbox = wizard.domElem.querySelector("input#clearme-check");
+        expect(select.value).toBe("");
+        expect(checkbox.checked).toBeFalsy();
     });
 });
 
