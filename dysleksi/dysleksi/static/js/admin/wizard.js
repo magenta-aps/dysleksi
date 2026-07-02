@@ -15,6 +15,11 @@ export class Wizard {
         this.hideBtns = this.domElem.querySelectorAll("button[data-hide]");
         this.toggleElems = this.domElem.querySelectorAll("[data-toggle]");
 
+        this.testChoice = this.domElem.querySelector(".test-choice");
+        this.testPartChoice = this.domElem.querySelector(".test-part-choice");
+        this.startDateTime = this.domElem.querySelector(".start-datetime");
+        this.endDateTime = this.domElem.querySelector(".end-datetime");
+
         this.currentStep = 1;
         this.totalSteps = this.domElem.querySelectorAll("fieldset").length;
 
@@ -157,6 +162,15 @@ export class Wizard {
     #reset() {
         // Reset view model
         this.currentStep = 1;
+
+        // Make sure the start- and end rows are always hidden
+        this.startDateTime.classList.add("d-none");
+        this.endDateTime.classList.add("d-none");
+
+        // Always reset to "Test" selected, "Deltest" hidden
+        this.testChoice.classList.remove("d-none");
+        this.testPartChoice.classList.add("d-none");
+
         // Update UI
         this.#update();
         // Reset form fields if values have been entered/selected
