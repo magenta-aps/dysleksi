@@ -32,6 +32,9 @@ const mockDoc = `
                         <option value="1" selected>One</option>
                     </select>
                     <input type="checkbox" name="clearme-check" id="clearme-check" checked />
+                    <div class="d-none">
+                        <input type="datetime-local" name="clearme-datetime" id="clearme-datetime" />
+                    </div>
                 </div>
                 <div class="test-choice"></div>
                 <div class="test-part-choice"></div>
@@ -290,12 +293,15 @@ describe("Wizard", () => {
     it("clears fields in containers hidden via 'data-toggle'", () => {
         const wizard = getInstance();
         const no = wizard.domElem.querySelector("input[type='radio'][value='no']");
-        no.checked = true;
-        no.dispatchEvent(new Event("click", { bubbles: true }));
         const select = wizard.domElem.querySelector("select#clearme");
         const checkbox = wizard.domElem.querySelector("input#clearme-check");
+        const datetime = wizard.domElem.querySelector("input#clearme-datetime");
+        datetime.value = "2026-01-01T12:00";
+        no.checked = true;
+        no.dispatchEvent(new Event("click", { bubbles: true }));
         expect(select.value).toBe("");
         expect(checkbox.checked).toBeFalsy();
+        expect(datetime.value).toBe("");
     });
 });
 
