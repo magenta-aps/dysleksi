@@ -713,7 +713,7 @@ class TestPart(models.Model):
                             question.challenge.image.url
                         )
 
-                for answer in question.possible_answers.all().order_by("id"):
+                for answer in question.possible_answers.all().order_by("index"):
                     answer_data = {
                         "id": answer.id,
                         "resource_id": answer.resource.id,
@@ -788,10 +788,13 @@ class TestPart(models.Model):
                 part=self, is_practice=is_practice, order=order, defaults=question
             )
 
+            kept_answer_pks = set()
+
             if "instruction_sequence" in data:
                 question.create_instruction_sequence(data["instruction_sequence"])
 
             # Correct answer
+            correct_index = data.get("correct_index")
             if data.get("correct"):
                 correct_answer = data["correct"]
                 test_resource_kwargs = {}
@@ -808,12 +811,15 @@ class TestPart(models.Model):
                     **test_resource_kwargs
                 )
 
-                PossibleAnswer.objects.get_or_create(
+                pa, _ = PossibleAnswer.objects.update_or_create(
                     question=question,
                     resource=correct_resource,
-                    defaults={"correctness": Correctness.CORRECT},
-                    index=data.get("correct_index"),
+                    defaults={
+                        "correctness": Correctness.CORRECT,
+                        "index": correct_index,
+                    },
                 )
+                kept_answer_pks.add(pa.pk)
 
             # Almost correct answer
             if data.get("partially_correct"):
@@ -821,15 +827,16 @@ class TestPart(models.Model):
                     partially_correct_resource, _ = TestResource.objects.get_or_create(
                         name=answer, text=answer
                     )
-                    PossibleAnswer.objects.get_or_create(
+                    pa, _ = PossibleAnswer.objects.update_or_create(
                         question=question,
                         resource=partially_correct_resource,
                         defaults={"correctness": Correctness.PARTIAL},
                     )
+                    kept_answer_pks.add(pa.pk)
 
             # Wrong answers
             if data.get("wrong"):
-                for wrong_answer in data["wrong"]:
+                for wrong_answer_index, wrong_answer in enumerate(data["wrong"]):
 
                     test_resource_kwargs = {}
 
@@ -845,13 +852,27 @@ class TestPart(models.Model):
                         **test_resource_kwargs
                     )
 
-                    PossibleAnswer.objects.get_or_create(
+                    if (
+                        correct_index is not None
+                        and wrong_answer_index >= correct_index
+                    ):
+                        possible_answer_index = wrong_answer_index + 1
+                    else:
+                        possible_answer_index = wrong_answer_index
+
+                    pa, _ = PossibleAnswer.objects.update_or_create(
                         question=question,
                         resource=wrong_resource,
-                        defaults={"correctness": Correctness.WRONG},
+                        defaults={
+                            "correctness": Correctness.WRONG,
+                            "index": possible_answer_index,
+                        },
                     )
+                    kept_answer_pks.add(pa.pk)
             if data.get("set1") and data.get("set2"):
-                for possible_answer in data["set1"] + data["set2"]:
+                for possible_answer_index, possible_answer in enumerate(
+                    data["set1"] + data["set2"]
+                ):
                     resource, created = TestResource.objects.get_or_create(
                         text=possible_answer,
                         name=(
@@ -874,11 +895,18 @@ class TestPart(models.Model):
                     else:
                         correctness = Correctness.WRONG
 
-                    PossibleAnswer.objects.get_or_create(
+                    pa, _ = PossibleAnswer.objects.update_or_create(
                         question=question,
                         resource=resource,
-                        defaults={"correctness": correctness},
+                        defaults={
+                            "correctness": correctness,
+                            "index": possible_answer_index,
+                        },
                     )
+                    kept_answer_pks.add(pa.pk)
+
+            # Delete all orphaned answers linked to this question
+            question.possible_answers.exclude(pk__in=kept_answer_pks).delete()
 
         # Remove questions that no longer exist in the JSON definition.
         # Questions are keyed by their order (0..len-1), so any question with an
