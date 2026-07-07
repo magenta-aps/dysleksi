@@ -346,12 +346,10 @@
                 "element": "next"
             },
             {
-                // Sungiusarnermi taamaallaat akissutit eqqortuunersoq paasitinneqartassaatit...
-                // Bogstavlyden vil kun blive angivet under opgaverne.
-                // Du vil få besked, hvis du vælger forkert under kun øveopgaverne.
+                // Du skal vælge det bogstav, der passer til den bogstavlyd, du hører.
                 "action": "playSound",
                 "delayAfter": 1250,
-                "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1c.1.mp3"
+                "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1c.2 (ny).mp3"
             },
 
             // Øveopgave 1 vises tydeligt – øveopgaverne starter.
