@@ -137,8 +137,8 @@ def update_or_create_letter_sound_test(
 ):
 
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/letter_sound/Enhanced/Deltests/1e.2.mp3",
-        sound="resources/letter_sound/Enhanced/Deltests/1e.2.mp3",
+        name="resources/letter_sound/Enhanced/Deltests/1e.2 (ny).mp3",
+        sound="resources/letter_sound/Enhanced/Deltests/1e.2 (ny).mp3",
     )
     completion, created = TestResource.objects.get_or_create(
         name="resources/letter_sound/Enhanced/Deltests/1e.3.mp3",
