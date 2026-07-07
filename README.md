@@ -67,6 +67,12 @@ To run type checks run:
 docker exec dysleksi-web mypy --config ../mypy.ini dysleksi/ --cache-dir=/dev/null
 ```
 
+To update a test run:
+
+```shell
+docker exec dysleksi-web python manage.py update_or_create_tests
+```
+
 ## Running a dev environment on an iPad
 To run the application on an iPad, start an avahi-daemon on your host PC:
 

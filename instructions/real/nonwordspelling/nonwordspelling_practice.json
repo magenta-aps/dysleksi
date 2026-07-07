@@ -131,10 +131,10 @@
         "element": "question-challenge"
       },
       {
-        // Du vil høre nonordet du skal skrive, f.eks.
+        // Du vil høre nonordet, f.eks.
         "action": "playSound",
         "delayAfter": 500,
-        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.4.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.4 (Ny).mp3"
       },
       {
         "action": "highlight",
@@ -336,9 +336,9 @@
             "delayAfter": 0
         },
         {
-            // Du skal skrive det nonord der bliver angivet.
+            // Du skal skrive det nonord, du hører, så godt du kan.
             "action": "playSound",
-            "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4c.2.mp3",
+            "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4c.2 (Ny).mp3",
             "delayAfter": 1250
         },
         {
