@@ -280,7 +280,11 @@ export class Wizard {
             const cls = evt.target.dataset[type];
             const elems = this.domElem.querySelectorAll("." + cls);
             for (const elem of elems) {
-                elem.classList.toggle("d-none", type === "hide");
+                const hide = type === "hide";
+                elem.classList.toggle("d-none", hide);
+                if (hide) {
+                    this.#clearFields(elem);
+                }
             }
         };
     }
@@ -316,6 +320,11 @@ export class Wizard {
             "input[type='checkbox'], input[type='radio']",
         )) {
             checkable.checked = false;
+        }
+        for (const datetime of container.querySelectorAll(
+            "input[type='datetime-local']",
+        )) {
+            datetime.value = "";
         }
     }
 }
