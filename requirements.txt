@@ -82,7 +82,7 @@ coverage==7.15.0
 freezegun==1.5.5
 
 ## Code typing check
-mypy==2.1.0
+mypy==2.2.0
 
 ## test traceback for parallel tests
 tblib==3.2.2
