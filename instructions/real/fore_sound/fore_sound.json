@@ -8,6 +8,57 @@
             "resources/fore_sound/Opgave/Træ-stykke.jpg",
             "resources/fore_sound/Opgave/Kage.jpg",
             "resources/fore_sound/Opgave/Dør.jpg"
+        ],
+        "continue_when_instruction_is_complete": false,
+        "instruction_sequence": [
+          // Skjul næste-knappen
+          {
+            "action": "hide",
+            "element": "next",
+            "delayAfter": 0
+          },
+          // Opgave 1 er skjult
+          {
+            "action": "hide",
+            "element": "question-challenge",
+            "delayAfter": 0
+          },
+          {
+            "action": "hide",
+            "element": "choices",
+            "delayAfter": 0
+          },
+    
+          {
+            // Du skal svare opgaverne så godt du kan.
+            "action": "playSound",
+            "delayAfter": 1250,
+            "resource": "resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.1.mp3"
+          },
+          {
+            // Nu får du ikke længere at vide om du har svaret rigtigt.
+            "action": "playSound",
+            "delayAfter": 1250,
+            "resource": "resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.mp3"
+          },
+
+          // Opgave 1 fader ind
+          {
+            "action": "show",
+            "element": "question-challenge",
+            "delayAfter": 0
+          },
+          {
+            "action": "show",
+            "element": "choices",
+            "delayAfter": 0
+          },
+          {
+            // Du starter nu.
+            "action": "playSound",
+            "delayAfter": 1250,
+            "resource": "resources/fore_sound/Enhanced/Deltests/2e.3.mp3"
+          }
         ]
     },
     {
