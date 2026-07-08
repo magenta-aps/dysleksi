@@ -5,17 +5,69 @@
     "correct": "iki",
     "partially_correct": ["igi", "iga", "ikki", "ike", "ekke", "eke", "ige"],
     "reminder": 15000,
-    // TOOD: specify new audio file "6e.2a" as `reminder_source` when we receive it
     "continue_when_instruction_is_complete": false,
     "instruction_sequence": [
       {
-        // Aallartipputit.
-        // Du starter nu.
-        // (Lånt fra "Nonordstavning")
+           "action": "hide",
+           "delayAfter": 0,
+           "element": "free-text-field"
+      },
+      {
+           "action": "hide",
+           "delayAfter": 0,
+           "element": "free-text-erase-btn"
+      },
+      {
+           "action": "hide",
+           "delayAfter": 0,
+           "element": "free-text-buttons"
+      },
+      {
+           "action": "hide",
+           "delayAfter": 0,
+           "element": "question-challenge"
+      },
+      {
+           "action": "hide",
+           "delayAfter": 0,
+           "element": "next"
+      },
+      {
         "action": "playSound",
-        //"resource": "resources/wordspelling/Enhanced/Deltest/6e.1.mp3",
-        "resource": "resources/nonwordspelling/Enhanced/Deltests/4e.3.mp3",
+        "resource": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6d.5 (Ny).mp3",
+        "delayAfter": 1250
+      },
+
+      {
+        // Du starter nu.
+        "action": "playSound",
+        "resource": "resources/wordspelling/Enhanced/Deltest/6e.1 (Ny).mp3",
         "delayAfter": 0
+      },
+      {
+           "action": "show",
+           "delayAfter": 0,
+           "element": "free-text-field"
+      },
+      {
+           "action": "show",
+           "delayAfter": 0,
+           "element": "free-text-erase-btn"
+      },
+      {
+           "action": "show",
+           "delayAfter": 0,
+           "element": "free-text-buttons"
+      },
+      {
+           "action": "show",
+           "delayAfter": 0,
+           "element": "question-challenge"
+      },
+      {
+           "action": "show",
+           "delayAfter": 0,
+           "element": "next"
       }
     ]
   },

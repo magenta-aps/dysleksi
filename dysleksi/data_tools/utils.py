@@ -218,8 +218,8 @@ def update_or_create_wordspelling_test(
     update_contents=True,
 ):
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/wordspelling/Enhanced/Deltest/6e.2.mp3",
-        sound="resources/wordspelling/Enhanced/Deltest/6e.2.mp3",
+        name="resources/wordspelling/Enhanced/Deltest/6e.2 (Ny).mp3",
+        sound="resources/wordspelling/Enhanced/Deltest/6e.2 (Ny).mp3",
     )
     completion, created = TestResource.objects.get_or_create(
         name="resources/wordspelling/Enhanced/Deltest/6e.3.mp3",

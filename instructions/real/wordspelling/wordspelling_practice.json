@@ -82,7 +82,6 @@
         "delayAfter": 2000,
         "resource": "resources/wordspelling/Enhanced/Instruktion/6b.1.mp3"
       },
-      // 6b.2
       {
         "action": "fadeOut",
         "delayAfter": 0,
@@ -114,11 +113,15 @@
         "delayAfter": 500,
         "resource": "resources/wordspelling/Enhanced/Instruktion/6b.2.mp3"
       },
-      // 6b.3 - fremhæv tastaturet
       {
         "action": "fadeIn",
         "delayAfter": 0,
         "element": "free-text-buttons"
+      },
+      {
+        "action": "fadeIn",
+        "delayAfter": 0,
+        "element": "free-text-erase-btn"
       },
       {
         "action": "highlight",
@@ -126,22 +129,10 @@
         "element": "free-text-buttons"
       },
       {
-        // "Her er dem, du skal klikke på, når du skriver." / "Allannermi toortagassat."
+        // Her er dem, du skal klikke på, når du skriver.
         "action": "playSound",
         "delayAfter": 750,
         "resource": "resources/wordspelling/Enhanced/Instruktion/6b.3.mp3"
-      },
-      {
-        // "Hvad er det, du skal bruge, når du skriver." / "Allannermi atugassat."
-        "action": "playSound",
-        "delayAfter": 1250,
-        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.3x.mp3"
-      },
-      // 6b.4
-      {
-        "action": "fadeOut",
-        "delayAfter": 0,
-        "element": "next"
       },
       {
         "action": "fadeIn",
@@ -149,50 +140,32 @@
         "element": "question-challenge"
       },
       {
-        // "Du vil høre ordet du skal skrive, f.eks." / "Oqaaseq allatassat ilinnut tusaatinneqartassaaq, soorlu"
-        "action": "playSound",
-        "delayAfter": 500,
-        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.4.mp3"
-      },
-      // 6b.5
-      {
-        // "tui"
-        "action": "playSound",
-        "delayAfter": 1250,
-        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.5.mp3"
-      },
-
-      // TODO: add 6b.5a - requires new audio file - in this step the challenge should appear in a non-faded state
-
-      // 6b.7
-      //   Tastaturet fremhæves. Når talen er færdig, skal systemet skrive ‘tui’ og vise bogstaverne tydeligt
-      //   og langsomt.
-      //
-      // Note that 6b.7 has been moved to appear before 6b.6!
-      {
-        // "Du skal skrive det ord, du hører, ved at klikke på bogstaverne"
-        // "Taava oqaaseq tusaasat, naqinnerit toortarlugit imatut allattassavat"
-        "action": "playSound",
-        "delayAfter": 1500,
-        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.7.mp3"
-      },
-      // Simuler tryk på lydikon (oplæser 'tui')
-      {
-        "action": "clickButton",
-        "delayAfter": 1500,
-        "element": "challenge-sound-btn"
-      },
-      // Fade tastaturet ind
-      {
-        "action": "fadeIn",
-        "element": "free-text-buttons",
-        "delayAfter": 1500
-      },
-      // Fade inputfeltet ind
-      {
         "action": "fadeIn",
         "delayAfter": 0,
         "element": "free-text-field"
+      },
+      {
+        // Du vil høre ordet, f.eks.
+        "action": "playSound",
+        "delayAfter": 500,
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.4 (Ny).mp3"
+      },
+      {
+        "action": "clickButton",
+        "delayAfter": 1250,
+        "element": "challenge-sound-btn"
+      },
+      {
+        // Du
+        "action": "playSound",
+        "delayAfter": 1250,
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.5a (Ny).mp3"
+      },
+      {
+        // Så skal du skrive det norord du hører, ved at klikke på bogstaverne, således..
+        "action": "playSound",
+        "delayAfter": 1250,
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.5b (Ny).mp3"
       },
       // Systemet trykker på bogstaverne t, u, i
       {
@@ -210,49 +183,61 @@
         "delayAfter": 2500,
         "element": "free-text-i"
       },
-
-      // 6b.6
       {
-        // "Du skal skrive det ord, du hører" / "Oqaaseq tusaalluanngitsoorukku"
+        // Hvis du ikke helt forstod ordet,
         "action": "playSound",
         "delayAfter": 0,
         "resource": "resources/wordspelling/Enhanced/Instruktion/6b.6-00.mp3"
       },
       {
         "action": "highlight",
-        "element": "question-challenge",
-        "delayAfter": 0
+        "delayAfter": 0,
+        "element": "question-challenge"
       },
       {
-        // "ved at klikke på bogstaverne." / "nipinut tusarnaarut toorlugu [...]"
-        "action": "playSound",
-        "delayAfter": 1250,
-        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.6-01.mp3"
-      },
-
-      // 6b.8
-      //   Ny tom opgave vises
-      //   Bogstaver,backspace og skrivefelt fremhæves samtidig.
-      //   1. Når talen er angivet -> skrives sui
-      //   2. Når toortarlugu er angivet -> trykkes der på backspace – så alle tui slettes fra højre side
-      //   3. Når talen er færdig, skrives tui
-      //
-      // TODO: indarbejd de nye lydfiler 6b.8a, 6b.8b, 6b.8c, 6b.8d fremfor vores egen opklipning i
-      // 6b.8-00, 6b.8-01, 6b.8-02, når vi får disse nye filer.
-      {
-        // "Hvis du kommer til at skrive forkert, f.eks. sui" / "Kukkullutit, soorlu sui allattoorukku"
+        // Kan du trykke på lydikonet for at høre det igen. Prøv at trykke på det.
         "action": "playSound",
         "delayAfter": 0,
-        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.8-00.mp3"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.6-01.mp3"
       },
-      // Slet det "indtastede" fra trin 6b.7
+      {
+        "action": "waitForUserClick",
+        "element": "challenge-sound-btn",
+        "delayAfter": 1250
+      },
       {
         "action": "removeText",
         "element": "free-text-field",
         "data": "3",  // Fjern 3 tegn fra input-felt
         "delayAfter": 750
       },
-      // Skriv s, u, i
+      {
+        "action": "highlight",
+        "delayAfter": 0,
+        "element": "free-text-field"
+      },
+      {
+        "action": "highlight",
+        "delayAfter": 0,
+        "element": "free-text-buttons"
+      },
+      {
+        "action": "highlight",
+        "delayAfter": 0,
+        "element": "free-text-erase-btn"
+      },
+      {
+        // Hvis du kommer til at fejle, kan du ændre det, du har skrevet,
+        "action": "playSound",
+        "delayAfter": 1250,
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.7 (Ny).mp3"
+      },
+      {
+        // F.eks.: Hvis du kommer til at skrive sui,
+        "action": "playSound",
+        "delayAfter": 750,
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.8 (Ny).mp3"
+      },
       {
         "action": "clickButton",
         "delayAfter": 1250,
@@ -269,21 +254,16 @@
         "element": "free-text-i"
       },
       {
-        // "kan du slette de skrevne ved at trykke på backspace" / "piiaat toortarlugu allatat piiarsinnaavat"
+        // kan du slette det, du har skrevet, ved at trykke på backspace,
         "action": "playSound",
         "delayAfter": 0,
-        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.8-01.mp3"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.9 (Ny).mp3"
       },
-      // Fade backspace-knappen ind
-      {
-        "action": "fadeIn",
-        "delayAfter": 1500,
-        "element": "free-text-erase-btn"
-      },
+
       // Sæt markøren ved 'i'
       {
         "action": "setMarker",
-        "delayAfter": 1250,
+        "delayAfter": 750,
         "element": "free-text-field",
         "data": "3"
       },
@@ -305,13 +285,14 @@
         "delayAfter": 2500,
         "element": "free-text-erase-btn"
       },
-      // Skriv t, u, i
+
       {
-        // "og skrive det rigtige tui" / "eqqortorlu tui allallugu"
+        // og skrive det rigtige qa
         "action": "playSound",
-        "delayAfter": 0,
-        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.8-02.mp3"
+        "delayAfter": 750,
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.10 (Ny).mp3"
       },
+      // Skriv t, u, i
       {
         "action": "clickButton",
         "delayAfter": 1250,
@@ -328,67 +309,17 @@
         "element": "free-text-i"
       },
 
-      // 6b.9 - opgaven vises tydeligt
       {
-        "action": "fadeIn",
-        "delayAfter": 0,
-        "element": "free-text-field"
-      },
-      {
-        "action": "fadeIn",
-        "delayAfter": 0,
-        "element": "free-text-buttons"
-      },
-      {
-        "action": "fadeIn",
-        "delayAfter": 0,
-        "element": "free-text-erase-btn"
-      },
-      {
-        "action": "fadeIn",
-        "delayAfter": 0,
-        "element": "question-challenge"
-      },
-      {
-        // Nalulertooruit eqqoriaallutit allassinnaavutit.
         // Du må gerne gætteskrive, hvis du er i tvivl.
-        // (Lånt fra "Nonordstavning")
         "action": "playSound",
-        "delayAfter": 1500,
-        //"resource": "resources/wordspelling/Enhanced/Instruktion/6b.9.mp3"
-        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.13.mp3"
+        "delayAfter": 0,
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.11 (Ny).mp3"
       },
-
-      // Note: 6b.10 has been removed by customer request
-//      // 6b.10
-//      // Slet det "indtastede" ('tui')
-//      {
-//        "action": "removeText",
-//        "element": "free-text-field",
-//        "data": "3",  // Fjern 3 tegn fra input-felt
-//        "delayAfter": 0
-//      },
-//      {
-//        // "Men, man kan først trykke på pilen efter man har skrevet et bogstav"
-//        // "Aatsaalli naqinnermik allataqareeruit suliassap tullianukarsinnaavutit."
-//        // "Aatsaalli naqinnermik ataatsimik allataqareeruit suliassap tullianukarsinnaavuti"
-//        "action": "playSound",
-//        "delayAfter": 750,
-//        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.10.mp3"
-//      },
-//      {
-//        "action": "playSound",
-//        "delayAfter": 1250,
-//        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.10x.mp3"
-//      },
-
-      // 6b.11 - Pilen fremhæves og klikkes når “toorlugu” angives
       {
-        // Aatsaat allataqareeraangavit tikkuut ...
         // Når du har skrevet ...
         "action": "playSound",
         "delayAfter": 0,
-        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.11-00.mp3"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.11a (Ny)-00.mp3"
       },
       {
         "action": "fadeIn",
@@ -401,14 +332,12 @@
         "delayAfter": 0
       },
       {
-        // ...  toorlugu suliassap tullianut ingerlaqqittassaatit.
         // ... går du videre til næste opgave ved at trykke på pilen
         "action": "playSound",
         "delayAfter": 1250,
-        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.11-01.mp3"
+        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.11a (Ny)-01.mp3"
       },
 
-      // 6b.12 - opgaven fader ud
       {
         // "Det er sådan, du skal skrive" / "Tassa taamatut suliaqassaatit"
         "action": "playSound",
@@ -435,16 +364,11 @@
         "delayAfter": 750,
         "element": "free-text-erase-btn"
       },
-
-      // 6b.13
       {
-        // Massakkut nammineq sungiusaatinik misiliilerputit.
         // Nu skal du selv prøve øveopgaverne.
-        // (Lånt fra "Nonordstavning")
         "action": "playSound",
         "delayAfter": 750,
-        //"resource": "resources/wordspelling/Enhanced/Instruktion/6b.13.mp3"
-        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.16.mp3"
+        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.13.mp3"
       },
 
       // 6b.14 - grøn knap vises
@@ -459,17 +383,6 @@
         "delayAfter": 1250,
         "resource": "resources/wordspelling/Enhanced/Instruktion/6b.14.mp3"
       }
-
-      // 6b.15 - removed by customer request
-//      {
-//        // "Ordet, som du skal skrive, vil kun blive angivet under øveopgaverne."
-//        // "Sungiusarnermi oqaaseq allatassat taamaallaat taaneqartassaaq."
-//        "action": "playSound",
-//        "delayAfter": 1250,
-//        "resource": "resources/wordspelling/Enhanced/Instruktion/6b.15.mp3"
-//      }
-
-      // TODO: add 6b.15a when we receive this audio file - show question in faded out state
     ]
   },
   // 6c.1-6c.4 - øveopgave 1: ulu
@@ -477,22 +390,60 @@
     "sound": "resources/wordspelling/Øveopgave/6c.2.mp3",
     "question_type": "free_text",
     "correct": "ulu",
-    //"reminder": 15000,
-    //"reminder_source": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6c.3.mp3",
     "continue_when_instruction_is_complete": false,
     "instruction_sequence": [
-      // TODO: make sure that question is now faded in
+      {
+           "action": "fadeOut",
+           "delayAfter": 0,
+           "element": "free-text-field"
+      },
+      {
+           "action": "fadeOut",
+           "delayAfter": 0,
+           "element": "free-text-erase-btn"
+      },
+      {
+           "action": "fadeOut",
+           "delayAfter": 0,
+           "element": "free-text-buttons"
+      },
+      {
+           "action": "fadeOut",
+           "delayAfter": 0,
+           "element": "question-challenge"
+      },
+      {
+        // Du skal skrive det ord der bliver angivet.
+        "action": "playSound",
+        "resource": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6c.7a (Ny).mp3",
+        "delayAfter": 1250
+      },
+
+      {
+           "action": "fadeIn",
+           "delayAfter": 0,
+           "element": "free-text-field"
+      },
+      {
+           "action": "fadeIn",
+           "delayAfter": 0,
+           "element": "free-text-erase-btn"
+      },
+      {
+           "action": "fadeIn",
+           "delayAfter": 0,
+           "element": "free-text-buttons"
+      },
+      {
+           "action": "fadeIn",
+           "delayAfter": 0,
+           "element": "question-challenge"
+      },
       {
         // "Du starter nu" / "Aallartipputit"
         "action": "playSound",
         "resource": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6c.1.mp3",
         "delayAfter": 1250
-      },
-      {
-        // Oplæs "ulu" (simuler tryk på knappen)
-        "action": "clickButton",
-        "element": "challenge-sound-btn",
-        "delayAfter": 0
       }
     ]
   },
@@ -501,23 +452,7 @@
     "sound": "resources/wordspelling/Øveopgave/6c.6.mp3",
     "question_type": "free_text",
     "correct": "matu",
-    //"reminder": 15000,
-    //"reminder_source": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6c.7.mp3",
-    "continue_when_instruction_is_complete": false,
-    "instruction_sequence": [
-      // Indsættes her for at forsinke næste trin
-      {
-        "action": "setRepeatButtonDestination",
-        "data": 1,
-        "delayAfter": 1250
-      },
-      {
-        // Oplæs "matu" (simuler tryk på knappen)
-        "action": "clickButton",
-        "element": "challenge-sound-btn",
-        "delayAfter": 0
-      }
-    ]
+    "continue_when_instruction_is_complete": false
   },
   // 6d - outro og forklaring på blå knap og gentag-knap
   {
@@ -537,7 +472,6 @@
         // Her kan du se to knapper.
         // (Lånt fra "Nonordstavning")
         "action": "playSound",
-        //"resource": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6d.1.mp3",
         "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.1.mp3",
         "delayAfter": 1250
       },
