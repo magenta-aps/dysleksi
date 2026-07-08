@@ -421,6 +421,15 @@ h6 {
   border: 1px solid $blue-normal;
   background: $blue-lightest;
 }
+
+.inline-button {
+  color: $blue-darkest;
+
+  &:hover {
+    background: $blue-lightest;
+    color: $blue-darkest;
+  }
+}
 .btn i.ph,
 .btn i.ph-fill {
   line-height: var(--bs-body-line-height);
