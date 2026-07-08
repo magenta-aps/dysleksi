@@ -39,19 +39,17 @@
       },
       {
         // Sapinngisamik suliassat amerlanerpaat akiniarsarissavatit.
-        // Du skal besvare så mange opgaver som muligt.,
-        // (Lånt fra "Sætningslæsning")
+        // Du skal besvare så mange opgaver som muligt.
         "action": "playSound",
         "delayAfter": 1250,
-        "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8e.2.mp3"
+        "resource": "resources/wordreading_1/Enhanced/Deltest/5e.2 (Ny).mp3"
       },
       {
         // Maanna akissutit eqqortuunersoq paasitinneqartassanngilatit.
         // Nu får du ikke længere, at vide om du har svaret rigtigt.
-        // (Lånt fra "Sætningslæsning")
         "action": "playSound",
         "delayAfter": 1250,
-        "resource": "resources/sentence_reading/Enhanced/Øveopgave 1 og 2/8e.3.mp3"
+        "resource": "resources/wordreading_1/Enhanced/Deltest/5e.3 (Ny).mp3"
       },
 
       // Opgave 1 fader ind
@@ -79,10 +77,9 @@
       {
         // Aallartipputit.
         // Du starter nu.
-        // (Lånt fra "Sætningslæsning")
         "action": "playSound",
         "delayAfter": 0,
-        "resource": "resources/sentence_reading/Enhanced/Deltests/8e.4.mp3"
+        "resource": "resources/wordreading_1/Enhanced/Deltest/5e.4 (Ny).mp3"
       }
     ]
   },
