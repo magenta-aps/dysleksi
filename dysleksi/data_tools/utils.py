@@ -56,8 +56,8 @@ def update_or_create_wordreading_1_test(
 ):
 
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/wordreading_1/Enhanced/Deltest/5e.2.mp3",
-        sound="resources/wordreading_1/Enhanced/Deltest/5e.2.mp3",
+        name="resources/wordreading_1/Enhanced/Deltest/5e.5 (Ny).mp3",
+        sound="resources/wordreading_1/Enhanced/Deltest/5e.5 (Ny).mp3",
     )
     completion, created = TestResource.objects.get_or_create(
         name="resources/wordreading_1/Enhanced/Deltest/5e.3.mp3",

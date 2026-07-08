@@ -55,7 +55,6 @@
           "resources/wordreading_1/Opgave/Bamse.jpg",
           "resources/wordreading_1/Opgave/Mælk.jpg"
         ],
-        // TODO: use new reminder audio "5b.13" when we receive the file
         "instruction_sequence": [
             {
                 "action": "show",
@@ -351,20 +350,16 @@
             },
 
             {
-                // TOOD: make sure the audio file 5c.1 is replaced by a new version saying:
-                // Atuariarlutit asseq atuakkannut tulluartoq toqqartassavat.
                 // Du skal læse og vælge det billede, der passer til ordet.
                 "action": "playSound",
                 "delayAfter": 1250,
-                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5c.1.mp3"
+                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5c.1 (Ny).mp3"
             },
             {
-                // Aallartipputit.
                 // Du starter.
-                // (Lånt fra "Sætningslæsning")
                 "action": "playSound",
                 "delayAfter": 0,
-                "resource": "resources/sentence_reading/Enhanced/Deltests/8e.4.mp3"
+                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5c.1a (Ny).mp3"
             },
 
             // Øveopgave 1 vises tydeligt - øveopgaverne starter
