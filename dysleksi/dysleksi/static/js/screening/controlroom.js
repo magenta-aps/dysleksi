@@ -1511,6 +1511,7 @@ export class TeacherView {
                 if (confirm(gettext("Er du sikker på at du vil afbryde testen"))) {
                     this.sendTestCancelled();
                     this.buttons.disableButtons();
+                    this.elapsedTimeView.stop();
                 }
             } else {
                 if (this.currentQuestionRequiresNoStudentInput()) {
