@@ -114,7 +114,7 @@ constantly==23.10.4
 cryptography==49.0.0
 defusedxml==0.7.1
 django-appconf==1.2.0
-django-formtools==2.6.1
+django-formtools==2.7
 django-phonenumber-field==8.4.0
 elementpath==4.8.0
 h11==0.16.0
