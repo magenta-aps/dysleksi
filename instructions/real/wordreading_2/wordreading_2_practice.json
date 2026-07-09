@@ -327,9 +327,9 @@
                 "delayAfter": 0
             },
             {
-                // "Du vil få besked, hvis du vælger forkert under kun øveopgaverne" / "Sungiusarnermi taamaallaat [...]"
+                // Du skal læse og vælge det ord, der passer til billedet.
                 "action": "playSound",
-                "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7c.1.mp3",
+                "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7c.1 (Ny).mp3",
                 "delayAfter": 1250
             },
 
@@ -341,9 +341,8 @@
             },
             {
                 // Aallartipputit / Du starter
-                // (Lånt fra "Forlyd")
                 "action": "playSound",
-                "resource": "resources/fore_sound/Enhanced/Øveopgave 1 og 2/2c.2.mp3",
+                "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7c.2 (Ny).mp3",
                 "delayAfter": 0
             }
         ]
