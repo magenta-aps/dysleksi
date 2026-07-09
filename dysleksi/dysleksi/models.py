@@ -1068,6 +1068,11 @@ class TestQuestion(models.Model):
                 },
             )
 
+        # Remove instructions that no longer exist in the JSON definition.
+        # Instructions are keyed by their order (0..len-1), so any instruction with
+        # an order beyond the current instruction count has been removed from the JSON.
+        sequence.instructions.filter(order__gte=len(instructions_data)).delete()
+
 
 class InstructionSequence(models.Model):
     question = models.OneToOneField(

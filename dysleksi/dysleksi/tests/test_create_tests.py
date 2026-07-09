@@ -245,6 +245,23 @@ class CreateTests(DysleksiTest):
         self.assertEqual(self.json_data["wordreading_2"][3]["wrong"][0], "appa")
         self.json_data["wordreading_2"][3]["wrong"][0] = "apa"
 
+        # 10. Remove a bunch of instructions from a test
+        self.assertGreater(
+            len(self.json_data["nonwordspelling_practice"][1]["instruction_sequence"]),
+            10,
+        )
+        self.json_data["nonwordspelling_practice"][1]["instruction_sequence"] = (
+            self.json_data["nonwordspelling_practice"][1]["instruction_sequence"][:10]
+        )
+        self.assertGreater(
+            len(
+                self.get_json_part("nonwordspelling")["practice"][1][
+                    "instruction_sequence"
+                ]["instructions"]
+            ),
+            10,
+        )
+
         self.save_json_files()
 
         # Create tests again
@@ -332,6 +349,16 @@ class CreateTests(DysleksiTest):
                 self.get_json_part("wordreading_2")["questions"][3]["possible_answers"]
             ),
             4,
+        )
+
+        # 10. Validate that instructions were removed
+        self.assertEqual(
+            len(
+                self.get_json_part("nonwordspelling")["practice"][1][
+                    "instruction_sequence"
+                ]["instructions"]
+            ),
+            10,
         )
 
     def test_answer_test(self):
