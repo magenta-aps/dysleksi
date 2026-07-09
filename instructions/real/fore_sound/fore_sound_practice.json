@@ -159,17 +159,11 @@
                 "element": "challenge-sound-btn",
                 "delayAfter": 0
             },            {
-                // Du kommer til at høre bogstavlydene enkeltvis, f.eks...
+                // Du kommer til at høre bogstavlydene enkeltvis
                 "action": "playSound",
-                "resource": "resources/fore_sound/Enhanced/Instruktion/2b.8.mp3",
-                "delayAfter": 750
+                "resource": "resources/fore_sound/Enhanced/Instruktion/2b.8-00.mp3",
+                "delayAfter": 1250
             },
-            {
-                "action": "clickButton",
-                "delayAfter": 1500,
-                "element": "challenge-sound-btn"
-            },
-
             {
                 // "Du"
                 "action": "playSound",
@@ -199,7 +193,7 @@
             {
                 // Da hesten har denne forlyd, skal du vælge hesten.
                 "action": "playSound",
-                "resource": "resources/fore_sound/Enhanced/Instruktion/2b.13.mp3",
+                "resource": "resources/fore_sound/Enhanced/Instruktion/2b.13 (Ny).mp3",
                 "delayAfter": 1250
             },
             {
@@ -444,10 +438,10 @@
                 "element": "next"
             },
             {
-                // Her er to valgmuligheder.
+                // Her kan du se to valgmuligheder.
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/fore_sound/Enhanced/Øveopgave 1 og 2/2d.1.mp3"
+                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.1.mp3"
             },
 
             {

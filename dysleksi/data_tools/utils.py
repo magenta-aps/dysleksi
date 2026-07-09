@@ -105,8 +105,8 @@ def update_or_create_fore_sound_test(
     )
 
     completion, created = TestResource.objects.get_or_create(
-        name="resources/fore_sound/Enhanced/Deltests/2e.3.mp3",
-        sound="resources/fore_sound/Enhanced/Deltests/2e.3.mp3",
+        name="resources/fore_sound/Enhanced/Deltests/2e.5 (Ny).mp3",
+        sound="resources/fore_sound/Enhanced/Deltests/2e.5 (Ny).mp3",
     )
 
     part, created = TestPart.objects.update_or_create(
