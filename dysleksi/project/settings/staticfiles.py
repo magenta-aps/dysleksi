@@ -5,7 +5,6 @@ from project.settings.base import TESTING
 
 STATIC_URL = "static/"
 STATIC_ROOT = "/static"
-REMINDER_FALLBACK = "/" + STATIC_URL + "audio/447307__mabdog__ringtone-1.wav"
 
 STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
 STATICFILES_FINDERS = [

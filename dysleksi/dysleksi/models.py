@@ -12,7 +12,6 @@ from functools import partial
 from math import floor
 from typing import Any, Dict, List, Self, Tuple
 
-from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
@@ -678,7 +677,7 @@ class TestPart(models.Model):
                         else None
                     ),
                     "reminder": question.reminder,
-                    "reminderSource": str(settings.REMINDER_FALLBACK),  # type: ignore
+                    "reminderSource": None,
                     "timeout": question.timeout,
                     "continue_when_instruction_is_complete": (
                         question.continue_when_instruction_is_complete
