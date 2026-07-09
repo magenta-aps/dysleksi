@@ -246,6 +246,11 @@ h6 {
         background: transparent;
         border: none;
         color: $mono-white;
+
+        option {
+          color: $mono-gray-dark-2;
+          background: $mono-white;
+        }
       }
     }
 
