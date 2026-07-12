@@ -133,7 +133,7 @@ qrcode==8.2
 rcssmin==1.2.2
 redis==8.0.1
 requests==2.34.2
-types-requests==2.33.0.20260518
+types-requests==2.33.0.20260712
 rjsmin==1.2.5
 service-identity==26.1.0
 six==1.17.0
