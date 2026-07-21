@@ -18,7 +18,7 @@ channels==4.3.2
 types-channels==4.3.0.20260518
 channels_redis==4.3.0
 uvicorn==0.51.0
-daphne==4.2.2
+daphne==4.2.3
 
 ## Serving static files
 whitenoise==6.12.0
