@@ -1,0 +1,11 @@
+{% with record.test_status|label_from_choices:ClassTestStatus as test_status %}
+{% if record.test_status == ClassTestStatus.OPEN %}
+    <i class="ph ph-lock-open"></i>
+    {{ test_status }}
+{% else %}
+    <span class="text-danger">
+        <i class="ph ph-lock"></i>
+        {{ test_status }}
+    </span>
+{% endif %}
+{% endwith %}

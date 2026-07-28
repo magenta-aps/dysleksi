@@ -133,6 +133,14 @@ msgid "Afventer"
 msgstr ""
 
 #: dysleksi/models.py
+msgid "Åben"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Låst"
+msgstr ""
+
+#: dysleksi/models.py
 msgid "CPR"
 msgstr ""
 
@@ -165,15 +173,19 @@ msgid "Completion time in milliseconds"
 msgstr ""
 
 #: dysleksi/tables.py
+msgid "Årgang"
+msgstr ""
+
+#: dysleksi/tables.py
 msgid "Klasse"
 msgstr ""
 
 #: dysleksi/tables.py
-msgid "Skoleår"
+msgid "Teststatus"
 msgstr ""
 
 #: dysleksi/tables.py
-msgid "Antal elever"
+msgid "Testoversigt"
 msgstr ""
 
 #: dysleksi/tables.py
@@ -186,6 +198,10 @@ msgstr ""
 
 #: dysleksi/tables.py
 msgid "Type"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Antal elever"
 msgstr ""
 
 #: dysleksi/tables.py
@@ -560,6 +576,9 @@ msgid "Normscore"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/table_columns/class_actions.html
+msgid "Se testoversigten"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/table_columns/student_actions.html
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
 msgid "Åbn"

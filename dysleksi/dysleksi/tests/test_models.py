@@ -22,6 +22,7 @@ from dysleksi.models import (
     CategoryColorChoice,
     CategoryRange,
     Class,
+    ClassTestStatus,
     Correctness,
     CorrectnessCategory,
     Instruction,
@@ -33,6 +34,7 @@ from dysleksi.models import (
     PossibleAnswer,
     QuestionResponse,
     ReadingSpeedCategory,
+    Student,
     Test,
     TestAssignment,
     TestPart,
@@ -110,6 +112,57 @@ class TestClass(DysleksiTest):
         self.assertQuerySetEqual(
             Class.objects.filter_user_permissions(self.teacher, "view"),
             Class.objects.filter(pk=self.klasse.pk),
+        )
+
+
+class TestClassQuerySet(DysleksiTest):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        # Add class where the single assignment is not yet completed by all students
+        cls.create_class_with_results(
+            "Partially completed",
+            {
+                cls.student1: True,
+                cls.student2: False,
+            },
+        )
+        # Add class where the single assignment is completed by all students
+        cls.create_class_with_results(
+            "Entirely completed",
+            {
+                cls.student1: True,
+                cls.student2: True,
+            },
+        )
+
+    @classmethod
+    def create_class_with_results(cls, name: str, results: dict[Student, bool]):
+        klasse = cls.create_class(2020, name)
+        assignment, _ = TestAssignment.objects.get_or_create(
+            test=cls.group_test,
+            teacher=cls.teacher,
+            klasse=klasse,
+        )
+        for student, completed in results.items():
+            TestResponse.objects.get_or_create(
+                assignment=assignment,
+                student=student,
+                completed=completed,
+            )
+
+    def test_annotate_test_status(self):
+        self.assertQuerySetEqual(
+            Class.objects.annotate_test_status().values_list(
+                "name", "test_status", "_all_assignments_completed"
+            ),
+            [
+                ("Entirely completed", ClassTestStatus.LOCKED, True),
+                ("Partially completed", ClassTestStatus.OPEN, False),
+                # 1.A has no assignments and thus cannot be completed
+                ("1.A", ClassTestStatus.OPEN, None),
+            ],
+            ordered=False,
         )
 
 

@@ -198,12 +198,7 @@ class ClassListView(GroupRequiredMixin, SingleTableView):
 
     def get_queryset(self):
         qs = super().get_queryset().filter_user_permissions(self.user, "view")
-        # Only classes in the current school year
-        # qs = qs.current()
-        # Add annotations used by `ClassTable`
-        qs = qs.annotate(
-            number_of_students=Count("students", distinct=True),
-        )
+        qs = qs.annotate_test_status()
         return qs
 
 
