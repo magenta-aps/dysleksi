@@ -89,6 +89,7 @@ const ws = getWebSocket();
 const mockSend = vi.fn();
 
 const SHARED_DOM_HTML = `
+    <div id="pause-overlay" style="display: none"><i class="ph ph-pause"></i></div>
     <div id="fade-overlay"></div>
     <h1 id="student-header" class="student-header"></h1>
     <audio id="instructions-sound"></audio>
@@ -1837,6 +1838,107 @@ describe("Timer and Reminder Cleanup", () => {
 
         expect(clearTimeout).toHaveBeenCalledWith(111);
         expect(clearTimeout).toHaveBeenCalledWith(222);
+    });
+});
+
+describe("Pause and resume", () => {
+    let view;
+    let domElements;
+
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.spyOn(global, "clearTimeout");
+
+        document.body.innerHTML = SHARED_DOM_HTML;
+
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
+            mockAudioContextInstance,
+        );
+
+        const test = new Test(groupTestData);
+        domElements = new GroupTestDomElements();
+        view = new GroupTestView(test, ws, 1, domElements, student);
+
+        view.setPart(0);
+        view.setQuestion(false, 0);
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+        vi.clearAllTimers();
+        vi.useRealTimers();
+        document.body.innerHTML = "";
+    });
+
+    it("clears timers and shows the overlay when paused", () => {
+        view.questionTimeoutId = 123;
+        view.questionReminderId = 456;
+        view.partTimeoutId = 789;
+
+        view.onChatMessage({ event: "test.paused" });
+
+        expect(view.paused).toBe(true);
+        expect(clearTimeout).toHaveBeenCalledWith(123);
+        expect(clearTimeout).toHaveBeenCalledWith(456);
+        expect(clearTimeout).toHaveBeenCalledWith(789);
+        expect(view.questionTimeoutId).toBeNull();
+        expect(view.questionReminderId).toBeNull();
+        expect(view.partTimeoutId).toBeNull();
+        expect(domElements.pauseOverlay.style.display).toBe("flex");
+    });
+
+    it("does not play reminder sounds while paused", () => {
+        const playSound = vi.spyOn(domElements, "playSound");
+        view.currentQuestion.reminder = 2000;
+        view.currentQuestion.reminderSource = "/static/audio/reminder.wav";
+        view.setupReminder();
+
+        view.onChatMessage({ event: "test.paused" });
+
+        // Advancing past the reminder delay must not trigger the sound because
+        // the timer was cleared on pause.
+        vi.advanceTimersByTime(5000);
+        expect(playSound).not.toHaveBeenCalled();
+    });
+
+    it("re-initiates timers and hides the overlay when resumed", () => {
+        const setupReminder = vi.spyOn(view, "setupReminder");
+        view.currentPart.timeout = 5000;
+        view.questionTimeoutId = 123;
+        view.partTimeoutId = 789;
+
+        view.onChatMessage({ event: "test.paused" });
+        view.onChatMessage({ event: "test.resume" });
+
+        expect(view.paused).toBe(false);
+        expect(setupReminder).toHaveBeenCalledTimes(1);
+        expect(view.partTimeoutId).not.toBeNull();
+        expect(domElements.pauseOverlay.style.display).toBe("none");
+    });
+
+    it("fires the re-initiated part timeout after resuming", () => {
+        const onPartTimeout = vi
+            .spyOn(view, "onPartTimeout")
+            .mockImplementation(() => {});
+        view.currentPart.timeout = 5000;
+        view.partTimeoutId = 789;
+
+        view.onChatMessage({ event: "test.paused" });
+        view.onChatMessage({ event: "test.resume" });
+
+        vi.advanceTimersByTime(5000);
+        expect(onPartTimeout).toHaveBeenCalled();
+    });
+
+    it("does not re-initiate a part timeout that was not running", () => {
+        view.questionTimeoutId = null;
+        view.questionReminderId = null;
+        view.partTimeoutId = null;
+
+        view.onChatMessage({ event: "test.paused" });
+        view.onChatMessage({ event: "test.resume" });
+
+        expect(view.partTimeoutId).toBeNull();
     });
 });
 

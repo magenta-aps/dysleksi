@@ -1075,6 +1075,23 @@ $border-radius-student-card: $spacer / 4 * 3;
     border-radius: $border-radius-student-card;
     justify-content: space-between;
 
+    #pause-overlay {
+      position: absolute;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    
+      background: rgba(0, 0, 0, 0.5);
+      color: #fff;
+      border-radius: inherit;
+
+      i {
+        font-size: 1.5rem;
+      }
+    }
+
     &.is-complete {
       border: 1px solid $green-lighter;
     }
@@ -1744,12 +1761,66 @@ $border-radius-student-card: $spacer / 4 * 3;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: $spacer;
+  gap: 80px;
   margin-top: 0.5 * $spacer;
   margin-bottom: $spacer;
 
   h2 {
     margin: 0 !important;
+  }
+}
+
+.screening-controls {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex: 1;
+
+  .screening-progress-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1 1 auto;
+  }
+
+  .screening-progress-label {
+    flex: 0 0 auto;
+    white-space: nowrap;
+  }
+
+  .screening-progress {
+    flex: 1 1 auto;
+    height: 6px;
+
+    .progress-bar {
+      background-color: $blue-light;
+    }
+  }
+
+  .btn i {
+    margin-right: 0.25 * $spacer;
+  }
+
+  .screening-actions {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  #paused,
+  #cancelled {
+    display: inline-flex;
+    align-items: center;
+    height: 30px;
+    font-size: 14px;
+    padding: 0 12px;
+  }
+
+  // Paused state: give the button a solid look to signal the timer is stopped
+  #paused.is-paused {
+    background-color: $blue-dark;
+    border-color: $blue-dark;
+    color: $white;
   }
 }
 

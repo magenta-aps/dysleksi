@@ -54,6 +54,7 @@ class TestDomElements {
         );
         this.testFinishedRow = document.querySelector("#test-finished-row");
         this.speakerIcon = document.querySelector("#speaker");
+        this.pauseOverlay = document.querySelector("#pause-overlay");
 
         this.currentAudioSource = null;
         this.inputLocked = false;
@@ -160,6 +161,13 @@ class TestDomElements {
     }
     hideTestBreak() {
         this.testBreak.style.display = "none";
+    }
+
+    showPauseOverlay() {
+        this.pauseOverlay.style.display = "flex";
+    }
+    hidePauseOverlay() {
+        this.pauseOverlay.style.display = "none";
     }
 
     showSoundCalibrationAnimation() {
@@ -293,6 +301,12 @@ class TestDomElements {
 
     hideIntro() {
         this.testIntro.style.display = "none";
+    }
+
+    hideAll() {
+        document.querySelectorAll(".center-screen").forEach((el) => {
+            el.style.display = "none";
+        });
     }
 
     hideTestPartOutro() {
