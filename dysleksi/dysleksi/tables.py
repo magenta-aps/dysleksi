@@ -4,7 +4,6 @@ from itertools import count
 from math import ceil
 from typing import Callable, Collection, List, Tuple
 
-from django.db.models import QuerySet
 from django.template import Context
 from django.template.loader import get_template
 from django.urls import reverse
@@ -14,6 +13,7 @@ from django_tables2 import A, Column, Table, TemplateColumn, tables
 from dysleksi.models import (
     CategoryRange,
     Class,
+    ClassTestStatus,
     Student,
     TestAssignment,
     TestAssignmentStatus,
@@ -37,40 +37,36 @@ class ClassTable(Table):
         model = Class
         fields: List[str] = []
 
-    klasse = tables.Column(
+    school_year_start = tables.Column(
         linkify=False,
-        accessor="name",
-        orderable=False,
+        verbose_name=_("Årgang"),
+    )
+
+    name = tables.Column(
+        linkify=False,
         verbose_name=_("Klasse"),
     )
 
-    school_year = tables.Column(
-        verbose_name=_("Skoleår"),
-    )
-
-    def order_school_year(self, queryset: QuerySet[Class, Class], is_descending: bool):
-        return (
-            queryset.order_by(("-" if is_descending else "") + "school_year_start"),
-            True,
-        )
-
-    number_of_students = tables.Column(
-        accessor=A("students__count"),
+    test_status = TemplateColumn(
+        template_name="dysleksi/admin/table_columns/class_test_status.html",
         orderable=False,
-        verbose_name=_("Antal elever"),
+        verbose_name=_("Teststatus"),
+        extra_context={"ClassTestStatus": ClassTestStatus},
     )
 
-    # status = tables.Column(
-    #     accessor=A("status"),
-    #     orderable=False,
-    #     verbose_name=_("Status"),
-    # )
-    #
-    # actions = TemplateColumn(
-    #     template_name="dysleksi/admin/table_columns/class_actions.html",
-    #     orderable=False,
-    #     verbose_name=_("Handlinger"),
-    # )
+    actions = TemplateColumn(
+        template_name="dysleksi/admin/table_columns/class_actions.html",
+        orderable=False,
+        verbose_name=_("Testoversigt"),
+    )
+
+    # def order_school_year_start(
+    #     self, queryset: QuerySet[Class, Class], is_descending: bool
+    # ):
+    #     return (
+    #         queryset.order_by(("-" if is_descending else "") + "school_year_start"),
+    #         True,
+    #     )
 
 
 class StudentTable(Table):

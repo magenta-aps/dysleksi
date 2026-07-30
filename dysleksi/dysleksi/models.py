@@ -13,6 +13,7 @@ from math import floor
 from typing import Any, Dict, List, Self, Tuple
 
 from django.contrib.auth.models import AbstractUser, Group
+from django.contrib.postgres.aggregates import BoolAnd
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
@@ -113,6 +114,11 @@ class TestAssignmentStatus(TextChoices):
     COMPLETED = "completed", _("Gennemført")
     IN_PROGRESS = "in_progress", _("I gang")
     PENDING = "pending", _("Afventer")
+
+
+class ClassTestStatus(TextChoices):
+    OPEN = "open", _("Åben")
+    LOCKED = "locked", _("Låst")
 
 
 class User(AbstractUser):
@@ -334,6 +340,20 @@ class ClassQuerySet(PermissionsQuerySet):
                 teachers=user,
             )
         return self.none()
+
+    def annotate_test_status(self):
+        return self.annotate(
+            # Add "internal" annotation used by the `test_status` annotation
+            _all_assignments_completed=BoolAnd("testassignment__responses__completed"),
+            # Add the `test_status` annotation itself
+            test_status=Case(
+                When(
+                    _all_assignments_completed=Value(True),
+                    then=Value(ClassTestStatus.LOCKED),
+                ),
+                default=Value(ClassTestStatus.OPEN),
+            ),
+        )
 
 
 class Class(PermissionsMixin, models.Model):
