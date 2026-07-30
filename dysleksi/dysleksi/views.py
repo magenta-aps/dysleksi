@@ -12,7 +12,6 @@ from django.db import transaction
 from django.db.models import (
     Aggregate,
     Avg,
-    Case,
     CharField,
     Count,
     DurationField,
@@ -23,7 +22,6 @@ from django.db.models import (
     QuerySet,
     Sum,
     Value,
-    When,
 )
 from django.db.models.expressions import BaseExpression, OuterRef, Subquery, Window
 from django.db.models.functions import Coalesce, Length, Replace, RowNumber
@@ -56,7 +54,6 @@ from dysleksi.models import (
     Student,
     Test,
     TestAssignment,
-    TestAssignmentStatus,
     TestPart,
     TestQuestion,
     TestResponse,
@@ -226,34 +223,9 @@ class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
         # Only show test assignments belonging to the teacher viewing the page
         qs = qs.filter_user_permissions(self.user, "view")
         # Add annotations used by `TestAssignmentTable`
-        qs = qs.annotate(
-            number_of_students=Case(
-                When(
-                    student_id__isnull=True,
-                    then=Count("klasse__students", distinct=True),
-                ),
-                When(
-                    student__id__isnull=False,
-                    then=Value(1),
-                ),
-            ),
-            # TODO: do we need to look at responses__completed?
-            number_of_students_responded=Count("responses__student__pk", distinct=True),
-        )
-        qs = qs.annotate(
-            status=Case(
-                When(
-                    number_of_students_responded=F("number_of_students"),
-                    then=Value(TestAssignmentStatus.COMPLETED),
-                ),
-                When(
-                    number_of_students_responded__gt=0,
-                    number_of_students_responded__lt=F("number_of_students"),
-                    then=Value(TestAssignmentStatus.IN_PROGRESS),
-                ),
-                default=Value(TestAssignmentStatus.PENDING),
-            ),
-        )
+        qs = qs.annotate_school_year()
+        qs = qs.annotate_class_name()
+        qs = qs.annotate_status()
         return qs
 
     def get_context_data(self, **kwargs):

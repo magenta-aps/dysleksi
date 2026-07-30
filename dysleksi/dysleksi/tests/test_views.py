@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 import json
 from datetime import timedelta
+from operator import attrgetter
 from unittest.mock import patch
 
 from bs4 import BeautifulSoup
@@ -324,16 +325,12 @@ class TestTestAssignmentListView(ResponseTest):
             objs,
             [
                 # Individual student test assignment
-                (1, 1, TestAssignmentStatus.COMPLETED),
+                TestAssignmentStatus.COMPLETED,
                 # Group test assignment
-                (2, 1, TestAssignmentStatus.IN_PROGRESS),
+                TestAssignmentStatus.IN_PROGRESS,
             ],
             ordered=False,
-            transform=lambda obj: (
-                obj.number_of_students,
-                obj.number_of_students_responded,
-                obj.status,
-            ),
+            transform=attrgetter("status"),
         )
 
 

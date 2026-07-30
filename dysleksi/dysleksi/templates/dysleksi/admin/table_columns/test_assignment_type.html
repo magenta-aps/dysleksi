@@ -1,0 +1,6 @@
+{% load i18n %}
+{% if record.test.test_type == TestType.GROUP %}
+{% translate 'Klassen' %}
+{% else %}
+{% translate 'Enkelte elever' %}
+{% endif %}

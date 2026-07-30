@@ -22,8 +22,8 @@ msgstr ""
 msgid "Vælg testtype"
 msgstr ""
 
-#: dysleksi/forms.py dysleksi/tables.py
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html dysleksi/views.py
+#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_base.html
+#: dysleksi/views.py
 msgid "Test"
 msgstr ""
 
@@ -121,7 +121,7 @@ msgid "Højt"
 msgstr ""
 
 #: dysleksi/models.py
-msgid "Gennemført"
+msgid "Oprettet"
 msgstr ""
 
 #: dysleksi/models.py
@@ -130,7 +130,7 @@ msgid "I gang"
 msgstr ""
 
 #: dysleksi/models.py
-msgid "Afventer"
+msgid "Gennemført"
 msgstr ""
 
 #: dysleksi/models.py
@@ -198,11 +198,19 @@ msgid "Klassetrin"
 msgstr ""
 
 #: dysleksi/tables.py
-msgid "Type"
+msgid "Skoleår"
 msgstr ""
 
 #: dysleksi/tables.py
-msgid "Antal elever"
+msgid "Test til"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Anvendelsestidspunkt"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Handlinger"
 msgstr ""
 
 #: dysleksi/tables.py
@@ -210,11 +218,11 @@ msgid "Startdato"
 msgstr ""
 
 #: dysleksi/tables.py
-msgid "Status"
+msgid "Slutdato"
 msgstr ""
 
 #: dysleksi/tables.py
-msgid "Handlinger"
+msgid "Resultatadgang"
 msgstr ""
 
 #: dysleksi/tables.py
@@ -580,7 +588,10 @@ msgstr ""
 msgid "Se testoversigten"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/table_columns/student_actions.html
+#: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_access.html
+msgid "Giv adgang"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
 msgid "Åbn"
 msgstr ""
@@ -588,6 +599,14 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
 msgid "Se resultater"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_type.html
+msgid "Klassen"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_type.html
+msgid "Enkelte elever"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
