@@ -147,4 +147,4 @@ urllib3==2.7.0
 xmlschema==2.5.1
 xmltodict==1.0.4
 zope.interface==8.5
-websockets==17.0
+websockets==17.0.1
