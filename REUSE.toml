@@ -16,6 +16,7 @@ path = [
     ".oxfmtrc.json",
     ".oxlintrc.json",
     ".gitlab-ci.yml",
+    ".hadolint.yaml",
     "mypy.ini",
     "requirements.txt",
     ".coveragerc",
