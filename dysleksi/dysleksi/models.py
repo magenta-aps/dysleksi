@@ -35,7 +35,7 @@ from django.db.models import (
     Window,
 )
 from django.db.models.expressions import OuterRef, Subquery
-from django.db.models.functions import Cast, Coalesce, NullIf, RowNumber
+from django.db.models.functions import Cast, Coalesce, Concat, NullIf, RowNumber
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
@@ -111,9 +111,9 @@ class TestType(TextChoices):
 
 
 class TestAssignmentStatus(TextChoices):
-    COMPLETED = "completed", _("Gennemført")
+    CREATED = "created", _("Oprettet")
     IN_PROGRESS = "in_progress", _("I gang")
-    PENDING = "pending", _("Afventer")
+    COMPLETED = "completed", _("Gennemført")
 
 
 class ClassTestStatus(TextChoices):
@@ -396,7 +396,13 @@ class Class(PermissionsMixin, models.Model):
     def school_year(self) -> str:
         return f"{self.school_year_start} - {self.school_year_end}"
 
-    name = models.CharField(max_length=256, null=False, blank=False, default="")
+    name = models.CharField(
+        max_length=256,
+        null=False,
+        blank=False,
+        default="",
+    )
+
     teachers = models.ManyToManyField(
         Teacher,
         related_name="classes",
@@ -502,6 +508,74 @@ class TestAssignmentQuerySet(PermissionsQuerySet):
             return self.filter(teacher=user)
         if user.is_student:
             return self.filter(Q(student=user) | Q(klasse__students=user))
+
+    def annotate_school_year(self):
+        def school_year(field):
+            # Return e.g. "24/25" if `school_year_start` is 2024
+            return Concat(
+                field - Value(2000),
+                Value("/"),
+                field - Value(2000) + Value(1),
+                output_field=models.CharField(),
+            )
+
+        def class_school_year():
+            return school_year(F("klasse__school_year_start"))
+
+        def student_school_year():
+            return school_year(
+                Subquery(
+                    self._get_student_class_query().values("school_year_start")[:1]
+                )
+            )
+
+        return self.annotate(
+            school_year=Case(
+                When(
+                    student_id__isnull=True,
+                    then=class_school_year(),
+                ),
+                When(
+                    student__id__isnull=False,
+                    then=student_school_year(),
+                ),
+            ),
+        )
+
+    def annotate_class_name(self):
+        return self.annotate(
+            class_name=Case(
+                When(
+                    student_id__isnull=True,
+                    then=F("klasse__name"),
+                ),
+                When(
+                    student__id__isnull=False,
+                    then=Subquery(self._get_student_class_query().values("name")[:1]),
+                ),
+            ),
+        )
+
+    def annotate_status(self):
+        return self.annotate(
+            # Add "internal" annotation used by the `status` annotation
+            _all_completed=BoolAnd("responses__completed"),
+            # Add the `status` annotation itself
+            status=Case(
+                When(
+                    _all_completed=Value(False),
+                    then=Value(TestAssignmentStatus.IN_PROGRESS),
+                ),
+                When(
+                    _all_completed=Value(True),
+                    then=Value(TestAssignmentStatus.COMPLETED),
+                ),
+                default=Value(TestAssignmentStatus.CREATED),
+            ),
+        )
+
+    def _get_student_class_query(self):
+        return Class.objects.filter(is_main=True, students=OuterRef("student"))
 
 
 class TestAssignment(PermissionsMixin, models.Model):

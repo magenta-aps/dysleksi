@@ -1,5 +1,5 @@
 {% load i18n %}
-{% if record.status == TestAssignmentStatus.PENDING %}
+{% if record.status == TestAssignmentStatus.CREATED %}
     <a href="{% url 'dysleksi:room' pk=record.pk %}" class="btn btn-outline-secondary">{% translate "Start" %}</a>
 {% elif record.status == TestAssignmentStatus.IN_PROGRESS %}
     <a href="{% url 'dysleksi:room' pk=record.pk %}" class="btn btn-outline-secondary">{% translate "Åbn" %}</a>

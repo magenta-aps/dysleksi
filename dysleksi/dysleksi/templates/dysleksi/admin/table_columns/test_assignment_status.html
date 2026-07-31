@@ -1,1 +1,18 @@
-{{ record.status|label_from_choices:TestAssignmentStatus }}
+{% with record.status|label_from_choices:TestAssignmentStatus as status %}
+{% if record.status == TestAssignmentStatus.CREATED %}
+    <span class="text-success">
+        <i class="ph ph-lock-open"></i>
+        {{ status }}
+    </span>
+{% elif record.status == TestAssignment.IN_PROGRESS %}
+    <span class="text-danger">
+        <i class="ph ph-lock-open"></i>
+        {{ status }}
+    </span>
+{% else %}
+    <span>
+        <i class="ph ph-lock"></i>
+        {{ status }}
+    </span>
+{% endif %}
+{% endwith %}

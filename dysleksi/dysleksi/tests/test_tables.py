@@ -6,7 +6,28 @@ from django.test import TestCase
 from django_tables2 import Table
 
 import dysleksi
-from dysleksi.tables import TestResultColumn
+from dysleksi.models import TestAssignment
+from dysleksi.tables import TestAssignmentTable, TestResultColumn
+from dysleksi.tests.base import DysleksiTest
+
+
+class TestTestAssignmentTable(DysleksiTest):
+    def setUp(self):
+        super().setUp()
+        self.queryset = (
+            TestAssignment.objects.annotate_school_year()
+            .annotate_class_name()
+            .annotate_status()
+        )
+        self.table = TestAssignmentTable(data=self.queryset)
+
+    def test_order_type(self):
+        queryset, _ = self.table.order_type(self.queryset, is_descending=False)
+        self.assertEqual(queryset.query.order_by, ("test__test_type",))
+
+    def test_order_status(self):
+        queryset, _ = self.table.order_status(self.queryset, is_descending=False)
+        self.assertEqual(queryset.query.order_by, ("status",))
 
 
 class TestTestResultColumn(TestCase):

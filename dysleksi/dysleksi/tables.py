@@ -4,6 +4,7 @@ from itertools import count
 from math import ceil
 from typing import Callable, Collection, List, Tuple
 
+from django.db.models import QuerySet
 from django.template import Context
 from django.template.loader import get_template
 from django.urls import reverse
@@ -18,6 +19,7 @@ from dysleksi.models import (
     TestAssignment,
     TestAssignmentStatus,
     TestPart,
+    TestType,
 )
 from dysleksi.utils import format_time
 
@@ -60,14 +62,6 @@ class ClassTable(Table):
         verbose_name=_("Testoversigt"),
     )
 
-    # def order_school_year_start(
-    #     self, queryset: QuerySet[Class, Class], is_descending: bool
-    # ):
-    #     return (
-    #         queryset.order_by(("-" if is_descending else "") + "school_year_start"),
-    #         True,
-    #     )
-
 
 class StudentTable(Table):
     class Meta:
@@ -87,49 +81,32 @@ class StudentTable(Table):
         verbose_name=_("Klassetrin"),
     )
 
-    # status = tables.Column(
-    #     accessor=A("status"),
-    #     orderable=False,
-    #     verbose_name=_("Status"),
-    # )
-    #
-    # actions = TemplateColumn(
-    #     template_name="dysleksi/admin/table_columns/student_actions.html",
-    #     orderable=False,
-    #     verbose_name=_("Handlinger"),
-    # )
-
-
-def _test_assignment_title(record):
-    subject = record.student.get_full_name() if record.student else record.klasse.name
-    return f"{subject} - {record.test}"
-
 
 class TestAssignmentTable(Table):
     class Meta:
         model = TestAssignment
         fields: List[str] = []
 
-    name = TemplateColumn(
-        template_name="dysleksi/admin/table_columns/test_assignment_name.html",
-        orderable=False,
-        verbose_name=_("Navn"),
-        attrs={
-            "td": {
-                "class": "truncate-cell",
-                "title": _test_assignment_title,
-            }
-        },
+    school_year = tables.Column(
+        accessor=A("school_year"),
+        verbose_name=_("Skoleår"),
+        orderable=True,
     )
 
-    type = tables.Column(
-        accessor=A("test__test_type"),
-        verbose_name=_("Type"),
+    class_name = tables.Column(
+        accessor=A("class_name"),
+        verbose_name=_("Klasse"),
+    )
+
+    type = TemplateColumn(
+        template_name="dysleksi/admin/table_columns/test_assignment_type.html",
+        verbose_name=_("Test til"),
+        extra_context={"TestType": TestType},
     )
 
     test = tables.Column(
         accessor=A("test__name"),
-        verbose_name=_("Test"),
+        verbose_name=_("Anvendelsestidspunkt"),
         attrs={
             "td": {
                 "class": "truncate-cell",
@@ -138,28 +115,9 @@ class TestAssignmentTable(Table):
         },
     )
 
-    number_of_students = tables.Column(
-        accessor=A("number_of_students"),
-        orderable=False,
-        verbose_name=_("Antal elever"),
-    )
-
-    start_date = TemplateColumn(
-        template_name="dysleksi/admin/table_columns/test_assignment_period.html",
-        verbose_name=_("Startdato"),
-        extra_context={"attr": "lower"},
-    )
-
-    end_date = TemplateColumn(
-        template_name="dysleksi/admin/table_columns/test_assignment_period.html",
-        verbose_name=_("Startdato"),
-        extra_context={"attr": "upper"},
-    )
-
     status = TemplateColumn(
         template_name="dysleksi/admin/table_columns/test_assignment_status.html",
-        orderable=False,
-        verbose_name=_("Status"),
+        verbose_name=_("Teststatus"),
         extra_context={"TestAssignmentStatus": TestAssignmentStatus},
     )
 
@@ -169,6 +127,42 @@ class TestAssignmentTable(Table):
         verbose_name=_("Handlinger"),
         extra_context={"TestAssignmentStatus": TestAssignmentStatus},
     )
+
+    start_date = TemplateColumn(
+        template_name="dysleksi/admin/table_columns/test_assignment_period.html",
+        orderable=False,
+        verbose_name=_("Startdato"),
+        extra_context={"attr": "lower"},
+    )
+
+    end_date = TemplateColumn(
+        template_name="dysleksi/admin/table_columns/test_assignment_period.html",
+        orderable=False,
+        verbose_name=_("Slutdato"),
+        extra_context={"attr": "upper"},
+    )
+
+    access = TemplateColumn(
+        template_name="dysleksi/admin/table_columns/test_assignment_access.html",
+        orderable=False,
+        verbose_name=_("Resultatadgang"),
+    )
+
+    def order_type(
+        self, queryset: QuerySet[TestAssignment, TestAssignment], is_descending: bool
+    ):
+        return (
+            queryset.order_by(("-" if is_descending else "") + "test__test_type"),
+            True,
+        )
+
+    def order_status(
+        self, queryset: QuerySet[TestAssignment, TestAssignment], is_descending: bool
+    ):
+        return (
+            queryset.order_by(("-" if is_descending else "") + "status"),
+            True,
+        )
 
 
 class TestResultTable(Table):
