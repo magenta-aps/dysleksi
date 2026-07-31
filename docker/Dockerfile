@@ -75,7 +75,7 @@ RUN django-admin compilemessages --locale=da --locale=kl --verbosity=1
 COPY --chown=dysleksi:dysleksi ./dev-environment/dysleksi.env dysleksi.env
 # hadolint ignore=SC1091
 RUN set -a && \
-    source dysleksi.env && \
+    . dysleksi.env && \
     export DJANGO_DEBUG=False && \
     set +a && \
     python manage.py collectstatic --verbosity=0 --no-input --clear && \
