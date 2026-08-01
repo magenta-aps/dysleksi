@@ -127,7 +127,7 @@ mypy_extensions==1.1.0
 packaging==26.2
 py-ubjson==0.16.1
 pycparser==3.0
-pyOpenSSL==26.3.0
+pyOpenSSL==26.4.0
 python-dateutil==2.9.0.post0
 qrcode==8.2
 rcssmin==1.2.2
