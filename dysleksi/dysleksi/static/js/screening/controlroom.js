@@ -390,6 +390,7 @@ export class StudentCard {
         this.subTestLeftArrow = this.el.querySelector(".ph-caret-left");
         this.subTestRightArrow = this.el.querySelector(".ph-caret-right");
         this.markedStudentsCount = document.getElementById("marked-students-count");
+        this.pauseOverlay = this.el.querySelector("#pause-overlay");
 
         this.currentViewPartIndex = 0;
         this.isHidden = true;
@@ -499,6 +500,16 @@ export class StudentCard {
             }
             this.partsProgress.appendChild(segment);
         });
+    }
+
+    pause() {
+        if (this.student.progress < 100) {
+            this.pauseOverlay.style.display = "flex";
+        }
+    }
+
+    resume() {
+        this.pauseOverlay.style.display = "none";
     }
 
     update() {
@@ -641,6 +652,8 @@ export class GroupTestContainer {
         this.markedStudentsButton.onclick = () => this.filterCards("marked");
         this.resultLinkDisabled = document.getElementById("result-link-disabled");
         this.resultLinkEnabled = document.getElementById("result-link-enabled");
+        this.progressBar = document.getElementById("test-progress-bar");
+        this.progressLabel = document.getElementById("test-progress-label");
 
         this.foldAllBtn.onclick = () => this.foldAllCards();
         this.sortBtn.onclick = () => this.sortCards();
@@ -785,6 +798,28 @@ export class GroupTestContainer {
         this.ongoingStudentsCount.innerHTML = ongoingStudents;
     }
 
+    updateProgressBar() {
+        // The overall progress is the average progress across all students.
+        const progresses = Array.from(this.students.values()).map(
+            (student) => student.progress,
+        );
+        const avgProgress = Math.round(
+            progresses.reduce((sum, progress) => sum + progress, 0) / progresses.length,
+        );
+        this.progressBar.style.width = `${avgProgress}%`;
+        this.progressLabel.textContent = `${avgProgress}%`;
+    }
+
+    markPause(data, paused) {
+        const student = this.students.get(data.student.id);
+        const studentCard = this.cards.get(student.id);
+        if (paused) {
+            studentCard.pause();
+        } else {
+            studentCard.resume();
+        }
+    }
+
     updateData(data) {
         const studentData = data.student;
         let student = this.students.get(studentData.id);
@@ -814,6 +849,7 @@ export class GroupTestContainer {
             this.cards.get(student.id).setPart(student.currentPartIndex);
         }
         this.updateCounts();
+        this.updateProgressBar();
         if (this.students.values().every((student) => student.progress === 100)) {
             // Alle studerende som vi har fået beskeder fra er nu på progress==100
             // Dette kan ske selvom vi kun har fået fra én
@@ -831,7 +867,7 @@ export class ActionButtons {
     constructor() {
         this.buttons = [
             ...document.querySelectorAll(
-                "#correct, #wrong, #cancelled, #skipped, #next",
+                "#correct, #wrong, #cancelled, #skipped, #next, #paused",
             ),
         ];
         this.active = null;
@@ -908,6 +944,9 @@ export class ActionButtons {
     }
     cancelButton() {
         return this.buttonById("cancelled");
+    }
+    pauseButton() {
+        return this.buttonById("paused");
     }
     skipButton() {
         return this.buttonById("skipped");
@@ -1045,6 +1084,10 @@ export class ElapsedTimeView {
         this.domElement = document.querySelector(selector);
         this.running = false;
         this.t1 = null;
+        // Total time spent paused, subtracted from the elapsed time so that
+        // pausing and resuming does not count the time spent paused.
+        this.pausedDuration = 0;
+        this.pauseStart = null;
         this.interval = window.setInterval(() => {
             this.update();
         }, 1000);
@@ -1062,9 +1105,31 @@ export class ElapsedTimeView {
         this.running = false;
     }
 
+    pause() {
+        if (!this.running) {
+            return;
+        }
+        this.running = false;
+        this.pauseStart = new Date();
+    }
+
+    resume() {
+        if (this.running) {
+            return;
+        }
+        this.running = true;
+        if (this.t1 === null) {
+            this.t1 = new Date();
+        }
+        if (this.pauseStart !== null) {
+            this.pausedDuration += new Date() - this.pauseStart;
+            this.pauseStart = null;
+        }
+    }
+
     update() {
         if (this.running && this.t1 !== null) {
-            const delta = new Date(new Date() - this.t1);
+            const delta = new Date(new Date() - this.t1 - this.pausedDuration);
             this.domElement.innerText = formatDuration(delta);
         }
     }
@@ -1133,6 +1198,7 @@ export class TeacherView {
         this.wsGetter = wsGetter;
         this.chatSocket = null;
         this.test = test;
+        this.testPaused = false;
 
         this.partIndex = null;
         this.questionIndex = null;
@@ -1181,6 +1247,22 @@ export class TeacherView {
         this._initButtonListeners();
         this._initFilterButtonSelection();
         this._startSyncInterval();
+    }
+
+    pauseTest() {
+        this.testPaused = true;
+        this.elapsedTimeView.pause();
+        this.buttons.pauseButton().classList.add("is-paused");
+        this.buttons.pauseButton().querySelector("i").className = "ph-fill ph-play";
+        this.sendTestPaused();
+    }
+
+    resumeTest() {
+        this.testPaused = false;
+        this.elapsedTimeView.resume();
+        this.buttons.pauseButton().classList.remove("is-paused");
+        this.buttons.pauseButton().querySelector("i").className = "ph-fill ph-pause";
+        this.sendTestResumed();
     }
 
     validatePartIndex(partIndex) {
@@ -1364,12 +1446,38 @@ export class TeacherView {
             }
 
             if (
-                ["test.started", "question.answered", "question.displayed"].includes(
-                    data.event,
-                ) &&
+                [
+                    "test.started",
+                    "question.answered",
+                    "question.displayed",
+                    "test.cancelled",
+                ].includes(data.event) &&
                 this.test.testType === "group"
             ) {
                 this.groupTestContainer.updateData(data);
+
+                if (
+                    data.event === "test.started" &&
+                    this.elapsedTimeView.running === false &&
+                    this.testPaused === false
+                ) {
+                    this.elapsedTimeView.start();
+                    this.buttons.pauseButton().disabled = false;
+                    this.buttons.cancelButton().disabled = false;
+                }
+
+                if (data.event === "test.started" && this.testPaused === true) {
+                    // Send a paused-message to newly joined students
+                    this.sendTestPaused();
+                }
+            }
+
+            if (data.event === "test.paused" && this.test.testType === "group") {
+                this.groupTestContainer.markPause(data, true);
+            }
+
+            if (data.event === "test.resumed" && this.test.testType === "group") {
+                this.groupTestContainer.markPause(data, false);
             }
 
             if (
@@ -1513,6 +1621,12 @@ export class TeacherView {
                     this.buttons.disableButtons();
                     this.elapsedTimeView.stop();
                 }
+            } else if (val === "paused") {
+                if (this.testPaused) {
+                    this.resumeTest();
+                } else {
+                    this.pauseTest();
+                }
             } else {
                 if (this.currentQuestionRequiresNoStudentInput()) {
                     if (val === "next") {
@@ -1622,6 +1736,26 @@ export class TeacherView {
                 partId: this.currentPart && this.currentPart.id,
                 assignmentId: this.assignmentId,
                 note: this.noteField.getNote(),
+            });
+        });
+    }
+
+    sendTestPaused() {
+        Object.values(this.studentChannels).forEach((channel) => {
+            channel.send({
+                uuid: crypto.randomUUID(),
+                event: "test.paused",
+                assignmentId: this.assignmentId,
+            });
+        });
+    }
+
+    sendTestResumed() {
+        Object.values(this.studentChannels).forEach((channel) => {
+            channel.send({
+                uuid: crypto.randomUUID(),
+                event: "test.resume",
+                assignmentId: this.assignmentId,
             });
         });
     }

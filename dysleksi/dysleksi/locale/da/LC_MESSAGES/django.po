@@ -651,6 +651,14 @@ msgid "Klasse %(class_name)s - Screening %(test_name)s"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+msgid "Pause"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+msgid "Afslut"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
 msgid "Færdige"
 msgstr ""
 

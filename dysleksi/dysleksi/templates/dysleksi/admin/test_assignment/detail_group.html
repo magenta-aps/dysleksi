@@ -38,6 +38,9 @@
                     <i id="foldout-arrow" class="ph-fill ph-caret-down"></i>
                 </span>
             </div>
+            <div id="pause-overlay">
+                <i class="ph-fill ph-pause"></i>
+            </div>
         </div>
         <div class="folded-area" style="display: none">
             <div class="parts-progress"></div>
@@ -62,7 +65,29 @@
 
     <div class="screening-header">
         <h2 class="mt-2 mb-4">{% blocktranslate trimmed with class_name=class_name test_name=test_name %}Klasse {{ class_name }} - Screening {{ test_name }}{% endblocktranslate %}</h2>
-        {% details_popup %}
+        <div class="screening-controls">
+            <div class="screening-progress-wrapper">
+                <span id="test-progress-label" class="screening-progress-label">0%</span>
+                <div class="progress screening-progress" role="progressbar">
+                    <div id="test-progress-bar" class="progress-bar" style="width: 0%"></div>
+                </div>
+            </div>
+            <span class="screening-timer d-inline-flex align-items-baseline">
+                <i class="ph ph-clock me-2"></i>
+                <span id="total-elapsed-time">00:00:00</span>
+            </span>
+            <div class="screening-actions">
+                <button id="paused" disabled=true class="btn btn-outline-secondary">
+                    <i class="ph-fill ph-pause"></i>
+                    <span class="pause-label">{% translate 'Pause' %}</span>
+                </button>
+                <button id="cancelled" disabled=true class="btn btn-warning">
+                    <i class="ph-fill ph-stop"></i>
+                    {% translate 'Afslut' %}
+                </button>
+            </div>
+            {% details_popup %}
+        </div>
     </div>
     <div class="group-test-container">
         <div class="group-test-header">

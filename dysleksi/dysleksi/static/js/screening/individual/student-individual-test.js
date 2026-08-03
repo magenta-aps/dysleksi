@@ -37,9 +37,6 @@ export class IndividualTestView extends StudentTestView {
             }
             this.showQuestion(data.practice, data.questionIndex);
         }
-        if (data.event === "test.cancelled") {
-            this.onTestComplete(true);
-        }
     }
 
     async onTestComplete(cancelled = false) {

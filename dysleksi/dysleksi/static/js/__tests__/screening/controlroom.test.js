@@ -73,6 +73,9 @@ const GROUP_DOM_HTML = `
                 <i id="foldout-arrow" class="ph-fill ph-caret-down"></i>
             </span>
         </div>
+            <div id="pause-overlay">
+                <i class="ph-fill ph-pause"></i>
+            </div>
         </div>
         <div class="folded-area" style="display: none;">
             <div class="parts-progress"></div>
@@ -89,6 +92,23 @@ const GROUP_DOM_HTML = `
         </div>
     </div>
 </template>
+
+<div class="screening-header">
+    <h2>Klasse 1A - Screening Test</h2>
+    <div class="screening-controls">
+        <div class="screening-progress-wrapper">
+            <span id="test-progress-label" class="screening-progress-label">0%</span>
+            <div class="progress screening-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+                <div id="test-progress-bar" class="progress-bar" style="width: 0%"></div>
+            </div>
+            <div id="elapsed-time"></div>
+        </div>
+        <button id="paused" class="btn btn-outline-secondary">
+            <i class="ph-fill ph-pause"></i>
+            <span class="pause-label">Pause</span>
+        </button>
+    </div>
+</div>
 
 <button id="all-students-button" class="btn btn-outline-primary">
   Alle (<span id="all-students-count">0</span>)
@@ -173,6 +193,7 @@ const INDIVIDUAL_DOM_HTML = `
 <button id="correct"><span>Korrekt</span></button>
 <button id="wrong">Forkert</button>
 <button id="cancelled">Afslut test</button>
+<button id="paused"><i class="ph-fill ph-pause"></i></button>
 <button id="skipped">Sprunget over</button>
 <button id="next">Næste</button>
 <button id="goto-next-result-group">Hop til næste</button>
@@ -206,6 +227,7 @@ describe("ActionButtons", () => {
         <button id="correct"></button>
         <button id="wrong"></button>
         <button id="cancelled"></button>
+        <button id="paused"></button>
         <button id="skipped"></button>
         <button id="next"></button>
     `;
@@ -360,6 +382,52 @@ describe("ElapsedTimeView", () => {
         vi.advanceTimersByTime(1000);
         // Assert: update was called by the interval
         expect(spyUpdate).toHaveBeenCalled();
+    });
+
+    it("can pause and resume", () => {
+        instance.start();
+        // Pausing a running timer freezes it and records when the pause began
+        instance.pause();
+        expect(instance.running).toBeFalsy();
+        expect(instance.pauseStart).not.toBeNull();
+
+        // Pausing again while already paused is a no-op
+        const firstPauseStart = instance.pauseStart;
+        instance.pause();
+        expect(instance.pauseStart).toBe(firstPauseStart);
+
+        // Resuming starts the timer again and banks the paused duration
+        instance.resume();
+        expect(instance.running).toBeTruthy();
+        expect(instance.pauseStart).toBeNull();
+        expect(instance.pausedDuration).toBeGreaterThanOrEqual(0);
+
+        // Resuming again while already running does nothing
+        const bankedDuration = instance.pausedDuration;
+        instance.resume();
+        expect(instance.pausedDuration).toBe(bankedDuration);
+    });
+
+    it("excludes paused time from the elapsed time", () => {
+        instance.start();
+        // Run for 5 seconds
+        vi.advanceTimersByTime(5000);
+        instance.pause();
+        // Stay paused for 10 seconds
+        vi.advanceTimersByTime(10000);
+        instance.resume();
+        // Run for 2 more seconds
+        vi.advanceTimersByTime(2000);
+        instance.update();
+        // Only the 7 running seconds should be counted, not the 10 paused ones
+        expect(instance.domElement.innerText).toMatch(/:00:07$/);
+    });
+
+    it("initialises the timer when resume is the first call", () => {
+        expect(instance.t1).toBeNull();
+        instance.resume();
+        expect(instance.t1).not.toBeNull();
+        expect(instance.running).toBeTruthy();
     });
 });
 
@@ -998,6 +1066,44 @@ describe("Teacher Individual test View", () => {
         expect(buttons.cancelButton().classList.contains("disabled")).toBe(true);
     });
 
+    it("pauses and resumes the test when the pause button is clicked", () => {
+        vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID-PAUSE");
+        const spyPause = vi.spyOn(elapsedTimeView, "pause");
+        const spyResume = vi.spyOn(elapsedTimeView, "resume");
+        const pauseButton = buttons.pauseButton();
+
+        // Initial state: the test is running
+        expect(view.testPaused).toBe(false);
+
+        // Act: click the pause button to pause the test
+        pauseButton.click();
+
+        // Assert: the test is paused, the timer stops and the icon becomes 'play'
+        expect(view.testPaused).toBe(true);
+        expect(spyPause).toHaveBeenCalled();
+        expect(pauseButton.classList.contains("is-paused")).toBe(true);
+        expect(pauseButton.querySelector("i").className).toBe("ph-fill ph-play");
+        expect(p2pChannel.send).toHaveBeenCalledWith({
+            uuid: "UUID-PAUSE",
+            event: "test.paused",
+            assignmentId: 1,
+        });
+
+        // Act: click the pause button again to resume the test
+        pauseButton.click();
+
+        // Assert: the test is running again, the timer resumes and the icon becomes 'pause'
+        expect(view.testPaused).toBe(false);
+        expect(spyResume).toHaveBeenCalled();
+        expect(pauseButton.classList.contains("is-paused")).toBe(false);
+        expect(pauseButton.querySelector("i").className).toBe("ph-fill ph-pause");
+        expect(p2pChannel.send).toHaveBeenCalledWith({
+            uuid: "UUID-PAUSE",
+            event: "test.resume",
+            assignmentId: 1,
+        });
+    });
+
     it("updates the event table when handling question feedback", () => {
         // Arrange
         view.setPartIndex(0);
@@ -1383,6 +1489,37 @@ describe("GroupTestContainer", () => {
         expect(card.currentViewPartIndex).toBe(1);
     });
 
+    it("updates the progress bar to the average progress across all students", () => {
+        const makeStudent = (id, progress) => ({
+            student: {
+                id,
+                firstName: `Student${id}`,
+                lastName: "Test",
+                progress,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
+        });
+
+        const progressBar = document.getElementById("test-progress-bar");
+        const progressLabel = document.getElementById("test-progress-label");
+
+        instance.updateData(makeStudent(1, 60));
+        expect(progressBar.style.width).toBe("60%");
+        expect(progressLabel.textContent).toBe("60%");
+
+        // The bar shows the average of the two students: (60 + 20) / 2 = 40
+        instance.updateData(makeStudent(2, 20));
+        expect(progressBar.style.width).toBe("40%");
+        expect(progressLabel.textContent).toBe("40%");
+
+        // Non-integer averages are rounded: (60 + 20 + 35) / 3 = 38.33 -> 38
+        instance.updateData(makeStudent(3, 35));
+        expect(progressBar.style.width).toBe("38%");
+        expect(progressLabel.textContent).toBe("38%");
+    });
+
     it("toggles folded area even when clicking on child elements (name text)", () => {
         const studentData = {
             student: {
@@ -1698,6 +1835,8 @@ describe("TeacherView socket 'test.started' handling", () => {
 
         wsGetter = vi.fn().mockReturnValue(socket);
 
+        const elapsedTimeView = new ElapsedTimeView("#elapsed-time");
+
         view = new TeacherView(
             {
                 testType: "group",
@@ -1714,6 +1853,8 @@ describe("TeacherView socket 'test.started' handling", () => {
             new ActionButtons(),
             new NoteField(),
             new QuestionView(),
+            elapsedTimeView,
+            null,
         );
 
         const mainSocketHandler = socket.addEventListener.mock.calls.find(
@@ -1757,6 +1898,103 @@ describe("TeacherView socket 'test.started' handling", () => {
         );
 
         expect(spy).toHaveBeenCalledWith(messageData);
+    });
+
+    it("Starts the timer when 'test.started' message is received", () => {
+        const spy = vi.spyOn(view.elapsedTimeView, "start");
+
+        // simulate 'test.started' message
+        const messageData = {
+            event: "test.started",
+            student: {
+                id: 1,
+                firstName: "Alice",
+                lastName: "Smith",
+                progress: 0,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
+        };
+
+        // Send two test.started events (simulating two students)
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: messageData,
+            }),
+        );
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: messageData,
+            }),
+        );
+
+        // Validate that the timer is only started ONCE
+        expect(spy).toHaveBeenCalledOnce();
+    });
+
+    it("sends a paused message to newly joined students when the test is paused", () => {
+        const spy = vi.spyOn(view, "sendTestPaused");
+
+        // Arrange: the test is currently paused
+        view.testPaused = true;
+
+        // simulate a 'test.started' message from a newly joined student
+        const messageData = {
+            event: "test.started",
+            student: {
+                id: 1,
+                firstName: "Alice",
+                lastName: "Smith",
+                progress: 0,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
+        };
+
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: messageData,
+            }),
+        );
+
+        // Assert: the newly joined student is told the test is paused
+        expect(spy).toHaveBeenCalled();
+    });
+
+    it("marks a student's card as paused/resumed on 'test.paused'/'test.resumed'", () => {
+        const markSpy = vi.spyOn(view.groupTestContainer, "markPause");
+
+        // A student must exist before it can be paused
+        const student = {
+            id: 1,
+            firstName: "Alice",
+            lastName: "Smith",
+            progress: 0,
+            currentPartIndex: 0,
+            currentQuestionIndex: 0,
+            resultsByPart: {},
+        };
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: { event: "test.started", student },
+            }),
+        );
+
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: { event: "test.paused", student },
+            }),
+        );
+        expect(markSpy).toHaveBeenCalledWith(expect.anything(), true);
+
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: { event: "test.resumed", student },
+            }),
+        );
+        expect(markSpy).toHaveBeenCalledWith(expect.anything(), false);
     });
 });
 
@@ -2323,6 +2561,35 @@ describe("StudentCard", () => {
         card.foldedArea.style.display = "none";
         resizeObserverCallback();
         expect(spy).toHaveBeenCalledTimes(1);
+    });
+
+    it("shows the pause overlay when paused before the test is complete", () => {
+        const card = new StudentCard(mockStudent, mockTest);
+        mockStudent.progress = 45;
+
+        card.pause();
+
+        expect(card.pauseOverlay.style.display).toBe("flex");
+    });
+
+    it("does not show the pause overlay when the student has finished", () => {
+        const card = new StudentCard(mockStudent, mockTest);
+        mockStudent.progress = 100;
+
+        card.pause();
+
+        expect(card.pauseOverlay.style.display).toBe("");
+    });
+
+    it("hides the pause overlay on resume", () => {
+        const card = new StudentCard(mockStudent, mockTest);
+        mockStudent.progress = 45;
+        card.pause();
+        expect(card.pauseOverlay.style.display).toBe("flex");
+
+        card.resume();
+
+        expect(card.pauseOverlay.style.display).toBe("none");
     });
 });
 

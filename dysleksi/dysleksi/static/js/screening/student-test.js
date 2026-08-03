@@ -20,6 +20,7 @@ export class StudentTestView extends EventTarget {
     showingInstructions = false;
     isPracticing = false;
     repeatQuestionIndex = null;
+    paused = false;
 
     constructor(test, chatSocket, assignmentId, domElements, student) {
         super();
@@ -56,6 +57,70 @@ export class StudentTestView extends EventTarget {
 
     onChatMessage(data) {
         console.log("Chat: received", data);
+
+        if (data.event === "test.cancelled") {
+            this.onTestComplete(true);
+        }
+
+        if (data.event === "test.paused") {
+            this.pauseTest();
+        }
+
+        if (data.event === "test.resume") {
+            this.resumeTest();
+        }
+    }
+
+    pauseTest() {
+        this.paused = true;
+
+        // Remember which timers were running so that resuming restores exactly
+        // those (and no reminder sound fires while paused).
+        this._pausedHadQuestionTimers =
+            this.questionTimeoutId != null || this.questionReminderId != null;
+        this._pausedHadPartTimeout = this.partTimeoutId != null;
+
+        // Clear all timeouts so nothing (including reminder sounds) fires while
+        // the test is paused.
+        this.clearTimeout();
+        this.clearReminder();
+        this.clearPartTimeout();
+
+        // Cover the student's interface with the pause overlay. It sits on top
+        // of everything and intercepts all clicks/taps, so all buttons are
+        // effectively invalidated while paused.
+        this.domElements.showPauseOverlay();
+
+        this.send({
+            event: "test.paused",
+            message: "Testen er sat på pause",
+        });
+    }
+
+    resumeTest() {
+        this.paused = false;
+
+        // Uncover the interface so the student can interact with it again.
+        this.domElements.hidePauseOverlay();
+
+        // Re-initiate the question timeout and reminder sounds.
+        if (this._pausedHadQuestionTimers && this.currentQuestion) {
+            this.setupReminder();
+        }
+
+        // Re-initiate the part timeout.
+        if (
+            this._pausedHadPartTimeout &&
+            this.currentPart &&
+            typeof this.onPartTimeout === "function"
+        ) {
+            this.setupPartTimeout();
+        }
+
+        this.send({
+            event: "test.resumed",
+            message: "Testen er genoptaget",
+        });
     }
 
     start() {
@@ -363,9 +428,7 @@ export class StudentTestView extends EventTarget {
             : this.currentPart.getFirstUnansweredQuestionIndex(this.student);
         const result = this.showQuestion(this.isPracticing, firstUnanswered);
         if (!this.isPracticing && Number(this.currentPart.timeout) > 1) {
-            this.partTimeoutId = setTimeout(() => {
-                this.onPartTimeout();
-            }, this.currentPart.timeout);
+            this.setupPartTimeout();
         }
         return result;
     }
@@ -378,6 +441,11 @@ export class StudentTestView extends EventTarget {
 
         if (cancelled) {
             alert("Testen er afbrudt");
+            this.student.progress = 100;
+            this.send({
+                event: "test.cancelled",
+                message: "Testen er afbrudt",
+            });
         } else {
             this.send({
                 event: "test.complete",
@@ -390,7 +458,7 @@ export class StudentTestView extends EventTarget {
                 test: this.test,
             }),
         );
-        this.domElements.hideTestContainer();
+        this.domElements.hideAll();
 
         if (this.test.parts.length > 1) {
             this.domElements.showSummary(this.test.parts, this.student, true);
@@ -420,10 +488,7 @@ export class StudentTestView extends EventTarget {
     }
 
     onPartComplete() {
-        if (this.partTimeoutId) {
-            clearTimeout(this.partTimeoutId);
-            this.partTimeoutId = null;
-        }
+        this.clearPartTimeout();
         this.dispatchEvent(
             new Event("part.complete", {
                 test: this.test,
@@ -559,11 +624,23 @@ export class StudentTestView extends EventTarget {
             this.questionTimeoutId = null;
         }
     }
+    clearPartTimeout() {
+        if (this.partTimeoutId) {
+            clearTimeout(this.partTimeoutId);
+            this.partTimeoutId = null;
+        }
+    }
     clearReminder() {
         if (this.questionReminderId) {
             clearTimeout(this.questionReminderId);
             this.questionReminderId = null;
         }
+    }
+
+    setupPartTimeout() {
+        this.partTimeoutId = setTimeout(() => {
+            this.onPartTimeout();
+        }, this.currentPart.timeout);
     }
 
     setupReminder() {
