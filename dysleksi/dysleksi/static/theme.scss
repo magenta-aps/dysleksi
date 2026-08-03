@@ -848,11 +848,15 @@ body.show-instructions .sound-btn.pulse {
     color: black;
     font-size: 26px;
     width: 80vw;
-    padding: 8px 32px;
+    padding: 0px 32px;
     border-radius: 8px;
     text-align: left;
     pointer-events: none;
     border: 2px solid $student-grey-light;
+
+    .summary-title {
+        padding: 8px 0px;
+    }
 }
 
 .summary-count {

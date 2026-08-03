@@ -220,6 +220,7 @@ class TestDomElements {
 
             // Container for text so the image is separate
             const textContainer = document.createElement("div");
+            textContainer.classList.add("summary-title");
 
             if (part.completedByStudent(student) || complete) {
                 textContainer.innerHTML =
@@ -233,7 +234,7 @@ class TestDomElements {
             const img = document.createElement("img");
             img.src = part.image;
             img.alt = "TestPart icon";
-            img.style.height = "50px";
+            img.style.height = "60px";
 
             // Append text and image to block
             block.appendChild(textContainer);
