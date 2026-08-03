@@ -41,7 +41,6 @@ $secondary: $student-grey-light;
 $asset-manifest: (
   "bg-sound-btn":          '/static/images/Knap-hoer-lyd.svg',
   "bg-sound-btn-playing":  '/static/images/Knap-hoer-lyd-aktiv.svg',
-  "bg-start-btn":          '/static/images/Knap-start.svg',
   "bg-start-part-btn":     '/static/images/Knap-start-deltest.svg',
   "bg-next-btn":           '/static/images/Knap-naeste-opgave.svg',
   "bg-repeat-btn":         '/static/images/Knap-gentag-instruktion.svg',
@@ -308,9 +307,9 @@ body.show-instructions {
 
 .start-btn {
   @extend .svg-btn;
-  background-image: var(--bg-start-btn);
-  width: 8rem;
-  height: 8rem;
+  background-image: var(--bg-next-btn);
+  width: 144px;
+  height: 64px;
 }
 
 .start-part-btn {

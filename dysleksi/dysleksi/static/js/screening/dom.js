@@ -346,7 +346,7 @@ class TestDomElements {
     }
 
     clearNextButtonClass() {
-        this.nextBtn.classList.remove("next-btn", "start-btn", "start-part-btn");
+        this.nextBtn.classList.remove("next-btn", "start-part-btn");
     }
 
     setNextButtonClass(cls) {

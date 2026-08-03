@@ -358,60 +358,16 @@ export class StudentTestView extends EventTarget {
     }
 
     updateNextButtonClass() {
-        // console.log(
-        //     "Updating next button class. " +
-        //     "isPracticing:",this.isPracticing,
-        //     ", currentQuestionIndex:",this.currentQuestionIndex,
-        //     ", practice.length:",this.currentPart.practice.length,
-        //     ", questions.length:",this.currentPart.questions.length
-        // );
-        if (this.isPracticing && this.currentPart.practice.length > 0) {
-            if (this.currentQuestionIndex === this.currentPart.practice.length - 1) {
-                // Sidste spørgsmål i øveopgave
-                this.domElements.setNextButtonClass("start-part-btn"); // Blå knap
-                return;
-            }
-
-            if (!this.currentQuestionIndex) {
-                // Første punkt i deltest
-                this.domElements.setNextButtonClass("start-btn"); // Rund knap
-                return;
-            }
-
-            if (this.showingOutro) {
-                // Viser introduktion
-                this.domElements.setNextButtonClass("start-btn"); // Rund knap
-                return;
-            }
-
-            if (
-                this.currentQuestion.continueWhenInstructionIsComplete &&
-                this.endedInstructions
-            ) {
-                // Vi er netop skiftet til en øveopgave, hvor vi skal vente på elevens input, efter at instruktionerne
-                // er afspillet færdige.
-                this.domElements.setNextButtonClass("start-btn"); // Rund knap
-                return;
-            }
-
-            if (
-                this.currentPart.practice
-                    .slice(0, this.currentQuestionIndex + 1)
-                    .every(
-                        (q) =>
-                            !!q.instruction_sequence &&
-                            q.continueWhenInstructionIsComplete !== false,
-                    ) &&
-                !this.currentPart.practice[this.currentQuestionIndex + 1]
-                    .instruction_sequence &&
-                !this.showingInstructions
-            ) {
-                // Dette og alle foregående spørgsmål har en instruktionssekvens. Næste spørgsmål har ikke. Vi er ikke p.t. i gang med at vise instruktioner
-                this.domElements.setNextButtonClass("start-btn"); // Rund knap
-                return;
-            }
+        if (
+            this.isPracticing &&
+            this.currentPart.practice.length > 0 &&
+            this.currentQuestionIndex === this.currentPart.practice.length - 1
+        ) {
+            // Sidste spørgsmål i øveopgave
+            this.domElements.setNextButtonClass("start-part-btn"); // Blå knap
+        } else {
+            this.domElements.setNextButtonClass("next-btn"); // Grøn knap med pil
         }
-        this.domElements.setNextButtonClass("next-btn"); // Grøn knap med pil
     }
 
     showFirstQuestion(isPracticing = false) {
