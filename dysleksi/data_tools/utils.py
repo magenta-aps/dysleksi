@@ -43,8 +43,8 @@ def update_or_create_wordreading_2_test(
         part.set_data_breakdown_ranges(
             "wordlength_data_breakdown", [(3, 4), (5, 6), (7, 8), (9, 11), (12, 15)]
         )
-    if created:
-        test.parts.add(part)
+
+    test.parts.add(part)
 
 
 def update_or_create_wordreading_1_test(
@@ -87,8 +87,7 @@ def update_or_create_wordreading_1_test(
         part.set_data_breakdown_ranges(
             "wordlength_data_breakdown", [(3, 4), (5, 6), (7, 8), (9, 11), (12, 15)]
         )
-    if created:
-        test.parts.add(part)
+    test.parts.add(part)
 
 
 def update_or_create_fore_sound_test(
@@ -124,8 +123,7 @@ def update_or_create_fore_sound_test(
         part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
             part.update_or_create_test_resources(practice_questions_data, True)
-    if created:
-        test.parts.add(part)
+    test.parts.add(part)
 
 
 def update_or_create_letter_sound_test(
@@ -160,8 +158,7 @@ def update_or_create_letter_sound_test(
         part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
             part.update_or_create_test_resources(practice_questions_data, True)
-    if created:
-        test.parts.add(part)
+    test.parts.add(part)
 
 
 def update_or_create_letter_shape_test(
@@ -206,8 +203,7 @@ def update_or_create_letter_shape_test(
         if practice_questions_data:
             part.update_or_create_test_resources(practice_questions_data, True)
 
-    if created:
-        test.parts.add(part)
+    test.parts.add(part)
 
 
 def update_or_create_wordspelling_test(
@@ -242,8 +238,7 @@ def update_or_create_wordspelling_test(
         if practice_questions_data:
             part.update_or_create_test_resources(practice_questions_data, True)
 
-    if created:
-        test.parts.add(part)
+    test.parts.add(part)
 
 
 def update_or_create_nonwordspelling_test(
@@ -278,8 +273,8 @@ def update_or_create_nonwordspelling_test(
         part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
             part.update_or_create_test_resources(practice_questions_data, True)
-    if created:
-        test.parts.add(part)
+
+    test.parts.add(part)
 
 
 def update_or_create_letter_pronunciation_test(
@@ -311,8 +306,7 @@ def update_or_create_letter_pronunciation_test(
         if practice_questions_data:
             part.update_or_create_test_resources(practice_questions_data, True)
 
-    if created:
-        test.parts.add(part)
+    test.parts.add(part)
 
 
 def update_or_create_word_pronunciation_test(
@@ -342,8 +336,8 @@ def update_or_create_word_pronunciation_test(
         part.update_or_create_test_resources(questions_data, False)
         if practice_questions_data:
             part.update_or_create_test_resources(practice_questions_data, True)
-    if created:
-        test.parts.add(part)
+
+    test.parts.add(part)
 
 
 def update_or_create_nonsense_word_pronunciation_test(
@@ -377,8 +371,7 @@ def update_or_create_nonsense_word_pronunciation_test(
         if practice_questions_data:
             part.update_or_create_test_resources(practice_questions_data, True)
 
-    if created:
-        test.parts.add(part)
+    test.parts.add(part)
 
 
 def update_or_create_sentence_reading_test(
@@ -418,5 +411,4 @@ def update_or_create_sentence_reading_test(
         )
         part.set_data_breakdown_ranges("wordcount_data_breakdown", [(1, 2), (3, 4)])
 
-    if created:
-        test.parts.add(part)
+    test.parts.add(part)
