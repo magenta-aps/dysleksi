@@ -518,6 +518,31 @@ describe("GroupTestFlow", () => {
         expect(startSoundCalibrationSpy).toHaveBeenCalled();
     });
 
+    it("Skips sound calibration after a refresh when the student already has results", () => {
+        const test = new Test(groupTestData);
+        const returningStudent = new Student({
+            id: 456,
+            firstName: "Return",
+            lastName: "Ing",
+        });
+        returningStudent.resultsByPart = { 0: ["correct"] };
+
+        const view = new GroupTestView(test, ws, 1, domElements, returningStudent);
+
+        const startSoundCalibrationSpy = vi.spyOn(view, "startSoundCalibration");
+        const showFirstQuestionSpy = vi
+            .spyOn(view, "showFirstQuestion")
+            .mockImplementation(() => {});
+
+        view.start();
+
+        // Ending the intro should skip calibration and show the first question.
+        domElements.endIntroButton.click();
+
+        expect(startSoundCalibrationSpy).not.toHaveBeenCalled();
+        expect(showFirstQuestionSpy).toHaveBeenCalled();
+    });
+
     it("Render intro and move on to onTestComplete", () => {
         const testData = JSON.parse(JSON.stringify(groupTestData));
 

@@ -1570,7 +1570,7 @@ export class TeacherView {
         this._flushMessageQueue();
         setInterval(() => {
             this._flushMessageQueue();
-        }, 5000);
+        }, 1000);
     }
 
     async _flushMessageQueue() {
@@ -1588,26 +1588,28 @@ export class TeacherView {
             return;
         }
 
-        const isOnline = await serverOnline();
-
         // Only attempt to send if the server is online and we have messages
         if (
             this.messageQueue.length > 0 &&
-            isOnline &&
             this.chatSocket.readyState === WebSocket.OPEN
         ) {
-            console.log(`Syncing ${this.messageQueue.length} messages to server...`);
+            const isOnline = await serverOnline();
+            if (isOnline) {
+                console.log(
+                    `Syncing ${this.messageQueue.length} messages to server...`,
+                );
 
-            const queueToProcess = [...this.messageQueue];
+                const queueToProcess = [...this.messageQueue];
 
-            try {
-                for (const msg of queueToProcess) {
-                    this.chatSocket.send(JSON.stringify(msg));
+                try {
+                    for (const msg of queueToProcess) {
+                        this.chatSocket.send(JSON.stringify(msg));
+                    }
+                    this.messageQueue = [];
+                    this._persistQueue();
+                } catch (err) {
+                    console.error("Sync failed, keeping messages in storage:", err);
                 }
-                this.messageQueue = [];
-                this._persistQueue();
-            } catch (err) {
-                console.error("Sync failed, keeping messages in storage:", err);
             }
         }
     }

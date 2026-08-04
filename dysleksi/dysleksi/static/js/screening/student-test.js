@@ -333,7 +333,14 @@ export class StudentTestView extends EventTarget {
             this.setPart(this.test.parts.length - 1);
             this.onTestComplete();
         } else {
-            this.startSoundCalibration();
+            if (this.student.hasResults) {
+                // If the student has already answered some questions, do not
+                // force him to go through the sound calibration again.
+                // see https://redmine.magenta.dk/issues/70626
+                this.showFirstQuestion(this.canPractice());
+            } else {
+                this.startSoundCalibration();
+            }
         }
     }
 

@@ -2,6 +2,10 @@ import { getWebSocket } from "../ws.js";
 
 let wakeLock = null;
 
+export function isEmpty(obj) {
+    return Object.keys(obj).length === 0;
+}
+
 export function setResponsiveFontSize(button, maxFontSize) {
     // Sets font size on a button but scales down if the text does not fit on the button
     button.style.fontSize = `${maxFontSize}px`;
