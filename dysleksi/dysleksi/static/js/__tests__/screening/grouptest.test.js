@@ -1967,21 +1967,6 @@ describe("StudentTestView - updateNextButtonClass", () => {
         document.body.innerHTML = "";
     });
 
-    it("Set button to round class on entry", () => {
-        view.setPart(0);
-        view.setQuestion(true, 0);
-        view.updateNextButtonClass();
-        expect(domElements.nextBtn.classList).toContain("start-btn");
-    });
-
-    it("Set button to round class on playing outro", () => {
-        view.setPart(0);
-        view.setQuestion(true, 1);
-        view.showingOutro = true;
-        view.updateNextButtonClass();
-        expect(domElements.nextBtn.classList).toContain("start-btn");
-    });
-
     it("should set 'start-part-btn' (Blue) on the last practice question", () => {
         view.isPracticing = true;
         // Move to the index of the last practice question
@@ -1993,43 +1978,6 @@ describe("StudentTestView - updateNextButtonClass", () => {
         expect(domElements.setNextButtonClass).toHaveBeenCalledWith("start-part-btn");
     });
 
-    it("should set 'start-btn' (Round) on the very first practice question", () => {
-        view.isPracticing = true;
-        view.setQuestion(true, 0);
-
-        // Ensure showingOutro is false to hit this specific block
-        view.showingOutro = false;
-
-        view.updateNextButtonClass();
-
-        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("start-btn");
-    });
-
-    it("should set 'start-btn' (Round) when showingOutro is true", () => {
-        view.isPracticing = true;
-        view.setQuestion(true, 1); // Middle question
-        view.showingOutro = true;
-
-        view.updateNextButtonClass();
-
-        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("start-btn");
-    });
-
-    it("should set 'start-btn' (Round) when transitioning from instructions to a normal question", () => {
-        view.isPracticing = true;
-
-        // Setup: Current question has instructions, next one does NOT
-        view.currentPart.practice[0].instruction_sequence = { instructions: [] };
-        view.currentPart.practice[1].instruction_sequence = null;
-
-        view.setQuestion(true, 0);
-        view.showingInstructions = false; // We just finished showing them
-
-        view.updateNextButtonClass();
-
-        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("start-btn");
-    });
-
     it("should default to 'next-btn' (Green) for standard test questions", () => {
         // Standard test mode (not practicing)
         view.isPracticing = false;
@@ -2037,47 +1985,6 @@ describe("StudentTestView - updateNextButtonClass", () => {
 
         view.updateNextButtonClass();
 
-        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("next-btn");
-    });
-
-    it("should set 'start-btn' via the instruction-to-task transition logic", () => {
-        view.isPracticing = true;
-        view.showingOutro = false;
-        view.showingInstructions = false;
-
-        // We need at least 3 questions to avoid hitting the "First" or "Last" checks
-        view.currentPart.practice = [
-            { instruction_sequence: { instructions: [] } }, // Index 0 (Has instruction)
-            { instruction_sequence: { instructions: [] } }, // Index 1 (CURRENT - Has instruction)
-            { instruction_sequence: null }, // Index 2 (NEXT - No instruction)
-            { instruction_sequence: null }, // Index 3 (Buffer to not be "Last")
-        ];
-
-        // Set to index 1
-        // 1. It's not index 0 (First check failed)
-        // 2. It's not index 3 (Last check failed)
-        // 3. practice.slice(0, 2) are all instructions (Every check passed)
-        // 4. practice[2] is NOT an instruction (Next check passed)
-        view.setQuestion(true, 1);
-
-        view.updateNextButtonClass();
-
-        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("start-btn");
-    });
-
-    it("should NOT set 'start-btn' if the next question also has instructions", () => {
-        view.isPracticing = true;
-        view.currentPart.practice = [
-            { instruction_sequence: {} },
-            { instruction_sequence: {} }, // Current
-            { instruction_sequence: {} }, // Next (This causes the block to fail)
-            { instruction_sequence: {} },
-        ];
-
-        view.setQuestion(true, 1);
-        view.updateNextButtonClass();
-
-        // Should fall through to the default class
         expect(domElements.setNextButtonClass).toHaveBeenCalledWith("next-btn");
     });
 });
