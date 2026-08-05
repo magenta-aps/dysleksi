@@ -1,5 +1,6 @@
 import { assetCache } from "./cache.js";
 import { calculateStudentProgress } from "./utils.js";
+import { isEmpty } from "./utils.js";
 
 export class Student {
     id;
@@ -19,6 +20,10 @@ export class Student {
     get displayName() {
         const lastInitial = this.lastName ? ` ${this.lastName[0].toUpperCase()}.` : "";
         return `${this.firstName}${lastInitial}`;
+    }
+
+    get hasResults() {
+        return !isEmpty(this.resultsByPart);
     }
 
     initializeMockData(test) {

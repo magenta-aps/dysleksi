@@ -2630,13 +2630,13 @@ describe("TeacherView Sync Logic", () => {
     });
 
     describe("_startSyncInterval", () => {
-        it("triggers _flushMessageQueue every 5 seconds", () => {
+        it("triggers _flushMessageQueue every second", () => {
             const flushSpy = vi.spyOn(view, "_flushMessageQueue");
 
-            vi.advanceTimersByTime(5000);
+            vi.advanceTimersByTime(1000);
             expect(flushSpy).toHaveBeenCalledTimes(1);
 
-            vi.advanceTimersByTime(5000);
+            vi.advanceTimersByTime(1000);
             expect(flushSpy).toHaveBeenCalledTimes(2);
         });
     });
