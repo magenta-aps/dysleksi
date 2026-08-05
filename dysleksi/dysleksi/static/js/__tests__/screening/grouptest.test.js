@@ -1474,6 +1474,24 @@ describe("GroupTestDomElements - showQuestionFreeText", () => {
         expect(displayField).toBeInstanceOf(HTMLElement);
         expect(displayField.classList.contains("display-field")).toBe(true);
     });
+
+    it("prevents the long-press context menu on keyboard buttons", () => {
+        domElements.showQuestionFreeText(listenerMock);
+
+        const letterBtn = document.querySelector(".letter-btn");
+        const eraseBtn = document.querySelector(".erase-btn");
+
+        for (const btn of [letterBtn, eraseBtn]) {
+            const event = new MouseEvent("contextmenu", {
+                bubbles: true,
+                cancelable: true,
+            });
+            const prevented = !btn.dispatchEvent(event);
+
+            expect(prevented).toBe(true);
+            expect(event.defaultPrevented).toBe(true);
+        }
+    });
 });
 
 describe("GroupTestDomElements - showQuestionChallenge", () => {

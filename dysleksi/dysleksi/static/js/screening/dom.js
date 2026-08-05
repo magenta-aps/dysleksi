@@ -733,13 +733,7 @@ class TestDomElements {
         displayField.inputMode = "none";
         displayField.disabled = true;
 
-        displayField.addEventListener(
-            "contextmenu",
-            (e) => {
-                e.preventDefault();
-            },
-            false,
-        );
+        displayField.addEventListener("contextmenu", (e) => e.preventDefault());
 
         displayField.addEventListener(
             "touchstart",
@@ -778,6 +772,8 @@ class TestDomElements {
             listener({ target: { value: displayField.value } });
             this.makeButtonGlow(eraseBtn.id);
         });
+        // Prevent the long-press context menu on touch devices.
+        eraseBtn.addEventListener("contextmenu", (e) => e.preventDefault());
 
         textFieldWrapper.append(displayField);
 
@@ -800,6 +796,8 @@ class TestDomElements {
                     listener({ target: { value: displayField.value } });
                     this.makeButtonGlow(btn.id);
                 });
+                // Prevent the long-press context menu on touch devices.
+                btn.addEventListener("contextmenu", (e) => e.preventDefault());
                 rowDiv.appendChild(btn);
                 // On the last letter button row, append the erase button
                 if (rowIndex === buttonRows.length - 1) {
@@ -886,11 +884,15 @@ export class GroupTestDomElements extends TestDomElements {
         if (imageUrl) {
             const image = document.createElement("img");
             image.src = imageUrl;
+            image.draggable = false;
             btn.append(image);
             btn.classList.add("square-btn");
         } else if (squareButton) {
             btn.classList.add("square-btn");
         }
+
+        // Prevent the long-press context menu on touch devices.
+        btn.addEventListener("contextmenu", (e) => e.preventDefault());
 
         // TODO: render sound
         btn.id = answer.buttonId;

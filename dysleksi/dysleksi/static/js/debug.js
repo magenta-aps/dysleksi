@@ -3,7 +3,6 @@ export class DebugConsole {
     originalLog;
     originalWarn;
     originalError;
-    isIpad;
 
     constructor(logboxId = "logbox") {
         this.logbox = document.getElementById(logboxId);
@@ -49,15 +48,6 @@ export class DebugConsole {
 
         // ---------- mark start ----------
         this.writeLine(">", ["Debug console attached"]);
-
-        // ---------- iPad hiding ----------
-        this.isIpad =
-            /iPad|Macintosh/.test(navigator.userAgent) &&
-            navigator.maxTouchPoints &&
-            navigator.maxTouchPoints > 1;
-        if (!this.isIpad) {
-            this.logbox.style.display = "none";
-        }
     }
 
     // ---------- helpers ----------
