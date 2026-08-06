@@ -39,7 +39,7 @@ export class GroupTestView extends StudentTestView {
     }
 
     // ---- Questions ----
-    showQuestion(isPracticing, questionIndex) {
+    async showQuestion(isPracticing, questionIndex) {
         const canShow = this.setQuestion(isPracticing, questionIndex);
         if (canShow) {
             console.log("---------------------------------------------");
@@ -56,6 +56,7 @@ export class GroupTestView extends StudentTestView {
                 this.currentQuestion,
             );
 
+            this.domElements.fadeScreenOverlay();
             this.setStudentHeader();
             this.domElements.toggleRepeatButton(false);
             this.domElements.toggleNextButton(false);
@@ -148,7 +149,7 @@ export class GroupTestView extends StudentTestView {
             }
 
             if (this.currentQuestion.instruction_sequence) {
-                this.runInstructions(() => {
+                await this.runInstructions(() => {
                     if (this.currentQuestion.continueWhenInstructionIsComplete) {
                         // Prompt user to go to next question (by removing the question elements)
                         // (This is the default behavior.)
@@ -330,7 +331,7 @@ export class GroupTestView extends StudentTestView {
         // Hide the image to avoid leaking into the next question
         this.domElements.hideChallengeImage();
 
-        if (this.showNextQuestion()) {
+        if (await this.showNextQuestion()) {
             // Next question is being shown
         } else {
             // no more questions in set

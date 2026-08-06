@@ -61,7 +61,7 @@ export class IndividualTestView extends StudentTestView {
     }
 
     // ---- Questions ----
-    showQuestion(isPracticing, questionIndex) {
+    async showQuestion(isPracticing, questionIndex) {
         const canShow = this.setQuestion(isPracticing, questionIndex);
         this.domElements.toggleNextButton(false);
         if (canShow) {
@@ -74,6 +74,7 @@ export class IndividualTestView extends StudentTestView {
                     this.currentQuestionIndex,
             );
 
+            this.domElements.fadeScreenOverlay();
             this.setStudentHeader();
             this.updateNextButtonClass();
 
@@ -82,7 +83,7 @@ export class IndividualTestView extends StudentTestView {
                     this.onQuestionComplete(this.currentQuestion),
                 );
                 this.domElements.setRepeatButtonListener(() => this.repeat());
-                this.runInstructions();
+                await this.runInstructions();
             } else {
                 this.setupReminder();
                 this.domElements.toggleRepeatButton(false);
@@ -116,7 +117,7 @@ export class IndividualTestView extends StudentTestView {
         return canShow;
     }
 
-    onQuestionComplete() {
+    async onQuestionComplete() {
         const duration = this.answeredAt - this.displayedAt;
         let message = `Elev har gennemført spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1}`;
         if (this.isPracticing) {
@@ -138,7 +139,7 @@ export class IndividualTestView extends StudentTestView {
             practice: this.isPracticing,
         });
         this.answeredAt = document.timeline.currentTime;
-        if (this.showNextQuestion()) {
+        if (await this.showNextQuestion()) {
             // Next question is being shown
         } else {
             if (this.isPracticing) {

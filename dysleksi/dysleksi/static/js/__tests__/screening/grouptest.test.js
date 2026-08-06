@@ -881,7 +881,7 @@ describe("GroupTestFlow", () => {
         });
     });
 
-    it("Let first testpart time out on second question", () => {
+    it("Let first testpart time out on second question", async () => {
         vi.useFakeTimers();
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
@@ -890,7 +890,7 @@ describe("GroupTestFlow", () => {
         view.setPart(0);
 
         const part = view.currentPart;
-        view.showFirstQuestion(false);
+        await view.showFirstQuestion(false);
         const firstQuestion = view.currentQuestion;
         const firstQuestionTitle = view.questionTitle();
 
@@ -1127,7 +1127,7 @@ describe("GroupTestFlow", () => {
         expect(view.domElements.makeButtonHappy).toHaveBeenCalled();
     });
 
-    it("Answer last question in part", () => {
+    it("Answer last question in part", async () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
         testSpy(view);
@@ -1137,7 +1137,7 @@ describe("GroupTestFlow", () => {
         const question = view.currentQuestion;
         const firstAnswer = question.possibleAnswers[0];
         view.selectAnswer(firstAnswer);
-        view.onQuestionComplete(question);
+        await view.onQuestionComplete(question);
 
         expect(view.onQuestionComplete).toHaveBeenCalled();
         expect(view.onPartComplete).toHaveBeenCalled();
@@ -1162,7 +1162,7 @@ describe("GroupTestFlow", () => {
         view.input.value = "aput";
         view.selectFreeText();
         view.send.mockClear();
-        view.onQuestionComplete(question);
+        await view.onQuestionComplete(question);
         // The only call to send is that the next question was displayed
         expect(view.send).toHaveBeenCalledOnce();
         expect(view.send).toHaveBeenCalledWith({
@@ -1294,7 +1294,7 @@ describe("GroupTestFlow", () => {
         });
     });
 
-    it("Answer last question in last part", () => {
+    it("Answer last question in last part", async () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, ws, 1, domElements, student);
         testSpy(view);
@@ -1305,7 +1305,7 @@ describe("GroupTestFlow", () => {
         const question = view.currentQuestion;
         view.input.value = "iki";
         view.selectFreeText();
-        view.onQuestionComplete(question);
+        await view.onQuestionComplete(question);
 
         expect(view.onQuestionComplete).toHaveBeenCalled();
         expect(view.onPartComplete).toHaveBeenCalled();
@@ -1321,7 +1321,7 @@ describe("GroupTestFlow", () => {
         expect(domElements.showSummary).toHaveBeenCalled();
     });
 
-    it("Answer last question in last part when there is only a single testpart", () => {
+    it("Answer last question in last part when there is only a single testpart", async () => {
         // Ensure there is only one testpart;
         const testData = JSON.parse(JSON.stringify(groupTestData));
         testData.parts = testData.parts.slice(-1);
@@ -1336,7 +1336,7 @@ describe("GroupTestFlow", () => {
         const question = view.currentQuestion;
         view.input.value = "iki";
         view.selectFreeText();
-        view.onQuestionComplete(question);
+        await view.onQuestionComplete(question);
 
         expect(view.onQuestionComplete).toHaveBeenCalled();
         expect(view.onPartComplete).toHaveBeenCalled();

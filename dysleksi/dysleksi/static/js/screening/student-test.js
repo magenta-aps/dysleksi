@@ -354,7 +354,7 @@ export class StudentTestView extends EventTarget {
         }
     }
 
-    showFirstQuestion(isPracticing = false) {
+    async showFirstQuestion(isPracticing = false) {
         this.isPracticing = isPracticing;
         console.log(
             "Showing first question",
@@ -366,7 +366,7 @@ export class StudentTestView extends EventTarget {
         const firstUnanswered = this.isPracticing
             ? 0
             : this.currentPart.getFirstUnansweredQuestionIndex(this.student);
-        const result = this.showQuestion(this.isPracticing, firstUnanswered);
+        const result = await this.showQuestion(this.isPracticing, firstUnanswered);
         if (!this.isPracticing && Number(this.currentPart.timeout) > 1) {
             this.setupPartTimeout();
         }
@@ -467,15 +467,11 @@ export class StudentTestView extends EventTarget {
         return true;
     }
 
-    showNextQuestion() {
-        const canShow = this.showQuestion(
+    async showNextQuestion() {
+        const canShow = await this.showQuestion(
             this.isPracticing,
             this.currentQuestionIndex + 1,
         );
-
-        if (canShow) {
-            this.domElements.fadeScreenOverlay();
-        }
         return canShow;
     }
 
@@ -538,7 +534,7 @@ export class StudentTestView extends EventTarget {
 
         this.domElements.fadeScreenOverlay();
 
-        instructionRunner.run().then(() => {
+        return instructionRunner.run().then(() => {
             this.domElements.unlockInput();
             if (this.domElements.skipInstructionButton) {
                 this.domElements.skipInstructionButton.style.display = "none";
@@ -578,6 +574,7 @@ export class StudentTestView extends EventTarget {
     }
 
     setupPartTimeout() {
+        console.log("Setting up part timeout");
         this.partTimeoutId = setTimeout(() => {
             this.onPartTimeout();
         }, this.currentPart.timeout);
