@@ -1,0 +1,87 @@
+{% extends "dysleksi/admin/base.html" %}
+{% load i18n %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dysleksi:class_list' %}">{% translate 'Klasser' %}</a></li>
+<li class="breadcrumb-item active" aria-current="page">
+    {% blocktranslate trimmed with class_name=object.name %}
+    Klasse {{ class_name }}
+    {% endblocktranslate %}
+</li>
+{% endblock %}
+
+{% block inner_content %}
+<div class="row">
+    <div class="col-9">
+        <h5 class="mt-2 mb-4">
+            <i class="ph ph-users-three fs-5"></i>
+            {% blocktranslate trimmed with class_name=object.name %}
+            Klasse {{ class_name }}
+            {% endblocktranslate %}
+            <span class="subheader">
+                ({% blocktranslate trimmed with school_year_start=object.school_year_start %}
+                Årgang {{ school_year_start }}
+                {% endblocktranslate %})
+            </span>
+        </h5>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table master-data">
+        <tr>
+            <td>{% translate 'Klasse ID:' %}</td>
+            <td>{{ object.pk }}</td>
+        </tr>
+        <tr>
+            <td>{% translate 'Antal elever:' %}</td>
+            <td>{{ object.students.count }}</td>
+        </tr>
+        <tr>
+            <td>{% translate 'Kontaktlærer:' %}</td>
+            <td>{{ teacher.get_full_name }}</td>
+        </tr>
+        <tr>
+            <td>{% translate 'Kontaktmail:' %}</td>
+            <td>{{ teacher.email|default_if_none:'-' }}</td>
+        </tr>
+        <tr>
+            <td>{% translate 'Gennemførte testforløb:' %}</td>
+            <td>
+                {% for a in completed_test_assignments %}
+                <span class="assignment d-inline-flex flex-column me-5">
+                    <div class="d-flex flex-row align-items-center">
+                        <i class="ph-fill ph-check-circle fs-5 me-1"></i>
+                        {{ a.test.name }}
+                    </div>
+                    {% has_permission a "view" as has_perm %}
+                    {% if has_perm %}
+                    <a href="{% url 'dysleksi:test_assignment_results' pk=a.pk %}">
+                        {% translate 'Se resultater' %}
+                    </a>
+                    {% endif %}
+                </span>
+                {% endfor %}
+            </td>
+        </tr>
+        <tr>
+            <td>{% translate 'Planlagte testforløb:' %}</td>
+            <td>
+                {% for a in planned_test_assignments %}
+                <span class="assignment d-inline-flex flex-column me-5">
+                    <div class="d-flex flex-row align-items-center">
+                        <i class="ph ph-calendar-check fs-5 me-1"></i>
+                        {{ a.test.name }}
+                    </div>
+                    <span class="date">
+                        {% blocktranslate trimmed with start=a.planned_date_time.period.lower %}
+                        Planlagt {{ start|date:"SHORT_DATE_FORMAT" }}
+                        {% endblocktranslate %}
+                    </span>
+                </span>
+                {% endfor %}
+            </td>
+        </tr>
+    </table>
+</div>
+{% endblock %}

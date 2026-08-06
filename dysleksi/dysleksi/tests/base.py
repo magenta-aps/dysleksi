@@ -60,6 +60,7 @@ class DysleksiTest(TestCase):
             first_name="Test",
             last_name="Lærer",
         )
+        cls.klasse.teachers.add(cls.teacher)
         cls.admin, _ = User.objects.update_or_create(
             username="TestAdmin",
             first_name="Test",

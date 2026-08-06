@@ -285,7 +285,23 @@ class Institution(models.Model):
     )
 
 
-class Student(User):
+class StudentQuerySet(PermissionsQuerySet):
+    @property
+    def model_name(self):
+        return "Student"
+
+    def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_teacher:
+            return self.filter(
+                institution=user.institution,  # type: ignore[attr-defined]
+                classes__teachers=user,
+            )
+        return self.none()
+
+
+class Student(PermissionsMixin, User):
+    objects = StudentQuerySet.as_manager()  # type: ignore
+
     institution = models.ForeignKey(
         Institution,
         null=True,

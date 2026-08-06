@@ -1,0 +1,80 @@
+{% extends "dysleksi/admin/base.html" %}
+{% load i18n %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dysleksi:class_list' %}">{% translate 'Klasser' %}</a></li>
+<li class="breadcrumb-item">
+    <a href="{% url 'dysleksi:class_detail' pk=main_class.pk %}">
+        {% blocktranslate trimmed with class_name=main_class.name %}
+        Klasse {{ class_name }}
+        {% endblocktranslate %}
+    </a>
+</li>
+<li class="breadcrumb-item active" aria-current="page">{{ object.get_full_name }}</li>
+{% endblock %}
+
+{% block inner_content %}
+<div class="row">
+    <div class="col-9">
+        <h5 class="mt-2 mb-4">
+            {{ object.get_full_name }}
+        </h5>
+    </div>
+</div>
+
+<div class="table-container">
+    <table class="table master-data">
+        <tr>
+            <td>{% translate 'Elev ID:' %}</td>
+            <td>{{ object.pk }}</td>
+        </tr>
+        <tr>
+            <td>{% translate 'CPR-nummer:' %}</td>
+            <td>{{ object.cpr }}</td>
+        </tr>
+        <tr>
+            <td>{% translate 'Kontaktmail:' %}</td>
+            <td>{{ object.email|default_if_none:'-' }}</td>
+        </tr>
+        {% if main_class %}
+        <tr>
+            <td>{% translate 'Klasse:' %}</td>
+            <td>
+                {% has_permission main_class "view" as has_perm %}
+                {% if has_perm %}
+                <a href="{% url 'dysleksi:class_detail' pk=main_class.pk %}">
+                    {{ main_class }}
+                </a>
+                {% else %}
+                {{ main_class }}
+                {% endif %}
+            </td>
+        </tr>
+        {% endif %}
+        {% if teacher %}
+        <tr>
+            <td>{% translate 'Kontaktlærer:' %}</td>
+            <td>{{ teacher.get_full_name }}</td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td>{% translate 'Gennemførte testforløb:' %}</td>
+            <td>
+                {% for a in completed_test_assignments %}
+                <span class="assignment d-inline-flex flex-column me-5">
+                    <div class="d-flex flex-row align-items-center">
+                        <i class="ph-fill ph-check-circle fs-5 me-1"></i>
+                        {{ a.test.name }}
+                    </div>
+                    {% has_permission a "view" as has_perm %}
+                    {% if has_perm %}
+                    <a href="{% url 'dysleksi:test_assignment_results' pk=a.pk %}">
+                        {% translate 'Se resultater' %}
+                    </a>
+                    {% endif %}
+                </span>
+                {% endfor %}
+            </td>
+        </tr>
+    </table>
+</div>
+{% endblock %}

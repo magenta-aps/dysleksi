@@ -10,11 +10,13 @@ from dysleksi.views import (
     AssignmentResultsFlagView,
     AssignmentResultsView,
     AssignmentView,
+    ClassDetailView,
     ClassListView,
     PartResponseView,
     RootView,
     StartGroupAssignmentView,
     StartIndividualAssignmentView,
+    StudentDetailView,
     StudentListView,
     TestAssignmentListView,
     TestResponseView,
@@ -38,7 +40,11 @@ urlpatterns: list[URLResolver | URLPattern] = [
     path("assignment/<int:pk>/", AssignmentView.as_view(), name="room"),
     path("class/", ClassListView.as_view(), name="class_list"),
     path("admin/classes/", ClassListView.as_view(), name="class_list"),
+    path("admin/classes/<int:pk>/", ClassDetailView.as_view(), name="class_detail"),
     path("admin/students/", StudentListView.as_view(), name="student_list"),
+    path(
+        "admin/students/<int:pk>/", StudentDetailView.as_view(), name="student_detail"
+    ),
     path(
         "admin/test-assignments/",
         TestAssignmentListView.as_view(),

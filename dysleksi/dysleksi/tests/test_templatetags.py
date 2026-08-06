@@ -2,12 +2,15 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 import datetime
+from unittest.mock import MagicMock
 
 from django.test import SimpleTestCase
 from django.utils import timezone
 from psycopg.types.range import Range
 
 from dysleksi.templatetags.get import get, range_attr
+from dysleksi.templatetags.permissions import has_permission
+from dysleksi.tests.base import DysleksiTest
 
 
 class TestTagGet(SimpleTestCase):
@@ -53,3 +56,20 @@ class TestTagRangeAttr(SimpleTestCase):
     def test_range_attr_invalid_input(self):
         self.assertEqual(range_attr(None, "lower"), "-")
         self.assertEqual(range_attr(None, "invalid"), "-")
+
+
+class TestHasPermission(DysleksiTest):
+    def test_handles_user_with_permission(self):
+        self.assertTrue(self._has_permission(self.klasse, self.teacher, "view"))
+
+    def test_handles_user_without_permission(self):
+        self.assertFalse(self._has_permission(self.klasse, self.other_teacher, "view"))
+
+    def test_handles_object_without_permissions_mixin(self):
+        self.assertTrue(self._has_permission(self.school, self.teacher, "view"))
+
+    def _has_permission(self, obj, user, action):
+        mock_request = MagicMock()
+        mock_request.user = user
+        mock_context = {"request": mock_request}
+        return has_permission(mock_context, obj, action)

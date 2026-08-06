@@ -32,10 +32,12 @@ from dysleksi.views import (
     AssignmentResultsFlagView,
     AssignmentResultsView,
     AssignmentView,
+    ClassDetailView,
     ClassListView,
     PaginationMixin,
     PartResponseView,
     RootView,
+    StudentDetailView,
     StudentListView,
     TestAssignmentListView,
     TestResponseView,
@@ -226,6 +228,27 @@ class TestClassListView(DysleksiTest):
         )
 
 
+class TestClassDetailView(DysleksiTest):
+    def test_teacher_view(self):
+        view = self.setup_view(ClassDetailView, self.teacher, pk=self.klasse.pk)
+        context_data = view.get_context_data()
+        self.assertEqual(context_data["teacher"], self.klasse.teachers.first())
+        self.assertQuerySetEqual(
+            context_data["completed_test_assignments"], TestAssignment.objects.none()
+        )
+        self.assertQuerySetEqual(
+            context_data["planned_test_assignments"],
+            TestAssignment.objects.filter(pk=self.test_assignment_class.pk),
+        )
+
+    def test_student_view(self):
+        self.client.force_login(self.student1)
+        response = self.client.get(
+            reverse("dysleksi:class_detail", kwargs={"pk": self.klasse.pk})
+        )
+        self.assertEqual(response.status_code, 403)
+
+
 class TestStudentListView(DysleksiTest):
 
     url = reverse("dysleksi:student_list")
@@ -252,6 +275,40 @@ class TestStudentListView(DysleksiTest):
     def test_student_view(self):
         self.client.force_login(self.student1)
         response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 403)
+
+
+class TestStudentDetailView(DysleksiTest):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        # Add student which is not part of `cls.klasse`
+        klasse = cls.create_class(2025, "Matematik", is_main=False)
+        klasse.teachers.add(cls.teacher)
+        cls.student3 = cls.create_student(
+            "TestStudent3", cpr=1234567892, first_name="Test3", last_name="Elev"
+        )
+        klasse.students.add(cls.student3)
+
+    def test_teacher_views_student_belonging_to_a_main_class(self):
+        view = self.setup_view(StudentDetailView, self.teacher, pk=self.student1.pk)
+        context_data = view.get_context_data()
+        self.assertEqual(context_data["teacher"], self.klasse.teachers.first())
+        self.assertQuerySetEqual(
+            context_data["completed_test_assignments"], TestAssignment.objects.none()
+        )
+
+    def test_teacher_views_student_not_belonging_to_a_main_class(self):
+        view = self.setup_view(StudentDetailView, self.teacher, pk=self.student3.pk)
+        context_data = view.get_context_data()
+        self.assertNotIn("main_class", context_data)
+        self.assertNotIn("teacher", context_data)
+
+    def test_student_view(self):
+        self.client.force_login(self.student1)
+        response = self.client.get(
+            reverse("dysleksi:student_detail", kwargs={"pk": self.student1.pk})
+        )
         self.assertEqual(response.status_code, 403)
 
 
