@@ -369,9 +369,9 @@ describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
     });
 
     it("Shows question choices", () => {
-        vi.spyOn(HTMLElement.prototype, "addEventListener").mockImplementation(
-            () => {},
-        );
+        const addEventListenerSpy = vi
+            .spyOn(HTMLElement.prototype, "addEventListener")
+            .mockImplementation(() => {});
         const listener = () => {};
 
         const answer1 = {
@@ -400,6 +400,9 @@ describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
         const button2 = dom.showQuestionChoice(answer2, listener, 2, container);
         expect(button2.textContent).toBe("Option A");
         expect(button2.addEventListener).toHaveBeenCalledWith("click", listener);
+
+        // Restore the prototype spy so later tests keep a working addEventListener.
+        addEventListenerSpy.mockRestore();
     });
 });
 
@@ -522,6 +525,21 @@ describe("GroupTestDomElements DOM utilities", () => {
     it("hides summary", () => {
         dom.hideSummary();
         expect(dom.testSummary.style.display).toBe("none");
+    });
+
+    it("waitForClick pulses the element and resolves once it is clicked", async () => {
+        const btn = document.getElementById("start-practice");
+
+        const waitPromise = dom.waitForClick(btn);
+
+        // The element pulses while we wait for the click
+        expect(btn.classList.contains("pulse")).toBe(true);
+
+        btn.click();
+        await waitPromise;
+
+        // Once clicked the pulse class is cleaned up again
+        expect(btn.classList.contains("pulse")).toBe(false);
     });
 
     it("showFaded sets initial opacity and calls showElement after timeout", () => {

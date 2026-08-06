@@ -954,9 +954,10 @@ body.show-instructions .sound-btn.pulse {
 #speaker {
   font-size: 100px;
   color: $student-blue-darkest;
-  position: absolute;
-  top: 2 * $spacer;
-  right: 2 * $spacer;
+  position: relative;
+  outline: none;
+  background: none;
+  border: none;
 
   &.playing::before {
     animation: speaker-pulse 1.5s steps(1, end) infinite;
