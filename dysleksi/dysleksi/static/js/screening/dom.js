@@ -49,11 +49,8 @@ class TestDomElements {
         );
         this.skipSummaryButton = document.querySelector("#skip-summary");
         this.repeatBtn = document.querySelector("#repeat");
-        this.soundCalibrationAnimation = document.querySelector(
-            "#sound-calibration-animation",
-        );
         this.testFinishedRow = document.querySelector("#test-finished-row");
-        this.speakerIcon = document.querySelector("#speaker");
+        this.speakerButton = document.querySelector("#speaker");
         this.pauseOverlay = document.querySelector("#pause-overlay");
 
         this.currentAudioSource = null;
@@ -168,25 +165,6 @@ class TestDomElements {
     }
     hidePauseOverlay() {
         this.pauseOverlay.style.display = "none";
-    }
-
-    showSoundCalibrationAnimation() {
-        this.showElement(this.soundCalibrationAnimation);
-    }
-
-    hideSoundCalibrationAnimation() {
-        this.hideElement(this.soundCalibrationAnimation);
-    }
-
-    stopSoundCalibrationAnimation() {
-        this.soundCalibrationAnimation.src = assetCache.fetch(
-            "/static/images/talking_face.png",
-        );
-    }
-    startSoundCalibrationAnimation() {
-        this.soundCalibrationAnimation.src = assetCache.fetch(
-            "/static/images/talking_face.gif",
-        );
     }
 
     async setLogOutButtonListener(buttonEl) {

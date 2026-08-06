@@ -192,7 +192,6 @@ export class StudentTestView extends EventTarget {
     async startSoundCalibration() {
         this.domElements.setBodyBackground("#E5ECF2"); // Light blue
         this.cancelAudio = false;
-        this.domElements.hideSoundCalibrationAnimation();
         this.domElements.hideElement(this.domElements.endSoundCalibrationButton);
         this.domElements.showSoundCalibration();
 
@@ -209,32 +208,13 @@ export class StudentTestView extends EventTarget {
             },
         );
 
-        this.domElements._setButtonListener(
-            this.domElements.soundCalibrationAnimation,
-            async () => {
-                const el = this.domElements.soundCalibrationAnimation;
-                if (el._busyPromise) return;
-                el._busyPromise = (async () => {
-                    this.domElements.startSoundCalibrationAnimation();
+        this.domElements.speakerButton.classList.add("playing");
 
-                    // Jeg hedder Pilu
-                    // Juster lyden, så du kan høre min stemme tydeligt.
-                    await this.domElements.playSound(
-                        "/static/audio/1t.3.wav",
-                        this.audioContext,
-                    );
-                    this.domElements.stopSoundCalibrationAnimation();
-                })();
-                el._busyPromise.finally(() => {
-                    el._busyPromise = null;
-                });
-            },
-        );
+        // It should not be possible to click the button while audio is playing
+        this.domElements.speakerButton.disabled = true;
 
-        this.domElements.speakerIcon.classList.add("playing");
-
-        // Testen starter om lidt.
         try {
+            // Testen starter om lidt.
             await this.domElements.playSound(
                 "/static/audio/1t.1.wav",
                 this.audioContext,
@@ -246,26 +226,23 @@ export class StudentTestView extends EventTarget {
                 "/static/audio/1t.2.wav",
                 this.audioContext,
             );
-            this.domElements.speakerIcon.classList.remove("playing");
-
             await this.sleep(750);
-            this.domElements.showSoundCalibrationAnimation();
-            await this.domElements.waitForClick(
-                this.domElements.soundCalibrationAnimation,
-            );
-
-            await this.sleep(750);
-            this.domElements.stopSoundCalibrationAnimation();
 
             // Tryk grøn når du er klar.
-            this.domElements.speakerIcon.classList.add("playing");
             await this.domElements.playSound(
                 "/static/audio/1t.4.wav",
                 this.audioContext,
             );
-            this.domElements.speakerIcon.classList.remove("playing");
+            this.domElements.speakerButton.classList.remove("playing");
 
             this.domElements.showElement(this.domElements.endSoundCalibrationButton);
+
+            // Clicking the speaker icon will play start the sound calibration routine
+            // over again
+            this.domElements.speakerButton.disabled = false;
+            this.domElements._setButtonListener(this.domElements.speakerButton, () =>
+                this.startSoundCalibration(),
+            );
         } catch (e) {
             if (e.message !== "cancelled") throw e;
             // cancelled — just exit silently

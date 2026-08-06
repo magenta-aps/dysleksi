@@ -658,11 +658,8 @@ describe("GroupTestFlow", () => {
         // The "next" button is hidden
         expect(domElements.endSoundCalibrationButton.style.visibility).toBe("hidden");
 
-        // The smiley image is hidden
-        expect(domElements.soundCalibrationAnimation.style.visibility).toBe("hidden");
-
         // The speaker icon is animated and voice-over audio starts playing
-        expect(domElements.speakerIcon.classList.contains("playing")).toBe(true);
+        expect(domElements.speakerButton.classList.contains("playing")).toBe(true);
         await advanceUntil(() => {
             expect(domElements.playSound).toHaveBeenCalledWith(
                 "/static/audio/1t.1.wav",
@@ -672,46 +669,6 @@ describe("GroupTestFlow", () => {
                 "/static/audio/1t.2.wav",
                 mockAudioContextInstance,
             );
-        });
-
-        // After the voice-over finishes, the speaker icon stops animating
-        expect(domElements.speakerIcon.classList.contains("playing")).toBe(false);
-
-        // The smiley appears, ready for the student to click. It is not talking
-        await advanceUntil(() => {
-            expect(domElements.soundCalibrationAnimation.style.visibility).toBe(
-                "visible",
-            );
-            expect(domElements.soundCalibrationAnimation.src.endsWith("png")).toBe(
-                true,
-            );
-        });
-
-        // Click the smiley
-        domElements.soundCalibrationAnimation.click();
-
-        // The smiley now starts talking
-        await advanceUntil(() => {
-            expect(domElements.startSoundCalibrationAnimation).toHaveBeenCalled();
-            expect(domElements.playSound).toHaveBeenCalledWith(
-                "/static/audio/1t.3.wav",
-                mockAudioContextInstance,
-            );
-            expect(domElements.soundCalibrationAnimation.src.endsWith("gif")).toBe(
-                true,
-            );
-        });
-
-        // The smiley stops talking when the audio is finished
-        await advanceUntil(() => {
-            expect(domElements.stopSoundCalibrationAnimation).toHaveBeenCalled();
-            expect(domElements.soundCalibrationAnimation.src.endsWith("png")).toBe(
-                true,
-            );
-        });
-
-        // The voice-over starts talking again.
-        await advanceUntil(() => {
             expect(domElements.playSound).toHaveBeenCalledWith(
                 "/static/audio/1t.4.wav",
                 mockAudioContextInstance,
@@ -721,22 +678,23 @@ describe("GroupTestFlow", () => {
         // The "next" button appears when the voice-over is finished
         expect(domElements.endSoundCalibrationButton.style.visibility).toBe("visible");
 
-        // The student can click the smiley again if he wants to test his sound
-        domElements.startSoundCalibrationAnimation.mockClear();
+        // The student can click the speaker icon if he wants to hear everything again
         domElements.playSound.mockClear();
-        domElements.soundCalibrationAnimation.click();
+        domElements.speakerButton.click();
 
         await advanceUntil(() => {
-            expect(domElements.startSoundCalibrationAnimation).toHaveBeenCalled();
             expect(domElements.playSound).toHaveBeenCalledWith(
-                "/static/audio/1t.3.wav",
+                "/static/audio/1t.1.wav",
                 mockAudioContextInstance,
             );
-
-            // Clicking again while the smiley is talking won't do a thing
-            domElements.startSoundCalibrationAnimation.mockClear();
-            domElements.soundCalibrationAnimation.click();
-            expect(domElements.startSoundCalibrationAnimation).not.toHaveBeenCalled();
+            expect(domElements.playSound).toHaveBeenCalledWith(
+                "/static/audio/1t.2.wav",
+                mockAudioContextInstance,
+            );
+            expect(domElements.playSound).toHaveBeenCalledWith(
+                "/static/audio/1t.4.wav",
+                mockAudioContextInstance,
+            );
         });
 
         domElements.endSoundCalibrationButton.click();
