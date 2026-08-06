@@ -54,6 +54,7 @@ from dysleksi.models import (
     Student,
     Test,
     TestAssignment,
+    TestAssignmentStatus,
     TestPart,
     TestQuestion,
     TestResponse,
@@ -199,6 +200,28 @@ class ClassListView(GroupRequiredMixin, SingleTableView):
         return qs
 
 
+class ClassDetailView(GroupRequiredMixin, ObjectPermissionsMixin, DetailView):
+    model = Class
+    groups_required = [TEACHERS]
+    template_name = "dysleksi/admin/class/detail.html"
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+
+        # TODO: if Tabulex data indicates who is "kontaktlærer", display that teacher
+        context_data["teacher"] = self.object.teachers.first()
+
+        assignments = self.object.testassignment_set.annotate_status()
+        context_data["completed_test_assignments"] = assignments.filter(
+            status=TestAssignmentStatus.COMPLETED
+        )
+        context_data["planned_test_assignments"] = assignments.filter(
+            status__in=(TestAssignmentStatus.CREATED, TestAssignmentStatus.IN_PROGRESS)
+        )
+
+        return context_data
+
+
 class StudentListView(GroupRequiredMixin, SingleTableView):
     model = Student
     table_class = StudentTable
@@ -210,6 +233,30 @@ class StudentListView(GroupRequiredMixin, SingleTableView):
         # Only show students belonging to the teacher viewing the page
         qs = qs.filter(institution=self.user.institution, classes__teachers=self.user)
         return qs
+
+
+class StudentDetailView(GroupRequiredMixin, ObjectPermissionsMixin, DetailView):
+    model = Student
+    groups_required = [TEACHERS]
+    template_name = "dysleksi/admin/student/detail.html"
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+
+        main_classes = self.object.classes.filter(is_main=True)
+        if main_classes.exists():
+            main_class = main_classes.first()
+            context_data["main_class"] = main_class
+            context_data["teacher"] = main_class.teachers.first()
+
+        assignments = TestAssignment.objects.filter(
+            Q(student=self.object) | Q(klasse__students=self.object)
+        ).annotate_status()
+        context_data["completed_test_assignments"] = assignments.filter(
+            status=TestAssignmentStatus.COMPLETED
+        )
+
+        return context_data
 
 
 class TestAssignmentListView(GroupRequiredMixin, SingleTableView):

@@ -550,6 +550,26 @@ textarea.form-control {
       border-right-width: var(--bs-border-width);
     }
   }
+
+  .master-data {
+    td:last-child {
+      width: 75%;
+      white-space: wrap;
+    }
+
+    span.assignment {
+      i.ph-fill {
+        color: $mono-gray-dark-1;
+      }
+      a, span.date {
+        font-size: 0.75 * $spacer;
+        margin-left: 1.5 * $spacer;
+      }
+      span.date {
+        color: $mono-gray-dark-1;
+      }
+    }
+  }
 }
 
 // Modal styles

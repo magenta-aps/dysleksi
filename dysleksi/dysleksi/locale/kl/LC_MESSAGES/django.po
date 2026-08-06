@@ -335,7 +335,9 @@ msgid "Tests"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/base.html
+#: dysleksi/templates/dysleksi/admin/class/detail.html
 #: dysleksi/templates/dysleksi/admin/class/list.html
+#: dysleksi/templates/dysleksi/admin/student/detail.html
 #: dysleksi/templates/dysleksi/class/list.html
 msgid "Klasser"
 msgstr "Klassit"
@@ -356,6 +358,58 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/base.html
 #: dysleksi/templates/dysleksi/screening/student.html
 msgid "Log ud"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/class/detail.html
+#: dysleksi/templates/dysleksi/admin/student/detail.html
+#, python-format
+msgid "Klasse %(class_name)s"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/class/detail.html
+#, python-format
+msgid "Årgang %(school_year_start)s"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/class/detail.html
+#, fuzzy
+#| msgid "Klasser"
+msgid "Klasse ID:"
+msgstr "Klassit"
+
+#: dysleksi/templates/dysleksi/admin/class/detail.html
+msgid "Antal elever:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/class/detail.html
+#: dysleksi/templates/dysleksi/admin/student/detail.html
+msgid "Kontaktlærer:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/class/detail.html
+#: dysleksi/templates/dysleksi/admin/student/detail.html
+msgid "Kontaktmail:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/class/detail.html
+#: dysleksi/templates/dysleksi/admin/student/detail.html
+msgid "Gennemførte testforløb:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/class/detail.html
+#: dysleksi/templates/dysleksi/admin/student/detail.html
+#: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+msgid "Se resultater"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/class/detail.html
+msgid "Planlagte testforløb:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/class/detail.html
+#, python-format
+msgid "Planlagt %(start|date:\"SHORT_DATE_FORMAT\")s"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_base.html
@@ -583,6 +637,20 @@ msgstr ""
 msgid "Normscore"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/student/detail.html
+msgid "Elev ID:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/student/detail.html
+msgid "CPR-nummer:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/student/detail.html
+#, fuzzy
+#| msgid "Klasser"
+msgid "Klasse:"
+msgstr "Klassit"
+
 #: dysleksi/templates/dysleksi/admin/table_columns/class_actions.html
 msgid "Se testoversigten"
 msgstr ""
@@ -593,11 +661,6 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
 msgid "Åbn"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
-msgid "Se resultater"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_type.html

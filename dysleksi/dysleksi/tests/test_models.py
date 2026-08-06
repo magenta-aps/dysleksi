@@ -75,6 +75,22 @@ class TestUser(DysleksiTest):
                 self.assertTrue(user.has_group(expected_groupname))
 
 
+class TestStudentQuerySet(DysleksiTest):
+    def test_filter_user_object_permissions_teacher(self):
+        self.assertQuerySetEqual(
+            Student.objects.filter_user_permissions(self.teacher, "view"),
+            Student.objects.filter(classes__pk=self.klasse.pk),
+            ordered=False,
+        )
+
+    def test_filter_user_object_permissions_student(self):
+        self.assertQuerySetEqual(
+            Student.objects.filter_user_permissions(self.student1, "view"),
+            Student.objects.none(),
+            ordered=False,
+        )
+
+
 class TestClass(DysleksiTest):
     def test_str(self):
         self.assertEqual(str(self.klasse), "1.A")
