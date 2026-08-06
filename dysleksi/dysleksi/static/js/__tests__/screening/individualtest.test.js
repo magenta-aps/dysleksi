@@ -220,9 +220,9 @@ describe("IndividualTestFlow", () => {
         expect(view.onTestComplete).toHaveBeenCalledWith(true);
     });
 
-    it("show invalid question", () => {
+    it("show invalid question", async () => {
         view.setPart(0);
-        const canShow = view.showQuestion(false, 999);
+        const canShow = await view.showQuestion(false, 999);
         expect(canShow).toBe(false);
     });
 
@@ -370,7 +370,7 @@ describe("IndividualTestFlow", () => {
         expect(view.onPartComplete).not.toHaveBeenCalled();
     });
 
-    it("onQuestionComplete calls onPartComplete when no next question exists", () => {
+    it("onQuestionComplete calls onPartComplete when no next question exists", async () => {
         view.setPart(0);
         view.showQuestion(false, 0);
 
@@ -381,7 +381,7 @@ describe("IndividualTestFlow", () => {
         view.displayedAt = 0;
         view.answeredAt = 10;
 
-        view.onQuestionComplete();
+        await view.onQuestionComplete();
 
         expect(view.onPartComplete).toHaveBeenCalled();
     });
@@ -408,7 +408,7 @@ describe("IndividualTestFlow", () => {
         expect(onChatMessageSpy).toHaveBeenCalledWith(payload);
     });
 
-    it("should handle practice mode UI and flow correctly", () => {
+    it("should handle practice mode UI and flow correctly", async () => {
         view.setPart(0);
         // 1. Force isPracticing to true
         view.isPracticing = true;
@@ -426,7 +426,7 @@ describe("IndividualTestFlow", () => {
         vi.spyOn(view, "showFirstQuestion").mockImplementation(() => {});
         vi.spyOn(view, "showNextQuestion").mockReturnValue(false);
 
-        view.onQuestionComplete();
+        await view.onQuestionComplete();
 
         // Assert: Correct practice message and redirect
         expect(view.send).toHaveBeenCalledWith(
@@ -580,10 +580,10 @@ describe("IndividualTestFlow", () => {
         }
     });
 
-    it("passes 'audio.silent' events on to teacher's session once instructions are completed", () => {
+    it("passes 'audio.silent' events on to teacher's session once instructions are completed", async () => {
         // Arrange: complete the instructions by showing the first question
         view.setPart(0);
-        view.showQuestion(true, 0); // first practice question
+        await view.showQuestion(true, 0); // first practice question
         // Act: pretend the audio detector dispatches an event
         view.audioDetector.dispatchEvent(new Event("audio.silent"));
         // Assert that we pass the audio event on
