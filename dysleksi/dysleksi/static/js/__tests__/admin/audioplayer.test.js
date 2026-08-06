@@ -120,6 +120,60 @@ describe("Audioplayer", () => {
         expect(durationEl.textContent).toBe("--:--");
     });
 
+    it("stops other players when a new one is clicked", () => {
+        document.body.innerHTML = `
+            <div class="audio"><audio></audio><i></i><span></span></div>
+            <div class="audio"><audio></audio><i></i><span></span></div>
+        `;
+
+        const players = document.getElementsByClassName("audio");
+        const first = players[0];
+        const second = players[1];
+        const firstAudio = first.getElementsByTagName("audio")[0];
+        const secondAudio = second.getElementsByTagName("audio")[0];
+        firstAudio.readyState = 4;
+        secondAudio.readyState = 4;
+
+        // `currentTime` is not implemented in jsdom, so make it a plain
+        // writable property on both audio elements.
+        Object.defineProperty(firstAudio, "currentTime", {
+            writable: true,
+            value: 0,
+        });
+        Object.defineProperty(secondAudio, "currentTime", {
+            writable: true,
+            value: 0,
+        });
+
+        const firstPauseSpy = vi.spyOn(firstAudio, "pause");
+        vi.spyOn(secondAudio, "pause");
+        vi.spyOn(firstAudio, "play");
+        vi.spyOn(secondAudio, "play");
+
+        initialize_audio_players(document);
+
+        // A `.audio` container without an `<audio>` element must be skipped
+        // gracefully by `stopOtherAudioPlayers`. It is added after
+        // initialization so it does not need its own player wiring.
+        document.body.insertAdjacentHTML(
+            "beforeend",
+            `<div class="audio"><i></i><span></span></div>`,
+        );
+
+        // Play the first player and pretend it has progressed.
+        first.getElementsByTagName("i")[0].dispatchEvent(new Event("click"));
+        expect(first.classList).toContain("playing");
+        firstAudio.currentTime = 5;
+
+        // Clicking the second player must interrupt the first one.
+        second.getElementsByTagName("i")[0].dispatchEvent(new Event("click"));
+
+        expect(firstPauseSpy).toHaveBeenCalled();
+        expect(firstAudio.currentTime).toBe(0);
+        expect(first.classList).not.toContain("playing");
+        expect(second.classList).toContain("playing");
+    });
+
     it("show duration when loaded", () => {
         audioEl.readyState = 1;
         audioEl.duration = 72;
