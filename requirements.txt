@@ -6,7 +6,7 @@
 
 ## Core Django & gunicorn
 Django==6.1
-django-stubs==6.0.7
+django-stubs==6.0.8
 django-stubs-ext==6.0.7
 gunicorn==26.0.0
 
