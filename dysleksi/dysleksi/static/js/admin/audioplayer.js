@@ -7,6 +7,7 @@ export function initialize_audio_players(parent) {
 
         const addClickListener = () => {
             playBtnEl.addEventListener("click", (_evt) => {
+                stopOtherAudioPlayers(audioEl);
                 audioEl.play();
                 uiEl.classList.add("playing");
                 updateAudioDuration(audioEl, durationEl);
@@ -35,6 +36,18 @@ export function initialize_audio_players(parent) {
                 updateAudioDuration(audioEl, durationEl);
             });
         }
+    }
+}
+
+function stopOtherAudioPlayers(currentAudioEl) {
+    for (let player of document.getElementsByClassName("audio")) {
+        const audioEl = player.getElementsByTagName("audio")[0];
+        if (!audioEl || audioEl === currentAudioEl) {
+            continue;
+        }
+        audioEl.pause();
+        audioEl.currentTime = 0;
+        player.classList.remove("playing");
     }
 }
 
