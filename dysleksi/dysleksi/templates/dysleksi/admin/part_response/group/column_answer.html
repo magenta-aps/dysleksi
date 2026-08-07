@@ -29,6 +29,23 @@
         <div
                 class="answer {% if record.correctness == "correct" %}answer-correct{% elif record.correctness == "partial" %}answer-almost-correct{% else %}answer-incorrect{% endif %}"
         >{{ record.answer_text|default_if_none:"&nbsp;" }}</div>
-    {% endif %}
 
+
+    {% elif record.question.part.test.test_type == TestType.INDIVIDUAL%}
+            {% if record.correctness == "correct" %}
+                <div class="answer answer-correct">
+                    {% if record.question.challenge.text %}
+                        {{ record.question.challenge.text }}
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="answer answer-incorrect">
+                    {% if record.actual_pronunciation %}
+                        {{ record.actual_pronunciation }}
+                    {% else %}
+                        -
+                    {% endif%}
+                </div>
+            {% endif %}
+    {% endif %}
 {% endwith %}

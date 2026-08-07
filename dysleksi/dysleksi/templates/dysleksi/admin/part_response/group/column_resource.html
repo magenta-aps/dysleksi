@@ -23,4 +23,6 @@
             <span class="ms-1"></span>
         </div>
     {% endif %}
+{% elif record.question.challenge.text %}
+    {{ record.question.challenge.text }}
 {% endif %}
