@@ -273,6 +273,7 @@ class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
         qs = qs.annotate_school_year()
         qs = qs.annotate_class_name()
         qs = qs.annotate_status()
+        qs = qs.order_by("-id")
         return qs
 
     def get_context_data(self, **kwargs):
