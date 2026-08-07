@@ -4,7 +4,8 @@ from itertools import count
 from math import ceil
 from typing import Callable, Collection, List, Tuple
 
-from django.db.models import QuerySet
+from django.db.models import F, Func, QuerySet
+from django.db.models.functions import Lower, Upper
 from django.template import Context
 from django.template.loader import get_template
 from django.urls import reverse
@@ -130,14 +131,14 @@ class TestAssignmentTable(Table):
 
     start_date = TemplateColumn(
         template_name="dysleksi/admin/table_columns/test_assignment_period.html",
-        orderable=False,
+        orderable=True,
         verbose_name=_("Startdato"),
         extra_context={"attr": "lower"},
     )
 
     end_date = TemplateColumn(
         template_name="dysleksi/admin/table_columns/test_assignment_period.html",
-        orderable=False,
+        orderable=True,
         verbose_name=_("Slutdato"),
         extra_context={"attr": "upper"},
     )
@@ -151,16 +152,39 @@ class TestAssignmentTable(Table):
     def order_type(
         self, queryset: QuerySet[TestAssignment, TestAssignment], is_descending: bool
     ):
-        return (
-            queryset.order_by(("-" if is_descending else "") + "test__test_type"),
-            True,
-        )
+        return self._order_queryset(queryset, F("test__test_type"), is_descending)
 
     def order_status(
         self, queryset: QuerySet[TestAssignment, TestAssignment], is_descending: bool
     ):
+        return self._order_queryset(queryset, F("status"), is_descending)
+
+    def order_start_date(
+        self, queryset: QuerySet[TestAssignment, TestAssignment], is_descending: bool
+    ):
+        return self._order_queryset(
+            queryset, Lower("planned_date_time__period"), is_descending
+        )
+
+    def order_end_date(
+        self, queryset: QuerySet[TestAssignment, TestAssignment], is_descending: bool
+    ):
+        return self._order_queryset(
+            queryset, Upper("planned_date_time__period"), is_descending
+        )
+
+    def _order_queryset(
+        self,
+        queryset: QuerySet[TestAssignment, TestAssignment],
+        attr: F | Func,
+        is_descending: bool,
+    ):
         return (
-            queryset.order_by(("-" if is_descending else "") + "status"),
+            queryset.order_by(
+                attr.desc(nulls_last=True)
+                if is_descending
+                else attr.asc(nulls_last=True)
+            ),
             True,
         )
 

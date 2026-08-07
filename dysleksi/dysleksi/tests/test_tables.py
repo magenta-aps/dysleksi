@@ -1,6 +1,8 @@
 from html import escape
 from unittest.mock import patch
 
+from django.db.models import F
+from django.db.models.functions import Lower, Upper
 from django.template import engines
 from django.test import TestCase
 from django_tables2 import Table
@@ -23,11 +25,28 @@ class TestTestAssignmentTable(DysleksiTest):
 
     def test_order_type(self):
         queryset, _ = self.table.order_type(self.queryset, is_descending=False)
-        self.assertEqual(queryset.query.order_by, ("test__test_type",))
+        self._assert_order_by_expression_is(queryset, F("test__test_type"))
 
     def test_order_status(self):
         queryset, _ = self.table.order_status(self.queryset, is_descending=False)
-        self.assertEqual(queryset.query.order_by, ("status",))
+        self._assert_order_by_expression_is(queryset, F("status"))
+
+    def test_order_start_date(self):
+        queryset, _ = self.table.order_start_date(self.queryset, is_descending=False)
+        self._assert_order_by_expression_is(
+            queryset, Lower("planned_date_time__period")
+        )
+
+    def test_order_end_date(self):
+        queryset, _ = self.table.order_end_date(self.queryset, is_descending=False)
+        self._assert_order_by_expression_is(
+            queryset, Upper("planned_date_time__period")
+        )
+
+    def _assert_order_by_expression_is(self, queryset, expected_expression):
+        order_by = queryset.query.order_by[0]
+        self.assertEqual(order_by.expression, expected_expression)
+        self.assertFalse(order_by.descending)
 
 
 class TestTestResultColumn(TestCase):
