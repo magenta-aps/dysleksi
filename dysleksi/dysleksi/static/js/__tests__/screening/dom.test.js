@@ -392,7 +392,11 @@ describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
 
         const button1 = dom.showQuestionChoice(answer1, null, 2, container);
         expect(button1.textContent).toBe("");
-        expect(button1.addEventListener).not.toHaveBeenCalled();
+        // No click handler is wired up when no listener is provided.
+        expect(button1.addEventListener).not.toHaveBeenCalledWith(
+            "click",
+            expect.anything(),
+        );
         const image = button1.firstChild;
         expect(image).not.toBeNull();
         expect(image.src).toContain("option1.png");
@@ -403,6 +407,26 @@ describe("GroupTestDomElements.showQuestionChallenge (text only)", () => {
 
         // Restore the prototype spy so later tests keep a working addEventListener.
         addEventListenerSpy.mockRestore();
+    });
+
+    it("prevents the long-press context menu on a choice button", () => {
+        // Undo the addEventListener spy from the previous test so the real
+        // contextmenu handler is attached.
+        vi.restoreAllMocks();
+        const answer = {
+            resourceText: "Option A",
+            resourceSoundUrl: null,
+            resourceImageUrl: null,
+            buttonId: "btn1",
+        };
+        const container = document.querySelector("#choices");
+        const button = dom.showQuestionChoice(answer, () => {}, 2, container);
+
+        const event = new Event("contextmenu", { cancelable: true });
+        const prevented = !button.dispatchEvent(event);
+
+        expect(prevented).toBe(true);
+        expect(event.defaultPrevented).toBe(true);
     });
 });
 

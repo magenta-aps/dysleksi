@@ -111,6 +111,12 @@ body {
   touch-action: pan-x pan-y; // Prevent pinch-zoom
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  // No text selection or long-press callout anywhere. A long-press (e.g. on a
+  // choice button) would otherwise select nearby text, such as #challenge-text.
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-touch-callout: none;
 }
 
 html, body {
@@ -151,10 +157,15 @@ h1, h2, h3, h4, h5, h6 {
   white-space: nowrap;
 
 
-  &:not(.no-hover):hover {
-    background-color: $student-blue !important;
-    outline: 4px solid $student-blue-dark !important;
-    box-shadow: $blue-button-shadow;
+  // Only apply hover styling on devices with a real hovering pointer (mouse).
+  // On touch devices the :hover state "sticks" after a tap/long-press, which
+  // makes a button look selected even though it isn't.
+  @media (hover: hover) {
+    &:not(.no-hover):hover {
+      background-color: $student-blue !important;
+      outline: 4px solid $student-blue-dark !important;
+      box-shadow: $blue-button-shadow;
+    }
   }
 
   &.selected {
@@ -193,12 +204,23 @@ h1, h2, h3, h4, h5, h6 {
       font-size: 68px;
     }
 
-    &.selected,
-    &:not(.no-hover):hover {
+    &.selected {
       background-color: $student-green-light !important;
       box-shadow: $dark-green-button-shadow;
       width: 210px !important;
       height: 105px !important;
+    }
+
+    // Only apply hover styling on devices with a real hovering pointer (mouse).
+    // On touch devices the :hover state "sticks" after a tap/long-press, which
+    // makes a button look selected even though it isn't.
+    @media (hover: hover) {
+      &:not(.no-hover):hover {
+        background-color: $student-green-light !important;
+        box-shadow: $dark-green-button-shadow;
+        width: 210px !important;
+        height: 105px !important;
+      }
     }
   }
 
@@ -214,12 +236,23 @@ h1, h2, h3, h4, h5, h6 {
       font-size: 68px;
     }
 
-    &.selected,
-    &:not(.no-hover):hover {
+    &.selected {
       background-color: $student-red-light !important;
       box-shadow: $dark-red-button-shadow;
       width: 210px !important;
       height: 105px !important;
+    }
+
+    // Only apply hover styling on devices with a real hovering pointer (mouse).
+    // On touch devices the :hover state "sticks" after a tap/long-press, which
+    // makes a button look selected even though it isn't.
+    @media (hover: hover) {
+      &:not(.no-hover):hover {
+        background-color: $student-red-light !important;
+        box-shadow: $dark-red-button-shadow;
+        width: 210px !important;
+        height: 105px !important;
+      }
     }
   }
 }
@@ -478,6 +511,14 @@ body.show-instructions {
     box-shadow: $button-shadow;
     transition: filter 0.2s ease-out;
     height: 100px;
+    user-select: none;              // no text selection on long-press
+    -webkit-touch-callout: none;    // no long-press callout menu (iOS/Chromium)
+
+    img {
+      pointer-events: none;         // long-press targets the button, not the image
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
   }
 
   &.true-false-layout {

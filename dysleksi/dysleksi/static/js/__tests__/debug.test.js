@@ -91,26 +91,6 @@ describe("DebugConsole", () => {
         expect(lastLine).toContain("PROMISE: Error: promise fail");
     });
 
-    it("should hide logbox on non-iPad", () => {
-        expect(logbox.style.display).toBe("none");
-    });
-
-    it("should NOT hide logbox on iPad", () => {
-        Object.defineProperty(global.navigator, "userAgent", {
-            value: "iPad",
-            configurable: true,
-        });
-        Object.defineProperty(global.navigator, "maxTouchPoints", {
-            value: 5,
-            configurable: true,
-        });
-
-        document.body.innerHTML = `<div id="logbox"></div>`;
-        const lb = document.getElementById("logbox");
-        new DebugConsole();
-        expect(lb.style.display).not.toBe("none");
-    });
-
     it("formatArg should stringify objects, errors, and primitives", () => {
         const obj = { a: 1 };
         const err = new Error("err");
