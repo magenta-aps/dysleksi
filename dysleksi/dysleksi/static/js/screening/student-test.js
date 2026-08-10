@@ -27,7 +27,7 @@ export class StudentTestView extends EventTarget {
         preventDoubleTapZoom();
         this.test = test;
         this.p2p = new WebRTCChannel();
-        this.p2p.studentSetup(chatSocket, student);
+        this.p2p.studentSetup(chatSocket, student, assignmentId);
         this.assignmentId = assignmentId;
         this.domElements = domElements;
         this.student = student;

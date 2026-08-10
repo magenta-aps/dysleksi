@@ -39,6 +39,7 @@ describe("test startSession", () => {
 
     it("should send session.start event", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
+        vi.spyOn(Date, "now").mockReturnValue(1000);
         const chatSocket = startSession(studentIds);
         expect(chatSocket.addEventListener).toHaveBeenCalled();
 
@@ -49,12 +50,14 @@ describe("test startSession", () => {
                 event: "session.start",
                 roomUrl: "/",
                 students: studentIds,
+                timestamp: 1000,
             }),
         );
     });
 
     it("should refresh session", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
+        vi.spyOn(Date, "now").mockReturnValue(1000);
 
         let chatSocket = startSession(studentIds);
         expect(chatSocket.addEventListener).toHaveBeenCalled();
@@ -69,6 +72,7 @@ describe("test startSession", () => {
                 event: "session.in_progress",
                 roomUrl: "/",
                 students: studentIds,
+                timestamp: 1000,
             }),
         );
     });

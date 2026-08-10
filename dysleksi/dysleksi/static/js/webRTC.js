@@ -18,7 +18,7 @@ export class WebRTCChannel extends EventTarget {
         });
     }
 
-    studentSetup(chatSocket, student) {
+    studentSetup(chatSocket, student, assignmentId) {
         this.peer.on("connection", (connection) => {
             this.conn = connection;
             this._setupConnectionEvents();
@@ -30,6 +30,7 @@ export class WebRTCChannel extends EventTarget {
                     event: "student.joined",
                     studentId: student.id,
                     webRTCId: id,
+                    assignmentId: assignmentId,
                 }),
             );
         });

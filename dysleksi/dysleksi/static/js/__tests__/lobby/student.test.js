@@ -15,6 +15,8 @@ describe("initStudentLobby / initRedirectSocket", () => {
     beforeEach(() => {
         sockets = {};
 
+        vi.useFakeTimers();
+
         // Mock window.location so assignment works
         originalLocation = global.window?.location;
         global.window = {
@@ -44,6 +46,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
 
     afterEach(() => {
         vi.clearAllMocks();
+        vi.useRealTimers();
         global.window.location = originalLocation;
     });
 
@@ -81,9 +84,13 @@ describe("initStudentLobby / initRedirectSocket", () => {
                 event: "session.in_progress",
                 roomUrl: "/rooms/room-1/",
                 students: [studentId],
+                timestamp: 1,
             }),
         });
 
+        // Redirect is debounced, so nothing happens until the timer fires
+        expect(window.location).toBe("");
+        vi.advanceTimersByTime(300);
         expect(window.location).toBe("/rooms/room-1/");
     });
 
@@ -97,10 +104,70 @@ describe("initStudentLobby / initRedirectSocket", () => {
                 event: "session.start",
                 roomUrl: "/rooms/room-2/",
                 students: [studentId],
+                timestamp: 1,
             }),
         });
 
+        vi.advanceTimersByTime(300);
         expect(window.location).toBe("/rooms/room-2/");
+    });
+
+    it("redirects to the latest test-assignment when a newer one arrives", () => {
+        initStudentLobby(studentId);
+
+        const socket = sockets["lobby"];
+
+        // First (older) assignment
+        socket.__trigger("message", {
+            data: JSON.stringify({
+                event: "session.start",
+                roomUrl: "/rooms/room-old/",
+                students: [studentId],
+                timestamp: 1,
+            }),
+        });
+
+        // Newer assignment arrives within the debounce window
+        socket.__trigger("message", {
+            data: JSON.stringify({
+                event: "session.in_progress",
+                roomUrl: "/rooms/room-new/",
+                students: [studentId],
+                timestamp: 2,
+            }),
+        });
+
+        vi.advanceTimersByTime(300);
+        expect(window.location).toBe("/rooms/room-new/");
+    });
+
+    it("keeps the newer test-assignment when an older one arrives afterwards", () => {
+        initStudentLobby(studentId);
+
+        const socket = sockets["lobby"];
+
+        // Newer assignment arrives first
+        socket.__trigger("message", {
+            data: JSON.stringify({
+                event: "session.in_progress",
+                roomUrl: "/rooms/room-new/",
+                students: [studentId],
+                timestamp: 2,
+            }),
+        });
+
+        // An older, out-of-order assignment arrives within the debounce window
+        socket.__trigger("message", {
+            data: JSON.stringify({
+                event: "session.start",
+                roomUrl: "/rooms/room-old/",
+                students: [studentId],
+                timestamp: 1,
+            }),
+        });
+
+        vi.advanceTimersByTime(300);
+        expect(window.location).toBe("/rooms/room-new/");
     });
 
     it("Does not redirect if studentId does not match", () => {
@@ -113,9 +180,11 @@ describe("initStudentLobby / initRedirectSocket", () => {
                 event: "session.start",
                 roomUrl: "/rooms/room-2/",
                 students: [1337],
+                timestamp: 1,
             }),
         });
 
+        vi.advanceTimersByTime(300);
         expect(window.location).not.toBe("/rooms/room-2/");
     });
 
@@ -128,9 +197,11 @@ describe("initStudentLobby / initRedirectSocket", () => {
             data: JSON.stringify({
                 event: "ping",
                 roomUrl: "/should-not-redirect/",
+                timestamp: 1,
             }),
         });
 
+        vi.advanceTimersByTime(300);
         expect(window.location).not.toBe("/should-not-redirect/");
     });
 });

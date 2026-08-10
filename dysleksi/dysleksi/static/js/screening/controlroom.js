@@ -1520,7 +1520,10 @@ export class TeacherView {
         this.chatSocket.addEventListener("message", (e) => {
             const data = JSON.parse(e.data);
 
-            if (data.event === "student.joined") {
+            if (
+                data.event === "student.joined" &&
+                data.assignmentId === this.assignmentId
+            ) {
                 console.log("Setting up webRTC channel for student", data.studentId);
 
                 if (this.studentChannels[data.studentId]) {
