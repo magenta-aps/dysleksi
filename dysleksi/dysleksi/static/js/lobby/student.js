@@ -2,7 +2,10 @@ import { getWebSocket } from "../ws.js";
 
 const REDIRECT_DEBOUNCE_MS = 300;
 
-function initRedirectSocket(studentId) {
+export function initRedirectSocket(
+    studentId,
+    redirect_events = ["session.in_progress", "session.start"],
+) {
     const chatSocket = getWebSocket();
     let pendingRedirect = null;
     let debounceTimer = null;
@@ -13,7 +16,7 @@ function initRedirectSocket(studentId) {
 
     chatSocket.addEventListener("message", (e) => {
         const data = JSON.parse(e.data);
-        if (["session.in_progress", "session.start"].includes(data.event)) {
+        if (redirect_events.includes(data.event)) {
             if (data.students.includes(studentId)) {
                 if (!pendingRedirect || data.timestamp > pendingRedirect.timestamp) {
                     console.log("Candidate redirect", data);
@@ -44,8 +47,4 @@ function initRedirectSocket(studentId) {
     );
 
     return chatSocket;
-}
-
-export function initStudentLobby(studentId) {
-    initRedirectSocket(studentId);
 }

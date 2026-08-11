@@ -5,11 +5,11 @@ import { vi, describe, it, expect, beforeEach } from "vitest";
 
 // 1. Mock the student module BEFORE importing the index
 vi.mock("../../lobby/student.js", () => ({
-    initStudentLobby: vi.fn(),
+    initRedirectSocket: vi.fn(),
 }));
 
 // Import the function we mocked to track calls
-import { initStudentLobby } from "../../lobby/student.js";
+import { initRedirectSocket } from "../../lobby/student.js";
 
 describe("Index Entry Point", () => {
     beforeEach(() => {
@@ -27,7 +27,7 @@ describe("Index Entry Point", () => {
         await import("../../lobby/index.js?t=" + Date.now());
 
         // 4. Assertions
-        expect(initStudentLobby).toHaveBeenCalledWith(1);
+        expect(initRedirectSocket).toHaveBeenCalledWith(1);
     });
 
     it("should throw or fail gracefully if the element is missing", async () => {

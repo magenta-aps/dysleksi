@@ -4,6 +4,7 @@ import { releaseWakeLock } from "./utils.js";
 import { unlockAudioOnGesture } from "./utils.js";
 import { preventDoubleTapZoom } from "./utils.js";
 import { WebRTCChannel } from "../webRTC.js";
+import { initRedirectSocket } from "../lobby/student.js";
 
 export class StudentTestView extends EventTarget {
     chatSocket;
@@ -37,6 +38,7 @@ export class StudentTestView extends EventTarget {
         this.audioContext = unlockAudioOnGesture();
         this.failedAttempts = 0;
         this.cancelAudio = false;
+        initRedirectSocket(Number(student.id), ["session.start"]);
     }
 
     questionTitle(practice = false) {
