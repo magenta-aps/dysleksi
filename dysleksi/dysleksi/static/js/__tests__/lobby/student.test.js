@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import { initStudentLobby } from "../../lobby/student.js";
+import { initRedirectSocket } from "../../lobby/student.js";
 import * as wsModule from "../../ws.js";
 
 // Mock getWebSocket
@@ -7,7 +7,7 @@ vi.mock("../ws.js", () => ({
     getWebSocket: vi.fn(),
 }));
 
-describe("initStudentLobby / initRedirectSocket", () => {
+describe("initRedirectSocket / initRedirectSocket", () => {
     let sockets;
     let originalLocation;
     let studentId;
@@ -51,7 +51,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
     });
 
     it("creates redirect socket", () => {
-        initStudentLobby(studentId);
+        initRedirectSocket(studentId);
 
         expect(wsModule.getWebSocket).toHaveBeenCalledTimes(1);
         expect(wsModule.getWebSocket).toHaveBeenCalledWith();
@@ -59,7 +59,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
 
     it("sends student.ready once when socket opens", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
-        initStudentLobby(studentId);
+        initRedirectSocket(studentId);
 
         const socket = sockets["lobby"];
 
@@ -75,7 +75,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
     });
 
     it("redirects on session.in_progress", () => {
-        initStudentLobby(studentId);
+        initRedirectSocket(studentId);
 
         const socket = sockets["lobby"];
 
@@ -95,7 +95,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
     });
 
     it("redirects on session.start", () => {
-        initStudentLobby(studentId);
+        initRedirectSocket(studentId);
 
         const socket = sockets["lobby"];
 
@@ -113,7 +113,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
     });
 
     it("redirects to the latest test-assignment when a newer one arrives", () => {
-        initStudentLobby(studentId);
+        initRedirectSocket(studentId);
 
         const socket = sockets["lobby"];
 
@@ -142,7 +142,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
     });
 
     it("keeps the newer test-assignment when an older one arrives afterwards", () => {
-        initStudentLobby(studentId);
+        initRedirectSocket(studentId);
 
         const socket = sockets["lobby"];
 
@@ -171,7 +171,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
     });
 
     it("Does not redirect if studentId does not match", () => {
-        initStudentLobby(studentId);
+        initRedirectSocket(studentId);
 
         const socket = sockets["lobby"];
 
@@ -189,7 +189,7 @@ describe("initStudentLobby / initRedirectSocket", () => {
     });
 
     it("does not redirect on unrelated events", () => {
-        initStudentLobby(studentId);
+        initRedirectSocket(studentId);
 
         const socket = sockets["lobby"];
 
