@@ -560,7 +560,11 @@ describe("Teacher Individual test View", () => {
             (c) => c[0] === "message",
         )[1];
         mainSocketHandler({
-            data: JSON.stringify({ event: "student.joined", studentId }),
+            data: JSON.stringify({
+                event: "student.joined",
+                studentId,
+                assignmentId: 1,
+            }),
         });
         p2pChannel = view.studentChannels[studentId];
     });
@@ -1861,7 +1865,11 @@ describe("TeacherView socket 'test.started' handling", () => {
             (c) => c[0] === "message",
         )[1];
         mainSocketHandler({
-            data: JSON.stringify({ event: "student.joined", studentId: studentId }),
+            data: JSON.stringify({
+                event: "student.joined",
+                studentId: studentId,
+                assignmentId: 1,
+            }),
         });
 
         p2pChannel = view.studentChannels[studentId];
@@ -2757,7 +2765,11 @@ describe("TeacherView _initSocket", () => {
         )[1];
 
         socketHandler({
-            data: JSON.stringify({ event: "student.joined", studentId }),
+            data: JSON.stringify({
+                event: "student.joined",
+                studentId,
+                assignmentId: 1,
+            }),
         });
 
         // Now WebRTCChannel is defined because of the import
@@ -2771,11 +2783,23 @@ describe("TeacherView _initSocket", () => {
         )[1];
 
         // First offer
-        socketHandler({ data: JSON.stringify({ event: "student.joined", studentId }) });
+        socketHandler({
+            data: JSON.stringify({
+                event: "student.joined",
+                studentId,
+                assignmentId: 1,
+            }),
+        });
         const oldChannel = view.studentChannels[studentId];
 
         // Second offer for same student
-        socketHandler({ data: JSON.stringify({ event: "student.joined", studentId }) });
+        socketHandler({
+            data: JSON.stringify({
+                event: "student.joined",
+                studentId,
+                assignmentId: 1,
+            }),
+        });
 
         expect(WebRTCChannel).toHaveBeenCalledTimes(2);
         expect(oldChannel.peer.destroy).toHaveBeenCalled();
@@ -2799,7 +2823,13 @@ describe("TeacherView _initSocket", () => {
             (c) => c[0] === "message",
         )[1];
 
-        socketHandler({ data: JSON.stringify({ event: "student.joined", studentId }) });
+        socketHandler({
+            data: JSON.stringify({
+                event: "student.joined",
+                studentId,
+                assignmentId: 1,
+            }),
+        });
 
         const newChannel = view.studentChannels[studentId];
         expect(p2pSpy).toHaveBeenCalledWith(newChannel);
@@ -2811,7 +2841,11 @@ describe("TeacherView _initSocket", () => {
         )[1];
 
         socketHandler({
-            data: JSON.stringify({ event: "student.joined", studentId: 123 }),
+            data: JSON.stringify({
+                event: "student.joined",
+                studentId: 123,
+                assignmentId: 1,
+            }),
         });
 
         const p2p = view.studentChannels[123];

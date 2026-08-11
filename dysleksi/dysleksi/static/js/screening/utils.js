@@ -33,6 +33,7 @@ export function setResponsiveFontSize(button, maxFontSize) {
 
 export function startSession(studentIds) {
     const chatSocket = getWebSocket();
+    const timestamp = Date.now();
 
     chatSocket.addEventListener(
         "open",
@@ -43,6 +44,7 @@ export function startSession(studentIds) {
                     event: "session.start",
                     roomUrl: window.location.href.replace(window.location.origin, ""),
                     students: studentIds,
+                    timestamp: timestamp,
                 }),
             );
         },
@@ -52,14 +54,14 @@ export function startSession(studentIds) {
     chatSocket.addEventListener("message", (e) => {
         const data = JSON.parse(e.data);
         if (data.event === "student.ready") {
-            refreshSession(studentIds);
+            refreshSession(studentIds, timestamp);
         }
     });
 
     return chatSocket;
 }
 
-export function refreshSession(studentIds) {
+export function refreshSession(studentIds, timestamp) {
     const chatSocket = getWebSocket();
     if (chatSocket.readyState === WebSocket.OPEN) {
         chatSocket.send(
@@ -68,6 +70,7 @@ export function refreshSession(studentIds) {
                 event: "session.in_progress",
                 roomUrl: window.location.href.replace(window.location.origin, ""),
                 students: studentIds,
+                timestamp: timestamp,
             }),
         );
     }
