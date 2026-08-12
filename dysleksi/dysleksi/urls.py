@@ -12,6 +12,7 @@ from dysleksi.views import (
     AssignmentView,
     ClassDetailView,
     ClassListView,
+    ClientErrorLogView,
     PartResponseView,
     RootView,
     StartGroupAssignmentView,
@@ -27,6 +28,7 @@ app_name = "dysleksi"
 urlpatterns: list[URLResolver | URLPattern] = [
     path("", RootView.as_view(), name="root"),
     path("ping", lambda r: HttpResponse(status=204), name="ping"),
+    path("client-error/", ClientErrorLogView.as_view(), name="client_error_log"),
     path(
         "assignment/individual/setup/",
         StartIndividualAssignmentView.as_view(),

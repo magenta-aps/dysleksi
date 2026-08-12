@@ -1,5 +1,7 @@
 from django.conf import settings
 from django.http import HttpRequest
+from django.middleware.csrf import get_token
+from django.urls import reverse
 
 
 def nav_context(request: HttpRequest):
@@ -19,6 +21,16 @@ def debug_context(request: HttpRequest):
 def version_context(request: HttpRequest):
     return {
         "version": settings.VERSION,  # type: ignore
+    }
+
+
+def client_error_log_context(request: HttpRequest):
+    # Where and how `static/js/error-reporting.js` should post browser errors.
+    return {
+        "CLIENT_ERROR_LOG_CONFIG": {
+            "url": reverse("dysleksi:client_error_log"),
+            "csrf_token": get_token(request),
+        }
     }
 
 
