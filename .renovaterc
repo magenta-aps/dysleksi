@@ -6,6 +6,10 @@
       "automerge": true,
       "gitLabIgnoreApprovals": true,
       "platformAutomerge": true
+    },
+    {
+      "matchPackageNames": ["django-stubs", "django-stubs-ext"],
+      "groupName": "django-stubs"
     }
   ]
 }
