@@ -763,6 +763,14 @@ msgid "Testen skal gennemføres først"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Venter på elev"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Eleven er kommet ind i testrummet"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Del"
 msgstr ""
 

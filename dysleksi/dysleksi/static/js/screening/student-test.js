@@ -5,6 +5,7 @@ import { unlockAudioOnGesture } from "./utils.js";
 import { preventDoubleTapZoom } from "./utils.js";
 import { WebRTCChannel } from "../webRTC.js";
 import { initRedirectSocket } from "../lobby/student.js";
+import { gettext } from "../i18n.js";
 
 export class StudentTestView extends EventTarget {
     chatSocket;
@@ -132,7 +133,7 @@ export class StudentTestView extends EventTarget {
 
         this.send({
             event: "test.started",
-            message: "Testen er startet",
+            message: gettext("Testen er startet"),
         });
         this.domElements.setRepeatButtonListener(() => this.repeat());
     }

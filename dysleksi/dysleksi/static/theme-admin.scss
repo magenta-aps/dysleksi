@@ -1798,6 +1798,98 @@ $border-radius-student-card: $spacer / 4 * 3;
   }
 }
 
+.screening-title {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+// The checkmark springs into place when the student enters the test room
+@keyframes student-presence-pop {
+  0% {
+    transform: scale(0.3);
+    opacity: 0;
+  }
+
+  60% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+.student-presence {
+  display: inline-flex;
+  align-items: center;
+  font-size: 14px;
+  color: $mono-gray-dark-2;
+  // Delay the visibility switch until the fade-out has finished
+  transition:
+    opacity 0.6s ease,
+    transform 0.6s ease,
+    visibility 0s linear 0.6s;
+
+  .student-presence-waiting,
+  .student-presence-arrived {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .spinner-border {
+    color: $blue-light;
+  }
+
+  .student-presence-arrived i {
+    color: $green-normal;
+    font-size: 24px;
+  }
+
+  &[data-state="waiting"] .student-presence-arrived {
+    display: none;
+  }
+
+  &[data-state="arrived"] .student-presence-waiting,
+  &[data-state="done"] .student-presence-waiting {
+    display: none;
+  }
+
+  &[data-state="arrived"] {
+    // Show again immediately if the student re-enters after the fade-out
+    transition-delay: 0s;
+
+    .student-presence-arrived {
+      animation: student-presence-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    }
+  }
+
+  // The student has arrived and the confirmation has been shown long enough
+  &[data-state="done"] {
+    opacity: 0;
+    visibility: hidden;
+    transform: scale(0.8);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-presence {
+    transition: none;
+    transition-delay: 0s;
+
+    &[data-state="arrived"] .student-presence-arrived {
+      animation: none;
+    }
+
+    &[data-state="done"] {
+      transform: none;
+    }
+  }
+}
+
 .screening-controls {
   display: flex;
   align-items: center;

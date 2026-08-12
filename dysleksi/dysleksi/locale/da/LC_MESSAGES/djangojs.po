@@ -61,3 +61,7 @@ msgstr ""
 #: dysleksi/static/js/screening/group/student-group-test.js
 msgid "Vælg et svar, før du går videre."
 msgstr ""
+
+#: dysleksi/static/js/screening/student-test.js
+msgid "Testen er startet"
+msgstr ""
