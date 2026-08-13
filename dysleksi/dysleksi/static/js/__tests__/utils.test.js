@@ -8,6 +8,7 @@ import { calculateStudentProgress } from "../screening/utils";
 import { preventDoubleTapZoom } from "../screening/utils";
 import { getCursorIndex, serverOnline } from "../screening/utils";
 import { setResponsiveFontSize } from "../screening/utils";
+import { isVisible } from "../screening/utils";
 
 // Mock getWebSocket
 vi.mock("../ws.js", () => ({
@@ -642,5 +643,41 @@ describe("setResponsiveFontSize", () => {
         setResponsiveFontSize(btn, 32);
 
         expect(parseInt(btn.style.fontSize)).toBeGreaterThanOrEqual(10);
+    });
+});
+
+describe("isVisible", () => {
+    afterEach(() => {
+        document.body.innerHTML = "";
+    });
+
+    it("returns false for missing or detached elements", () => {
+        expect(isVisible(null)).toBe(false);
+        expect(isVisible(document.createElement("button"))).toBe(false);
+    });
+
+    it("returns true for a rendered element", () => {
+        const btn = document.createElement("button");
+        document.body.appendChild(btn);
+
+        expect(isVisible(btn)).toBe(true);
+    });
+
+    it("returns false when the element itself is display:none", () => {
+        const btn = document.createElement("button");
+        btn.style.display = "none";
+        document.body.appendChild(btn);
+
+        expect(isVisible(btn)).toBe(false);
+    });
+
+    it("returns false when an ancestor is display:none", () => {
+        const container = document.createElement("div");
+        const btn = document.createElement("button");
+        container.style.display = "none";
+        container.appendChild(btn);
+        document.body.appendChild(container);
+
+        expect(isVisible(btn)).toBe(false);
     });
 });

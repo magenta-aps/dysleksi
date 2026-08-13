@@ -15,15 +15,6 @@ import * as utils from "../../screening/utils.js";
 import { Student } from "../../screening/model.js";
 import { InstructionSequenceRunner } from "../../screening/instruction.js";
 
-HTMLElement.prototype.checkVisibility = function () {
-    let el = this;
-    while (el) {
-        if (getComputedStyle(el).display === "none") return false;
-        el = el.parentElement;
-    }
-    return true;
-};
-
 const mockP2P = {
     connect: vi.fn(),
     send: vi.fn(),
