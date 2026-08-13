@@ -6,6 +6,21 @@ export function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }
 
+export function isVisible(el) {
+    // Replacement function for Element.checkVisibility()
+    // Because Element.checkVisibility() was introduced in Safari 17.4
+    // Some ipads still run safari < 17.4
+    //
+    // Source: https://developer.apple.com/documentation/safari-release-notes/
+    //  safari-17_4-release-notes?changes=latest_major
+    if (!el || !el.isConnected) return false;
+
+    for (let node = el; node; node = node.parentElement) {
+        if (getComputedStyle(node).display === "none") return false;
+    }
+    return true;
+}
+
 export function setResponsiveFontSize(button, maxFontSize) {
     // Sets font size on a button but scales down if the text does not fit on the button
     button.style.fontSize = `${maxFontSize}px`;

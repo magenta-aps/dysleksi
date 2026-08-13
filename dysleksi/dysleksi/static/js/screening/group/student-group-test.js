@@ -1,5 +1,5 @@
 import { StudentTestView } from "../student-test.js";
-import { calculateStudentProgress } from "../utils.js";
+import { calculateStudentProgress, isVisible } from "../utils.js";
 import { gettext } from "../../i18n.js";
 
 export class GroupTestView extends StudentTestView {
@@ -358,9 +358,7 @@ export class GroupTestView extends StudentTestView {
         if (!this.answerButtons) return [];
         return this.answerButtons
             .filter(
-                (a) =>
-                    a.button.classList.contains("selected") &&
-                    a.button.checkVisibility(),
+                (a) => a.button.classList.contains("selected") && isVisible(a.button),
             )
             .map((a) => a.button);
     }
