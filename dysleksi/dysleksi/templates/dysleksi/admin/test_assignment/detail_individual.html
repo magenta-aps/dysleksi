@@ -17,7 +17,19 @@
      data-assignment-id="{{ object.pk }}">
 
     <div class="screening-header">
-        <h2 class="mt-2 mb-4">{{ test_assignment.student.get_full_name }} - {{ test_assignment.test.name }}</h2>
+        <div class="screening-title">
+            <h2 class="mt-2 mb-4">{{ test_assignment.student.get_full_name }} - {{ test_assignment.test.name }}</h2>
+            <div id="student-presence" class="student-presence" data-state="waiting" role="status" aria-live="polite">
+                <span class="student-presence-waiting">
+                    <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                    <span>{% translate 'Venter på elev' %}</span>
+                </span>
+                <span class="student-presence-arrived">
+                    <i class="ph-fill ph-check-circle" aria-hidden="true"></i>
+                    <span class="visually-hidden">{% translate 'Eleven er kommet ind i testrummet' %}</span>
+                </span>
+            </div>
+        </div>
         {% details_popup %}
     </div>
     <div class="card">

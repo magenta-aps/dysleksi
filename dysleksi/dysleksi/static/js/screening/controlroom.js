@@ -98,7 +98,9 @@ export class EventTable extends EventTarget {
         }
         if (
             data.practice ||
-            !["question.answered", "question.feedback"].includes(data.event)
+            !["question.answered", "question.feedback", "test.started"].includes(
+                data.event,
+            )
         ) {
             return;
         }
@@ -125,6 +127,17 @@ export class EventTable extends EventTarget {
             noteEl = this.createTd("note");
             rowEl.append(partNameEl, questionEl, resultEl, answerEl, noteEl);
             this.eventsEl.prepend(rowEl);
+        } else if (data.event === "test.started") {
+            rowEl = document.createElement("tr");
+            partNameEl = this.createTd("part-name");
+            questionEl = this.createTd("question");
+            resultEl = this.createTd("result");
+            answerEl = this.createTd("answer");
+            noteEl = this.createTd("note");
+            rowEl.append(partNameEl, questionEl, resultEl, answerEl, noteEl);
+            this.eventsEl.prepend(rowEl);
+            noteEl.textContent = data.message;
+            return;
         } else {
             // Modify existing row (created when handling `question.feedback` event)
             try {
@@ -1182,6 +1195,27 @@ export class DetailsPopup {
     }
 }
 
+export class StudentPresenceIndicator {
+    /* Shows "waiting for student" next to the page heading until the student
+       enters the test room, then briefly shows a confirmation instead. */
+    constructor(selector = "#student-presence", hideDelay = 5000) {
+        this.domElement = document.querySelector(selector);
+        this.hideDelay = hideDelay;
+        this.timeout = null;
+    }
+
+    markStudentArrived() {
+        if (this.domElement === null) {
+            return;
+        }
+        clearTimeout(this.timeout);
+        this.domElement.dataset.state = "arrived";
+        this.timeout = setTimeout(() => {
+            this.domElement.dataset.state = "done";
+        }, this.hideDelay);
+    }
+}
+
 export class TeacherView {
     constructor(
         test,
@@ -1225,6 +1259,7 @@ export class TeacherView {
         this.elapsedTimeView = elapsedTimeView;
         this.audioIndicator = audioIndicator;
         this.detailsPopup = new DetailsPopup();
+        this.studentPresence = new StudentPresenceIndicator();
 
         this.filterButtons = document.querySelectorAll(".group-test-header .btn");
         this.gotoNextResultGroupButton = document.querySelector(
@@ -1397,6 +1432,10 @@ export class TeacherView {
                 if (data.event === "instructions.completed") {
                     this.showingInstructions = false;
                     this.buttons.enableNextButton();
+                }
+                if (data.event === "test.started") {
+                    this.table.updateTable(data);
+                    this.studentPresence.markStudentArrived();
                 }
             }
 

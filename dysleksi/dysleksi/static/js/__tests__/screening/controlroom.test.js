@@ -19,6 +19,7 @@ import { StudentCard } from "../../screening/controlroom.js";
 import { Student } from "../../screening/model.js";
 import { WebRTCChannel } from "../../webRTC.js";
 import { DetailsPopup } from "../../screening/controlroom.js";
+import { StudentPresenceIndicator } from "../../screening/controlroom.js";
 
 vi.mock("../../screening/utils.js");
 
@@ -170,6 +171,21 @@ const GROUP_DOM_HTML = `
 `;
 
 const INDIVIDUAL_DOM_HTML = `
+<div class="screening-header">
+    <div class="screening-title">
+        <h2>Anna Andersen - Screening Test</h2>
+        <div id="student-presence" class="student-presence" data-state="waiting" role="status" aria-live="polite">
+            <span class="student-presence-waiting">
+                <span class="spinner-border spinner-border-sm" aria-hidden="true"></span>
+                <span>Venter på elev</span>
+            </span>
+            <span class="student-presence-arrived">
+                <i class="ph-fill ph-check-circle" aria-hidden="true"></i>
+                <span class="visually-hidden">Eleven er kommet ind i testrummet</span>
+            </span>
+        </div>
+    </div>
+</div>
 <div id="question-container">
     <h1 id="question-title"></h1>
     <div id="question-content"></div>
@@ -1262,6 +1278,28 @@ describe("Teacher Individual test View", () => {
         );
         // Assert: audio indicator renders paused
         expect(spyRender).toHaveBeenCalledWith(0);
+    });
+
+    it("confirms that the student has entered the room when the test starts", () => {
+        // Arrange: the teacher is waiting for the student
+        const presenceEl = document.querySelector("#student-presence");
+        expect(presenceEl.dataset.state).toBe("waiting");
+        // Act: start test
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "test.started",
+                    partIndex: 0,
+                    questionIndex: 0,
+                },
+            }),
+        );
+        // Assert: the confirmation is shown, and hidden again after 5 seconds
+        expect(presenceEl.dataset.state).toBe("arrived");
+        vi.advanceTimersByTime(4999);
+        expect(presenceEl.dataset.state).toBe("arrived");
+        vi.advanceTimersByTime(1);
+        expect(presenceEl.dataset.state).toBe("done");
     });
 
     it("runs animated audio indicator while the student answers", () => {
@@ -3046,6 +3084,45 @@ describe("DetailsPopup", () => {
         innerLabel.dispatchEvent(new Event("click", { bubbles: true }));
 
         expect(detailsPopup.isOpen()).toBe(true);
+    });
+});
+
+describe("StudentPresenceIndicator", () => {
+    beforeEach(() => {
+        vi.useFakeTimers();
+        document.body.innerHTML = INDIVIDUAL_DOM_HTML;
+    });
+
+    afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
+    });
+
+    it("keeps waiting until the student arrives", () => {
+        const indicator = new StudentPresenceIndicator();
+        vi.advanceTimersByTime(60000);
+        expect(indicator.domElement.dataset.state).toBe("waiting");
+    });
+
+    it("restarts the delay when the student arrives again", () => {
+        const indicator = new StudentPresenceIndicator();
+
+        indicator.markStudentArrived();
+        vi.advanceTimersByTime(4000);
+        // The student re-enters the room before the confirmation is hidden
+        indicator.markStudentArrived();
+        vi.advanceTimersByTime(4000);
+        expect(indicator.domElement.dataset.state).toBe("arrived");
+
+        vi.advanceTimersByTime(1000);
+        expect(indicator.domElement.dataset.state).toBe("done");
+    });
+
+    it("does not throw when the element is missing from the DOM", () => {
+        document.body.innerHTML = "";
+        const indicator = new StudentPresenceIndicator();
+        expect(indicator.domElement).toBeNull();
+        expect(() => indicator.markStudentArrived()).not.toThrow();
     });
 });
 
