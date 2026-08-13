@@ -9,7 +9,7 @@ export async function start() {
     const testType = roleEl.dataset.testType;
     let initStudent, initTeacher;
 
-    const assignmentId = roleEl.dataset.assignmentId;
+    const assignmentId = Number(roleEl.dataset.assignmentId);
     const testContentsEl = document.getElementById("test_contents");
     const testContents = testContentsEl ? JSON.parse(testContentsEl.textContent) : null;
     const studentIdsEl = document.getElementById("student_ids");
@@ -19,7 +19,7 @@ export async function start() {
     const studentData = {};
     studentData.firstName = roleEl.dataset.studentFirstName;
     studentData.lastName = roleEl.dataset.studentLastName;
-    studentData.id = roleEl.dataset.studentId;
+    studentData.id = Number(roleEl.dataset.studentId);
 
     const student = new Student(studentData);
     student.populateExistingAnswers(test);
@@ -51,7 +51,7 @@ export async function start() {
     }
     if (role === "teacher") {
         initTeacher(assignmentId, test);
-        startSession(studentIds);
+        startSession(studentIds, assignmentId);
     }
 }
 

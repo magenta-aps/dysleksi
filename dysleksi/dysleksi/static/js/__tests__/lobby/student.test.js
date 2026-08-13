@@ -170,6 +170,65 @@ describe("initRedirectSocket / initRedirectSocket", () => {
         expect(window.location).toBe("/rooms/room-new/");
     });
 
+    it("redirects when the test-assignment matches", () => {
+        initRedirectSocket(studentId, 42);
+
+        const socket = sockets["lobby"];
+
+        socket.__trigger("message", {
+            data: JSON.stringify({
+                event: "session.start",
+                roomUrl: "/rooms/room-42/",
+                students: [studentId],
+                assignmentId: 42,
+                timestamp: 1,
+            }),
+        });
+
+        vi.advanceTimersByTime(300);
+        expect(window.location).toBe("/rooms/room-42/");
+    });
+
+    it("Does not redirect if the test-assignment does not match", () => {
+        initRedirectSocket(studentId, 42);
+
+        const socket = sockets["lobby"];
+
+        socket.__trigger("message", {
+            data: JSON.stringify({
+                event: "session.start",
+                roomUrl: "/rooms/room-1337/",
+                students: [studentId],
+                assignmentId: 1337,
+                timestamp: 1,
+            }),
+        });
+
+        vi.advanceTimersByTime(300);
+        expect(window.location).toBe("");
+    });
+
+    it("redirects to any test-assignment when no assignment is given", () => {
+        // A student waiting in the lobby is not tied to a single assignment,
+        // and should therefore follow whichever one the teacher starts
+        initRedirectSocket(studentId);
+
+        const socket = sockets["lobby"];
+
+        socket.__trigger("message", {
+            data: JSON.stringify({
+                event: "session.start",
+                roomUrl: "/rooms/room-1337/",
+                students: [studentId],
+                assignmentId: 1337,
+                timestamp: 1,
+            }),
+        });
+
+        vi.advanceTimersByTime(300);
+        expect(window.location).toBe("/rooms/room-1337/");
+    });
+
     it("Does not redirect if studentId does not match", () => {
         initRedirectSocket(studentId);
 

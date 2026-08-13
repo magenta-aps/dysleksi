@@ -39,7 +39,7 @@ export class StudentTestView extends EventTarget {
         this.audioContext = unlockAudioOnGesture();
         this.failedAttempts = 0;
         this.cancelAudio = false;
-        initRedirectSocket(Number(student.id), ["session.start"]);
+        initRedirectSocket(student.id, assignmentId, ["session.start"]);
     }
 
     questionTitle(practice = false) {
