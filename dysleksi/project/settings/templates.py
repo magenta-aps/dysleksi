@@ -27,6 +27,7 @@ TEMPLATES = [
                 "dysleksi.context_processors.debug_context",
                 "dysleksi.context_processors.version_context",
                 "dysleksi.context_processors.webrtc_settings",
+                "dysleksi.context_processors.client_error_log_context",
             ],
             "loaders": default_loaders if DEBUG else cached_loaders,
             "libraries": {

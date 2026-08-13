@@ -34,6 +34,7 @@ from dysleksi.views import (
     AssignmentView,
     ClassDetailView,
     ClassListView,
+    ClientErrorLogView,
     PaginationMixin,
     PartResponseView,
     RootView,
@@ -1604,3 +1605,91 @@ class TestPartResponseView(ResponseTest):
         self.assertAlmostEqual(context["ReadingSpeedCategories"][1].scaled_width(), 0.1)
         self.assertAlmostEqual(context["y_scale"], 10.0)
         self.assertEqual(context["plot"], [(1.0, 6.0)])
+
+
+class TestClientErrorLogView(DysleksiTest):
+
+    payload = {
+        "kind": "uncaught",
+        "message": "TypeError: x is not a function",
+        "stack": "TypeError: x is not a function\n    at play (dom.js:12:34)",
+        "source": "https://dysleksi-web/static/js/screening/dom.js:12:34",
+        "url": "https://dysleksi-web/assignment/1/",
+        "user_agent": "Mozilla/5.0",
+    }
+
+    def post(self, data, user=None, content_type="application/json"):
+        request = RequestFactory().post("", data=data, content_type=content_type)
+        request.user = user if user is not None else AnonymousUser()
+        with patch("dysleksi.views.client_error_logger") as logger:
+            response = ClientErrorLogView.as_view()(request)
+        return response, logger
+
+    def test_logs_report(self):
+        response, logger = self.post(self.payload, user=self.student1)
+        self.assertEqual(response.status_code, 204)
+        logger.error.assert_called_once_with(
+            f"uncaught [user={self.student1.username}] "
+            "[page=https://dysleksi-web/assignment/1/] "
+            "TypeError: x is not a function\n"
+            "    at https://dysleksi-web/static/js/screening/dom.js:12:34\n"
+            "    TypeError: x is not a function\n"
+            "    at play (dom.js:12:34)\n"
+            "    user agent: Mozilla/5.0"
+        )
+
+    def test_logs_report_for_anonymous_user(self):
+        response, logger = self.post(self.payload)
+        self.assertEqual(response.status_code, 204)
+        self.assertIn("[user=anonymous]", logger.error.call_args.args[0])
+
+    def test_logs_minimal_report(self):
+        response, logger = self.post({})
+        self.assertEqual(response.status_code, 204)
+        logger.error.assert_called_once_with("unknown [user=anonymous] [page=?] ")
+
+    def test_logs_unknown_kind_as_unknown(self):
+        response, logger = self.post({"kind": "<script>", "message": "hey"})
+        self.assertEqual(response.status_code, 204)
+        logger.error.assert_called_once_with("unknown [user=anonymous] [page=?] hey")
+
+    def test_logs_report_limit_being_reached(self):
+        response, logger = self.post({"kind": "limit", "message": "no more reports"})
+        self.assertEqual(response.status_code, 204)
+        logger.error.assert_called_once_with(
+            "limit [user=anonymous] [page=?] no more reports"
+        )
+
+    def test_truncates_long_fields(self):
+        response, logger = self.post(
+            {"kind": "console.error", "message": "m" * 3000, "stack": "s" * 5000}
+        )
+        self.assertEqual(response.status_code, 204)
+        first_line, stack_line = logger.error.call_args.args[0].splitlines()
+        self.assertEqual(
+            first_line,
+            "console.error [user=anonymous] [page=?] "
+            + "m" * ClientErrorLogView.max_message_length,
+        )
+        self.assertEqual(stack_line.strip(), "s" * ClientErrorLogView.max_stack_length)
+
+    def test_rejects_invalid_json(self):
+        response, logger = self.post("not json", content_type="text/plain")
+        self.assertEqual(response.status_code, 400)
+        logger.error.assert_not_called()
+
+    def test_rejects_non_object_payload(self):
+        response, logger = self.post([1, 2, 3])
+        self.assertEqual(response.status_code, 400)
+        logger.error.assert_not_called()
+
+    def test_rejects_oversized_payload(self):
+        response, logger = self.post({"message": "m" * 20000})
+        self.assertEqual(response.status_code, 413)
+        logger.error.assert_not_called()
+
+    def test_rejects_get(self):
+        request = RequestFactory().get("")
+        request.user = AnonymousUser()
+        response = ClientErrorLogView.as_view()(request)
+        self.assertEqual(response.status_code, 405)

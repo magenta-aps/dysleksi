@@ -37,6 +37,9 @@ SPDX-License-Identifier: MPL-2.0
     {% block js_module %}
     {% endblock %}
 
+    {{ CLIENT_ERROR_LOG_CONFIG|json_script:"client-error-log-config" }}
+    <script type="module" src="{% static 'js/error-reporting.js' %}"></script>
+
     {% if show_debug_console %}
     <div id="logbox" class="logbox"></div>
 

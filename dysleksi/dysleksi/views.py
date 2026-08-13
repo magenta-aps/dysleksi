@@ -1,6 +1,8 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
+import json
+import logging
 from datetime import timedelta
 from functools import cached_property, partial
 from math import ceil
@@ -30,6 +32,7 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
+from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
 from django.views.generic.edit import UpdateView
 from django_stubs_ext import StrOrPromise
@@ -80,6 +83,10 @@ from dysleksi.tables import (
     column_group,
 )
 from dysleksi.utils import reverse_ordering, scan_static_files
+
+# Errors reported by the browser are logged under their own logger name, so they
+# can be told apart from server side errors in the container log.
+client_error_logger = logging.getLogger("dysleksi.javascript")
 
 
 class UserTypeMixin(LoginRequiredMixin):
@@ -1389,3 +1396,63 @@ class PartResponseView(
         context["QuestionType"] = QuestionType
 
         return context
+
+
+class ClientErrorLogView(View):
+    """Receives JavaScript errors caught in the browser by
+    `static/js/error-reporting.js` and writes them to the server log, making
+    errors on the students' and teachers' devices visible in the container log.
+    """
+
+    http_method_names = ["post"]
+
+    # A report is a handful of short strings. Anything substantially larger than
+    # that is not something we want in the log.
+    max_payload_size = 10000
+    max_message_length = 2000
+    max_stack_length = 4000
+
+    # Reports for anything but these kinds are logged under "unknown", as the
+    # kind ends up in the log message.
+    kinds = ("uncaught", "unhandledrejection", "console.error", "limit")
+
+    def post(self, request, *args, **kwargs) -> HttpResponse:
+        if len(request.body) > self.max_payload_size:
+            return HttpResponse(status=413)
+        try:
+            payload = json.loads(request.body)
+        except (json.JSONDecodeError, UnicodeDecodeError):
+            return HttpResponse(status=400)
+        if not isinstance(payload, dict):
+            return HttpResponse(status=400)
+
+        client_error_logger.error(self.format_report(payload))
+        return HttpResponse(status=204)
+
+    def field(self, payload: dict, name: str, max_length: int) -> str | None:
+        value = payload.get(name)
+        if value is None:
+            return None
+        return str(value)[:max_length]
+
+    def format_report(self, payload: dict) -> str:
+        kind = payload.get("kind")
+        user = self.request.user
+        lines = [
+            "{kind} [user={user}] [page={page}] {message}".format(
+                kind=kind if kind in self.kinds else "unknown",
+                user=user.username if user.is_authenticated else "anonymous",
+                page=self.field(payload, "url", 500) or "?",
+                message=self.field(payload, "message", self.max_message_length) or "",
+            )
+        ]
+        source = self.field(payload, "source", 500)
+        if source:
+            lines.append(f"    at {source}")
+        stack = self.field(payload, "stack", self.max_stack_length)
+        if stack:
+            lines.extend(f"    {line.strip()}" for line in stack.splitlines())
+        user_agent = self.field(payload, "user_agent", 500)
+        if user_agent:
+            lines.append(f"    user agent: {user_agent}")
+        return "\n".join(lines)
