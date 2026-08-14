@@ -1892,11 +1892,8 @@ class Message(models.Model):
 
                 question_response.answer_option = choice
                 question_response.answer_text = self.data.get("textAnswer")
-                correctness = (
-                    choice.correctness if choice else self.data.get("correctness")
-                )
-                if correctness is not None:
-                    question_response.correctness = correctness
+                question_response.correctness = self.data.get("correctness")
+
                 question_response.finished_after = duration
 
                 sound_data = self.data.get("recordingBase64")

@@ -810,6 +810,7 @@ class TestMessage(DysleksiTest):
                 "questionId": self.question1.pk,
                 "choiceId": self.possible_correct_answer1.pk,
                 "duration": 10000,
+                "correctness": "correct",
             },
             user=self.student1,
         )
