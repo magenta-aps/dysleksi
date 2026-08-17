@@ -2,10 +2,12 @@
 {% if record.test_status == ClassTestStatus.OPEN %}
     <i class="ph ph-lock-open"></i>
     {{ test_status }}
-{% else %}
-    <span class="text-danger">
+{% elif record.test_status == ClassTestStatus.LOCKED %}
+    <span class="text-success">
         <i class="ph ph-lock"></i>
         {{ test_status }}
     </span>
+{% else %}
+    -
 {% endif %}
 {% endwith %}

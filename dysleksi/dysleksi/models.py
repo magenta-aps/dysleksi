@@ -118,8 +118,9 @@ class TestAssignmentStatus(TextChoices):
 
 
 class ClassTestStatus(TextChoices):
+    NONE = "none", _("Ingen tests")
     OPEN = "open", _("Åben")
-    LOCKED = "locked", _("Låst")
+    LOCKED = "locked", _("Gennemført")
 
 
 class User(AbstractUser):
@@ -360,15 +361,25 @@ class ClassQuerySet(PermissionsQuerySet):
 
     def annotate_test_status(self):
         return self.annotate(
-            # Add "internal" annotation used by the `test_status` annotation
+            # Add "internal" annotations used by the `test_status` annotation
+            _assignment_count=Count("testassignment__pk"),
             _all_assignments_completed=BoolAnd("testassignment__responses__completed"),
             # Add the `test_status` annotation itself
             test_status=Case(
                 When(
-                    _all_assignments_completed=Value(True),
+                    Q(_assignment_count__gt=0)
+                    & Q(
+                        Q(_all_assignments_completed__isnull=True)
+                        | Q(_all_assignments_completed=Value(False))
+                    ),
+                    then=Value(ClassTestStatus.OPEN),
+                ),
+                When(
+                    Q(_assignment_count__gt=0)
+                    & Q(_all_assignments_completed=Value(True)),
                     then=Value(ClassTestStatus.LOCKED),
                 ),
-                default=Value(ClassTestStatus.OPEN),
+                default=Value(ClassTestStatus.NONE),
             ),
         )
 
@@ -673,6 +684,17 @@ class TestAssignment(PermissionsMixin, models.Model):
     def __str__(self) -> str:
         assignee = self.student or self.klasse
         return f"{self.test.name}/{str(self.teacher)} ({str(assignee)})"
+
+    @cached_property
+    def class_for_nav(self):
+        if self.klasse is not None:
+            return self.klasse
+        elif self.student is not None:
+            return self.student.classes.filter(is_main=True).first()
+        else:
+            raise ValueError(  # pragma: no cover
+                "cannot get `class_for_nav` for %r" % self
+            )
 
 
 class TestPartResultsBreakdownRange(models.Model):

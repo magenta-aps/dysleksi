@@ -1,2 +1,3 @@
 {% load i18n %}
-<a href="#" class="btn btn-outline-secondary">{% translate "Se testoversigten" %}</a>
+<a href="{% url 'dysleksi:class_detail' pk=record.pk %}" class="btn btn-outline-secondary">{% translate "Åbn klasse" %}</a>
+<a href="{% url 'dysleksi:class_assignment_list' class_pk=record.pk %}" class="btn btn-outline-secondary">{% translate "Se testoversigt" %}</a>

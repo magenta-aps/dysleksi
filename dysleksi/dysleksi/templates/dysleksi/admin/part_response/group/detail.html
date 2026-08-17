@@ -10,15 +10,15 @@
 
 
 {% block breadcrumb %}
-    <li class="breadcrumb-item"><a href="{% url 'dysleksi:test_assignment_list' %}">{% translate 'Tests' %}</a></li>
+    <li class="breadcrumb-item"><a href="{% url 'dysleksi:test_assignment_result_list' %}">{% translate 'Resultater' %}</a></li>
+
     <li class="breadcrumb-item">
-        <a href="{% url 'dysleksi:room' object.pk %}">
-            {% blocktranslate trimmed with class_name=object.assignment.klasse_name test_name=object.assignment.test.name %}
-                Klasse {{ class_name }} - {{ test_name }}
+        <a href="{% url 'dysleksi:test_assignment_results' object.testresponse.assignment.pk %}">
+            {% blocktranslate trimmed with class_name=object.testresponse.assignment.class_for_nav.name test_name=object.testresponse.assignment.test.name %}
+            Klasse {{ class_name }} - {{ test_name }}
             {% endblocktranslate %}
         </a>
     </li>
-    <li class="breadcrumb-item">{% translate "Resultater" %}</li>
     <li class="breadcrumb-item">
         <a href="{% url 'dysleksi:test_assignment_student_results' assignment_pk=object.testresponse.assignment.pk response_pk=object.testresponse.pk %}">
         {{ object.testresponse.student.get_full_name }}

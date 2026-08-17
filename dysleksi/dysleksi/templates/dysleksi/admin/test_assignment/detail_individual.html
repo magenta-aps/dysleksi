@@ -4,7 +4,14 @@
 {% load error_modal from modals %}
 
 {% block breadcrumb %}
-<li class="breadcrumb-item"><a href="{% url 'dysleksi:test_assignment_list' %}">{% translate 'Tests' %}</a></li>
+<li class="breadcrumb-item"><a href="{% url 'dysleksi:class_list' %}">{% translate 'Klasser' %}</a></li>
+<li class="breadcrumb-item">
+    <a href="{% url 'dysleksi:class_assignment_list' class_pk=class.pk %}">
+        {% blocktranslate trimmed with class_name=class.name %}
+        Klasse {{ class_name }}
+        {% endblocktranslate %}
+    </a>
+</li>
 <li class="breadcrumb-item active" aria-current="page">
     {{ test_assignment.student.get_full_name }} - {{ test_assignment.test.name }}
 </li>

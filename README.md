@@ -24,14 +24,21 @@ docker compose up -d
 ## Usage hints
 
 In your browser, go to https://dysleksi-web/ and log in using the teacher's credentials.
+
 Now open a second browser in incognito mode, and go to https://dysleksi-web/ there as
-well. Log in using the student's credentials:
+well. Log in using the student's credentials.
 
-| Method            | Teacher username   | Teacher password   | Student username | Student password |
-|-------------------|--------------------|--------------------|------------------|------------------|
-| Username/password | `lærer`            | `lærer`            | `elev`           | `elev`           |
-| UniLogin/MitID    | `laerer@dys.gl`    | `laerer`           | `elev@dys.gl`    | `elev`           |
+To login using username/password, go to https://dysleksi-web/login/forward/django instead.
 
+| Role                                    | Login type        | Teacher username | Teacher password |
+|-----------------------------------------|:------------------|------------------|------------------|
+| Teacher 1                               | UniLogin/MitID    | `laerer@dys.gl`  | `laerer`         |
+| Teacher 1                               | Username/password | `0222222222`     | `lærer`          |
+| Teacher 2                               | Username/password | `lærer`          | `lærer`          |
+| Teacher 3 (admin)                       | Username/password | `admin`          | `admin`          |
+| Student 1                               | UniLogin/MitID    | `elev@dys.gl`    | `elev`           |
+| Student 2                               | UniLogin/MitID    | `elev2@dys.gl`   | `elev2`          |
+| Student 3 ("Steve Jobs", iPad testing)  | Username/password | `elev`           | `elev`           |
 
 To begin a screening session, click "Start individueltest" in the teacher window. The "student window" should now automatically switch to a screening session.
 

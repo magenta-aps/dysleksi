@@ -5,10 +5,47 @@
 {% load assign_group_modal from modals %}
 {% load assign_individual_modal from modals %}
 
+{% block breadcrumb %}
+{% if current_class %}
+<li class="breadcrumb-item"><a href="{% url 'dysleksi:class_list' %}">{% translate 'Klasser' %}</a></li>
+<li class="breadcrumb-item">
+    {% has_permission current_class "view" as has_perm %}
+    {% if has_perm %}
+    <a href="{% url 'dysleksi:class_detail' pk=current_class.pk %}">
+        {% blocktranslate trimmed with class_name=current_class.name %}
+        Klasse {{ class_name }}
+        {% endblocktranslate %}
+    </a>
+    {% else %}
+        {% blocktranslate trimmed with class_name=current_class.name %}
+        Klasse {{ class_name }}
+        {% endblocktranslate %}
+    {% endif %}
+</li>
+<li class="breadcrumb-item active" aria-current="page">{% translate 'Testoversigt' %}</li>
+{% endif %}
+{% endblock %}
+
 {% block inner_content %}
-<div class="d-flex justify-content-between align-content-center mb-3">
-    <h1>{% translate 'Tests' %}</h1>
-    <div class="align-content-center ms-auto">
+<div class="row">
+    <div class="col-6">
+        <h5 class="mt-2 mb-4">
+            <i class="ph ph-users-three fs-5"></i>
+            {% if current_class %}
+                {% blocktranslate trimmed with class_name=current_class.name %}
+                Testoversigt for {{ class_name }}
+                {% endblocktranslate %}
+                <span class="subheader">
+                    ({% blocktranslate trimmed with school_year_start=current_class.school_year_start %}
+                    Årgang {{ school_year_start }}
+                    {% endblocktranslate %})
+                </span>
+            {% else %}
+                {% translate 'Tests' %}
+            {% endif %}
+        </h5>
+    </div>
+    <div class="col-6 mt-2 text-end">
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assign_group">
             <i class="ph ph-plus me-1"></i>
             {% translate 'Tildel gruppetest' %}

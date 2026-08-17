@@ -3,7 +3,7 @@
 {% load static %}
 
 {% block breadcrumb %}
-<li class="breadcrumb-item"><a href="{% url 'dysleksi:test_assignment_list' %}">{% translate 'Tests' %}</a></li>
+<li class="breadcrumb-item"><a href="{% url 'dysleksi:class_assignment_list' class_pk=class.pk %}">{% translate 'Tests' %}</a></li>
 <li class="breadcrumb-item active" aria-current="page">
     {% blocktranslate trimmed with class_name=class_name test_name=test_name %}
         Klasse {{ class_name }} - Screening {{ test_name }}
