@@ -37,6 +37,7 @@ from dysleksi.models import (
     Student,
     Test,
     TestAssignment,
+    TestAssignmentStatus,
     TestPart,
     TestQuestion,
     TestResource,
@@ -388,6 +389,72 @@ class TestTestAssignment(ResponseTest):
                 'check constraint "student_or_class_must_be_set"'
             )
         )
+
+    def status(self, assignment: TestAssignment):
+        return (
+            TestAssignment.objects.filter(pk=assignment.pk)
+            .annotate_status()
+            .first()
+            .status
+        )
+
+    def test_end(self):
+        assignment = self.test_assignment_student
+        self.assertEqual(self.status(assignment), TestAssignmentStatus.IN_PROGRESS)
+
+        assignment.end()
+
+        # The unfinished response is now completed, and marked as cancelled
+        # because the student did not answer all questions
+        self.test_response_student.refresh_from_db()
+        self.assertTrue(self.test_response_student.completed)
+        self.assertTrue(self.test_response_student.cancelled)
+        # The test is listed as cancelled in the test overview
+        self.assertEqual(self.status(assignment), TestAssignmentStatus.CANCELLED)
+
+    def test_end_keeps_completed_responses_uncancelled(self):
+        assignment = self.test_assignment_class
+
+        assignment.end()
+
+        # Both students finished their test before the teacher ended it
+        for response in (self.test_response_class_1, self.test_response_class_2):
+            response.refresh_from_db()
+            self.assertTrue(response.completed)
+            self.assertFalse(response.cancelled)
+        self.assertEqual(self.status(assignment), TestAssignmentStatus.COMPLETED)
+
+    def test_end_without_any_responses(self):
+        assignment = self.test_assignment_student
+        assignment.responses.all().delete()
+        self.assertEqual(self.status(assignment), TestAssignmentStatus.CREATED)
+
+        assignment.end()
+
+        # The student never answered anything, but there is still a (blank)
+        # response to show on the results page
+        self.assertEqual(assignment.responses.count(), 1)
+        self.assertEqual(self.status(assignment), TestAssignmentStatus.CANCELLED)
+
+    def test_end_group_test_without_any_responses(self):
+        assignment = self.test_assignment_class
+        assignment.responses.all().delete()
+
+        assignment.end()
+
+        # There are two blank responses for the results page. Because there are two
+        # students
+        self.assertEqual(assignment.responses.count(), 2)
+        self.assertEqual(self.status(assignment), TestAssignmentStatus.CANCELLED)
+
+    def test_end_twice(self):
+        assignment = self.test_assignment_student
+        assignment.end()
+
+        assignment.end()
+
+        self.assertEqual(assignment.responses.count(), 1)
+        self.assertEqual(self.status(assignment), TestAssignmentStatus.CANCELLED)
 
     def test_access(self):
         for user in (self.admin, self.privileged_user):
@@ -898,6 +965,30 @@ class TestMessage(DysleksiTest):
         )
         message.handle()
         self.assertEqual(message.error, f"No assignmentId in message {message.uuid}")
+
+    def test_test_cancelled(self):
+        testresponse = TestResponse.objects.create(
+            assignment=self.group_assignment,
+            student=self.student1,
+        )
+        message = Message.objects.create(
+            uuid=uuid4(),
+            event="test.cancelled",
+            data={
+                "assignmentId": self.group_assignment.pk,
+                "partId": None,
+                "questionId": None,
+                "note": "",
+            },
+            user=self.teacher,
+        )
+        message.handle()
+        self.assertIsNone(message.error)
+
+        testresponse.refresh_from_db()
+        self.assertTrue(testresponse.completed)
+        self.assertTrue(testresponse.cancelled)
+        self.assertFalse(QuestionResponse.objects.exists())
 
     def test_student_from_assignment(self):
         message = Message.objects.create(

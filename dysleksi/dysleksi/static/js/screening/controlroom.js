@@ -4,6 +4,13 @@ import { serverOnline } from "./utils.js";
 import { gettext, blocktranslate } from "../i18n.js";
 import { Modal } from "bootstrap";
 
+export const showResultLink = () => {
+    const disabled = document.getElementById("result-link-disabled");
+    const enabled = document.getElementById("result-link-enabled");
+    disabled.classList.add("d-none");
+    enabled.classList.remove("d-none");
+};
+
 const formatDuration = (duration) => {
     const hours = String(duration.getHours() - 1).padStart(2, "0");
     const minutes = String(duration.getMinutes()).padStart(2, "0");
@@ -663,8 +670,6 @@ export class GroupTestContainer {
         this.ongoingStudentsButton.onclick = () => this.filterCards("ongoing");
         this.finishedStudentsButton.onclick = () => this.filterCards("finished");
         this.markedStudentsButton.onclick = () => this.filterCards("marked");
-        this.resultLinkDisabled = document.getElementById("result-link-disabled");
-        this.resultLinkEnabled = document.getElementById("result-link-enabled");
         this.progressBar = document.getElementById("test-progress-bar");
         this.progressLabel = document.getElementById("test-progress-label");
 
@@ -866,13 +871,8 @@ export class GroupTestContainer {
         if (this.students.values().every((student) => student.progress === 100)) {
             // Alle studerende som vi har fået beskeder fra er nu på progress==100
             // Dette kan ske selvom vi kun har fået fra én
-            this.onTestComplete();
+            showResultLink();
         }
-    }
-
-    onTestComplete() {
-        this.resultLinkDisabled.classList.add("d-none");
-        this.resultLinkEnabled.classList.remove("d-none");
     }
 }
 
@@ -1437,6 +1437,9 @@ export class TeacherView {
                     this.table.updateTable(data);
                     this.studentPresence.markStudentArrived();
                 }
+                if (data.event === "test.complete") {
+                    showResultLink();
+                }
             }
 
             if (
@@ -1770,18 +1773,27 @@ export class TeacherView {
     }
 
     sendTestCancelled() {
+        const data = {
+            uuid: crypto.randomUUID(),
+            event: "test.cancelled",
+            partIndex: this.partIndex,
+            questionIndex: this.questionIndex,
+            questionId: this.currentQuestion && this.currentQuestion.id,
+            partId: this.currentPart && this.currentPart.id,
+            assignmentId: this.assignmentId,
+            note: this.noteField.getNote(),
+        };
+
+        // Update student sessions
         Object.values(this.studentChannels).forEach((channel) => {
-            channel.send({
-                uuid: crypto.randomUUID(),
-                event: "test.cancelled",
-                partIndex: this.partIndex,
-                questionIndex: this.questionIndex,
-                questionId: this.currentQuestion && this.currentQuestion.id,
-                partId: this.currentPart && this.currentPart.id,
-                assignmentId: this.assignmentId,
-                note: this.noteField.getNote(),
-            });
+            channel.send(data);
         });
+
+        // Tell the server that the test is over.
+        this.messageQueue.push(data);
+        this._persistQueue();
+        this._flushMessageQueue();
+        showResultLink();
     }
 
     sendTestPaused() {

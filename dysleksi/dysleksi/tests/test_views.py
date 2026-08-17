@@ -1093,7 +1093,7 @@ class TestTestResponseView(ResponseTest):
                 "Bedømmelse",
                 "Over middel;Se elevens svar",
                 "Elendigt;Se elevens svar",
-                "Ikke fuldført;Se elevens svar",
+                "Ikke fuldført",
                 "",
             ],
         )

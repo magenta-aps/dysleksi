@@ -3,6 +3,6 @@
     <a href="{% url 'dysleksi:room' pk=record.pk %}" class="btn btn-outline-secondary">{% translate "Start" %}</a>
 {% elif record.status == TestAssignmentStatus.IN_PROGRESS %}
     <a href="{% url 'dysleksi:room' pk=record.pk %}" class="btn btn-outline-secondary">{% translate "Åbn" %}</a>
-{% elif record.status == TestAssignmentStatus.COMPLETED %}
+{% elif record.status == TestAssignmentStatus.COMPLETED or record.status == TestAssignmentStatus.CANCELLED %}
     <a href="{% url 'dysleksi:test_assignment_results' pk=record.pk %}" class="btn btn-outline-secondary">{% translate "Se resultater" %}</a>
 {% endif %}

@@ -262,6 +262,7 @@ class TestResultColumn(FooterColumnMixin, TemplateColumn):
         subgroups: List[CategoryRange] | None = None,
         assignment: TestAssignment | None = None,
         part: TestPart | None = None,
+        total_answers: int = 0,
         *args,
         **kwargs,
     ):
@@ -270,6 +271,8 @@ class TestResultColumn(FooterColumnMixin, TemplateColumn):
         self.subgroups = subgroups
         self.assignment = assignment
         self.part = part
+        # Antallet af besvarede spørgsmål i denne deltest for hele klassen
+        self.total_answers = total_answers
 
     def get_footer_value(self, bound_column, table):
         count = len(table.data)

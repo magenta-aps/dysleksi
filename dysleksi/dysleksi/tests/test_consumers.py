@@ -196,6 +196,23 @@ class TestChatConsumerMessageIntegration(TransactionTestCase):
         handle_mock.assert_called_once()
 
     @patch.object(Message, "handle")
+    def test_create_message_object_without_student(self, handle_mock: MagicMock):
+        # Messages about the test itself (e.g. the teacher ending the test) name
+        # no student, and are attributed to the user that sent them
+        data = self.data()
+        data["event"] = "test.cancelled"
+        del data["student"]
+        handle_mock.return_value = None
+
+        async_to_sync(self.send_message)(json.dumps(data))
+
+        message_object = Message.objects.filter(uuid=data["uuid"]).first()
+        self.assertIsNotNone(message_object)
+        self.assertEqual(message_object.event, "test.cancelled")
+        self.assertEqual(message_object.user.pk, self.test_user.pk)
+        handle_mock.assert_called_once()
+
+    @patch.object(Message, "handle")
     def test_create_message_object_already_exists(self, handle_mock: MagicMock):
         data = self.data()
         message: str = json.dumps(data)
