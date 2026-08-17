@@ -215,6 +215,12 @@ const INDIVIDUAL_DOM_HTML = `
 <button id="goto-next-result-group">Hop til næste</button>
 <textarea id="note" class="d-none"></textarea>
 <div id="audio-indicator"></div>
+<div class="result-link">
+    <div id="result-link-disabled" class="d-inline">
+        <button class="btn btn-outline-secondary" disabled="disabled">Se resultater</button>
+    </div>
+    <a id="result-link-enabled" class="btn btn-outline-secondary d-none" href="/assignment/1/result/">Se resultater</a>
+</div>
 <div class="modal fade" id="error" tabindex="-1" aria-labelledby="error-label" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content"><div class="modal-body"><div class="modal-body-inner"></div></div></div>
@@ -1468,6 +1474,21 @@ describe("Teacher Individual test View", () => {
         expect(view.showingInstructions).toBeFalsy();
         expect(spyEnableNextButton).toHaveBeenCalled();
     });
+
+    it("shows the result link on `test.complete` student events", () => {
+        // Arrange
+        const disabled = document.getElementById("result-link-disabled");
+        const enabled = document.getElementById("result-link-enabled");
+        expect(disabled.classList.contains("d-none")).toBe(false);
+        expect(enabled.classList.contains("d-none")).toBe(true);
+        // Act
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", { detail: { event: "test.complete" } }),
+        );
+        // Assert
+        expect(disabled.classList.contains("d-none")).toBe(true);
+        expect(enabled.classList.contains("d-none")).toBe(false);
+    });
 });
 
 describe("GroupTestContainer", () => {
@@ -1732,48 +1753,6 @@ describe("GroupTestContainer", () => {
         card.el.click();
         expect(folded.style.display).toBe("none");
         expect(arrowSpan.className).toBe(initialArrowClass);
-    });
-
-    it("onTestComplete called when progress is filled", () => {
-        const spy = vi.spyOn(instance, "onTestComplete");
-        const studentData1 = {
-            student: {
-                id: 4,
-                firstName: "James",
-                lastName: "Bend",
-                progress: 50,
-                currentPartIndex: 0,
-                currentQuestionIndex: 0,
-                resultsByPart: {},
-            },
-        };
-        instance.updateData(studentData1);
-        const studentData2 = {
-            student: {
-                id: 5,
-                firstName: "Jason",
-                lastName: "Barne",
-                progress: 100,
-                currentPartIndex: 0,
-                currentQuestionIndex: 0,
-                resultsByPart: {},
-            },
-        };
-        instance.updateData(studentData2);
-        expect(spy).not.toHaveBeenCalled();
-        studentData1.student.progress = 100;
-        instance.updateData(studentData1);
-        expect(spy).toHaveBeenCalled();
-    });
-
-    it("onTestComplete toggles button", () => {
-        const resultLinkDisabled = document.getElementById("result-link-disabled");
-        const resultLinkEnabled = document.getElementById("result-link-enabled");
-        expect(resultLinkDisabled.classList).not.toContain("d-none");
-        expect(resultLinkEnabled.classList).toContain("d-none");
-        instance.onTestComplete();
-        expect(resultLinkDisabled.classList).toContain("d-none");
-        expect(resultLinkEnabled.classList).not.toContain("d-none");
     });
 });
 

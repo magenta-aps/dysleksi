@@ -504,6 +504,11 @@ class AssignmentResultsView(
             proportion_key = f"{key}_proportion"
             category_key = f"{key}_category"
             part_questions_count = part.questions.count()
+            # Antallet af besvarede spørgsmål i denne deltest for hele klassen
+            part_answers_count = QuestionResponse.objects.filter(
+                partresponse__testresponse__assignment=self.object,
+                partresponse__testpart=part,
+            ).count()
             qs = (
                 # Annotér med antallet af korrekte svar i denne Part
                 qs.annotate_correct_count(count_key, Q(partresponses__testpart=part))
@@ -555,6 +560,7 @@ class AssignmentResultsView(
                         ),
                         assignment=self.object,
                         part=part,
+                        total_answers=part_answers_count,
                         orderable=False,
                     ),
                 )
@@ -905,6 +911,7 @@ class TestResponseView(
                         lambda part, column_values: {
                             "response": self.object,
                             "part": part,
+                            "total_answers": column_values[0] or 0,
                             "category": CorrectnessCategory.categorize_proportion(
                                 # Matcher rækkefølgen af linjer i data,
                                 # specificeret nedenunder i `field_spec`

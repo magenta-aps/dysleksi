@@ -1,7 +1,7 @@
 <div class="d-inline-block">
 
 {% with assignment_pk=column.column.assignment.pk testpart_pk=column.column.part.pk %}
-    {% if assignment_pk and testpart_pk %}
+    {% if assignment_pk and testpart_pk and column.column.total_answers > 0 %}
     <a class="result-part-header" href="{% url 'dysleksi:test_assignment_part_results' assignment_pk=assignment_pk testpart_pk=testpart_pk %}">{{ column.header }}</a>
     {% else %}
     {{ column.header }}

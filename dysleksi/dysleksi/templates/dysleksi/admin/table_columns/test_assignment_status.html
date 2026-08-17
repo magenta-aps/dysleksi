@@ -4,9 +4,14 @@
         <i class="ph ph-lock-open"></i>
         {{ status }}
     </span>
-{% elif record.status == TestAssignment.IN_PROGRESS %}
-    <span class="text-danger">
+{% elif record.status == TestAssignmentStatus.IN_PROGRESS %}
+    <span>
         <i class="ph ph-lock-open"></i>
+        {{ status }}
+    </span>
+{% elif record.status == TestAssignmentStatus.CANCELLED %}
+    <span class="text-danger">
+        <i class="ph ph-lock"></i>
         {{ status }}
     </span>
 {% else %}

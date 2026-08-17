@@ -13,7 +13,7 @@ from math import floor
 from typing import Any, Dict, List, Self, Tuple
 
 from django.contrib.auth.models import AbstractUser, Group
-from django.contrib.postgres.aggregates import BoolAnd
+from django.contrib.postgres.aggregates import BoolAnd, BoolOr
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
 from django.core.files.base import ContentFile
@@ -114,6 +114,7 @@ class TestAssignmentStatus(TextChoices):
     CREATED = "created", _("Oprettet")
     IN_PROGRESS = "in_progress", _("I gang")
     COMPLETED = "completed", _("Gennemført")
+    CANCELLED = "cancelled", _("Afbrudt")
 
 
 class ClassTestStatus(TextChoices):
@@ -576,8 +577,13 @@ class TestAssignmentQuerySet(PermissionsQuerySet):
         return self.annotate(
             # Add "internal" annotation used by the `status` annotation
             _all_completed=BoolAnd("responses__completed"),
+            _any_cancelled=BoolOr("responses__cancelled"),
             # Add the `status` annotation itself
             status=Case(
+                When(
+                    _any_cancelled=Value(True),
+                    then=Value(TestAssignmentStatus.CANCELLED),
+                ),
                 When(
                     _all_completed=Value(False),
                     then=Value(TestAssignmentStatus.IN_PROGRESS),
@@ -642,6 +648,27 @@ class TestAssignment(PermissionsMixin, models.Model):
     def klasse_name(self):
         if self.klasse:
             return self.klasse.name
+
+    def end(self) -> None:
+        """End the test, as when the teacher clicks "Afslut test".
+
+        Any responses that are still in progress are marked as completed and
+        cancelled, which is what makes the test count as "Gennemført" in the
+        test overview.
+        """
+
+        # Make sure the results page has a response to show, even if the
+        # student(s) never answered a single question
+        if self.student:
+            TestResponse.objects.get_or_create(assignment=self, student=self.student)
+            students = [self.student]
+        elif self.klasse:  # pragma: no branch
+            students = list(self.klasse.students.all())
+
+        for student in students:
+            TestResponse.objects.get_or_create(assignment=self, student=student)
+
+        self.responses.filter(completed=False).update(completed=True, cancelled=True)
 
     def __str__(self) -> str:
         assignee = self.student or self.klasse
@@ -1900,12 +1927,7 @@ class Message(models.Model):
                 test_response.save()
 
             elif self.event == HandledEvent.TEST_CANCELLED:
-                question_response = self.question_response
-                question_response.note = self.data.get("note")
-                question_response.save()
-                test_response = self.test_response
-                test_response.cancelled = True
-                test_response.save()
+                self.assignment.end()
 
         except Exception as e:
             self.processed = timezone.now()

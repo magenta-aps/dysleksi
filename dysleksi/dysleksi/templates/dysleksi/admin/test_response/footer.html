@@ -14,7 +14,7 @@
     {% endif %}
 </div>
 <div class="text-center">
-    {% if value.category != CorrectnessCategory.is_default %}
+    {% if value.total_answers > 0 %}
     <a href="{% url 'dysleksi:test_assignment_part_result' assignment_pk=response.assignment_id testpart_pk=part.pk testresponse_pk=response.pk %}">
         {% translate "Se elevens svar" %}
     </a>

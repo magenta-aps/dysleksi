@@ -134,6 +134,10 @@ msgid "Gennemført"
 msgstr ""
 
 #: dysleksi/models.py
+msgid "Afbrudt"
+msgstr ""
+
+#: dysleksi/models.py
 msgid "Åben"
 msgstr ""
 
@@ -399,6 +403,7 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/student/detail.html
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Se resultater"
 msgstr ""
 
@@ -754,6 +759,7 @@ msgid "Delvist korrekt svar"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Testen skal gennemføres først"
 msgstr ""
 

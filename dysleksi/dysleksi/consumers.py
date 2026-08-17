@@ -70,12 +70,19 @@ class ChatConsumer(JsonWebsocketConsumer):
         event = content["event"]
 
         if event in HandledEvent:
+            # Messages send by a student contain a "student" key.
+            # Messages sent by teachers do not
+            student = content.get("student")
             message, created = Message.objects.get_or_create(
                 uuid=content["uuid"],
                 defaults={
                     "event": content["event"],
                     "data": content,
-                    "user": Student.objects.get(id=content["student"]["id"]),
+                    "user": (
+                        Student.objects.get(id=student["id"])
+                        if student is not None
+                        else self.user
+                    ),
                 },
             )
             if created:

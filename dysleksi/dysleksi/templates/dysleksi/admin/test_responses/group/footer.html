@@ -14,8 +14,10 @@
     {% endif %}
 </div>
 <div class="text-center">
+    {% if column.column.total_answers > 0 %}
     <a href="{% url 'dysleksi:test_assignment_part_results' assignment_pk=object.pk testpart_pk=part.pk %}">
         {% translate "Se detaljer" %}
     </a>
+    {% endif %}
 </div>
 {% endwith %}
