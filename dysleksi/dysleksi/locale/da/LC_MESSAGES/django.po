@@ -138,11 +138,11 @@ msgid "Afbrudt"
 msgstr ""
 
 #: dysleksi/models.py
-msgid "Åben"
+msgid "Ingen tests"
 msgstr ""
 
 #: dysleksi/models.py
-msgid "Låst"
+msgid "Åben"
 msgstr ""
 
 #: dysleksi/models.py
@@ -178,6 +178,10 @@ msgid "Completion time in milliseconds"
 msgstr ""
 
 #: dysleksi/tables.py
+msgid "ID"
+msgstr ""
+
+#: dysleksi/tables.py
 msgid "Årgang"
 msgstr ""
 
@@ -190,7 +194,7 @@ msgid "Teststatus"
 msgstr ""
 
 #: dysleksi/tables.py
-msgid "Testoversigt"
+msgid "Handlinger"
 msgstr ""
 
 #: dysleksi/tables.py
@@ -211,10 +215,6 @@ msgstr ""
 
 #: dysleksi/tables.py
 msgid "Anvendelsestidspunkt"
-msgstr ""
-
-#: dysleksi/tables.py
-msgid "Handlinger"
 msgstr ""
 
 #: dysleksi/tables.py
@@ -329,27 +329,47 @@ msgid "Luk"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/base.html
-#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
-#: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-#: dysleksi/templates/dysleksi/admin/test_assignment/list.html
-#: dysleksi/templates/dysleksi/admin/test_response/detail.html
-#: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
-msgid "Tests"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/base.html
 #: dysleksi/templates/dysleksi/admin/class/detail.html
 #: dysleksi/templates/dysleksi/admin/class/list.html
 #: dysleksi/templates/dysleksi/admin/student/detail.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/list.html
 #: dysleksi/templates/dysleksi/class/list.html
 msgid "Klasser"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/base.html
-#: dysleksi/templates/dysleksi/admin/student/list.html
-msgid "Elever"
+#: dysleksi/templates/dysleksi/admin/class/detail.html
+#: dysleksi/templates/dysleksi/admin/student/detail.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/list.html
+#, python-format
+msgid "Klasse %(class_name)s"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/base.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/list.html
+msgid "Testoversigt"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/base.html
+#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/result_list.html
+#: dysleksi/templates/dysleksi/admin/test_response/detail.html
+#: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
+msgid "Resultater"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/base.html
+#, python-format
+msgid "%(class_name)s - %(test_name)s"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/base.html
+#, python-format
+msgid "%(student_name)s - %(test_name)s"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/base.html
@@ -366,14 +386,18 @@ msgid "Log ud"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/class/detail.html
-#: dysleksi/templates/dysleksi/admin/student/detail.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/list.html
 #, python-format
-msgid "Klasse %(class_name)s"
+msgid "Årgang %(school_year_start)s"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/class/detail.html
-#, python-format
-msgid "Årgang %(school_year_start)s"
+msgid "Overblik"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/class/detail.html
+#: dysleksi/templates/dysleksi/admin/student/list.html
+msgid "Elever"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/class/detail.html
@@ -491,14 +515,6 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
 #, python-format
 msgid "Klasse %(class_name)s - %(test_name)s"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
-#: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-#: dysleksi/templates/dysleksi/admin/test_response/detail.html
-#: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
-msgid "Resultater"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
@@ -654,7 +670,11 @@ msgid "Klasse:"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/table_columns/class_actions.html
-msgid "Se testoversigten"
+msgid "Åbn klasse"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/table_columns/class_actions.html
+msgid "Se testoversigt"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_access.html
@@ -707,6 +727,11 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
 #, python-format
 msgid "%(part_name)s (%(question_count)s opgaver)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/list.html
+msgid "Tests"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
@@ -809,6 +834,11 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Svarede:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/list.html
+#, python-format
+msgid "Testoversigt for %(class_name)s"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_response/detail.html

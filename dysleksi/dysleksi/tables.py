@@ -40,6 +40,11 @@ class ClassTable(Table):
         model = Class
         fields: List[str] = []
 
+    id = tables.Column(
+        accessor=A("id"),
+        verbose_name=_("ID"),
+    )
+
     school_year_start = tables.Column(
         linkify=False,
         verbose_name=_("Årgang"),
@@ -60,7 +65,21 @@ class ClassTable(Table):
     actions = TemplateColumn(
         template_name="dysleksi/admin/table_columns/class_actions.html",
         orderable=False,
-        verbose_name=_("Testoversigt"),
+        verbose_name=_("Handlinger"),
+    )
+
+
+class ClassStudentTable(Table):
+    "Table used for listing all students in a given class"
+
+    class Meta:
+        model = Student
+        fields: List[str] = []
+
+    name = TemplateColumn(
+        template_name="dysleksi/admin/table_columns/student_name_link.html",
+        orderable=False,
+        verbose_name=_("Navn"),
     )
 
 
@@ -187,6 +206,11 @@ class TestAssignmentTable(Table):
             ),
             True,
         )
+
+
+class TestAssignmentResultTable(TestAssignmentTable):
+    class Meta(TestAssignmentTable.Meta):
+        exclude = ("status",)
 
 
 class TestResultTable(Table):

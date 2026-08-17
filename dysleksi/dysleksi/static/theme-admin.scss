@@ -197,14 +197,19 @@ h6 {
       flex-flow: column nowrap;
       flex-grow: 1;
       justify-content: space-between;
+      overflow: hidden;
     }
 
     nav {
+      flex: 1;
+      overflow-y: auto;
+      align-items: stretch;
       padding: $spacer;
     }
 
     div.navbar-nav {
       flex-basis: 100%;
+      min-height: min-content;
     }
 
     a.nav-link {
@@ -1110,7 +1115,7 @@ $border-radius-student-card: $spacer / 4 * 3;
       align-items: center;
       justify-content: center;
       z-index: 10;
-    
+
       background: rgba(0, 0, 0, 0.5);
       color: #fff;
       border-radius: inherit;

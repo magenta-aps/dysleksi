@@ -36,7 +36,7 @@ from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
 from django.views.generic.edit import UpdateView
 from django_stubs_ext import StrOrPromise
-from django_tables2 import Column, SingleTableView
+from django_tables2 import Column, SingleTableMixin, SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
 
 from dysleksi.forms import StartClassRoomForm, StartIndividualRoomForm
@@ -68,6 +68,7 @@ from dysleksi.models import (
 from dysleksi.tables import (
     AnswerByTimeResultsTable,
     AnswerTimeTable,
+    ClassStudentTable,
     ClassTable,
     EmptyColumn,
     PartResultTable,
@@ -77,6 +78,7 @@ from dysleksi.tables import (
     StudentTable,
     StudentTestResponseTable,
     StudentTestResultsColumn,
+    TestAssignmentResultTable,
     TestAssignmentTable,
     TestResultColumn,
     TestResultTable,
@@ -130,7 +132,7 @@ class ObjectPermissionsMixin:
 class RootView(UserTypeMixin, TemplateView):
     def get(self, request, *args, **kwargs):
         if not self.user.is_anonymous and self.user.is_teacher:
-            return redirect("dysleksi:test_assignment_list")
+            return redirect("dysleksi:class_list")
         return super().get(request, *args, **kwargs)
 
     def get_template_prefix(self) -> str:
@@ -143,8 +145,34 @@ class RootView(UserTypeMixin, TemplateView):
         return context_data
 
 
-class AssignmentView(UserTypeMixin, ObjectPermissionsMixin, DetailView):
+class NavigationMixin:
+    def add_navigation_context(
+        self,
+        context_data,
+        current_class: Class | None,
+        current_assignment: TestAssignment | None,
+    ):
+        if self.user.is_teacher:  # type: ignore[attr-defined]
+            # Add context for navigation menu (classes)
+            context_data["teacher_classes"] = Class.objects.filter(
+                teachers=self.user,  # type: ignore[attr-defined]
+            )
+            context_data["current_class"] = current_class
+            # Add context for navigation menu (results)
+            context_data["teacher_results"] = (
+                TestAssignment.objects.filter(
+                    teacher=self.user,  # type: ignore[attr-defined]
+                )
+                .annotate_status()
+                .filter(status=TestAssignmentStatus.COMPLETED)
+                .order_by("klasse__name", "student__last_name")
+            )
+            context_data["current_assignment"] = current_assignment
 
+
+class AssignmentView(
+    UserTypeMixin, ObjectPermissionsMixin, NavigationMixin, DetailView
+):
     model = TestAssignment
     context_object_name = "test_assignment"
 
@@ -186,6 +214,9 @@ class AssignmentView(UserTypeMixin, ObjectPermissionsMixin, DetailView):
         )
         context["static_files"] = scan_static_files()
 
+        self.add_navigation_context(context, assignment.class_for_nav, None)
+        context["class"] = assignment.class_for_nav
+
         return context
 
     def get_room_type(self) -> str:
@@ -195,7 +226,7 @@ class AssignmentView(UserTypeMixin, ObjectPermissionsMixin, DetailView):
             return "individual"
 
 
-class ClassListView(GroupRequiredMixin, SingleTableView):
+class ClassListView(GroupRequiredMixin, NavigationMixin, SingleTableView):
     model = Class
     table_class = ClassTable
     groups_required = [TEACHERS]
@@ -206,14 +237,27 @@ class ClassListView(GroupRequiredMixin, SingleTableView):
         qs = qs.annotate_test_status()
         return qs
 
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        self.add_navigation_context(context_data, None, None)
+        return context_data
 
-class ClassDetailView(GroupRequiredMixin, ObjectPermissionsMixin, DetailView):
+
+class ClassDetailView(
+    GroupRequiredMixin,
+    ObjectPermissionsMixin,
+    SingleTableMixin,
+    NavigationMixin,
+    DetailView,
+):
     model = Class
+    table_class = ClassStudentTable
     groups_required = [TEACHERS]
     template_name = "dysleksi/admin/class/detail.html"
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
+        self.add_navigation_context(context_data, self.object, None)
 
         # TODO: if Tabulex data indicates who is "kontaktlærer", display that teacher
         context_data["teacher"] = self.object.teachers.first()
@@ -227,6 +271,10 @@ class ClassDetailView(GroupRequiredMixin, ObjectPermissionsMixin, DetailView):
         )
 
         return context_data
+
+    def get_table_data(self):
+        # Return all students in this class (for `ClassStudentTable`)
+        return self.object.students.all()
 
 
 class StudentListView(GroupRequiredMixin, SingleTableView):
@@ -242,7 +290,9 @@ class StudentListView(GroupRequiredMixin, SingleTableView):
         return qs
 
 
-class StudentDetailView(GroupRequiredMixin, ObjectPermissionsMixin, DetailView):
+class StudentDetailView(
+    GroupRequiredMixin, ObjectPermissionsMixin, NavigationMixin, DetailView
+):
     model = Student
     groups_required = [TEACHERS]
     template_name = "dysleksi/admin/student/detail.html"
@@ -254,7 +304,12 @@ class StudentDetailView(GroupRequiredMixin, ObjectPermissionsMixin, DetailView):
         if main_classes.exists():
             main_class = main_classes.first()
             context_data["main_class"] = main_class
+            # TODO: find the "klasselærer" among all teachers of this class?
             context_data["teacher"] = main_class.teachers.first()
+        else:
+            main_class = None
+
+        self.add_navigation_context(context_data, main_class, None)
 
         assignments = TestAssignment.objects.filter(
             Q(student=self.object) | Q(klasse__students=self.object)
@@ -266,7 +321,7 @@ class StudentDetailView(GroupRequiredMixin, ObjectPermissionsMixin, DetailView):
         return context_data
 
 
-class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
+class TestAssignmentListView(GroupRequiredMixin, NavigationMixin, SingleTableView):
     model = TestAssignment
     table_class = TestAssignmentTable
     groups_required = [TEACHERS]
@@ -274,8 +329,17 @@ class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
 
     def get_queryset(self):
         qs = super().get_queryset()
+
         # Only show test assignments belonging to the teacher viewing the page
         qs = qs.filter_user_permissions(self.user, "view")
+
+        # Filter on class, if given
+        if self.current_class is not None:
+            qs = qs.filter(
+                Q(klasse__pk=self.current_class.pk)
+                | Q(student__classes__pk=self.current_class.pk)
+            )
+
         # Add annotations used by `TestAssignmentTable`
         qs = qs.annotate_school_year()
         qs = qs.annotate_class_name()
@@ -285,9 +349,18 @@ class TestAssignmentListView(GroupRequiredMixin, SingleTableView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
+        self.add_navigation_context(context, self.current_class, None)
+        context["class"] = self.current_class
         context["assign_group_form"] = StartClassRoomForm(teacher=self.user)
         context["assign_individual_form"] = StartIndividualRoomForm(teacher=self.user)
         return context
+
+    @cached_property
+    def current_class(self) -> Class | None:
+        class_pk = self.kwargs.get("class_pk")
+        if class_pk is not None:
+            return Class.objects.get(pk=class_pk)
+        return None
 
 
 class StartAssignmentView(GroupRequiredMixin, CreateView):
@@ -304,7 +377,10 @@ class StartAssignmentView(GroupRequiredMixin, CreateView):
 
     def get_success_url(self):
         if self.object.planned_date_time is not None:
-            return reverse("dysleksi:test_assignment_list")
+            return reverse(
+                "dysleksi:class_assignment_list",
+                kwargs={"class_pk": self.object.class_for_nav.pk},
+            )
         else:
             return reverse("dysleksi:room", kwargs={"pk": self.object.pk})
 
@@ -434,8 +510,27 @@ class PaginationMixin:
         return context_data
 
 
+class AssignmentResultListView(TestAssignmentListView):
+    template_name = "dysleksi/admin/test_assignment/result_list.html"
+    table_class = TestAssignmentResultTable
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        qs = qs.filter(status=TestAssignmentStatus.COMPLETED)
+        return qs
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        self.add_navigation_context(context_data, None, None)
+        return context_data
+
+
 class AssignmentResultsView(
-    GroupRequiredMixin, PaginationMixin, ObjectPermissionsMixin, DetailView
+    GroupRequiredMixin,
+    PaginationMixin,
+    ObjectPermissionsMixin,
+    NavigationMixin,
+    DetailView,
 ):
     # Results view of as Class' responses to an entire Test
     groups_required = [TEACHERS]
@@ -618,6 +713,8 @@ class AssignmentResultsView(
                 "sort": self.request.GET.get("sort", "rank"),
             }
         )
+        self.add_navigation_context(context_data, None, self.object)
+        context_data["assignment"] = self.object
         return context_data
 
 
@@ -737,7 +834,11 @@ class AssignmentPartResultsView(GroupRequiredMixin, ObjectPermissionsMixin, List
 
 
 class TestResponseView(
-    GroupRequiredMixin, PaginationMixin, ObjectPermissionsMixin, DetailView
+    GroupRequiredMixin,
+    PaginationMixin,
+    ObjectPermissionsMixin,
+    NavigationMixin,
+    DetailView,
 ):
     # Results view of as Student's responses to an entire Test
     model = TestResponse
@@ -1033,11 +1134,17 @@ class TestResponseView(
                 "part_names": self.get_part_names(),
             }
         )
+        self.add_navigation_context(context, None, self.object.assignment)
+        context["assignment"] = self.object.assignment
         return context
 
 
 class PartResponseView(
-    GroupRequiredMixin, ObjectPermissionsMixin, PaginationMixin, DetailView
+    GroupRequiredMixin,
+    ObjectPermissionsMixin,
+    PaginationMixin,
+    NavigationMixin,
+    DetailView,
 ):
     # Results view of as Student's responses to a single TestPart
     model = PartResponse
@@ -1401,6 +1508,9 @@ class PartResponseView(
         )
 
         context["QuestionType"] = QuestionType
+
+        self.add_navigation_context(context, None, self.object.testresponse.assignment)
+        context["assignment"] = self.object.testresponse.assignment
 
         return context
 

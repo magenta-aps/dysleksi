@@ -22,18 +22,86 @@
         <div class="offcanvas-body">
             <nav class="navbar">
                 <div class="navbar-nav">
-                    <a href="{% url 'dysleksi:test_assignment_list' %}" class="nav-link mb-3 {% if current_view == 'dysleksi:test_assignment_list' or current_view == 'dysleksi:room' %}active{% endif %}">
-                        <i class="ph ph-notebook fs-5"></i>
-                        <span>{% translate "Tests" %}</span>
-                    </a>
-                    <a href="{% url 'dysleksi:class_list' %}" class="nav-link mb-3 {% if current_view == 'dysleksi:class_list' %}active{% endif %}">
-                        <i class="ph-fill ph-users-three fs-5"></i>
-                        <span>{% translate "Klasser" %}</span>
-                    </a>
-                    <a href="{% url 'dysleksi:student_list' %}" class="nav-link mb-3 {% if current_view == 'dysleksi:student_list' %}active{% endif %}">
-                        <i class="ph ph-user-rectangle fs-5"></i>
-                        <span>{% translate "Elever" %}</span>
-                    </a>
+                    <li class="nav-item">
+                        <a href="{% url 'dysleksi:class_list' %}" class="nav-link mb-3 d-flex align-items-center justify-content-between {% if current_view == 'dysleksi:class_list' %}active{% endif %}">
+                            <span class="d-flex align-items-center">
+                                <i class="ph ph-users-three fs-5"></i>
+                                {% translate "Klasser" %}
+                            </span>
+                            <span data-bs-toggle="collapse" data-bs-target="#collapseClasses" aria-expanded="false" aria-controls="collapseClasses">
+                                {% if teacher_classes %}
+                                <i class="ph ph-caret-up"></i>
+                                {% else %}
+                                <i class="ph ph-caret-down"></i>
+                                {% endif %}
+                            </span>
+                        </a>
+                    </li>
+                    <ul class="navbar-nav collapse {% if class != None and current_class == class %}show{% endif %}" id="collapseClasses">
+                        {% for class in teacher_classes %}
+                        <li class="nav-item">
+                            <a href="{% url 'dysleksi:class_detail' pk=class.pk %}" class="nav-link ms-3 mb-3 d-flex align-items-center justify-content-between {% if current_view == 'dysleksi:class_detail' and current_class == class %}active{% endif %}">
+                                <span class="d-flex align-items-center">
+                                    <i class="ph ph-users-three fs-5"></i>
+                                    {% blocktranslate trimmed with class_name=class.name %}
+                                    Klasse {{ class_name }}
+                                    {% endblocktranslate %}
+                                </span>
+                                <span data-bs-toggle="collapse" data-bs-target="#collapseClass{{ class.pk }}" aria-expanded="false" aria-controls="collapseClass{{ class.pk }}">
+                                    {% if current_class == class %}
+                                    <i class="ph ph-caret-up"></i>
+                                    {% else %}
+                                    <i class="ph ph-caret-down"></i>
+                                    {% endif %}
+                                </span>
+                            </a>
+                        </li>
+                        <ul class="navbar-nav collapse {% if current_class == class %}show{% endif %}" id="collapseClass{{ class.pk }}">
+                            <li class="nav-item">
+                                <a href="{% url 'dysleksi:class_assignment_list' class_pk=class.pk %}"
+                                   class="nav-link ms-5 mb-3 {% if current_view == 'dysleksi:class_assignment_list' and current_class == class %}active{% endif %}">
+                                    <i class="ph ph-list-bullets fs-5"></i>
+                                    <span>{% translate 'Testoversigt' %}</span>
+                                </a>
+                            </li>
+                        </ul>
+                        {% endfor %}
+                    </ul>
+                    <li class="nav-item">
+                        <a href="{% url 'dysleksi:test_assignment_result_list' %}" class="nav-link mb-3 d-flex align-items-center justify-content-between {% if current_view == 'dysleksi:test_assignment_result_list' %}active{% endif %}">
+                            <span class="d-flex align-items-center">
+                                <i class="ph ph-list-bullets fs-5"></i>
+                                {% translate "Resultater" %}
+                            </span>
+                            <span data-bs-toggle="collapse" data-bs-target="#collapseResults" aria-expanded="false" aria-controls="collapseResults">
+                                {% if teacher_results %}
+                                <i class="ph ph-caret-up"></i>
+                                {% else %}
+                                <i class="ph ph-caret-down"></i>
+                                {% endif %}
+                            </span>
+                        </a>
+                    </li>
+                    <ul class="navbar-nav collapse {% if assignment != None and current_assignment == assignment %}show{% endif %}" id="collapseResults">
+                        {% for assignment in teacher_results %}
+                        <li class="nav-item">
+                            <a href="{% url 'dysleksi:test_assignment_results' pk=assignment.pk %}" class="nav-link ms-3 mb-3 d-flex align-items-center justify-content-between {% if current_assignment == assignment %}active{% endif %}">
+                                <span class="d-flex align-items-center">
+                                    <i class="ph ph-list-bullets fs-5"></i>
+                                    {% if assignment.klasse %}
+                                        {% blocktranslate trimmed with test_name=assignment.test.name class_name=assignment.klasse.name %}
+                                        {{ class_name }} - {{ test_name }}
+                                        {% endblocktranslate %}
+                                    {% else %}
+                                        {% blocktranslate trimmed with test_name=assignment.test.name student_name=assignment.student.get_full_name  %}
+                                        {{ student_name }} - {{ test_name }}
+                                        {% endblocktranslate %}
+                                    {% endif %}
+                                </span>
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
                 </div>
             </nav>
             <div>
@@ -114,5 +182,7 @@
 <script type="module">
     // This import uses the import map defined above
     import * as bootstrap from 'bootstrap';
+    import { initializeSidebar } from "{% static 'js/admin/sidebar.js' %}";
+    document.addEventListener("DOMContentLoaded", initializeSidebar);
 </script>
 {% endblock %}

@@ -1,13 +1,21 @@
 {% extends "dysleksi/admin/base.html" %}
 {% load i18n %}
+
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'dysleksi:class_list' %}">{% translate 'Klasser' %}</a></li>
 <li class="breadcrumb-item">
+    {% has_permission main_class "view" as has_perm %}
+    {% if has_perm %}
     <a href="{% url 'dysleksi:class_detail' pk=main_class.pk %}">
         {% blocktranslate trimmed with class_name=main_class.name %}
         Klasse {{ class_name }}
         {% endblocktranslate %}
     </a>
+    {% else %}
+        {% blocktranslate trimmed with class_name=main_class.name %}
+        Klasse {{ class_name }}
+        {% endblocktranslate %}
+    {% endif %}
 </li>
 <li class="breadcrumb-item active" aria-current="page">{{ object.get_full_name }}</li>
 {% endblock %}

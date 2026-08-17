@@ -29,6 +29,7 @@ from dysleksi.tables import PartResultTable, StudentTestResponseTable, TestResul
 from dysleksi.tests.base import DysleksiTest, ResponseTest
 from dysleksi.views import (
     AssignmentPartResultsView,
+    AssignmentResultListView,
     AssignmentResultsFlagView,
     AssignmentResultsView,
     AssignmentView,
@@ -320,8 +321,6 @@ class TestTestAssignmentListView(ResponseTest):
         super().setUpTestData()
         cls.create_parts()
 
-    url = reverse("dysleksi:test_assignment_list")
-
     def test_get_template_names(self):
         view = self.setup_view(TestAssignmentListView, self.teacher)
         self.assertEqual(
@@ -335,7 +334,7 @@ class TestTestAssignmentListView(ResponseTest):
             view.get_context_data()["object_list"], expected_objs, ordered=False
         )
         self.client.force_login(self.privileged_user)
-        response = self.client.get(self.url)
+        response = self.client.get(self._get_url())
         self.assertEqual(response.status_code, 200)
         self.assertQuerySetEqual(
             response.context_data["object_list"], expected_objs, ordered=False
@@ -348,7 +347,7 @@ class TestTestAssignmentListView(ResponseTest):
             view.get_context_data()["object_list"], expected_objs, ordered=False
         )
         self.client.force_login(self.teacher)
-        response = self.client.get(self.url)
+        response = self.client.get(self._get_url())
         self.assertEqual(response.status_code, 200)
         self.assertQuerySetEqual(
             response.context_data["object_list"], expected_objs, ordered=False
@@ -361,7 +360,7 @@ class TestTestAssignmentListView(ResponseTest):
             view.get_context_data()["object_list"], expected_objs, ordered=False
         )
         self.client.force_login(self.other_teacher)
-        response = self.client.get(self.url)
+        response = self.client.get(self._get_url())
         self.assertEqual(response.status_code, 200)
         self.assertQuerySetEqual(
             response.context_data["object_list"], expected_objs, ordered=False
@@ -369,7 +368,7 @@ class TestTestAssignmentListView(ResponseTest):
 
     def test_student_view(self):
         self.client.force_login(self.student1)
-        response = self.client.get(self.url)
+        response = self.client.get(self._get_url())
         self.assertEqual(response.status_code, 403)
 
     def test_queryset_annotations(self):
@@ -390,6 +389,35 @@ class TestTestAssignmentListView(ResponseTest):
             ordered=False,
             transform=attrgetter("status"),
         )
+
+    def test_queryset_filter_on_class_pk(self):
+        view = self.setup_view(
+            TestAssignmentListView, self.teacher, class_pk=self.klasse.pk
+        )
+        objs = view.get_context_data()["object_list"]
+        self.assertQuerySetEqual(
+            objs.order_by("klasse__pk").values("klasse__pk", "student__pk"),
+            [
+                {"klasse__pk": self.klasse.pk, "student__pk": None},
+                {"klasse__pk": None, "student__pk": self.student1.pk},
+            ],
+        )
+
+    def _get_url(self, **kwargs):
+        kwargs.setdefault("class_pk", self.klasse.pk)
+        return reverse("dysleksi:class_assignment_list", kwargs=kwargs)
+
+
+class TestAssignmentResultListView(DysleksiTest):
+    def test_get_queryset(self):
+        view = self.setup_view(AssignmentResultListView, self.teacher)
+        self.assertQuerySetEqual(view.get_queryset(), [])
+
+    def test_get_context_data(self):
+        view = self.setup_view(AssignmentResultListView, self.teacher)
+        context_data = view.get_context_data()
+        self.assertIsNone(context_data["current_class"])
+        self.assertIsNone(context_data["current_assignment"])
 
 
 class TestStartRoomView(DysleksiTest):
@@ -437,7 +465,11 @@ class TestStartRoomView(DysleksiTest):
             reverse("dysleksi:start_individual_room"), data=data
         )
         self._assert_json_response_contains_redirect(
-            response, reverse("dysleksi:test_assignment_list")
+            response,
+            reverse(
+                "dysleksi:class_assignment_list",
+                kwargs={"class_pk": self.klasse.pk},
+            ),
         )
         assignment = TestAssignment.objects.latest("pk")
         self.assertIsNotNone(assignment.planned_date_time)
@@ -493,7 +525,11 @@ class TestStartRoomView(DysleksiTest):
         self.client.force_login(self.teacher)
         response = self.client.post(reverse("dysleksi:start_group_room"), data=data)
         self._assert_json_response_contains_redirect(
-            response, reverse("dysleksi:test_assignment_list")
+            response,
+            reverse(
+                "dysleksi:class_assignment_list",
+                kwargs={"class_pk": self.klasse.pk},
+            ),
         )
         assignment = TestAssignment.objects.latest("pk")
         self.assertIsNotNone(assignment.planned_date_time)
