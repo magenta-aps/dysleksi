@@ -119,7 +119,7 @@ django-phonenumber-field==8.5.0
 elementpath==4.8.0
 h11==0.16.0
 hyperlink==21.0.0
-idna==3.18
+idna==3.19
 Incremental==24.11.0
 libsass==0.23.0
 msgpack==1.2.1
