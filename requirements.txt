@@ -8,7 +8,7 @@
 Django==6.1
 django-stubs==6.1.0
 django-stubs-ext==6.1.0
-gunicorn==26.0.0
+gunicorn==26.1.0
 
 ## Postgres binding
 psycopg==3.3.4
