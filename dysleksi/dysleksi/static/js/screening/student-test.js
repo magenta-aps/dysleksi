@@ -4,6 +4,7 @@ import { releaseWakeLock } from "./utils.js";
 import { unlockAudioOnGesture } from "./utils.js";
 import { preventDoubleTapZoom } from "./utils.js";
 import { WebRTCChannel } from "../webRTC.js";
+import { WINDOW_BLOCKED_EVENT } from "./window-lock.js";
 import { initRedirectSocket } from "../lobby/student.js";
 import { gettext } from "../i18n.js";
 
@@ -35,6 +36,9 @@ export class StudentTestView extends EventTarget {
         this.student = student;
         this.p2p.addEventListener("message", (e) => {
             this.onChatMessage(e.detail);
+        });
+        document.addEventListener(WINDOW_BLOCKED_EVENT, () => {
+            this.p2p.close();
         });
         this.audioContext = unlockAudioOnGesture();
         this.failedAttempts = 0;

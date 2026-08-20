@@ -34,6 +34,7 @@ vi.mock("../../webRTC.js", () => {
 
             this.connect = vi.fn();
             this.send = vi.fn();
+            this.close = vi.fn();
             this.peer = {
                 on: vi.fn(),
                 destroy: vi.fn(),
@@ -588,7 +589,7 @@ describe("Teacher Individual test View", () => {
                 assignmentId: 1,
             }),
         });
-        p2pChannel = view.studentChannels[studentId];
+        [p2pChannel] = view.studentChannels[studentId];
     });
 
     afterEach(() => {
@@ -932,7 +933,7 @@ describe("Teacher Individual test View", () => {
     it("warns if trying to send feedback for more than one student in individual tests", () => {
         // Arrange: pretend we are connected to two students
         const mockChannel = { send: vi.fn() };
-        view.studentChannels = { 1: mockChannel, 2: mockChannel };
+        view.studentChannels = { 1: [mockChannel], 2: [mockChannel] };
         // Arrange: go to question and mark it correct
         view.setPartIndex(0);
         view.setQuestionIndex(1);
@@ -1889,7 +1890,7 @@ describe("TeacherView socket 'test.started' handling", () => {
             }),
         });
 
-        p2pChannel = view.studentChannels[studentId];
+        [p2pChannel] = view.studentChannels[studentId];
     });
 
     afterEach(() => {
@@ -2791,10 +2792,10 @@ describe("TeacherView _initSocket", () => {
 
         // Now WebRTCChannel is defined because of the import
         expect(WebRTCChannel).toHaveBeenCalledTimes(1);
-        expect(view.studentChannels[studentId]).toBeDefined();
+        expect(view.studentChannels[studentId]).toHaveLength(1);
     });
 
-    it("creates a new channel if a student re-joins", () => {
+    it("keeps both channels if a student joins from another window", () => {
         const socketHandler = socket.addEventListener.mock.calls.find(
             (c) => c[0] === "message",
         )[1];
@@ -2807,7 +2808,7 @@ describe("TeacherView _initSocket", () => {
                 assignmentId: 1,
             }),
         });
-        const oldChannel = view.studentChannels[studentId];
+        const [oldChannel] = view.studentChannels[studentId];
 
         // Second offer for same student
         socketHandler({
@@ -2819,7 +2820,35 @@ describe("TeacherView _initSocket", () => {
         });
 
         expect(WebRTCChannel).toHaveBeenCalledTimes(2);
-        expect(oldChannel.peer.destroy).toHaveBeenCalled();
+        // We cannot tell which window the student is in, so the old channel stays.
+        // Sending messages to a dead channel is not a dealbreaker. We would rather
+        // Send too many messages than too few.
+        expect(oldChannel.peer.destroy).not.toHaveBeenCalled();
+        expect(view.studentChannels[studentId]).toHaveLength(2);
+    });
+
+    it("drops only the channel that hung up", () => {
+        const socketHandler = socket.addEventListener.mock.calls.find(
+            (c) => c[0] === "message",
+        )[1];
+        const join = () =>
+            socketHandler({
+                data: JSON.stringify({
+                    event: "student.joined",
+                    studentId,
+                    assignmentId: 1,
+                }),
+            });
+        join();
+        join();
+        const [oldChannel, newChannel] = view.studentChannels[studentId];
+
+        // The window behind the first channel was closed or taken over
+        oldChannel.dispatchEvent(new Event("close"));
+
+        expect(view.studentChannels[studentId]).toEqual([newChannel]);
+        expect(oldChannel.close).toHaveBeenCalled();
+        expect(newChannel.close).not.toHaveBeenCalled();
     });
 
     it("ignores WebSocket messages that are not student.joined", () => {
@@ -2848,7 +2877,7 @@ describe("TeacherView _initSocket", () => {
             }),
         });
 
-        const newChannel = view.studentChannels[studentId];
+        const [newChannel] = view.studentChannels[studentId];
         expect(p2pSpy).toHaveBeenCalledWith(newChannel);
     });
 
@@ -2865,7 +2894,7 @@ describe("TeacherView _initSocket", () => {
             }),
         });
 
-        const p2p = view.studentChannels[123];
+        const [p2p] = view.studentChannels[123];
 
         const openHandler = p2p.peer.on.mock.calls.find(
             (call) => call[0] === "open",

@@ -7,10 +7,13 @@
 {{ test_contents|json_script:"test_contents" }}
 {{ assignment|json_script:"assignment" }}
 {{ static_files|json_script:"static_files" }}
+{{ window_lock_config|json_script:"window-lock-config" }}
 <script type="module" src="{% static 'js/screening/index.js' %}"></script>
 {% endblock %}
 
 {% block content %}
+{% include "dysleksi/window_blocked.html" %}
+
 <div id="pause-overlay" class="center-screen">
     <i class="ph-fill ph-pause"></i>
 </div>

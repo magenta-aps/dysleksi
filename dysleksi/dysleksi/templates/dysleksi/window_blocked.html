@@ -1,0 +1,26 @@
+{% load i18n %}
+<div id="window-blocked" class="window-blocked d-none" role="alert">
+    <div class="window-blocked-message">
+        <i class="ph ph-lock"></i>
+        {% if user.is_student %}
+        <h2>{% translate 'Din test er åbnet i et nyere vindue' %}</h2>
+        <p>
+            {% blocktranslate trimmed %}
+                Du kan kun tage testen i ét vindue ad gangen. Luk dette vindue,
+                og fortsæt i det vindue, du åbnede sidst.
+            {% endblocktranslate %}
+        </p>
+        {% else %}
+        <h2>{% translate 'Denne test er allerede igangsat i et andet vindue' %}</h2>
+        <p>
+            {% blocktranslate trimmed %}
+                En test kan kun styres fra ét vindue ad gangen. Luk dette vindue,
+                og fortsæt i det vindue, hvor testen blev sat i gang.
+            {% endblocktranslate %}
+        </p>
+        <a class="btn btn-primary" href="{% url 'dysleksi:class_assignment_list' class_pk=class.pk %}">
+            {% translate 'Tilbage til testoversigten' %}
+        </a>
+        {% endif %}
+    </div>
+</div>

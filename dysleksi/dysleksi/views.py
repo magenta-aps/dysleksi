@@ -9,6 +9,7 @@ from math import ceil
 from typing import Any, Dict, List, Set, Tuple
 
 from django.conf import settings
+from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.db import transaction
 from django.db.models import (
@@ -28,12 +29,14 @@ from django.db.models import (
 from django.db.models.expressions import BaseExpression, OuterRef, Subquery, Window
 from django.db.models.functions import Coalesce, Length, Replace, RowNumber
 from django.http.response import Http404, HttpResponse, JsonResponse
+from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
 from django.utils.functional import Promise
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
+from django.views.generic.detail import SingleObjectMixin
 from django.views.generic.edit import UpdateView
 from django_stubs_ext import StrOrPromise
 from django_tables2 import Column, SingleTableMixin, SingleTableView
@@ -213,6 +216,12 @@ class AssignmentView(
             assignment.klasse.students.all().count() if assignment.klasse else None
         )
         context["static_files"] = scan_static_files()
+        # Where and how `static/js/screening/window-lock.js` should claim the
+        # right to run this assignment.
+        context["window_lock_config"] = {
+            "url": reverse("dysleksi:window_lock", kwargs={"pk": assignment.pk}),
+            "csrf_token": get_token(self.request),
+        }
 
         self.add_navigation_context(context, assignment.class_for_nav, None)
         context["class"] = assignment.class_for_nav
@@ -224,6 +233,63 @@ class AssignmentView(
             return "group"
         else:
             return "individual"
+
+
+class WindowLockView(
+    LoginRequiredMixin, ObjectPermissionsMixin, SingleObjectMixin, View
+):
+
+    model = TestAssignment
+    http_method_names = ["post"]
+
+    # Amount of seconds to wait before releasing the lock (if not renewed)
+    timeout = 16
+
+    def post(self, request, *args, **kwargs) -> HttpResponse:
+        payload = json.loads(request.body)
+        window_id = payload["windowId"]
+
+        assignment = self.get_object()
+
+        key = self.lock_key(assignment)
+        if payload.get("release"):
+            self.release(key, window_id)
+            return JsonResponse({"granted": False})
+        granted = self.claim(key, window_id, bool(payload.get("acquire")))
+        return JsonResponse({"granted": granted})
+
+    def claim(self, key: str, window_id: str, acquire: bool) -> bool:
+        cache = caches["chat"]
+
+        if acquire and self.user.is_student:
+            # When a student starts a test, grant the lock.
+            cache.set(key, window_id, timeout=self.timeout)
+            return True
+
+        if cache.add(key, window_id, timeout=self.timeout):
+            # If the key is not yet in the cache; Grant the lock
+            return True
+
+        if cache.get(key) == window_id:
+            # If the key is already in the cache; Renew the lock
+            cache.touch(key, self.timeout)
+            return True
+        return False
+
+    def release(self, key: str, window_id: str) -> None:
+        cache = caches["chat"]
+        if cache.get(key) == window_id:
+            cache.delete(key)
+
+    def lock_key(self, assignment: TestAssignment) -> str:
+        # For students the lock is uniqe for each user-id/assignment-id combination
+        if self.user.is_student:
+            return f"window_lock:student:{assignment.pk}:{self.user.pk}"
+
+        # For teachers the lock is unique for each assignment-id. Because a class
+        # can have multiple teachers. When teacher1 starts a test, teacher2 should not
+        # be able to also come in and try and control the test.
+        return f"window_lock:teacher:{assignment.pk}"
 
 
 class ClassListView(GroupRequiredMixin, NavigationMixin, SingleTableView):

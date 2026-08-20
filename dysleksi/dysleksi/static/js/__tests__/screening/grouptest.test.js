@@ -14,10 +14,12 @@ import { spyAttributes } from "../utils.js";
 import * as utils from "../../screening/utils.js";
 import { Student } from "../../screening/model.js";
 import { InstructionSequenceRunner } from "../../screening/instruction.js";
+import { WINDOW_BLOCKED_EVENT } from "../../screening/window-lock.js";
 
 const mockP2P = {
     connect: vi.fn(),
     send: vi.fn(),
+    close: vi.fn(),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     studentSetup: vi.fn(),
@@ -1931,6 +1933,34 @@ describe("Pause and resume", () => {
         view.onChatMessage({ event: "test.resume" });
 
         expect(view.partTimeoutId).toBeNull();
+    });
+});
+
+describe("A window that is taken over", () => {
+    beforeEach(() => {
+        document.body.innerHTML = SHARED_DOM_HTML;
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
+            mockAudioContextInstance,
+        );
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+        document.body.innerHTML = "";
+    });
+
+    it("hangs up on the teacher", () => {
+        new GroupTestView(
+            new Test(groupTestData),
+            ws,
+            1,
+            new GroupTestDomElements(),
+            student,
+        );
+
+        document.dispatchEvent(new Event(WINDOW_BLOCKED_EVENT));
+
+        expect(mockP2P.close).toHaveBeenCalled();
     });
 });
 

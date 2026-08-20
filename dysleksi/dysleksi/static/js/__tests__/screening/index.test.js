@@ -11,6 +11,11 @@ import * as group_student from "../../screening/group/student.js";
 import { start } from "../../screening";
 import { Test, Student } from "../../screening/model.js";
 
+// Rendered into every assignment page by `window_lock_config`
+const LOCK_CONFIG = `<script type="application/json" id="window-lock-config">
+    {"url": "/assignment/1/window-lock/", "csrf_token": "token"}
+</script>`;
+
 describe("Startup test", () => {
     let socket;
 
@@ -43,6 +48,10 @@ describe("Startup test", () => {
             .mockImplementation(() => {});
         vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
         initMockDataSpy = vi.spyOn(Student.prototype, "initializeMockData");
+        // By default the server lets this window run the test
+        global.fetch = vi
+            .fn()
+            .mockResolvedValue({ ok: true, json: async () => ({ granted: true }) });
 
         groupStudentIds = [1, 2];
         individualStudentIds = [1];
@@ -64,6 +73,7 @@ describe("Startup test", () => {
                 data-room-name="room_1" 
                 data-assignment-id="1"
             >
+                ${LOCK_CONFIG}
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(individualTestData)}
                 </script>
@@ -101,6 +111,7 @@ describe("Startup test", () => {
                 data-room-name="room_1" 
                 data-assignment-id="1"
             >
+                ${LOCK_CONFIG}
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(individualTestData)}
                 </script>
@@ -135,6 +146,7 @@ describe("Startup test", () => {
                 data-room-name="room_1" 
                 data-assignment-id="1"
             >
+                ${LOCK_CONFIG}
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(groupTestData)}
                 </script>
@@ -161,16 +173,47 @@ describe("Startup test", () => {
         expect(initGroupStudent).not.toHaveBeenCalled();
     });
 
+    it("does not start the test when the server refuses the window", async () => {
+        global.fetch.mockResolvedValue({
+            ok: true,
+            json: async () => ({ granted: false }),
+        });
+        document.body.innerHTML = `
+            <div id="window-blocked" class="d-none"></div>
+            <div class="container"
+                data-test-type="individual"
+                data-role="teacher"
+                data-room-name="room_1"
+                data-assignment-id="1"
+            >
+                ${LOCK_CONFIG}
+                <script type="application/json" id="test_contents">
+                ${JSON.stringify(individualTestData)}
+                </script>
+                <script type="application/json" id="student_ids">
+                ${JSON.stringify(individualStudentIds)}
+                </script>
+            </div>
+        `;
+        await start();
+
+        expect(initIndividualTeacher).not.toHaveBeenCalled();
+        expect(
+            document.getElementById("window-blocked").classList.contains("d-none"),
+        ).toBe(false);
+    });
+
     it("individual student test", async () => {
         document.body.innerHTML = `
-            <div class="container" 
-                data-test-type="individual" 
-                data-role="student" 
+            <div class="container"
+                data-test-type="individual"
+                data-role="student"
                 data-student-first-name="Jack"
                 data-student-last-name="Wilshere"
                 data-room-name="room_1" 
                 data-assignment-id="1"
             >
+                ${LOCK_CONFIG}
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(individualTestData)}
                 </script>
@@ -204,6 +247,7 @@ describe("Startup test", () => {
                 data-room-name="room_1" 
                 data-assignment-id="1"
             >
+                ${LOCK_CONFIG}
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(groupTestData)}
                 </script>
@@ -251,6 +295,7 @@ describe("Startup test", () => {
                 data-room-name="room_1" 
                 data-assignment-id="1"
             >
+                ${LOCK_CONFIG}
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(groupTestData)}
                 </script>
@@ -285,6 +330,7 @@ describe("Startup test", () => {
                 data-room-name="room_1" 
                 data-assignment-id="1"
             >
+                ${LOCK_CONFIG}
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(groupTestData)}
                 </script>
@@ -324,6 +370,7 @@ describe("Startup test", () => {
                 data-student-id="1"
                 data-assignment-id="1"
             >
+                ${LOCK_CONFIG}
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(groupTestData)}
                 </script>

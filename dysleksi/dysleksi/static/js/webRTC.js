@@ -56,6 +56,15 @@ export class WebRTCChannel extends EventTarget {
         this.conn.on("data", (data) => {
             this.dispatchEvent(new CustomEvent("message", { detail: data }));
         });
+
+        // The window on the other end closed, reloaded, or hung up on us
+        this.conn.on("close", () => {
+            this.dispatchEvent(new Event("close"));
+        });
+    }
+
+    close() {
+        this.peer.destroy();
     }
 
     send(data) {

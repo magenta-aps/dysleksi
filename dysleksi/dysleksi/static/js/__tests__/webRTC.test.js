@@ -19,6 +19,7 @@ class MockPeer extends EventTarget {
     constructor() {
         super();
         this.connect = vi.fn();
+        this.destroy = vi.fn();
         this.id = "mock-peer-id";
     }
     on(event, cb) {
@@ -120,6 +121,25 @@ describe("WebRTCChannel", () => {
         expect(messageSpy).toHaveBeenCalled();
         const eventReceived = messageSpy.mock.calls[0][0];
         expect(eventReceived.detail).toEqual(testData);
+    });
+
+    it('should dispatch "close" event when the other end hangs up', () => {
+        const mockConn = new MockConnection();
+        const closeSpy = vi.fn();
+        channel.addEventListener("close", closeSpy);
+
+        channel.conn = mockConn;
+        channel._setupConnectionEvents();
+
+        mockConn.dispatchEvent(new Event("close"));
+
+        expect(closeSpy).toHaveBeenCalled();
+    });
+
+    it("close() should destroy the peer", () => {
+        channel.close();
+
+        expect(mockPeerInstance.destroy).toHaveBeenCalled();
     });
 
     it("should send data immediately if connection is open", () => {

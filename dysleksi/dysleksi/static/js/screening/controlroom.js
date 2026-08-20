@@ -1568,17 +1568,17 @@ export class TeacherView {
             ) {
                 console.log("Setting up webRTC channel for student", data.studentId);
 
-                if (this.studentChannels[data.studentId]) {
-                    console.log(
-                        "Cleaning up old connection for student",
-                        data.studentId,
-                    );
-                    this.studentChannels[data.studentId].peer.destroy();
-                }
-
                 const p2p = new WebRTCChannel();
-                this.studentChannels[data.studentId] = p2p;
+                this.studentChannels[data.studentId] = [
+                    ...(this.studentChannels[data.studentId] || []),
+                    p2p,
+                ];
                 this._initP2PSocket(p2p);
+
+                p2p.addEventListener("close", () => {
+                    console.log("Connection closed for student", data.studentId);
+                    this._removeStudentChannel(data.studentId, p2p);
+                });
 
                 p2p.peer.on("open", () => {
                     p2p.connect(data.webRTCId);
@@ -1589,6 +1589,21 @@ export class TeacherView {
                 this.onStudentSetupError(data);
             }
         });
+    }
+
+    _removeStudentChannel(studentId, channel) {
+        this.studentChannels[studentId] = this.studentChannels[studentId].filter(
+            (c) => c !== channel,
+        );
+        channel.close();
+    }
+
+    _sendToStudents(data) {
+        Object.values(this.studentChannels)
+            .flat()
+            .forEach((channel) => {
+                channel.send(data);
+            });
     }
 
     onStudentSetupError(data) {
@@ -1785,9 +1800,7 @@ export class TeacherView {
         };
 
         // Update student sessions
-        Object.values(this.studentChannels).forEach((channel) => {
-            channel.send(data);
-        });
+        this._sendToStudents(data);
 
         // Tell the server that the test is over.
         this.messageQueue.push(data);
@@ -1797,22 +1810,18 @@ export class TeacherView {
     }
 
     sendTestPaused() {
-        Object.values(this.studentChannels).forEach((channel) => {
-            channel.send({
-                uuid: crypto.randomUUID(),
-                event: "test.paused",
-                assignmentId: this.assignmentId,
-            });
+        this._sendToStudents({
+            uuid: crypto.randomUUID(),
+            event: "test.paused",
+            assignmentId: this.assignmentId,
         });
     }
 
     sendTestResumed() {
-        Object.values(this.studentChannels).forEach((channel) => {
-            channel.send({
-                uuid: crypto.randomUUID(),
-                event: "test.resume",
-                assignmentId: this.assignmentId,
-            });
+        this._sendToStudents({
+            uuid: crypto.randomUUID(),
+            event: "test.resume",
+            assignmentId: this.assignmentId,
         });
     }
 
@@ -1831,9 +1840,7 @@ export class TeacherView {
         };
 
         // Update student sessions
-        Object.values(this.studentChannels).forEach((channel) => {
-            channel.send(data);
-        });
+        this._sendToStudents(data);
 
         // Update local UI
         if (this.table !== null) {
@@ -1864,17 +1871,15 @@ export class TeacherView {
     }
 
     sendQuestionChanged() {
-        Object.values(this.studentChannels).forEach((channel) => {
-            channel.send({
-                uuid: crypto.randomUUID(),
-                event: "question.changed",
-                partIndex: this.partIndex,
-                partId: this.currentPart.id,
-                questionIndex: this.questionIndex,
-                questionId: this.currentQuestion.id,
-                assignmentId: this.assignmentId,
-                practice: this.currentIsPractice,
-            });
+        this._sendToStudents({
+            uuid: crypto.randomUUID(),
+            event: "question.changed",
+            partIndex: this.partIndex,
+            partId: this.currentPart.id,
+            questionIndex: this.questionIndex,
+            questionId: this.currentQuestion.id,
+            assignmentId: this.assignmentId,
+            practice: this.currentIsPractice,
         });
     }
 

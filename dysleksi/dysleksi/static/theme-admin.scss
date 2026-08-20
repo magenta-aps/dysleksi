@@ -2062,3 +2062,38 @@ $border-radius-student-card: $spacer / 4 * 3;
     justify-content: center;
   }
 }
+
+// Covers the whole window when the assignment is already being run in another
+// window
+.window-blocked {
+  position: fixed;
+  inset: 0;
+  z-index: 1080; // above the sidebar navigation and any modal backdrop
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2 * $spacer;
+  background-color: rgba($mono-gray-darkest, 0.6);
+
+  .window-blocked-message {
+    max-width: 32rem;
+    padding: 2 * $spacer;
+    border-radius: $border-radius;
+    background-color: $white;
+    text-align: center;
+
+    i {
+      font-size: 3rem;
+      color: $blue-dark;
+    }
+
+    h2 {
+      margin: $spacer 0;
+      font-size: 1.5rem;
+    }
+
+    p {
+      color: $mono-gray-dark-2;
+    }
+  }
+}

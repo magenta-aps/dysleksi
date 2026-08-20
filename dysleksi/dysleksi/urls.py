@@ -22,6 +22,7 @@ from dysleksi.views import (
     StudentListView,
     TestAssignmentListView,
     TestResponseView,
+    WindowLockView,
 )
 
 app_name = "dysleksi"
@@ -41,6 +42,11 @@ urlpatterns: list[URLResolver | URLPattern] = [
         name="start_group_room",
     ),
     path("assignment/<int:pk>/", AssignmentView.as_view(), name="room"),
+    path(
+        "assignment/<int:pk>/window-lock/",
+        WindowLockView.as_view(),
+        name="window_lock",
+    ),
     path("class/", ClassListView.as_view(), name="class_list"),
     path("admin/classes/", ClassListView.as_view(), name="class_list"),
     path("admin/classes/<int:pk>/", ClassDetailView.as_view(), name="class_detail"),

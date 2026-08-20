@@ -1023,3 +1023,38 @@ body.show-instructions .sound-btn.pulse {
   94%  { content: "\e44c"; } // low
   100% { content: "\e44a"; } // high
 }
+
+// Covers the whole window when the test is already open in another window of
+// the same student
+.window-blocked {
+  position: fixed;
+  inset: 0;
+  z-index: 1080; // above the pause overlay
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2 * $spacer;
+  background-color: rgba($student-grey-darkest, 0.6);
+
+  .window-blocked-message {
+    max-width: 32rem;
+    padding: 2 * $spacer;
+    border-radius: 16px;
+    background-color: $white;
+    text-align: center;
+
+    i {
+      font-size: 3rem;
+      color: $student-purple;
+    }
+
+    h2 {
+      margin: $spacer 0;
+      font-size: 1.5rem;
+    }
+
+    p {
+      color: $student-grey-dark;
+    }
+  }
+}
