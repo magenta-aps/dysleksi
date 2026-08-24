@@ -18,6 +18,8 @@
 {% endblock %}
 
 {% block inner_content %}
+{% include "dysleksi/window_blocked.html" %}
+
 <div data-role="teacher"
      data-test-type="{{ test_type }}"
      data-room-name="{{ room_name }}"
@@ -148,5 +150,6 @@
 {{ student_ids|json_script:"student_ids" }}
 {{ static_files|json_script:"static_files" }}
 {{ assignment|json_script:"assignment" }}
+{{ window_lock_config|json_script:"window-lock-config" }}
 <script type="module" src="{% static 'js/screening/index.js' %}"></script>
 {% endblock %}

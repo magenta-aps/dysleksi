@@ -1,5 +1,6 @@
 import { startSession } from "./utils.js";
 import { Test, Student } from "./model.js";
+import { WindowLock, showWindowBlockedMessage } from "./window-lock.js";
 
 export async function start() {
     const roleEl = document.querySelector("[data-role]");
@@ -44,6 +45,16 @@ export async function start() {
         }
     } else {
         throw new Error("Invalid test type '" + testType + "'");
+    }
+
+    const lockConfig = JSON.parse(
+        document.getElementById("window-lock-config").textContent,
+    );
+    const windowLock = new WindowLock(lockConfig.url, lockConfig.csrf_token);
+    if (!(await windowLock.acquire())) {
+        // Do not allow multiple active windows per test.
+        showWindowBlockedMessage();
+        return;
     }
 
     if (role === "student") {

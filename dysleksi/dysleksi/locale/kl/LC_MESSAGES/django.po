@@ -929,6 +929,30 @@ msgstr ""
 msgid "Du er færdig med opgaverne"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/window_blocked.html
+msgid "Din test er åbnet i et nyere vindue"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/window_blocked.html
+msgid ""
+"Du kan kun tage testen i ét vindue ad gangen. Luk dette vindue, og fortsæt i "
+"det vindue, du åbnede sidst."
+msgstr ""
+
+#: dysleksi/templates/dysleksi/window_blocked.html
+msgid "Denne test er allerede igangsat i et andet vindue"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/window_blocked.html
+msgid ""
+"En test kan kun styres fra ét vindue ad gangen. Luk dette vindue, og fortsæt "
+"i det vindue, hvor testen blev sat i gang."
+msgstr ""
+
+#: dysleksi/templates/dysleksi/window_blocked.html
+msgid "Tilbage til testoversigten"
+msgstr ""
+
 #: dysleksi/utils.py
 #, python-format
 msgid "%(sek)s sek."

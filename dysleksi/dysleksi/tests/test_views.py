@@ -8,6 +8,7 @@ from unittest.mock import patch
 
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import AnonymousUser
+from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.http.response import Http404, JsonResponse
 from django.test import RequestFactory, override_settings
@@ -1729,3 +1730,103 @@ class TestClientErrorLogView(DysleksiTest):
         request.user = AnonymousUser()
         response = ClientErrorLogView.as_view()(request)
         self.assertEqual(response.status_code, 405)
+
+
+LOCMEM_CACHES = {
+    "default": {"BACKEND": "django.core.cache.backends.locmem.LocMemCache"},
+    "chat": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "window-lock-tests",
+    },
+}
+
+
+@override_settings(CACHES=LOCMEM_CACHES)
+class WindowLockViewTest(DysleksiTest):
+    def setUp(self):
+        super().setUp()
+        caches["chat"].clear()
+
+    def url(self, assignment=None):
+        assignment = assignment or self.test_assignment_student
+        return reverse("dysleksi:window_lock", kwargs={"pk": assignment.pk})
+
+    def claim(self, window_id, assignment=None, **extra):
+        # A claim without "acquire" is what a window that is already open sends
+        # to renew its lease
+        return self.client.post(
+            self.url(assignment),
+            data=json.dumps({"windowId": window_id, **extra}),
+            content_type="application/json",
+        )
+
+    def acquire(self, window_id, assignment=None):
+        # What a window that has just opened sends
+        return self.claim(window_id, assignment, acquire=True)
+
+    def assertGranted(self, response, granted):
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(json.loads(response.content), {"granted": granted})
+
+    def test_first_window_is_granted_the_lock(self):
+        self.client.force_login(self.teacher)
+        self.assertGranted(self.acquire("window-a"), True)
+
+    def test_second_window_is_refused(self):
+        self.client.force_login(self.teacher)
+        self.acquire("window-a")
+        self.assertGranted(self.acquire("window-b"), False)
+
+    def test_the_holder_can_renew_its_lease(self):
+        self.client.force_login(self.teacher)
+        self.acquire("window-a")
+        self.assertGranted(self.claim("window-a"), True)
+        # Renewing does not let anyone else in
+        self.assertGranted(self.acquire("window-b"), False)
+
+    def test_a_released_lock_is_free_again(self):
+        self.client.force_login(self.teacher)
+        self.acquire("window-a")
+        self.assertGranted(self.claim("window-a", release=True), False)
+        self.assertGranted(self.acquire("window-b"), True)
+
+    def test_a_window_cannot_release_someone_elses_lock(self):
+        self.client.force_login(self.teacher)
+        self.acquire("window-a")
+        self.claim("window-b", release=True)
+        self.assertGranted(self.acquire("window-c"), False)
+
+    def test_an_expired_lease_is_free_again(self):
+        self.client.force_login(self.teacher)
+        self.acquire("window-a")
+        # The holder stopped renewing, so the lease ran out
+        caches["chat"].clear()
+        self.assertGranted(self.acquire("window-b"), True)
+
+    def test_students_of_a_group_test_do_not_block_each_other(self):
+        assignment = self.test_assignment_class
+        self.client.force_login(self.student1)
+        self.assertGranted(self.acquire("window-a", assignment), True)
+        self.client.force_login(self.student2)
+        self.assertGranted(self.acquire("window-b", assignment), True)
+
+    def test_a_student_does_not_block_the_teacher(self):
+        assignment = self.test_assignment_class
+        self.client.force_login(self.student1)
+        self.assertGranted(self.acquire("window-a", assignment), True)
+        self.client.force_login(self.teacher)
+        self.assertGranted(self.acquire("window-b", assignment), True)
+
+    def test_a_new_student_window_takes_the_test_over(self):
+        assignment = self.test_assignment_class
+        self.client.force_login(self.student1)
+        self.assertGranted(self.acquire("window-a", assignment), True)
+        self.assertGranted(self.acquire("window-b", assignment), True)
+        # The window that held the lock is told to stop
+        self.assertGranted(self.claim("window-a", assignment), False)
+        self.assertGranted(self.claim("window-b", assignment), True)
+
+    def test_the_lock_is_per_assignment(self):
+        self.client.force_login(self.teacher)
+        self.assertGranted(self.acquire("window-a", self.test_assignment_student), True)
+        self.assertGranted(self.acquire("window-b", self.test_assignment_class), True)
