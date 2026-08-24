@@ -17,6 +17,7 @@ export class Wizard {
 
         this.testChoice = this.domElem.querySelector(".test-choice");
         this.testPartChoice = this.domElem.querySelector(".test-part-choice");
+        this.testParts = this.domElem.querySelector("tr.test-parts");
         this.startDateTime = this.domElem.querySelector(".start-datetime");
         this.endDateTime = this.domElem.querySelector(".end-datetime");
 
@@ -230,6 +231,19 @@ export class Wizard {
                 }
             }
         }
+
+        this.#updateTestParts();
+    }
+
+    #updateTestParts() {
+        // Show the test parts contained in the currently selected test. The row is
+        // hidden if the teacher picked individual test parts instead of a whole test.
+        const select = this.testChoice.querySelector("select");
+        const parts = this.testChoice.classList.contains("d-none")
+            ? ""
+            : select.options[select.selectedIndex].dataset.parts;
+        this.testParts.querySelector("td:last-child").innerText = parts;
+        this.testParts.classList.toggle("d-none", parts === "");
     }
 
     #getSummaryValue(field, summaryState) {
