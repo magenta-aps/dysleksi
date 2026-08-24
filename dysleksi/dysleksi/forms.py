@@ -1,4 +1,5 @@
 from django import forms
+from django.db.models import Prefetch
 from django.forms import (
     ModelChoiceField,
     ModelMultipleChoiceField,
@@ -22,6 +23,27 @@ from dysleksi.models import (
 class HTML5DateWidget(widgets.Input):
     input_type = "datetime-local"
     template_name = "django/forms/widgets/datetime.html"
+
+
+class TestSelect(forms.Select):
+    """`Select` widget which adds the names of the test parts of each test to a
+    `data-parts` attribute on the corresponding `<option>` element. This allows the
+    teacher UI to show which test parts a given test consists of.
+    """
+
+    def create_option(self, name, value, *args, **kwargs):
+        option = super().create_option(name, value, *args, **kwargs)
+        if value:
+            option["attrs"]["data-parts"] = ", ".join(
+                part.name for part in value.instance.parts.all()
+            )
+        return option
+
+
+def tests_of_type(test_type: TestType):
+    return Test.objects.filter(test_type=test_type, custom=False).prefetch_related(
+        Prefetch("parts", queryset=TestPart.objects.order_by("id"))
+    )
 
 
 class StartRoomForm(forms.ModelForm):
@@ -139,7 +161,8 @@ class StartIndividualRoomForm(DynamicFormMixin, StartRoomForm):
     test = DynamicField(
         ModelChoiceField,
         label=_("Vælg test"),
-        queryset=Test.objects.filter(test_type=TestType.INDIVIDUAL, custom=False),
+        queryset=tests_of_type(TestType.INDIVIDUAL),
+        widget=TestSelect(),
         required=lambda form: form.data.get("test_parts") is None,
     )
 
@@ -169,7 +192,8 @@ class StartClassRoomForm(DynamicFormMixin, StartRoomForm):
     test = DynamicField(
         ModelChoiceField,
         label=_("Vælg test"),
-        queryset=Test.objects.filter(test_type=TestType.GROUP, custom=False),
+        queryset=tests_of_type(TestType.GROUP),
+        widget=TestSelect(),
         required=lambda form: form.data.get("test_parts") is None,
     )
 

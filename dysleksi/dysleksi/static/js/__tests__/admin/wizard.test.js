@@ -36,7 +36,12 @@ const mockDoc = `
                         <input type="datetime-local" name="clearme-datetime" id="clearme-datetime" />
                     </div>
                 </div>
-                <div class="test-choice"></div>
+                <div class="test-choice">
+                    <select name="test" id="test">
+                        <option value="">-</option>
+                        <option value="1" data-parts="Part 1, Part 2" selected>Test 1</option>
+                    </select>
+                </div>
                 <div class="test-part-choice"></div>
             </fieldset>
             <fieldset data-step="2">
@@ -71,6 +76,12 @@ const mockDoc = `
                     <span data-id="checkbox"></span>
                     <span data-id="radio"></span>
                     <span data-id="hidden"></span>
+                    <table>
+                        <tr class="d-none test-parts">
+                            <td>Test parts</td>
+                            <td></td>
+                        </tr>
+                    </table>
                 </div>
             </fieldset>
         </form>
@@ -225,6 +236,23 @@ describe("Wizard", () => {
         expect(textDisplay.innerText).toBe("DEF");
         const datetimeDisplay = wizard.domElem.querySelector("[data-id='baz']");
         expect(datetimeDisplay.innerText).toBe("torsdag den 1. januar 2026 kl. 12.00");
+    });
+
+    it("displays the test parts of the selected test", () => {
+        const wizard = getInstance();
+        wizard.gotoStep(3);
+        expect(wizard.testParts.querySelector("td:last-child").innerText).toBe(
+            "Part 1, Part 2",
+        );
+        expect(wizard.testParts.classList).not.toContain("d-none");
+    });
+
+    it("hides the test parts row if individual test parts are chosen", () => {
+        document.querySelector("div.test-choice").classList.add("d-none");
+        const wizard = getInstance();
+        wizard.gotoStep(3);
+        expect(wizard.testParts.querySelector("td:last-child").innerText).toBe("");
+        expect(wizard.testParts.classList).toContain("d-none");
     });
 
     it("submits a form via 'fetch' and handles success", () => {

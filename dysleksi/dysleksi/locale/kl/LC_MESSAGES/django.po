@@ -476,6 +476,10 @@ msgid "Testtype"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/assign_base.html
+msgid "Indeholder deltests"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
 msgid "Tilbage"
 msgstr ""
 
