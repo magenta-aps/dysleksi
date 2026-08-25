@@ -1196,6 +1196,42 @@ export class DetailsPopup {
     }
 }
 
+export class CancelTestModal {
+    constructor() {
+        this.domElement = document.querySelector("#cancel-test");
+        this.modal = Modal.getOrCreateInstance(this.domElement);
+        this.uncompletedContainer = this.domElement.querySelector(
+            ".uncompleted-students",
+        );
+        this.studentList = this.domElement.querySelector(".student-list");
+        this.confirmButton = this.domElement.querySelector(".confirm-btn");
+        this.confirmButton.addEventListener("click", () => {
+            this.modal.hide();
+            this.onConfirm();
+        });
+    }
+
+    show(uncompletedStudents, onConfirm) {
+        this.onConfirm = onConfirm;
+
+        if (this.studentList !== null) {
+            this.studentList.replaceChildren(
+                ...uncompletedStudents.map((student) => {
+                    const item = document.createElement("li");
+                    item.textContent = student.displayName;
+                    return item;
+                }),
+            );
+        }
+        this.uncompletedContainer.classList.toggle(
+            "d-none",
+            uncompletedStudents.length === 0,
+        );
+
+        this.modal.show();
+    }
+}
+
 export class StudentPresenceIndicator {
     /* Shows "waiting for student" next to the page heading until the student
        enters the test room, then briefly shows a confirmation instead. */
@@ -1228,6 +1264,7 @@ export class TeacherView {
         questionView,
         elapsedTimeView = null,
         audioIndicator = null,
+        students = [],
     ) {
         this.assignmentId = assignmentId;
         this.wsGetter = wsGetter;
@@ -1241,6 +1278,15 @@ export class TeacherView {
         this.currentQuestion = null;
         this.currentIsPractice = null;
         this.showingInstructions = null;
+
+        // Every student taking part in the test, whether or not they have
+        // joined, along with the ids of those who have completed it.
+        this.students = students.map((data) => new Student(data));
+        this.completedStudentIds = new Set(
+            this.students
+                .filter((student) => this.test.completedByStudent(student))
+                .map((student) => student.id),
+        );
 
         this.table = table || new EventTable();
         /* istanbul ignore next */
@@ -1261,6 +1307,7 @@ export class TeacherView {
         this.audioIndicator = audioIndicator;
         this.detailsPopup = new DetailsPopup();
         this.studentPresence = new StudentPresenceIndicator();
+        this.cancelTestModal = new CancelTestModal();
 
         this.filterButtons = document.querySelectorAll(".group-test-header .btn");
         this.gotoNextResultGroupButton = document.querySelector(
@@ -1439,6 +1486,7 @@ export class TeacherView {
                     this.studentPresence.markStudentArrived();
                 }
                 if (data.event === "test.complete") {
+                    this.completedStudentIds.add(data.student.id);
                     showResultLink();
                 }
             }
@@ -1498,6 +1546,10 @@ export class TeacherView {
                 this.test.testType === "group"
             ) {
                 this.groupTestContainer.updateData(data);
+
+                if (data.student.progress === 100) {
+                    this.completedStudentIds.add(data.student.id);
+                }
 
                 if (
                     data.event === "test.started" &&
@@ -1698,15 +1750,21 @@ export class TeacherView {
         }
     }
 
+    uncompletedStudents() {
+        return this.students.filter(
+            (student) => !this.completedStudentIds.has(student.id),
+        );
+    }
+
     _initButtonListeners() {
         this.buttons.addClickListener((e) => {
             const val = e.target.id || e.target.parentElement.id;
             if (val === "cancelled") {
-                if (confirm(gettext("Er du sikker på at du vil afbryde testen"))) {
+                this.cancelTestModal.show(this.uncompletedStudents(), () => {
                     this.sendTestCancelled();
                     this.buttons.disableButtons();
                     this.elapsedTimeView.stop();
-                }
+                });
             } else if (val === "paused") {
                 if (this.testPaused) {
                     this.resumeTest();

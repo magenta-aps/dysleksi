@@ -19,7 +19,7 @@ export function initRedirectSocket(
         const data = JSON.parse(e.data);
         if (redirect_events.includes(data.event)) {
             if (
-                data.students.includes(studentId) &&
+                data.studentIds.includes(studentId) &&
                 // When assignmentID is undefined, a student listens for any assignment
                 // When it is set, the student only listens to a specific assignment
                 (data.assignmentId == assignmentId || assignmentId === undefined)

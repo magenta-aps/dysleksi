@@ -83,7 +83,7 @@ describe("initRedirectSocket / initRedirectSocket", () => {
             data: JSON.stringify({
                 event: "session.in_progress",
                 roomUrl: "/rooms/room-1/",
-                students: [studentId],
+                studentIds: [studentId],
                 timestamp: 1,
             }),
         });
@@ -103,7 +103,7 @@ describe("initRedirectSocket / initRedirectSocket", () => {
             data: JSON.stringify({
                 event: "session.start",
                 roomUrl: "/rooms/room-2/",
-                students: [studentId],
+                studentIds: [studentId],
                 timestamp: 1,
             }),
         });
@@ -122,7 +122,7 @@ describe("initRedirectSocket / initRedirectSocket", () => {
             data: JSON.stringify({
                 event: "session.start",
                 roomUrl: "/rooms/room-old/",
-                students: [studentId],
+                studentIds: [studentId],
                 timestamp: 1,
             }),
         });
@@ -132,7 +132,7 @@ describe("initRedirectSocket / initRedirectSocket", () => {
             data: JSON.stringify({
                 event: "session.in_progress",
                 roomUrl: "/rooms/room-new/",
-                students: [studentId],
+                studentIds: [studentId],
                 timestamp: 2,
             }),
         });
@@ -151,7 +151,7 @@ describe("initRedirectSocket / initRedirectSocket", () => {
             data: JSON.stringify({
                 event: "session.in_progress",
                 roomUrl: "/rooms/room-new/",
-                students: [studentId],
+                studentIds: [studentId],
                 timestamp: 2,
             }),
         });
@@ -161,7 +161,7 @@ describe("initRedirectSocket / initRedirectSocket", () => {
             data: JSON.stringify({
                 event: "session.start",
                 roomUrl: "/rooms/room-old/",
-                students: [studentId],
+                studentIds: [studentId],
                 timestamp: 1,
             }),
         });
@@ -179,7 +179,7 @@ describe("initRedirectSocket / initRedirectSocket", () => {
             data: JSON.stringify({
                 event: "session.start",
                 roomUrl: "/rooms/room-42/",
-                students: [studentId],
+                studentIds: [studentId],
                 assignmentId: 42,
                 timestamp: 1,
             }),
@@ -198,7 +198,7 @@ describe("initRedirectSocket / initRedirectSocket", () => {
             data: JSON.stringify({
                 event: "session.start",
                 roomUrl: "/rooms/room-1337/",
-                students: [studentId],
+                studentIds: [studentId],
                 assignmentId: 1337,
                 timestamp: 1,
             }),
@@ -219,7 +219,7 @@ describe("initRedirectSocket / initRedirectSocket", () => {
             data: JSON.stringify({
                 event: "session.start",
                 roomUrl: "/rooms/room-1337/",
-                students: [studentId],
+                studentIds: [studentId],
                 assignmentId: 1337,
                 timestamp: 1,
             }),
@@ -238,7 +238,7 @@ describe("initRedirectSocket / initRedirectSocket", () => {
             data: JSON.stringify({
                 event: "session.start",
                 roomUrl: "/rooms/room-2/",
-                students: [1337],
+                studentIds: [1337],
                 timestamp: 1,
             }),
         });

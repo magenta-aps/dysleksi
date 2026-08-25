@@ -24,8 +24,8 @@ describe("Startup test", () => {
     let initGroupTeacher;
     let initGroupStudent;
     let initMockDataSpy;
-    let groupStudentIds;
-    let individualStudentIds;
+    let groupStudents;
+    let individualStudents;
 
     beforeEach(() => {
         socket = {
@@ -53,8 +53,11 @@ describe("Startup test", () => {
             .fn()
             .mockResolvedValue({ ok: true, json: async () => ({ granted: true }) });
 
-        groupStudentIds = [1, 2];
-        individualStudentIds = [1];
+        groupStudents = [
+            { id: 1, firstName: "Alice", lastName: "Smith" },
+            { id: 2, firstName: "Bob", lastName: "Jones" },
+        ];
+        individualStudents = [{ id: 1, firstName: "Alice", lastName: "Smith" }];
     });
 
     afterEach(() => {
@@ -76,9 +79,6 @@ describe("Startup test", () => {
                 ${LOCK_CONFIG}
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(individualTestData)}
-                </script>
-                <script type="application/json" id="student_ids">
-                ${JSON.stringify(individualStudentIds)}
                 </script>
                 <div id="question-container">
                 <h1 id="question-title"></h1>
@@ -115,8 +115,8 @@ describe("Startup test", () => {
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(individualTestData)}
                 </script>
-                <script type="application/json" id="student_ids">
-                ${JSON.stringify(individualStudentIds)}
+                <script type="application/json" id="students">
+                ${JSON.stringify(individualStudents)}
                 </script>
                 <div id="question-container">
                 <h1 id="question-title"></h1>
@@ -150,8 +150,8 @@ describe("Startup test", () => {
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(groupTestData)}
                 </script>
-                <script type="application/json" id="student_ids">
-                ${JSON.stringify(groupStudentIds)}
+                <script type="application/json" id="students">
+                ${JSON.stringify(groupStudents)}
                 </script>
                 <div id="question-container">
                 <h1 id="question-title"></h1>
@@ -190,9 +190,6 @@ describe("Startup test", () => {
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(individualTestData)}
                 </script>
-                <script type="application/json" id="student_ids">
-                ${JSON.stringify(individualStudentIds)}
-                </script>
             </div>
         `;
         await start();
@@ -216,9 +213,6 @@ describe("Startup test", () => {
                 ${LOCK_CONFIG}
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(individualTestData)}
-                </script>
-                <script type="application/json" id="student_ids">
-                ${JSON.stringify(individualStudentIds)}
                 </script>
                 <h1 id="instructions-text"></h1>
                 <audio id="instructions-sound"></audio>
@@ -250,9 +244,6 @@ describe("Startup test", () => {
                 ${LOCK_CONFIG}
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(groupTestData)}
-                </script>
-                <script type="application/json" id="student_ids">
-                ${JSON.stringify(groupStudentIds)}
                 </script>
                 <h1 id="instructions-text"></h1>
                 <audio id="instructions-sound"></audio>
@@ -299,9 +290,6 @@ describe("Startup test", () => {
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(groupTestData)}
                 </script>
-                <script type="application/json" id="student_ids">
-                ${JSON.stringify(groupStudentIds)}
-                </script>
                 <h1 id="instructions-text"></h1>
                 <audio id="instructions-sound"></audio>
                 <button class="btn btn-primary" id="start-practice"></button>
@@ -333,9 +321,6 @@ describe("Startup test", () => {
                 ${LOCK_CONFIG}
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(groupTestData)}
-                </script>
-                <script type="application/json" id="student_ids">
-                ${JSON.stringify(groupStudentIds)}
                 </script>
                 <h1 id="instructions-text"></h1>
                 <audio id="instructions-sound"></audio>
@@ -373,9 +358,6 @@ describe("Startup test", () => {
                 ${LOCK_CONFIG}
                 <script type="application/json" id="test_contents">
                 ${JSON.stringify(groupTestData)}
-                </script>
-                <script type="application/json" id="student_ids">
-                ${JSON.stringify(groupStudentIds)}
                 </script>
                 <h1 id="instructions-text"></h1>
                 <audio id="instructions-sound"></audio>

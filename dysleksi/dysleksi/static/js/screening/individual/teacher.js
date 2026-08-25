@@ -8,7 +8,7 @@ import {
 } from "../controlroom.js";
 import { getWebSocket } from "../../ws.js";
 
-export function initTeacher(assignmentId, test) {
+export function initTeacher(assignmentId, test, students) {
     console.log("called initTeacher");
 
     const table = new EventTable(test);
@@ -37,6 +37,7 @@ export function initTeacher(assignmentId, test) {
         questionView,
         elapsedTimeView,
         audioIndicator,
+        students,
     );
 
     console.log("TeacherView created");

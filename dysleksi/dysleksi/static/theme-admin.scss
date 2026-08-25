@@ -616,6 +616,21 @@ ul.modal-progress {
   }
 }
 
+.modal.cancel-test {
+  .uncompleted-students {
+    p:last-child {
+      margin-bottom: 0;
+    }
+
+    // A whole class must be readable without scrolling the modal
+    ul.student-list {
+      columns: 3;
+      padding-left: 0;
+      list-style-position: inside;
+    }
+  }
+}
+
 .summary {
   padding: $spacer;
   margin: $spacer 0;

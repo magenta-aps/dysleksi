@@ -1,7 +1,7 @@
 {% extends "dysleksi/admin/base.html" %}
 {% load i18n %}
 {% load static %}
-{% load error_modal from modals %}
+{% load error_modal cancel_individual_test_modal from modals %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'dysleksi:class_list' %}">{% translate 'Klasser' %}</a></li>
@@ -144,12 +144,13 @@
 
 {% block modals %}
 {% error_modal %}
+{% cancel_individual_test_modal %}
 {% endblock %}
 
 {% block js_module %}
 {{ block.super }}
 {{ test_contents|json_script:"test_contents" }}
-{{ student_ids|json_script:"student_ids" }}
+{{ students|json_script:"students" }}
 {{ static_files|json_script:"static_files" }}
 {{ assignment|json_script:"assignment" }}
 {{ window_lock_config|json_script:"window-lock-config" }}

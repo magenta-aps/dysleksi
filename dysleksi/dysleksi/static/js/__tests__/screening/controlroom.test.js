@@ -54,6 +54,42 @@ global.ResizeObserver = function (cb) {
     this.disconnect = vi.fn();
 };
 
+// Rendered by the `cancel_group_test_modal`/`cancel_individual_test_modal`
+// template tags, which only differ in what they say about the students
+const cancelTestModalHtml = (uncompletedStudents) => `
+<div class="modal fade cancel-test" id="cancel-test" tabindex="-1" data-bs-backdrop="static" aria-labelledby="cancel-test-label" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="cancel-test-label">Afslut test</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Luk"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body-inner">
+                    <p>Er du sikker på at du vil afbryde testen?</p>
+                    <div class="uncompleted-students d-none">${uncompletedStudents}</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Fortryd</button>
+                <button type="button" class="btn btn-warning confirm-btn">Afslut test</button>
+            </div>
+        </div>
+    </div>
+</div>
+`;
+
+const CANCEL_GROUP_TEST_MODAL_HTML = cancelTestModalHtml(`
+    <p>Følgende elever har ikke gennemført testen:</p>
+    <ul class="student-list"></ul>
+    <p>Hvis testen afbrydes, kan disse elever ikke gennemføre den på et senere tidspunkt.</p>
+`);
+
+const CANCEL_INDIVIDUAL_TEST_MODAL_HTML = cancelTestModalHtml(`
+    <p>Eleven har ikke gennemført testen.</p>
+    <p>Hvis testen afbrydes, kan eleven ikke gennemføre den på et senere tidspunkt.</p>
+`);
+
 const GROUP_DOM_HTML = `
 <template id="student-card-template">
     <div class="student-card">
@@ -110,6 +146,10 @@ const GROUP_DOM_HTML = `
         <button id="paused" class="btn btn-outline-secondary">
             <i class="ph-fill ph-pause"></i>
             <span class="pause-label">Pause</span>
+        </button>
+        <button id="cancelled" disabled=true class="btn btn-warning">
+            <i class="ph-fill ph-stop"></i>
+            Afslut
         </button>
     </div>
 </div>
@@ -171,6 +211,7 @@ const GROUP_DOM_HTML = `
     </div>
     <a id="result-link-enabled" class="btn btn-outline-secondary d-none" href="/assignment/1/result/">Se resultater</a>
 </div>
+${CANCEL_GROUP_TEST_MODAL_HTML}
 `;
 
 const INDIVIDUAL_DOM_HTML = `
@@ -244,7 +285,7 @@ const INDIVIDUAL_DOM_HTML = `
     </div>
 </div>
 <div id="outside-element">Outside content</div>
-
+${CANCEL_INDIVIDUAL_TEST_MODAL_HTML}
 `;
 
 describe("ActionButtons", () => {
@@ -1066,7 +1107,7 @@ describe("Teacher Individual test View", () => {
         expect(spyStart).not.toHaveBeenCalled();
     });
 
-    it("sends message and disables buttons on cancel click", () => {
+    it("sends message and disables buttons when the cancellation is confirmed", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
 
         // Add data in note field
@@ -1074,9 +1115,9 @@ describe("Teacher Individual test View", () => {
         view.setPartIndex(0);
         view.setQuestionIndex(0);
 
-        // click the button
-        const cancelButton = buttons.cancelButton();
-        cancelButton.click();
+        // Ask to cancel the test, but do not confirm it yet
+        buttons.cancelButton().click();
+        expect(p2pChannel.send).not.toHaveBeenCalled();
 
         const expectedContent = {
             uuid: "UUID123",
@@ -1089,8 +1130,7 @@ describe("Teacher Individual test View", () => {
             note: "Test note",
         };
 
-        global.confirm = vi.fn().mockReturnValue(true);
-        buttons.cancelButton().click();
+        document.querySelector("#cancel-test .confirm-btn").click();
         expect(p2pChannel.send).toHaveBeenCalledWith(expectedContent);
         expect(buttons.cancelButton().classList.contains("disabled")).toBe(true);
     });
@@ -1486,7 +1526,9 @@ describe("Teacher Individual test View", () => {
         expect(enabled.classList.contains("d-none")).toBe(true);
         // Act
         p2pChannel.dispatchEvent(
-            new CustomEvent("message", { detail: { event: "test.complete" } }),
+            new CustomEvent("message", {
+                detail: { event: "test.complete", student: { id: studentId } },
+            }),
         );
         // Assert
         expect(disabled.classList.contains("d-none")).toBe(true);
@@ -1776,6 +1818,9 @@ describe("TeacherView _initFilterButtonSelection", () => {
                 <button class="btn" id="btn2">Filter 2</button>
                 <button class="btn" id="btn3">Filter 3</button>
             </div>
+            <div id="cancel-test">
+                <button class="btn confirm-btn"></button>
+            </div>
         `;
 
         socket = {
@@ -2023,6 +2068,200 @@ describe("TeacherView socket 'test.started' handling", () => {
             }),
         );
         expect(markSpy).toHaveBeenCalledWith(expect.anything(), false);
+    });
+});
+
+describe("TeacherView cancel test modal", () => {
+    let socket;
+    let wsGetter;
+    let p2pChannel;
+    const studentId = 123;
+    const classStudents = [
+        { id: 1, firstName: "Alice", lastName: "Smith" },
+        { id: 2, firstName: "Bob", lastName: "Jones" },
+        { id: 3, firstName: "Cecilie", lastName: "Dahl" },
+    ];
+
+    const createView = (testData, students) => {
+        socket = {
+            addEventListener: vi.fn(),
+            send: vi.fn(),
+            readyState: 1,
+        };
+        wsGetter = vi.fn().mockReturnValue(socket);
+
+        const view = new TeacherView(
+            testData,
+            1,
+            wsGetter,
+            new EventTable(),
+            new ActionButtons(),
+            new NoteField(),
+            new QuestionView(),
+            new ElapsedTimeView("#elapsed-time"),
+            null,
+            students,
+        );
+
+        const mainSocketHandler = socket.addEventListener.mock.calls.find(
+            (c) => c[0] === "message",
+        )[1];
+        mainSocketHandler({
+            data: JSON.stringify({
+                event: "student.joined",
+                studentId: studentId,
+                assignmentId: 1,
+            }),
+        });
+        [p2pChannel] = view.studentChannels[studentId];
+
+        return view;
+    };
+
+    const groupTest = (completedStudentIds = []) => ({
+        testType: "group",
+        parts: [{ name: "part1", questions: [{}] }],
+        completedByStudent: (student) => completedStudentIds.includes(student.id),
+    });
+
+    beforeEach(() => {
+        vi.useFakeTimers();
+        global.localStorage = {
+            getItem: vi.fn(),
+            setItem: vi.fn(),
+            clear: vi.fn(),
+        };
+    });
+
+    afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
+        vi.restoreAllMocks();
+        vi.unstubAllGlobals();
+    });
+
+    const individualTest = () => ({
+        testType: "individual",
+        parts: [{ name: "part1", questions: [{}] }],
+        completedByStudent: () => false,
+    });
+
+    /* Open the modal the way the teacher does, and report the warning it gives
+       about the students, or null when it does not warn. The list of names in
+       the group test modal is reported as an array. */
+    const openModal = (view) => {
+        const cancelButton = view.buttons.cancelButton();
+        // The button is enabled once the test has started
+        cancelButton.disabled = false;
+        cancelButton.click();
+
+        const uncompleted = document.querySelector(
+            "#cancel-test .uncompleted-students",
+        );
+        if (uncompleted.classList.contains("d-none")) {
+            return null;
+        }
+        return [...uncompleted.children].map((el) =>
+            el.tagName === "UL"
+                ? [...el.children].map((item) => item.textContent)
+                : el.textContent,
+        );
+    };
+
+    it("lists all students in the class who have not completed the test", () => {
+        document.body.innerHTML = GROUP_DOM_HTML;
+        const view = createView(groupTest([2]), classStudents);
+        const spyShow = vi.spyOn(view.cancelTestModal.modal, "show");
+
+        expect(openModal(view)).toEqual([
+            "Følgende elever har ikke gennemført testen:",
+            ["Alice S.", "Cecilie D."],
+            "Hvis testen afbrydes, kan disse elever ikke gennemføre den på et senere tidspunkt.",
+        ]);
+        expect(spyShow).toHaveBeenCalled();
+    });
+
+    it("lists a single student of a group test as well", () => {
+        document.body.innerHTML = GROUP_DOM_HTML;
+        const view = createView(groupTest([1, 3]), classStudents);
+
+        expect(openModal(view)).toEqual([
+            "Følgende elever har ikke gennemført testen:",
+            ["Bob J."],
+            "Hvis testen afbrydes, kan disse elever ikke gennemføre den på et senere tidspunkt.",
+        ]);
+    });
+
+    it("does not warn about anyone when everyone has completed the test", () => {
+        document.body.innerHTML = GROUP_DOM_HTML;
+        const view = createView(groupTest([1, 2, 3]), classStudents);
+
+        expect(openModal(view)).toBeNull();
+    });
+
+    it("stops listing a student once they complete the test", () => {
+        document.body.innerHTML = GROUP_DOM_HTML;
+        const view = createView(groupTest([1, 2]), classStudents);
+
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "question.answered",
+                    student: {
+                        id: 3,
+                        firstName: "Cecilie",
+                        lastName: "Dahl",
+                        progress: 100,
+                        currentPartIndex: 0,
+                        currentQuestionIndex: 0,
+                        resultsByPart: {},
+                    },
+                },
+            }),
+        );
+
+        expect(openModal(view)).toBeNull();
+    });
+
+    it("warns about the student of an individual test without naming them", () => {
+        document.body.innerHTML = INDIVIDUAL_DOM_HTML;
+        const view = createView(individualTest(), [classStudents[0]]);
+
+        expect(openModal(view)).toEqual([
+            "Eleven har ikke gennemført testen.",
+            "Hvis testen afbrydes, kan eleven ikke gennemføre den på et senere tidspunkt.",
+        ]);
+    });
+
+    it("stops warning about the student of an individual test when it is complete", () => {
+        document.body.innerHTML = INDIVIDUAL_DOM_HTML;
+        const view = createView(individualTest(), [classStudents[0]]);
+
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: {
+                    event: "test.complete",
+                    student: { id: 1, firstName: "Alice", lastName: "Smith" },
+                },
+            }),
+        );
+
+        expect(openModal(view)).toBeNull();
+    });
+
+    it("does not cancel the test until the teacher confirms it", () => {
+        document.body.innerHTML = INDIVIDUAL_DOM_HTML;
+        const view = createView(individualTest(), [classStudents[0]]);
+        const spySendTestCancelled = vi.spyOn(view, "sendTestCancelled");
+        const spyHide = vi.spyOn(view.cancelTestModal.modal, "hide");
+
+        openModal(view);
+        expect(spySendTestCancelled).not.toHaveBeenCalled();
+
+        document.querySelector("#cancel-test .confirm-btn").click();
+
+        expect(spySendTestCancelled).toHaveBeenCalled();
+        expect(spyHide).toHaveBeenCalled();
     });
 });
 

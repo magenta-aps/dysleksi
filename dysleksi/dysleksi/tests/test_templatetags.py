@@ -4,6 +4,7 @@
 import datetime
 from unittest.mock import MagicMock
 
+from django.template import Context, Template
 from django.test import SimpleTestCase
 from django.utils import timezone
 from psycopg.types.range import Range
@@ -56,6 +57,35 @@ class TestTagRangeAttr(SimpleTestCase):
     def test_range_attr_invalid_input(self):
         self.assertEqual(range_attr(None, "lower"), "-")
         self.assertEqual(range_attr(None, "invalid"), "-")
+
+
+class TestCancelTestModals(SimpleTestCase):
+
+    common_selectors = (
+        'id="cancel-test"',
+        'class="uncompleted-students d-none"',
+        "confirm-btn",
+    )
+
+    def test_group_test_modal(self):
+        # The group test modal lists the students who have not completed it
+        self.assert_renders(
+            "cancel_group_test_modal", 'class="student-list"', "Følgende elever"
+        )
+
+    def test_individual_test_modal(self):
+        # The individual test modal is about a single student, so it has no list
+        self.assert_renders("cancel_individual_test_modal", "Eleven har ikke")
+        self.assertNotIn("student-list", self.render("cancel_individual_test_modal"))
+
+    def assert_renders(self, tag, *selectors):
+        rendered = self.render(tag)
+        for selector in self.common_selectors + selectors:
+            with self.subTest(tag=tag, selector=selector):
+                self.assertIn(selector, rendered)
+
+    def render(self, tag) -> str:
+        return Template("{%% load modals %%}{%% %s %%}" % tag).render(Context())
 
 
 class TestHasPermission(DysleksiTest):
