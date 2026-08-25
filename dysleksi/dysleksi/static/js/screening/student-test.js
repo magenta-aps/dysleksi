@@ -4,6 +4,7 @@ import { releaseWakeLock } from "./utils.js";
 import { unlockAudioOnGesture } from "./utils.js";
 import { preventDoubleTapZoom } from "./utils.js";
 import { WebRTCChannel } from "../webRTC.js";
+import { fallbackOnWebRTCFailure } from "../webSocketChannel.js";
 import { WINDOW_BLOCKED_EVENT } from "./window-lock.js";
 import { initRedirectSocket } from "../lobby/student.js";
 import { gettext } from "../i18n.js";
@@ -29,16 +30,27 @@ export class StudentTestView extends EventTarget {
         super();
         preventDoubleTapZoom();
         this.test = test;
-        this.p2p = new WebRTCChannel();
-        this.p2p.studentSetup(chatSocket, student, assignmentId);
+        this.channel = new WebRTCChannel();
+        this.channel.studentSetup(chatSocket, student, assignmentId);
         this.assignmentId = assignmentId;
         this.domElements = domElements;
         this.student = student;
-        this.p2p.addEventListener("message", (e) => {
-            this.onChatMessage(e.detail);
+        this._listenOnChannel(this.channel);
+
+        // Fallback to websocket communication in case webRTC fails
+        // Websocket communication does NOT work offline.
+        fallbackOnWebRTCFailure(this.channel, {
+            chatSocket: chatSocket,
+            assignmentId: assignmentId,
+            studentId: student.id,
+            onFallback: (channel) => {
+                this.channel.close();
+                this.channel = channel;
+                this._listenOnChannel(channel);
+            },
         });
         document.addEventListener(WINDOW_BLOCKED_EVENT, () => {
-            this.p2p.close();
+            this.channel.close();
         });
         this.audioContext = unlockAudioOnGesture();
         this.failedAttempts = 0;
@@ -54,12 +66,18 @@ export class StudentTestView extends EventTarget {
         }
     }
 
+    _listenOnChannel(channel) {
+        channel.addEventListener("message", (e) => {
+            this.onChatMessage(e.detail);
+        });
+    }
+
     send(data) {
         data.assignmentId = this.assignmentId;
         data.uuid = crypto.randomUUID();
         data.student = this.student;
         console.log("Chat: sending", data);
-        this.p2p.send(data);
+        this.channel.send(data);
     }
 
     onChatMessage(data) {

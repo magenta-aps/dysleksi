@@ -40,6 +40,18 @@ describe("getWebSocket", () => {
         expect(ws.url).toBe("wss://example.com/ws/chat/lobby/");
     });
 
+    it("joins a named room when one is asked for", () => {
+        const ws = getWebSocket("assignment_42");
+
+        expect(ws.url).toBe("wss://example.com/ws/chat/assignment_42/");
+    });
+
+    it("connects to the relay when asked for that path", () => {
+        const ws = getWebSocket("assignment_42", "relay");
+
+        expect(ws.url).toBe("wss://example.com/ws/relay/assignment_42/");
+    });
+
     it("uses ws protocol for http", () => {
         window.location.protocol = "http:";
         const ws = getWebSocket();

@@ -1,11 +1,13 @@
 let sockets = {};
 
-export function getWebSocket() {
-    const chatId = "lobby";
+// path = "chat" forwards and stores messages on the server
+// path = "relay" only forwards messages. Nothing is stored.
+export function getWebSocket(chatId = "lobby", path = "chat") {
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
+    const key = `${path}/${chatId}`;
 
     // Reuse socket if exists and open/connecting
-    const existingSocket = sockets[chatId];
+    const existingSocket = sockets[key];
     if (
         existingSocket &&
         (existingSocket.readyState === WebSocket.OPEN ||
@@ -16,13 +18,13 @@ export function getWebSocket() {
 
     // Otherwise create a new one
     const newSocket = new WebSocket(
-        `${protocol}://${window.location.host}/ws/chat/${chatId}/`,
+        `${protocol}://${window.location.host}/ws/${path}/${chatId}/`,
     );
-    sockets[chatId] = newSocket;
+    sockets[key] = newSocket;
 
     // Remove from cache when closed
     newSocket.addEventListener("close", () => {
-        delete sockets[chatId];
+        delete sockets[key];
     });
 
     return newSocket;

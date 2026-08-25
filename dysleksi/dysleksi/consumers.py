@@ -94,3 +94,38 @@ class ChatConsumer(JsonWebsocketConsumer):
     def chat_message(self, message: dict):
         # Send message to WebSocket
         self.send_json({k: v for k, v in message.items() if k != "type"})
+
+
+class RelayConsumer(JsonWebsocketConsumer):
+    """
+    Consumer which allows teacher and student to talk to each other in case the webRTC
+    connection fails
+
+    Does not store anything to the database; That is what the ChatConsumer is for.
+    """
+
+    def connect(self):
+        self.user = self.scope["user"]
+        if self.user is None or not self.user.is_authenticated:
+            raise DenyConnection("User not authenticated")
+
+        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
+        self.room_group_name = f"relay_{self.room_name}"
+        async_to_sync(self.channel_layer.group_add)(
+            self.room_group_name, self.channel_name
+        )
+        self.accept()
+        logger.info("'%s' joined relay '%s'", self.user, self.room_name)
+
+    def disconnect(self, close_code):
+        async_to_sync(self.channel_layer.group_discard)(
+            self.room_group_name, self.channel_name
+        )
+        logger.info("'%s' left relay '%s'", self.user, self.room_name)
+
+    def receive_json(self, content: dict, **kwargs):
+        content["type"] = "relay.message"
+        async_to_sync(self.channel_layer.group_send)(self.room_group_name, content)
+
+    def relay_message(self, message: dict):
+        self.send_json({k: v for k, v in message.items() if k != "type"})

@@ -18,6 +18,8 @@ import { GroupTestContainer } from "../../screening/controlroom.js";
 import { StudentCard } from "../../screening/controlroom.js";
 import { Student } from "../../screening/model.js";
 import { WebRTCChannel } from "../../webRTC.js";
+import { WebSocketChannel } from "../../webSocketChannel.js";
+import { resetSockets } from "../../ws.js";
 import { DetailsPopup } from "../../screening/controlroom.js";
 import { StudentPresenceIndicator } from "../../screening/controlroom.js";
 
@@ -2864,7 +2866,7 @@ describe("TeacherView _initSocket", () => {
     });
 
     it("wires the P2P channel to the P2P message handler", () => {
-        const p2pSpy = vi.spyOn(view, "_initP2PSocket");
+        const socketSpy = vi.spyOn(view, "_initTestSocket");
         const socketHandler = socket.addEventListener.mock.calls.find(
             (c) => c[0] === "message",
         )[1];
@@ -2878,7 +2880,7 @@ describe("TeacherView _initSocket", () => {
         });
 
         const [newChannel] = view.studentChannels[studentId];
-        expect(p2pSpy).toHaveBeenCalledWith(newChannel);
+        expect(socketSpy).toHaveBeenCalledWith(newChannel);
     });
 
     it("calls p2p.connect() when the peer connection opens", () => {
@@ -2904,6 +2906,85 @@ describe("TeacherView _initSocket", () => {
         openHandler();
 
         expect(p2p.connect).toHaveBeenCalledTimes(1);
+    });
+});
+
+describe("TeacherView websocket fallback", () => {
+    let socket;
+    let view;
+    let socketHandler;
+    const studentId = 88;
+
+    const announceFailure = (assignmentId = 1) =>
+        socketHandler({
+            data: JSON.stringify({
+                event: "webrtc.failed",
+                studentId,
+                assignmentId,
+            }),
+        });
+
+    const join = () =>
+        socketHandler({
+            data: JSON.stringify({
+                event: "student.joined",
+                studentId,
+                assignmentId: 1,
+            }),
+        });
+
+    beforeEach(() => {
+        vi.stubGlobal(
+            "WebSocket",
+            class extends EventTarget {
+                constructor(url) {
+                    super();
+                    this.url = url;
+                    this.readyState = 1;
+                    this.send = vi.fn();
+                }
+                static OPEN = 1;
+                static CLOSED = 3;
+                static CLOSING = 2;
+                static CONNECTING = 0;
+            },
+        );
+
+        socket = { addEventListener: vi.fn(), send: vi.fn() };
+        view = new TeacherView({ parts: [] }, 1, vi.fn().mockReturnValue(socket));
+        socketHandler = socket.addEventListener.mock.calls.find(
+            (c) => c[0] === "message",
+        )[1];
+    });
+
+    afterEach(() => {
+        resetSockets();
+        vi.unstubAllGlobals();
+        vi.clearAllMocks();
+    });
+
+    it("opens a websocket channel when webRTC fails", () => {
+        announceFailure();
+
+        const [channel] = view.studentChannels[studentId];
+        expect(channel).toBeInstanceOf(WebSocketChannel);
+    });
+
+    it("drops dead WebRTC channels", () => {
+        join();
+        const [p2p] = view.studentChannels[studentId];
+
+        announceFailure();
+
+        expect(p2p.close).toHaveBeenCalled();
+        expect(view.studentChannels[studentId]).toHaveLength(1);
+        expect(view.studentChannels[studentId][0]).toBeInstanceOf(WebSocketChannel);
+    });
+
+    it("ignores a failure announced for another assignment", () => {
+        expect(view.studentChannels[studentId]).toBeUndefined();
+        announceFailure(2);
+        expect(view.studentChannels[studentId]).toBeUndefined();
     });
 });
 
