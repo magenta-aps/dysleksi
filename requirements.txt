@@ -111,7 +111,7 @@ cffi==2.1.1
 charset-normalizer==3.5.1
 click==8.4.2
 constantly==23.10.4
-cryptography==50.0.0
+cryptography==50.0.1
 defusedxml==0.7.1
 django-appconf==1.2.0
 django-formtools==2.7
