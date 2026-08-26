@@ -5,6 +5,7 @@
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'dysleksi:class_list' %}">{% translate 'Klasser' %}</a></li>
+{% if class %}
 <li class="breadcrumb-item">
     <a href="{% url 'dysleksi:class_assignment_list' class_pk=class.pk %}">
         {% blocktranslate trimmed with class_name=class.name %}
@@ -12,6 +13,7 @@
         {% endblocktranslate %}
     </a>
 </li>
+{% endif %}
 <li class="breadcrumb-item active" aria-current="page">
     {{ test_assignment.student.get_full_name }} - {{ test_assignment.test.name }}
 </li>
