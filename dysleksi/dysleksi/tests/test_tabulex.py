@@ -17,7 +17,16 @@ from dysleksi.clients.tabulex import (
     TabulexClient,
 )
 from dysleksi.clients.tabulex_dummydata import Export
-from dysleksi.models import STUDENTS, TEACHERS, Class, Institution, Student, Teacher
+from dysleksi.models import (
+    READING_SUPERVISORS,
+    STUDENTS,
+    TEACHERS,
+    Class,
+    Institution,
+    ReadingSupervisor,
+    Student,
+    Teacher,
+)
 
 
 class TestTabulex(TestCase):
@@ -29,6 +38,7 @@ class TestTabulex(TestCase):
         )
         Group.objects.update_or_create(name=TEACHERS)
         Group.objects.update_or_create(name=STUDENTS)
+        Group.objects.update_or_create(name=READING_SUPERVISORS)
 
     @patch.object(TabulexClient, "client", new_callable=PropertyMock)
     @patch("builtins.print")
@@ -406,6 +416,90 @@ class TestTabulex(TestCase):
         self.assertIn("Updated teacher 1000000a18 (Henrik Sørensen)", printed_messages)
         a18_messages = printed_messages["Updated teacher 1000000a18 (Henrik Sørensen)"]
         self.assertIn("    removing old class 1.A Raketvidenskab", a18_messages)
+
+    def test_reading_supervisor(self):
+        # The role of a læsevejleder differs from school-to-school, so the dummy
+        # data holds one of each accepted spelling
+        cases = (
+            ("1000000a20", "Bendt Ledersen"),
+            ("1000000a22", "Vibeke Nielsen"),
+        )
+        self.tabulex_client.update_model("abc", False, False)
+        institution = Institution.objects.get(number="R00123")
+
+        for username, full_name in cases:
+            with self.subTest(username=username):
+                supervisor = ReadingSupervisor.objects.filter(username=username).first()
+                self.assertIsNotNone(supervisor)
+                self.assertEqual(supervisor.get_full_name(), full_name)
+                self.assertTrue(supervisor.is_reading_supervisor)
+                # A læsevejleder is not a teacher of any class, but can see all
+                # classes at the institution
+                self.assertFalse(Teacher.objects.filter(pk=supervisor.pk).exists())
+                self.assertQuerySetEqual(supervisor.institutions.all(), [institution])
+                self.assertQuerySetEqual(
+                    supervisor.accessible_classes,
+                    institution.classes.all(),
+                    ordered=False,
+                )
+
+    def test_reading_supervisor_takes_precedence_over_teacher(self):
+        # "1000000a23" is both "Leder" and "Lærer" in the dummy data. Being a
+        # læsevejleder wins, so no teacher is created and the classes listed on
+        # the employee are ignored
+        self.tabulex_client.update_model("abc", False, False)
+
+        supervisor = ReadingSupervisor.objects.get(username="1000000a23")
+        self.assertEqual(supervisor.get_full_name(), "Aputsiaq Lynge")
+        self.assertFalse(Teacher.objects.filter(pk=supervisor.pk).exists())
+        class_1a_matematik = Class.objects.get(group_id="1.A Matematik")
+        self.assertQuerySetEqual(
+            class_1a_matematik.teachers.all(),
+            Teacher.objects.filter(username="1000000a18"),
+        )
+
+    def test_reading_supervisor_multiple_institutions(self):
+        other_institution = Institution.objects.create(
+            number="R00456", name="En Anden Skole"
+        )
+        self.tabulex_client.update_model("abc", False, False)
+
+        supervisor = ReadingSupervisor.objects.get(username="1000000a20")
+        supervisor.institutions.add(other_institution)
+
+        # Importing the same institution again keeps the other institution
+        self.tabulex_client.update_model("abc", False, False)
+        self.assertQuerySetEqual(
+            supervisor.institutions.all(),
+            [Institution.objects.get(number="R00123"), other_institution],
+            ordered=False,
+        )
+
+    def test_reading_supervisor_from_dummydata(self):
+        with patch("builtins.print") as mock_print:
+            self.tabulex_client.update_model("abc", False, True)
+
+        supervisor = ReadingSupervisor.objects.get(username="1000000a20")
+        self.assertEqual(supervisor.get_full_name(), "Bendt Ledersen")
+        institution = Institution.objects.get(number="R00123")
+        self.assertQuerySetEqual(supervisor.institutions.all(), [institution])
+
+        printed_messages = self._parse_print(mock_print.mock_calls)
+        heading = "Created reading supervisor 1000000a20 (Bendt Ledersen)"
+        self.assertIn(heading, printed_messages)
+        self.assertIn(
+            "    adding institution ET Skole - ændret", printed_messages[heading]
+        )
+
+    def test_create_reading_supervisor_login(self):
+        self.assertFalse(
+            ReadingSupervisor.objects.filter(username="1000000a20").exists()
+        )
+        with override_settings(DEBUG=True):
+            self.tabulex_client.update_model("abc", False, False)
+        supervisor = ReadingSupervisor.objects.filter(username="1000000a20").first()
+        self.assertIsNotNone(supervisor)
+        self.assertTrue(supervisor.check_password("password"))
 
     def test_create_teacher_login(self):
         self.assertFalse(Teacher.objects.filter(username="1000000a18").exists())

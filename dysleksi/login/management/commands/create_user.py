@@ -5,7 +5,14 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 
-from dysleksi.models import STUDENTS, TEACHERS, Student, Teacher
+from dysleksi.models import (
+    READING_SUPERVISORS,
+    STUDENTS,
+    TEACHERS,
+    ReadingSupervisor,
+    Student,
+    Teacher,
+)
 
 User = get_user_model()
 
@@ -24,7 +31,9 @@ class Command(BaseCommand):
         groups = options.get("groups") or []
 
         user_class = User
-        if TEACHERS in groups:
+        if READING_SUPERVISORS in groups:
+            user_class = ReadingSupervisor
+        elif TEACHERS in groups:
             user_class = Teacher
         elif STUDENTS in groups:
             user_class = Student

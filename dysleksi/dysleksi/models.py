@@ -50,6 +50,7 @@ from dysleksi.exceptions import MissingIdException
 # they are present in the database as Group names, and rows are searched for by these
 TEACHERS = "Lærere"
 STUDENTS = "Elever"
+READING_SUPERVISORS = "Læsevejledere"
 
 logger = logging.getLogger(__name__)
 
@@ -156,6 +157,8 @@ class User(AbstractUser):
     def user_type(self) -> str:
         if self.is_superuser:
             return "Administrator"
+        if self.is_reading_supervisor:
+            return "Læsevejleder"
         if self.is_teacher:
             return "Lærer"
         if self.is_student:
@@ -165,6 +168,10 @@ class User(AbstractUser):
     @cached_property
     def is_teacher(self):
         return self.has_group(TEACHERS)
+
+    @cached_property
+    def is_reading_supervisor(self):
+        return self.has_group(READING_SUPERVISORS)
 
     @cached_property
     def is_student(self):
@@ -177,7 +184,11 @@ class User(AbstractUser):
         )
 
     def subclass_instance(self) -> "User":
-        if self.is_teacher:
+        # Læsevejledere are also in the TEACHERS group, so they must be
+        # checked before teachers
+        if self.is_reading_supervisor:
+            return ReadingSupervisor.objects.get_or_create(user_ptr=self)[0]
+        elif self.is_teacher:
             return Teacher.objects.get_or_create(user_ptr=self)[0]
         elif self.is_student:
             return Student.objects.get_or_create(user_ptr=self)[0]
@@ -293,6 +304,10 @@ class StudentQuerySet(PermissionsQuerySet):
         return "Student"
 
     def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_reading_supervisor:
+            # A læsevejleder sees every student at the schools they are linked to
+            institutions = user.institutions.all()  # type: ignore[attr-defined]
+            return self.filter(institution__in=institutions)
         if user.is_teacher:
             return self.filter(
                 institution=user.institution,  # type: ignore[attr-defined]
@@ -313,6 +328,7 @@ class Student(PermissionsMixin, User):
 
     is_student = True
     is_teacher = False
+    is_reading_supervisor = False
 
 
 @receiver(post_save, sender=Student)
@@ -331,12 +347,51 @@ class Teacher(User):
 
     is_student = False
     is_teacher = True
+    is_reading_supervisor = False
+
+    @property
+    def accessible_classes(self) -> "QuerySet[Class]":
+        return self.classes.all()
+
+    @property
+    def accessible_assignments(self) -> "QuerySet[TestAssignment]":
+        return TestAssignment.objects.filter_user_object_permissions(self, "view")
 
 
 @receiver(post_save, sender=Teacher)
 def on_update_teacher(sender, instance: Teacher, created: bool, **kwargs):
     if created:  # pragma: no branch
         instance.groups.add(Group.objects.get(name=TEACHERS))
+
+
+class ReadingSupervisor(User):
+
+    institutions = models.ManyToManyField(
+        Institution,
+        related_name="reading_supervisors",
+    )
+
+    is_student = False
+    # A reading supervisor is like a teacher. Just with access to all classes
+    is_teacher = True
+    is_reading_supervisor = True
+
+    @property
+    def accessible_classes(self) -> "QuerySet[Class]":
+        return Class.objects.filter(institution__in=self.institutions.all())
+
+    @property
+    def accessible_assignments(self) -> "QuerySet[TestAssignment]":
+        return TestAssignment.objects.filter_user_object_permissions(self, "view")
+
+
+@receiver(post_save, sender=ReadingSupervisor)
+def on_update_reading_supervisor(
+    sender, instance: ReadingSupervisor, created: bool, **kwargs
+):
+    if created:  # pragma: no branch
+        instance.groups.add(Group.objects.get(name=TEACHERS))
+        instance.groups.add(Group.objects.get(name=READING_SUPERVISORS))
 
 
 class ClassQuerySet(PermissionsQuerySet):
@@ -352,6 +407,10 @@ class ClassQuerySet(PermissionsQuerySet):
         return "Class"
 
     def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_reading_supervisor:
+            # A læsevejleder sees every class at the schools they are linked to
+            institutions = user.institutions.all()  # type: ignore[attr-defined]
+            return self.filter(institution__in=institutions)
         if user.is_teacher:
             return self.filter(
                 institution=user.institution,  # type: ignore[attr-defined]
@@ -532,6 +591,15 @@ class TestAssignmentQuerySet(PermissionsQuerySet):
         return "TestAssignment"
 
     def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_reading_supervisor:
+            # A læsevejleder sees the assignments of every class and student at
+            # the schools they are linked to, plus the ones they created themselves
+            institutions = user.institutions.all()  # type: ignore[attr-defined]
+            return self.filter(
+                Q(teacher=user)
+                | Q(klasse__institution__in=institutions)
+                | Q(student__institution__in=institutions)
+            )
         if user.is_teacher:
             return self.filter(teacher=user)
         if user.is_student:
@@ -630,7 +698,7 @@ class TestAssignment(PermissionsMixin, models.Model):
         null=False,
     )
     teacher = models.ForeignKey(
-        Teacher,
+        User,  # Teacher OR ReadingSupervisor
         on_delete=models.CASCADE,
         blank=False,
         null=False,
@@ -1381,6 +1449,9 @@ class TestResponseQuerySet(PermissionsQuerySet):
         return "Class"
 
     def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_reading_supervisor:
+            institutions = user.institutions.all()  # type: ignore[attr-defined]
+            return self.filter(student__institution__in=institutions)
         if user.is_teacher:
             return self.filter(assignment__teacher=user)
         return self.none()
@@ -1516,6 +1587,9 @@ class PartResponseQuerySet(PermissionsQuerySet):
         return "PartResponse"
 
     def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_reading_supervisor:
+            institutions = user.institutions.all()  # type: ignore[attr-defined]
+            return self.filter(testresponse__student__institution__in=institutions)
         if user.is_teacher:
             return self.filter(testresponse__assignment__teacher=user)
         return self.none()
@@ -1713,6 +1787,11 @@ class QuestionResponseQuerySet(PermissionsQuerySet):
         return "QuestionResponse"
 
     def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_reading_supervisor:
+            institutions = user.institutions.all()  # type: ignore[attr-defined]
+            return self.filter(
+                partresponse__testresponse__student__institution__in=institutions
+            )
         if user.is_teacher:
             return self.filter(partresponse__testresponse__assignment__teacher=user)
         return self.none()

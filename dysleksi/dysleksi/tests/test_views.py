@@ -17,7 +17,9 @@ from django.utils.translation import gettext_lazy as _
 from django.views import View
 
 from dysleksi.models import (
+    Class,
     CorrectnessCategory,
+    Institution,
     Student,
     Test,
     TestAssignment,
@@ -228,6 +230,29 @@ class TestClassListView(DysleksiTest):
         self.assertQuerySetEqual(
             response.context_data["object_list"],
             self.teacher.classes.all().order_by("school_year_start"),
+        )
+
+    def test_reading_supervisor_view(self):
+        # A class at `cls.school` that nobody teaches
+        other_class = self.create_class(2025, "9.Z", is_main=True)
+        # A class at a school the læsevejleder is not linked to
+        other_school = Institution.objects.create(number="test456", name="AndenSkole")
+        Class.objects.create(
+            institution=other_school,
+            school_year_start=2025,
+            name="9.Y",
+            group_id="9.Y",
+            is_main=True,
+        )
+        supervisor = self.create_reading_supervisor("Vejleder")
+
+        self.client.force_login(supervisor)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertQuerySetEqual(
+            response.context_data["object_list"],
+            [self.klasse, other_class],
+            ordered=False,
         )
 
 

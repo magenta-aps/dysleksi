@@ -14,6 +14,7 @@ from django.test.client import RequestFactory
 from django.utils import timezone
 
 from dysleksi.models import (
+    READING_SUPERVISORS,
     STUDENTS,
     TEACHERS,
     CategoryColorChoice,
@@ -25,6 +26,7 @@ from dysleksi.models import (
     QuestionResponse,
     QuestionType,
     ReadingSpeedCategory,
+    ReadingSupervisor,
     Student,
     Teacher,
     Test,
@@ -44,6 +46,7 @@ class DysleksiTest(TestCase):
         super().setUpTestData()
         Group.objects.get_or_create(name=TEACHERS)
         Group.objects.get_or_create(name=STUDENTS)
+        Group.objects.get_or_create(name=READING_SUPERVISORS)
         cls.school = cls.create_school(number="test123", name="TestSkolen")
         cls.klasse = cls.create_class(2025, "1.A", is_main=True)
         cls.student1 = cls.create_student(
@@ -398,6 +401,17 @@ class DysleksiTest(TestCase):
             defaults=kwargs,
         )
         return teacher
+
+    @classmethod
+    def create_reading_supervisor(
+        cls, username: str, *institutions: Institution, **kwargs
+    ) -> ReadingSupervisor:
+        supervisor, _ = ReadingSupervisor.objects.update_or_create(
+            username=username,
+            defaults=kwargs,
+        )
+        supervisor.institutions.set(institutions or [cls.school])
+        return supervisor
 
     @classmethod
     def create_student(cls, username: str, **kwargs) -> Student:

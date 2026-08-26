@@ -155,18 +155,15 @@ class NavigationMixin:
         current_class: Class | None,
         current_assignment: TestAssignment | None,
     ):
-        if self.user.is_teacher:  # type: ignore[attr-defined]
+        user = self.user  # type: ignore[attr-defined]
+        if user.is_teacher:
             # Add context for navigation menu (classes)
-            context_data["teacher_classes"] = Class.objects.filter(
-                teachers=self.user,  # type: ignore[attr-defined]
-            )
+            # For a læsevejleder this is every class at their schools
+            context_data["teacher_classes"] = user.accessible_classes
             context_data["current_class"] = current_class
             # Add context for navigation menu (results)
             context_data["teacher_results"] = (
-                TestAssignment.objects.filter(
-                    teacher=self.user,  # type: ignore[attr-defined]
-                )
-                .annotate_status()
+                user.accessible_assignments.annotate_status()
                 .filter(status=TestAssignmentStatus.COMPLETED)
                 .order_by("klasse__name", "student__last_name")
             )
@@ -352,7 +349,8 @@ class StudentListView(GroupRequiredMixin, SingleTableView):
     def get_queryset(self):
         qs = super().get_queryset()
         # Only show students belonging to the teacher viewing the page
-        qs = qs.filter(institution=self.user.institution, classes__teachers=self.user)
+        # (or, for a læsevejleder, to their schools)
+        qs = qs.filter_user_object_permissions(self.user, "view")
         return qs
 
 
