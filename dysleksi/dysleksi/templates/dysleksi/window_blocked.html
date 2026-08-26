@@ -18,9 +18,11 @@
                 og fortsæt i det vindue, hvor testen blev sat i gang.
             {% endblocktranslate %}
         </p>
+        {% if class %}
         <a class="btn btn-primary" href="{% url 'dysleksi:class_assignment_list' class_pk=class.pk %}">
             {% translate 'Tilbage til testoversigten' %}
         </a>
+        {% endif %}
         {% endif %}
     </div>
 </div>

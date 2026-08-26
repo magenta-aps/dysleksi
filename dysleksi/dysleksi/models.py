@@ -690,7 +690,10 @@ class TestAssignment(PermissionsMixin, models.Model):
         if self.klasse is not None:
             return self.klasse
         elif self.student is not None:
-            return self.student.classes.filter(is_main=True).first()
+            return (
+                self.student.classes.filter(is_main=True).first()
+                or self.student.classes.first()
+            )
         else:
             raise ValueError(  # pragma: no cover
                 "cannot get `class_for_nav` for %r" % self
