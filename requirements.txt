@@ -122,7 +122,7 @@ hyperlink==21.0.0
 idna==3.19
 Incremental==24.11.0
 libsass==0.23.0
-msgpack==1.2.1
+msgpack==1.2.2
 mypy_extensions==1.1.0
 packaging==26.3
 py-ubjson==0.16.1
