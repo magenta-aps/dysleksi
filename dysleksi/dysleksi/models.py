@@ -325,6 +325,8 @@ class StudentQuerySet(PermissionsQuerySet):
 class Student(PermissionsMixin, User):
     objects = StudentQuerySet.as_manager()  # type: ignore
 
+    history = HistoricalRecords()
+
     institution = models.ForeignKey(
         Institution,
         null=True,
@@ -336,6 +338,10 @@ class Student(PermissionsMixin, User):
     is_teacher = False
     is_reading_supervisor = False
 
+    class Meta:
+        verbose_name = _("elev")
+        verbose_name_plural = _("elever")
+
 
 @receiver(post_save, sender=Student)
 def on_update_student(sender, instance: Student, created: bool, **kwargs):
@@ -344,6 +350,8 @@ def on_update_student(sender, instance: Student, created: bool, **kwargs):
 
 
 class Teacher(User):
+    history = HistoricalRecords()
+
     institution = models.ForeignKey(
         Institution,
         null=True,
@@ -362,6 +370,10 @@ class Teacher(User):
     @property
     def accessible_assignments(self) -> "QuerySet[TestAssignment]":
         return TestAssignment.objects.filter_user_object_permissions(self, "view")
+
+    class Meta:
+        verbose_name = _("lærer")
+        verbose_name_plural = _("lærere")
 
 
 @receiver(post_save, sender=Teacher)
@@ -453,6 +465,9 @@ class Class(PermissionsMixin, models.Model):
 
     objects = ClassQuerySet.as_manager()
 
+    # Changes to class membership are audited too, hence the `m2m_fields`
+    history = HistoricalRecords(m2m_fields=["students", "teachers"])
+
     institution = models.ForeignKey(
         Institution,
         null=True,
@@ -516,9 +531,13 @@ class Class(PermissionsMixin, models.Model):
     class Meta:
         # Tilsammen identificerer disse tre en klasse unikt
         unique_together = ("institution", "group_id", "school_year_start")
+        verbose_name = _("klasse")
+        verbose_name_plural = _("klasser")
 
 
 class TestResource(models.Model):
+    history = HistoricalRecords()
+
     name = models.CharField(max_length=200, blank=False, null=False)
     image = models.ImageField(upload_to="images", blank=True, null=True)
     sound = models.FileField(upload_to="sounds", blank=True, null=True)
@@ -550,6 +569,8 @@ class TestResource(models.Model):
 
 
 class Test(models.Model):
+    history = HistoricalRecords()
+
     name = models.CharField(max_length=255)
 
     test_type = models.CharField(
@@ -697,6 +718,8 @@ class TestAssignment(PermissionsMixin, models.Model):
 
     objects = TestAssignmentQuerySet.as_manager()
 
+    history = HistoricalRecords()
+
     test = models.ForeignKey(
         Test,
         on_delete=models.CASCADE,
@@ -791,6 +814,8 @@ class TestPartResultsBreakdownRange(models.Model):
 
 
 class TestPart(models.Model):
+    history = HistoricalRecords(m2m_fields=["tests"])
+
     tests = models.ManyToManyField(
         Test,
         related_name="parts",
@@ -1201,6 +1226,8 @@ class TestQuestion(models.Model):
 
     objects = TestQuestionQuerySet.as_manager()
 
+    history = HistoricalRecords()
+
     part = models.ForeignKey(
         TestPart,
         on_delete=models.CASCADE,
@@ -1310,6 +1337,8 @@ class TestQuestion(models.Model):
 
 
 class InstructionSequence(models.Model):
+    history = HistoricalRecords()
+
     question = models.OneToOneField(
         TestQuestion,
         on_delete=models.CASCADE,
@@ -1331,6 +1360,8 @@ class InstructionSequence(models.Model):
 
 
 class Instruction(models.Model):
+    history = HistoricalRecords()
+
     sequence = models.ForeignKey(
         InstructionSequence,
         on_delete=models.CASCADE,
@@ -1413,6 +1444,8 @@ class Instruction(models.Model):
 
 
 class PossibleAnswer(models.Model):
+    history = HistoricalRecords()
+
     question = models.ForeignKey(
         TestQuestion,
         on_delete=models.CASCADE,
@@ -1545,6 +1578,8 @@ class TestResponseQuerySet(PermissionsQuerySet):
 class TestResponse(PermissionsMixin, models.Model):
 
     objects = TestResponseQuerySet.as_manager()
+
+    history = HistoricalRecords()
 
     def clean(self):
         if self.assignment.student is not None:
@@ -1781,6 +1816,8 @@ class PartResponse(PermissionsMixin, models.Model):
 
     objects = PartResponseQuerySet.as_manager()
 
+    history = HistoricalRecords()
+
     testresponse = models.ForeignKey(
         TestResponse,
         on_delete=models.CASCADE,
@@ -1840,6 +1877,8 @@ class QuestionResponseQuerySet(PermissionsQuerySet):
 class QuestionResponse(PermissionsMixin, models.Model):
 
     objects = QuestionResponseQuerySet.as_manager()
+
+    history = HistoricalRecords()
 
     question = models.ForeignKey(
         TestQuestion,

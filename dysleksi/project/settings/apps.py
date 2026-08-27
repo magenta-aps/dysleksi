@@ -18,6 +18,7 @@ INSTALLED_APPS = [
     "django_extended_makemessages",
     "adminsortable2",
     "simple_history",
+    "audit",
     "login",
     "compressor",
     "csp_helpers",

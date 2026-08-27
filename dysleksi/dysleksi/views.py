@@ -8,6 +8,7 @@ from functools import cached_property, partial
 from math import ceil
 from typing import Any, Dict, List, Set, Tuple
 
+from audit.view_mixins import DetailViewLogMixin, ListViewLogMixin
 from django.conf import settings
 from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
@@ -172,7 +173,11 @@ class NavigationMixin:
 
 
 class AssignmentView(
-    UserTypeMixin, ObjectPermissionsMixin, NavigationMixin, DetailView
+    UserTypeMixin,
+    ObjectPermissionsMixin,
+    NavigationMixin,
+    DetailViewLogMixin,
+    DetailView,
 ):
     model = TestAssignment
     context_object_name = "test_assignment"
@@ -312,12 +317,17 @@ class ClassDetailView(
     ObjectPermissionsMixin,
     SingleTableMixin,
     NavigationMixin,
+    DetailViewLogMixin,
     DetailView,
 ):
     model = Class
     table_class = ClassStudentTable
     groups_required = [TEACHERS]
     template_name = "dysleksi/admin/class/detail.html"
+
+    def get_logged_items(self):
+        # The page lists the students of the class, so log access to them too
+        return [self.object, *self.object.students.all()]
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -341,7 +351,7 @@ class ClassDetailView(
         return self.object.students.all()
 
 
-class StudentListView(GroupRequiredMixin, SingleTableView):
+class StudentListView(GroupRequiredMixin, ListViewLogMixin, SingleTableView):
     model = Student
     table_class = StudentTable
     groups_required = [TEACHERS]
@@ -356,7 +366,11 @@ class StudentListView(GroupRequiredMixin, SingleTableView):
 
 
 class StudentDetailView(
-    GroupRequiredMixin, ObjectPermissionsMixin, NavigationMixin, DetailView
+    GroupRequiredMixin,
+    ObjectPermissionsMixin,
+    NavigationMixin,
+    DetailViewLogMixin,
+    DetailView,
 ):
     model = Student
     groups_required = [TEACHERS]
@@ -386,7 +400,9 @@ class StudentDetailView(
         return context_data
 
 
-class TestAssignmentListView(GroupRequiredMixin, NavigationMixin, SingleTableView):
+class TestAssignmentListView(
+    GroupRequiredMixin, NavigationMixin, ListViewLogMixin, SingleTableView
+):
     model = TestAssignment
     table_class = TestAssignmentTable
     groups_required = [TEACHERS]
@@ -595,6 +611,7 @@ class AssignmentResultsView(
     PaginationMixin,
     ObjectPermissionsMixin,
     NavigationMixin,
+    DetailViewLogMixin,
     DetailView,
 ):
     # Results view of as Class' responses to an entire Test
@@ -602,6 +619,10 @@ class AssignmentResultsView(
     model = TestAssignment
     table_class = TestResultTable
     template_name = "dysleksi/admin/test_responses/group/list.html"
+
+    def get_logged_items(self):
+        # The page shows the results of every student in the class
+        return [self.object, *self.object.responses.all()]
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
@@ -799,7 +820,9 @@ class AssignmentResultsFlagView(GroupRequiredMixin, ObjectPermissionsMixin, Upda
         return JsonResponse({"flagged": self.object.flagged})
 
 
-class AssignmentPartResultsView(GroupRequiredMixin, ObjectPermissionsMixin, ListView):
+class AssignmentPartResultsView(
+    GroupRequiredMixin, ObjectPermissionsMixin, ListViewLogMixin, ListView
+):
     # Results view of as Class' responses to a single TestPart
     groups_required = [TEACHERS]
     model = PartResponse
@@ -911,6 +934,7 @@ class TestResponseView(
     PaginationMixin,
     ObjectPermissionsMixin,
     NavigationMixin,
+    DetailViewLogMixin,
     DetailView,
 ):
     # Results view of as Student's responses to an entire Test
@@ -1236,6 +1260,7 @@ class PartResponseView(
     ObjectPermissionsMixin,
     PaginationMixin,
     NavigationMixin,
+    DetailViewLogMixin,
     DetailView,
 ):
     # Results view of as Student's responses to a single TestPart

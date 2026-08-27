@@ -45,9 +45,18 @@ To begin a screening session, click "Start individueltest" in the teacher window
 
 ## Accessing Django admin
 
-In your browser, go to https://dysleksi-web/django-admin/, and log in using the credentials `admin/admin`.
+In your browser, go to https://dysleksi-web/django-admin/, and log in using the
+credentials `admin/admin`.
 
-The `admin` user is also a teacher, making it easy to edit data in the Django admin, and then trying out those changes in the teacher UI without switching users.
+The `admin` user is also a teacher, making it easy to edit data in the Django admin,
+and then trying out those changes in the teacher UI without switching users.
+
+The audit log (who-viewed-what) and login attempts can also be viewed in the
+django-admin:
+- https://dysleksi-web/django-admin/audit/loginattempt/
+- https://dysleksi-web/django-admin/audit/pageview/
+- https://dysleksi-web/django-admin/audit/itemview/
+
 
 ## Testing
 

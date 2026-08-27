@@ -13,6 +13,7 @@ from django.conf import settings
 from django.core import serializers
 from django.core.management import call_command
 from django.test.utils import override_settings
+from simple_history.models import HistoricalChanges
 
 from dysleksi.management.commands.import_test import remove_json_comments
 from dysleksi.management.commands.update_or_create_tests import answer_test
@@ -92,7 +93,11 @@ class CreateTests(DysleksiTest):
     def snapshot(self):
         # Serialize every row of every model, ordered by pk so the comparison
         # is stable. Captures field values too, not just row counts.
-        models = list(apps.get_app_config("dysleksi").get_models())
+        models = [
+            model
+            for model in apps.get_app_config("dysleksi").get_models()
+            if not issubclass(model, HistoricalChanges)
+        ]
         return {
             model._meta.label: serializers.serialize(
                 "json", model.objects.all().order_by("pk")

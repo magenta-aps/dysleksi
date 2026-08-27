@@ -17,6 +17,10 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: dysleksi/admin.py dysleksi/templates/dysleksi/base.html
+msgid "Dysleksi"
+msgstr ""
+
 #: dysleksi/forms.py
 msgid "Vælg testtype"
 msgstr ""
@@ -151,6 +155,34 @@ msgstr ""
 #: dysleksi/models.py
 msgid "UniLogin UniID"
 msgstr ""
+
+#: dysleksi/models.py
+msgid "elev"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "elever"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "lærer"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "lærere"
+msgstr ""
+
+#: dysleksi/models.py
+#, fuzzy
+#| msgid "Klasser"
+msgid "klasse"
+msgstr "Klassit"
+
+#: dysleksi/models.py
+#, fuzzy
+#| msgid "Klasser"
+msgid "klasser"
+msgstr "Klassit"
 
 #: dysleksi/models.py
 msgid "Student must match assignment."
@@ -897,10 +929,6 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
 msgid "Samlet overblik over score i deltest"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/base.html
-msgid "Dysleksi"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/staff.html

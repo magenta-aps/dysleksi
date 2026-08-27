@@ -18,6 +18,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: dysleksi/admin.py dysleksi/templates/dysleksi/base.html
+msgid "Dysleksi"
+msgstr ""
+
 #: dysleksi/forms.py
 msgid "Vælg testtype"
 msgstr ""
@@ -151,6 +155,30 @@ msgstr ""
 
 #: dysleksi/models.py
 msgid "UniLogin UniID"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "elev"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "elever"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "lærer"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "lærere"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "klasse"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "klasser"
 msgstr ""
 
 #: dysleksi/models.py
@@ -892,10 +920,6 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
 msgid "Samlet overblik over score i deltest"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/base.html
-msgid "Dysleksi"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/staff.html
