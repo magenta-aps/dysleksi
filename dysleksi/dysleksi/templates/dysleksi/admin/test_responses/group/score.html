@@ -3,7 +3,7 @@
         <div class="result-score category-{{ category.color_key }}"
              data-proportion="{{ record|get:proportion_key }}"
         >
-            {{ value }}
+            {{ value|floatformat:"-1" }}
         </div>
     {% endwith %}
 {% endwith %}

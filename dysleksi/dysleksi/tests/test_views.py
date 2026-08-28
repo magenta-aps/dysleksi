@@ -931,11 +931,15 @@ class TestAssignmentPartResultsView(ResponseTest):
 
         self.assertEqual(answer1.responses_count, 4)
         self.assertEqual(answer1.correct_count, 4)
+        self.assertEqual(answer1.almost_correct_count, 0)
+        self.assertEqual(answer1.score, 4)
         self.assertEqual(answer1.correct_proportion, 1.0)
         self.assertEqual(answer1.correct_percentage, 100)
 
         self.assertEqual(answer2.responses_count, 4)
         self.assertEqual(answer2.correct_count, 1)
+        self.assertEqual(answer2.almost_correct_count, 0)
+        self.assertEqual(answer2.score, 1)
         self.assertEqual(answer2.correct_proportion, 0.25)
         self.assertEqual(answer2.correct_percentage, 25)
 
@@ -996,11 +1000,12 @@ class TestAssignmentPartResultsView(ResponseTest):
                     ["Elev"],
                     ["Forsøgte"],
                     ["Rigtige"],
+                    ["Næsten rigtige"],
                     ["Rigtighedsprocent"],
                     ["Normscore (0-100)"],
                 ],
-                [["Test1 Elev"], ["4"], ["4"], ["100%"], ["100"]],
-                [["Test2 Elev"], ["4"], ["1"], ["25%"], ["25"]],
+                [["Test1 Elev"], ["4"], ["4"], ["0"], ["100%"], ["100"]],
+                [["Test2 Elev"], ["4"], ["1"], ["0"], ["25%"], ["25"]],
             ],
         )
 
@@ -1067,14 +1072,20 @@ class TestTestResponseView(ResponseTest):
                     part_key_2: 1,
                 },
                 {
+                    "data_category": "Antal næsten rigtige",
+                    f"{part_key_1}_lette_ord": 1,
+                    f"{part_key_1}_nemme_ord": 0,
+                    part_key_2: 0,
+                },
+                {
                     "data_category": "Rigtighedsprocent",
-                    f"{part_key_1}_lette_ord": "0 %",
+                    f"{part_key_1}_lette_ord": "50 %",
                     f"{part_key_1}_nemme_ord": "100 %",
                     part_key_2: "100 %",
                 },
                 {
                     "data_category": "Normscore",
-                    f"{part_key_1}_lette_ord": "0 %",
+                    f"{part_key_1}_lette_ord": "25 %",
                     f"{part_key_1}_nemme_ord": "50 %",
                     part_key_2: "50 %",
                 },
@@ -1089,9 +1100,9 @@ class TestTestResponseView(ResponseTest):
             ],
             [
                 "Bedømmelse",
-                "Elendigt;Se elevens svar",
-                "Over middel;Se elevens svar",
-                "Over middel;Se elevens svar",
+                "Under middel;Se elevens svar",
+                "Middel;Se elevens svar",
+                "Middel;Se elevens svar",
                 "",
             ],
         )
@@ -1120,7 +1131,7 @@ class TestTestResponseView(ResponseTest):
                 },
                 {
                     "data_category": "Antal oversprungne",
-                    f"{part_key_1}_lette_ord": 1,
+                    f"{part_key_1}_lette_ord": 0,
                     f"{part_key_1}_nemme_ord": 0,
                     part_key_2: None,
                 },
@@ -1131,14 +1142,20 @@ class TestTestResponseView(ResponseTest):
                     part_key_2: None,
                 },
                 {
+                    "data_category": "Antal næsten rigtige",
+                    f"{part_key_1}_lette_ord": 1,
+                    f"{part_key_1}_nemme_ord": 0,
+                    part_key_2: None,
+                },
+                {
                     "data_category": "Rigtighedsprocent",
-                    f"{part_key_1}_lette_ord": "0 %",
+                    f"{part_key_1}_lette_ord": "50 %",
                     f"{part_key_1}_nemme_ord": "100 %",
                     part_key_2: None,
                 },
                 {
                     "data_category": "Normscore",
-                    f"{part_key_1}_lette_ord": "0 %",
+                    f"{part_key_1}_lette_ord": "50 %",
                     f"{part_key_1}_nemme_ord": "100 %",
                     part_key_2: None,
                 },
@@ -1153,8 +1170,8 @@ class TestTestResponseView(ResponseTest):
             ],
             [
                 "Bedømmelse",
+                "Middel;Se elevens svar",
                 "Over middel;Se elevens svar",
-                "Elendigt;Se elevens svar",
                 "Ikke fuldført",
                 "",
             ],
@@ -1178,15 +1195,16 @@ class TestTestResponseView(ResponseTest):
                 [[], ["WordSpelling (2 opg.)"], ["SentenceReading (1 opg.)"], []],
                 [["Lette ord (1 opg.)"], ["Nemme ord (1 opg.)"]],
                 [["Antal forsøgte"], ["1"], ["1"], ["1"], []],
-                [["Antal oversprungne"], ["1"], ["0"], ["0"], []],
+                [["Antal oversprungne"], ["0"], ["0"], ["0"], []],
                 [["Antal rigtige"], ["0"], ["1"], ["1"], []],
-                [["Rigtighedsprocent"], ["0 %"], ["100 %"], ["100 %"], []],
-                [["Normscore"], ["0 %"], ["100 %"], ["100 %"], []],
+                [["Antal næsten rigtige"], ["1"], ["0"], ["0"], []],
+                [["Rigtighedsprocent"], ["50 %"], ["100 %"], ["100 %"], []],
+                [["Normscore"], ["50 %"], ["100 %"], ["100 %"], []],
                 [
                     ["Bedømmelse"],
+                    ["Middel", "Se elevens svar"],
                     ["Over middel", "Se elevens svar"],
-                    ["Elendigt", "Se elevens svar"],
-                    ["Elendigt", "Se elevens svar"],
+                    ["Over middel", "Se elevens svar"],
                     [],
                 ],
             ],
@@ -1240,7 +1258,7 @@ class TestTestResponseView(ResponseTest):
             table.data.data[1],
             {
                 "data_category": "Antal oversprungne",
-                part_key_a: 1,
+                part_key_a: 0,
                 part_key_b: 0,
                 part_key_c: 0,
             },
@@ -1257,17 +1275,26 @@ class TestTestResponseView(ResponseTest):
         self.assertEqual(
             table.data.data[3],
             {
-                "data_category": "Rigtighedsprocent",
-                part_key_a: "0 %",
-                part_key_b: "100 %",
-                part_key_c: "100 %",
+                "data_category": "Antal næsten rigtige",
+                part_key_a: 1,
+                part_key_b: 0,
+                part_key_c: 0,
             },
         )
         self.assertEqual(
             table.data.data[4],
             {
+                "data_category": "Rigtighedsprocent",
+                part_key_a: "50 %",
+                part_key_b: "100 %",
+                part_key_c: "100 %",
+            },
+        )
+        self.assertEqual(
+            table.data.data[5],
+            {
                 "data_category": "Normscore",
-                part_key_a: "0 %",
+                part_key_a: "50 %",
                 part_key_b: "100 %",
                 part_key_c: "100 %",
             },
@@ -1282,9 +1309,12 @@ class TestTestResponseView(ResponseTest):
             ],
             [
                 "Bedømmelse",
+                # 0,5 rigtige ud af 1 opgave
+                "Middel;Se elevens svar",
+                # 1 rigtig ud af 1 opgave
                 "Over middel;Se elevens svar",
-                "Elendigt;Se elevens svar",
-                "Elendigt;Se elevens svar",
+                # 1 rigtig ud af 1 opgave
+                "Over middel;Se elevens svar",
             ],
         )
 
@@ -1295,7 +1325,7 @@ class TestTestResponseView(ResponseTest):
             assignment_pk=self.test_assignment_student.pk,
             response_pk=self.test_response_student.pk,
         )
-        self.assertEqual(view.get_plot_data(), [0, 100, 100])
+        self.assertEqual(view.get_plot_data(), [50, 100, 100])
 
     def test_get_part_names(self):
         view = self.setup_view(
@@ -1625,7 +1655,7 @@ class TestPartResponseView(ResponseTest):
             [
                 [["Opg."], ["Billede"], ["Rigtigt svar"], ["Elevens svar"], ["Tid"]],
                 [["1"], [], [], ["TestOrd"], ["3 sek."]],
-                [["2"], [], ["TestOrd"], [], ["4 sek."]],
+                [["2"], [], ["TestOrd"], ["TestOrd"], ["4 sek."]],
                 [["3"], [], [], [], ["5 sek."]],
                 [["4"], [], [], [], ["6 sek."]],
                 [[], [], [], [], ["18 sek."]],
