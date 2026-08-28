@@ -24,7 +24,7 @@ daphne==4.2.3
 whitenoise==6.12.0
 
 ## Bootstrap-layout
-django-bootstrap5==26.2
+django-bootstrap5==26.3
 
 ## Table layout
 django-tables2==3.0.0
