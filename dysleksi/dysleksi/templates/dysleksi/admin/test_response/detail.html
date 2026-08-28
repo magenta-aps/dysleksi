@@ -111,7 +111,7 @@
                 <tbody>
                 {% localize off %}
                     {% for pk, category in CorrectnessCategories.items reversed %}
-                        <tr style="height: {{ category.width_pct }}%">
+                        <tr style="height: calc({{ category.width_pct }} * var(--plot-canvas-height) / 100)">
                             {% for part_pk, part_naming in part_names.items %}
                                 {% with part_name=part_naming.0 subpart_names=part_naming.1 %}
                                 <td class="plot-table-x-category-cell category-{{ category.color_key }}" colspan="{{ subpart_names|length }}"></td>
