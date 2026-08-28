@@ -207,8 +207,6 @@ h1, h2, h3, h4, h5, h6 {
     &.selected {
       background-color: $student-green-light !important;
       box-shadow: $dark-green-button-shadow;
-      width: 210px !important;
-      height: 105px !important;
     }
 
     // Only apply hover styling on devices with a real hovering pointer (mouse).
@@ -218,8 +216,6 @@ h1, h2, h3, h4, h5, h6 {
       &:not(.no-hover):hover {
         background-color: $student-green-light !important;
         box-shadow: $dark-green-button-shadow;
-        width: 210px !important;
-        height: 105px !important;
       }
     }
   }
@@ -239,8 +235,6 @@ h1, h2, h3, h4, h5, h6 {
     &.selected {
       background-color: $student-red-light !important;
       box-shadow: $dark-red-button-shadow;
-      width: 210px !important;
-      height: 105px !important;
     }
 
     // Only apply hover styling on devices with a real hovering pointer (mouse).
@@ -250,8 +244,6 @@ h1, h2, h3, h4, h5, h6 {
       &:not(.no-hover):hover {
         background-color: $student-red-light !important;
         box-shadow: $dark-red-button-shadow;
-        width: 210px !important;
-        height: 105px !important;
       }
     }
   }
@@ -522,7 +514,7 @@ body.show-instructions {
   }
 
   &.true-false-layout {
-    min-height: 105px;  // adjust for buttons growing from 100px to 105px height on hover+select
+    min-height: 100px;
     gap: 32px;
   }
 
