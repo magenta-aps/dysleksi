@@ -1629,10 +1629,10 @@ $border-radius-student-card: $spacer / 4 * 3;
 
     .plot-table {
       table-layout:fixed;
-      height: var(--plot-canvas-height);
       position: relative;
       margin-bottom: 0;
       tbody {
+        height: var(--plot-canvas-height);
         td {
           opacity: 0.5;
         }
