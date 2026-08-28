@@ -580,6 +580,66 @@
       },
       {
         "Person": {
+          "FirstName": "Bendt",
+          "FamilyName": "Ledersen",
+          "UserId": "1000000a20"
+        },
+        "Student": null,
+        "Employee": {
+          "Role": [
+            "Ledelse"
+          ],
+          "ShortName": "BL",
+          "Occupation": "Skoleleder",
+          "Location": null,
+          "GroupId": []
+        },
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Vibeke",
+          "FamilyName": "Nielsen",
+          "UserId": "1000000a22"
+        },
+        "Student": null,
+        "Employee": {
+          "Role": [
+            "Leder"
+          ],
+          "ShortName": "VN",
+          "Occupation": "Viceskoleleder",
+          "Location": null,
+          "GroupId": []
+        },
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
+          "FirstName": "Aputsiaq",
+          "FamilyName": "Lynge",
+          "UserId": "1000000a23"
+        },
+        "Student": null,
+        "Employee": {
+          "Role": [
+            "Leder",
+            "Lærer"
+          ],
+          "ShortName": "AL",
+          "Occupation": "Afdelingsleder",
+          "Location": null,
+          "GroupId": [
+            "1.A Matematik"
+          ]
+        },
+        "Extern": null,
+        "source": "testdata"
+      },
+      {
+        "Person": {
           "FirstName": "Larsine",
           "FamilyName": "Chemnitz",
           "UserId": "1000000a21"

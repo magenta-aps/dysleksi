@@ -3,17 +3,14 @@
 # SPDX-License-Identifier: MPL-2.0
 from datetime import date
 
-from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 
-from dysleksi.models import Class, Institution, Student, Teacher
+from dysleksi.models import Class, Institution, ReadingSupervisor, Student, Teacher
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
 
-        teacher_group = Group.objects.get(name="Lærere")
-        student_group = Group.objects.get(name="Elever")
         school, _ = Institution.objects.get_or_create(name="TestSkolen", number="1234")
 
         # Create teacher who is in idp
@@ -31,7 +28,6 @@ class Command(BaseCommand):
         )
         if created:
             teacher.set_password("lærer")
-            teacher.groups.add(teacher_group)
             teacher.save()
 
         # Create teacher who is not in idp (for easy-access on an ipad)
@@ -49,7 +45,6 @@ class Command(BaseCommand):
         )
         if created:
             teacher2.set_password("lærer")
-            teacher2.groups.add(teacher_group)
             teacher2.save()
 
         # Create teacher who is also an admin (to access Django admin *and* teacher UI)
@@ -67,8 +62,24 @@ class Command(BaseCommand):
         )
         if created:
             teacher3.set_password("admin")
-            teacher3.groups.add(teacher_group)
             teacher3.save()
+
+        # Create læsevejleder, who can see all classes at the school
+        reading_supervisor, created = ReadingSupervisor.objects.update_or_create(
+            username="læsevejleder",
+            defaults={
+                "is_staff": False,
+                "is_superuser": False,
+                "first_name": "Læsevejleder",
+                "last_name": "Vejledersen",
+                "cpr": "0222222225",
+                "uniid": "0222222225",
+            },
+        )
+        if created:
+            reading_supervisor.set_password("læsevejleder")
+            reading_supervisor.save()
+        reading_supervisor.institutions.add(school)
 
         # Create student who is in idp
         student, created = Student.objects.update_or_create(
@@ -85,7 +96,6 @@ class Command(BaseCommand):
         )
         if created:
             student.set_password("elev")
-            student.groups.add(student_group)
 
         # Create dummy student
         student2, created = Student.objects.update_or_create(
@@ -102,7 +112,6 @@ class Command(BaseCommand):
         )
         if created:
             student2.set_password("elev2")
-            student2.groups.add(student_group)
 
         # Create student who is not in idp (for easy-access on an ipad)
         student3, created = Student.objects.update_or_create(
@@ -118,7 +127,6 @@ class Command(BaseCommand):
         )
         if created:
             student3.set_password("elev")
-            student3.groups.add(student_group)
             student3.save()
 
         # create some more students for group-test-testing
@@ -138,7 +146,6 @@ class Command(BaseCommand):
             )
             if created:
                 group_test_student.set_password(f"elev{student_id}")
-                group_test_student.groups.add(student_group)
                 group_test_student.save()
             group_test_students.append(group_test_student)
 

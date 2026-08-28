@@ -5,7 +5,7 @@
 from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 
-from dysleksi.models import STUDENTS, TEACHERS
+from dysleksi.models import READING_SUPERVISORS, STUDENTS, TEACHERS
 
 
 class Command(BaseCommand):
@@ -19,4 +19,7 @@ class Command(BaseCommand):
         )
         student_group, _ = Group.objects.update_or_create(
             name=STUDENTS,
+        )
+        reading_supervisor_group, _ = Group.objects.update_or_create(
+            name=READING_SUPERVISORS,
         )

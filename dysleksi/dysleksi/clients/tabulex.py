@@ -25,7 +25,16 @@ from zeep.wsse.signature import (
 )
 
 from dysleksi.clients.tabulex_dummydata import Export
-from dysleksi.models import STUDENTS, TEACHERS, Class, Institution, Student, Teacher
+from dysleksi.models import (
+    READING_SUPERVISORS,
+    STUDENTS,
+    TEACHERS,
+    Class,
+    Institution,
+    ReadingSupervisor,
+    Student,
+    Teacher,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -249,6 +258,7 @@ class DysleksiTabulexClient(TabulexClient):
 
         Group.objects.update_or_create(name=TEACHERS)
         Group.objects.update_or_create(name=STUDENTS)
+        Group.objects.update_or_create(name=READING_SUPERVISORS)
 
         if load_remote and institution_number is not None:
             data = self.export_xml(institution_number)  # pragma: no cover
@@ -285,7 +295,7 @@ class DysleksiTabulexClient(TabulexClient):
             if verbose:  # pragma: no branch
                 print(f"{('Created' if created else 'Updated')} class {cls.name}")
 
-        # Loop people, create/update Students/Teachers
+        # Loop people, create/update Students/Teachers/ReadingSupervisors
         for institution_person in institution_data.InstitutionPerson:
             if institution_person.Student is not None and self._is_or_contains_any(
                 institution_person.Student.Role, "Elev"
@@ -354,7 +364,37 @@ class DysleksiTabulexClient(TabulexClient):
                         print(f"    adding new class {new_class.name}")
                     student.classes.add(new_class)
 
+            # NOTE: Is "ledelse" or "Leder" the proper role for a "Læsevejleder"?
+            # The actual name of the læsevejleder role likely differs from
+            # school-to-school.
+            #
+            # If new roles which should receive a "læsevejleder" login show up, this
+            # if-statement check should be extended.
             if institution_person.Employee is not None and self._is_or_contains_any(
+                institution_person.Employee.Role, "Ledelse", "Leder"
+            ):
+                supervisor, created = ReadingSupervisor.objects.update_or_create(
+                    username=institution_person.Person.UserId,
+                    defaults={
+                        "first_name": institution_person.Person.FirstName,
+                        "last_name": institution_person.Person.FamilyName,
+                        "uniid": institution_person.Person.UserId,
+                    },
+                )
+                if verbose:  # pragma: no branch
+                    print(
+                        f"{('Created' if created else 'Updated')} reading supervisor "
+                        f"{supervisor.username} ({supervisor.get_full_name()})"
+                    )
+                if settings.DEBUG and created:
+                    supervisor.set_password("password")
+                    supervisor.save()
+                if institution_object not in supervisor.institutions.all():
+                    if verbose:  # pragma: no branch
+                        print(f"    adding institution {institution_object.name}")
+                    supervisor.institutions.add(institution_object)
+
+            elif institution_person.Employee is not None and self._is_or_contains_any(
                 institution_person.Employee.Role, "Pædagog", "Lærer"
             ):
                 teacher, created = Teacher.objects.update_or_create(

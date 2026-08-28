@@ -36,6 +36,7 @@ To login using username/password, go to https://dysleksi-web/login/forward/djang
 | Teacher 1                               | Username/password | `0222222222`     | `lærer`          |
 | Teacher 2                               | Username/password | `lærer`          | `lærer`          |
 | Teacher 3 (admin)                       | Username/password | `admin`          | `admin`          |
+| Læsevejleder (sees all classes)         | Username/password | `læsevejleder`   | `læsevejleder`   |
 | Student 1                               | UniLogin/MitID    | `elev@dys.gl`    | `elev`           |
 | Student 2                               | UniLogin/MitID    | `elev2@dys.gl`   | `elev2`          |
 | Student 3 ("Steve Jobs", iPad testing)  | Username/password | `elev`           | `elev`           |

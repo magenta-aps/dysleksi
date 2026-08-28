@@ -17,6 +17,7 @@ from django.utils import timezone
 from freezegun import freeze_time
 
 from dysleksi.models import (
+    READING_SUPERVISORS,
     STUDENTS,
     TEACHERS,
     CategoryColorChoice,
@@ -25,6 +26,7 @@ from dysleksi.models import (
     ClassTestStatus,
     Correctness,
     CorrectnessCategory,
+    Institution,
     Instruction,
     InstructionAction,
     InstructionSequence,
@@ -34,6 +36,7 @@ from dysleksi.models import (
     PossibleAnswer,
     QuestionResponse,
     ReadingSpeedCategory,
+    ReadingSupervisor,
     Student,
     Test,
     TestAssignment,
@@ -74,6 +77,115 @@ class TestUser(DysleksiTest):
         for user, expected_groupname in cases:
             with self.subTest(user=user, expected_str=expected_groupname):
                 self.assertTrue(user.has_group(expected_groupname))
+
+
+class TestReadingSupervisor(DysleksiTest):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        # A second school, where the læsevejleder also works
+        cls.other_school = Institution.objects.create(
+            number="test456", name="DenAndenSkole"
+        )
+        cls.other_school_class = Class.objects.create(
+            institution=cls.other_school,
+            school_year_start=2025,
+            name="3.C",
+            group_id="3.C",
+            is_main=True,
+        )
+        # A class at a school the læsevejleder is *not* linked to
+        cls.third_school = Institution.objects.create(
+            number="test789", name="DenTredjeSkole"
+        )
+        cls.third_school_class = Class.objects.create(
+            institution=cls.third_school,
+            school_year_start=2025,
+            name="5.B",
+            group_id="5.B",
+            is_main=True,
+        )
+        # `cls.klasse` belongs to `cls.school` and has no relation to the
+        # læsevejleder other than through the school
+        cls.supervisor = cls.create_reading_supervisor(
+            "TestLæsevejleder",
+            cls.school,
+            cls.other_school,
+            first_name="Test",
+            last_name="Læsevejleder",
+        )
+
+    def test_str(self):
+        self.assertEqual(
+            str(self.supervisor),
+            f"Test Læsevejleder (type=Læsevejleder, pk={self.supervisor.pk})",
+        )
+
+    def test_groups(self):
+        # A læsevejleder has the same access as a teacher, and is thus also a
+        # member of the teacher group
+        self.assertTrue(self.supervisor.has_group(READING_SUPERVISORS))
+        self.assertTrue(self.supervisor.has_group(TEACHERS))
+        self.assertTrue(self.supervisor.is_reading_supervisor)
+        self.assertTrue(self.supervisor.is_teacher)
+        self.assertFalse(self.teacher.is_reading_supervisor)
+
+    def test_subclass_instance(self):
+        user = User.objects.get(pk=self.supervisor.pk)
+        subclass_instance = user.subclass_instance()
+        self.assertIsInstance(subclass_instance, ReadingSupervisor)
+        self.assertEqual(subclass_instance, self.supervisor)
+
+    def test_not_a_teacher_of_the_class(self):
+        self.assertQuerySetEqual(self.klasse.teachers.all(), [self.teacher])
+
+    def test_accessible_classes(self):
+        self.assertQuerySetEqual(
+            self.supervisor.accessible_classes,
+            [self.klasse, self.other_school_class],
+            ordered=False,
+        )
+
+    def test_class_permissions(self):
+        self.assertQuerySetEqual(
+            Class.objects.filter_user_permissions(self.supervisor, "view"),
+            [self.klasse, self.other_school_class],
+            ordered=False,
+        )
+        self.assertTrue(self.klasse.has_permission(self.supervisor, "view"))
+        self.assertFalse(
+            self.third_school_class.has_permission(self.supervisor, "view")
+        )
+
+    def test_student_permissions(self):
+        self.assertQuerySetEqual(
+            Student.objects.filter_user_permissions(self.supervisor, "view"),
+            [self.student1, self.student2],
+            ordered=False,
+        )
+
+    def test_assignment_permissions(self):
+        # Both assignments belong to `cls.klasse`/`cls.student1` at `cls.school`
+        self.assertQuerySetEqual(
+            TestAssignment.objects.filter_user_permissions(self.supervisor, "view"),
+            [self.test_assignment_student, self.test_assignment_class],
+            ordered=False,
+        )
+
+    def test_can_be_assigned_a_test(self):
+        assignment = TestAssignment.objects.create(
+            test=self.group_test,
+            teacher=self.supervisor,
+            klasse=self.other_school_class,
+        )
+        self.assertIn(
+            assignment,
+            TestAssignment.objects.filter_user_permissions(self.supervisor, "view"),
+        )
+        self.assertNotIn(
+            assignment,
+            TestAssignment.objects.filter_user_permissions(self.teacher, "view"),
+        )
 
 
 class TestStudentQuerySet(DysleksiTest):
@@ -244,6 +356,29 @@ class TestPartResponse(ResponseTest):
             ).order_by("pk"),
         )
 
+    def test_access_reading_supervisor(self):
+        # A læsevejleder sees the part responses of every student at the schools
+        # they are linked to
+        supervisor = self.create_reading_supervisor("Læsevejleder", self.school)
+        self.assertQuerySetEqual(
+            PartResponse.objects.filter_user_permissions(supervisor, "view").order_by(
+                "pk"
+            ),
+            PartResponse.objects.filter(
+                pk__in=(self.group_partresponse_1.pk, self.group_partresponse_2.pk)
+            ).order_by("pk"),
+        )
+        other_school = Institution.objects.create(
+            number="test456", name="DenAndenSkole"
+        )
+        other_supervisor = self.create_reading_supervisor(
+            "AndenLæsevejleder", other_school
+        )
+        self.assertQuerySetEqual(
+            PartResponse.objects.filter_user_permissions(other_supervisor, "view"),
+            PartResponse.objects.none(),
+        )
+
 
 class TestQuestionResponse(ResponseTest):
 
@@ -305,6 +440,27 @@ class TestQuestionResponse(ResponseTest):
                     self.group_questionresponse_2_4.pk,
                 )
             ).order_by("pk"),
+        )
+
+    def test_access_reading_supervisor(self):
+        # A læsevejleder sees the question responses of every student at the
+        # schools they are linked to
+        supervisor = self.create_reading_supervisor("Læsevejleder", self.school)
+        self.assertQuerySetEqual(
+            QuestionResponse.objects.filter_user_permissions(
+                supervisor, "view"
+            ).order_by("pk"),
+            QuestionResponse.objects.all().order_by("pk"),
+        )
+        other_school = Institution.objects.create(
+            number="test456", name="DenAndenSkole"
+        )
+        other_supervisor = self.create_reading_supervisor(
+            "AndenLæsevejleder", other_school
+        )
+        self.assertQuerySetEqual(
+            QuestionResponse.objects.filter_user_permissions(other_supervisor, "view"),
+            QuestionResponse.objects.none(),
         )
 
 
@@ -607,6 +763,27 @@ class TestTestResponse(ResponseTest):
             TestResponse.objects.filter(assignment__teacher=self.teacher).order_by(
                 "pk"
             ),
+        )
+
+    def test_access_reading_supervisor(self):
+        # A læsevejleder sees the test responses of every student at the schools
+        # they are linked to
+        supervisor = self.create_reading_supervisor("Læsevejleder", self.school)
+        self.assertQuerySetEqual(
+            TestResponse.objects.filter_user_permissions(supervisor, "view").order_by(
+                "pk"
+            ),
+            TestResponse.objects.all().order_by("pk"),
+        )
+        other_school = Institution.objects.create(
+            number="test456", name="DenAndenSkole"
+        )
+        other_supervisor = self.create_reading_supervisor(
+            "AndenLæsevejleder", other_school
+        )
+        self.assertQuerySetEqual(
+            TestResponse.objects.filter_user_permissions(other_supervisor, "view"),
+            TestResponse.objects.none(),
         )
 
 

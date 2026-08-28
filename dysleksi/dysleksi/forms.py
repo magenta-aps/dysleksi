@@ -151,7 +151,7 @@ class StartIndividualRoomForm(DynamicFormMixin, StartRoomForm):
         StudentChoiceField,
         label=_("Vælg elev"),
         queryset=lambda form: Student.objects.filter(
-            classes__in=form.teacher.classes.all()
+            classes__in=form.teacher.accessible_classes
         )
         .distinct()
         .prefetch_related("classes")
@@ -186,7 +186,7 @@ class StartClassRoomForm(DynamicFormMixin, StartRoomForm):
     klasse = DynamicField(
         ModelChoiceField,
         label=_("Vælg klasse"),
-        queryset=lambda form: form.teacher.classes.all().order_by("name"),
+        queryset=lambda form: form.teacher.accessible_classes.order_by("name"),
     )
 
     test = DynamicField(
