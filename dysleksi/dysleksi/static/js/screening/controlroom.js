@@ -1,5 +1,6 @@
 import { Student } from "./model.js";
 import { WebRTCChannel } from "../webRTC.js";
+import { WebSocketChannel } from "../webSocketChannel.js";
 import { serverOnline } from "./utils.js";
 import { gettext, blocktranslate } from "../i18n.js";
 import { Modal } from "bootstrap";
@@ -1420,8 +1421,8 @@ export class TeacherView {
         );
     }
 
-    _initP2PSocket(p2p) {
-        p2p.addEventListener("message", (e) => {
+    _initTestSocket(channel) {
+        channel.addEventListener("message", (e) => {
             const data = e.detail;
 
             if (this.test.testType === "individual") {
@@ -1569,11 +1570,7 @@ export class TeacherView {
                 console.log("Setting up webRTC channel for student", data.studentId);
 
                 const p2p = new WebRTCChannel();
-                this.studentChannels[data.studentId] = [
-                    ...(this.studentChannels[data.studentId] || []),
-                    p2p,
-                ];
-                this._initP2PSocket(p2p);
+                this._addStudentChannel(data.studentId, p2p);
 
                 p2p.addEventListener("close", () => {
                     console.log("Connection closed for student", data.studentId);
@@ -1585,10 +1582,37 @@ export class TeacherView {
                 });
             }
 
+            // Local P2P connection failed. Shift to webSocket communication over the
+            // server (which does not work offline)
+            if (
+                data.event === "webrtc.failed" &&
+                data.assignmentId === this.assignmentId
+            ) {
+                console.warn(
+                    "Offline communication failed. Falling back to server-based communication for student",
+                    data.studentId,
+                );
+                for (const channel of this.studentChannels[data.studentId] || []) {
+                    this._removeStudentChannel(data.studentId, channel);
+                }
+                this._addStudentChannel(
+                    data.studentId,
+                    new WebSocketChannel(this.assignmentId, data.studentId, "teacher"),
+                );
+            }
+
             if (data.event === "setup.error") {
                 this.onStudentSetupError(data);
             }
         });
+    }
+
+    _addStudentChannel(studentId, channel) {
+        this.studentChannels[studentId] = [
+            ...(this.studentChannels[studentId] || []),
+            channel,
+        ];
+        this._initTestSocket(channel);
     }
 
     _removeStudentChannel(studentId, channel) {

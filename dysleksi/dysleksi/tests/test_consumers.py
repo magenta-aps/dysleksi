@@ -127,6 +127,51 @@ class TestChatConsumer(TestCase):
             )
 
 
+class TestRelayConsumer(TestCase):
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        Group.objects.get_or_create(name=STUDENTS)
+        cls.test_user = Student.objects.create(
+            institution=Institution.objects.create(
+                number="def", name="RelayTestSchool"
+            ),
+            username="RelayTestUser",
+        )
+
+    async def _get_communicator(self) -> WebsocketCommunicator:
+        application = AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
+        communicator = WebsocketCommunicator(application, "/ws/relay/assignment_1234/")
+        communicator.scope["user"] = self.test_user
+        return communicator
+
+    async def test_connect(self):
+        communicator = await self._get_communicator()
+        connected, subprotocol = await communicator.connect()
+        self.assertTrue(connected)
+        await communicator.disconnect()
+
+    async def test_rejects_anonymous_users(self):
+        communicator = await self._get_communicator()
+        communicator.scope["user"] = AnonymousUser()
+        connected, subprotocol = await communicator.connect()
+        self.assertFalse(connected)
+
+    async def test_forwards_to_the_room(self):
+        message: str = json.dumps(
+            {"event": "question.displayed", "from": "teacher", "studentId": 1}
+        )
+        communicator = await self._get_communicator()
+        await communicator.connect()
+        await communicator.send_to(message)
+
+        response = await communicator.receive_from()
+
+        self.assertEqual(json.loads(response), json.loads(message))
+        await communicator.disconnect()
+
+
 class TestChatConsumerMessageIntegration(TransactionTestCase):
 
     def setUp(self):

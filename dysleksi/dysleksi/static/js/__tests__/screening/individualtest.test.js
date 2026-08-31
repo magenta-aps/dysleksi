@@ -17,9 +17,11 @@ import { MockAudioContext } from "../mock_audio.js";
 const mockP2P = {
     connect: vi.fn(),
     send: vi.fn(),
+    close: vi.fn(),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
     studentSetup: vi.fn(),
+    messageQueue: [],
 };
 
 vi.mock("../../webRTC.js", () => {
