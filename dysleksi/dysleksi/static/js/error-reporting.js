@@ -1,5 +1,5 @@
-// Forwards JavaScript errors in the browser to the server, so they end up in
-// the docker logs
+// Forwards JavaScript errors and warnings in the browser to the server, so they
+// end up in the docker logs
 
 // Number of reports a single page may send. Reaching the limit is reported,
 // so the log never goes quiet without saying so.
@@ -14,6 +14,7 @@ export class ErrorReporter {
     maxReports;
     reportCount;
     originalError;
+    originalWarn;
 
     constructor(url, csrfToken, maxReports = MAX_REPORTS) {
         this.url = url;
@@ -21,14 +22,16 @@ export class ErrorReporter {
         this.maxReports = maxReports;
         this.reportCount = 0;
         this.originalError = console.error;
+        this.originalWarn = console.warn;
 
         console.error = (...args) => {
             this.originalError(...args);
-            this.report({
-                kind: "console.error",
-                message: args.map((arg) => this.formatArg(arg)).join(" "),
-                stack: this.stackOf(args.find((arg) => arg instanceof Error)),
-            });
+            this.reportConsole("console.error", args);
+        };
+
+        console.warn = (...args) => {
+            this.originalWarn(...args);
+            this.reportConsole("console.warn", args);
         };
 
         window.addEventListener("error", (event) => {
@@ -48,6 +51,14 @@ export class ErrorReporter {
                 message: this.formatArg(event.reason),
                 stack: this.stackOf(event.reason),
             });
+        });
+    }
+
+    reportConsole(kind, args) {
+        this.report({
+            kind: kind,
+            message: args.map((arg) => this.formatArg(arg)).join(" "),
+            stack: this.stackOf(args.find((arg) => arg instanceof Error)),
         });
     }
 
@@ -89,7 +100,7 @@ export class ErrorReporter {
             this.send(
                 "limit",
                 `Reached the limit of ${this.maxReports} reports for this page ` +
-                    "load, further errors are not reported",
+                    "load, further errors and warnings are not reported",
             );
             return;
         }
