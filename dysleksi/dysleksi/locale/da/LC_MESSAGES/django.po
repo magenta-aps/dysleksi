@@ -245,6 +245,10 @@ msgstr ""
 msgid "Rigtige"
 msgstr ""
 
+#: dysleksi/tables.py
+msgid "Næsten rigtige"
+msgstr ""
+
 #: dysleksi/tables.py dysleksi/views.py
 msgid "Rigtighedsprocent"
 msgstr ""
@@ -501,6 +505,11 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/error.html
 msgid "Fejl!"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/column_answer.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Sprunget over"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/column_resource.html
@@ -821,10 +830,6 @@ msgid "Markér svar som:"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Sprunget over"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Næste opgave"
 msgstr ""
 
@@ -987,6 +992,10 @@ msgstr ""
 
 #: dysleksi/views.py
 msgid "Antal rigtige"
+msgstr ""
+
+#: dysleksi/views.py
+msgid "Antal næsten rigtige"
 msgstr ""
 
 #: dysleksi/views.py

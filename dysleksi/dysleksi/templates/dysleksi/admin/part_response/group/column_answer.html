@@ -1,3 +1,4 @@
+{% load i18n %}
 {% with question_type=record.question.question_type %}
     {% if question_type == QuestionType.MULTIPLE_CHOICE or question_type == QuestionType.MULTIPLE_CHOICE_WITH_DISPLAY_FIELD %}
         <div class="answer-multiple-choice">
@@ -31,13 +32,15 @@
         >{{ record.answer_text|default_if_none:"&nbsp;" }}</div>
 
 
-    {% elif record.question.part.test.test_type == TestType.INDIVIDUAL%}
+    {% elif record.partresponse.testresponse.assignment.test.test_type == TestType.INDIVIDUAL %}
             {% if record.correctness == "correct" %}
                 <div class="answer answer-correct">
                     {% if record.question.challenge.text %}
                         {{ record.question.challenge.text }}
                     {% endif %}
                 </div>
+            {% elif record.correctness == "skipped" %}
+                <div class="answer">{% translate "Sprunget over" %}</div>
             {% else %}
                 <div class="answer answer-incorrect">
                     {% if record.actual_pronunciation %}

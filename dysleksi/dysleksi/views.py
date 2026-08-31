@@ -44,6 +44,7 @@ from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
 
 from dysleksi.forms import StartClassRoomForm, StartIndividualRoomForm
 from dysleksi.models import (
+    PARTIAL_SCORE,
     TEACHERS,
     Class,
     Correctness,
@@ -621,7 +622,7 @@ class AssignmentResultsView(
         category_key = f"{key}_category"
 
         questions_count: int = TestQuestion.objects.filter(
-            part__tests=self.object.test
+            part__tests=self.object.test, is_practice=False
         ).count()
 
         # Data til kasserne i toppen, hvor hver kategori har nogle elever
@@ -662,11 +663,12 @@ class AssignmentResultsView(
             count_key = f"{key}_count"
             proportion_key = f"{key}_proportion"
             category_key = f"{key}_category"
-            part_questions_count = part.questions.count()
+            part_questions_count = part.questions.filter(is_practice=False).count()
             # Antallet af besvarede spørgsmål i denne deltest for hele klassen
             part_answers_count = QuestionResponse.objects.filter(
                 partresponse__testresponse__assignment=self.object,
                 partresponse__testpart=part,
+                question__is_practice=False,
             ).count()
             qs = (
                 # Annotér med antallet af korrekte svar i denne Part
@@ -826,11 +828,18 @@ class AssignmentPartResultsView(GroupRequiredMixin, ObjectPermissionsMixin, List
                 "correct_count",
                 Q(correctness=Correctness.CORRECT, question__is_practice=False),
             )
-            .annotate_proportion(
-                "responses_count", "correct_count", "correct_proportion"
+            .annotate_questionresponses_count(
+                "almost_correct_count",
+                Q(correctness=Correctness.PARTIAL, question__is_practice=False),
             )
+            # Procenten regnes af scoren, hvor et næsten rigtigt svar tæller en halv
+            .annotate_score(
+                "score",
+                Q(question__is_practice=False),
+            )
+            .annotate_proportion("responses_count", "score", "correct_proportion")
             .annotate_percentage("correct_proportion", "correct_percentage")
-            .annotate_ordering("correct_count", "rank", False)
+            .annotate_ordering("score", "rank", False)
             .annotate_question_sum_answer_time(
                 "total_answer_time", Q(question__is_practice=False)
             )
@@ -995,9 +1004,18 @@ class TestResponseView(
                     Q(question__is_practice=False, correctness=Correctness.CORRECT)
                     & response_q,
                 )
+                .annotate_questionresponses_count(
+                    f"almost_correct_count{suffix}",
+                    Q(question__is_practice=False, correctness=Correctness.PARTIAL)
+                    & response_q,
+                )
+                .annotate_score(
+                    f"score{suffix}",
+                    Q(question__is_practice=False) & response_q,
+                )
                 .annotate_proportion(
                     f"responses_count{suffix}",
-                    f"correct_count{suffix}",
+                    f"score{suffix}",
                     f"correct_proportion_of_answered{suffix}",
                 )
                 .annotate_percentage(
@@ -1006,7 +1024,7 @@ class TestResponseView(
                 )
                 .annotate_proportion(
                     f"questions_count{suffix}",
-                    f"correct_count{suffix}",
+                    f"score{suffix}",
                     f"correct_proportion_of_all{suffix}",
                 )
                 .annotate_percentage(
@@ -1016,7 +1034,7 @@ class TestResponseView(
             if self.test_type == TestType.INDIVIDUAL:
                 qs = qs.annotate_questionresponses_count(
                     f"skipped_count{suffix}",
-                    Q(question__is_practice=False, correctness=Correctness.PARTIAL)
+                    Q(question__is_practice=False, correctness=Correctness.SKIPPED)
                     & response_q,
                 )
 
@@ -1030,6 +1048,25 @@ class TestResponseView(
         part_header = _("%(part_name)s (%(questions_count)s opg.)")
         extra_columns = []
         supercolumns_count = 0
+
+        field_spec: List[Tuple[StrOrPromise, str, str | None]] = [
+            (_("Antal forsøgte"), "responses_count", None)
+        ]
+        if self.test_type == TestType.INDIVIDUAL:
+            # Kun ved individuelle tests kan læreren springe en opgave over
+            field_spec += [
+                (_("Antal oversprungne"), "skipped_count", None),
+            ]
+        field_spec += [
+            (_("Antal rigtige"), "correct_count", None),
+            (_("Antal næsten rigtige"), "almost_correct_count", None),
+            (_("Rigtighedsprocent"), "correct_pct_of_answered", "%(value)s %%"),
+            (_("Normscore"), "correct_pct_of_all", "%(value)s %%"),
+        ]
+        row_index = {spec[1]: i for i, spec in enumerate(field_spec)}
+        responses_row = row_index["responses_count"]
+        correct_row = row_index["correct_count"]
+        almost_correct_row = row_index["almost_correct_count"]
 
         # for partresponse in qs:
         part_pks = set()
@@ -1053,6 +1090,8 @@ class TestResponseView(
             part_columns: List[Tuple[str, Column]] = []
             for group_name, questions in question_groups.items():
                 column_key = self.group_map[part.pk][group_name]["part_pk_key"]
+                # Antal opgaver i denne søjle, som bedømmelsen regnes ud af
+                column_questions_count = questions.count()
 
                 assert column_key is not None  # to make mypy happy
                 # column_key is e.g "part_42_store_bogstaver" if processing a group,
@@ -1073,21 +1112,25 @@ class TestResponseView(
                     verbose_name=column_header,
                     footer_template_name="dysleksi/admin/" "test_response/footer.html",
                     footer_value=partial(
-                        lambda part, column_values: {
+                        lambda part, questions_count, column_values: {
                             "response": self.object,
                             "part": part,
-                            "total_answers": column_values[0] or 0,
+                            "total_answers": column_values[responses_row] or 0,
                             "category": CorrectnessCategory.categorize_proportion(
-                                # Matcher rækkefølgen af linjer i data,
-                                # specificeret nedenunder i `field_spec`
-                                # For at regne kategorien ud deler vi antal rigtige
-                                # (række 1) med antal besvarelser (række 0)
-                                (column_values[1] / column_values[0])
-                                if column_values[0] not in (0, None)
+                                (
+                                    (
+                                        column_values[correct_row]
+                                        + column_values[almost_correct_row]
+                                        * PARTIAL_SCORE
+                                    )
+                                    / questions_count
+                                )
+                                if column_values[responses_row] not in (0, None)
                                 else None
                             ),
                         },
                         part,
+                        column_questions_count,
                     ),
                 )
 
@@ -1110,21 +1153,6 @@ class TestResponseView(
         if supercolumns_count < self.get_page_size():
             for i in range(self.get_page_size() - supercolumns_count):
                 extra_columns.append((f"empty_{i}", EmptyColumn()))
-
-        # Extract data for the table. This repeats for each row,
-        # so do it in a loop based on specification here
-        field_spec: List[Tuple[StrOrPromise, str, str | None]] = [
-            (_("Antal forsøgte"), "responses_count", None)
-        ]
-        if self.test_type == TestType.INDIVIDUAL:
-            field_spec += [
-                (_("Antal oversprungne"), "skipped_count", None),
-            ]
-        field_spec += [
-            (_("Antal rigtige"), "correct_count", None),
-            (_("Rigtighedsprocent"), "correct_pct_of_answered", "%(value)s %%"),
-            (_("Normscore"), "correct_pct_of_all", "%(value)s %%"),
-        ]
 
         data = []
         for label, value_key, value_fmt in field_spec:
@@ -1570,8 +1598,6 @@ class PartResponseView(
             data=self.get_current_items(),
             exclude=exclude_columns,
         )
-
-        context["QuestionType"] = QuestionType
 
         self.add_navigation_context(context, None, self.object.testresponse.assignment)
         context["assignment"] = self.object.testresponse.assignment

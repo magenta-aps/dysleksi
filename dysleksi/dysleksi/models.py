@@ -98,6 +98,12 @@ class Correctness(models.TextChoices):
     SKIPPED = "skipped"
 
 
+# A partially correct answer counts as a half-correct answer
+# Change this to "1" if a partially correct answer should count the same as a fully
+# correct answer
+PARTIAL_SCORE = 0.5
+
+
 class QuestionType(TextChoices):
     MULTIPLE_CHOICE = "multiple_choice"
     MULTIPLE_CHOICE_WITH_DISPLAY_FIELD = "multiple_choice_with_display_field"
@@ -1461,13 +1467,21 @@ class TestResponseQuerySet(PermissionsQuerySet):
     ) -> "TestResponseQuerySet":
         if filter is None:
             filter = Q()
-        correct = Correctness.CORRECT
+        relation = "partresponses__questionresponses"
+        filter &= Q(**{f"{relation}__question__is_practice": False})
+
+        def count_with(correctness: Correctness) -> Count:
+            return Count(
+                relation, filter=filter & Q(**{f"{relation}__correctness": correctness})
+            )
+
         return self.annotate(
             **{
-                output_key: Count(
-                    "partresponses__questionresponses",
-                    filter=filter
-                    & Q(partresponses__questionresponses__correctness=correct),
+                output_key: ExpressionWrapper(
+                    count_with(Correctness.CORRECT)
+                    + count_with(Correctness.PARTIAL)
+                    * Value(PARTIAL_SCORE, output_field=FloatField()),
+                    output_field=FloatField(),
                 )
             }
         )
@@ -1612,6 +1626,32 @@ class PartResponseQuerySet(PermissionsQuerySet):
                         .values("count")
                     ),
                     0,
+                )
+            }
+        )
+
+    def annotate_score(self, output_key: str, filter: Q) -> "PartResponseQuerySet":
+        return self.annotate(
+            **{
+                output_key: Coalesce(
+                    Subquery(
+                        QuestionResponse.objects.filter(
+                            partresponse=OuterRef("pk"),
+                        )
+                        .filter(filter)
+                        .values("partresponse")
+                        .annotate(
+                            score=ExpressionWrapper(
+                                Count("id", filter=Q(correctness=Correctness.CORRECT))
+                                + Count("id", filter=Q(correctness=Correctness.PARTIAL))
+                                * Value(PARTIAL_SCORE, output_field=FloatField()),
+                                output_field=FloatField(),
+                            )
+                        )
+                        .values("score")
+                    ),
+                    0.0,
+                    output_field=FloatField(),
                 )
             }
         )
@@ -1770,13 +1810,13 @@ class PartResponse(PermissionsMixin, models.Model):
 
     @property
     def correctness_category_answered(self):
-        correct_responses_count = self.questionresponses.filter(
-            correctness=Correctness.CORRECT
-        ).count()
-        responses_count = self.questionresponses.count()
-        correct_proportion_of_answered = float(correct_responses_count) / float(
-            responses_count
+        responses = self.questionresponses.filter(question__is_practice=False)
+        score = (
+            responses.filter(correctness=Correctness.CORRECT).count()
+            + responses.filter(correctness=Correctness.PARTIAL).count() * PARTIAL_SCORE
         )
+        responses_count = responses.count()
+        correct_proportion_of_answered = score / float(responses_count)
         return CorrectnessCategory.categorize_proportion(correct_proportion_of_answered)
 
 
@@ -1974,7 +2014,8 @@ class Message(models.Model):
 
                 question_response.answer_option = choice
                 question_response.answer_text = self.data.get("textAnswer")
-                question_response.correctness = self.data.get("correctness")
+                if "correctness" in self.data:
+                    question_response.correctness = self.data["correctness"]
 
                 question_response.finished_after = duration
 

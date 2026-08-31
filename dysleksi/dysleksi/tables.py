@@ -16,6 +16,7 @@ from dysleksi.models import (
     CategoryRange,
     Class,
     ClassTestStatus,
+    QuestionType,
     Student,
     TestAssignment,
     TestAssignmentStatus,
@@ -336,6 +337,10 @@ class PartResultTable(Table):
         verbose_name=_("Rigtige"),
         accessor=A("correct_count"),
     )
+    almost_correct_count = Column(
+        verbose_name=_("Næsten rigtige"),
+        accessor=A("almost_correct_count"),
+    )
     correct_proportion = Column(
         verbose_name=_("Rigtighedsprocent"),
         accessor=A("correct_proportion"),
@@ -478,6 +483,7 @@ class QuestionResponsesTable(NonOrderableTableMixin, Table):
     correct_answer = TemplateColumn(
         verbose_name=_("Rigtigt svar"),
         template_name="dysleksi/admin/part_response/group/column_correct.html",
+        extra_context={"QuestionType": QuestionType},
         attrs={
             "th": {"class": "column-correct-answer"},
             "td": {"class": "column-correct-answer"},
@@ -486,6 +492,7 @@ class QuestionResponsesTable(NonOrderableTableMixin, Table):
     student_answer = TemplateColumn(
         verbose_name=_("Elevens svar"),
         template_name="dysleksi/admin/part_response/group/column_answer.html",
+        extra_context={"QuestionType": QuestionType, "TestType": TestType},
         attrs={
             "th": {"class": "column-student-answer"},
             "td": {"class": "column-student-answer"},
