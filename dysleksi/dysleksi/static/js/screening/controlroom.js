@@ -1269,6 +1269,7 @@ export class TeacherView {
         this.assignmentId = assignmentId;
         this.wsGetter = wsGetter;
         this.chatSocket = null;
+        this.syncSocket = null;
         this.test = test;
         this.testPaused = false;
 
@@ -1327,6 +1328,7 @@ export class TeacherView {
         this.messageQueue = savedQueue ? JSON.parse(savedQueue) : [];
 
         this._initSocket();
+        this._initSyncSocket();
         this._initButtonListeners();
         this._initFilterButtonSelection();
         this._startSyncInterval();
@@ -1610,6 +1612,10 @@ export class TeacherView {
         });
     }
 
+    _initSyncSocket() {
+        this.syncSocket = this.wsGetter(`sync_assignment_${this.assignmentId}`);
+    }
+
     _initSocket() {
         this.chatSocket = this.wsGetter();
         this.chatSocket.addEventListener("message", (e) => {
@@ -1710,24 +1716,24 @@ export class TeacherView {
     }
 
     async _flushMessageQueue() {
-        if (this.chatSocket.readyState === WebSocket.CONNECTING) {
+        if (this.syncSocket.readyState === WebSocket.CONNECTING) {
             console.log("Socket is currently connecting... waiting.");
             return;
         }
 
         if (
-            this.chatSocket.readyState === WebSocket.CLOSED ||
-            this.chatSocket.readyState === WebSocket.CLOSING
+            this.syncSocket.readyState === WebSocket.CLOSED ||
+            this.syncSocket.readyState === WebSocket.CLOSING
         ) {
             console.log("Socket closed. Attempting to reconnect...");
-            this._initSocket();
+            this._initSyncSocket();
             return;
         }
 
         // Only attempt to send if the server is online and we have messages
         if (
             this.messageQueue.length > 0 &&
-            this.chatSocket.readyState === WebSocket.OPEN
+            this.syncSocket.readyState === WebSocket.OPEN
         ) {
             const isOnline = await serverOnline();
             if (isOnline) {
@@ -1739,7 +1745,7 @@ export class TeacherView {
 
                 try {
                     for (const msg of queueToProcess) {
-                        this.chatSocket.send(JSON.stringify(msg));
+                        this.syncSocket.send(JSON.stringify(msg));
                     }
                     this.messageQueue = [];
                     this._persistQueue();
