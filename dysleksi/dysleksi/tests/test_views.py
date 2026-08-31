@@ -1730,6 +1730,14 @@ class TestClientErrorLogView(DysleksiTest):
             "    user agent: Mozilla/5.0"
         )
 
+    def test_logs_warning_at_warning_level(self):
+        response, logger = self.post({"kind": "console.warn", "message": "Oh noes!"})
+        self.assertEqual(response.status_code, 204)
+        logger.warning.assert_called_once_with(
+            "console.warn [user=anonymous] [page=?] Oh noes!"
+        )
+        logger.error.assert_not_called()
+
     def test_logs_report_for_anonymous_user(self):
         response, logger = self.post(self.payload)
         self.assertEqual(response.status_code, 204)

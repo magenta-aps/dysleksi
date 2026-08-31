@@ -91,8 +91,8 @@ from dysleksi.tables import (
 )
 from dysleksi.utils import reverse_ordering, scan_static_files
 
-# Errors reported by the browser are logged under their own logger name, so they
-# can be told apart from server side errors in the container log.
+# Errors and warnings reported by the browser are logged under their own logger
+# name, so they can be told apart from server side errors in the container log.
 client_error_logger = logging.getLogger("dysleksi.javascript")
 
 
@@ -1640,9 +1640,9 @@ class PartResponseView(
 
 
 class ClientErrorLogView(View):
-    """Receives JavaScript errors caught in the browser by
+    """Receives JavaScript errors and warnings caught in the browser by
     `static/js/error-reporting.js` and writes them to the server log, making
-    errors on the students' and teachers' devices visible in the container log.
+    them visible in the container log for the students' and teachers' devices.
     """
 
     http_method_names = ["post"]
@@ -1655,7 +1655,16 @@ class ClientErrorLogView(View):
 
     # Reports for anything but these kinds are logged under "unknown", as the
     # kind ends up in the log message.
-    kinds = ("uncaught", "unhandledrejection", "console.error", "limit")
+    kinds = (
+        "uncaught",
+        "unhandledrejection",
+        "console.error",
+        "console.warn",
+        "limit",
+    )
+
+    # Kinds that are not errors, and are logged at warning level instead
+    warning_kinds = ("console.warn",)
 
     def post(self, request, *args, **kwargs) -> HttpResponse:
         if len(request.body) > self.max_payload_size:
@@ -1667,7 +1676,11 @@ class ClientErrorLogView(View):
         if not isinstance(payload, dict):
             return HttpResponse(status=400)
 
-        client_error_logger.error(self.format_report(payload))
+        report = self.format_report(payload)
+        if payload.get("kind") in self.warning_kinds:
+            client_error_logger.warning(report)
+        else:
+            client_error_logger.error(report)
         return HttpResponse(status=204)
 
     def field(self, payload: dict, name: str, max_length: int) -> str | None:

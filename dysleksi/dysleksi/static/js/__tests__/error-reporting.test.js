@@ -10,7 +10,9 @@ const CSRF_TOKEN = "token123";
 describe("ErrorReporter", () => {
     let reporter;
     let consoleErrorSpy;
+    let consoleWarnSpy;
     let originalConsoleError;
+    let originalConsoleWarn;
     let attachedHandlers;
 
     function payloads() {
@@ -27,6 +29,10 @@ describe("ErrorReporter", () => {
         originalConsoleError = console.error;
         consoleErrorSpy = vi.fn();
         console.error = consoleErrorSpy;
+
+        originalConsoleWarn = console.warn;
+        consoleWarnSpy = vi.fn();
+        console.warn = consoleWarnSpy;
 
         // Keep track of the window handlers each reporter attaches, so they can
         // be removed again after the test. Otherwise reporters from earlier
@@ -48,6 +54,7 @@ describe("ErrorReporter", () => {
             window.removeEventListener(type, handler);
         }
         console.error = originalConsoleError;
+        console.warn = originalConsoleWarn;
         document.body.innerHTML = "";
         vi.restoreAllMocks();
         vi.resetModules(); // reset module cache so import re-triggers auto-init
@@ -76,6 +83,26 @@ describe("ErrorReporter", () => {
         expect(payload.stack).toBeNull();
         expect(payload.url).toBe(window.location.href);
         expect(payload.user_agent).toBe(navigator.userAgent);
+    });
+
+    it("reports console.warn and still writes to the console", () => {
+        console.warn("Oh noes!", { id: 4 });
+
+        expect(consoleWarnSpy).toHaveBeenCalledWith("Oh noes!", { id: 4 });
+        expect(reporter.reportCount).toBe(1);
+        const payload = payloads()[0];
+        expect(payload.kind).toBe("console.warn");
+        expect(payload.message).toBe('Oh noes! {"id":4}');
+        expect(payload.stack).toBeNull();
+    });
+
+    it("includes the stack when console.warn is given an error", () => {
+        console.warn("Oh noes!", new Error("offline"));
+
+        const payload = payloads()[0];
+        expect(payload.kind).toBe("console.warn");
+        expect(payload.message).toContain("Error: offline");
+        expect(payload.stack).toContain("Error: offline");
     });
 
     it("includes the stack when console.error is given an error", () => {
@@ -186,7 +213,7 @@ describe("ErrorReporter", () => {
         expect(reported[2].kind).toBe("limit");
         expect(reported[2].message).toBe(
             "Reached the limit of 2 reports for this page load, " +
-                "further errors are not reported",
+                "further errors and warnings are not reported",
         );
     });
 
