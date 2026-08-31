@@ -11,7 +11,7 @@ django-stubs-ext==6.1.0
 gunicorn==26.2.0
 
 ## Postgres binding
-psycopg==3.3.4
+psycopg==3.3.5
 
 ## Async packages, for handling websockets
 channels==4.3.2
