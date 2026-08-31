@@ -13,8 +13,9 @@ export async function start() {
     const assignmentId = Number(roleEl.dataset.assignmentId);
     const testContentsEl = document.getElementById("test_contents");
     const testContents = testContentsEl ? JSON.parse(testContentsEl.textContent) : null;
-    const studentIdsEl = document.getElementById("student_ids");
-    const studentIds = studentIdsEl ? JSON.parse(studentIdsEl.textContent) : null;
+    // Every student taking part in the test, whether or not they have joined
+    const studentsEl = document.getElementById("students");
+    const students = studentsEl ? JSON.parse(studentsEl.textContent) : [];
     const test = new Test(testContents);
 
     const studentData = {};
@@ -61,7 +62,8 @@ export async function start() {
         initStudent(assignmentId, test, student, testType);
     }
     if (role === "teacher") {
-        initTeacher(assignmentId, test);
+        initTeacher(assignmentId, test, students);
+        const studentIds = students.map(({ id }) => id);
         startSession(studentIds, assignmentId);
     }
 }

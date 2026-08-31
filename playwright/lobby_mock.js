@@ -76,7 +76,7 @@ const students = Array.from({ length: 5 }, (_, i) => ({
                                 let msg;
                                 try { msg = JSON.parse(e.data); } catch { return; }
                                 if (msg.event === 'session.start'
-                                        && msg.students?.includes(studentId)) {
+                                        && msg.studentIds?.includes(studentId)) {
                                     window.onSessionStart(msg.roomUrl);
                                 }
                             };

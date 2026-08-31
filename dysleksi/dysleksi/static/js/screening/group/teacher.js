@@ -8,7 +8,7 @@ import {
 } from "../controlroom.js";
 import { getWebSocket } from "../../ws.js";
 
-export function initTeacher(assignmentId, test) {
+export function initTeacher(assignmentId, test, students) {
     const table = new EventTable();
     const buttons = new ActionButtons();
     const noteField = new NoteField();
@@ -24,5 +24,7 @@ export function initTeacher(assignmentId, test) {
         noteField,
         questionView,
         elapsedTimeView,
+        null,
+        students,
     );
 }

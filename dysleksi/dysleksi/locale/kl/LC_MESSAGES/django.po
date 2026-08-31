@@ -536,6 +536,38 @@ msgstr ""
 msgid "OK"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/modals/cancel_group_test.html
+msgid "Følgende elever har ikke gennemført testen:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/cancel_group_test.html
+msgid ""
+"Hvis testen afbrydes, kan disse elever ikke gennemføre den på et senere "
+"tidspunkt."
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/cancel_individual_test.html
+msgid "Eleven har ikke gennemført testen."
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/cancel_individual_test.html
+msgid ""
+"Hvis testen afbrydes, kan eleven ikke gennemføre den på et senere tidspunkt."
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/cancel_test_base.html
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Afslut test"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/cancel_test_base.html
+msgid "Er du sikker på at du vil afbryde testen?"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/modals/cancel_test_base.html
+msgid "Fortryd"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/modals/error.html
 msgid "Fejl!"
 msgstr ""
@@ -852,10 +884,6 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Hop til næste del"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Afslut test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html

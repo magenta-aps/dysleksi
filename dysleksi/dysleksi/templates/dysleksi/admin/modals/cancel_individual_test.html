@@ -1,0 +1,7 @@
+{% extends 'dysleksi/admin/modals/cancel_test_base.html' %}
+{% load i18n %}
+
+{% block uncompleted_students %}
+<p>{% translate 'Eleven har ikke gennemført testen.' %}</p>
+<p>{% translate 'Hvis testen afbrydes, kan eleven ikke gennemføre den på et senere tidspunkt.' %}</p>
+{% endblock %}

@@ -202,11 +202,20 @@ class AssignmentView(
         test = Test.objects.get(pk=assignment.test_id)
         context["test_contents"] = test.to_json(self.object)
         if assignment.klasse:
-            context["student_ids"] = list(
-                assignment.klasse.students.values_list("id", flat=True)
+            students = list(
+                assignment.klasse.students.order_by("first_name", "last_name")
             )
         else:
-            context["student_ids"] = [assignment.student.id]
+            students = [assignment.student]
+        # All students taking part in the test, whether or not they have joined
+        context["students"] = [
+            {
+                "id": student.id,
+                "firstName": student.first_name,
+                "lastName": student.last_name,
+            }
+            for student in students
+        ]
         context["test_type"] = self.get_room_type()
         context["test_type_label"] = _("Test")
         context["student"] = self.user

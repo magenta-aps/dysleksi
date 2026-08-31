@@ -53,10 +53,6 @@ msgstr ""
 msgid "(Systemfejlen er %(error)s)"
 msgstr ""
 
-#: dysleksi/static/js/screening/controlroom.js
-msgid "Er du sikker på at du vil afbryde testen"
-msgstr ""
-
 #: dysleksi/static/js/screening/group/student-group-test.js
 msgid "Vælg et svar, før du går videre."
 msgstr ""
