@@ -66,7 +66,7 @@ describe("test startSession", () => {
         expect(chatSocket.addEventListener).toHaveBeenCalled();
 
         chatSocket.__trigger("message", {
-            data: JSON.stringify({ event: "student.ready" }),
+            data: JSON.stringify({ event: "student.ready", studentId: 1 }),
         });
         expect(chatSocket.send).toHaveBeenCalled();
         expect(chatSocket.send).toHaveBeenCalledWith(
