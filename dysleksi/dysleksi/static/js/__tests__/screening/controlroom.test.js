@@ -2951,7 +2951,7 @@ describe("TeacherView Sync Logic", () => {
 
         it("attempts to reconnect if socket is CLOSED", async () => {
             socket.readyState = 3; // CLOSED
-            const initSpy = vi.spyOn(view, "_initSocket");
+            const initSpy = vi.spyOn(view, "_initSyncSocket");
 
             await view._flushMessageQueue();
 
