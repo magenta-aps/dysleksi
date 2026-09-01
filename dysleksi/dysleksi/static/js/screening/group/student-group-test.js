@@ -9,8 +9,8 @@ export class GroupTestView extends StudentTestView {
     questionTimeoutId;
     partTimeoutId;
 
-    constructor(test, chatSocket, assignmentId, domElements, student) {
-        super(test, chatSocket, assignmentId, domElements, student);
+    constructor(test, assignmentId, domElements, student) {
+        super(test, assignmentId, domElements, student);
     }
 
     start() {

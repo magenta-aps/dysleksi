@@ -2,7 +2,7 @@ let sockets = {};
 
 // path = "chat" forwards and stores messages on the server
 // path = "relay" only forwards messages. Nothing is stored.
-export function getWebSocket(chatId = "lobby", path = "chat") {
+function getWebSocket(chatId, path) {
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
     const key = `${path}/${chatId}`;
 
@@ -28,6 +28,16 @@ export function getWebSocket(chatId = "lobby", path = "chat") {
     });
 
     return newSocket;
+}
+
+export function getAssignmentSocket(assignmentId) {
+    return getWebSocket(`assignment_${assignmentId}`, "relay");
+}
+export function getSyncSocket(assignmentId) {
+    return getWebSocket(`sync_assignment_${assignmentId}`, "chat");
+}
+export function getLobbySocket() {
+    return getWebSocket("lobby", "relay");
 }
 
 export function resetSockets() {

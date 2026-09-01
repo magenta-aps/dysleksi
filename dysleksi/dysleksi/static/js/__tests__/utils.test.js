@@ -10,13 +10,14 @@ import { getCursorIndex, serverOnline } from "../screening/utils";
 import { setResponsiveFontSize } from "../screening/utils";
 import { isVisible } from "../screening/utils";
 
-// Mock getWebSocket
 vi.mock("../ws.js", () => ({
-    getWebSocket: vi.fn(),
+    getLobbySocket: vi.fn(),
+    getAssignmentSocket: vi.fn(),
 }));
-// Mock getWebSocket
+
+// One fake socket per room name, reused across calls like the real ws.js cache
 const sockets = {};
-vi.spyOn(wsModule, "getWebSocket").mockImplementation((roomName) => {
+function mockSocket(roomName) {
     if (sockets[roomName]) return sockets[roomName];
     const listeners = {};
 
@@ -33,11 +34,24 @@ vi.spyOn(wsModule, "getWebSocket").mockImplementation((roomName) => {
 
     sockets[roomName] = socket;
     return socket;
-});
+}
+vi.spyOn(wsModule, "getLobbySocket").mockImplementation(() => mockSocket("lobby"));
+vi.spyOn(wsModule, "getAssignmentSocket").mockImplementation((assignmentId) =>
+    mockSocket(`assignment_${assignmentId}`),
+);
 
 describe("test startSession", () => {
     let studentIds = [1];
     let assignmentId = 42;
+
+    const sessionStart = JSON.stringify({
+        uuid: "UUID123",
+        event: "session.start",
+        roomUrl: "/",
+        studentIds: studentIds,
+        timestamp: 1000,
+        assignmentId: assignmentId,
+    });
 
     it("should send session.start event", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
@@ -46,16 +60,24 @@ describe("test startSession", () => {
         expect(chatSocket.addEventListener).toHaveBeenCalled();
 
         chatSocket.__trigger("open");
-        expect(chatSocket.send).toHaveBeenCalledWith(
-            JSON.stringify({
-                uuid: "UUID123",
-                event: "session.start",
-                roomUrl: "/",
-                studentIds: studentIds,
-                timestamp: 1000,
-                assignmentId: assignmentId,
-            }),
-        );
+        expect(chatSocket.send).toHaveBeenCalledWith(sessionStart);
+    });
+
+    it("should wait for a socket that is still connecting", () => {
+        vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
+        vi.spyOn(Date, "now").mockReturnValue(1000);
+
+        const chatSocket = wsModule.getLobbySocket();
+        chatSocket.readyState = WebSocket.CONNECTING;
+        chatSocket.send.mockClear();
+
+        startSession(studentIds, assignmentId);
+        expect(chatSocket.send).not.toHaveBeenCalled();
+
+        chatSocket.__trigger("open");
+        expect(chatSocket.send).toHaveBeenCalledWith(sessionStart);
+
+        chatSocket.readyState = WebSocket.OPEN;
     });
 
     it("should refresh session", () => {
@@ -95,19 +117,19 @@ describe("test startSession", () => {
     });
 
     it("should not send session.in_progress if socket is not OPEN", () => {
-        const chatSocket = startSession(studentIds, assignmentId);
+        const lobbySocket = startSession(studentIds, assignmentId);
 
         // Manually change the mock's readyState to CLOSED (or any value != 1)
-        chatSocket.readyState = WebSocket.CLOSED;
+        lobbySocket.readyState = WebSocket.CLOSED;
 
         // Clear call history from the startSession call if any
-        chatSocket.send.mockClear();
+        lobbySocket.send.mockClear();
 
         // Trigger the refresh
         refreshSession(studentIds, assignmentId, 1000);
 
         // Verify send was never called
-        expect(chatSocket.send).not.toHaveBeenCalled();
+        expect(lobbySocket.send).not.toHaveBeenCalled();
     });
 });
 

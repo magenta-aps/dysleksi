@@ -6,7 +6,6 @@ import {
     TeacherView,
     QuestionView,
 } from "../controlroom.js";
-import { getWebSocket } from "../../ws.js";
 
 export function initTeacher(assignmentId, test, students) {
     console.log("called initTeacher");
@@ -30,7 +29,6 @@ export function initTeacher(assignmentId, test, students) {
     new TeacherView(
         test,
         assignmentId,
-        getWebSocket,
         table,
         buttons,
         null,

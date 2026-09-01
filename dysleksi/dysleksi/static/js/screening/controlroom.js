@@ -1,3 +1,4 @@
+import { getAssignmentSocket, getSyncSocket } from "..//ws.js";
 import { Student } from "./model.js";
 import { WebRTCChannel } from "../webRTC.js";
 import { WebSocketChannel } from "../webSocketChannel.js";
@@ -1257,7 +1258,6 @@ export class TeacherView {
     constructor(
         test,
         assignmentId,
-        wsGetter,
         table,
         buttons,
         noteField,
@@ -1267,8 +1267,7 @@ export class TeacherView {
         students = [],
     ) {
         this.assignmentId = assignmentId;
-        this.wsGetter = wsGetter;
-        this.chatSocket = null;
+        this.assignmentSocket = null;
         this.syncSocket = null;
         this.test = test;
         this.testPaused = false;
@@ -1613,12 +1612,12 @@ export class TeacherView {
     }
 
     _initSyncSocket() {
-        this.syncSocket = this.wsGetter(`sync_assignment_${this.assignmentId}`);
+        this.syncSocket = getSyncSocket(this.assignmentId);
     }
 
     _initSocket() {
-        this.chatSocket = this.wsGetter();
-        this.chatSocket.addEventListener("message", (e) => {
+        this.assignmentSocket = getAssignmentSocket(this.assignmentId);
+        this.assignmentSocket.addEventListener("message", (e) => {
             const data = JSON.parse(e.data);
 
             if (
