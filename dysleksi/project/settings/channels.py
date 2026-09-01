@@ -6,6 +6,7 @@ CHANNEL_LAYERS = {
                 {"address": "redis://dysleksi-redis:6379", "socket_timeout": None}
             ],
             "expiry": 300,
+            "capacity": 2000,
         },
     },
 }
