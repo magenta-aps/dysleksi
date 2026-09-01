@@ -69,7 +69,7 @@ export function startSession(studentIds, assignmentId) {
 
     chatSocket.addEventListener("message", (e) => {
         const data = JSON.parse(e.data);
-        if (data.event === "student.ready") {
+        if (data.event === "student.ready" && studentIds.includes(data.studentId)) {
             refreshSession(studentIds, assignmentId, timestamp);
         }
     });
