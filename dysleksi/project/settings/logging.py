@@ -14,6 +14,10 @@ def skip_client_errors(record):
     return True
 
 
+def skip_client_disconnects(record):
+    return "CancelledError exception in shielded future" not in record.getMessage()
+
+
 LOGGING: dict = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -27,6 +31,10 @@ LOGGING: dict = {
         "skip_client_errors": {
             "()": "django.utils.log.CallbackFilter",
             "callback": skip_client_errors,
+        },
+        "skip_client_disconnects": {
+            "()": "django.utils.log.CallbackFilter",
+            "callback": skip_client_disconnects,
         },
     },
     "formatters": {
@@ -48,6 +56,10 @@ LOGGING: dict = {
         "level": "INFO",
     },
     "loggers": {
+        "asyncio": {
+            "level": "INFO",
+            "filters": ["skip_client_disconnects"],
+        },
         "django": {
             "handlers": ["gunicorn"],
             "level": "INFO",
