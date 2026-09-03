@@ -5,7 +5,6 @@ import { describe, it, expect, beforeEach, vi, afterEach } from "vitest";
 import { IndividualTestView } from "../../screening/individual/student-individual-test.js";
 import { Student } from "../../screening/model.js";
 import * as individualTestData from "./individualtest.json" with { type: "json" };
-import { getWebSocket } from "../../ws";
 import { IndividualTestDomElements } from "../../screening/dom.js";
 import { Test } from "../../screening/model.js";
 import { StudentTestView } from "../../screening/student-test.js";
@@ -38,7 +37,6 @@ describe("IndividualTestFlow", () => {
     let test;
     let domElements;
     let mediaRecorder;
-    let ws;
     let testSpy;
     let student;
     let stopSpy;
@@ -97,7 +95,6 @@ describe("IndividualTestFlow", () => {
             spyAttributes(test, ["chatSocket", "domElements", "summary"]);
         };
 
-        ws = getWebSocket("class_123");
         mediaRecorder = {
             start: vi.fn(),
             stop: vi.fn(),
@@ -116,7 +113,7 @@ describe("IndividualTestFlow", () => {
         });
 
         test = new Test(individualTestData);
-        view = new IndividualTestView(test, ws, 1, domElements, mediaRecorder, student);
+        view = new IndividualTestView(test, 1, domElements, mediaRecorder, student);
         testSpy(view);
     });
 
@@ -599,7 +596,6 @@ describe("Individual Test - Timer and Reminder Cleanup", () => {
     let student;
     let domElements;
     let mediaRecorder;
-    let ws;
 
     beforeEach(() => {
         vi.useFakeTimers();
@@ -620,9 +616,7 @@ describe("Individual Test - Timer and Reminder Cleanup", () => {
             stop: vi.fn(),
         };
 
-        ws = getWebSocket("class_123");
-
-        view = new IndividualTestView(test, ws, 1, domElements, mediaRecorder, student);
+        view = new IndividualTestView(test, 1, domElements, mediaRecorder, student);
         view.setPart(0);
     });
 

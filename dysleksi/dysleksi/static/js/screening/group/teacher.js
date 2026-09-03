@@ -6,7 +6,6 @@ import {
     QuestionView,
     ElapsedTimeView,
 } from "../controlroom.js";
-import { getWebSocket } from "../../ws.js";
 
 export function initTeacher(assignmentId, test, students) {
     const table = new EventTable();
@@ -18,7 +17,6 @@ export function initTeacher(assignmentId, test, students) {
     new TeacherView(
         test,
         assignmentId,
-        getWebSocket,
         table,
         buttons,
         noteField,

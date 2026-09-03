@@ -1,17 +1,9 @@
-import { getWebSocket } from "./ws.js";
+import { getAssignmentSocket } from "./ws.js";
 
 // Amount of milliseconds to wait before giving up on webRTC local communication.
 // When webRTC does not respons within this amount of milliseconds, a websocket
 // connection is opened instead (which does not work offline)
 export const WEBRTC_DEADLINE_MS = 10000;
-
-export function assignmentRoom(assignmentId) {
-    return `assignment_${assignmentId}`;
-}
-
-function relaySocket(assignmentId) {
-    return getWebSocket(assignmentRoom(assignmentId), "relay");
-}
 
 export class WebSocketChannel extends EventTarget {
     constructor(assignmentId, studentId, role) {
@@ -19,31 +11,32 @@ export class WebSocketChannel extends EventTarget {
         this.assignmentId = assignmentId;
         this.studentId = studentId;
         this.role = role;
+        this.counterpart = role === "student" ? "teacher" : "student";
         this.messageQueue = [];
         this.closed = false;
-        this._bind(relaySocket(assignmentId));
+        this._bind();
     }
 
-    _bind(socket) {
-        this.socket = socket;
+    _bind() {
+        this.socket = getAssignmentSocket(this.assignmentId);
 
-        socket.addEventListener("message", (e) => {
+        this.socket.addEventListener("message", (e) => {
             if (this.closed) {
                 return;
             }
             const data = JSON.parse(e.data);
-            // Everything sent to the room arrives here, including the echo of our
-            // own sends and, in a group test, the other students' traffic.
-            if (data.studentId !== this.studentId || data.from === this.role) {
+            // Students are only interested in teacher messages with the correct ID
+            // Teachers are only interested in student messages
+            if (data.studentId !== this.studentId || data.from !== this.counterpart) {
                 return;
             }
             this.dispatchEvent(new CustomEvent("message", { detail: data }));
         });
 
-        if (socket.readyState === WebSocket.OPEN) {
+        if (this.socket.readyState === WebSocket.OPEN) {
             queueMicrotask(() => this._opened());
         } else {
-            socket.addEventListener("open", () => this._opened(), { once: true });
+            this.socket.addEventListener("open", () => this._opened(), { once: true });
         }
     }
 
@@ -76,7 +69,7 @@ export class WebSocketChannel extends EventTarget {
         ) {
             // getWebSocket() drops closed sockets from its cache, so this hands
             // back a fresh one to flush the queue into once it opens.
-            this._bind(relaySocket(this.assignmentId));
+            this._bind();
         }
     }
 

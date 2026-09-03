@@ -13,7 +13,7 @@ const mockClose = vi.fn();
 let openHandler;
 
 vi.mock("../../../ws.js", () => ({
-    getWebSocket: vi.fn(() => ({
+    getAssignmentSocket: vi.fn(() => ({
         addEventListener: vi.fn((event, cb) => {
             if (event === "open") openHandler = cb;
         }),

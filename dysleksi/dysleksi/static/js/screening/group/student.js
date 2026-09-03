@@ -1,22 +1,16 @@
-import { getWebSocket } from "../../ws.js";
+import { getAssignmentSocket } from "../../ws.js";
 import { GroupTestDomElements } from "../dom.js";
 import { GroupTestView } from "./student-group-test.js";
 
 export function initStudent(assignmentId, test, student) {
-    const chatSocket = getWebSocket();
+    const assignmentSocket = getAssignmentSocket(assignmentId);
     const domElements = new GroupTestDomElements();
 
     // Start when socket is ready
-    chatSocket.addEventListener("open", async () => {
+    assignmentSocket.addEventListener("open", async () => {
         console.log("Socket open");
         try {
-            const view = new GroupTestView(
-                test,
-                chatSocket,
-                assignmentId,
-                domElements,
-                student,
-            );
+            const view = new GroupTestView(test, assignmentId, domElements, student);
 
             view.start();
         } catch (err) {

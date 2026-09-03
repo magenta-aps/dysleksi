@@ -19,11 +19,31 @@ import { StudentCard } from "../../screening/controlroom.js";
 import { Student } from "../../screening/model.js";
 import { WebRTCChannel } from "../../webRTC.js";
 import { WebSocketChannel } from "../../webSocketChannel.js";
-import { resetSockets } from "../../ws.js";
+import { getAssignmentSocket, getSyncSocket } from "../../ws.js";
 import { DetailsPopup } from "../../screening/controlroom.js";
 import { StudentPresenceIndicator } from "../../screening/controlroom.js";
 
 vi.mock("../../screening/utils.js");
+
+vi.mock("../../ws.js", () => ({
+    getAssignmentSocket: vi.fn(),
+    getSyncSocket: vi.fn(),
+}));
+
+const mockSocket = (readyState) => {
+    const socket = {
+        addEventListener: vi.fn(),
+        send: vi.fn(),
+        readyState: readyState,
+    };
+    getAssignmentSocket.mockReturnValue(socket);
+    getSyncSocket.mockReturnValue(socket);
+    return socket;
+};
+
+// The handler the view attached to the signalling socket
+const getMainSocketHandler = (socket) =>
+    socket.addEventListener.mock.calls.find((c) => c[0] === "message")[1];
 
 vi.mock("../../webRTC.js", () => {
     return {
@@ -572,7 +592,6 @@ describe("Teacher Individual test View", () => {
     let elapsedTimeView;
     let audioIndicator;
     let view;
-    let wsGetter;
     let individualTest;
     let mainSocketHandler;
     let p2pChannel;
@@ -586,12 +605,7 @@ describe("Teacher Individual test View", () => {
             clear: vi.fn(),
         };
 
-        socket = {
-            addEventListener: vi.fn(),
-            send: vi.fn(),
-        };
-
-        wsGetter = vi.fn().mockReturnValue(socket);
+        socket = mockSocket();
 
         document.body.innerHTML = INDIVIDUAL_DOM_HTML;
 
@@ -613,7 +627,6 @@ describe("Teacher Individual test View", () => {
         view = new TeacherView(
             individualTest,
             1,
-            wsGetter,
             table,
             buttons,
             note,
@@ -622,9 +635,7 @@ describe("Teacher Individual test View", () => {
             audioIndicator,
         );
 
-        mainSocketHandler = socket.addEventListener.mock.calls.find(
-            (c) => c[0] === "message",
-        )[1];
+        mainSocketHandler = getMainSocketHandler(socket);
         mainSocketHandler({
             data: JSON.stringify({
                 event: "student.joined",
@@ -696,9 +707,9 @@ describe("Teacher Individual test View", () => {
     });
 
     it("initializes default sub-views when optional arguments are omitted", () => {
-        // We only pass the required arguments: test, assignmentId, wsGetter
+        // We only pass the required arguments: test, assignmentId
         // The rest (table, buttons, noteField, questionView) will fall back to 'new' instances
-        const minimalView = new TeacherView(individualTest, 1, wsGetter);
+        const minimalView = new TeacherView(individualTest, 1);
 
         // Verify that the properties are instances of their respective classes
         expect(minimalView.table).toBeInstanceOf(EventTable);
@@ -760,7 +771,6 @@ describe("Teacher Individual test View", () => {
         view = new TeacherView(
             individualTest,
             1,
-            wsGetter,
             table,
             buttons,
             note,
@@ -796,7 +806,7 @@ describe("Teacher Individual test View", () => {
     });
 
     it("initializes socket and button listeners", () => {
-        expect(wsGetter).toHaveBeenCalledWith();
+        expect(getAssignmentSocket).toHaveBeenCalledWith(1);
         expect(socket.addEventListener).toHaveBeenCalledWith(
             "message",
             expect.any(Function),
@@ -1802,8 +1812,6 @@ describe("GroupTestContainer", () => {
 });
 
 describe("TeacherView _initFilterButtonSelection", () => {
-    let socket;
-
     beforeEach(() => {
         vi.useFakeTimers();
         global.localStorage = {
@@ -1823,12 +1831,7 @@ describe("TeacherView _initFilterButtonSelection", () => {
             </div>
         `;
 
-        socket = {
-            addEventListener: vi.fn(),
-            send: vi.fn(),
-        };
-
-        const wsGetter = () => socket;
+        mockSocket();
 
         // Minimal test data
         const testData = { parts: [] };
@@ -1836,7 +1839,6 @@ describe("TeacherView _initFilterButtonSelection", () => {
         new TeacherView(
             testData,
             1,
-            wsGetter,
             new EventTable(testData),
             new ActionButtons(),
             new NoteField(),
@@ -1881,7 +1883,6 @@ describe("TeacherView _initFilterButtonSelection", () => {
 
 describe("TeacherView socket 'test.started' handling", () => {
     let socket;
-    let wsGetter;
     let view;
     let p2pChannel;
     const studentId = 123;
@@ -1896,13 +1897,7 @@ describe("TeacherView socket 'test.started' handling", () => {
 
         document.body.innerHTML = GROUP_DOM_HTML;
 
-        socket = {
-            addEventListener: vi.fn(),
-            send: vi.fn(),
-            readyState: 1,
-        };
-
-        wsGetter = vi.fn().mockReturnValue(socket);
+        socket = mockSocket(1);
 
         const elapsedTimeView = new ElapsedTimeView("#elapsed-time");
 
@@ -1917,7 +1912,6 @@ describe("TeacherView socket 'test.started' handling", () => {
                 ],
             }, // minimal test data
             1,
-            wsGetter,
             new EventTable(),
             new ActionButtons(),
             new NoteField(),
@@ -1926,9 +1920,7 @@ describe("TeacherView socket 'test.started' handling", () => {
             null,
         );
 
-        const mainSocketHandler = socket.addEventListener.mock.calls.find(
-            (c) => c[0] === "message",
-        )[1];
+        const mainSocketHandler = getMainSocketHandler(socket);
         mainSocketHandler({
             data: JSON.stringify({
                 event: "student.joined",
@@ -2073,7 +2065,6 @@ describe("TeacherView socket 'test.started' handling", () => {
 
 describe("TeacherView cancel test modal", () => {
     let socket;
-    let wsGetter;
     let p2pChannel;
     const studentId = 123;
     const classStudents = [
@@ -2083,17 +2074,11 @@ describe("TeacherView cancel test modal", () => {
     ];
 
     const createView = (testData, students) => {
-        socket = {
-            addEventListener: vi.fn(),
-            send: vi.fn(),
-            readyState: 1,
-        };
-        wsGetter = vi.fn().mockReturnValue(socket);
+        socket = mockSocket(1);
 
         const view = new TeacherView(
             testData,
             1,
-            wsGetter,
             new EventTable(),
             new ActionButtons(),
             new NoteField(),
@@ -2103,9 +2088,7 @@ describe("TeacherView cancel test modal", () => {
             students,
         );
 
-        const mainSocketHandler = socket.addEventListener.mock.calls.find(
-            (c) => c[0] === "message",
-        )[1];
+        const mainSocketHandler = getMainSocketHandler(socket);
         mainSocketHandler({
             data: JSON.stringify({
                 event: "student.joined",
@@ -2862,7 +2845,6 @@ describe("StudentCard", () => {
 
 describe("TeacherView Sync Logic", () => {
     let socket;
-    let wsGetter;
     let view;
     let serverOnlineMock;
 
@@ -2872,17 +2854,11 @@ describe("TeacherView Sync Logic", () => {
         const utils = await import("../../screening/utils.js");
         serverOnlineMock = vi.mocked(utils.serverOnline);
 
-        socket = {
-            addEventListener: vi.fn(),
-            send: vi.fn(),
-            readyState: 1, // OPEN
-        };
-        wsGetter = vi.fn().mockReturnValue(socket);
+        socket = mockSocket(1); // OPEN
 
         view = new TeacherView(
             { parts: [] },
             1,
-            wsGetter,
             new EventTable(),
             new ActionButtons(),
             new NoteField(),
@@ -2989,20 +2965,15 @@ describe("TeacherView Sync Logic", () => {
 
 describe("TeacherView _initSocket", () => {
     let socket;
-    let wsGetter;
     let view;
     const studentId = 88;
 
     beforeEach(() => {
         vi.useFakeTimers();
 
-        socket = {
-            addEventListener: vi.fn(),
-            send: vi.fn(),
-        };
-        wsGetter = vi.fn().mockReturnValue(socket);
+        socket = mockSocket();
 
-        view = new TeacherView({ parts: [] }, 1, wsGetter);
+        view = new TeacherView({ parts: [] }, 1);
     });
 
     afterEach(() => {
@@ -3019,9 +2990,7 @@ describe("TeacherView _initSocket", () => {
     });
 
     it("instantiates a new channel when a student offer arrives for the first time", () => {
-        const socketHandler = socket.addEventListener.mock.calls.find(
-            (c) => c[0] === "message",
-        )[1];
+        const socketHandler = getMainSocketHandler(socket);
 
         socketHandler({
             data: JSON.stringify({
@@ -3037,9 +3006,7 @@ describe("TeacherView _initSocket", () => {
     });
 
     it("keeps both channels if a student joins from another window", () => {
-        const socketHandler = socket.addEventListener.mock.calls.find(
-            (c) => c[0] === "message",
-        )[1];
+        const socketHandler = getMainSocketHandler(socket);
 
         // First offer
         socketHandler({
@@ -3069,9 +3036,7 @@ describe("TeacherView _initSocket", () => {
     });
 
     it("drops only the channel that hung up", () => {
-        const socketHandler = socket.addEventListener.mock.calls.find(
-            (c) => c[0] === "message",
-        )[1];
+        const socketHandler = getMainSocketHandler(socket);
         const join = () =>
             socketHandler({
                 data: JSON.stringify({
@@ -3093,9 +3058,7 @@ describe("TeacherView _initSocket", () => {
     });
 
     it("ignores WebSocket messages that are not student.joined", () => {
-        const socketHandler = socket.addEventListener.mock.calls.find(
-            (c) => c[0] === "message",
-        )[1];
+        const socketHandler = getMainSocketHandler(socket);
 
         socketHandler({
             data: JSON.stringify({ event: "ping", studentId: 99 }),
@@ -3106,9 +3069,7 @@ describe("TeacherView _initSocket", () => {
 
     it("wires the P2P channel to the P2P message handler", () => {
         const socketSpy = vi.spyOn(view, "_initTestSocket");
-        const socketHandler = socket.addEventListener.mock.calls.find(
-            (c) => c[0] === "message",
-        )[1];
+        const socketHandler = getMainSocketHandler(socket);
 
         socketHandler({
             data: JSON.stringify({
@@ -3123,9 +3084,7 @@ describe("TeacherView _initSocket", () => {
     });
 
     it("calls p2p.connect() when the peer connection opens", () => {
-        const socketHandler = socket.addEventListener.mock.calls.find(
-            (c) => c[0] === "message",
-        )[1];
+        const socketHandler = getMainSocketHandler(socket);
 
         socketHandler({
             data: JSON.stringify({
@@ -3173,32 +3132,12 @@ describe("TeacherView websocket fallback", () => {
         });
 
     beforeEach(() => {
-        vi.stubGlobal(
-            "WebSocket",
-            class extends EventTarget {
-                constructor(url) {
-                    super();
-                    this.url = url;
-                    this.readyState = 1;
-                    this.send = vi.fn();
-                }
-                static OPEN = 1;
-                static CLOSED = 3;
-                static CLOSING = 2;
-                static CONNECTING = 0;
-            },
-        );
-
-        socket = { addEventListener: vi.fn(), send: vi.fn() };
-        view = new TeacherView({ parts: [] }, 1, vi.fn().mockReturnValue(socket));
-        socketHandler = socket.addEventListener.mock.calls.find(
-            (c) => c[0] === "message",
-        )[1];
+        socket = mockSocket();
+        view = new TeacherView({ parts: [] }, 1);
+        socketHandler = getMainSocketHandler(socket);
     });
 
     afterEach(() => {
-        resetSockets();
-        vi.unstubAllGlobals();
         vi.clearAllMocks();
     });
 
@@ -3228,13 +3167,9 @@ describe("TeacherView websocket fallback", () => {
 });
 
 describe("TeacherView messageQueue initialization", () => {
-    let socket;
-    let wsGetter;
-
     beforeEach(() => {
         vi.useFakeTimers();
-        socket = { addEventListener: vi.fn(), send: vi.fn() };
-        wsGetter = vi.fn().mockReturnValue(socket);
+        mockSocket();
 
         // Ensure localStorage is clean before each test
         vi.spyOn(Storage.prototype, "getItem");
@@ -3250,7 +3185,7 @@ describe("TeacherView messageQueue initialization", () => {
         // Path: savedQueue is null
         vi.mocked(localStorage.getItem).mockReturnValue(null);
 
-        const view = new TeacherView({ parts: [] }, 1, wsGetter);
+        const view = new TeacherView({ parts: [] }, 1);
 
         expect(view.messageQueue).toEqual([]);
         expect(localStorage.getItem).toHaveBeenCalledWith(`msg_queue_1`);
@@ -3264,7 +3199,7 @@ describe("TeacherView messageQueue initialization", () => {
         ];
         vi.mocked(localStorage.getItem).mockReturnValue(JSON.stringify(mockQueue));
 
-        const view = new TeacherView({ parts: [] }, 1, wsGetter);
+        const view = new TeacherView({ parts: [] }, 1);
 
         expect(view.messageQueue).toEqual(mockQueue);
         expect(view.messageQueue.length).toBe(2);
@@ -3275,7 +3210,7 @@ describe("TeacherView messageQueue initialization", () => {
         vi.mocked(localStorage.getItem).mockReturnValue("not-valid-json");
 
         expect(() => {
-            new TeacherView({ parts: [] }, 1, wsGetter);
+            new TeacherView({ parts: [] }, 1);
         }).toThrow(); // JSON.parse will throw here
     });
 });

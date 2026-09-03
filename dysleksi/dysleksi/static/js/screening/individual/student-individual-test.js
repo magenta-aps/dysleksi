@@ -7,8 +7,8 @@ export class IndividualTestView extends StudentTestView {
     recordedAudio;
     isPracticing = false;
 
-    constructor(test, chatSocket, assignmentId, domElements, mediaRecorder, student) {
-        super(test, chatSocket, assignmentId, domElements, student);
+    constructor(test, assignmentId, domElements, mediaRecorder, student) {
+        super(test, assignmentId, domElements, student);
         this.mediaRecorder = mediaRecorder;
         this.audioDetector = new AudioDetector(this.mediaRecorder.stream);
         for (const event of ["audio.detected", "audio.quiet"]) {

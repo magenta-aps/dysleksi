@@ -6,7 +6,6 @@ import * as groupTestData from "./grouptest.json" with { type: "json" };
 import * as letterSoundTestData from "./letter_sound_test.json" with { type: "json" };
 import * as sentenceReadingTestData from "./sentence_reading_test.json" with { type: "json" };
 import * as letterShapeTestData from "./letter_shape_test.json" with { type: "json" };
-import { getWebSocket } from "../../ws";
 import { GroupTestDomElements } from "../../screening/dom.js";
 import { Test } from "../../screening/model.js";
 import { GroupTestView } from "../../screening/group/student-group-test.js";
@@ -78,7 +77,6 @@ const student = new Student({
     firstName: "Test",
     lastName: "Student",
 });
-const ws = getWebSocket();
 const mockSend = vi.fn();
 
 const SHARED_DOM_HTML = `
@@ -242,7 +240,7 @@ describe("GroupTestFlow", () => {
 
     it("should set the next button listener in start() and trigger onQuestionComplete", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
 
         // Spy on onQuestionComplete to verify it gets called
         const onCompleteSpy = vi
@@ -273,7 +271,7 @@ describe("GroupTestFlow", () => {
 
     it("should set the repeat button listener in start() and trigger repeat", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
 
         // Spy on onQuestionComplete to verify it gets called
         const repeatSpy = vi.spyOn(view, "repeat").mockImplementation(() => {});
@@ -301,7 +299,7 @@ describe("GroupTestFlow", () => {
 
     it("should hide the test part intro image when there is no previous part", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
 
         // 1. Ensure currentPart is set but previousPart remains null
@@ -322,7 +320,7 @@ describe("GroupTestFlow", () => {
 
     it("should show the test part outro image when moving from part 0 to part 1", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
 
         // 1. Set up transition state (previousPart exists)
@@ -352,7 +350,7 @@ describe("GroupTestFlow", () => {
 
         // 3. Create a question with an instruction sequence
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, localDomElements, student);
+        const view = new GroupTestView(test, 1, localDomElements, student);
         testSpy(view);
 
         // Mock the InstructionSequenceRunner.run to return a promise we can control
@@ -402,7 +400,7 @@ describe("GroupTestFlow", () => {
 
     it("should handle free_text selection and update next button state", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
 
         // 1. Move to a part that has free_text questions (Part 1 in your JSON)
@@ -442,22 +440,18 @@ describe("GroupTestFlow", () => {
     it("Test complain when there are no parts", () => {
         expect(
             () =>
-                new Test(
-                    {
-                        id: 1,
-                        name: "Middle 2. grade",
-                        parts: [],
-                    },
-                    ws,
-                    domElements,
-                ),
+                new Test({
+                    id: 1,
+                    name: "Middle 2. grade",
+                    parts: [],
+                }),
         ).toThrowError("Test has no parts");
     });
 
     it("Render Summary", () => {
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
 
         view.start();
@@ -482,7 +476,7 @@ describe("GroupTestFlow", () => {
         });
 
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
 
         view.start();
@@ -495,7 +489,7 @@ describe("GroupTestFlow", () => {
 
     it("Render intro and move on to startSoundCalibration", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
 
         const startIntroSpy = vi.spyOn(view, "startIntro");
         const startSoundCalibrationSpy = vi.spyOn(view, "startSoundCalibration");
@@ -520,7 +514,7 @@ describe("GroupTestFlow", () => {
         });
         returningStudent.resultsByPart = { 0: ["correct"] };
 
-        const view = new GroupTestView(test, ws, 1, domElements, returningStudent);
+        const view = new GroupTestView(test, 1, domElements, returningStudent);
 
         const startSoundCalibrationSpy = vi.spyOn(view, "startSoundCalibration");
         const showFirstQuestionSpy = vi
@@ -549,7 +543,7 @@ describe("GroupTestFlow", () => {
         });
 
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
 
         const onTestCompleteSpy = vi.spyOn(view, "onTestComplete");
         view.start();
@@ -562,7 +556,7 @@ describe("GroupTestFlow", () => {
 
     it("Ends summary and displays practice question", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.start();
         view.endSummary();
@@ -574,7 +568,7 @@ describe("GroupTestFlow", () => {
 
     it("should use default parameter (false) when showFirstQuestion is called without arguments", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
 
         view.start();
         view.showFirstQuestion();
@@ -589,7 +583,7 @@ describe("GroupTestFlow", () => {
         testData.parts[0].practice = [];
 
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.start();
         view.endSummary();
@@ -611,7 +605,7 @@ describe("GroupTestFlow", () => {
         };
 
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.start();
         view.endSummary();
@@ -631,7 +625,7 @@ describe("GroupTestFlow", () => {
         });
 
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.start();
         view.endSummary();
@@ -642,7 +636,7 @@ describe("GroupTestFlow", () => {
     it("Guides the student through sound calibration", async () => {
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         domElements.playSound.mockResolvedValue();
         view.start();
         view.startSoundCalibration();
@@ -697,7 +691,7 @@ describe("GroupTestFlow", () => {
     it("Skips sound calibration if the debug button is clicked", async () => {
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         domElements.playSound.mockResolvedValue();
         view.start();
         const calibrationPromise = view.startSoundCalibration();
@@ -714,7 +708,7 @@ describe("GroupTestFlow", () => {
     it("Guides the student through the summary", async () => {
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         domElements.playSound.mockResolvedValue();
         view.start();
         view.startSummary();
@@ -754,7 +748,7 @@ describe("GroupTestFlow", () => {
     it("Allows skipping the summary with the debug button", async () => {
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         domElements.playSound.mockResolvedValue();
         view.start();
         const calibrationPromise = view.startSummary();
@@ -772,7 +766,7 @@ describe("GroupTestFlow", () => {
         const testData = JSON.parse(JSON.stringify(groupTestData));
 
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.start();
         view.endSoundCalibration();
@@ -788,7 +782,7 @@ describe("GroupTestFlow", () => {
         testData.parts = testData.parts.slice(0, 1);
 
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.start();
         view.endSoundCalibration();
@@ -800,7 +794,7 @@ describe("GroupTestFlow", () => {
         vi.useRealTimers();
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
 
         domElements.playSound.mockRejectedValue(new Error("audio decode failed"));
         view.start();
@@ -813,7 +807,7 @@ describe("GroupTestFlow", () => {
         vi.useRealTimers();
         const testData = JSON.parse(JSON.stringify(groupTestData));
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
 
         domElements.playSound.mockRejectedValue(new Error("network error"));
         view.start();
@@ -823,7 +817,7 @@ describe("GroupTestFlow", () => {
     it("Trigger for first question reminder", () => {
         vi.useFakeTimers();
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         test.parts[0].timeout = 0;
         test.parts[0].questions[0].reminder = 5000;
         // Mock audio play
@@ -839,7 +833,7 @@ describe("GroupTestFlow", () => {
     it("Let first question time out", () => {
         vi.useFakeTimers();
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         test.parts[0].timeout = 0;
         test.parts[0].questions[0].timeout = 10000;
         testSpy(view);
@@ -877,7 +871,7 @@ describe("GroupTestFlow", () => {
     it("Let first testpart time out on second question", async () => {
         vi.useFakeTimers();
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         test.parts[0].timeout = 60000;
         testSpy(view);
         view.setPart(0);
@@ -938,7 +932,7 @@ describe("GroupTestFlow", () => {
 
     it("Select second answer of first question", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setPart(0);
 
@@ -962,7 +956,7 @@ describe("GroupTestFlow", () => {
 
     it("Go to next question", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setPart(0);
 
@@ -1003,7 +997,7 @@ describe("GroupTestFlow", () => {
     it("plays the challenge sound on question display", () => {
         // Arrange
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         const spyRunInstructions = vi.spyOn(view, "runInstructions");
         const spyPlayChallengeSound = vi.spyOn(view, "playChallengeSound");
         // Arrange: go to word spelling questions (which use sound challenges)
@@ -1028,7 +1022,7 @@ describe("GroupTestFlow", () => {
 
     it("Answer practice question without selecting answer", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setPart(0);
 
@@ -1041,7 +1035,7 @@ describe("GroupTestFlow", () => {
 
     it("Answer practice question correctly", async () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         domElements.playSound.mockResolvedValue();
         testSpy(view);
         view.setPart(0);
@@ -1065,7 +1059,7 @@ describe("GroupTestFlow", () => {
 
     it("Always has correct answer on the same index for practice question", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setPart(0);
 
@@ -1079,7 +1073,7 @@ describe("GroupTestFlow", () => {
 
     it("Answer practice question incorrectly", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setPart(0);
 
@@ -1100,7 +1094,7 @@ describe("GroupTestFlow", () => {
 
     it("Answer last practice question in part", async () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         domElements.playSound.mockResolvedValue();
         testSpy(view);
         view.setPart(0);
@@ -1122,7 +1116,7 @@ describe("GroupTestFlow", () => {
 
     it("Answer last question in part", async () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setPart(0);
         const part = view.currentPart;
@@ -1145,7 +1139,7 @@ describe("GroupTestFlow", () => {
 
     it("Answer freetext practice question correctly", async () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setPart(1);
 
@@ -1177,7 +1171,7 @@ describe("GroupTestFlow", () => {
 
     it("Answer freetext question correctly", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setPart(1);
 
@@ -1210,7 +1204,7 @@ describe("GroupTestFlow", () => {
 
     it("Answer freetext question almost correctly", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setPart(1);
 
@@ -1243,7 +1237,7 @@ describe("GroupTestFlow", () => {
 
     it("Answer freetext question with empty string", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setPart(1);
 
@@ -1256,7 +1250,7 @@ describe("GroupTestFlow", () => {
 
     it("Answer freetext question incorrectly", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setPart(1);
 
@@ -1289,7 +1283,7 @@ describe("GroupTestFlow", () => {
 
     it("Answer last question in last part", async () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         const canShow = view.setPart(test.parts.length - 1);
         expect(canShow).toBe(true);
@@ -1320,7 +1314,7 @@ describe("GroupTestFlow", () => {
         testData.parts = testData.parts.slice(-1);
 
         const test = new Test(testData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         const canShow = view.setPart(test.parts.length - 1);
         expect(canShow).toBe(true);
@@ -1347,7 +1341,7 @@ describe("GroupTestFlow", () => {
 
     it("Answer question with instruction sequence", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         const canShow = view.setPart(0);
         expect(canShow).toBe(true);
@@ -1359,7 +1353,7 @@ describe("GroupTestFlow", () => {
 
     it("Show instructions", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setPart(0);
         view.showQuestion(true, 0);
@@ -1667,16 +1661,7 @@ describe("GroupTestDomElements - Repeatbutton", () => {
 
     it("repeat button destination", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(
-            test,
-            {
-                addEventListener: vi.fn(),
-                send: vi.fn(),
-            },
-            1,
-            domElements,
-            student,
-        );
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setRepeatDestination(1);
         view.setPart(0);
@@ -1689,7 +1674,7 @@ describe("GroupTestDomElements - Repeatbutton", () => {
 
     it("should repeat the CURRENT question if no repeat destination is set", () => {
         const test = new Test(groupTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
 
         view.setPart(0);
@@ -1723,7 +1708,7 @@ describe("compareTextAnswer", () => {
 
         const test = new Test(groupTestData);
         domElements = new GroupTestDomElements();
-        view = new GroupTestView(test, ws, 1, domElements, student);
+        view = new GroupTestView(test, 1, domElements, student);
     });
 
     afterEach(() => {
@@ -1776,7 +1761,7 @@ describe("Timer and Reminder Cleanup", () => {
         const test = new Test(groupTestData);
 
         domElements = new GroupTestDomElements();
-        view = new GroupTestView(test, ws, 1, domElements, student);
+        view = new GroupTestView(test, 1, domElements, student);
 
         // Use a part/question we know is multiple_choice to avoid free_text logic crashes
         view.setPart(0);
@@ -1851,7 +1836,7 @@ describe("Pause and resume", () => {
 
         const test = new Test(groupTestData);
         domElements = new GroupTestDomElements();
-        view = new GroupTestView(test, ws, 1, domElements, student);
+        view = new GroupTestView(test, 1, domElements, student);
 
         view.setPart(0);
         view.setQuestion(false, 0);
@@ -1952,7 +1937,6 @@ describe("A window that is taken over", () => {
     it("hangs up on the teacher", () => {
         new GroupTestView(
             new Test(groupTestData),
-            ws,
             1,
             new GroupTestDomElements(),
             student,
@@ -1977,7 +1961,7 @@ describe("StudentTestView - updateNextButtonClass", () => {
         domElements = new GroupTestDomElements();
         spyAttributes(domElements);
 
-        view = new GroupTestView(test, ws, 1, domElements, student);
+        view = new GroupTestView(test, 1, domElements, student);
         testSpy(view);
         view.setPart(0);
     });
@@ -2125,7 +2109,7 @@ describe("LetterSoundTest", () => {
 
     it("Increases font size on answerButton objects", async () => {
         const test = new Test(letterSoundTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.setPart(0);
         view.showFirstQuestion(false);
 
@@ -2135,7 +2119,7 @@ describe("LetterSoundTest", () => {
 
     it("Plays sound when button is clicked", async () => {
         const test = new Test(letterSoundTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.setPart(0);
         view.showFirstQuestion(false);
 
@@ -2182,7 +2166,7 @@ describe("Sentence Reading Test", () => {
 
     it("Displays both image and text", async () => {
         const test = new Test(sentenceReadingTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.setPart(0);
         view.showFirstQuestion(false);
 
@@ -2196,7 +2180,7 @@ describe("Sentence Reading Test", () => {
 
     it("Uses correct font size", async () => {
         const test = new Test(sentenceReadingTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.setPart(0);
         view.showFirstQuestion(false);
 
@@ -2212,7 +2196,7 @@ describe("Sentence Reading Test", () => {
 
     it("Dims True when False is clicked and the other way around", async () => {
         const test = new Test(sentenceReadingTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.setPart(0);
         view.showFirstQuestion(false);
 
@@ -2233,7 +2217,7 @@ describe("Sentence Reading Test", () => {
 
     it("Resets button states when a button is clicked again", async () => {
         const test = new Test(sentenceReadingTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.setPart(0);
         view.showFirstQuestion(false);
 
@@ -2256,7 +2240,7 @@ describe("Sentence Reading Test", () => {
 
     it("Resets button states when a non-button element is clicked", async () => {
         const test = new Test(sentenceReadingTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.start();
         view.setPart(0);
         view.showFirstQuestion(false);
@@ -2281,7 +2265,7 @@ describe("Sentence Reading Test", () => {
 
     it("Adds no-hover class when unselecting and removes it on pointerleave", async () => {
         const test = new Test(sentenceReadingTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.start();
         view.setPart(0);
         view.showFirstQuestion(false);
@@ -2330,7 +2314,7 @@ describe("Letter Shape Test", () => {
 
     it("Updates elements and correctly identifies the correct answer", async () => {
         const test = new Test(letterShapeTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.setPart(0);
         view.showFirstQuestion(false);
 
@@ -2384,7 +2368,7 @@ describe("Letter Shape Test", () => {
 
     it("Allows proceeding from practice question when both answers are correct", async () => {
         const test = new Test(letterShapeTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.setPart(0);
         view.start();
         domElements.playSound.mockResolvedValue();
@@ -2429,7 +2413,7 @@ describe("Letter Shape Test", () => {
 
     it("Helps student after three failed attempts", async () => {
         const test = new Test(letterShapeTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.setPart(0);
         view.start();
         view.showFirstQuestion(true);
@@ -2481,7 +2465,7 @@ describe("Letter Shape Test", () => {
 
     it("Helps student after three failed attempts when left row is correct", async () => {
         const test = new Test(letterShapeTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.setPart(0);
         view.start();
         view.showFirstQuestion(true);
@@ -2524,7 +2508,7 @@ describe("Letter Shape Test", () => {
 
     it("Helps student after three failed attempts when right row is correct", async () => {
         const test = new Test(letterShapeTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.setPart(0);
         view.start();
         view.showFirstQuestion(true);
@@ -2567,7 +2551,7 @@ describe("Letter Shape Test", () => {
 
     it("Unable to press next button when both answers are wrong", async () => {
         const test = new Test(letterShapeTestData);
-        const view = new GroupTestView(test, ws, 1, domElements, student);
+        const view = new GroupTestView(test, 1, domElements, student);
         view.setPart(0);
         view.start();
         view.showFirstQuestion(true);

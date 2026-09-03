@@ -6,11 +6,11 @@ import { preventDoubleTapZoom } from "./utils.js";
 import { WebRTCChannel } from "../webRTC.js";
 import { fallbackOnWebRTCFailure } from "../webSocketChannel.js";
 import { WINDOW_BLOCKED_EVENT } from "./window-lock.js";
-import { initRedirectSocket } from "../lobby/student.js";
+import { listenForRedirect } from "../redirect.js";
 import { gettext } from "../i18n.js";
+import { getAssignmentSocket } from "../ws.js";
 
 export class StudentTestView extends EventTarget {
-    chatSocket;
     assignmentId;
     domElements;
     student;
@@ -26,12 +26,13 @@ export class StudentTestView extends EventTarget {
     repeatQuestionIndex = null;
     paused = false;
 
-    constructor(test, chatSocket, assignmentId, domElements, student) {
+    constructor(test, assignmentId, domElements, student) {
         super();
         preventDoubleTapZoom();
         this.test = test;
         this.channel = new WebRTCChannel();
-        this.channel.studentSetup(chatSocket, student, assignmentId);
+        const assignmentSocket = getAssignmentSocket(assignmentId);
+        this.channel.studentSetup(assignmentSocket, student, assignmentId);
         this.assignmentId = assignmentId;
         this.domElements = domElements;
         this.student = student;
@@ -40,7 +41,7 @@ export class StudentTestView extends EventTarget {
         // Fallback to websocket communication in case webRTC fails
         // Websocket communication does NOT work offline.
         fallbackOnWebRTCFailure(this.channel, {
-            chatSocket: chatSocket,
+            chatSocket: assignmentSocket,
             assignmentId: assignmentId,
             studentId: student.id,
             onFallback: (channel) => {
@@ -55,7 +56,7 @@ export class StudentTestView extends EventTarget {
         this.audioContext = unlockAudioOnGesture();
         this.failedAttempts = 0;
         this.cancelAudio = false;
-        initRedirectSocket(student.id, assignmentId, ["session.start"]);
+        listenForRedirect(student.id, assignmentId, ["session.start"]);
     }
 
     questionTitle(practice = false) {

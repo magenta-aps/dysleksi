@@ -45,7 +45,6 @@ import {
     TeacherView,
     AudioIndicator,
 } from "../../../screening/controlroom.js";
-import { getWebSocket } from "../../../ws.js";
 
 describe("initTeacher", () => {
     let showButtonsSpy, questionShowSpy;
@@ -72,12 +71,11 @@ describe("initTeacher", () => {
         const args = TeacherView.mock.calls[0];
         expect(args[0]).toBe(testObj);
         expect(args[1]).toBe(assignmentId);
-        expect(args[2]).toBe(getWebSocket);
-        expect(args[3]).toBeInstanceOf(EventTable);
-        expect(args[4]).toBeInstanceOf(ActionButtons);
-        expect(args[5]).toBeNull();
-        expect(args[6]).toBeInstanceOf(QuestionView);
-        expect(args[7]).toBeInstanceOf(ElapsedTimeView);
-        expect(args[8]).toBeInstanceOf(AudioIndicator);
+        expect(args[2]).toBeInstanceOf(EventTable);
+        expect(args[3]).toBeInstanceOf(ActionButtons);
+        expect(args[4]).toBeNull();
+        expect(args[5]).toBeInstanceOf(QuestionView);
+        expect(args[6]).toBeInstanceOf(ElapsedTimeView);
+        expect(args[7]).toBeInstanceOf(AudioIndicator);
     });
 });

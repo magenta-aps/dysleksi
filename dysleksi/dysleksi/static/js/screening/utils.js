@@ -1,4 +1,4 @@
-import { getWebSocket } from "../ws.js";
+import { getLobbySocket, getAssignmentSocket } from "../ws.js";
 
 let wakeLock = null;
 
@@ -46,49 +46,59 @@ export function setResponsiveFontSize(button, maxFontSize) {
     new ResizeObserver(getSize).observe(button);
 }
 
+function sessionMessage(event, studentIds, assignmentId, timestamp) {
+    return JSON.stringify({
+        uuid: crypto.randomUUID(),
+        event: event,
+        roomUrl: window.location.href.replace(window.location.origin, ""),
+        studentIds: studentIds,
+        timestamp: timestamp,
+        assignmentId: assignmentId,
+    });
+}
+
+function announceSession(socket, studentIds, assignmentId, timestamp) {
+    const message = sessionMessage(
+        "session.start",
+        studentIds,
+        assignmentId,
+        timestamp,
+    );
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(message);
+    } else {
+        socket.addEventListener("open", () => socket.send(message), { once: true });
+    }
+}
+
 export function startSession(studentIds, assignmentId) {
-    const chatSocket = getWebSocket();
+    const lobbySocket = getLobbySocket();
+    const assignmentSocket = getAssignmentSocket(assignmentId);
     const timestamp = Date.now();
 
-    chatSocket.addEventListener(
-        "open",
-        () => {
-            chatSocket.send(
-                JSON.stringify({
-                    uuid: crypto.randomUUID(),
-                    event: "session.start",
-                    roomUrl: window.location.href.replace(window.location.origin, ""),
-                    studentIds: studentIds,
-                    timestamp: timestamp,
-                    assignmentId: assignmentId,
-                }),
-            );
-        },
-        { once: true },
-    );
+    // Students waiting in the lobby are called in over the lobby socket.
+    announceSession(lobbySocket, studentIds, assignmentId, timestamp);
 
-    chatSocket.addEventListener("message", (e) => {
+    // Students who are already in a room of this assignment have left the lobby
+    // behind, and are told over the assignment socket instead.
+    announceSession(assignmentSocket, studentIds, assignmentId, timestamp);
+
+    lobbySocket.addEventListener("message", (e) => {
         const data = JSON.parse(e.data);
         if (data.event === "student.ready" && studentIds.includes(data.studentId)) {
             refreshSession(studentIds, assignmentId, timestamp);
         }
     });
 
-    return chatSocket;
+    return lobbySocket;
 }
 
 export function refreshSession(studentIds, assignmentId, timestamp) {
-    const chatSocket = getWebSocket();
-    if (chatSocket.readyState === WebSocket.OPEN) {
-        chatSocket.send(
-            JSON.stringify({
-                uuid: crypto.randomUUID(),
-                event: "session.in_progress",
-                roomUrl: window.location.href.replace(window.location.origin, ""),
-                studentIds: studentIds,
-                timestamp: timestamp,
-                assignmentId: assignmentId,
-            }),
+    // Only students waiting in the lobby need to be invited while a test is in progress
+    const lobbySocket = getLobbySocket();
+    if (lobbySocket.readyState === WebSocket.OPEN) {
+        lobbySocket.send(
+            sessionMessage("session.in_progress", studentIds, assignmentId, timestamp),
         );
     }
 }
