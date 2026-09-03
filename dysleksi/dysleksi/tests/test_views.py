@@ -164,6 +164,29 @@ class TestAssignmentView(DysleksiTest):
         context = view.get_context_data()
         self.assertIn("test_contents", context)
 
+    def open_room(self, user: User):
+        self.setup_view(
+            AssignmentView,
+            user,
+            room_name="class_1",
+            test_id=self.individual_test.id,
+            pk=self.assignment1.id,
+        )
+        self.assignment1.refresh_from_db()
+
+    def test_teacher_starts_the_test(self):
+        self.assertIsNone(self.assignment1.start_date_time)
+
+        self.open_room(self.teacher)
+
+        self.assertIsNotNone(self.assignment1.start_date_time)
+
+    def test_student_does_not_start_the_test(self):
+        # Only the teacher decides when a test starts
+        self.open_room(self.student1)
+
+        self.assertIsNone(self.assignment1.start_date_time)
+
     def test_access(self):
         for assignment in (self.assignment1, self.assignment2):
             for user in (self.admin, self.teacher, self.student1, self.privileged_user):

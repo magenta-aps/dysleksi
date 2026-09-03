@@ -49,13 +49,11 @@ describe("test startSession", () => {
         event: "session.start",
         roomUrl: "/",
         studentIds: studentIds,
-        timestamp: 1000,
         assignmentId: assignmentId,
     });
 
     it("should send session.start event", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
-        vi.spyOn(Date, "now").mockReturnValue(1000);
         const chatSocket = startSession(studentIds, assignmentId);
         expect(chatSocket.addEventListener).toHaveBeenCalled();
 
@@ -65,7 +63,6 @@ describe("test startSession", () => {
 
     it("should wait for a socket that is still connecting", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
-        vi.spyOn(Date, "now").mockReturnValue(1000);
 
         const chatSocket = wsModule.getLobbySocket();
         chatSocket.readyState = WebSocket.CONNECTING;
@@ -82,7 +79,6 @@ describe("test startSession", () => {
 
     it("should refresh session", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
-        vi.spyOn(Date, "now").mockReturnValue(1000);
 
         let chatSocket = startSession(studentIds, assignmentId);
         expect(chatSocket.addEventListener).toHaveBeenCalled();
@@ -97,7 +93,6 @@ describe("test startSession", () => {
                 event: "session.in_progress",
                 roomUrl: "/",
                 studentIds: studentIds,
-                timestamp: 1000,
                 assignmentId: assignmentId,
             }),
         );
@@ -126,7 +121,7 @@ describe("test startSession", () => {
         lobbySocket.send.mockClear();
 
         // Trigger the refresh
-        refreshSession(studentIds, assignmentId, 1000);
+        refreshSession(studentIds, assignmentId);
 
         // Verify send was never called
         expect(lobbySocket.send).not.toHaveBeenCalled();

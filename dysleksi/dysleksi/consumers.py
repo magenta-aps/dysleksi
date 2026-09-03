@@ -6,7 +6,7 @@ from channels.exceptions import DenyConnection
 from channels.generic.websocket import JsonWebsocketConsumer
 from django.core.cache import caches
 
-from dysleksi.models import HandledEvent, Message, Student
+from dysleksi.models import HandledEvent, Message, Student, TestAssignment
 
 logger = logging.getLogger(__name__)
 cache = caches["chat"]  # As defined in settings/cache.py
@@ -124,8 +124,39 @@ class RelayConsumer(JsonWebsocketConsumer):
         logger.info("'%s' left relay '%s'", self.user, self.room_name)
 
     def receive_json(self, content: dict, **kwargs):
+        invite_events = ("session.start", "session.in_progress")
+        if self.room_name == "lobby" and content.get("event") in invite_events:
+
+            # Only consider students for which this is their latest assignment.
+            content["studentIds"] = self.students_to_invite(content)
+
+            if not content["studentIds"]:
+                # The lobby is for inviting students to tests.
+                # If there is nobody to invite, the message should be rejected
+                return
+
         content["type"] = "relay.message"
         async_to_sync(self.channel_layer.group_send)(self.room_group_name, content)
+
+    def students_to_invite(self, content: dict) -> list[int]:
+        student_ids = content["studentIds"]
+        assignment_id = content["assignmentId"]
+
+        start_date_time = TestAssignment.objects.get(pk=assignment_id).start_date_time
+
+        students_with_newer_assignments = {
+            student.pk
+            for student in Student.objects.filter(pk__in=student_ids)
+            if student.has_assignment_after(start_date_time)
+        }
+
+        if students_with_newer_assignments:
+            logger.info(
+                "Not inviting students %s to assignment '%s'; they have a newer one",
+                sorted(students_with_newer_assignments),
+                content["assignmentId"],
+            )
+        return [id for id in student_ids if id not in students_with_newer_assignments]
 
     def relay_message(self, message: dict):
         self.send_json({k: v for k, v in message.items() if k != "type"})
