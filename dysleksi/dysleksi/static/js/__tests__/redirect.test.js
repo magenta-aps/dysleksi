@@ -25,8 +25,6 @@ describe("listenForRedirect", () => {
     };
 
     beforeEach(() => {
-        vi.useFakeTimers();
-
         // Mock window.location so assignment works
         originalLocation = global.window?.location;
         global.window = {
@@ -41,7 +39,6 @@ describe("listenForRedirect", () => {
 
     afterEach(() => {
         vi.clearAllMocks();
-        vi.useRealTimers();
         global.window.location = originalLocation;
     });
 
@@ -52,12 +49,8 @@ describe("listenForRedirect", () => {
             event: "session.in_progress",
             roomUrl: "/rooms/room-1/",
             studentIds: [studentId],
-            timestamp: 1,
         });
 
-        // Redirect is debounced, so nothing happens until the timer fires
-        expect(window.location).toBe("");
-        vi.advanceTimersByTime(300);
         expect(window.location).toBe("/rooms/room-1/");
     });
 
@@ -68,10 +61,8 @@ describe("listenForRedirect", () => {
             event: "session.start",
             roomUrl: "/rooms/room-2/",
             studentIds: [studentId],
-            timestamp: 1,
         });
 
-        vi.advanceTimersByTime(300);
         expect(window.location).toBe("/rooms/room-2/");
     });
 
@@ -84,57 +75,9 @@ describe("listenForRedirect", () => {
             roomUrl: "/rooms/room-1/",
             studentIds: [studentId],
             assignmentId: 42,
-            timestamp: 1,
         });
 
-        vi.advanceTimersByTime(300);
         expect(window.location).toBe("");
-    });
-
-    it("redirects to the latest test-assignment when a newer one arrives", () => {
-        listenForRedirect(studentId);
-
-        // First (older) assignment
-        receive({
-            event: "session.start",
-            roomUrl: "/rooms/room-old/",
-            studentIds: [studentId],
-            timestamp: 1,
-        });
-
-        // Newer assignment arrives within the debounce window
-        receive({
-            event: "session.in_progress",
-            roomUrl: "/rooms/room-new/",
-            studentIds: [studentId],
-            timestamp: 2,
-        });
-
-        vi.advanceTimersByTime(300);
-        expect(window.location).toBe("/rooms/room-new/");
-    });
-
-    it("keeps the newer test-assignment when an older one arrives afterwards", () => {
-        listenForRedirect(studentId);
-
-        // Newer assignment arrives first
-        receive({
-            event: "session.in_progress",
-            roomUrl: "/rooms/room-new/",
-            studentIds: [studentId],
-            timestamp: 2,
-        });
-
-        // An older, out-of-order assignment arrives within the debounce window
-        receive({
-            event: "session.start",
-            roomUrl: "/rooms/room-old/",
-            studentIds: [studentId],
-            timestamp: 1,
-        });
-
-        vi.advanceTimersByTime(300);
-        expect(window.location).toBe("/rooms/room-new/");
     });
 
     it("redirects when the test-assignment matches", () => {
@@ -145,10 +88,8 @@ describe("listenForRedirect", () => {
             roomUrl: "/rooms/room-42/",
             studentIds: [studentId],
             assignmentId: 42,
-            timestamp: 1,
         });
 
-        vi.advanceTimersByTime(300);
         expect(window.location).toBe("/rooms/room-42/");
     });
 
@@ -160,10 +101,8 @@ describe("listenForRedirect", () => {
             roomUrl: "/rooms/room-1337/",
             studentIds: [studentId],
             assignmentId: 1337,
-            timestamp: 1,
         });
 
-        vi.advanceTimersByTime(300);
         expect(window.location).toBe("");
     });
 
@@ -175,10 +114,8 @@ describe("listenForRedirect", () => {
             roomUrl: "/rooms/room-1337/",
             studentIds: [studentId],
             assignmentId: 1337,
-            timestamp: 1,
         });
 
-        vi.advanceTimersByTime(300);
         expect(window.location).toBe("/rooms/room-1337/");
     });
 
@@ -189,10 +126,8 @@ describe("listenForRedirect", () => {
             event: "session.start",
             roomUrl: "/rooms/room-2/",
             studentIds: [1337],
-            timestamp: 1,
         });
 
-        vi.advanceTimersByTime(300);
         expect(window.location).not.toBe("/rooms/room-2/");
     });
 
@@ -202,10 +137,8 @@ describe("listenForRedirect", () => {
         receive({
             event: "ping",
             roomUrl: "/should-not-redirect/",
-            timestamp: 1,
         });
 
-        vi.advanceTimersByTime(300);
         expect(window.location).not.toBe("/should-not-redirect/");
     });
 

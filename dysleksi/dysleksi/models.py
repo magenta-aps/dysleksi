@@ -342,6 +342,27 @@ class Student(PermissionsMixin, User):
         verbose_name = _("elev")
         verbose_name_plural = _("elever")
 
+    @property
+    def latest_active_assignment(self) -> "TestAssignment | None":
+        return (
+            TestAssignment.objects.filter(Q(student=self) | Q(klasse__students=self))
+            .exclude(start_date_time__isnull=True)
+            .order_by("-start_date_time")
+            .first()
+        )
+
+    def has_assignment_after(self, date_time):
+        """
+        Returns True if the student has a more recent assignment waiting for him/her,
+        compared to the given datetime
+        """
+        latest = self.latest_active_assignment
+
+        if latest and latest.start_date_time > date_time:
+            return True
+        else:
+            return False
+
 
 @receiver(post_save, sender=Student)
 def on_update_student(sender, instance: Student, created: bool, **kwargs):
@@ -751,11 +772,26 @@ class TestAssignment(PermissionsMixin, models.Model):
         blank=True,
         null=True,
     )
+    # When a teacher last started this test. A test which is only planned has not
+    # been started yet.
+    start_date_time = models.DateTimeField(
+        blank=True,
+        null=True,
+    )
 
     @property
     def klasse_name(self):
         if self.klasse:
             return self.klasse.name
+
+    def start(self) -> None:
+        """Start the test, as when the teacher opens its test-room.
+
+        Starting a test makes it the newest one of its students, so it is the test
+        they are invited into while they wait in the lobby.
+        """
+        self.start_date_time = timezone.now()
+        self.save(update_fields=["start_date_time"])
 
     def end(self) -> None:
         """End the test, as when the teacher clicks "Afslut test".

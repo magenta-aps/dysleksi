@@ -89,11 +89,9 @@ describe("initRedirectSocket", () => {
                 roomUrl: "/rooms/room-1337/",
                 studentIds: [studentId],
                 assignmentId: 1337,
-                timestamp: 1,
             }),
         });
 
-        vi.advanceTimersByTime(300);
         expect(window.location).toBe("/rooms/room-1337/");
     });
 });
