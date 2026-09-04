@@ -778,6 +778,11 @@ class TestAssignment(PermissionsMixin, models.Model):
         blank=True,
         null=True,
     )
+    name = models.CharField(
+        max_length=200,
+        blank=True,
+        null=True,
+    )
 
     @property
     def klasse_name(self):

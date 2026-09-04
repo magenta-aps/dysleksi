@@ -29,7 +29,12 @@ from django.db.models import (
 )
 from django.db.models.expressions import BaseExpression, OuterRef, Subquery, Window
 from django.db.models.functions import Coalesce, Length, Replace, RowNumber
-from django.http.response import Http404, HttpResponse, JsonResponse
+from django.http.response import (
+    Http404,
+    HttpResponse,
+    HttpResponseRedirect,
+    JsonResponse,
+)
 from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse
@@ -43,7 +48,7 @@ from django_stubs_ext import StrOrPromise
 from django_tables2 import Column, SingleTableMixin, SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
 
-from dysleksi.forms import StartClassRoomForm, StartIndividualRoomForm
+from dysleksi.forms import StartRoomForm
 from dysleksi.models import (
     PARTIAL_SCORE,
     TEACHERS,
@@ -90,6 +95,9 @@ from dysleksi.tables import (
     column_group,
 )
 from dysleksi.utils import reverse_ordering, scan_static_files
+
+# Logger for errors encountered server-side (i.e. by any view)
+logger = logging.getLogger(__name__)
 
 # Errors and warnings reported by the browser are logged under their own logger
 # name, so they can be told apart from server side errors in the container log.
@@ -449,8 +457,6 @@ class TestAssignmentListView(
         context = super().get_context_data(**kwargs)
         self.add_navigation_context(context, self.current_class, None)
         context["class"] = self.current_class
-        context["assign_group_form"] = StartClassRoomForm(teacher=self.user)
-        context["assign_individual_form"] = StartIndividualRoomForm(teacher=self.user)
         return context
 
     @cached_property
@@ -461,12 +467,11 @@ class TestAssignmentListView(
         return None
 
 
-class StartAssignmentView(GroupRequiredMixin, CreateView):
+class StartAssignmentView(GroupRequiredMixin, NavigationMixin, CreateView):
     template_name = "dysleksi/lobby/start_room.html"
     model = TestAssignment
-    http_method_names = ["post"]
+    form_class = StartRoomForm
     groups_required = [TEACHERS]
-    test_type: TestType | None = None  # overridden in subclasses
 
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
@@ -482,17 +487,6 @@ class StartAssignmentView(GroupRequiredMixin, CreateView):
         else:
             return reverse("dysleksi:room", kwargs={"pk": self.object.pk})
 
-    def form_invalid(self, form):
-        return JsonResponse(
-            {
-                "status": "error",
-                "error": "\n\n".join(
-                    ", ".join(str(error.message) for error in errors)
-                    for field, errors in form.errors.as_data().items()
-                ),
-            }
-        )
-
     def form_valid(self, form):
         if form.cleaned_data["test_parts"]:
             self.object = self.create_test_from_test_parts(form)
@@ -500,14 +494,14 @@ class StartAssignmentView(GroupRequiredMixin, CreateView):
             # Implicitly sets `self.object` to the created `TestAssignment`
             super().form_valid(form)
         # Note: our `get_success_url` depends on `self.object` being set
-        return JsonResponse({"status": "success", "redirect": self.get_success_url()})
+        return HttpResponseRedirect(self.get_success_url())
 
     @transaction.atomic
     def create_test_from_test_parts(self, form) -> TestAssignment:
         # Create test
         test = Test.objects.create(
             name=self._get_test_name(form),
-            test_type=self.test_type,  # type: ignore
+            test_type=form.cleaned_data["test_type"],
             custom=True,
         )
         # Add the selected test parts
@@ -529,16 +523,6 @@ class StartAssignmentView(GroupRequiredMixin, CreateView):
             raise ValueError(  # pragma: no cover
                 "cannot create test name for %d test parts", len(test_parts)
             )
-
-
-class StartIndividualAssignmentView(StartAssignmentView):
-    form_class = StartIndividualRoomForm
-    test_type = TestType.INDIVIDUAL
-
-
-class StartGroupAssignmentView(StartAssignmentView):
-    form_class = StartClassRoomForm
-    test_type = TestType.GROUP
 
 
 class AdminRootView(GroupRequiredMixin, TemplateView):

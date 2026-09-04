@@ -460,6 +460,12 @@ h6 {
 .d-flex .form-check {
   margin-right: $spacer;
 }
+.form-check-input.is-valid:checked {
+  background-color: transparent;
+}
+.form-check-input.is-valid ~ .form-check-label {
+  color: var(--bs-body-color);
+}
 input[type='datetime-local'] {
   border-radius: 0.75 * $spacer;
 }
@@ -473,6 +479,26 @@ textarea.form-control {
 // Text input fields
 .form-control {
   font-size: 0.75 * $spacer;
+}
+// "Inline" form input fields
+.inline-field {
+  field-sizing: content;
+  background: transparent;
+  outline: 0;
+  border: none;
+  border-bottom: 1px solid transparent;
+}
+.inline-field:hover {
+  cursor: pointer;
+}
+.inline-field:focus {
+  border-bottom: 1px solid $mono-gray-light;
+}
+.inline-field + i.ph-pencil-simple {
+  color: $mono-gray-dark-1;
+}
+.inline-field:hover + i.ph-pencil-simple {
+  color: $mono-gray-dark-3;
 }
 
 // Table styles
