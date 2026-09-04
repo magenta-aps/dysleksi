@@ -1,8 +1,17 @@
 {% extends "dysleksi/admin/base.html" %}
 {% load i18n %}
+{% load static %}
+
+{% block extra_headers %}
+    {{ block.super }}
+    {% if has_development %}
+    <script src="{% static 'vendor/js/chartjs/chart.umd.min.js' %}"></script>
+    {% endif %}
+{% endblock %}
 
 {% block breadcrumb %}
 <li class="breadcrumb-item"><a href="{% url 'dysleksi:class_list' %}">{% translate 'Klasser' %}</a></li>
+{% if main_class %}
 <li class="breadcrumb-item">
     {% has_permission main_class "view" as has_perm %}
     {% if has_perm %}
@@ -17,6 +26,7 @@
         {% endblocktranslate %}
     {% endif %}
 </li>
+{% endif %}
 <li class="breadcrumb-item active" aria-current="page">{{ object.get_full_name }}</li>
 {% endblock %}
 
@@ -29,60 +39,90 @@
     </div>
 </div>
 
-<div class="table-container">
-    <table class="table master-data">
-        <tr>
-            <td>{% translate 'Elev ID:' %}</td>
-            <td>{{ object.pk }}</td>
-        </tr>
-        <tr>
-            <td>{% translate 'CPR-nummer:' %}</td>
-            <td>{{ object.cpr }}</td>
-        </tr>
-        <tr>
-            <td>{% translate 'Kontaktmail:' %}</td>
-            <td>{{ object.email|default_if_none:'-' }}</td>
-        </tr>
-        {% if main_class %}
-        <tr>
-            <td>{% translate 'Klasse:' %}</td>
-            <td>
-                {% has_permission main_class "view" as has_perm %}
-                {% if has_perm %}
-                <a href="{% url 'dysleksi:class_detail' pk=main_class.pk %}">
-                    {{ main_class }}
-                </a>
-                {% else %}
-                {{ main_class }}
+<ul class="nav nav-pills mb-3" id="studentTab" role="tablist">
+    <li class="nav-item" role="presentation">
+        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview-tab-pane" type="button"
+                role="tab" aria-controls="overview-tab-pane" aria-selected="true">
+            {% translate 'Overblik' %}
+        </button>
+    </li>
+    <li class="nav-item" role="presentation">
+        <button class="nav-link" id="skills-tab" data-bs-toggle="tab" data-bs-target="#skills-tab-pane" type="button"
+                role="tab" aria-controls="skills-tab-pane" aria-selected="false">
+            {% translate 'Delfærdigheder' %}
+        </button>
+    </li>
+</ul>
+
+<div class="tab-content" id="studentTabContent">
+    <div class="tab-pane fade show active" id="overview-tab-pane" role="tabpanel" aria-labelledby="overview-tab" tabindex="0">
+        <div class="table-container">
+            <table class="table master-data">
+                <tr>
+                    <td>{% translate 'Elev ID:' %}</td>
+                    <td>{{ object.pk }}</td>
+                </tr>
+                <tr>
+                    <td>{% translate 'CPR-nummer:' %}</td>
+                    <td>{{ object.cpr }}</td>
+                </tr>
+                <tr>
+                    <td>{% translate 'Kontaktmail:' %}</td>
+                    <td>{{ object.email|default_if_none:'-' }}</td>
+                </tr>
+                {% if main_class %}
+                <tr>
+                    <td>{% translate 'Klasse:' %}</td>
+                    <td>
+                        {% has_permission main_class "view" as has_perm %}
+                        {% if has_perm %}
+                        <a href="{% url 'dysleksi:class_detail' pk=main_class.pk %}">
+                            {{ main_class }}
+                        </a>
+                        {% else %}
+                        {{ main_class }}
+                        {% endif %}
+                    </td>
+                </tr>
                 {% endif %}
-            </td>
-        </tr>
-        {% endif %}
-        {% if teacher %}
-        <tr>
-            <td>{% translate 'Kontaktlærer:' %}</td>
-            <td>{{ teacher.get_full_name }}</td>
-        </tr>
-        {% endif %}
-        <tr>
-            <td>{% translate 'Gennemførte testforløb:' %}</td>
-            <td>
-                {% for a in completed_test_assignments %}
-                <span class="assignment d-inline-flex flex-column me-5">
-                    <div class="d-flex flex-row align-items-center">
-                        <i class="ph-fill ph-check-circle fs-5 me-1"></i>
-                        {{ a.test.name }}
-                    </div>
-                    {% has_permission a "view" as has_perm %}
-                    {% if has_perm %}
-                    <a href="{% url 'dysleksi:test_assignment_results' pk=a.pk %}">
-                        {% translate 'Se resultater' %}
-                    </a>
-                    {% endif %}
-                </span>
-                {% endfor %}
-            </td>
-        </tr>
-    </table>
+                {% if teacher %}
+                <tr>
+                    <td>{% translate 'Kontaktlærer:' %}</td>
+                    <td>{{ teacher.get_full_name }}</td>
+                </tr>
+                {% endif %}
+                <tr>
+                    <td>{% translate 'Gennemførte testforløb:' %}</td>
+                    <td>
+                        {% for a in completed_test_assignments %}
+                        <span class="assignment d-inline-flex flex-column me-5">
+                            <div class="d-flex flex-row align-items-center">
+                                <i class="ph-fill ph-check-circle fs-5 me-1"></i>
+                                {{ a.test.name }}
+                            </div>
+                            {% has_permission a "view" as has_perm %}
+                            {% if has_perm %}
+                            <a href="{% url 'dysleksi:test_assignment_results' pk=a.pk %}">
+                                {% translate 'Se resultater' %}
+                            </a>
+                            {% endif %}
+                        </span>
+                        {% endfor %}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane fade" id="skills-tab-pane" role="tabpanel" aria-labelledby="skills-tab" tabindex="0">
+        {% include "dysleksi/admin/student/skills.html" %}
+    </div>
 </div>
+{% endblock %}
+
+{% block js_module %}
+    {{ block.super }}
+    <script type="module">
+        import { initializeStudentDevelopment } from "{% static 'js/admin/student-development.js' %}";
+        document.addEventListener("DOMContentLoaded", initializeStudentDevelopment);
+    </script>
 {% endblock %}

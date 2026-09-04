@@ -1,0 +1,41 @@
+{% load i18n %}
+
+<div id="skills-list">
+    {% for skill in skills %}
+    <div class="student-skill">
+        <div class="student-skill-name">
+            <div>{{ skill.part.name }}</div>
+            <div class="subheader">
+                {% blocktranslate trimmed with test_name=skill.test.name %}
+                Seneste test: {{ test_name }}
+                {% endblocktranslate %}
+            </div>
+        </div>
+        <div class="student-skill-bar">
+            {% include "dysleksi/admin/student/normscore_bar.html" with response=skill.response subgroups=skill.subgroups %}
+        </div>
+        <div class="student-skill-link">
+            {% if skill.development %}
+            <a href="#development-{{ skill.part.pk }}">
+                {% translate 'Se udvikling' %}
+            </a>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="student-skill-legend">
+        {% for category in categories %}
+        <span class="student-skill-legend-item">
+            <span class="student-skill-legend-color category-{{ category.color_key }}"></span>
+            {{ category.label }}
+        </span>
+        {% endfor %}
+    </div>
+</div>
+
+{% for skill in skills %}
+    {% if skill.development %}
+    {% include "dysleksi/admin/student/development.html" %}
+    {% endif %}
+{% endfor %}

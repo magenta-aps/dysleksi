@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 import json
-from datetime import timedelta
+from datetime import datetime, timedelta
 from operator import attrgetter
 from unittest.mock import patch
 
@@ -10,21 +10,27 @@ from bs4 import BeautifulSoup
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.core.management import call_command
 from django.http.response import Http404, HttpResponse, HttpResponseRedirect
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
+from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
 from dysleksi.models import (
     Class,
+    Correctness,
     CorrectnessCategory,
     Institution,
+    PartResponse,
+    QuestionResponse,
     Student,
     Test,
     TestAssignment,
     TestAssignmentStatus,
     TestPart,
+    TestResponse,
     TestType,
     User,
 )
@@ -333,6 +339,8 @@ class TestStudentDetailView(DysleksiTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
+        # The page shows the student's subskill scores
+        call_command("create_result_categories")
         # Add student which is not part of `cls.klasse`
         klasse = cls.create_class(2025, "Matematik", is_main=False)
         klasse.teachers.add(cls.teacher)
@@ -360,6 +368,142 @@ class TestStudentDetailView(DysleksiTest):
         response = self.client.get(
             reverse("dysleksi:student_detail", kwargs={"pk": self.student1.pk})
         )
+        self.assertEqual(response.status_code, 403)
+
+
+class StudentSkillsTest(ResponseTest):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        super().create_parts()
+        tz = timezone.get_current_timezone()
+
+        cls.earlier_test = Test.objects.create(
+            name="Test0",
+            test_type=TestType.GROUP,
+        )
+        cls.earlier_test.parts.add(cls.group_test_part)
+        cls.earlier_assignment = TestAssignment.objects.create(
+            test=cls.earlier_test,
+            teacher=cls.teacher,
+            klasse=cls.klasse,
+        )
+        cls.earlier_test_response = TestResponse.objects.create(
+            assignment=cls.earlier_assignment,
+            student=cls.student1,
+            completed=True,
+        )
+        cls.earlier_part_response = PartResponse.objects.create(
+            testresponse=cls.earlier_test_response,
+            testpart=cls.group_test_part,
+            completed=True,
+            started_at=datetime(2025, 5, 1, 12, 0, 0, tzinfo=tz),
+        )
+        QuestionResponse.objects.create(
+            partresponse=cls.earlier_part_response,
+            question=cls.group_question_1,
+            correctness=Correctness.CORRECT,
+        )
+        QuestionResponse.objects.create(
+            partresponse=cls.earlier_part_response,
+            question=cls.group_question_2,
+            correctness=Correctness.WRONG,
+        )
+
+
+class TestStudentSkillsView(StudentSkillsTest):
+
+    def _get_url(self, student):
+        return reverse("dysleksi:student_detail", kwargs={"pk": student.pk})
+
+    def _get_skills(self, student):
+        view = self.setup_view(StudentDetailView, self.teacher, pk=student.pk)
+        return view.get_context_data()["skills"]
+
+    def test_shows_the_latest_score_of_each_subskill(self):
+        skills = self._get_skills(self.student1)
+
+        # `cls.part` belongs to the individual test, which the student has not
+        # taken, so it is not listed
+        self.assertEqual([skill["part"] for skill in skills], [self.group_test_part])
+
+        skill = skills[0]
+        self.assertEqual(skill["test"], self.group_test)
+        self.assertEqual(skill["response"], self.group_partresponse_1)
+        self.assertEqual(skill["response"].score, 4)
+        self.assertEqual(skill["response"].questions_count, 4)
+        self.assertEqual(skill["response"].percentage, 100)
+
+        # 4 questions split over the four score categories
+        self.assertEqual(
+            [
+                (
+                    subgroup.category.color_key,
+                    subgroup.lower_bound,
+                    subgroup.upper_bound,
+                )
+                for subgroup in skill["subgroups"]
+            ],
+            [("red", 0, 0), ("yellow", 1, 1), ("green", 2, 3), ("blue", 4, 4)],
+        )
+
+    def test_no_development_after_a_single_test(self):
+        skills = self._get_skills(self.student2)
+        self.assertEqual([skill["part"] for skill in skills], [self.group_test_part])
+        self.assertIsNone(skills[0]["development"])
+
+    def test_cancelled_responses_are_left_out(self):
+        self.test_response_class_1.cancelled = True
+        self.test_response_class_1.save()
+
+        skills = self._get_skills(self.student1)
+        # Only the earlier response is left, so there is nothing to develop from
+        self.assertEqual(skills[0]["test"], self.earlier_test)
+        self.assertIsNone(skills[0]["development"])
+
+    def test_one_development_column_per_test_in_chronological_order(self):
+        development = self._get_skills(self.student1)[0]["development"]
+
+        # The columns are headed by the date the student took the test
+        self.assertEqual(
+            [column["response"].started_at for column in development["columns"]],
+            [
+                self.earlier_part_response.started_at,
+                self.group_partresponse_1.started_at,
+            ],
+        )
+        self.assertEqual(
+            [column["response"].score for column in development["columns"]],
+            [1, 4],
+        )
+        self.assertEqual(development["plot"], [25, 100])
+
+    def test_the_score_is_categorized_per_test(self):
+        columns = self._get_skills(self.student1)[0]["development"]["columns"]
+
+        categories = {
+            category.color_key: category.pk
+            for category in CorrectnessCategory.non_default()
+        }
+        # 1 out of 4 is "Under middel", 4 out of 4 is "Over middel"
+        self.assertEqual(columns[0]["response"].category, categories["yellow"])
+        self.assertEqual(columns[1]["response"].category, categories["blue"])
+        # The interval each category covers, for the number of questions asked
+        self.assertEqual(columns[0]["ranges"][categories["yellow"]].lower_bound, 1)
+        self.assertEqual(columns[0]["ranges"][categories["yellow"]].upper_bound, 1)
+
+    def test_teacher_view(self):
+        self.client.force_login(self.teacher)
+        response = self.client.get(self._get_url(self.student1))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Se udvikling")
+        # The development is on the same page, hidden until the link is clicked
+        self.assertContains(response, "Tilbage til delfærdigheder")
+
+    def test_student_view(self):
+        self.client.force_login(self.student1)
+        response = self.client.get(self._get_url(self.student1))
         self.assertEqual(response.status_code, 403)
 
 
