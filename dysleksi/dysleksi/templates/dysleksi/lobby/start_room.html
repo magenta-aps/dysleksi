@@ -1,49 +1,89 @@
-{% extends "dysleksi/base.html" %}
+{% extends "dysleksi/admin/base.html" %}
 {% load i18n %}
+{% load static %}
 {% load django_bootstrap5 %}
 
-{% block content %}
-<div class="container mt-4" style="max-width: 640px;" data-lobby-role="teacher">
+{% block inner_content %}
+<div class="mb-3">
+    <form novalidate method="post" class="start-room">
+        <h1>
+            {% translate "Tildel test:" %}
+            {{ form.name }}
+            <i class="ph-fill ph-pencil-simple"></i>
+        </h1>
 
-  {% if test_type == "group" %}
-    <h1 class="mb-4">{% trans "Start gruppetest" %}</h1>
-  {% else %}
-    <h1 class="mb-4">{% trans "Start individueltest" %}</h1>
-  {% endif %}
+        <div class="table-container col-8 mt-4 mb-3 px-4 py-4">
+            {% csrf_token %}
 
-  {# Add data-room to the form #}
-  <form method="post" novalidate id="start-room-form" data-room="">
-    {% csrf_token %}
+            {% bootstrap_form_errors form type="non_fields" %}
 
-    {% if form.non_field_errors %}
-      <div class="alert alert-danger">
-        {{ form.non_field_errors }}
-      </div>
-    {% endif %}
+            {% bootstrap_field form.test_type wrapper_class="test-type-choice" field_class="d-flex" %}
+            {% if form.is_group %}
+            {% bootstrap_field form.klasse wrapper_class="mb-3 class-choice" %}
+            {% bootstrap_field form.student wrapper_class="mb-3 student-choice d-none" %}
+            {% else %}
+            {% bootstrap_field form.klasse wrapper_class="mb-3 class-choice d-none" %}
+            {% bootstrap_field form.student wrapper_class="mb-3 student-choice" %}
+            {% endif %}
 
-    {% if test_type == "group" %}
-      <div class="mb-3">
-        {% bootstrap_field form.klasse %}
-      </div>
-    {% else %}
-      <div class="mb-3">
-        {% bootstrap_field form.student %}
-      </div>
-    {% endif %}
+            {% bootstrap_field form.is_test_part wrapper_class="is-test-part-choice" field_class="d-flex" %}
+            {% if form.is_group and form.is_test %}
+            {% bootstrap_field form.class_test wrapper_class="mb-3 class-test-choice" %}
+            {% bootstrap_field form.class_test_parts wrapper_class="mb-3 class-test-part-choice d-none" %}
+            {% bootstrap_field form.student_test wrapper_class="mb-3 student-test-choice d-none" %}
+            {% bootstrap_field form.student_test_parts wrapper_class="mb-3 student-test-part-choice d-none" %}
+            {% elif form.is_group and not form.is_test %}
+            {% bootstrap_field form.class_test wrapper_class="mb-3 class-test-choice d-none" %}
+            {% bootstrap_field form.class_test_parts wrapper_class="mb-3 class-test-part-choice" %}
+            {% bootstrap_field form.student_test wrapper_class="mb-3 student-test-choice d-none" %}
+            {% bootstrap_field form.student_test_parts wrapper_class="mb-3 student-test-part-choice d-none" %}
+            {% elif not form.is_group and form.is_test %}
+            {% bootstrap_field form.class_test wrapper_class="mb-3 class-test-choice d-none" %}
+            {% bootstrap_field form.class_test_parts wrapper_class="mb-3 class-test-part-choice d-none" %}
+            {% bootstrap_field form.student_test wrapper_class="mb-3 student-test-choice" %}
+            {% bootstrap_field form.student_test_parts wrapper_class="mb-3 student-test-part-choice d-none" %}
+            {% elif not form.is_group and not form.is_test %}
+            {% bootstrap_field form.class_test wrapper_class="mb-3 class-test-choice d-none" %}
+            {% bootstrap_field form.class_test_parts wrapper_class="mb-3 class-test-part-choice d-none" %}
+            {% bootstrap_field form.student_test wrapper_class="mb-3 student-test-choice d-none" %}
+            {% bootstrap_field form.student_test_parts wrapper_class="mb-3 student-test-part-choice" %}
+            {% endif %}
 
-    <div class="mb-4">
-      {% bootstrap_field form.test %}
-    </div>
-
-    <div class="d-flex gap-2">
-      <button type="submit" class="btn btn-primary">
-        {% trans "Start test" %}
-      </button>
-      <a href="{% url 'dysleksi:root' %}" class="btn btn-outline-secondary">
-        {% trans "Annullér" %}
-      </a>
-    </div>
-  </form>
+            {% bootstrap_field form.is_immediate wrapper_class="is-immediate-choice" field_class="d-flex" %}
+            <div class="start-datetime row mt-3 mb-3 d-flex align-items-center {% if form.hide_start_datetime %}d-none{% endif %}">
+                {% bootstrap_field form.start_datetime layout="horizontal" wrapper_class="col-6" %}
+                <div class="col-6">
+                    <button class="add-end btn inline-button">
+                        <i class="ph ph-plus me-1"></i>
+                        {% translate "Tilføj sluttidspunkt" %}
+                    </button>
+                </div>
+            </div>
+            <div class="end-datetime row mt-3 mb-3 d-flex align-items-center {% if form.hide_start_datetime or form.hide_end_datetime %}d-none{% endif %}">
+                {% bootstrap_field form.end_datetime layout="horizontal" wrapper_class="col-6" %}
+                <div class="col-6">
+                    <button class="remove-end btn inline-button">
+                        <i class="ph ph-x me-1"></i>
+                        {% translate "Fjern sluttidspunkt" %}
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="d-flex">
+            <a href="{% url 'dysleksi:root' %}" class="btn btn-outline-secondary me-3">
+                <i class="ph ph-x"></i>
+                {% translate "Afbryd" %}
+            </a>
+            <button type="submit" class="btn btn-primary">
+                <i class="ph ph-check"></i>
+                {% translate "Bekræft og tildel test" %}
+            </button>
+        </div>
+    </form>
 </div>
+{% endblock %}
 
+{% block js_module %}
+{{ block.super }}
+<script type="module" src="{% static 'js/admin/start-room-form.js' %}"></script>
 {% endblock %}

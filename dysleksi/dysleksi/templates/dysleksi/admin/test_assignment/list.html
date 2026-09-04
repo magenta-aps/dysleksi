@@ -2,8 +2,6 @@
 {% load i18n %}
 {% load static %}
 {% load render_table from django_tables2 %}
-{% load assign_group_modal from modals %}
-{% load assign_individual_modal from modals %}
 
 {% block breadcrumb %}
 {% if current_class %}
@@ -45,26 +43,6 @@
             {% endif %}
         </h5>
     </div>
-    <div class="col-6 mt-2 text-end">
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assign_group">
-            <i class="ph ph-plus me-1"></i>
-            {% translate 'Tildel gruppetest' %}
-        </button>
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#assign_individual">
-            <i class="ph ph-plus me-1"></i>
-            {% translate 'Tildel individuel test' %}
-        </button>
-    </div>
 </div>
 {% render_table table %}
-{% endblock %}
-
-{% block modals %}
-{% assign_group_modal form=assign_group_form %}
-{% assign_individual_modal form=assign_individual_form %}
-{% endblock %}
-
-{% block js_module %}
-{{ block.super }}
-<script type="module" src="{% static 'js/admin/wizard.js' %}"></script>
 {% endblock %}

@@ -21,18 +21,49 @@ msgstr ""
 msgid "Dysleksi"
 msgstr ""
 
+#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/class/list.html
+msgid "Ny test til målgruppen"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Gruppetest"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Individuel test"
+msgstr ""
+
 #: dysleksi/forms.py
 msgid "Vælg testtype"
 msgstr ""
 
-#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_base.html
-#: dysleksi/views.py
+#: dysleksi/forms.py
+msgid "Vælg klasse"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Vælg elev"
+msgstr ""
+
+#: dysleksi/forms.py dysleksi/views.py
 msgid "Test"
 msgstr ""
 
 #: dysleksi/forms.py
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Deltest"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Vælg testsammensætning"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Vælg test"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Vælg deltests"
 msgstr ""
 
 #: dysleksi/forms.py
@@ -47,12 +78,12 @@ msgstr ""
 msgid "Planlæg"
 msgstr ""
 
-#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_base.html
+#: dysleksi/forms.py
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
 msgid "Start"
 msgstr ""
 
-#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/modals/assign_base.html
+#: dysleksi/forms.py
 msgid "Slut"
 msgstr ""
 
@@ -66,22 +97,6 @@ msgstr ""
 
 #: dysleksi/forms.py dysleksi/tests/test_forms.py
 msgid "Slutdato kan ikke være før startdato"
-msgstr ""
-
-#: dysleksi/forms.py
-msgid "Vælg elev"
-msgstr ""
-
-#: dysleksi/forms.py
-msgid "Vælg test"
-msgstr ""
-
-#: dysleksi/forms.py
-msgid "Vælg deltests"
-msgstr ""
-
-#: dysleksi/forms.py
-msgid "Vælg klasse"
 msgstr ""
 
 #: dysleksi/management/commands/create_result_categories.py
@@ -354,7 +369,7 @@ msgstr ""
 msgid "Elevens svar"
 msgstr ""
 
-#: dysleksi/tables.py dysleksi/templates/dysleksi/admin/modals/assign_base.html
+#: dysleksi/tables.py
 msgid "Tid"
 msgstr ""
 
@@ -477,59 +492,8 @@ msgstr ""
 msgid "Planlagt %(start|date:\"SHORT_DATE_FORMAT\")s"
 msgstr ""
 
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
-#: dysleksi/templates/dysleksi/admin/modals/assign_group.html
-#: dysleksi/templates/dysleksi/admin/test_assignment/list.html
-msgid "Tildel gruppetest"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
-msgid "Deltagere og test"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
-msgid "Bekræft"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
-msgid "Tilføj sluttidspunkt"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
-msgid "Fjern sluttidspunkt"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
-msgid "Bekræft følgende opsætning"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
-msgid "Deltagere"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
-msgid "Testtype"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
-msgid "Indeholder deltests"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
-msgid "Tilbage"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
-msgid "Næste"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_base.html
-msgid "Bekræft og tildel test"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/modals/assign_individual.html
-#: dysleksi/templates/dysleksi/admin/test_assignment/list.html
-msgid "Tildel individuel test"
+#: dysleksi/templates/dysleksi/admin/class/list.html
+msgid "Tildel test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/base.html
@@ -964,25 +928,35 @@ msgid "Administrator"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/start_room.html
-#: dysleksi/templates/dysleksi/lobby/teacher.html
-msgid "Start gruppetest"
+msgid "Tildel test:"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/start_room.html
-#: dysleksi/templates/dysleksi/lobby/teacher.html
-msgid "Start individueltest"
+msgid "Tilføj sluttidspunkt"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/start_room.html
-msgid "Start test"
+msgid "Fjern sluttidspunkt"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/start_room.html
-msgid "Annullér"
+msgid "Afbryd"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/start_room.html
+msgid "Bekræft og tildel test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/teacher.html
 msgid "Lærer"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/teacher.html
+msgid "Start individueltest"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/teacher.html
+msgid "Start gruppetest"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/screening/student.html
