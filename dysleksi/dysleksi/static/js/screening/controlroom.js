@@ -1,6 +1,6 @@
 import { getAssignmentSocket, getSyncSocket } from "..//ws.js";
 import { Student } from "./model.js";
-import { WebRTCChannel } from "../webRTC.js";
+import { WebRTCPeer } from "../webRTC.js";
 import { WebSocketChannel } from "../webSocketChannel.js";
 import { serverOnline } from "./utils.js";
 import { gettext, blocktranslate } from "../i18n.js";
@@ -1321,6 +1321,7 @@ export class TeacherView {
             console.info("could not create bootstrap modal for #error");
         }
 
+        this.webRTCPeer = new WebRTCPeer();
         this.studentChannels = {};
 
         const savedQueue = localStorage.getItem(`msg_queue_${this.assignmentId}`);
@@ -1626,16 +1627,12 @@ export class TeacherView {
             ) {
                 console.log("Setting up webRTC channel for student", data.studentId);
 
-                const p2p = new WebRTCChannel();
+                const p2p = this.webRTCPeer.connect(data.webRTCId);
                 this._addStudentChannel(data.studentId, p2p);
 
                 p2p.addEventListener("close", () => {
                     console.log("Connection closed for student", data.studentId);
                     this._removeStudentChannel(data.studentId, p2p);
-                });
-
-                p2p.peer.on("open", () => {
-                    p2p.connect(data.webRTCId);
                 });
             }
 

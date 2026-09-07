@@ -14,19 +14,18 @@ import { InstructionSequenceRunner } from "../../screening/instruction.js";
 import { MockAudioContext } from "../mock_audio.js";
 
 const mockP2P = {
-    connect: vi.fn(),
     send: vi.fn(),
     close: vi.fn(),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
-    studentSetup: vi.fn(),
     messageQueue: [],
 };
 
 vi.mock("../../webRTC.js", () => {
     return {
-        WebRTCChannel: vi.fn().mockImplementation(function () {
-            return mockP2P;
+        WebRTCPeer: vi.fn().mockImplementation(function () {
+            this.studentSetup = vi.fn().mockReturnValue(mockP2P);
+            this.close = vi.fn();
         }),
     };
 });

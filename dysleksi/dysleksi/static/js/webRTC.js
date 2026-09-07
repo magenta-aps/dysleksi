@@ -1,9 +1,8 @@
-export class WebRTCChannel extends EventTarget {
-    constructor() {
-        super();
-        this.conn = null;
-        this.messageQueue = []; // Store messages here if not connected
+export class WebRTCPeer {
+    /* Owns the connection to the signalling server. A teacher page needs one
+       channel per student, and they all share this single peer. */
 
+    constructor() {
         const configElement = document.getElementById("webrtc-config");
         const config = JSON.parse(configElement.textContent);
 
@@ -16,15 +15,20 @@ export class WebRTCChannel extends EventTarget {
             secure: true,
             key: config.key,
         });
+
+        this.opened = new Promise((resolve) => this.peer.on("open", resolve));
+    }
+
+    connect(webRTCId) {
+        const channel = new WebRTCChannel();
+        this.opened.then(() => channel.attach(this.peer.connect(webRTCId)));
+        return channel;
     }
 
     studentSetup(chatSocket, student, assignmentId) {
-        this.peer.on("connection", (connection) => {
-            this.conn = connection;
-            this._setupConnectionEvents();
-        });
-
-        this.peer.on("open", (id) => {
+        const channel = new WebRTCChannel();
+        this.peer.on("connection", (connection) => channel.attach(connection));
+        this.opened.then((id) => {
             chatSocket.send(
                 JSON.stringify({
                     event: "student.joined",
@@ -34,37 +38,49 @@ export class WebRTCChannel extends EventTarget {
                 }),
             );
         });
+        return channel;
     }
 
-    async connect(id) {
-        this.conn = this.peer.connect(id);
-        this._setupConnectionEvents();
+    close() {
+        this.peer.destroy();
+    }
+}
+
+export class WebRTCChannel extends EventTarget {
+    constructor() {
+        super();
+        this.conn = null;
+        this.messageQueue = []; // Store messages here if not connected
     }
 
-    _setupConnectionEvents() {
-        this.conn.on("open", () => {
+    attach(conn) {
+        this.conn = conn;
+
+        conn.on("open", () => {
             // Send all messages that were waiting
             while (this.messageQueue.length > 0) {
                 const msg = this.messageQueue.shift();
                 console.log("Sending queued message: ", msg.event);
-                this.conn.send(msg);
+                conn.send(msg);
             }
 
             this.dispatchEvent(new Event("open"));
         });
 
-        this.conn.on("data", (data) => {
+        conn.on("data", (data) => {
             this.dispatchEvent(new CustomEvent("message", { detail: data }));
         });
 
         // The window on the other end closed, reloaded, or hung up on us
-        this.conn.on("close", () => {
+        conn.on("close", () => {
             this.dispatchEvent(new Event("close"));
         });
     }
 
     close() {
-        this.peer.destroy();
+        if (this.conn !== null) {
+            this.conn.close();
+        }
     }
 
     send(data) {

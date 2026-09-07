@@ -3,7 +3,7 @@ import { requestWakeLock } from "./utils.js";
 import { releaseWakeLock } from "./utils.js";
 import { unlockAudioOnGesture } from "./utils.js";
 import { preventDoubleTapZoom } from "./utils.js";
-import { WebRTCChannel } from "../webRTC.js";
+import { WebRTCPeer } from "../webRTC.js";
 import { fallbackOnWebRTCFailure } from "../webSocketChannel.js";
 import { WINDOW_BLOCKED_EVENT } from "./window-lock.js";
 import { listenForRedirect } from "../redirect.js";
@@ -30,9 +30,9 @@ export class StudentTestView extends EventTarget {
         super();
         preventDoubleTapZoom();
         this.test = test;
-        this.channel = new WebRTCChannel();
+        this.peer = new WebRTCPeer();
         const assignmentSocket = getAssignmentSocket(assignmentId);
-        this.channel.studentSetup(assignmentSocket, student, assignmentId);
+        this.channel = this.peer.studentSetup(assignmentSocket, student, assignmentId);
         this.assignmentId = assignmentId;
         this.domElements = domElements;
         this.student = student;
@@ -45,7 +45,7 @@ export class StudentTestView extends EventTarget {
             assignmentId: assignmentId,
             studentId: student.id,
             onFallback: (channel) => {
-                this.channel.close();
+                this.peer.close();
                 this.channel = channel;
                 this._listenOnChannel(channel);
             },
