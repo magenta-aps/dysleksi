@@ -422,7 +422,81 @@ class StudentDetailView(
             status=TestAssignmentStatus.COMPLETED
         )
 
+        skills = self.get_skills()
+        context_data["skills"] = skills
+        context_data["has_development"] = any(skill["development"] for skill in skills)
+        context_data["categories"] = CorrectnessCategory.non_default().order_by(
+            "upper_proportion_limit"
+        )
+        context_data["CorrectnessCategories"] = CorrectnessCategory.pk_map()
+
         return context_data
+
+    def get_part_responses(self) -> PartResponseQuerySet:
+        return (
+            PartResponse.objects.filter(
+                testresponse__student=self.object,
+                testresponse__completed=True,
+                testresponse__cancelled=False,
+                completed=True,
+            )
+            .annotate_score("score", Q(question__is_practice=False))
+            .annotate_questions_count("questions_count", Q(is_practice=False))
+            .annotate_proportion("questions_count", "score", "proportion")
+            .annotate_percentage("proportion", "percentage")
+            .annotate_score_category("proportion", "category")
+            .select_related("testpart", "testresponse__assignment__test")
+            .order_by("started_at", "pk")
+        )
+
+    def get_skills(self) -> List[Dict[str, Any]]:
+        by_part: Dict[int, List[PartResponse]] = {}
+        for part_response in self.get_part_responses():
+            by_part.setdefault(part_response.testpart_id, []).append(part_response)
+
+        skills = []
+        for part_pk, responses in sorted(by_part.items()):
+            latest = responses[-1]
+            skills.append(
+                {
+                    "part": latest.testpart,
+                    "test": latest.testresponse.assignment.test,
+                    "response": latest,
+                    "subgroups": CorrectnessCategory.partition_question_count(
+                        latest.questions_count  # type: ignore[attr-defined]
+                    ),
+                    # There is nothing to develop from until the second test
+                    "development": (
+                        self.get_development(responses) if len(responses) > 1 else None
+                    ),
+                }
+            )
+
+        return skills
+
+    @staticmethod
+    def get_development(responses: List[PartResponse]) -> Dict[str, Any]:
+        columns = []
+        for response in responses:
+            subgroups = CorrectnessCategory.partition_question_count(
+                response.questions_count  # type: ignore[attr-defined]
+            )
+            columns.append(
+                {
+                    "response": response,
+                    "ranges": {
+                        subgroup.category.pk: subgroup for subgroup in subgroups
+                    },
+                }
+            )
+
+        return {
+            "columns": columns,
+            "plot": [
+                response.percentage  # type: ignore[attr-defined]
+                for response in responses
+            ],
+        }
 
 
 class TestAssignmentListView(

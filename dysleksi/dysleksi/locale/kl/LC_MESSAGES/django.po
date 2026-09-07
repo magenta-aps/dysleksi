@@ -442,6 +442,7 @@ msgid "Årgang %(school_year_start)s"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/class/detail.html
+#: dysleksi/templates/dysleksi/admin/student/detail.html
 msgid "Overblik"
 msgstr ""
 
@@ -694,9 +695,14 @@ msgid "Læsetempo"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_responses/group/normscore_plot.html
+#: dysleksi/templates/dysleksi/admin/student/development.html
 #: dysleksi/templates/dysleksi/admin/test_response/detail.html
 #: dysleksi/views.py
 msgid "Normscore"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/student/detail.html
+msgid "Delfærdigheder"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/student/detail.html
@@ -712,6 +718,32 @@ msgstr ""
 #| msgid "Klasser"
 msgid "Klasse:"
 msgstr "Klassit"
+
+#: dysleksi/templates/dysleksi/admin/student/development.html
+msgid "Tilbage til delfærdigheder"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/student/development.html
+#, python-format
+msgid "Udvikling i %(part_name)s"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/student/development.html
+msgid "Score"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/student/development.html
+msgid "Dato"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/student/skills.html
+#, python-format
+msgid "Seneste test: %(test_name)s"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/student/skills.html
+msgid "Se udvikling"
+msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/table_columns/class_actions.html
 msgid "Åbn klasse"

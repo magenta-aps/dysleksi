@@ -175,7 +175,7 @@ class Command(BaseCommand):
             is_main=False,
             institution=school,
         )
-        secondary_class.teachers.set([teacher, teacher2, teacher3])
+        secondary_class.teachers.set([teacher, teacher3])
 
         klasse = Class.objects.get(school_year_start=school_year_start, name="2.A")
         klasse.students.add(student)
@@ -185,6 +185,7 @@ class Command(BaseCommand):
 
         klasse = Class.objects.get(school_year_start=school_year_start, name="0.C")
         klasse.students.add(student3)
+        klasse.teachers.add(teacher2)
         secondary_class.students.add(student3)
 
         for group_test_student in group_test_students:

@@ -1,0 +1,30 @@
+{% load l10n %}
+{# The student's `score`, marked by an arrow on a bar of the score categories #}
+<div class="normscore-arrow" style="left: {{ response.percentage }}%">
+    <div>
+        {{ response.score|floatformat:"-1" }}
+        <i class="ph-fill ph-caret-down"></i>
+    </div>
+</div>
+{% localize off %}
+<div class="normscore-bar">
+    {% spaceless %}
+    {% for subgroup in subgroups %}
+        <div
+                class="normscore-part category-{{ subgroup.category.color_key }}"
+                style="width: calc(100% * ({{ subgroup.category.upper_proportion_limit }} - {{ subgroup.category.lower_proportion_limit }}))"
+        >
+        </div>
+    {% endfor %}
+    {% endspaceless %}
+</div>
+<div class="normscore-scale">
+    {% spaceless %}
+    {% for subgroup in subgroups %}
+        <div style="width: calc(100% * ({{ subgroup.category.upper_proportion_limit }} - {{ subgroup.category.lower_proportion_limit }}))">
+            {{ subgroup.lower_bound }}-{{ subgroup.upper_bound }}
+        </div>
+    {% endfor %}
+    {% endspaceless %}
+</div>
+{% endlocalize %}
