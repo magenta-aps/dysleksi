@@ -648,9 +648,6 @@ ul.modal-progress {
 
 .modal.cancel-test {
   .uncompleted-students {
-    p:last-child {
-      margin-bottom: 0;
-    }
 
     // A whole class must be readable without scrolling the modal
     ul.student-list {
