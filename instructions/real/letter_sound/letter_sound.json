@@ -100,7 +100,7 @@
         "sound": "resources/shared/Bogstavlyde/1f.13 - u.mp3",
         "correct": "u",
         "correct_index": 1,
-        "wrong": ["e", "q", "a"]
+        "wrong": ["i", "q", "a"]
     },
     {
         "question_type": "multiple_choice",
@@ -175,7 +175,7 @@
     {
         "question_type": "multiple_choice",
         "sound": "resources/shared/Bogstavlyde/1f.24 - t[d].mp3",
-        "correct": "t(d)",
+        "correct": "t",
         "correct_index": 2,
         "wrong": ["j", "s", "f"]
     }
