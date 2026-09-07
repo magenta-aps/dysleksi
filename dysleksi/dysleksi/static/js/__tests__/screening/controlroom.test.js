@@ -599,11 +599,11 @@ describe("Teacher Individual test View", () => {
 
     beforeEach(() => {
         vi.useFakeTimers();
-        global.localStorage = {
+        vi.stubGlobal("localStorage", {
             getItem: vi.fn(),
             setItem: vi.fn(),
             clear: vi.fn(),
-        };
+        });
 
         socket = mockSocket();
 
@@ -1814,11 +1814,11 @@ describe("GroupTestContainer", () => {
 describe("TeacherView _initFilterButtonSelection", () => {
     beforeEach(() => {
         vi.useFakeTimers();
-        global.localStorage = {
+        vi.stubGlobal("localStorage", {
             getItem: vi.fn(),
             setItem: vi.fn(),
             clear: vi.fn(),
-        };
+        });
 
         document.body.innerHTML = `
             <div class="group-test-header">
@@ -1889,11 +1889,11 @@ describe("TeacherView socket 'test.started' handling", () => {
 
     beforeEach(() => {
         vi.useFakeTimers();
-        global.localStorage = {
+        vi.stubGlobal("localStorage", {
             getItem: vi.fn(),
             setItem: vi.fn(),
             clear: vi.fn(),
-        };
+        });
 
         document.body.innerHTML = GROUP_DOM_HTML;
 
@@ -2109,11 +2109,11 @@ describe("TeacherView cancel test modal", () => {
 
     beforeEach(() => {
         vi.useFakeTimers();
-        global.localStorage = {
+        vi.stubGlobal("localStorage", {
             getItem: vi.fn(),
             setItem: vi.fn(),
             clear: vi.fn(),
-        };
+        });
     });
 
     afterEach(() => {

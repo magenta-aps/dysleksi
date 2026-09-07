@@ -10,6 +10,10 @@
     {
       "matchPackageNames": ["django-stubs", "django-stubs-ext"],
       "groupName": "django-stubs"
+    },
+    {
+      "matchPackageNames": ["vitest", "@vitest/**"],
+      "groupName": "vitest"
     }
   ]
 }
