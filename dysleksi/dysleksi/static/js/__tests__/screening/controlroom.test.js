@@ -805,6 +805,47 @@ describe("Teacher Individual test View", () => {
         expect(questionNumber.innerText).toBe("Opgave 1 af 3");
     });
 
+    it("numbers practice questions by their position among practice questions", () => {
+        const questionNumber = document.getElementById("question-number");
+        const thisQuestionView = new QuestionView(
+            "#question-container",
+            "#question-title",
+            "#question-content",
+            "#part-name",
+            "#part-number",
+            "#question-number",
+        );
+        view = new TeacherView(
+            individualTest,
+            1,
+            table,
+            buttons,
+            note,
+            thisQuestionView,
+        );
+        view.setPartIndex(0);
+        // One instruction followed by three practice questions
+        const practice = view.test.parts[0].practice;
+        view.test.parts[0].practice = [
+            practice[0],
+            practice[1],
+            practice[1],
+            practice[1],
+        ];
+
+        view.setQuestionIndex(0, true);
+        expect(questionNumber.innerText).toBe("Instruktion 1 af 1");
+
+        view.setQuestionIndex(1, true);
+        expect(questionNumber.innerText).toBe("Øveopgave 1 af 3");
+
+        view.setQuestionIndex(2, true);
+        expect(questionNumber.innerText).toBe("Øveopgave 2 af 3");
+
+        view.setQuestionIndex(3, true);
+        expect(questionNumber.innerText).toBe("Øveopgave 3 af 3");
+    });
+
     it("initializes socket and button listeners", () => {
         expect(getAssignmentSocket).toHaveBeenCalledWith(1);
         expect(socket.addEventListener).toHaveBeenCalledWith(
