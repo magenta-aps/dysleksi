@@ -2,13 +2,14 @@
  * @vitest-environment jsdom
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
-import { WebRTCChannel } from "../webRTC.js";
+import { WebRTCPeer, WebRTCChannel } from "../webRTC.js";
 
 class MockConnection extends EventTarget {
     constructor() {
         super();
         this.open = false;
         this.send = vi.fn();
+        this.close = vi.fn();
     }
     on(event, cb) {
         this.addEventListener(event, (e) => cb(e.detail !== undefined ? e.detail : e));
@@ -30,9 +31,14 @@ class MockPeer extends EventTarget {
 // Attach to global so the constructor in webRTC.js finds it
 global.Peer = MockPeer;
 
-describe("WebRTCChannel", () => {
-    let channel;
+describe("WebRTCPeer", () => {
+    let peer;
     let mockPeerInstance;
+
+    const open = async (id = "generated-id-456") => {
+        mockPeerInstance.dispatchEvent(new CustomEvent("open", { detail: id }));
+        await peer.opened;
+    };
 
     beforeEach(() => {
         // Setup the config element required by the constructor
@@ -48,7 +54,7 @@ describe("WebRTCChannel", () => {
             return mockPeerInstance;
         });
 
-        channel = new WebRTCChannel();
+        peer = new WebRTCPeer();
     });
 
     it("should initialize with correct PeerJS configuration", () => {
@@ -60,32 +66,27 @@ describe("WebRTCChannel", () => {
                 secure: true,
             }),
         );
-        expect(channel.messageQueue).toEqual([]);
     });
 
-    it('should send "student.joined" via chatSocket when peer opens', () => {
+    it('should send "student.joined" via chatSocket when peer opens', async () => {
         const mockChatSocket = { send: vi.fn() };
-        const mockStudent = { id: 123 };
 
-        channel.studentSetup(mockChatSocket, mockStudent);
-
-        // Simulate PeerJS 'open' event
-        mockPeerInstance.dispatchEvent(
-            new CustomEvent("open", { detail: "generated-id-456" }),
-        );
+        peer.studentSetup(mockChatSocket, { id: 123 }, 7);
+        await open();
 
         expect(mockChatSocket.send).toHaveBeenCalledWith(
             JSON.stringify({
                 event: "student.joined",
                 studentId: 123,
                 webRTCId: "generated-id-456",
+                assignmentId: 7,
             }),
         );
     });
 
     it("should assign connection when a remote peer connects (Teacher -> Student)", () => {
         const mockConn = new MockConnection();
-        channel.studentSetup({}, {});
+        const channel = peer.studentSetup({ send: vi.fn() }, {});
 
         // Simulate incoming connection
         mockPeerInstance.dispatchEvent(
@@ -95,26 +96,50 @@ describe("WebRTCChannel", () => {
         expect(channel.conn).toBe(mockConn);
     });
 
-    it("connect(id) should initiate a PeerJS connection", async () => {
+    it("connect(id) should initiate a PeerJS connection once the peer is open", async () => {
         const mockConn = new MockConnection();
         mockPeerInstance.connect.mockReturnValue(mockConn);
 
-        channel.connect("student-id");
+        const channel = peer.connect("student-id");
+        expect(channel.conn).toBeNull();
+
+        await open();
 
         expect(mockPeerInstance.connect).toHaveBeenCalledWith("student-id");
         expect(channel.conn).toBe(mockConn);
+    });
+
+    it("shares a single peer between all the channels a teacher opens", async () => {
+        mockPeerInstance.connect.mockImplementation(() => new MockConnection());
+
+        const channels = [1, 2, 3].map((id) => peer.connect(`student-${id}`));
+        await open();
+
+        expect(global.Peer).toHaveBeenCalledTimes(1);
+        expect(mockPeerInstance.connect).toHaveBeenCalledTimes(3);
+        expect(new Set(channels.map((channel) => channel.conn)).size).toBe(3);
+    });
+
+    it("close() should destroy the peer", () => {
+        peer.close();
+
+        expect(mockPeerInstance.destroy).toHaveBeenCalled();
+    });
+});
+
+describe("WebRTCChannel", () => {
+    let channel;
+
+    beforeEach(() => {
+        channel = new WebRTCChannel();
     });
 
     it('should dispatch "message" event when data is received', () => {
         const mockConn = new MockConnection();
         const messageSpy = vi.fn();
         channel.addEventListener("message", messageSpy);
+        channel.attach(mockConn);
 
-        // Manually trigger setup
-        channel.conn = mockConn;
-        channel._setupConnectionEvents();
-
-        // Simulate incoming data
         const testData = { event: "draw", x: 10 };
         mockConn.dispatchEvent(new CustomEvent("data", { detail: testData }));
 
@@ -127,25 +152,30 @@ describe("WebRTCChannel", () => {
         const mockConn = new MockConnection();
         const closeSpy = vi.fn();
         channel.addEventListener("close", closeSpy);
-
-        channel.conn = mockConn;
-        channel._setupConnectionEvents();
+        channel.attach(mockConn);
 
         mockConn.dispatchEvent(new Event("close"));
 
         expect(closeSpy).toHaveBeenCalled();
     });
 
-    it("close() should destroy the peer", () => {
+    it("close() should close the connection but leave the peer alone", () => {
+        const mockConn = new MockConnection();
+        channel.attach(mockConn);
+
         channel.close();
 
-        expect(mockPeerInstance.destroy).toHaveBeenCalled();
+        expect(mockConn.close).toHaveBeenCalled();
+    });
+
+    it("close() should do nothing when the connection was never established", () => {
+        expect(() => channel.close()).not.toThrow();
     });
 
     it("should send data immediately if connection is open", () => {
         const mockConn = new MockConnection();
         mockConn.open = true;
-        channel.conn = mockConn;
+        channel.attach(mockConn);
 
         const data = { event: "test-event" };
         channel.send(data);
@@ -163,35 +193,21 @@ describe("WebRTCChannel", () => {
 
     it("should flush the message queue when the connection opens", () => {
         const mockConn = new MockConnection();
-        channel.conn = mockConn;
+        const openSpy = vi.fn();
+        channel.addEventListener("open", openSpy);
 
         const data1 = { event: "msg1" };
         const data2 = { event: "msg2" };
-
-        // 1. Queue messages
         channel.send(data1);
         channel.send(data2);
         expect(channel.messageQueue.length).toBe(2);
 
-        // 2. Setup events and trigger 'open'
-        channel._setupConnectionEvents();
+        channel.attach(mockConn);
         mockConn.dispatchEvent(new Event("open"));
 
-        // 3. Verify send was called for both and queue is empty
         expect(mockConn.send).toHaveBeenCalledWith(data1);
         expect(mockConn.send).toHaveBeenCalledWith(data2);
         expect(channel.messageQueue.length).toBe(0);
-    });
-
-    it('should dispatch an "open" event to listeners when connection is ready', () => {
-        const mockConn = new MockConnection();
-        const openSpy = vi.fn();
-        channel.addEventListener("open", openSpy);
-
-        channel.conn = mockConn;
-        channel._setupConnectionEvents();
-        mockConn.dispatchEvent(new Event("open"));
-
         expect(openSpy).toHaveBeenCalled();
     });
 });

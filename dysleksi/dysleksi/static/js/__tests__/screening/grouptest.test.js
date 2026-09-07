@@ -16,18 +16,17 @@ import { InstructionSequenceRunner } from "../../screening/instruction.js";
 import { WINDOW_BLOCKED_EVENT } from "../../screening/window-lock.js";
 
 const mockP2P = {
-    connect: vi.fn(),
     send: vi.fn(),
     close: vi.fn(),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
-    studentSetup: vi.fn(),
 };
 
 vi.mock("../../webRTC.js", () => {
     return {
-        WebRTCChannel: vi.fn().mockImplementation(function () {
-            return mockP2P;
+        WebRTCPeer: vi.fn().mockImplementation(function () {
+            this.studentSetup = vi.fn().mockReturnValue(mockP2P);
+            this.close = vi.fn();
         }),
     };
 });
