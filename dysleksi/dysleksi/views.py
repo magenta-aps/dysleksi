@@ -524,7 +524,7 @@ class TestAssignmentListView(
         qs = qs.annotate_school_year()
         qs = qs.annotate_class_name()
         qs = qs.annotate_status()
-        qs = qs.order_by("-id")
+        qs = qs.order_by("-start_date_time", "-id")
         return qs
 
     def get_context_data(self, **kwargs):
