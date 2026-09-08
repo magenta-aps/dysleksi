@@ -511,8 +511,7 @@ msgid "Eleven har ikke gennemført testen."
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/cancel_individual_test.html
-msgid ""
-"Hvis testen afbrydes, kan eleven ikke gennemføre den på et senere tidspunkt."
+msgid "Hvis du afslutter testen nu, kan eleven ikke fortsætte testen senere."
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/cancel_test_base.html
@@ -521,11 +520,11 @@ msgid "Afslut test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/cancel_test_base.html
-msgid "Er du sikker på at du vil afbryde testen?"
+msgid "Er du sikker på, at du vil afbryde testen?"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/cancel_test_base.html
-msgid "Fortryd"
+msgid "Fortsæt testen"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/error.html

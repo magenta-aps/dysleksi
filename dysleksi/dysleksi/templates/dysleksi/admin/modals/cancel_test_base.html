@@ -9,16 +9,16 @@
 {% block modal_title %}{% translate 'Afslut test' %}{% endblock %}
 
 {% block modal_body %}
-<p>{% translate 'Er du sikker på at du vil afbryde testen?' %}</p>
 {# Shown by `static/js/screening/controlroom.js` when one or more students have #}
 {# not completed the test #}
 <div class="uncompleted-students d-none">
     {% block uncompleted_students %}
     {% endblock %}
 </div>
+<p>{% translate 'Er du sikker på, at du vil afbryde testen?' %}</p>
 {% endblock %}
 
 {% block modal_footer %}
-<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{% translate 'Fortryd' %}</button>
+<button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{% translate 'Fortsæt testen' %}</button>
 <button type="button" class="btn btn-warning confirm-btn">{% translate 'Afslut test' %}</button>
 {% endblock %}
