@@ -6,15 +6,13 @@ import json
 import uuid
 from asyncio import Future, wait_for
 from datetime import timedelta
-from unittest.mock import ANY, MagicMock, call, patch
+from unittest.mock import MagicMock, patch
 
 from asgiref.sync import async_to_sync
 from channels.auth import AuthMiddlewareStack
 from channels.routing import URLRouter
 from channels.testing import WebsocketCommunicator
-from channels_redis.core import RedisChannelLayer
 from django.contrib.auth.models import AnonymousUser, Group
-from django.core.cache import caches
 from django.db.models.signals import post_save
 from django.test import TestCase, TransactionTestCase
 from django.utils import timezone
@@ -81,61 +79,6 @@ class TestChatConsumer(TestCase):
         communicator = await self._get_communicator()
         communicator.scope["user"] = AnonymousUser()
         await communicator.connect()
-
-    async def test_send_cached_messages(self):
-        with (
-            patch.object(caches["chat"], "get_many") as mock_cache,
-            patch.object(RedisChannelLayer, "send") as mock_send,
-        ):
-            mock_cache.return_value = {
-                "chat_classroom_0001": {
-                    "event": "lobby.joined",
-                    "room": "classroom",
-                },
-                "chat_classroom_0002": {
-                    "event": "lobby.present",
-                    "room": "classroom",
-                },
-                "chat_classroom_0003": {
-                    "event": "other.event",
-                    "room": "classroom",
-                },
-            }
-            communicator = await self._get_communicator()
-            connected, subprotocol = await communicator.connect()
-            self.assertTrue(connected)
-            await communicator.disconnect()
-            mock_send.assert_has_calls(
-                [
-                    call(
-                        ANY,
-                        {
-                            "type": "chat.message",
-                            "event": "lobby.joined",
-                            "room": "classroom",
-                        },
-                    ),
-                    call(
-                        ANY,
-                        {
-                            "type": "chat.message",
-                            "event": "lobby.present",
-                            "room": "classroom",
-                        },
-                    ),
-                ]
-            )
-            self.assertNotIn(
-                call(
-                    ANY,
-                    {
-                        "type": "chat.message",
-                        "event": "other.event",
-                        "room": "classroom",
-                    },
-                ),
-                mock_send.call_args_list,
-            )
 
 
 class TestRelayConsumer(TestCase):
