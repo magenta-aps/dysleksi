@@ -240,6 +240,23 @@ class TestLobbyInvitations(TransactionTestCase):
 
         self.assertIsNone(relayed)
 
+    def test_a_student_subset_only_concerns_the_students_in_it(self):
+        # The teacher started a newer group test for student1 alone
+        subset_assignment = TestAssignment.objects.create(
+            test=self.test,
+            teacher=self.teacher,
+            klasse=self.klasse,
+            start_date_time=timezone.now() + timedelta(minutes=5),
+        )
+        subset_assignment.student_subset.add(self.student1)
+
+        # It takes student1 away from their individual test, but student2 is
+        # not in the subset, so they are still invited into the group test
+        self.assertIsNone(self.invite(self.individual_assignment, [self.student1]))
+        relayed = self.invite(self.group_assignment, [self.student2])
+
+        self.assertEqual(relayed["studentIds"], [self.student2.pk])
+
 
 class TestChatConsumerMessageIntegration(TransactionTestCase):
 
