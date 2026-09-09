@@ -187,6 +187,33 @@ class TestReadingSupervisor(DysleksiTest):
             TestAssignment.objects.filter_user_permissions(self.teacher, "view"),
         )
 
+    def test_assignments_are_visible_to_the_teacher_of_the_class(self):
+        class_assignment = TestAssignment.objects.create(
+            test=self.group_test,
+            teacher=self.supervisor,
+            klasse=self.klasse,
+        )
+        student_assignment = TestAssignment.objects.create(
+            test=self.individual_test,
+            teacher=self.supervisor,
+            student=self.student1,
+        )
+        self.assertQuerySetEqual(
+            TestAssignment.objects.filter_user_permissions(self.teacher, "view"),
+            [
+                self.test_assignment_student,
+                self.test_assignment_class,
+                class_assignment,
+                student_assignment,
+            ],
+            ordered=False,
+        )
+        # A teacher who does not teach the class still sees nothing
+        self.assertQuerySetEqual(
+            TestAssignment.objects.filter_user_permissions(self.other_teacher, "view"),
+            [],
+        )
+
 
 class TestStudentQuerySet(DysleksiTest):
     def test_filter_user_object_permissions_teacher(self):
