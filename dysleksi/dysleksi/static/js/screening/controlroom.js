@@ -1400,28 +1400,18 @@ export class TeacherView {
         let questionType;
         let total;
         let current;
-        const counts = this.getPracticeQuestionCounts();
 
         if (practice) {
             this.currentQuestion = this.currentPart.practice[questionIndex];
-            const instructionSequence = this.currentQuestion.instruction_sequence;
-            if (instructionSequence !== null && instructionSequence !== undefined) {
-                questionType = gettext("Instruktion");
-                total = counts.instructions;
-                current = this.clamp(
-                    this.questionIndex + counts.instructions - counts.nonInstructions,
-                    1,
-                    total,
-                );
-            } else {
-                questionType = gettext("Øveopgave");
-                total = counts.nonInstructions;
-                current = this.clamp(
-                    this.questionIndex + counts.nonInstructions - counts.instructions,
-                    1,
-                    total,
-                );
-            }
+            const isInstruction = this.isInstruction(this.currentQuestion);
+            questionType = isInstruction
+                ? gettext("Instruktion")
+                : gettext("Øveopgave");
+            const sameKind = (p) => this.isInstruction(p) === isInstruction;
+            total = this.currentPart.practice.filter(sameKind).length;
+            current = this.currentPart.practice
+                .slice(0, questionIndex + 1)
+                .filter(sameKind).length;
         } else {
             this.currentQuestion = this.currentPart.questions[questionIndex];
             questionType = gettext("Opgave");
@@ -1449,18 +1439,11 @@ export class TeacherView {
         return Math.max(min, Math.min(number, max));
     }
 
-    getPracticeQuestionCounts() {
-        let instructions = 0;
-        let nonInstructions = 0;
-        for (const practice of this.currentPart.practice) {
-            const instructionSequence = practice.instruction_sequence;
-            if (instructionSequence !== null && instructionSequence !== undefined) {
-                instructions++;
-            } else {
-                nonInstructions++;
-            }
-        }
-        return { instructions: instructions, nonInstructions: nonInstructions };
+    isInstruction(question) {
+        return (
+            question.instruction_sequence !== null &&
+            question.instruction_sequence !== undefined
+        );
     }
 
     currentQuestionRequiresNoStudentInput() {
