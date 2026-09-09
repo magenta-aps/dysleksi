@@ -612,6 +612,22 @@ class TestTestAssignment(ResponseTest):
         self.assertEqual(assignment.responses.count(), 1)
         self.assertEqual(self.status(assignment), TestAssignmentStatus.CANCELLED)
 
+    def test_end_group_test_for_student_subset(self):
+        # Arrange: create test assignment for group test, using `student_subset`
+        test_assignment_student_subset = TestAssignment.objects.create(
+            test=self.group_test,
+            teacher=self.teacher,
+            klasse=self.klasse,
+        )
+        test_assignment_student_subset.student_subset.add(self.student2)
+        # Act
+        test_assignment_student_subset.end()
+        # Assert
+        self.assertEqual(test_assignment_student_subset.responses.count(), 1)
+        self.assertEqual(
+            self.status(test_assignment_student_subset), TestAssignmentStatus.CANCELLED
+        )
+
     def test_access(self):
         for user in (self.admin, self.privileged_user):
             self.assertQuerySetEqual(

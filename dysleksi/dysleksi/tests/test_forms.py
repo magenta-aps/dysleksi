@@ -3,8 +3,8 @@
 # SPDX-License-Identifier: MPL-2.0
 from django.utils.translation import gettext_lazy as _
 
-from dysleksi.forms import StartRoomForm, StudentChoiceField
-from dysleksi.models import Student
+from dysleksi.forms import ClassStudentFormSet, StartRoomForm, StudentChoiceField
+from dysleksi.models import Class, Student
 from dysleksi.tests.base import DysleksiTest
 
 
@@ -98,3 +98,21 @@ class TestStartRoomForm(DysleksiTest):
             "is_test_part": "test",
             "is_immediate": "n",
         }
+
+
+class TestClassStudentFormSet(DysleksiTest):
+    def test_requires_at_least_one_student(self):
+        instance = ClassStudentFormSet(
+            data={
+                "form-TOTAL_FORMS": "1",
+                "form-INITIAL_FORMS": "1",
+                "form-MIN_NUM_FORMS": "0",
+                "form-MAX_NUM_FORMS": "1000",
+                "form-0-id": self.klasse.pk,
+                "form-0-students": [],  # No students selected
+            },
+            queryset=Class.objects.filter(pk=self.klasse.pk),
+        )
+        self.assertFormSetError(
+            instance, 0, "students", _("Vælg venligst mindst én elev")
+        )

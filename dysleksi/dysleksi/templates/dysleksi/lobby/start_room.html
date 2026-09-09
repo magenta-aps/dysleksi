@@ -19,34 +19,43 @@
 
             {% bootstrap_field form.test_type wrapper_class="test-type-choice" field_class="d-flex" %}
             {% if form.is_group %}
-            {% bootstrap_field form.klasse wrapper_class="mb-3 class-choice" %}
-            {% bootstrap_field form.student wrapper_class="mb-3 student-choice d-none" %}
+            {% bootstrap_field form.klasse wrapper_class="class-choice" %}
+            {% bootstrap_field form.student wrapper_class="student-choice d-none" %}
             {% else %}
-            {% bootstrap_field form.klasse wrapper_class="mb-3 class-choice d-none" %}
-            {% bootstrap_field form.student wrapper_class="mb-3 student-choice" %}
+            {% bootstrap_field form.klasse wrapper_class="class-choice d-none" %}
+            {% bootstrap_field form.student wrapper_class="student-choice" %}
             {% endif %}
 
-            {% bootstrap_field form.is_test_part wrapper_class="is-test-part-choice" field_class="d-flex" %}
+            {{ class_student_formset.management_form }}
+            {% for class_student_form in class_student_formset %}
+            <div data-class-pk="{{ class_student_form.instance.pk }}"
+                 class="{% if not form.is_group or form.class_pk is None or form.class_pk != class_student_form.instance.pk %}d-none{% endif %}">
+                {% bootstrap_field class_student_form.students label="" %}
+                {% bootstrap_field class_student_form.id %}
+            </div>
+            {% endfor %}
+
+            {% bootstrap_field form.is_test_part wrapper_class="mt-3 is-test-part-choice" field_class="d-flex" %}
             {% if form.is_group and form.is_test %}
-            {% bootstrap_field form.class_test wrapper_class="mb-3 class-test-choice" %}
-            {% bootstrap_field form.class_test_parts wrapper_class="mb-3 class-test-part-choice d-none" %}
-            {% bootstrap_field form.student_test wrapper_class="mb-3 student-test-choice d-none" %}
-            {% bootstrap_field form.student_test_parts wrapper_class="mb-3 student-test-part-choice d-none" %}
+            {% bootstrap_field form.class_test wrapper_class="my-3 class-test-choice" %}
+            {% bootstrap_field form.class_test_parts wrapper_class="my-3 class-test-part-choice d-none" %}
+            {% bootstrap_field form.student_test wrapper_class="my-3 student-test-choice d-none" %}
+            {% bootstrap_field form.student_test_parts wrapper_class="my-3 student-test-part-choice d-none" %}
             {% elif form.is_group and not form.is_test %}
-            {% bootstrap_field form.class_test wrapper_class="mb-3 class-test-choice d-none" %}
-            {% bootstrap_field form.class_test_parts wrapper_class="mb-3 class-test-part-choice" %}
-            {% bootstrap_field form.student_test wrapper_class="mb-3 student-test-choice d-none" %}
-            {% bootstrap_field form.student_test_parts wrapper_class="mb-3 student-test-part-choice d-none" %}
+            {% bootstrap_field form.class_test wrapper_class="my-3 class-test-choice d-none" %}
+            {% bootstrap_field form.class_test_parts wrapper_class="my-3 class-test-part-choice" %}
+            {% bootstrap_field form.student_test wrapper_class="my-3 student-test-choice d-none" %}
+            {% bootstrap_field form.student_test_parts wrapper_class="my-3 student-test-part-choice d-none" %}
             {% elif not form.is_group and form.is_test %}
-            {% bootstrap_field form.class_test wrapper_class="mb-3 class-test-choice d-none" %}
-            {% bootstrap_field form.class_test_parts wrapper_class="mb-3 class-test-part-choice d-none" %}
-            {% bootstrap_field form.student_test wrapper_class="mb-3 student-test-choice" %}
-            {% bootstrap_field form.student_test_parts wrapper_class="mb-3 student-test-part-choice d-none" %}
+            {% bootstrap_field form.class_test wrapper_class="my-3 class-test-choice d-none" %}
+            {% bootstrap_field form.class_test_parts wrapper_class="my-3 class-test-part-choice d-none" %}
+            {% bootstrap_field form.student_test wrapper_class="my-3 student-test-choice" %}
+            {% bootstrap_field form.student_test_parts wrapper_class="my-3 student-test-part-choice d-none" %}
             {% elif not form.is_group and not form.is_test %}
-            {% bootstrap_field form.class_test wrapper_class="mb-3 class-test-choice d-none" %}
-            {% bootstrap_field form.class_test_parts wrapper_class="mb-3 class-test-part-choice d-none" %}
-            {% bootstrap_field form.student_test wrapper_class="mb-3 student-test-choice d-none" %}
-            {% bootstrap_field form.student_test_parts wrapper_class="mb-3 student-test-part-choice" %}
+            {% bootstrap_field form.class_test wrapper_class="my-3 class-test-choice d-none" %}
+            {% bootstrap_field form.class_test_parts wrapper_class="my-3 class-test-part-choice d-none" %}
+            {% bootstrap_field form.student_test wrapper_class="my-3 student-test-choice d-none" %}
+            {% bootstrap_field form.student_test_parts wrapper_class="my-3 student-test-part-choice" %}
             {% endif %}
 
             {% bootstrap_field form.is_immediate wrapper_class="is-immediate-choice" field_class="d-flex" %}

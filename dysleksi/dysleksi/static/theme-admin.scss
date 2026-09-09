@@ -480,6 +480,14 @@ textarea.form-control {
 .input-group-text:has(+ .form-control:focus) {
   border: $border-width solid #80adc2;
 }
+// Grid layout containing checkboxes
+form .grid {
+  &.border {
+    padding: 0.5 * $spacer;
+    border: 1px solid $mono-gray-dark-1;
+    border-radius: 0.75 * $spacer;
+  }
+}
 // Text input fields
 .form-control {
   font-size: 0.75 * $spacer;

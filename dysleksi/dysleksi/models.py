@@ -345,7 +345,9 @@ class Student(PermissionsMixin, User):
     @property
     def latest_active_assignment(self) -> "TestAssignment | None":
         return (
-            TestAssignment.objects.filter(Q(student=self) | Q(klasse__students=self))
+            TestAssignment.objects.filter(
+                Q(student=self) | Q(klasse__students=self) | Q(student_subset=self)
+            )
             .exclude(start_date_time__isnull=True)
             .order_by("-start_date_time")
             .first()
@@ -747,12 +749,14 @@ class TestAssignment(PermissionsMixin, models.Model):
         blank=False,
         null=False,
     )
+
     teacher = models.ForeignKey(
         User,  # Teacher OR ReadingSupervisor
         on_delete=models.CASCADE,
         blank=False,
         null=False,
     )
+
     student = models.ForeignKey(
         Student,
         on_delete=models.CASCADE,
@@ -760,24 +764,34 @@ class TestAssignment(PermissionsMixin, models.Model):
         blank=True,
         null=True,
     )
+
     klasse = models.ForeignKey(
         Class,
         on_delete=models.CASCADE,
         blank=True,
         null=True,
     )
+
+    student_subset = models.ManyToManyField(
+        Student,
+        related_name="student_subset",
+    )
+    "Use this relation to assign a test to a subset of students in a given class"
+
     planned_date_time = models.OneToOneField(
         PlannedDateTime,
         on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
+
     # When a teacher last started this test. A test which is only planned has not
     # been started yet.
     start_date_time = models.DateTimeField(
         blank=True,
         null=True,
     )
+
     name = models.CharField(
         max_length=200,
         blank=True,
@@ -811,8 +825,13 @@ class TestAssignment(PermissionsMixin, models.Model):
         if self.student:
             TestResponse.objects.get_or_create(assignment=self, student=self.student)
             students = [self.student]
-        elif self.klasse:  # pragma: no branch
-            students = list(self.klasse.students.all())
+        elif self.klasse:
+            if self.student_subset.exists():
+                students = list(self.student_subset.all())
+            else:
+                students = list(self.klasse.students.all())
+        else:
+            return  # pragma: no cover
 
         for student in students:
             TestResponse.objects.get_or_create(assignment=self, student=student)

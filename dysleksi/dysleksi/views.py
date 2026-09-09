@@ -48,7 +48,7 @@ from django_stubs_ext import StrOrPromise
 from django_tables2 import Column, SingleTableMixin, SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
 
-from dysleksi.forms import StartRoomForm
+from dysleksi.forms import ClassStudentFormSet, StartRoomForm
 from dysleksi.models import (
     PARTIAL_SCORE,
     TEACHERS,
@@ -218,9 +218,11 @@ class AssignmentView(
         test = Test.objects.get(pk=assignment.test_id)
         context["test_contents"] = test.to_json(self.object)
         if assignment.klasse:
-            students = list(
-                assignment.klasse.students.order_by("first_name", "last_name")
-            )
+            if assignment.student_subset.exists():
+                students = assignment.student_subset
+            else:
+                students = assignment.klasse.students
+            students = list(students.order_by("first_name", "last_name"))
         else:
             students = [assignment.student]
         # All students taking part in the test, whether or not they have joined
@@ -232,6 +234,7 @@ class AssignmentView(
             }
             for student in students
         ]
+        context["student_count"] = len(students) if assignment.klasse else None
         context["test_type"] = self.get_room_type()
         context["test_type_label"] = _("Test")
         context["student"] = self.user
@@ -239,9 +242,6 @@ class AssignmentView(
         context["test_name"] = test.name
         context["class_name"] = assignment.klasse_name or ", ".join(
             [c.name for c in assignment.student.classes.all()]
-        )
-        context["student_count"] = (
-            assignment.klasse.students.all().count() if assignment.klasse else None
         )
         context["static_files"] = scan_static_files()
         # Where and how `static/js/screening/window-lock.js` should claim the
@@ -547,6 +547,15 @@ class StartAssignmentView(GroupRequiredMixin, NavigationMixin, CreateView):
     form_class = StartRoomForm
     groups_required = [TEACHERS]
 
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data["class_student_formset"] = ClassStudentFormSet(
+            self.request.POST if self.request.method == "POST" else None,
+            queryset=self.user.accessible_classes,
+        )
+        self.add_navigation_context(context_data, None, None)
+        return context_data
+
     def get_form_kwargs(self):
         kwargs = super().get_form_kwargs()
         kwargs["teacher"] = self.request.user.subclass_instance()
@@ -562,16 +571,43 @@ class StartAssignmentView(GroupRequiredMixin, NavigationMixin, CreateView):
             return reverse("dysleksi:room", kwargs={"pk": self.object.pk})
 
     def form_valid(self, form):
-        if form.cleaned_data["test_parts"]:
-            self.object = self.create_test_from_test_parts(form)
-        else:
-            # Implicitly sets `self.object` to the created `TestAssignment`
-            super().form_valid(form)
-        # Note: our `get_success_url` depends on `self.object` being set
-        return HttpResponseRedirect(self.get_success_url())
+        student_subset = self._get_student_subset(form)
+        with transaction.atomic():
+            if student_subset:
+                self.object = self.create_assignment_for_student_subset(
+                    form, student_subset
+                )
+            elif form.cleaned_data["test_parts"]:
+                test = self.create_test_from_test_parts(form)
+                # Create test assignment using `test`
+                self.object = form.save(commit=False)
+                self.object.test = test
+                self.object.save()
+            else:
+                # Implicitly sets `self.object` to the created `TestAssignment`
+                super().form_valid(form)
 
-    @transaction.atomic
-    def create_test_from_test_parts(self, form) -> TestAssignment:
+            # Note: our `get_success_url` depends on `self.object` being set
+            return HttpResponseRedirect(self.get_success_url())
+
+    def create_assignment_for_student_subset(
+        self, form, student_subset: QuerySet[Student]
+    ) -> TestAssignment:
+        if form.cleaned_data["test_parts"]:
+            test = self.create_test_from_test_parts(form)
+        else:
+            test = form.cleaned_data["test"]
+        assignment = TestAssignment.objects.create(
+            test=test,
+            teacher=form.teacher,
+            klasse=form.cleaned_data["klasse"],
+            planned_date_time=form.get_planned_date_time(),
+            name=form.cleaned_data["name"],
+        )
+        assignment.student_subset.set(student_subset)
+        return assignment
+
+    def create_test_from_test_parts(self, form) -> Test:
         # Create test
         test = Test.objects.create(
             name=self._get_test_name(form),
@@ -581,11 +617,7 @@ class StartAssignmentView(GroupRequiredMixin, NavigationMixin, CreateView):
         # Add the selected test parts
         for test_part in form.cleaned_data["test_parts"]:
             test.parts.add(test_part)
-        # Create test assignment for this test/test parts
-        test_assignment = form.save(commit=False)
-        test_assignment.test = test
-        test_assignment.save()
-        return test_assignment
+        return test
 
     def _get_test_name(self, form) -> str:
         test_parts = form.cleaned_data["test_parts"]
@@ -597,6 +629,27 @@ class StartAssignmentView(GroupRequiredMixin, NavigationMixin, CreateView):
             raise ValueError(  # pragma: no cover
                 "cannot create test name for %d test parts", len(test_parts)
             )
+
+    def _get_student_subset(self, form) -> QuerySet[Student]:
+        if (
+            form.cleaned_data["test_type"] != TestType.GROUP
+            or form.cleaned_data["klasse"] is None
+        ):
+            logger.info("not returning student subset for %r", form)
+        else:
+            class_student_formset = ClassStudentFormSet(self.request.POST)
+            class_student_formset.is_valid()
+            cls = form.cleaned_data["klasse"]
+            for class_student_form in class_student_formset.forms:
+                if class_student_form.is_valid() and class_student_form.instance == cls:
+                    student_subset = class_student_form.cleaned_data["students"]
+                    if student_subset.count() == cls.students.count():
+                        logger.info("all students in %r selected, returning None", cls)
+                        return Student.objects.none()
+                    return student_subset
+                else:
+                    pass  # pragma: no cover
+        return Student.objects.none()
 
 
 class AdminRootView(GroupRequiredMixin, TemplateView):
