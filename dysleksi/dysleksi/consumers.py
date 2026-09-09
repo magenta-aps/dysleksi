@@ -5,6 +5,7 @@ from asgiref.sync import async_to_sync
 from channels.exceptions import DenyConnection
 from channels.generic.websocket import JsonWebsocketConsumer
 from django.core.cache import caches
+from django.db.models import Q
 
 from dysleksi.models import HandledEvent, Message, Student, TestAssignment
 
@@ -136,11 +137,17 @@ class RelayConsumer(JsonWebsocketConsumer):
 
         start_date_time = TestAssignment.objects.get(pk=assignment_id).start_date_time
 
-        students_with_newer_assignments = {
-            student.pk
-            for student in Student.objects.filter(pk__in=student_ids)
-            if student.has_assignment_after(start_date_time)
-        }
+        students_with_newer_assignments = set(
+            Student.objects.filter(
+                Q(assignments__start_date_time__gt=start_date_time)
+                | Q(student_subset__start_date_time__gt=start_date_time)
+                | Q(
+                    classes__testassignment__start_date_time__gt=start_date_time,
+                    classes__testassignment__student_subset__isnull=True,
+                ),
+                pk__in=student_ids,
+            ).values_list("pk", flat=True)
+        )
 
         if students_with_newer_assignments:
             logger.info(

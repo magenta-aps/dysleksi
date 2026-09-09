@@ -342,29 +342,6 @@ class Student(PermissionsMixin, User):
         verbose_name = _("elev")
         verbose_name_plural = _("elever")
 
-    @property
-    def latest_active_assignment(self) -> "TestAssignment | None":
-        return (
-            TestAssignment.objects.filter(
-                Q(student=self) | Q(klasse__students=self) | Q(student_subset=self)
-            )
-            .exclude(start_date_time__isnull=True)
-            .order_by("-start_date_time")
-            .first()
-        )
-
-    def has_assignment_after(self, date_time):
-        """
-        Returns True if the student has a more recent assignment waiting for him/her,
-        compared to the given datetime
-        """
-        latest = self.latest_active_assignment
-
-        if latest and latest.start_date_time > date_time:
-            return True
-        else:
-            return False
-
 
 @receiver(post_save, sender=Student)
 def on_update_student(sender, instance: Student, created: bool, **kwargs):
