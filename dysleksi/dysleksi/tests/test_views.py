@@ -111,6 +111,10 @@ class TestAssignmentView(DysleksiTest):
         cls.assignment2 = TestAssignment.objects.create(
             test=cls.test2, teacher=cls.teacher, student=cls.student1
         )
+        cls.assignment3 = TestAssignment.objects.create(
+            test=cls.test, teacher=cls.teacher, klasse=cls.klasse
+        )
+        cls.assignment3.student_subset.add(cls.student2)
 
     def test_get_template_names(self):
         cases: list[tuple[User, str, str, TestAssignment]] = [
@@ -137,6 +141,18 @@ class TestAssignmentView(DysleksiTest):
                 "dysleksi/screening/student.html",
                 "class_123",
                 self.assignment1,
+            ),
+            (
+                self.teacher,
+                "dysleksi/admin/test_assignment/detail_group.html",
+                "class_123",
+                self.assignment3,
+            ),
+            (
+                self.student1,
+                "dysleksi/screening/student.html",
+                "class_123",
+                self.assignment3,
             ),
         ]
         for user, template_name, room_name, assignment in cases:
@@ -169,6 +185,21 @@ class TestAssignmentView(DysleksiTest):
         )
         context = view.get_context_data()
         self.assertIn("test_contents", context)
+
+    def test_student_subset(self):
+        view = self.setup_view(
+            AssignmentView,
+            self.teacher,
+            room_name="class_1",
+            test_id=self.individual_test.id,
+            pk=self.assignment3.id,
+        )
+        context_data = view.get_context_data()
+        self.assertQuerySetEqual(
+            [student["id"] for student in context_data["students"]],
+            [self.student2.pk],
+            ordered=False,
+        )
 
     def open_room(self, user: User):
         self.setup_view(
@@ -625,6 +656,12 @@ class TestStartRoomView(DysleksiTest):
         )
         cls.group_test.parts.add(cls.group_test_part_2)
 
+    def test_get(self):
+        self.client.force_login(self.teacher)
+        response = self.client.get(reverse("dysleksi:start_room"))
+        self.assertIn("form", response.context_data)
+        self.assertIn("class_student_formset", response.context_data)
+
     def test_create_individual_room_immediate(self):
         data = {
             "test_type": "individual",
@@ -749,6 +786,96 @@ class TestStartRoomView(DysleksiTest):
         self._assert_response_redirects(response, expected_url)
         self.assertTrue(test_count_after == test_count_before + 1)
         self.assertTrue(assignment.test, Test.objects.latest("pk"))
+
+    def test_create_group_room_student_subset_test(self):
+        data = {
+            "test_type": "group",
+            "klasse": self.klasse.id,
+            "class_test": self.group_test.id,
+            "class_test_parts": [],
+            "is_test_part": "test",
+            "is_immediate": "y",
+            "start_datetime": "",
+            "end_datetime": "",
+            # `ClassStudentFormSet` data
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-MIN_NUM_FORMS": "0",
+            "form-MAX_NUM_FORMS": "1000",
+            "form-0-id": self.klasse.pk,
+            "form-0-students": [self.student2.pk],  # Use subset of students 1 and 2
+        }
+        self.client.force_login(self.teacher)
+        response = self.client.post(reverse("dysleksi:start_room"), data=data)
+        assignment = TestAssignment.objects.order_by("-pk").first()
+        expected_url = reverse("dysleksi:room", kwargs={"pk": assignment.pk})
+        self._assert_response_redirects(response, expected_url)
+        self.assertQuerySetEqual(
+            assignment.student_subset.all(),
+            [self.student2],
+            ordered=False,
+        )
+
+    def test_create_group_room_student_subset_test_parts(self):
+        data = {
+            "test_type": "group",
+            "klasse": self.klasse.id,
+            "class_test": "",
+            "class_test_parts": [
+                str(self.group_test_part.pk),
+                str(self.group_test_part_2.pk),
+            ],
+            "is_test_part": "part",
+            "is_immediate": "y",
+            "start_datetime": "",
+            "end_datetime": "",
+            # `ClassStudentFormSet` data
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-MIN_NUM_FORMS": "0",
+            "form-MAX_NUM_FORMS": "1000",
+            "form-0-id": self.klasse.pk,
+            "form-0-students": [self.student2.pk],  # Use subset of students 1 and 2
+        }
+        self.client.force_login(self.teacher)
+        response = self.client.post(reverse("dysleksi:start_room"), data=data)
+        assignment = TestAssignment.objects.order_by("-pk").first()
+        expected_url = reverse("dysleksi:room", kwargs={"pk": assignment.pk})
+        self._assert_response_redirects(response, expected_url)
+        self.assertQuerySetEqual(
+            assignment.student_subset.all(),
+            [self.student2],
+            ordered=False,
+        )
+
+    def test_create_group_room_student_subset_is_entire_class(self):
+        data = {
+            "test_type": "group",
+            "klasse": self.klasse.id,
+            "class_test": self.group_test.id,
+            "class_test_parts": [],
+            "is_test_part": "test",
+            "is_immediate": "y",
+            "start_datetime": "",
+            "end_datetime": "",
+            # `ClassStudentFormSet` data
+            "form-TOTAL_FORMS": "1",
+            "form-INITIAL_FORMS": "1",
+            "form-MIN_NUM_FORMS": "0",
+            "form-MAX_NUM_FORMS": "1000",
+            "form-0-id": self.klasse.pk,
+            "form-0-students": [self.student1.pk, self.student2.pk],  # Use entire class
+        }
+        self.client.force_login(self.teacher)
+        response = self.client.post(reverse("dysleksi:start_room"), data=data)
+        assignment = TestAssignment.objects.order_by("-pk").first()
+        expected_url = reverse("dysleksi:room", kwargs={"pk": assignment.pk})
+        self._assert_response_redirects(response, expected_url)
+        self.assertQuerySetEqual(
+            assignment.student_subset.all(),
+            [],
+            ordered=False,
+        )
 
     def test_renders_form_error(self):
         data = {

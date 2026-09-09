@@ -14,9 +14,9 @@ export class Form {
         );
         this.addEndBtn = this.element(".add-end", this.addEnd);
         this.removeEndBtn = this.element(".remove-end", this.removeEnd);
+        this.classChoice = this.element(".class-choice", this.updateClassChoice);
 
         // Elements that are updated by event handlers
-        this.classChoice = this.element(".class-choice");
         this.studentChoice = this.element(".student-choice");
         this.classTestChoice = this.element(".class-test-choice");
         this.classTestPartChoice = this.element(".class-test-part-choice");
@@ -50,6 +50,15 @@ export class Form {
             this.studentTestPartChoice,
             !this.state.isGroup && !this.state.isTest,
         );
+
+        this.displayMultiple("[data-class-pk]", (elem) => {
+            if (this.state.isGroup) {
+                const select = this.classChoice.querySelector("select");
+                const currentClassPk = select.options[select.selectedIndex].value;
+                return elem.dataset["classPk"] === currentClassPk;
+            }
+            return false;
+        });
     }
 
     updateIsTestPart(evt) {
@@ -75,6 +84,12 @@ export class Form {
             this.clearDateValue(this.startDateTime);
             this.clearDateValue(this.endDateTime);
         }
+    }
+
+    updateClassChoice(evt) {
+        this.displayMultiple("[data-class-pk]", (elem) => {
+            return elem.dataset["classPk"] === evt.target.value;
+        });
     }
 
     addEnd(evt) {
@@ -110,6 +125,13 @@ export class Form {
 
     display(element, state) {
         element.classList.toggle("d-none", !state);
+    }
+
+    displayMultiple(selector, callback) {
+        const elems = this.domElem.querySelectorAll(selector);
+        for (const elem of elems) {
+            elem.classList.toggle("d-none", !callback(elem));
+        }
     }
 
     clearDateValue(element) {

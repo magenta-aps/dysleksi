@@ -2,8 +2,10 @@ from django import forms
 from django.db.models import Prefetch
 from django.forms import (
     ModelChoiceField,
+    ModelForm,
     ModelMultipleChoiceField,
     ValidationError,
+    modelformset_factory,
     widgets,
 )
 from django.utils import timezone
@@ -11,6 +13,7 @@ from django.utils.translation import gettext_lazy as _
 from dynamic_forms import DynamicField, DynamicFormMixin
 
 from dysleksi.models import (
+    Class,
     PlannedDateTime,
     Student,
     Test,
@@ -50,6 +53,45 @@ class StudentChoiceField(ModelChoiceField):
         return f"{obj.first_name} {obj.last_name} ({main_class_name})"
 
 
+class ClassStudentMultipleChoiceField(ModelMultipleChoiceField):
+    def label_from_instance(self, obj: Student) -> str:
+        return obj.get_full_name()
+
+
+class ClassStudentForm(DynamicFormMixin, ModelForm):
+    class Meta:
+        model = Class
+        fields = ["id", "students"]
+
+    id = forms.IntegerField(widget=forms.HiddenInput())
+
+    students = DynamicField(
+        ClassStudentMultipleChoiceField,
+        required=False,
+        queryset=lambda form: (
+            # Display all students in class
+            form.instance.students.all()
+            if form.instance.pk
+            else Student.objects.none()
+        ),
+        widget=forms.CheckboxSelectMultiple(attrs={"class": "grid border"}),
+    )
+
+    def clean_students(self):
+        students = self.cleaned_data["students"]
+        if students.count() == 0:
+            raise ValidationError(_("Vælg venligst mindst én elev"))
+        return students
+
+
+ClassStudentFormSet = modelformset_factory(
+    Class,
+    form=ClassStudentForm,
+    extra=0,
+    edit_only=True,
+)
+
+
 def tests_of_type(test_type: TestType):
     return Test.objects.filter(test_type=test_type, custom=False).prefetch_related(
         Prefetch("parts", queryset=TestPart.objects.order_by("id"))
@@ -59,7 +101,7 @@ def tests_of_type(test_type: TestType):
 class StartRoomForm(DynamicFormMixin, forms.ModelForm):
     class Meta:
         model = TestAssignment
-        exclude = ("teacher", "test")
+        exclude = ("teacher", "test", "student_subset")
 
     name = forms.CharField(
         initial=_("Ny test til målgruppen"),
@@ -234,18 +276,9 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
             pass  # pragma: no cover
 
     def save(self, commit=True):
-        if self.period is None or self.cleaned_data["start_datetime"] is None:
-            # No planned date time was given, so ensure the field is cleared
-            self.instance.planned_date_time = None
-        else:
-            # Create new planned date time
-            self.instance.planned_date_time = PlannedDateTime.objects.create(
-                period=self.period,
-            )
-
+        self.instance.planned_date_time = self.get_planned_date_time()
         if self.cleaned_data["test"] is not None:
             self.instance.test = self.cleaned_data["test"]
-
         return super().save(commit=commit)
 
     @property
@@ -263,6 +296,16 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
     @property
     def hide_end_datetime(self) -> bool:
         return self.data.get("end_datetime") in (None, "")
+
+    @property
+    def class_pk(self) -> int | None:
+        val = self.data.get("klasse")
+        return int(val) if val else None
+
+    def get_planned_date_time(self):
+        if self.period is None or self.cleaned_data["start_datetime"] is None:
+            return None
+        return PlannedDateTime.objects.create(period=self.period)
 
     def _get_test(self, cleaned_data):
         if cleaned_data["is_test_part"] == "test":
