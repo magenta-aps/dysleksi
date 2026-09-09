@@ -30,14 +30,6 @@ class ChatConsumer(JsonWebsocketConsumer):
         self.accept()
         logger.info("'%s' joined room '%s'", self.scope["user"], self.room_name)
 
-        values = cache.get_many(sorted(cache.keys(f"{self.room_group_name}_*")))
-        for key, message in values.items():
-            if message.get("event") in ("lobby.joined", "lobby.present"):
-                # Send only cached "joined" and "present" messages
-                async_to_sync(self.channel_layer.send)(
-                    self.channel_name, {"type": "chat.message", **message}
-                )
-
     def disconnect(self, close_code):
         # Leave room group
         async_to_sync(self.channel_layer.group_discard)(
