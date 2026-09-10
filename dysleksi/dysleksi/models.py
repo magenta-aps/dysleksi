@@ -628,7 +628,15 @@ class TestAssignmentQuerySet(PermissionsQuerySet):
                 | Q(student__institution__in=institutions)
             )
         if user.is_teacher:
-            return self.filter(teacher=user)
+            # A teacher sees the assignments they created themselves, plus the ones
+            # created for their own classes and students by someone else, such as
+            # a læsevejleder
+            classes = Class.objects.filter(teachers__pk=user.pk)
+            return self.filter(
+                Q(teacher=user)
+                | Q(klasse__in=classes)
+                | Q(student__in=Student.objects.filter(classes__in=classes))
+            )
         if user.is_student:
             return self.filter(Q(student=user) | Q(klasse__students=user))
 
@@ -1529,7 +1537,11 @@ class TestResponseQuerySet(PermissionsQuerySet):
             institutions = user.institutions.all()  # type: ignore[attr-defined]
             return self.filter(student__institution__in=institutions)
         if user.is_teacher:
-            return self.filter(assignment__teacher=user)
+            return self.filter(
+                assignment__in=TestAssignment.objects.filter_user_object_permissions(
+                    user, action
+                )
+            )
         return self.none()
 
     def annotate_correct_count(
@@ -1677,7 +1689,11 @@ class PartResponseQuerySet(PermissionsQuerySet):
             institutions = user.institutions.all()  # type: ignore[attr-defined]
             return self.filter(testresponse__student__institution__in=institutions)
         if user.is_teacher:
-            return self.filter(testresponse__assignment__teacher=user)
+            return self.filter(
+                testresponse__assignment__in=(
+                    TestAssignment.objects.filter_user_object_permissions(user, action)
+                )
+            )
         return self.none()
 
     def annotate_questionresponses_count(
@@ -1907,7 +1923,11 @@ class QuestionResponseQuerySet(PermissionsQuerySet):
                 partresponse__testresponse__student__institution__in=institutions
             )
         if user.is_teacher:
-            return self.filter(partresponse__testresponse__assignment__teacher=user)
+            return self.filter(
+                partresponse__testresponse__assignment__in=(
+                    TestAssignment.objects.filter_user_object_permissions(user, action)
+                )
+            )
         return self.none()
 
 
