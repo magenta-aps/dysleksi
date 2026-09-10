@@ -24,6 +24,7 @@ export class Form {
         this.studentTestPartChoice = this.element(".student-test-part-choice");
         this.startDateTime = this.element(".start-datetime");
         this.endDateTime = this.element(".end-datetime");
+        this.hasEnd = this.element("#id_has_end");
 
         // Internal state
         this.state = {
@@ -106,6 +107,7 @@ export class Form {
         this.display(this.endDateTime, this.state.hasEndDate);
         this.display(this.addEndBtn, !this.state.hasEndDate);
         this.clearDateValue(this.endDateTime);
+        this.hasEnd.value = state ? "y" : "n";
     }
 
     updateState(evt, name, value) {

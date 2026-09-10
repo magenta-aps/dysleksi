@@ -59,6 +59,7 @@
             {% endif %}
 
             {% bootstrap_field form.is_immediate wrapper_class="is-immediate-choice" field_class="d-flex" %}
+            {{ form.has_end }}{# Hidden field, updated by JS #}
             <div class="start-datetime row mt-3 mb-3 d-flex align-items-center {% if form.hide_start_datetime %}d-none{% endif %}">
                 {% bootstrap_field form.start_datetime layout="horizontal" wrapper_class="col-6" %}
                 <div class="col-6">

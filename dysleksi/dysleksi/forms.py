@@ -209,6 +209,12 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
         widget=forms.RadioSelect(choices=[("y", _("Start nu")), ("n", _("Planlæg"))]),
     )
 
+    has_end = forms.BooleanField(
+        initial="n",
+        required=True,
+        widget=forms.HiddenInput(),
+    )
+
     start_datetime = DynamicField(
         forms.DateTimeField,
         required=lambda form: form.data.get("is_immediate") == "n",
@@ -218,7 +224,7 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
 
     end_datetime = DynamicField(
         forms.DateTimeField,
-        required=False,
+        required=lambda form: form.data.get("has_end") == "y",
         label=_("Slut"),
         widget=HTML5DateWidget(),
     )
@@ -295,6 +301,8 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
 
     @property
     def hide_end_datetime(self) -> bool:
+        if self.data.get("has_end") == "y":
+            return False
         return self.data.get("end_datetime") in (None, "")
 
     @property
