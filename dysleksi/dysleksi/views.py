@@ -85,7 +85,6 @@ from dysleksi.tables import (
     QuestionResponsesTable,
     ReadingWordCountResultsTable,
     ReadingWordLengthResultsTable,
-    StudentTable,
     StudentTestResponseTable,
     StudentTestResultsColumn,
     TestAssignmentResultTable,
@@ -142,22 +141,6 @@ class ObjectPermissionsMixin:
         return object
 
 
-class RootView(UserTypeMixin, TemplateView):
-    def get(self, request, *args, **kwargs):
-        if not self.user.is_anonymous and self.user.is_teacher:
-            return redirect("dysleksi:class_list")
-        return super().get(request, *args, **kwargs)
-
-    def get_template_prefix(self) -> str:
-        return "dysleksi/lobby"
-
-    def get_context_data(self, **kwargs) -> dict[str, Any]:
-        context_data = super().get_context_data(**kwargs)
-        if not self.user.is_anonymous and self.user.is_student:
-            context_data["student"] = self.user
-        return context_data
-
-
 class NavigationMixin:
     def add_navigation_context(
         self,
@@ -178,6 +161,24 @@ class NavigationMixin:
                 .order_by("klasse__name", "student__last_name")
             )
             context_data["current_assignment"] = current_assignment
+
+
+class RootView(UserTypeMixin, NavigationMixin, TemplateView):
+    def get(self, request, *args, **kwargs):
+        if not self.user.is_anonymous and self.user.is_teacher:
+            return redirect("dysleksi:class_list")
+        return super().get(request, *args, **kwargs)
+
+    def get_template_prefix(self) -> str:
+        return "dysleksi/lobby"
+
+    def get_context_data(self, **kwargs) -> dict[str, Any]:
+        context_data = super().get_context_data(**kwargs)
+        if not self.user.is_anonymous and self.user.is_student:
+            context_data["student"] = self.user
+        elif not self.user.is_anonymous and self.user.is_teacher:
+            self.add_navigation_context(context_data, None, None)
+        return context_data
 
 
 class AssignmentView(
@@ -374,20 +375,6 @@ class ClassDetailView(
     def get_table_data(self):
         # Return all students in this class (for `ClassStudentTable`)
         return self.object.students.all()
-
-
-class StudentListView(GroupRequiredMixin, ListViewLogMixin, SingleTableView):
-    model = Student
-    table_class = StudentTable
-    groups_required = [TEACHERS]
-    template_name = "dysleksi/admin/student/list.html"
-
-    def get_queryset(self):
-        qs = super().get_queryset()
-        # Only show students belonging to the teacher viewing the page
-        # (or, for a læsevejleder, to their schools)
-        qs = qs.filter_user_object_permissions(self.user, "view")
-        return qs
 
 
 class StudentDetailView(
@@ -650,11 +637,6 @@ class StartAssignmentView(GroupRequiredMixin, NavigationMixin, CreateView):
                 else:
                     pass  # pragma: no cover
         return Student.objects.none()
-
-
-class AdminRootView(GroupRequiredMixin, TemplateView):
-    groups_required = [TEACHERS]
-    template_name = "dysleksi/admin/base.html"
 
 
 class PaginationMixin:
@@ -949,7 +931,11 @@ class AssignmentResultsFlagView(GroupRequiredMixin, ObjectPermissionsMixin, Upda
 
 
 class AssignmentPartResultsView(
-    GroupRequiredMixin, ObjectPermissionsMixin, ListViewLogMixin, ListView
+    GroupRequiredMixin,
+    ObjectPermissionsMixin,
+    NavigationMixin,
+    ListViewLogMixin,
+    ListView,
 ):
     # Results view of as Class' responses to a single TestPart
     groups_required = [TEACHERS]
@@ -1046,6 +1032,10 @@ class AssignmentPartResultsView(
         )
         if self.part.show_normscore_speed_plot:  # pragma: no cover
             context["plot"] = self.get_plot_data()
+
+        self.add_navigation_context(context, None, self.assignment)
+        context["assignment"] = self.assignment
+
         return context
 
     def get_table(self) -> PartResultTable:

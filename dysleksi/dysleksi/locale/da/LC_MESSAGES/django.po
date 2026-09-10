@@ -249,10 +249,6 @@ msgid "Navn"
 msgstr ""
 
 #: dysleksi/tables.py
-msgid "Klassetrin"
-msgstr ""
-
-#: dysleksi/tables.py
 msgid "Skoleår"
 msgstr ""
 

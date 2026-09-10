@@ -84,25 +84,6 @@ class ClassStudentTable(Table):
     )
 
 
-class StudentTable(Table):
-    class Meta:
-        model = Student
-        fields: List[str] = []
-
-    name = TemplateColumn(
-        template_name="dysleksi/admin/table_columns/student_name.html",
-        orderable=False,
-        verbose_name=_("Navn"),
-    )
-
-    klasse = tables.Column(
-        linkify=False,
-        accessor=A("klasse__name"),
-        orderable=False,
-        verbose_name=_("Klassetrin"),
-    )
-
-
 class TestAssignmentTable(Table):
     class Meta:
         model = TestAssignment
