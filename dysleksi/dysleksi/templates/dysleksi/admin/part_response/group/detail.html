@@ -24,7 +24,7 @@
         {{ object.testresponse.student.get_full_name }}
         </a>
     </li>
-    <li class="breadcrumb-item active" aria-current="page">{{ object.testpart.name }}</li>
+    <li class="breadcrumb-item active" aria-current="page">{{ object.testpart.localized_name }}</li>
 {% endblock %}
 
 {% block inner_content %}
@@ -39,7 +39,7 @@
         <div class="col-9">
             <h5 class="mt-2 mb-4">
                 <i class="ph ph-chart-bar fs-5"></i>
-                {% blocktranslate trimmed with name=testresponse.student.get_full_name part_name=testpart.name %}
+                {% blocktranslate trimmed with name=testresponse.student.get_full_name part_name=part.localized_name %}
                     Resultater for {{ name }} - {{ part_name }}
                 {% endblocktranslate %}
             </h5>

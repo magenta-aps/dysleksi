@@ -837,7 +837,7 @@ class AssignmentResultsView(
                         template_name="dysleksi/admin/test_responses/group/score.html",
                         footer_template_name="dysleksi/admin/"
                         "test_responses/group/footer.html",
-                        verbose_name=part.name,
+                        verbose_name=part.localized_name,
                         accessor=count_key,
                         extra_context={  # til brug i template for celle
                             "count_key": count_key,
@@ -1228,7 +1228,7 @@ class TestResponseView(
             part_pks.add(part.pk)
 
             supercolumn_header = part_header % {
-                "part_name": part.name,
+                "part_name": part.localized_name,
                 "questions_count": part.questions.filter(is_practice=False).count(),
             }
 
@@ -1353,7 +1353,7 @@ class TestResponseView(
         )
         return {
             part.pk: (
-                part.name,
+                part.localized_name,
                 part.questions.result_groups_names(),
                 part.pk in answered_parts,
             )

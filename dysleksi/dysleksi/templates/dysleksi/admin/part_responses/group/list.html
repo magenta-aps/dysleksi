@@ -27,7 +27,7 @@
     {% translate "Resultater" %}
     </a>
 </li>
-    <li class="breadcrumb-item active">{{ part.name }}</li>
+    <li class="breadcrumb-item active">{{ part.localized_name }}</li>
 {% endblock %}
 
 {% block inner_content %}
@@ -40,7 +40,7 @@
         <div class="col-9">
             <h5 class="mt-2 mb-4">
                 <i class="ph ph-chart-bar fs-5"></i>
-                {% blocktranslate trimmed with part_name=part.name %}
+                {% blocktranslate trimmed with part_name=part.localized_name %}
                 Resultater for {{ part_name }}
                 {% endblocktranslate %}
                 <span class="subheader">

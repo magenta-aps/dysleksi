@@ -4,7 +4,7 @@
     {% for skill in skills %}
     <div class="student-skill">
         <div class="student-skill-name">
-            <div>{{ skill.part.name }}</div>
+            <div>{{ skill.part.localized_name }}</div>
             <div class="subheader">
                 {% blocktranslate trimmed with test_name=skill.test.name %}
                 Seneste test: {{ test_name }}

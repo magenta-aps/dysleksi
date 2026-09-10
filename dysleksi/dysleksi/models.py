@@ -40,7 +40,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.functional import cached_property
-from django.utils.translation import gettext
+from django.utils.translation import get_language, gettext
 from django.utils.translation import gettext_lazy as _
 from simple_history.models import HistoricalRecords
 
@@ -866,6 +866,7 @@ class TestPart(models.Model):
         related_name="parts",
     )
     name = models.CharField(max_length=255)
+    name_kl = models.CharField(max_length=255, blank=True)
     image_url = models.CharField(
         max_length=255,
         blank=True,
@@ -936,6 +937,12 @@ class TestPart(models.Model):
     )
 
     def __str__(self) -> str:
+        return self.localized_name
+
+    @property
+    def localized_name(self) -> str:
+        if get_language() == "kl":
+            return self.name_kl or self.name
         return self.name
 
     @cached_property
@@ -952,7 +959,7 @@ class TestPart(models.Model):
 
         part_data: dict = {
             "id": self.id,
-            "name": self.name,
+            "name": self.localized_name,
             "image": self.image_url,
             "instructions_url": (self.instructions.url if self.instructions else None),
             "timeout": self.timeout,

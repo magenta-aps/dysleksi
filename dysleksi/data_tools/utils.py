@@ -23,6 +23,7 @@ def update_or_create_wordreading_2_test(
     part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
+            "name_kl": "Oqaatsinik atuarneq 2",
             "timeout": 600000,  # 600 seconds / 10 minutes
             "partial_score_after": 300000,  # 300 seconds / 5 minutes
             "reminder": 15000,  # 15 seconds
@@ -67,6 +68,7 @@ def update_or_create_wordreading_1_test(
     part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
+            "name_kl": "Oqaatsinik atuarneq 1",
             "timeout": 360000,  # 360 seconds / 6 minutes
             "partial_score_after": 120000,  # 120 seconds / 2 minutes
             "image_url": "/media/resources/wordreading_1/wordreading_1.png",
@@ -111,6 +113,7 @@ def update_or_create_fore_sound_test(
     part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
+            "name_kl": "Oqaatsimi nipi siulleq",
             "timeout": 360000,  # 360 seconds / 6 minutes
             "partial_score_after": 120000,  # 120 seconds / 2 minutes
             "image_url": "/media/resources/fore_sound/fore_sound.png",
@@ -146,6 +149,7 @@ def update_or_create_letter_sound_test(
     part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
+            "name_kl": "Naqinnerit nipaat",
             "timeout": 0,
             "partial_score_after": 0,
             "image_url": "/media/resources/letter_sound/letter_sound.png",
@@ -188,6 +192,7 @@ def update_or_create_letter_shape_test(
     part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
+            "name_kl": "Naqinnerit ilusaat - angisuut mikisullu",
             "timeout": 0,
             "partial_score_after": 0,
             "image_url": "/media/resources/letter_shape/letter_shape.png",
@@ -225,6 +230,7 @@ def update_or_create_wordspelling_test(
     part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
+            "name_kl": "Oqaatsinik allanneq",
             "timeout": 0,  # no timeout
             "partial_score_after": 0,  # no partial score (?)
             "image_url": "/media/resources/wordspelling/wordspelling.png",
@@ -260,6 +266,7 @@ def update_or_create_nonwordspelling_test(
     part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
+            "name_kl": "Oqaasiusanik allanneq",
             "timeout": 0,  # no timeout
             "partial_score_after": 0,  # no partial score (?)
             "image_url": "/media/resources/nonwordspelling/nonwordspelling.png",
@@ -292,6 +299,7 @@ def update_or_create_letter_pronunciation_test(
     part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
+            "name_kl": "Naqinnerit atiinik taaguineq (angisuut mikisullu)",
             "timeout": 0,
             "partial_score_after": 30000,
             "image_url": (
@@ -324,6 +332,7 @@ def update_or_create_word_pronunciation_test(
     part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
+            "name_kl": "Oqaatsinik nipituumik atuarneq",
             "timeout": 0,
             "partial_score_after": 30000,
             "image_url": "/media/resources/word_pronunciation/word_pronunciation.png",
@@ -355,6 +364,7 @@ def update_or_create_nonsense_word_pronunciation_test(
     part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
+            "name_kl": "Oqaasiusanik nipituumik atuarneq",
             "timeout": 0,
             "partial_score_after": 30000,
             "image_url": (
@@ -393,6 +403,7 @@ def update_or_create_sentence_reading_test(
     part, created = TestPart.objects.update_or_create(
         name=name,
         defaults={
+            "name_kl": "Oqaaseqatigiinnik atuarneq",
             "timeout": 8 * 60 * 1000,  # 8 minutes
             "partial_score_after": 4 * 60 * 1000,  # 4 minutes
             "image_url": "/media/resources/sentence_reading/sentence_reading.png",
