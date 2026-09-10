@@ -22,6 +22,10 @@ msgstr ""
 msgid "Dysleksi"
 msgstr ""
 
+#: dysleksi/forms.py dysleksi/tests/test_forms.py
+msgid "Vælg venligst mindst én elev"
+msgstr ""
+
 #: dysleksi/forms.py dysleksi/templates/dysleksi/admin/class/list.html
 msgid "Ny test til målgruppen"
 msgstr ""
@@ -718,10 +722,6 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/student/development.html
 #, python-format
 msgid "Udvikling i %(part_name)s"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/student/development.html
-msgid "Score"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/student/development.html
