@@ -525,7 +525,7 @@ msgid "Fortsæt testen"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/modals/error.html
-msgid "Fejl!"
+msgid "Fejl"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/column_answer.html

@@ -42,15 +42,15 @@ msgid "%(questionType)s %(current)s af %(total)s"
 msgstr ""
 
 #: dysleksi/static/js/screening/controlroom.js
-msgid "Fejl på %(name)s's computer."
+msgid "Eleven kan ikke bruge mikrofonen."
 msgstr ""
 
 #: dysleksi/static/js/screening/controlroom.js
-msgid "Der er problemer med at afspille eller optage lyd på elevens computer."
+msgid "Systemet kan ikke få adgang til mikrofonen på %(name)s's computer ..."
 msgstr ""
 
 #: dysleksi/static/js/screening/controlroom.js
-msgid "(Systemfejlen er %(error)s)"
+msgid "Mikrofonen er nødvendig for at gennemføre denne test"
 msgstr ""
 
 #: dysleksi/static/js/screening/group/student-group-test.js
