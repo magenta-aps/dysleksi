@@ -14,7 +14,7 @@ from django.core.management import call_command
 from django.http.response import Http404, HttpResponse, HttpResponseRedirect
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
-from django.utils import timezone
+from django.utils import timezone, translation
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 
@@ -185,6 +185,32 @@ class TestAssignmentView(DysleksiTest):
         )
         context = view.get_context_data()
         self.assertIn("test_contents", context)
+
+    def test_test_part_names_are_localized(self):
+        part = TestPart.objects.create(
+            name="Ordlæsning 2",
+            name_kl="Oqaatsinik atuarneq 2",
+            timeout=0,
+            partial_score_after=0,
+        )
+        self.test.parts.add(part)
+        for language, expected_name in (
+            ("da", "Ordlæsning 2"),
+            ("kl", "Oqaatsinik atuarneq 2"),
+        ):
+            with self.subTest(language=language):
+                with translation.override(language):
+                    view = self.setup_view(
+                        AssignmentView,
+                        self.teacher,
+                        room_name="class_1",
+                        test_id=self.test.id,
+                        pk=self.assignment1.id,
+                    )
+                    context = view.get_context_data()
+                self.assertEqual(
+                    context["test_contents"]["parts"][0]["name"], expected_name
+                )
 
     def test_student_subset(self):
         view = self.setup_view(

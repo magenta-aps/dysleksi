@@ -13,7 +13,7 @@ from django.db import IntegrityError
 from django.db.models import Q
 from django.db.models.fields.files import FieldFile
 from django.test import TestCase
-from django.utils import timezone
+from django.utils import timezone, translation
 from freezegun import freeze_time
 
 from dysleksi.models import (
@@ -495,6 +495,18 @@ class TestTestPart(DysleksiTest):
     def test_str(self):
         test_part = TestPart(name="Test")
         self.assertEqual(str(test_part), "Test")
+
+    def test_localized_name(self):
+        test_part = TestPart(name="Ordlæsning 2", name_kl="Oqaatsinik atuarneq 2")
+        with translation.override("da"):
+            self.assertEqual(test_part.localized_name, "Ordlæsning 2")
+        with translation.override("kl"):
+            self.assertEqual(test_part.localized_name, "Oqaatsinik atuarneq 2")
+
+    def test_localized_name_falls_back_to_danish(self):
+        test_part = TestPart(name="Ordlæsning 2")
+        with translation.override("kl"):
+            self.assertEqual(test_part.localized_name, "Ordlæsning 2")
 
     def test_breakdown_ranges(self):
         test_part = TestPart.objects.create(
