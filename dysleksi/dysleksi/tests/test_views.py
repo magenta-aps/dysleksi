@@ -670,6 +670,7 @@ class TestStartRoomView(DysleksiTest):
             "student_test_parts": [],
             "is_test_part": "test",
             "is_immediate": "y",
+            "has_end": "n",
             "start_datetime": "",
             "end_datetime": "",
         }
@@ -687,6 +688,7 @@ class TestStartRoomView(DysleksiTest):
             "student_test_parts": [],
             "is_test_part": "test",
             "is_immediate": "n",
+            "has_end": "y",
             "start_datetime": "2030-01-01T12:00",
             "end_datetime": "2030-01-01T13:00",
         }
@@ -710,6 +712,7 @@ class TestStartRoomView(DysleksiTest):
             "student_test_parts": [str(self.part.pk)],
             "is_test_part": "part",
             "is_immediate": "y",
+            "has_end": "n",
             "start_datetime": "",
             "end_datetime": "",
         }
@@ -731,6 +734,7 @@ class TestStartRoomView(DysleksiTest):
             "class_test_parts": [],
             "is_test_part": "test",
             "is_immediate": "y",
+            "has_end": "n",
             "start_datetime": "",
             "end_datetime": "",
         }
@@ -748,6 +752,7 @@ class TestStartRoomView(DysleksiTest):
             "class_test_parts": [],
             "is_test_part": "test",
             "is_immediate": "n",
+            "has_end": "y",
             "start_datetime": "2030-01-01T12:00",
             "end_datetime": "2030-01-01T13:00",
         }
@@ -774,6 +779,7 @@ class TestStartRoomView(DysleksiTest):
             ],
             "is_test_part": "part",
             "is_immediate": "y",
+            "has_end": "n",
             "start_datetime": "",
             "end_datetime": "",
         }
@@ -795,6 +801,7 @@ class TestStartRoomView(DysleksiTest):
             "class_test_parts": [],
             "is_test_part": "test",
             "is_immediate": "y",
+            "has_end": "n",
             "start_datetime": "",
             "end_datetime": "",
             # `ClassStudentFormSet` data
@@ -827,6 +834,7 @@ class TestStartRoomView(DysleksiTest):
             ],
             "is_test_part": "part",
             "is_immediate": "y",
+            "has_end": "n",
             "start_datetime": "",
             "end_datetime": "",
             # `ClassStudentFormSet` data
@@ -856,6 +864,7 @@ class TestStartRoomView(DysleksiTest):
             "class_test_parts": [],
             "is_test_part": "test",
             "is_immediate": "y",
+            "has_end": "n",
             "start_datetime": "",
             "end_datetime": "",
             # `ClassStudentFormSet` data
@@ -884,6 +893,7 @@ class TestStartRoomView(DysleksiTest):
             "class_test": self.group_test.id,
             "is_test_part": "test",
             "is_immediate": "n",
+            "has_end": "n",
             "start_datetime": "2025-01-01T00:00",
             "end_datetime": "",
         }

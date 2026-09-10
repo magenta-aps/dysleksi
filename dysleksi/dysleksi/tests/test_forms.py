@@ -89,6 +89,18 @@ class TestStartRoomForm(DysleksiTest):
         self.assertIsNone(instance.cleaned_data["class_test"])
         self.assertIsNone(instance.cleaned_data["class_test_parts"])
 
+    def test_hide_end_datetime_is_false_if_not_has_end(self):
+        data = {
+            "student": self.student1.pk,
+            "student_test": self.individual_test,
+            "start_datetime": "2030-01-01T00:00:00",
+            "end_datetime": "",
+            **self.base_form_data,
+        }
+        data["has_end"] = "y"
+        instance = StartRoomForm(self.teacher, data=data)
+        self.assertFalse(instance.hide_end_datetime)
+
     @property
     def base_form_data(self):
         return {
@@ -97,6 +109,7 @@ class TestStartRoomForm(DysleksiTest):
             "class_test": self.group_test,
             "is_test_part": "test",
             "is_immediate": "n",
+            "has_end": "n",
         }
 
 

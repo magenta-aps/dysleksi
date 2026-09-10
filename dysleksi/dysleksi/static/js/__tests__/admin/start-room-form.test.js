@@ -57,6 +57,7 @@ const mockDoc = `
             <input class="form-check-input" type="radio" name="is_immediate" value="y" required id="id_is_immediate_0" checked>
             <input class="form-check-input" type="radio" name="is_immediate" value="n" required id="id_is_immediate_1">
         </div>
+        <input type="hidden" name="has_end" id="id_has_end">
         <div class="start-datetime d-none">
             <input type="datetime-local" name="start_datetime" class="form-control" id="id_start_datetime">
             <button class="add-end"></button>
