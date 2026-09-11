@@ -1580,12 +1580,11 @@ export class TeacherView {
             }
 
             if (this.test.testType === "individual" && data.event === "audio.silent") {
+                // Display error on teacher's device
                 const student = new Student(data.student);
-                const error = "Mikrofonen ser ikke ud til at modtage lyd";
-                this.onStudentSetupError({
-                    studentDisplayName: student.displayName,
-                    error: error,
-                });
+                this.onStudentSetupError({ studentDisplayName: student.displayName });
+                // Log technical error to server
+                throw new Error(`mic audio is silent for ${student.displayName}`);
             }
 
             if (!data.event.startsWith("audio.")) {
@@ -1672,9 +1671,10 @@ export class TeacherView {
         if (this.errorModal !== null) {
             const modalBody = document.querySelector("#error .modal-body-inner");
             modalBody.innerHTML = `
-                <p class="fw-bold">${blocktranslate(gettext("Fejl på %(name)s's computer."), { name: data.studentDisplayName })}</p>
-                <p>${gettext("Der er problemer med at afspille eller optage lyd på elevens computer.")}</p>
-                <p>${blocktranslate(gettext("(Systemfejlen er %(error)s)"), { error: `<code>${data.error}</code>` })}</p>
+                <i class="ph ph-warning fs-3 mt-3"></i>
+                <p class="fw-bold">${gettext("Eleven kan ikke bruge mikrofonen.")}</p>
+                <p>${blocktranslate(gettext("Systemet kan ikke få adgang til mikrofonen på %(name)s's computer ..."), { name: data.studentDisplayName })}</p>
+                <p>${gettext("Mikrofonen er nødvendig for at gennemføre denne test")}</p>
             `;
             this.errorModal.show();
         }
