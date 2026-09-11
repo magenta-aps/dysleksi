@@ -15,6 +15,7 @@ omit =
     */__init__.py
     */migrations/*
     */tests/*
+    */formats/*
     */common/form_mixins.py
     */management/commands/create_user.py
     */management/commands/create_groups.py

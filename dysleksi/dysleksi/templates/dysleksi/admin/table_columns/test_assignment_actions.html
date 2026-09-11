@@ -1,8 +1,11 @@
 {% load i18n %}
-{% if record.status == TestAssignmentStatus.CREATED %}
-    <a href="{% url 'dysleksi:room' pk=record.pk %}" class="btn btn-outline-secondary">{% translate "Start" %}</a>
-{% elif record.status == TestAssignmentStatus.IN_PROGRESS %}
-    <a href="{% url 'dysleksi:room' pk=record.pk %}" class="btn btn-outline-secondary">{% translate "Åbn" %}</a>
-{% elif record.status == TestAssignmentStatus.COMPLETED or record.status == TestAssignmentStatus.CANCELLED %}
-    <a href="{% url 'dysleksi:test_assignment_results' pk=record.pk %}" class="btn btn-outline-secondary">{% translate "Se resultater" %}</a>
-{% endif %}
+<div class="text-wrap">
+    {% if record.status == TestAssignmentStatus.CREATED %}
+    <a href="{% url 'dysleksi:room' pk=record.pk %}" class="btn btn-outline-secondary text-nowrap mb-1">{% translate "Start" %}</a>
+    {% elif record.status == TestAssignmentStatus.IN_PROGRESS %}
+    <a href="{% url 'dysleksi:room' pk=record.pk %}" class="btn btn-outline-secondary text-nowrap mb-1">{% translate "Åbn" %}</a>
+    {% elif record.status == TestAssignmentStatus.COMPLETED or record.status == TestAssignmentStatus.CANCELLED %}
+    <a href="{% url 'dysleksi:test_assignment_results' pk=record.pk %}" class="btn btn-outline-secondary text-nowrap mb-1">{% translate "Se resultater" %}</a>
+    {% endif %}
+    <a href="#" class="btn btn-outline-secondary text-nowrap mb-1">{% translate "Giv adgang" %}</a>
+</div>

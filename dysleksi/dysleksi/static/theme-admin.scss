@@ -571,6 +571,10 @@ form .grid {
       vertical-align: middle;
     }
 
+    td.wide {
+      width: 5%;
+    }
+
     // Forces all table headers to design color
     > :not(caption) > * > th,
     > :not(caption) > * > th > a {

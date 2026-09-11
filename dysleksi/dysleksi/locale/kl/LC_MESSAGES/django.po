@@ -268,15 +268,7 @@ msgid "Anvendelsestidspunkt"
 msgstr ""
 
 #: dysleksi/tables.py
-msgid "Startdato"
-msgstr ""
-
-#: dysleksi/tables.py
-msgid "Slutdato"
-msgstr ""
-
-#: dysleksi/tables.py
-msgid "Resultatadgang"
+msgid "Start- og slutdato"
 msgstr ""
 
 #: dysleksi/tables.py
@@ -753,6 +745,7 @@ msgid "Se testoversigt"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_access.html
+#: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
 msgid "Giv adgang"
 msgstr ""
 

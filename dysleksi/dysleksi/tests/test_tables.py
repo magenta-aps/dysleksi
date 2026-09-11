@@ -2,7 +2,7 @@ from html import escape
 from unittest.mock import patch
 
 from django.db.models import F
-from django.db.models.functions import Lower, Upper
+from django.db.models.functions import Lower
 from django.template import engines
 from django.test import TestCase
 from django_tables2 import Table
@@ -31,16 +31,10 @@ class TestTestAssignmentTable(DysleksiTest):
         queryset, _ = self.table.order_status(self.queryset, is_descending=False)
         self._assert_order_by_expression_is(queryset, F("status"))
 
-    def test_order_start_date(self):
-        queryset, _ = self.table.order_start_date(self.queryset, is_descending=False)
+    def test_order_period(self):
+        queryset, _ = self.table.order_period(self.queryset, is_descending=False)
         self._assert_order_by_expression_is(
             queryset, Lower("planned_date_time__period")
-        )
-
-    def test_order_end_date(self):
-        queryset, _ = self.table.order_end_date(self.queryset, is_descending=False)
-        self._assert_order_by_expression_is(
-            queryset, Upper("planned_date_time__period")
         )
 
     def _assert_order_by_expression_is(self, queryset, expected_expression):

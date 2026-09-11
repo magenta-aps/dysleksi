@@ -1,1 +1,11 @@
-{{ record.planned_date_time.period|range_attr:attr }}
+{% with record.planned_date_time.period|range_attr:"lower" as start_date %}
+{% with record.planned_date_time.period|range_attr:"upper" as end_date %}
+{% if start_date %}
+    {{ start_date|date:"DATETIME_FORMAT" }}
+{% endif %}
+{% if start_date and end_date %}
+    <br>
+    {{ end_date|date:"DATETIME_FORMAT" }}
+{% endif %}
+{% endwith %}
+{% endwith %}
