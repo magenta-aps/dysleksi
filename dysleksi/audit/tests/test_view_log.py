@@ -40,10 +40,6 @@ class ViewLogTest(ResponseTest):
         )
         self.assert_logged("StudentDetailView", [self.student1])
 
-    def test_student_list_is_logged(self):
-        self.client.get(reverse("dysleksi:student_list"))
-        self.assert_logged("StudentListView", [self.student1, self.student2])
-
     def test_class_detail_logs_class_and_students(self):
         self.client.get(reverse("dysleksi:class_detail", kwargs={"pk": self.klasse.pk}))
         self.assert_logged(

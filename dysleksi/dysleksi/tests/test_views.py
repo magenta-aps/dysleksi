@@ -25,7 +25,6 @@ from dysleksi.models import (
     Institution,
     PartResponse,
     QuestionResponse,
-    Student,
     Test,
     TestAssignment,
     TestAssignmentStatus,
@@ -49,7 +48,6 @@ from dysleksi.views import (
     PartResponseView,
     RootView,
     StudentDetailView,
-    StudentListView,
     TestAssignmentListView,
     TestResponseView,
     UserTypeMixin,
@@ -360,35 +358,6 @@ class TestClassDetailView(DysleksiTest):
         response = self.client.get(
             reverse("dysleksi:class_detail", kwargs={"pk": self.klasse.pk})
         )
-        self.assertEqual(response.status_code, 403)
-
-
-class TestStudentListView(DysleksiTest):
-
-    url = reverse("dysleksi:student_list")
-
-    def test_get_template_names(self):
-        view = self.setup_view(StudentListView, self.teacher)
-        self.assertEqual(
-            view.get_template_names()[0], "dysleksi/admin/student/list.html"
-        )
-
-    def test_teacher_view(self):
-        view = self.setup_view(StudentListView, self.teacher)
-        expected_objs = Student.objects.filter(classes__teachers=self.teacher)
-        self.assertQuerySetEqual(
-            view.get_context_data()["object_list"], expected_objs, ordered=False
-        )
-        self.client.force_login(self.teacher)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, 200)
-        self.assertQuerySetEqual(
-            response.context_data["object_list"], expected_objs, ordered=False
-        )
-
-    def test_student_view(self):
-        self.client.force_login(self.student1)
-        response = self.client.get(self.url)
         self.assertEqual(response.status_code, 403)
 
 
