@@ -40,4 +40,13 @@ describe("goto-student-tab", () => {
         link.dispatchEvent(new Event("click"));
         expect(spyShow).toHaveBeenCalled();
     });
+
+    it("stores the shown tab in the url", () => {
+        window.history.replaceState({}, "", "/admin/classes/3/?page=2");
+        initializeGoToStudentTab();
+        document
+            .querySelector("#students-tab")
+            .dispatchEvent(new Event("shown.bs.tab"));
+        expect(window.location.search).toBe("?page=2&tab=students-tab");
+    });
 });

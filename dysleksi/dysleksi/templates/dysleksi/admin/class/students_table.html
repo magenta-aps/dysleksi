@@ -1,0 +1,34 @@
+{% extends "django_tables2/bootstrap5-responsive.html" %}
+{% load django_tables2 %}
+{% load i18n %}
+
+{# Identical to the default django tables2 template. But with next/previous buttons #}
+{# pointing at the correct tab #}
+
+{% block pagination.previous %}
+<li class="previous page-item">
+    <a href="{% querystring_replace table.prefixed_page_field=table.page.previous_page_number "tab"="students-tab" %}" class="page-link">
+        <span aria-hidden="true">&laquo;</span>
+        {% translate 'forrige' %}
+    </a>
+</li>
+{% endblock pagination.previous %}
+
+{% block pagination.range %}
+{% for p in table.page|table_page_range:table.paginator %}
+    <li class="page-item{% if table.page.number == p %} active{% endif %}">
+        <a class="page-link" {% if p != '...' %}href="{% querystring_replace table.prefixed_page_field=p "tab"="students-tab" %}"{% endif %}>
+            {{ p }}
+        </a>
+    </li>
+{% endfor %}
+{% endblock pagination.range %}
+
+{% block pagination.next %}
+<li class="next page-item">
+    <a href="{% querystring_replace table.prefixed_page_field=table.page.next_page_number "tab"="students-tab" %}" class="page-link">
+        {% translate 'næste' %}
+        <span aria-hidden="true">&raquo;</span>
+    </a>
+</li>
+{% endblock pagination.next %}

@@ -484,6 +484,14 @@ msgstr ""
 msgid "Tildel test"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/class/students_table.html
+msgid "forrige"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/class/students_table.html
+msgid "næste"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/modals/base.html
 msgid "OK"
 msgstr ""
