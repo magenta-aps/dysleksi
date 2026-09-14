@@ -76,6 +76,7 @@ class ClassStudentTable(Table):
     class Meta:
         model = Student
         fields: List[str] = []
+        template_name = "dysleksi/admin/class/students_table.html"
 
     name = TemplateColumn(
         template_name="dysleksi/admin/table_columns/student_name_link.html",

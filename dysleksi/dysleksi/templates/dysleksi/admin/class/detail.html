@@ -31,21 +31,21 @@
 
 <ul class="nav nav-pills mb-3" id="myTab" role="tablist">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="master-data-tab" data-bs-toggle="tab" data-bs-target="#master-data-tab-pane" type="button"
-                role="tab" aria-controls="master-data-tab-pane" aria-selected="true">
+        <button class="nav-link {% if active_tab == 'master-data-tab' %}active{% endif %}" id="master-data-tab" data-bs-toggle="tab" data-bs-target="#master-data-tab-pane" type="button"
+                role="tab" aria-controls="master-data-tab-pane" aria-selected="{% if active_tab == 'master-data-tab' %}true{% else %}false{% endif %}">
             {% translate 'Overblik' %}
         </button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="students-tab" data-bs-toggle="tab" data-bs-target="#students-tab-pane" type="button"
-                role="tab" aria-controls="students-tab-pane" aria-selected="false">
+        <button class="nav-link {% if active_tab == 'students-tab' %}active{% endif %}" id="students-tab" data-bs-toggle="tab" data-bs-target="#students-tab-pane" type="button"
+                role="tab" aria-controls="students-tab-pane" aria-selected="{% if active_tab == 'students-tab' %}true{% else %}false{% endif %}">
             {% translate 'Elever' %}
         </button>
     </li>
 </ul>
 
 <div class="tab-content" id="myTabContent">
-    <div class="tab-pane fade show active" id="master-data-tab-pane" role="tabpanel" aria-labelledby="master-data-tab" tabindex="0">
+    <div class="tab-pane fade {% if active_tab == 'master-data-tab' %}show active{% endif %}" id="master-data-tab-pane" role="tabpanel" aria-labelledby="master-data-tab" tabindex="0">
         <div class="table-container">
             <table class="table master-data">
                 <tr>
@@ -106,7 +106,7 @@
             </table>
         </div>
     </div>
-    <div class="tab-pane fade" id="students-tab-pane" role="tabpanel" aria-labelledby="students-tab" tabindex="0">
+    <div class="tab-pane fade {% if active_tab == 'students-tab' %}show active{% endif %}" id="students-tab-pane" role="tabpanel" aria-labelledby="students-tab" tabindex="0">
         {% render_table table %}
     </div>
 </div>

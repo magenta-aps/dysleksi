@@ -362,6 +362,8 @@ class ClassDetailView(
         # TODO: if Tabulex data indicates who is "kontaktlærer", display that teacher
         context_data["teacher"] = self.object.teachers.first()
 
+        context_data["active_tab"] = self.request.GET.get("tab", "master-data-tab")
+
         assignments = self.object.testassignment_set.annotate_status()
         context_data["completed_test_assignments"] = assignments.filter(
             status=TestAssignmentStatus.COMPLETED

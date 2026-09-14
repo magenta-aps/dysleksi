@@ -7,4 +7,12 @@ export function initializeGoToStudentTab() {
         const studentsTab = new bootstrap.Tab("#students-tab");
         studentsTab.show();
     });
+    // Remember the tab in the URL to handle reloads and pagination
+    for (const tab of document.querySelectorAll("#myTab [data-bs-toggle='tab']")) {
+        tab.addEventListener("shown.bs.tab", (evt) => {
+            const params = new URLSearchParams(window.location.search);
+            params.set("tab", evt.target.id);
+            history.replaceState(null, "", "?" + params.toString());
+        });
+    }
 }
