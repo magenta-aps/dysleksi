@@ -82,6 +82,16 @@ export class StudentTestView extends EventTarget {
     }
 
     onChatMessage(data) {
+        if (data.event === "teacher.ping") {
+            // Answer the teacher, who is watching for closed browsers
+            this.channel.send({
+                event: "student.heartbeat",
+                assignmentId: this.assignmentId,
+                student: this.student,
+            });
+            return;
+        }
+
         console.log("Chat: received", data);
 
         if (data.event === "test.cancelled") {

@@ -1734,6 +1734,10 @@ describe("GroupTestContainer", () => {
         expect(folded.style.display).toBe("none");
     });
 
+    it("ignores presence updates for a student who has no card yet", () => {
+        expect(() => instance.setStudentConnected(404, false)).not.toThrow();
+    });
+
     it("creates a new student card if it doesn't exist", () => {
         const studentData = {
             student: {
@@ -2120,6 +2124,137 @@ describe("TeacherView socket 'test.started' handling", () => {
             }),
         );
         expect(markSpy).toHaveBeenCalledWith(expect.anything(), false);
+    });
+});
+
+describe("TeacherView student presence", () => {
+    let view;
+    let socketHandler;
+    let p2pChannel;
+    const studentId = 123;
+    const student = {
+        id: studentId,
+        firstName: "Alice",
+        lastName: "Smith",
+        progress: 0,
+        currentPartIndex: 0,
+        currentQuestionIndex: 0,
+        resultsByPart: {},
+    };
+
+    const join = () =>
+        socketHandler({
+            data: JSON.stringify({
+                event: "student.joined",
+                studentId: studentId,
+                assignmentId: 1,
+            }),
+        });
+
+    const sendFromStudent = (detail) =>
+        p2pChannel.dispatchEvent(new CustomEvent("message", { detail: detail }));
+
+    const topRow = () => view.groupTestContainer.cards.get(studentId).topRow;
+
+    const isDisconnected = () => topRow().classList.contains("is-disconnected");
+
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.stubGlobal("localStorage", {
+            getItem: vi.fn(),
+            setItem: vi.fn(),
+            clear: vi.fn(),
+        });
+
+        document.body.innerHTML = GROUP_DOM_HTML;
+
+        const socket = mockSocket(1);
+
+        view = new TeacherView(
+            {
+                testType: "group",
+                parts: [{ name: "part1", questions: [{}] }],
+            },
+            1,
+            new EventTable(),
+            new ActionButtons(),
+            new NoteField(),
+            new QuestionView(),
+            new ElapsedTimeView("#elapsed-time"),
+            null,
+        );
+
+        socketHandler = getMainSocketHandler(socket);
+        join();
+        [p2pChannel] = view.studentChannels[studentId];
+        sendFromStudent({ event: "test.started", student: student });
+    });
+
+    afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
+        vi.restoreAllMocks();
+        vi.unstubAllGlobals();
+    });
+
+    it("asks the students whether they are still there", () => {
+        vi.advanceTimersByTime(5000);
+
+        expect(p2pChannel.send).toHaveBeenCalledWith({ event: "teacher.ping" });
+    });
+
+    it("leaves the card alone as long as the student answers", () => {
+        for (let ping = 0; ping < 4; ping++) {
+            vi.advanceTimersByTime(5000);
+            sendFromStudent({ event: "student.heartbeat", student: student });
+        }
+
+        expect(isDisconnected()).toBe(false);
+        // Heartbeats are of no interest to the server
+        expect(view.messageQueue).toHaveLength(1);
+    });
+
+    it("marks the card when the student stops answering", () => {
+        sendFromStudent({ event: "student.heartbeat", student: student });
+
+        vi.advanceTimersByTime(20000);
+
+        expect(isDisconnected()).toBe(true);
+        expect(topRow().title).toBe("Ingen forbindelse til eleven");
+    });
+
+    it("clears the mark when the student comes back", () => {
+        sendFromStudent({ event: "student.heartbeat", student: student });
+        vi.advanceTimersByTime(20000);
+
+        sendFromStudent({ event: "student.heartbeat", student: student });
+
+        expect(isDisconnected()).toBe(false);
+    });
+
+    it("marks the card as soon as the last channel hangs up", () => {
+        p2pChannel.dispatchEvent(new Event("close"));
+
+        expect(isDisconnected()).toBe(true);
+    });
+
+    it("leaves the card alone while the student has another window open", () => {
+        join();
+
+        p2pChannel.dispatchEvent(new Event("close"));
+
+        expect(isDisconnected()).toBe(false);
+    });
+
+    it("leaves the card alone when a student who is done hangs up", () => {
+        sendFromStudent({
+            event: "question.answered",
+            student: { ...student, progress: 100 },
+        });
+
+        p2pChannel.dispatchEvent(new Event("close"));
+
+        expect(isDisconnected()).toBe(false);
     });
 });
 
@@ -3134,6 +3269,23 @@ describe("TeacherView _initSocket", () => {
         expect(view.studentChannels[studentId]).toEqual([newChannel]);
         expect(oldChannel.close).toHaveBeenCalled();
         expect(newChannel.close).not.toHaveBeenCalled();
+    });
+
+    it("drops the channel that hung up when there are no student cards", () => {
+        const socketHandler = getMainSocketHandler(socket);
+        socketHandler({
+            data: JSON.stringify({
+                event: "student.joined",
+                studentId,
+                assignmentId: 1,
+            }),
+        });
+        const [channel] = view.studentChannels[studentId];
+
+        // An individual test has no cards to mark as disconnected
+        channel.dispatchEvent(new Event("close"));
+
+        expect(view.studentChannels[studentId]).toHaveLength(0);
     });
 
     it("ignores WebSocket messages that are not student.joined", () => {

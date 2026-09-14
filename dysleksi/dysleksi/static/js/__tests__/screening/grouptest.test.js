@@ -1947,6 +1947,37 @@ describe("A window that is taken over", () => {
     });
 });
 
+describe("The student heartbeat", () => {
+    beforeEach(() => {
+        document.body.innerHTML = SHARED_DOM_HTML;
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
+            mockAudioContextInstance,
+        );
+    });
+
+    afterEach(() => {
+        vi.clearAllMocks();
+        document.body.innerHTML = "";
+    });
+
+    it("answers the teacher's ping", () => {
+        const view = new GroupTestView(
+            new Test(groupTestData),
+            1,
+            new GroupTestDomElements(),
+            student,
+        );
+
+        view.onChatMessage({ event: "teacher.ping" });
+
+        expect(mockP2P.send).toHaveBeenCalledWith({
+            event: "student.heartbeat",
+            assignmentId: 1,
+            student: student,
+        });
+    });
+});
+
 describe("StudentTestView - updateNextButtonClass", () => {
     let view;
     let domElements;
