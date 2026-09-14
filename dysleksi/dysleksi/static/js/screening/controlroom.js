@@ -415,11 +415,11 @@ export class StudentCard {
         this.pauseOverlay = this.el.querySelector("#pause-overlay");
 
         this.currentViewPartIndex = 0;
-        this.isHidden = true;
 
         // Initial setup
         this.nameText.textContent = this.student.displayName;
         this._initEventListeners();
+        this.foldOut();
     }
 
     _initEventListeners() {
