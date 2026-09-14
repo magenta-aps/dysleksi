@@ -407,7 +407,7 @@ export class StudentTestView extends EventTarget {
 
         if (cancelled) {
             alert("Testen er afbrudt");
-            this.student.progress = 100;
+            this.student.cancelled = true;
             this.send({
                 event: "test.cancelled",
                 message: "Testen er afbrudt",

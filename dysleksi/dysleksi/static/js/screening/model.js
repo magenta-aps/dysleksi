@@ -16,6 +16,7 @@ export class Student {
         this.currentPartIndex = null;
         this.currentQuestionIndex = null;
         this.marked = false;
+        this.cancelled = false;
     }
     get displayName() {
         const lastInitial = this.lastName ? ` ${this.lastName[0].toUpperCase()}.` : "";

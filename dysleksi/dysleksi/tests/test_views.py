@@ -942,6 +942,16 @@ class TestAssignmentResultsView(ResponseTest):
             self.test_response_class_2, by_category[1]["items"]
         )  # test_response_class_2 er under middel
 
+    def test_by_category_without_answers(self):
+        self.group_partresponse_2.questionresponses.all().delete()
+        view = self.setup_view(
+            AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk
+        )
+        by_category = view.get_by_category()
+        self.assertIn(
+            self.test_response_class_2, by_category[4]["items"]
+        )  # test_response_class_2 er markeret som "Ikke fuldført"
+
     def test_table(self):
         view = self.setup_view(
             AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk

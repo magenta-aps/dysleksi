@@ -1183,6 +1183,11 @@ $border-radius-student-card: $spacer / 4 * 3;
       border: 1px solid $green-lighter;
     }
 
+    &.is-cancelled {
+      background-color: $mono-white;
+      border: 1px solid $mono-gray-light;
+    }
+
     .student-controls {
         display: flex;
         align-items: center;
@@ -1240,6 +1245,10 @@ $border-radius-student-card: $spacer / 4 * 3;
 
     &.is-complete {
       background-color: $green-lightest;
+    }
+
+    &.is-cancelled {
+      background-color: $mono-gray-lighter;
     }
   }
 

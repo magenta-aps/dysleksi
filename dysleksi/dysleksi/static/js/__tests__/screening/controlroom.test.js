@@ -1814,6 +1814,29 @@ describe("GroupTestContainer", () => {
         expect(fill.style.width).toBe("80%");
     });
 
+    it("greys out the card of a cancelled student, keeping its progress", () => {
+        const studentData = {
+            student: {
+                id: 3,
+                firstName: "Carol",
+                lastName: "Danvers",
+                progress: 40,
+                cancelled: true,
+                currentPartIndex: 0,
+                currentQuestionIndex: 0,
+                resultsByPart: {},
+            },
+        };
+        instance.updateData(studentData);
+
+        const card = instance.cards.get(3);
+        const fill = card.el.querySelector(".progress-fill");
+        expect(fill.style.width).toBe("40%");
+        expect(fill.classList.contains("is-cancelled")).toBe(true);
+        expect(card.topRow.classList.contains("is-cancelled")).toBe(true);
+        expect(card.statusIcon.style.display).toBe("none");
+    });
+
     it("toggles folded area when card is clicked", () => {
         const studentData = {
             student: {
