@@ -1698,7 +1698,7 @@ describe("GroupTestContainer", () => {
         const nameSpan = card.el.querySelector(".student-name");
 
         // Ensure it's hidden initially
-        folded.style.display = "none";
+        card.foldIn();
 
         // Click on the span (target is NOT .folded-area, so it should NOT return early)
         nameSpan.click();
@@ -1855,22 +1855,18 @@ describe("GroupTestContainer", () => {
         const folded = card.el.querySelector(".folded-area");
         const arrowSpan = card.el.querySelector("#foldout-arrow");
 
-        // Initially folded
-        expect(folded.style.display === "" || folded.style.display === "none").toBe(
-            true,
-        );
+        // Initially folded out
+        expect(folded.style.display).toBe("flex");
         const initialArrowClass = arrowSpan.className;
 
-        // Click to unfold
-        console.log("ARROWSPAN1", arrowSpan.innerHTML);
-        card.el.click();
-        expect(folded.style.display).toBe("flex");
-        console.log("ARROWSPAN2", arrowSpan.innerHTML);
-        expect(arrowSpan.className).not.toBe(initialArrowClass);
-
-        // Click to fold again
+        // Click to fold in
         card.el.click();
         expect(folded.style.display).toBe("none");
+        expect(arrowSpan.className).not.toBe(initialArrowClass);
+
+        // Click to unfold again
+        card.el.click();
+        expect(folded.style.display).toBe("flex");
         expect(arrowSpan.className).toBe(initialArrowClass);
     });
 });
@@ -2737,9 +2733,6 @@ describe("StudentCard", () => {
     it("toggles the 'is-expanded' class and display style when clicked", () => {
         const card = new StudentCard(mockStudent, mockTest);
 
-        expect(card.foldedArea.style.display).toBe("none");
-
-        card.el.click();
         expect(card.foldedArea.style.display).toBe("flex");
         expect(card.el.classList.contains("is-expanded")).toBe(true);
         expect(card.arrowIcon.className).toBe("ph-fill ph-caret-up");
@@ -2747,6 +2740,10 @@ describe("StudentCard", () => {
         card.el.click();
         expect(card.foldedArea.style.display).toBe("none");
         expect(card.el.classList.contains("is-expanded")).toBe(false);
+
+        card.el.click();
+        expect(card.foldedArea.style.display).toBe("flex");
+        expect(card.el.classList.contains("is-expanded")).toBe(true);
     });
 
     it("changes viewable part when navigation arrows are clicked", () => {
@@ -3604,7 +3601,7 @@ describe("GroupTestContainer foldAllCards", () => {
     });
 
     it("folds all cards out when all are folded in", () => {
-        // All cards start folded in by default
+        container.cards.forEach((card) => card.foldIn());
         btn.click();
         container.cards.forEach((card) => {
             expect(card.foldedArea.style.display).toBe("flex");
@@ -3613,7 +3610,6 @@ describe("GroupTestContainer foldAllCards", () => {
     });
 
     it("folds all cards in when all are folded out", () => {
-        container.cards.forEach((card) => card.foldOut());
         btn.click();
         container.cards.forEach((card) => {
             expect(card.foldedArea.style.display).toBe("none");
@@ -3622,9 +3618,9 @@ describe("GroupTestContainer foldAllCards", () => {
     });
 
     it("folds all cards in when only some are folded out", () => {
-        // Open just one card — anyCardIsFoldedOut should be true
-        const firstCard = container.cards.values().next().value;
-        firstCard.foldOut();
+        // Close all but one card — anyCardIsFoldedOut should still be true
+        container.cards.forEach((card) => card.foldIn());
+        container.cards.values().next().value.foldOut();
 
         btn.click();
         container.cards.forEach((card) => {
