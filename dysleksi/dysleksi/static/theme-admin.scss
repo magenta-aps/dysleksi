@@ -1188,6 +1188,15 @@ $border-radius-student-card: $spacer / 4 * 3;
       border: 1px solid $mono-gray-light;
     }
 
+    &.is-disconnected {
+      background-color: $red-lightest;
+      border: 1px solid $red-lighter;
+
+      .progress-fill {
+        background-color: $red-lighter;
+      }
+    }
+
     .student-controls {
         display: flex;
         align-items: center;

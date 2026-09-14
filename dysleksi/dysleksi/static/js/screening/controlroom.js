@@ -13,6 +13,11 @@ export const showResultLink = () => {
     enabled.classList.remove("d-none");
 };
 
+// How often we ask the students whether they are still there, and how long we
+// wait for an answer before marking a student as gone.
+const PING_MS = 5000;
+const STUDENT_TIMEOUT_MS = 15000;
+
 const formatDuration = (duration) => {
     const hours = String(duration.getHours() - 1).padStart(2, "0");
     const minutes = String(duration.getMinutes()).padStart(2, "0");
@@ -534,6 +539,11 @@ export class StudentCard {
         this.pauseOverlay.style.display = "none";
     }
 
+    setConnected(connected) {
+        this.topRow.classList.toggle("is-disconnected", !connected);
+        this.topRow.title = connected ? "" : gettext("Ingen forbindelse til eleven");
+    }
+
     update() {
         this._renderPartsProgress();
         const isCurrentPart =
@@ -830,6 +840,10 @@ export class GroupTestContainer {
         );
         this.progressBar.style.width = `${avgProgress}%`;
         this.progressLabel.textContent = `${avgProgress}%`;
+    }
+
+    setStudentConnected(studentId, connected) {
+        this.cards.get(studentId)?.setConnected(connected);
     }
 
     markPause(data, paused) {
@@ -1326,6 +1340,7 @@ export class TeacherView {
 
         this.webRTCPeer = new WebRTCPeer();
         this.studentChannels = {};
+        this.studentsLastSeen = new Map();
 
         const savedQueue = localStorage.getItem(`msg_queue_${this.assignmentId}`);
         this.messageQueue = savedQueue ? JSON.parse(savedQueue) : [];
@@ -1335,6 +1350,7 @@ export class TeacherView {
         this._initButtonListeners();
         this._initFilterButtonSelection();
         this._startSyncInterval();
+        this._startPresenceInterval();
     }
 
     pauseTest() {
@@ -1459,6 +1475,11 @@ export class TeacherView {
     _initTestSocket(channel) {
         channel.addEventListener("message", (e) => {
             const data = e.detail;
+
+            if (data.event === "student.heartbeat") {
+                this._markStudentSeen(data.student.id);
+                return;
+            }
 
             if (this.test.testType === "individual") {
                 if (data.event === "instructions.started") {
@@ -1618,6 +1639,9 @@ export class TeacherView {
                 p2p.addEventListener("close", () => {
                     console.log("Connection closed for student", data.studentId);
                     this._removeStudentChannel(data.studentId, p2p);
+                    if (this.studentChannels[data.studentId].length === 0) {
+                        this._markStudentGone(data.studentId);
+                    }
                 });
             }
 
@@ -1659,6 +1683,39 @@ export class TeacherView {
             (c) => c !== channel,
         );
         channel.close();
+    }
+
+    _startPresenceInterval() {
+        // A websocket channel stays open even when the student is gone, so we
+        // ask the students to say hello instead, and mark the ones who do not
+        // answer as gone.
+        setInterval(() => {
+            this._sendToStudents({ event: "teacher.ping" });
+            for (const [studentId, lastSeen] of this.studentsLastSeen) {
+                if (new Date() - lastSeen > STUDENT_TIMEOUT_MS) {
+                    this._markStudentGone(studentId);
+                }
+            }
+        }, PING_MS);
+    }
+
+    _markStudentSeen(studentId) {
+        this.studentsLastSeen.set(studentId, new Date());
+        this._setStudentConnected(studentId, true);
+    }
+
+    _markStudentGone(studentId) {
+        this.studentsLastSeen.delete(studentId);
+        // A student who is done with the test is allowed to close the browser
+        if (!this.completedStudentIds.has(studentId)) {
+            this._setStudentConnected(studentId, false);
+        }
+    }
+
+    _setStudentConnected(studentId, connected) {
+        if (this.test.testType === "group") {
+            this.groupTestContainer.setStudentConnected(studentId, connected);
+        }
     }
 
     _sendToStudents(data) {
