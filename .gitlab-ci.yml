@@ -140,7 +140,8 @@ Lint Javascript:
   extends: .lint-default
   image: node:lts
   script:
-    - npm install -g oxfmt oxlint
+    - npm install -g oxfmt@0.42.0
+    - npm install -g oxlint@1.57.0
     - oxfmt --check "dysleksi/dysleksi/static/js/**/*.js"
     - oxlint --format=default "dysleksi/dysleksi/static/js"
 
