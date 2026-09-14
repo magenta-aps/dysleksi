@@ -540,14 +540,16 @@ export class StudentCard {
             this.currentViewPartIndex === this.student.currentPartIndex;
         this.progressFill.style.width = `${this.student.progress}%`;
 
+        this.statusIcon.style.display = "none";
         if (this.student.progress === 100) {
             this.progressFill.classList.add("is-complete");
             this.topRow.classList.add("is-complete");
             this.statusIcon.style.display = "block";
             this.statusIcon.className = "ph-fill ph-check-circle green";
             this.currentPartText.textContent = "-";
-        } else {
-            this.statusIcon.style.display = "none";
+        } else if (this.student.cancelled) {
+            this.progressFill.classList.add("is-cancelled");
+            this.topRow.classList.add("is-cancelled");
         }
 
         if (this.student.marked) {
@@ -856,6 +858,7 @@ export class GroupTestContainer {
         }
 
         student.progress = studentData.progress;
+        student.cancelled = studentData.cancelled;
         student.currentPartIndex = studentData.currentPartIndex;
         student.currentQuestionIndex = studentData.currentQuestionIndex;
         student.resultsByPart = studentData.resultsByPart;

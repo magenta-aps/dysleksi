@@ -34,7 +34,7 @@ from django.db.models import (
     When,
     Window,
 )
-from django.db.models.expressions import OuterRef, Subquery
+from django.db.models.expressions import Exists, OuterRef, Subquery
 from django.db.models.functions import Cast, Coalesce, Concat, NullIf, RowNumber
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -1607,7 +1607,18 @@ class TestResponseQuerySet(PermissionsQuerySet):
 
         default_key = CorrectnessCategory.default().pk
         cases = []
-        completed_filter = Q(completed=True)
+
+        # We only need to find a CorrectnessCategory if the student has
+        # answered at least one question
+        #
+        # Students who have not answered a single question are marked with the default
+        # correctness category ("Ikke fuldført")
+        completed_filter = Q(completed=True) & Exists(
+            QuestionResponse.objects.filter(
+                partresponse__testresponse=OuterRef("pk"),
+                question__is_practice=False,
+            )
+        )
 
         for category in CorrectnessCategory.non_default():
             if category.lower_proportion_limit == 0.0:
