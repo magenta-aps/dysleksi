@@ -163,6 +163,7 @@ services:
     volumes:
       - ../dysleksi-binaries/real-data:/web/resources/:ro
       - ../dysleksi-binaries/dummy-data:/web/dummy-resources/:ro
+      - file-data:/web/:ro  # Serve files in `file-data` volume (aka. MEDIA_ROOT, aka. uploaded files)
     networks:
       - default
     restart: unless-stopped
