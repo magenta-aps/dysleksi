@@ -122,6 +122,8 @@ export class StudentTestView extends EventTarget {
         this.clearReminder();
         this.clearPartTimeout();
 
+        this.audioContext.suspend();
+
         // Cover the student's interface with the pause overlay. It sits on top
         // of everything and intercepts all clicks/taps, so all buttons are
         // effectively invalidated while paused.
@@ -138,6 +140,8 @@ export class StudentTestView extends EventTarget {
 
         // Uncover the interface so the student can interact with it again.
         this.domElements.hidePauseOverlay();
+
+        this.audioContext.resume();
 
         // Re-initiate the question timeout and reminder sounds.
         if (this._pausedHadQuestionTimers && this.currentQuestion) {
