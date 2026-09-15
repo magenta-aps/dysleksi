@@ -379,7 +379,11 @@ class TestPartResponse(ResponseTest):
                 "pk"
             ),
             PartResponse.objects.filter(
-                pk__in=(self.group_partresponse_1.pk, self.group_partresponse_2.pk)
+                pk__in=(
+                    self.group_partresponse_1.pk,
+                    self.group_partresponse_2.pk,
+                    self.individual_partresponse.pk,
+                )
             ).order_by("pk"),
         )
 
@@ -392,7 +396,11 @@ class TestPartResponse(ResponseTest):
                 "pk"
             ),
             PartResponse.objects.filter(
-                pk__in=(self.group_partresponse_1.pk, self.group_partresponse_2.pk)
+                pk__in=(
+                    self.group_partresponse_1.pk,
+                    self.group_partresponse_2.pk,
+                    self.individual_partresponse.pk,
+                )
             ).order_by("pk"),
         )
         other_school = Institution.objects.create(
@@ -465,6 +473,7 @@ class TestQuestionResponse(ResponseTest):
                     self.group_questionresponse_2_2.pk,
                     self.group_questionresponse_2_3.pk,
                     self.group_questionresponse_2_4.pk,
+                    self.individual_questionresponse.pk,
                 )
             ).order_by("pk"),
         )
@@ -692,7 +701,11 @@ class TestTestAssignment(ResponseTest):
                 "pk"
             ),
             PartResponse.objects.filter(
-                pk__in=(self.group_partresponse_1.pk, self.group_partresponse_2.pk)
+                pk__in=(
+                    self.group_partresponse_1.pk,
+                    self.group_partresponse_2.pk,
+                    self.individual_partresponse.pk,
+                )
             ).order_by("pk"),
         )
 
@@ -1715,8 +1728,8 @@ class TestTestResponseQuerySet(ResponseTest):
         )
         student1_answer = qs[0]
         student2_answer = qs[1]
-        self.assertEqual(student1_answer.proportion, 1)
-        self.assertEqual(student2_answer.proportion, 0.25)
+        self.assertEqual(student1_answer.proportion, 0.8)
+        self.assertEqual(student2_answer.proportion, 0.2)
 
     def test_annotate_score_category(self):
         qs = (

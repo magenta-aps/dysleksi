@@ -1867,6 +1867,9 @@ $border-radius-student-card: $spacer / 4 * 3;
   .column-student-answer {
     width: 30% !important;
   }
+  .column-edit-note {
+    width: 15% !important;
+  }
   &:has(.column-challenge-sentence) {
     .column-student-answer {
       width: 15% !important;

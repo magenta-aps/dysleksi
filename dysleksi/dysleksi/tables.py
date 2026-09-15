@@ -473,6 +473,14 @@ class QuestionResponsesTable(NonOrderableTableMixin, Table):
             "td": {"class": "column-student-answer-time"},
         },
     )
+    note = TemplateColumn(
+        verbose_name=_("Bemærkning"),
+        template_name="dysleksi/admin/part_response/group/column_edit_note.html",
+        attrs={
+            "th": {"class": "column-edit-note"},
+            "td": {"class": "column-edit-note"},
+        },
+    )
 
     def render_student_answer_time(self, value):
         # Convert ms to s

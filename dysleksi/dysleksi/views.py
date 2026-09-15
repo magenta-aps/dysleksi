@@ -1738,6 +1738,8 @@ class PartResponseView(
         ]
         if count_type_qs["teacher_judged"] == 0:
             exclude_columns.append("challenge_sentence")
+        if self.object.testresponse.assignment.test.test_type == TestType.GROUP:
+            exclude_columns.append("note")
 
         context["responses_table"] = QuestionResponsesTable(
             data=self.get_current_items(),
@@ -1821,3 +1823,18 @@ class ClientErrorLogView(View):
         if user_agent:
             lines.append(f"    user agent: {user_agent}")
         return "\n".join(lines)
+
+
+class EditNoteView(GroupRequiredMixin, ObjectPermissionsMixin, View):
+    def post(self, request, *args, **kwargs):
+        try:
+            pk = self.request.POST.get("pk")
+            note = self.request.POST.get("note")
+            obj = QuestionResponse.objects.get(pk=pk)
+        except QuestionResponse.DoesNotExist:
+            raise Http404(f"QuestionResponse {pk} does not exist")
+        else:
+            self.test_permissions(obj)
+            obj.note = note
+            obj.save(update_fields=["note"])
+            return HttpResponse("ok")
