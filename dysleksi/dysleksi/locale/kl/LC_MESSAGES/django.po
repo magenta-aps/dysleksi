@@ -365,6 +365,11 @@ msgstr ""
 msgid "Tid"
 msgstr ""
 
+#: dysleksi/tables.py
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Bemærkning"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/base.html
 #: dysleksi/templates/dysleksi/admin/modals/base.html
 msgid "Luk"
@@ -892,10 +897,6 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Resultat"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Bemærkning"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html

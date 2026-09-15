@@ -661,6 +661,32 @@ class ResponseTest(DysleksiTest):
         )
         cls.group_questionresponse_2_4.save()
 
+        # Individual test: response
+        cls.individual_test_part = cls.part
+        cls.individual_question = TestQuestion.objects.create(
+            part=cls.individual_test_part,
+            challenge=cls.resource1,
+            reminder=5000,
+            reminder_source=cls.resource4,
+        )
+        cls.individual_partresponse = PartResponse.objects.create(
+            testresponse=cls.test_response_student,
+            testpart=cls.individual_test_part,
+            completed=True,
+            started_at=datetime(2026, 5, 1, 12, 0, 0, tzinfo=tz),
+        )
+        cls.individual_questionresponse = QuestionResponse.objects.create(
+            partresponse=cls.individual_partresponse,
+            question=cls.individual_question,
+            correctness=Correctness.CORRECT,
+            finished_after=3000,
+            note="Original note",
+        )
+        cls.individual_questionresponse.submitted_at = datetime(
+            2026, 5, 1, 12, 0, 10, tzinfo=tz
+        )
+        cls.individual_questionresponse.save()
+
     @classmethod
     def create_wordspelling_part(cls, individual: bool = False):
         super().create_wordspelling_part(individual)

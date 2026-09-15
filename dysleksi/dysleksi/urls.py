@@ -14,6 +14,7 @@ from dysleksi.views import (
     ClassDetailView,
     ClassListView,
     ClientErrorLogView,
+    EditNoteView,
     PartResponseView,
     RootView,
     StartAssignmentView,
@@ -80,5 +81,10 @@ urlpatterns: list[URLResolver | URLPattern] = [
         "assignment/<int:assignment_pk>/<int:testpart_pk>/<int:testresponse_pk>/",
         PartResponseView.as_view(),
         name="test_assignment_part_result",
+    ),
+    path(
+        "edit-note/",
+        EditNoteView.as_view(),
+        name="edit_note",
     ),
 ]

@@ -44,6 +44,7 @@ from dysleksi.views import (
     ClassDetailView,
     ClassListView,
     ClientErrorLogView,
+    EditNoteView,
     PaginationMixin,
     PartResponseView,
     RootView,
@@ -1924,6 +1925,42 @@ class TestPartResponseView(ResponseTest):
             ],
         )
 
+    def test_answer_table_individual_test(self):
+        view = self.setup_view(
+            PartResponseView,
+            self.teacher,
+            assignment_pk=self.test_assignment_student.pk,
+            testresponse_pk=self.test_response_student.pk,
+            testpart_pk=self.individual_test_part.pk,
+        )
+        context = view.get_context_data()
+        table = context["responses_table"]
+        self.assertIn("challenge_image", table.exclude)
+        self.assertIn("challenge_sound", table.exclude)
+        self.assertIn("challenge_sentence", table.exclude)
+
+        response = view.response
+        response.render()
+        soup = BeautifulSoup(response.content, "html.parser")
+        table = self.html_table_to_list(
+            soup.find("div", id="test-results-table").find("table")
+        )
+        self.assertEqual(
+            table,
+            [
+                [
+                    ["Opg."],
+                    ["Ord"],
+                    ["Rigtigt svar"],
+                    ["Elevens svar"],
+                    ["Tid"],
+                    ["Bemærkning"],
+                ],
+                [["1"], ["TestOrd"], ["TestOrd"], [], ["3 sek."], []],
+                [[], [], [], [], ["3 sek."], []],
+            ],
+        )
+
     def test_access(self):
         self.setup_view(
             PartResponseView,
@@ -2203,3 +2240,32 @@ class WindowLockViewTest(DysleksiTest):
         self.client.force_login(self.teacher)
         self.assertGranted(self.acquire("window-a", self.test_assignment_student), True)
         self.assertGranted(self.acquire("window-b", self.test_assignment_class), True)
+
+
+class TestEditNoteView(ResponseTest):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.create_parts()
+
+    def test_post_valid_question_response_pk(self):
+        question_response = QuestionResponse.objects.earliest("pk")
+        response = self.post(
+            self.teacher, {"pk": question_response.pk, "note": "Mit notat"}
+        )
+        self.assertIsInstance(response, HttpResponse)
+        question_response.refresh_from_db()
+        self.assertEqual(question_response.note, "Mit notat")
+
+    def test_post_invalid_question_response_pk(self):
+        with self.assertRaises(Http404):
+            self.post(self.teacher, {"pk": -1, "note": "Mit notat"})
+
+    def post(self, user, data):
+        request_factory = RequestFactory()
+        request = request_factory.post("")
+        request.user = user
+        request.POST = data
+        view = EditNoteView()
+        view.setup(request)
+        return view.post(request)
