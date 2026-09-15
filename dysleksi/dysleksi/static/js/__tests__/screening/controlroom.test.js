@@ -459,7 +459,20 @@ describe("ElapsedTimeView", () => {
         // Test update when timer is started
         instance.start();
         instance.update();
-        expect(instance.domElement.innerText).toMatch(/^-?\d{1,2}:\d{2}:\d{2}$/);
+        expect(instance.domElement.innerText).toMatch(/^\d{2}:\d{2}:\d{2}$/);
+    });
+
+    it("formats the elapsed time independently of the local timezone", () => {
+        const originalTZ = process.env.TZ;
+        process.env.TZ = "America/Nuuk";
+        try {
+            instance.start();
+            vi.advanceTimersByTime(3600000 + 5000);
+            instance.update();
+            expect(instance.domElement.innerText).toBe("01:00:05");
+        } finally {
+            process.env.TZ = originalTZ;
+        }
     });
 
     it("updates its DOM element on an interval", () => {
@@ -506,7 +519,7 @@ describe("ElapsedTimeView", () => {
         vi.advanceTimersByTime(2000);
         instance.update();
         // Only the 7 running seconds should be counted, not the 10 paused ones
-        expect(instance.domElement.innerText).toMatch(/:00:07$/);
+        expect(instance.domElement.innerText).toBe("00:00:07");
     });
 
     it("initialises the timer when resume is the first call", () => {
