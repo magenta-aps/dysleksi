@@ -18,10 +18,11 @@ export const showResultLink = () => {
 const PING_MS = 5000;
 const STUDENT_TIMEOUT_MS = 15000;
 
-const formatDuration = (duration) => {
-    const hours = String(duration.getHours() - 1).padStart(2, "0");
-    const minutes = String(duration.getMinutes()).padStart(2, "0");
-    const seconds = String(duration.getSeconds()).padStart(2, "0");
+const formatDuration = (milliseconds) => {
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
+    const minutes = String(Math.floor(totalSeconds / 60) % 60).padStart(2, "0");
+    const seconds = String(totalSeconds % 60).padStart(2, "0");
     return `${hours}:${minutes}:${seconds}`;
 };
 
@@ -315,7 +316,7 @@ export class EventTable extends EventTarget {
         const startTick = () => {
             tickInterval = setInterval(() => {
                 const s = Math.floor(audioEl.currentTime);
-                durationEl.innerText = formatDuration(new Date(s * 1000));
+                durationEl.innerText = formatDuration(s * 1000);
             }, 250);
         };
 
@@ -366,10 +367,7 @@ export class EventTable extends EventTarget {
     updateAudioDuration(audioEl, durationEl) {
         const duration = audioEl.duration;
         if (!isNaN(duration) && isFinite(duration)) {
-            durationEl.innerText = formatDuration(
-                // Convert duration in seconds to `Date` (specified in milliseconds)
-                new Date(duration * 1000),
-            );
+            durationEl.innerText = formatDuration(duration * 1000);
         } else {
             durationEl.innerHTML = "--:--:--";
         }
@@ -1161,7 +1159,7 @@ export class ElapsedTimeView {
 
     update() {
         if (this.running && this.t1 !== null) {
-            const delta = new Date(new Date() - this.t1 - this.pausedDuration);
+            const delta = new Date() - this.t1 - this.pausedDuration;
             this.domElement.innerText = formatDuration(delta);
         }
     }
