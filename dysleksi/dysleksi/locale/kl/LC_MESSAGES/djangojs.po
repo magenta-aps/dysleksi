@@ -18,6 +18,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 
 #: dysleksi/static/js/screening/controlroom.js
+msgid "Ingen forbindelse til eleven"
+msgstr ""
+
+#: dysleksi/static/js/screening/controlroom.js
 msgid "Deltest"
 msgstr ""
 

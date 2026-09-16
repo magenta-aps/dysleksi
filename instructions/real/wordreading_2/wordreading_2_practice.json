@@ -326,13 +326,6 @@
                 "element": "challenge-image",
                 "delayAfter": 0
             },
-            {
-                // Du skal læse og vælge det ord, der passer til billedet.
-                "action": "playSound",
-                "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7c.1 (Ny).mp3",
-                "delayAfter": 1250
-            },
-
             // Øveopgave 1 vises tydeligt – øveopgaverne starter
             {
                 "action": "fadeIn",
