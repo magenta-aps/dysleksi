@@ -351,6 +351,11 @@ body.show-instructions {
   height: 64px;
   align-self: flex-end;
 
+  // On short screens the task content pushes the button past the bottom edge.
+  // Sticky lifts it back into view, overlapping the content above it.
+  position: sticky;
+  bottom: 1rem;
+  z-index: 5; // above the task content, below #fade-overlay
 }
 
 .task-btn {
