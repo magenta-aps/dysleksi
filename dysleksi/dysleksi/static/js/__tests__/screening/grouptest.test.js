@@ -63,6 +63,7 @@ const createMockAudioContext = () => {
     const mockAudioContextInstance = {
         state: "suspended",
         resume: vi.fn().mockResolvedValue(),
+        suspend: vi.fn().mockResolvedValue(),
         decodeAudioData: vi.fn().mockResolvedValue({ duration: 1.0 }),
         createBufferSource: vi.fn(() => mockSource),
         destination: {},
@@ -1877,6 +1878,14 @@ describe("Pause and resume", () => {
         // the timer was cleared on pause.
         vi.advanceTimersByTime(5000);
         expect(playSound).not.toHaveBeenCalled();
+    });
+
+    it("freezes and continues the audio when paused and resumed", () => {
+        view.onChatMessage({ event: "test.paused" });
+        expect(mockAudioContextInstance.suspend).toHaveBeenCalled();
+
+        view.onChatMessage({ event: "test.resume" });
+        expect(mockAudioContextInstance.resume).toHaveBeenCalled();
     });
 
     it("re-initiates timers and hides the overlay when resumed", () => {
