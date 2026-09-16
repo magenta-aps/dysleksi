@@ -424,10 +424,24 @@ body.show-instructions {
 #free-text-buttons {
   .letter-row {
     position: relative;  // contains absolutely positioned `.erase-btn`
+    display: flex;
+    flex-wrap: nowrap;  // buttons shrink instead of hopping to the next row
+    justify-content: center;
+    gap: 1.5 * $spacer;
+    padding-bottom: 1.5 * $spacer;
+
+    &:has(.erase-btn) {
+      // keeps the row centered while leaving room for the erase button
+      padding-inline: 8.5 * $spacer;
+    }
 
     button {
-      width: 7.96vw;  // this fits 9 buttons in middle row (iPad, landscape)
-      margin: 0 0 1.5 * $spacer 1.5 * $spacer;
+      flex: 1 1 0;
+      min-width: 0;
+      max-width: 7.96vw;  // this fits 9 buttons in middle row (iPad, landscape)
+      margin: 0;
+      padding-left: 0;
+      padding-right: 0;
     }
 
     .erase-btn {
@@ -439,6 +453,7 @@ body.show-instructions {
       justify-content: center;
       height: 4 * $spacer !important;
       width: 7 * $spacer !important;
+      max-width: none;  // not subject to the shrinking of the letter buttons
       margin: 0;
       padding: 0 2rem;
       background-color: $student-grey-lighter !important;
