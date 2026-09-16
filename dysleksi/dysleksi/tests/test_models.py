@@ -964,6 +964,10 @@ class TestTest(DysleksiTest):
         self.assertEqual(
             question_model.reminder_source.url, question_json["reminderSource"]
         )
+        self.assertEqual(question_model.reminder, question_json["reminder"])
+        self.assertEqual(
+            question_model.reminder_interval, question_json["reminder_interval"]
+        )
         self.assertEqual(question_model.hint_source.url, question_json["hintSource"])
         self.assertEqual(
             (

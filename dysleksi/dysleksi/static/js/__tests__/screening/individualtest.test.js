@@ -250,7 +250,7 @@ describe("IndividualTestFlow", () => {
         expect(mediaRecorder.start).toHaveBeenCalled();
     });
 
-    it("Trigger for first question reminder", () => {
+    it("Trigger for first question reminder", async () => {
         test.parts[0].timeout = 0;
         test.parts[0].questions[0].reminder = 5000;
         // Mock audio play
@@ -258,8 +258,55 @@ describe("IndividualTestFlow", () => {
         view.setPart(0);
         view.showFirstQuestion(false);
 
-        vi.advanceTimersByTime(5000);
-        expect(view.domElements.playSound).toHaveBeenCalled();
+        await vi.advanceTimersByTimeAsync(5000);
+        expect(view.domElements.playSound).toHaveBeenCalledTimes(1);
+
+        // Without a reminder interval the reminder only plays once
+        await vi.advanceTimersByTimeAsync(60000);
+        expect(view.domElements.playSound).toHaveBeenCalledTimes(1);
+        expect(view.questionReminderId).toBe(null);
+    });
+
+    it("Reminder repeats while reminderInterval is set", async () => {
+        test.parts[0].timeout = 0;
+        test.parts[0].questions[0].reminder = 5000;
+        test.parts[0].questions[0].reminderInterval = 2000;
+        // The interval is counted from the moment the sound finishes
+        view.domElements.playSound = vi.fn(
+            () => new Promise((resolve) => setTimeout(resolve, 3000)),
+        );
+        view.setPart(0);
+        view.showFirstQuestion(false);
+
+        await vi.advanceTimersByTimeAsync(5000);
+        expect(view.domElements.playSound).toHaveBeenCalledTimes(1);
+
+        await vi.advanceTimersByTimeAsync(4999);
+        expect(view.domElements.playSound).toHaveBeenCalledTimes(1);
+
+        await vi.advanceTimersByTimeAsync(1);
+        expect(view.domElements.playSound).toHaveBeenCalledTimes(2);
+    });
+
+    it("Reminder stops when cleared while the sound is playing", async () => {
+        test.parts[0].timeout = 0;
+        test.parts[0].questions[0].reminder = 5000;
+        test.parts[0].questions[0].reminderInterval = 2000;
+        let soundEnded;
+        view.domElements.playSound = vi.fn(
+            () => new Promise((resolve) => (soundEnded = resolve)),
+        );
+        view.setPart(0);
+        view.showFirstQuestion(false);
+
+        await vi.advanceTimersByTimeAsync(5000);
+        expect(view.domElements.playSound).toHaveBeenCalledTimes(1);
+
+        view.clearReminder();
+        soundEnded();
+
+        await vi.advanceTimersByTimeAsync(60000);
+        expect(view.domElements.playSound).toHaveBeenCalledTimes(1);
     });
 
     it("question.feedback triggers teacherFeedback(correct)", () => {
@@ -456,11 +503,7 @@ describe("IndividualTestFlow", () => {
     });
 
     it("should play reminder sound when reminder interval is reached", () => {
-        // Mock audio element
-        view.domElements.reminderSoundEl = {
-            play: vi.fn(),
-            currentTime: 10, // Start with non-zero to test reset
-        };
+        view.domElements.playSound = vi.fn();
 
         view.setPart(0);
         test.parts[0].questions[0].reminder = 3000;

@@ -891,6 +891,15 @@ class TestPart(models.Model):
         default=0,
         help_text="Time after which to play reminder sound, in milliseconds",
     )
+    reminder_interval = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        default=None,
+        help_text=(
+            "Time between repeats of the reminder sound, in milliseconds. "
+            "Leave empty to only play the reminder once"
+        ),
+    )
     reminder_source = models.ForeignKey(
         TestResource,
         on_delete=models.PROTECT,
@@ -990,6 +999,7 @@ class TestPart(models.Model):
                         else None
                     ),
                     "reminder": question.reminder,
+                    "reminder_interval": question.reminder_interval,
                     "reminderSource": None,
                     "timeout": question.timeout,
                     "continue_when_instruction_is_complete": (
@@ -1073,6 +1083,9 @@ class TestPart(models.Model):
                 "question_type", QuestionType.NO_INPUT_REQUIRED
             )
             question["reminder"] = data.get("reminder", self.reminder)
+            question["reminder_interval"] = data.get(
+                "reminder_interval", self.reminder_interval
+            )
             question_reminder_source = data.get("reminder_source", self.reminder_source)
             if question_reminder_source is not None:
                 question["reminder_source"], _ = TestResource.objects.get_or_create(
@@ -1318,6 +1331,15 @@ class TestQuestion(models.Model):
         null=False,
         default=0,
         help_text="Time after which to play reminder sound, in milliseconds",
+    )
+    reminder_interval = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        default=None,
+        help_text=(
+            "Time between repeats of the reminder sound, in milliseconds. "
+            "Leave empty to only play the reminder once"
+        ),
     )
     reminder_source = models.ForeignKey(
         TestResource,
