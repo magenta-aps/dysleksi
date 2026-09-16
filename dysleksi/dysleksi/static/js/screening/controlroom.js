@@ -1502,9 +1502,9 @@ export class TeacherView {
                 ["question.answered", "question.displayed"].includes(data.event) &&
                 this.test.testType === "individual"
             ) {
-                this.setPartIndex(data.partIndex);
-                this.setQuestionIndex(data.questionIndex, data.practice);
                 if (data.event === "question.displayed") {
+                    this.setPartIndex(data.partIndex);
+                    this.setQuestionIndex(data.questionIndex, data.practice);
                     this.buttons.enableButtons();
                     if (this.currentQuestionRequiresNoStudentInput()) {
                         // Disable "correct", "wrong", "skipped" buttons during practice questions
@@ -1531,7 +1531,7 @@ export class TeacherView {
                 }
 
                 // Update "elapsed time"
-                if (this.elapsedTimeView !== null && this.currentQuestion !== null) {
+                if (this.elapsedTimeView !== null) {
                     if (!data.practice) {
                         if (data.event === "question.displayed") {
                             this.elapsedTimeView.start();

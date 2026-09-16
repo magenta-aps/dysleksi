@@ -691,7 +691,7 @@ describe("Teacher Individual test View", () => {
         });
     });
 
-    it("updates indices but does not enable buttons when event is 'question.answered'", () => {
+    it("Does not enable buttons when event is 'question.answered'", () => {
         // 1. Setup: Ensure buttons are currently disabled
         buttons.disableButtons();
 
@@ -708,11 +708,6 @@ describe("Teacher Individual test View", () => {
                 },
             }),
         );
-
-        // 3. Assertions
-        // Indices should be updated
-        expect(view.partIndex).toBe(0);
-        expect(view.questionIndex).toBe(0);
 
         // Buttons should REMAIN disabled (because the 'question.displayed' block was skipped)
         const btn = document.querySelector("#correct");
