@@ -2,6 +2,10 @@ import { getLobbySocket, getAssignmentSocket } from "../ws.js";
 
 let wakeLock = null;
 
+// How often the teacher asks the students whether they are still there. Both
+// sides give up after three missed pings.
+export const PING_MS = 5000;
+
 export function isEmpty(obj) {
     return Object.keys(obj).length === 0;
 }

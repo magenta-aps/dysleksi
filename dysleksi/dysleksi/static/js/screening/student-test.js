@@ -3,6 +3,7 @@ import { requestWakeLock } from "./utils.js";
 import { releaseWakeLock } from "./utils.js";
 import { unlockAudioOnGesture } from "./utils.js";
 import { preventDoubleTapZoom } from "./utils.js";
+import { PING_MS } from "./utils.js";
 import { WebRTCPeer } from "../webRTC.js";
 import { fallbackOnWebRTCFailure } from "../webSocketChannel.js";
 import { WINDOW_BLOCKED_EVENT } from "./window-lock.js";
@@ -53,6 +54,9 @@ export class StudentTestView extends EventTarget {
         document.addEventListener(WINDOW_BLOCKED_EVENT, () => {
             this.channel.close();
         });
+        window.addEventListener("offline", () => {
+            this.domElements.showConnectionLostOverlay();
+        });
         this.audioContext = unlockAudioOnGesture();
         this.failedAttempts = 0;
         this.cancelAudio = false;
@@ -83,6 +87,7 @@ export class StudentTestView extends EventTarget {
 
     onChatMessage(data) {
         if (data.event === "teacher.ping") {
+            this._markTeacherSeen();
             // Answer the teacher, who is watching for closed browsers
             this.channel.send({
                 event: "student.heartbeat",
@@ -105,6 +110,14 @@ export class StudentTestView extends EventTarget {
         if (data.event === "test.resume") {
             this.resumeTest();
         }
+    }
+
+    _markTeacherSeen() {
+        clearTimeout(this.teacherTimeoutId);
+        this.domElements.hideConnectionLostOverlay();
+        this.teacherTimeoutId = setTimeout(() => {
+            this.domElements.showConnectionLostOverlay();
+        }, 3 * PING_MS);
     }
 
     pauseTest() {
@@ -416,6 +429,8 @@ export class StudentTestView extends EventTarget {
     async onTestComplete(cancelled = false) {
         console.log("Test complete");
         releaseWakeLock();
+        // A student who is done with the test does not need the teacher anymore
+        clearTimeout(this.teacherTimeoutId);
         this.domElements.hideInstructions();
         this.domElements.showQuestionChallenge();
 

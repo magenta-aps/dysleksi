@@ -2,7 +2,7 @@ import { getAssignmentSocket, getSyncSocket } from "..//ws.js";
 import { Student } from "./model.js";
 import { WebRTCPeer } from "../webRTC.js";
 import { WebSocketChannel } from "../webSocketChannel.js";
-import { serverOnline } from "./utils.js";
+import { serverOnline, PING_MS } from "./utils.js";
 import { gettext, blocktranslate } from "../i18n.js";
 import { Modal } from "bootstrap";
 
@@ -12,11 +12,6 @@ export const showResultLink = () => {
     disabled.classList.add("d-none");
     enabled.classList.remove("d-none");
 };
-
-// How often we ask the students whether they are still there, and how long we
-// wait for an answer before marking a student as gone.
-const PING_MS = 5000;
-const STUDENT_TIMEOUT_MS = 15000;
 
 const formatDuration = (milliseconds) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
@@ -1690,7 +1685,7 @@ export class TeacherView {
         setInterval(() => {
             this._sendToStudents({ event: "teacher.ping" });
             for (const [studentId, lastSeen] of this.studentsLastSeen) {
-                if (new Date() - lastSeen > STUDENT_TIMEOUT_MS) {
+                if (new Date() - lastSeen > 3 * PING_MS) {
                     this._markStudentGone(studentId);
                 }
             }

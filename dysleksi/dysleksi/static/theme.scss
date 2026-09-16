@@ -697,7 +697,8 @@ body.show-instructions .sound-btn.pulse {
   z-index: 10;
 }
 
-#pause-overlay {
+#pause-overlay,
+#connection-lost-overlay {
   position: fixed;
   inset: 0;
   z-index: 100000;
@@ -709,6 +710,16 @@ body.show-instructions .sound-btn.pulse {
 
   i {
     font-size: 40vmin;
+  }
+}
+
+#connection-lost-overlay {
+  flex-direction: column;
+  gap: 2rem;
+  text-align: center;
+
+  i {
+    font-size: 25vmin;
   }
 }
 

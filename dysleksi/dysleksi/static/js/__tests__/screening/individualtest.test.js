@@ -46,6 +46,7 @@ describe("IndividualTestFlow", () => {
         global.window = {
             location: { protocol: "https:", host: "example.com" },
             AudioContext: MockAudioContext,
+            addEventListener: vi.fn(),
         };
         global.document.timeline = {
             currentTime: 0,

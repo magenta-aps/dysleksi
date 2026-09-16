@@ -989,6 +989,10 @@ msgid "Start gruppetest"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/screening/student.html
+msgid "Ingen forbindelse til læreren"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/screening/student.html
 #, python-format
 msgid "Hej %(name)s %(last_name)s"
 msgstr ""
