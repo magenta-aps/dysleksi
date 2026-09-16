@@ -19,6 +19,10 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: dysleksi/static/js/screening/controlroom.js
+msgid "Ingen forbindelse til eleven"
+msgstr ""
+
+#: dysleksi/static/js/screening/controlroom.js
 msgid "Deltest"
 msgstr ""
 
