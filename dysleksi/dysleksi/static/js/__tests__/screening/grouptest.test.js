@@ -20,6 +20,7 @@ const mockP2P = {
     close: vi.fn(),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
+    reconnect: vi.fn(),
 };
 
 vi.mock("../../webRTC.js", () => {
@@ -2021,6 +2022,88 @@ describe("The student heartbeat", () => {
         onOffline();
 
         expect(domElements.connectionLostOverlay.style.display).toBe("flex");
+    });
+});
+
+describe("A student who lost the teacher", () => {
+    let view;
+
+    // The listeners the view attached to the window and to its channel
+    const goOffline = () =>
+        window.addEventListener.mock.calls.find(([event]) => event === "offline")[1]();
+    const reconnectChannel = () =>
+        mockP2P.addEventListener.mock.calls.find(([event]) => event === "open")[1]();
+
+    beforeEach(() => {
+        vi.useFakeTimers();
+        document.body.innerHTML = SHARED_DOM_HTML;
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(
+            mockAudioContextInstance,
+        );
+        view = new GroupTestView(
+            new Test(groupTestData),
+            1,
+            new GroupTestDomElements(),
+            student,
+        );
+    });
+
+    afterEach(() => {
+        vi.useRealTimers();
+        vi.clearAllMocks();
+        document.body.innerHTML = "";
+    });
+
+    it("keeps asking for a new connection until the teacher answers", () => {
+        goOffline();
+        expect(mockP2P.reconnect).toHaveBeenCalledTimes(1);
+
+        vi.advanceTimersByTime(utils.PING_MS);
+        expect(mockP2P.reconnect).toHaveBeenCalledTimes(2);
+
+        // A ping means the teacher is back, so there is nothing left to ask for
+        view.onChatMessage({ event: "teacher.ping" });
+        vi.advanceTimersByTime(utils.PING_MS);
+        expect(mockP2P.reconnect).toHaveBeenCalledTimes(2);
+    });
+
+    it("only asks on one schedule, however it finds out", () => {
+        goOffline();
+        goOffline();
+
+        vi.advanceTimersByTime(utils.PING_MS);
+
+        expect(mockP2P.reconnect).toHaveBeenCalledTimes(2);
+    });
+
+    it("repeats what the teacher never confirmed over the new connection", () => {
+        view.send({ event: "test.started" });
+        const message = mockP2P.send.mock.lastCall[0];
+
+        reconnectChannel();
+
+        expect(mockP2P.messageQueue).toHaveLength(0);
+        expect(mockP2P.send).toHaveBeenLastCalledWith(message);
+    });
+
+    it("lets go of a message the teacher confirms", () => {
+        view.send({ event: "test.started" });
+        const { uuid } = mockP2P.send.mock.lastCall[0];
+        mockP2P.send.mockClear();
+
+        view.onChatMessage({ event: "message.received", uuid: uuid });
+        reconnectChannel();
+
+        expect(mockP2P.send).not.toHaveBeenCalled();
+    });
+
+    it("does not repeat microphone events", () => {
+        view.send({ event: "audio.detected" });
+        mockP2P.send.mockClear();
+
+        reconnectChannel();
+
+        expect(mockP2P.send).not.toHaveBeenCalled();
     });
 });
 

@@ -18,6 +18,7 @@ const mockP2P = {
     close: vi.fn(),
     addEventListener: vi.fn(),
     removeEventListener: vi.fn(),
+    reconnect: vi.fn(),
     messageQueue: [],
 };
 

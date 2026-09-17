@@ -26,23 +26,25 @@ export class StudentTestView extends EventTarget {
     isPracticing = false;
     repeatQuestionIndex = null;
     paused = false;
+    rejoinIntervalId = null;
 
     constructor(test, assignmentId, domElements, student) {
         super();
         preventDoubleTapZoom();
         this.test = test;
         this.peer = new WebRTCPeer();
-        const assignmentSocket = getAssignmentSocket(assignmentId);
-        this.channel = this.peer.studentSetup(assignmentSocket, student, assignmentId);
+        this.channel = this.peer.studentSetup(student, assignmentId);
         this.assignmentId = assignmentId;
         this.domElements = domElements;
         this.student = student;
+        // Messages the teacher has not confirmed yet, oldest first
+        this.outbox = new Map();
         this._listenOnChannel(this.channel);
 
         // Fallback to websocket communication in case webRTC fails
         // Websocket communication does NOT work offline.
         fallbackOnWebRTCFailure(this.channel, {
-            chatSocket: assignmentSocket,
+            chatSocket: getAssignmentSocket(assignmentId),
             assignmentId: assignmentId,
             studentId: student.id,
             onFallback: (channel) => {
@@ -55,7 +57,7 @@ export class StudentTestView extends EventTarget {
             this.channel.close();
         });
         window.addEventListener("offline", () => {
-            this.domElements.showConnectionLostOverlay();
+            this.onConnectionLost();
         });
         this.audioContext = unlockAudioOnGesture();
         this.failedAttempts = 0;
@@ -75,6 +77,9 @@ export class StudentTestView extends EventTarget {
         channel.addEventListener("message", (e) => {
             this.onChatMessage(e.detail);
         });
+        channel.addEventListener("open", () => {
+            this._resendUnconfirmed();
+        });
     }
 
     send(data) {
@@ -82,7 +87,19 @@ export class StudentTestView extends EventTarget {
         data.uuid = crypto.randomUUID();
         data.student = this.student;
         console.log("Chat: sending", data);
+
+        // Exclude audio.detected / audio.quiet / audio.silent
+        if (!data.event.startsWith("audio.")) {
+            this.outbox.set(data.uuid, data);
+        }
         this.channel.send(data);
+    }
+
+    _resendUnconfirmed() {
+        this.channel.messageQueue = [];
+        for (const message of this.outbox.values()) {
+            this.channel.send(message);
+        }
     }
 
     onChatMessage(data) {
@@ -94,6 +111,11 @@ export class StudentTestView extends EventTarget {
                 assignmentId: this.assignmentId,
                 student: this.student,
             });
+            return;
+        }
+
+        if (data.event === "message.received") {
+            this.outbox.delete(data.uuid);
             return;
         }
 
@@ -114,10 +136,23 @@ export class StudentTestView extends EventTarget {
 
     _markTeacherSeen() {
         clearTimeout(this.teacherTimeoutId);
+        clearInterval(this.rejoinIntervalId);
+        this.rejoinIntervalId = null;
         this.domElements.hideConnectionLostOverlay();
         this.teacherTimeoutId = setTimeout(() => {
-            this.domElements.showConnectionLostOverlay();
+            this.onConnectionLost();
         }, 3 * PING_MS);
+    }
+
+    onConnectionLost() {
+        this.domElements.showConnectionLostOverlay();
+        if (this.rejoinIntervalId !== null) {
+            return;
+        }
+        this.channel.reconnect();
+        this.rejoinIntervalId = setInterval(() => {
+            this.channel.reconnect();
+        }, PING_MS);
     }
 
     pauseTest() {
@@ -431,6 +466,7 @@ export class StudentTestView extends EventTarget {
         releaseWakeLock();
         // A student who is done with the test does not need the teacher anymore
         clearTimeout(this.teacherTimeoutId);
+        clearInterval(this.rejoinIntervalId);
         this.domElements.hideInstructions();
         this.domElements.showQuestionChallenge();
 

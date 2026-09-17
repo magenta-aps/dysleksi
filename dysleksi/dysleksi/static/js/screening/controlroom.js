@@ -1334,6 +1334,7 @@ export class TeacherView {
         this.webRTCPeer = new WebRTCPeer();
         this.studentChannels = {};
         this.studentsLastSeen = new Map();
+        this.handledMessages = new Set();
 
         const savedQueue = localStorage.getItem(`msg_queue_${this.assignmentId}`);
         this.messageQueue = savedQueue ? JSON.parse(savedQueue) : [];
@@ -1472,6 +1473,16 @@ export class TeacherView {
             if (data.event === "student.heartbeat") {
                 this._markStudentSeen(data.student.id);
                 return;
+            }
+
+            if (data.uuid !== undefined) {
+                // Confirm receipt so the student can let go of the message.
+                // Messages which are not confirmed stay in the student's message queue
+                channel.send({ event: "message.received", uuid: data.uuid });
+                if (this.handledMessages.has(data.uuid)) {
+                    return;
+                }
+                this.handledMessages.add(data.uuid);
             }
 
             if (this.test.testType === "individual") {
@@ -1683,6 +1694,11 @@ export class TeacherView {
         // ask the students to say hello instead, and mark the ones who do not
         // answer as gone.
         setInterval(() => {
+            this.webRTCPeer.reconnect();
+            if (this.assignmentSocket.readyState === WebSocket.CLOSED) {
+                this._initSocket();
+            }
+
             this._sendToStudents({ event: "teacher.ping" });
             for (const [studentId, lastSeen] of this.studentsLastSeen) {
                 if (new Date() - lastSeen > 3 * PING_MS) {

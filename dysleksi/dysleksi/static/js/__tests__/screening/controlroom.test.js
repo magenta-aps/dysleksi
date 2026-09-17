@@ -61,6 +61,7 @@ vi.mock("../../webRTC.js", () => {
         WebRTCPeer: vi.fn().mockImplementation(function () {
             this.connect = vi.fn(mockChannel);
             this.close = vi.fn();
+            this.reconnect = vi.fn();
         }),
     };
 });
@@ -2137,6 +2138,7 @@ describe("TeacherView socket 'test.started' handling", () => {
 
 describe("TeacherView student presence", () => {
     let view;
+    let socket;
     let socketHandler;
     let p2pChannel;
     const studentId = 123;
@@ -2176,7 +2178,7 @@ describe("TeacherView student presence", () => {
 
         document.body.innerHTML = GROUP_DOM_HTML;
 
-        const socket = mockSocket(1);
+        socket = mockSocket(1);
 
         view = new TeacherView(
             {
@@ -2252,6 +2254,34 @@ describe("TeacherView student presence", () => {
         p2pChannel.dispatchEvent(new Event("close"));
 
         expect(isDisconnected()).toBe(false);
+    });
+
+    it("confirms every message it receives, repeats included", () => {
+        const answer = { event: "question.answered", uuid: "abc", student: student };
+
+        // Send a message twice as the student
+        sendFromStudent(answer);
+        sendFromStudent(answer);
+
+        // Teacher acknowledges the message twice
+        expect(p2pChannel.send).toHaveBeenCalledTimes(2);
+        expect(p2pChannel.send).toHaveBeenCalledWith({
+            event: "message.received",
+            uuid: "abc",
+        });
+
+        // The teacher does NOT send the duplicate message to the server
+        expect(view.messageQueue.filter((m) => m.uuid === "abc")).toHaveLength(1);
+    });
+
+    it("listens on a fresh relay socket when the old one dies", () => {
+        const listeners = () =>
+            socket.addEventListener.mock.calls.filter(([e]) => e === "message");
+        socket.readyState = WebSocket.CLOSED;
+
+        vi.advanceTimersByTime(5000);
+
+        expect(listeners()).toHaveLength(2);
     });
 
     it("leaves the card alone when a student who is done hangs up", () => {
