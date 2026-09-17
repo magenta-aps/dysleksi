@@ -184,12 +184,17 @@
             },
 
             {
-                // Bogstavlyden angives – lyt godt efter: [h].
+                // Bogstavlyden angives – lyt godt efter:
                 "action": "playSound",
                 "resource": "resources/fore_sound/Enhanced/Instruktion/2b.12.mp3",
                 "delayAfter": 1250
             },
-
+            //  [h]
+            {
+                "action": "clickButton",
+                "delayAfter": 2250,
+                "element": "challenge-sound-btn"
+            },
             {
                 // Da hesten har denne forlyd, skal du vælge hesten.
                 "action": "playSound",
