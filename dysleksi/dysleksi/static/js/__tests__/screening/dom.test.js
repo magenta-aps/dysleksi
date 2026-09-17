@@ -1022,7 +1022,8 @@ describe("GroupTestDomElements.showTestExit", () => {
 
     beforeEach(() => {
         document.body.innerHTML = `
-            <div id="test-exit" style="display: none"></div>
+            <div id="test-exit" class="center-screen" style="display: none"></div>
+            <div id="logged-out" class="center-screen" style="display: none"></div>
             <button id="log-out" style="visibility: visible"></button>
             <audio id="instructions-sound"></audio>
             <div id="student-header"></div>
@@ -1063,32 +1064,48 @@ describe("GroupTestDomElements.showTestExit", () => {
     });
 
     it("should show exit container and keep logout visible when online", async () => {
-        const reachSpy = vi.spyOn(utils, "serverOnline").mockResolvedValue(true);
-
         await dom.showTestExit();
 
         expect(dom.testExit.style.display).toBe("flex");
         expect(dom.logOutButton.style.visibility).not.toBe("hidden");
-        expect(reachSpy).toHaveBeenCalled();
     });
 
-    it("should hide the logout button when the server is unreachable", async () => {
+    it("should not hide the logout button when the server is unreachable", () => {
         vi.spyOn(utils, "serverOnline").mockResolvedValue(false);
 
-        await dom.showTestExit();
+        dom.showTestExit();
 
         expect(dom.testExit.style.display).toBe("flex");
-        expect(dom.logOutButton.style.visibility).toBe("hidden");
+        expect(dom.logOutButton.style.visibility).not.toBe("hidden");
     });
 
     it("should redirect to /logout when clicked", async () => {
         vi.spyOn(utils, "serverOnline").mockResolvedValue(true);
 
-        await dom.showTestExit();
+        dom.showTestExit();
 
-        dom.logOutButton._clickHandler();
+        await dom.logOutButton._clickHandler();
 
+        expect(dom.testExit.style.display).toBe("none");
+        expect(dom.loggedOut.style.display).toBe("flex");
         expect(window.location.href).toBe("/logout");
+    });
+
+    it("should wait for the server before invalidating the session", async () => {
+        vi.spyOn(utils, "serverOnline")
+            .mockResolvedValueOnce(false)
+            .mockResolvedValue(true);
+        vi.useFakeTimers();
+
+        dom.showTestExit();
+        const loggedOut = dom.logOutButton._clickHandler();
+        await vi.runAllTimersAsync();
+        await loggedOut;
+
+        expect(dom.loggedOut.style.display).toBe("flex");
+        expect(window.location.href).toBe("/logout");
+
+        vi.useRealTimers();
     });
 });
 

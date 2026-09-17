@@ -1,4 +1,4 @@
-import { getCursorIndex, serverOnline } from "./utils.js";
+import { getCursorIndex, serverOnline, PING_MS } from "./utils.js";
 import { assetCache } from "./cache.js";
 import { setResponsiveFontSize } from "./utils.js";
 
@@ -34,6 +34,7 @@ class TestDomElements {
         this.testExit = document.querySelector("#test-exit");
         this.logOutButton = document.querySelector("#log-out");
         this.summaryLogOutButton = document.querySelector("#summary-log-out");
+        this.loggedOut = document.querySelector("#logged-out");
         this.testPartOutroText = document.querySelector("#testpart-outro-text");
         this.testPartOutroImage = document.querySelector("#testpart-outro-image");
         this.testSummary = document.querySelector("#test-summary");
@@ -175,15 +176,25 @@ class TestDomElements {
         this.connectionLostOverlay.style.display = "none";
     }
 
-    async setLogOutButtonListener(buttonEl) {
-        this._setButtonListener(buttonEl, () => {
-            window.location.href = "/logout";
-        });
+    showLoggedOut() {
+        this.loggedOut.style.display = "flex";
+    }
 
-        const isOnline = await serverOnline();
-        if (!isOnline) {
-            buttonEl.style.visibility = "hidden";
+    setLogOutButtonListener(buttonEl) {
+        this._setButtonListener(buttonEl, () => this.logOut());
+    }
+
+    async logOut() {
+        this.hideAll();
+        this.showLoggedOut();
+
+        // Sleep until the server comes online
+        while (!(await serverOnline())) {
+            await new Promise((resolve) => setTimeout(resolve, PING_MS));
         }
+
+        // Invalidate the session
+        window.location.href = "/logout";
     }
 
     async showSummary(parts, student, complete = false) {
@@ -191,7 +202,7 @@ class TestDomElements {
         this.summaryContainer.innerHTML = "";
 
         if (complete) {
-            await this.setLogOutButtonListener(this.summaryLogOutButton);
+            this.setLogOutButtonListener(this.summaryLogOutButton);
 
             this.testFinishedRow.style.display = "flex";
             this.endSummaryButton.style.display = "none";
@@ -280,9 +291,9 @@ class TestDomElements {
         this.testContainer.style.display = "flex";
     }
 
-    async showTestExit() {
+    showTestExit() {
         this.testExit.style.display = "flex";
-        await this.setLogOutButtonListener(this.logOutButton);
+        this.setLogOutButtonListener(this.logOutButton);
     }
 
     hideIntro() {
