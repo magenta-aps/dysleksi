@@ -283,7 +283,9 @@
             {
                 // "Nu skal du selv prøve øveopgaverne" / "Massakkut [...]"
                 "action": "playSound",
-                "resource": "resources/fore_sound/Enhanced/Instruktion/2b.18.mp3",
+                // Sound borrowed from wordreading.
+                // See https://redmine.magenta.dk/issues/71781
+                "resource": "resources/wordreading_1/Enhanced/Instruktion/5b.11.mp3",
                 "delayAfter": 1250
             },
 
