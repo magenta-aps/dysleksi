@@ -159,6 +159,7 @@ class DysleksiTest(TestCase):
             part=cls.part,
             challenge=cls.resource1,
             reminder=5000,
+            reminder_interval=2000,
             reminder_source=cls.resource4,
             hint_source=cls.resource4,
         )

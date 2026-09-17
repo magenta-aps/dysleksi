@@ -27,6 +27,7 @@ def update_or_create_wordreading_2_test(
             "timeout": 600000,  # 600 seconds / 10 minutes
             "partial_score_after": 300000,  # 300 seconds / 5 minutes
             "reminder": 15000,  # 15 seconds
+            "reminder_interval": 10000,  # 10 seconds
             "image_url": "/media/resources/wordreading_2/wordreading_2.png",
             "reminder_source": reminder,
             "completion_source": completion,
@@ -73,6 +74,7 @@ def update_or_create_wordreading_1_test(
             "partial_score_after": 120000,  # 120 seconds / 2 minutes
             "image_url": "/media/resources/wordreading_1/wordreading_1.png",
             "reminder": 15000,  # 15 seconds
+            "reminder_interval": 10000,  # 10 seconds
             "reminder_source": reminder,
             "completion_source": completion,
             "show_normscore_speed_plot": True,
@@ -118,6 +120,7 @@ def update_or_create_fore_sound_test(
             "partial_score_after": 120000,  # 120 seconds / 2 minutes
             "image_url": "/media/resources/fore_sound/fore_sound.png",
             "reminder": 15000,  # 15 seconds
+            "reminder_interval": 10000,  # 10 seconds
             "reminder_source": reminder,
             "completion_source": completion,
         },
@@ -154,6 +157,7 @@ def update_or_create_letter_sound_test(
             "partial_score_after": 0,
             "image_url": "/media/resources/letter_sound/letter_sound.png",
             "reminder": 15000,  # 15 seconds
+            "reminder_interval": 10000,  # 10 seconds
             "reminder_source": reminder,
             "completion_source": completion,
         },
@@ -197,6 +201,7 @@ def update_or_create_letter_shape_test(
             "partial_score_after": 0,
             "image_url": "/media/resources/letter_shape/letter_shape.png",
             "reminder": 15000,  # 15 seconds
+            "reminder_interval": 10000,  # 10 seconds
             "reminder_source": reminder,
             "completion_source": completion,
             "practice_correct_feedback_source": practice_correct_feedback,
@@ -236,6 +241,7 @@ def update_or_create_wordspelling_test(
             "image_url": "/media/resources/wordspelling/wordspelling.png",
             "reminder_source": reminder,
             "reminder": 15000,  # 15 seconds
+            "reminder_interval": 10000,  # 10 seconds
             "completion_source": completion,
         },
     )
@@ -272,6 +278,7 @@ def update_or_create_nonwordspelling_test(
             "image_url": "/media/resources/nonwordspelling/nonwordspelling.png",
             "reminder_source": reminder,
             "reminder": 15000,  # 15 seconds
+            "reminder_interval": 10000,  # 10 seconds
             "completion_source": completion,
         },
     )
@@ -410,6 +417,7 @@ def update_or_create_sentence_reading_test(
             "reminder_source": reminder,
             "completion_source": completion,
             "reminder": 15000,  # 15 seconds
+            "reminder_interval": 10000,  # 10 seconds
         },
     )
     if update_contents:

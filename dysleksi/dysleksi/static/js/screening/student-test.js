@@ -629,17 +629,28 @@ export class StudentTestView extends EventTarget {
         }
         if (Number(this.currentQuestion.reminder) > 1) {
             this.clearReminder();
-            this.questionReminderId = setTimeout(() => {
-                console.log(
-                    "Playing reminder sound",
-                    this.currentQuestion.reminderSource,
-                );
-                this.domElements.playSound(
-                    this.currentQuestion.reminderSource,
-                    this.audioContext,
-                    "drop",
-                );
-            }, this.currentQuestion.reminder);
+            this.scheduleReminder(this.currentQuestion.reminder);
         }
+    }
+
+    scheduleReminder(delay) {
+        const reminderId = setTimeout(async () => {
+            console.log("Playing reminder sound", this.currentQuestion.reminderSource);
+            await this.domElements.playSound(
+                this.currentQuestion.reminderSource,
+                this.audioContext,
+                "drop",
+            );
+            if (this.questionReminderId !== reminderId) {
+                // Cleared or restarted while the sound was playing.
+                return;
+            }
+            if (Number(this.currentQuestion.reminderInterval) > 1) {
+                this.scheduleReminder(this.currentQuestion.reminderInterval);
+            } else {
+                this.questionReminderId = null;
+            }
+        }, delay);
+        this.questionReminderId = reminderId;
     }
 }

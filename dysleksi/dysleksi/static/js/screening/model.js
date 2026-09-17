@@ -300,6 +300,7 @@ export class Question {
     domElements;
     instruction_sequence;
     reminder;
+    reminderInterval;
     reminderSource;
     hintSource;
     timeout;
@@ -324,6 +325,7 @@ export class Question {
         );
         this.instruction_sequence = data.instruction_sequence;
         this.reminder = data.reminder;
+        this.reminderInterval = data.reminder_interval;
         this.reminderSource = data.reminderSource;
         this.hintSource = data.hintSource;
         this.timeout = data.timeout;
