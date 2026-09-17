@@ -52,6 +52,7 @@ class TestDomElements {
         this.testFinishedRow = document.querySelector("#test-finished-row");
         this.speakerButton = document.querySelector("#speaker");
         this.pauseOverlay = document.querySelector("#pause-overlay");
+        this.connectionLostOverlay = document.querySelector("#connection-lost-overlay");
 
         this.currentAudioSource = null;
         this.inputLocked = false;
@@ -165,6 +166,13 @@ class TestDomElements {
     }
     hidePauseOverlay() {
         this.pauseOverlay.style.display = "none";
+    }
+
+    showConnectionLostOverlay() {
+        this.connectionLostOverlay.style.display = "flex";
+    }
+    hideConnectionLostOverlay() {
+        this.connectionLostOverlay.style.display = "none";
     }
 
     async setLogOutButtonListener(buttonEl) {

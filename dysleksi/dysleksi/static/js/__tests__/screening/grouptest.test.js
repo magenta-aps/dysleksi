@@ -81,6 +81,7 @@ const mockSend = vi.fn();
 
 const SHARED_DOM_HTML = `
     <div id="pause-overlay" style="display: none"><i class="ph ph-pause"></i></div>
+    <div id="connection-lost-overlay" style="display: none"><i class="ph ph-wifi-slash"></i></div>
     <div id="fade-overlay"></div>
     <h1 id="student-header" class="student-header"></h1>
     <audio id="instructions-sound"></audio>
@@ -157,6 +158,7 @@ global.ResizeObserver = class ResizeObserver {
 // Mock window.location correctly
 global.window = {
     location: { protocol: "https:", host: "example.com" },
+    addEventListener: vi.fn(),
 };
 global.document.timeline = {
     currentTime: 0,
@@ -1984,6 +1986,41 @@ describe("The student heartbeat", () => {
             assignmentId: 1,
             student: student,
         });
+    });
+
+    it("covers the screen when the teacher stops pinging", async () => {
+        vi.useFakeTimers();
+        const domElements = new GroupTestDomElements();
+        const view = new GroupTestView(
+            new Test(groupTestData),
+            1,
+            domElements,
+            student,
+        );
+
+        view.onChatMessage({ event: "teacher.ping" });
+        expect(domElements.connectionLostOverlay.style.display).toBe("none");
+
+        await vi.advanceTimersByTimeAsync(15000);
+        expect(domElements.connectionLostOverlay.style.display).toBe("flex");
+
+        // The overlay goes away once the teacher is back
+        view.onChatMessage({ event: "teacher.ping" });
+        expect(domElements.connectionLostOverlay.style.display).toBe("none");
+
+        vi.useRealTimers();
+    });
+
+    it("covers the screen at once when the device goes offline", () => {
+        const domElements = new GroupTestDomElements();
+        new GroupTestView(new Test(groupTestData), 1, domElements, student);
+
+        const [, onOffline] = window.addEventListener.mock.calls.find(
+            ([event]) => event === "offline",
+        );
+        onOffline();
+
+        expect(domElements.connectionLostOverlay.style.display).toBe("flex");
     });
 });
 
