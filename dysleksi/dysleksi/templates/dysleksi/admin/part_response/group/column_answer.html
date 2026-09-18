@@ -52,7 +52,7 @@
             {% endif %}
         {% if record.answer_sound %}
             <div class="audio">
-                <audio src="{{ record.answer_sound.url }}" preload="auto"></audio>
+                <audio src="{% url 'dysleksi:question_response_answer_sound_detail' pk=record.pk %}" preload="auto"></audio>
                 <i class="ph-fill ph-play"></i>
                 <span class="ms-1"></span>
             </div>

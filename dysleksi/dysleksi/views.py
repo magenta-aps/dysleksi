@@ -1838,3 +1838,20 @@ class EditNoteView(GroupRequiredMixin, ObjectPermissionsMixin, View):
             obj.note = note
             obj.save(update_fields=["note"])
             return HttpResponse("ok")
+
+
+class QuestionResponseAnswerSoundDetail(
+    GroupRequiredMixin, ObjectPermissionsMixin, DetailView
+):
+    model = QuestionResponse
+
+    def render_to_response(self, context, **response_kwargs):
+        try:
+            with self.object.answer_sound.open() as content:
+                return HttpResponse(
+                    content=content,
+                    content_type="application/octet-stream",
+                )
+        except ValueError:
+            # "The 'answer_sound' attribute has no file associated with it."
+            raise Http404(f"No `answer_sound` for question response {self.object.pk}")

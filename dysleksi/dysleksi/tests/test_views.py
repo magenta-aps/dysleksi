@@ -10,6 +10,7 @@ from bs4 import BeautifulSoup
 from django.contrib.auth.models import AnonymousUser
 from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
+from django.core.files.base import ContentFile
 from django.core.management import call_command
 from django.http.response import Http404, HttpResponse, HttpResponseRedirect
 from django.test import RequestFactory, override_settings
@@ -47,6 +48,7 @@ from dysleksi.views import (
     EditNoteView,
     PaginationMixin,
     PartResponseView,
+    QuestionResponseAnswerSoundDetail,
     RootView,
     StudentDetailView,
     TestAssignmentListView,
@@ -2044,6 +2046,55 @@ class TestPartResponseView(ResponseTest):
         self.assertAlmostEqual(context["ReadingSpeedCategories"][1].scaled_width(), 0.1)
         self.assertAlmostEqual(context["y_scale"], 10.0)
         self.assertEqual(context["plot"], [(1.0, 6.0)])
+
+
+@override_settings(
+    STORAGES={
+        "default": {
+            "BACKEND": "django.core.files.storage.memory.InMemoryStorage",
+        },
+    }
+)
+class TestQuestionResponseAnswerSoundDetail(ResponseTest):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        super().create_parts()
+
+    def test_access(self):
+        # Test allowed access where audio recording exists
+        self.individual_questionresponse.answer_sound.save("name", ContentFile("foo"))
+        view = self.setup_view(
+            QuestionResponseAnswerSoundDetail,
+            self.teacher,
+            pk=self.individual_questionresponse.pk,
+        )
+        self.assertIsInstance(view.response, HttpResponse)
+        self.assertEqual(view.response.content, b"foo")
+
+        # Test allowed access where no audio recording exists
+        self.individual_questionresponse.answer_sound.delete()
+        with self.assertRaises(Http404):
+            self.setup_view(
+                QuestionResponseAnswerSoundDetail,
+                self.teacher,
+                pk=self.individual_questionresponse.pk,
+            )
+
+        # Test disallowed access raises appropriate 403
+        for user in (
+            self.student1,
+            self.other_user,
+            self.other_teacher,
+            self.inactive_user,
+            self.not_logged_in_user,
+        ):
+            with self.assertRaises(PermissionDenied):
+                self.setup_view(
+                    QuestionResponseAnswerSoundDetail,
+                    user,
+                    pk=self.individual_questionresponse.pk,
+                )
 
 
 class TestClientErrorLogView(DysleksiTest):
