@@ -40,6 +40,14 @@ export function getLobbySocket() {
     return getWebSocket("lobby", "relay");
 }
 
+export function sendWhenOpen(socket, message) {
+    if (socket.readyState === WebSocket.OPEN) {
+        socket.send(message);
+    } else {
+        socket.addEventListener("open", () => socket.send(message), { once: true });
+    }
+}
+
 export function resetSockets() {
     sockets = {};
 }

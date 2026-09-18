@@ -10,7 +10,8 @@ import { getCursorIndex, serverOnline } from "../screening/utils";
 import { setResponsiveFontSize } from "../screening/utils";
 import { isVisible } from "../screening/utils";
 
-vi.mock("../ws.js", () => ({
+vi.mock(import("../ws.js"), async (importOriginal) => ({
+    ...(await importOriginal()),
     getLobbySocket: vi.fn(),
     getAssignmentSocket: vi.fn(),
 }));

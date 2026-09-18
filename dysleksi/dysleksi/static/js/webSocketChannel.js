@@ -41,12 +41,22 @@ export class WebSocketChannel extends EventTarget {
     }
 
     _opened() {
+        this.dispatchEvent(new Event("open"));
+
         while (this.messageQueue.length > 0) {
             const message = this.messageQueue.shift();
             console.log("Sending queued message: ", message.event);
             this.send(message);
         }
-        this.dispatchEvent(new Event("open"));
+    }
+
+    reconnect() {
+        if (
+            this.socket.readyState === WebSocket.CLOSED ||
+            this.socket.readyState === WebSocket.CLOSING
+        ) {
+            this._bind();
+        }
     }
 
     send(data) {
@@ -62,15 +72,7 @@ export class WebSocketChannel extends EventTarget {
 
         console.log("Relay not ready, queuing message:", data.event);
         this.messageQueue.push(message);
-
-        if (
-            this.socket.readyState === WebSocket.CLOSED ||
-            this.socket.readyState === WebSocket.CLOSING
-        ) {
-            // getWebSocket() drops closed sockets from its cache, so this hands
-            // back a fresh one to flush the queue into once it opens.
-            this._bind();
-        }
+        this.reconnect();
     }
 
     close() {

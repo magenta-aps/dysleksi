@@ -1,4 +1,4 @@
-import { getLobbySocket, getAssignmentSocket } from "../ws.js";
+import { getLobbySocket, getAssignmentSocket, sendWhenOpen } from "../ws.js";
 
 let wakeLock = null;
 
@@ -61,12 +61,7 @@ function sessionMessage(event, studentIds, assignmentId) {
 }
 
 function announceSession(socket, studentIds, assignmentId) {
-    const message = sessionMessage("session.start", studentIds, assignmentId);
-    if (socket.readyState === WebSocket.OPEN) {
-        socket.send(message);
-    } else {
-        socket.addEventListener("open", () => socket.send(message), { once: true });
-    }
+    sendWhenOpen(socket, sessionMessage("session.start", studentIds, assignmentId));
 }
 
 export function startSession(studentIds, assignmentId) {

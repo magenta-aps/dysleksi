@@ -3,6 +3,12 @@
  */
 import { describe, it, expect, beforeEach, vi } from "vitest";
 import { WebRTCPeer, WebRTCChannel } from "../webRTC.js";
+import { getAssignmentSocket } from "../ws.js";
+
+vi.mock(import("../ws.js"), async (importOriginal) => ({
+    ...(await importOriginal()),
+    getAssignmentSocket: vi.fn(),
+}));
 
 class MockConnection extends EventTarget {
     constructor() {
@@ -21,6 +27,9 @@ class MockPeer extends EventTarget {
         super();
         this.connect = vi.fn();
         this.destroy = vi.fn();
+        this.reconnect = vi.fn();
+        this.disconnected = false;
+        this.destroyed = false;
         this.id = "mock-peer-id";
     }
     on(event, cb) {
@@ -34,13 +43,24 @@ global.Peer = MockPeer;
 describe("WebRTCPeer", () => {
     let peer;
     let mockPeerInstance;
+    let mockSocket;
 
     const open = async (id = "generated-id-456") => {
         mockPeerInstance.dispatchEvent(new CustomEvent("open", { detail: id }));
         await peer.opened;
     };
 
+    const joinMessage = JSON.stringify({
+        event: "student.joined",
+        studentId: 123,
+        webRTCId: "generated-id-456",
+        assignmentId: 7,
+    });
+
     beforeEach(() => {
+        mockSocket = { send: vi.fn(), readyState: WebSocket.OPEN };
+        getAssignmentSocket.mockReturnValue(mockSocket);
+
         // Setup the config element required by the constructor
         document.body.innerHTML = `
             <script id="webrtc-config" type="application/json">
@@ -69,24 +89,44 @@ describe("WebRTCPeer", () => {
     });
 
     it('should send "student.joined" via chatSocket when peer opens', async () => {
-        const mockChatSocket = { send: vi.fn() };
-
-        peer.studentSetup(mockChatSocket, { id: 123 }, 7);
+        peer.studentSetup({ id: 123 }, 7);
         await open();
 
-        expect(mockChatSocket.send).toHaveBeenCalledWith(
-            JSON.stringify({
-                event: "student.joined",
-                studentId: 123,
-                webRTCId: "generated-id-456",
-                assignmentId: 7,
-            }),
-        );
+        expect(mockSocket.send).toHaveBeenCalledWith(joinMessage);
+    });
+
+    it("should announce itself again when the channel is reconnected", async () => {
+        const channel = peer.studentSetup({ id: 123 }, 7);
+        await open();
+        mockSocket.send.mockClear();
+
+        channel.reconnect();
+        await peer.opened;
+
+        expect(mockSocket.send).toHaveBeenCalledWith(joinMessage);
+    });
+
+    it("should reconnect when disconnected", () => {
+        mockPeerInstance.disconnected = true;
+
+        peer.reconnect();
+
+        expect(mockPeerInstance.reconnect).toHaveBeenCalled();
+    });
+
+    it("should not reconnect when the channel is destroyed", () => {
+        peer.reconnect();
+
+        mockPeerInstance.disconnected = true;
+        mockPeerInstance.destroyed = true;
+        peer.reconnect();
+
+        expect(mockPeerInstance.reconnect).not.toHaveBeenCalled();
     });
 
     it("should assign connection when a remote peer connects (Teacher -> Student)", () => {
         const mockConn = new MockConnection();
-        const channel = peer.studentSetup({ send: vi.fn() }, {});
+        const channel = peer.studentSetup({}, 7);
 
         // Simulate incoming connection
         mockPeerInstance.dispatchEvent(
@@ -209,5 +249,16 @@ describe("WebRTCChannel", () => {
         expect(mockConn.send).toHaveBeenCalledWith(data2);
         expect(channel.messageQueue.length).toBe(0);
         expect(openSpy).toHaveBeenCalled();
+    });
+
+    it("should hang up on the connection a new one replaces", () => {
+        const oldConn = new MockConnection();
+        const newConn = new MockConnection();
+
+        channel.attach(oldConn);
+        channel.attach(newConn);
+
+        expect(oldConn.close).toHaveBeenCalled();
+        expect(channel.conn).toBe(newConn);
     });
 });

@@ -1,3 +1,5 @@
+import { getAssignmentSocket, sendWhenOpen } from "./ws.js";
+
 export class WebRTCPeer {
     /* Owns the connection to the signalling server. A teacher page needs one
        channel per student, and they all share this single peer. */
@@ -25,11 +27,17 @@ export class WebRTCPeer {
         return channel;
     }
 
-    studentSetup(chatSocket, student, assignmentId) {
-        const channel = new WebRTCChannel();
-        this.peer.on("connection", (connection) => channel.attach(connection));
-        this.opened.then((id) => {
-            chatSocket.send(
+    reconnect() {
+        if (this.peer.disconnected && !this.peer.destroyed) {
+            console.log("Rejoining the signalling server");
+            this.peer.reconnect();
+        }
+    }
+
+    studentSetup(student, assignmentId) {
+        const announce = (id) =>
+            sendWhenOpen(
+                getAssignmentSocket(assignmentId),
                 JSON.stringify({
                     event: "student.joined",
                     studentId: student.id,
@@ -37,7 +45,13 @@ export class WebRTCPeer {
                     assignmentId: assignmentId,
                 }),
             );
+
+        const channel = new WebRTCChannel(() => {
+            this.reconnect();
+            this.opened.then(announce);
         });
+        this.peer.on("connection", (connection) => channel.attach(connection));
+        this.opened.then(announce);
         return channel;
     }
 
@@ -47,24 +61,29 @@ export class WebRTCPeer {
 }
 
 export class WebRTCChannel extends EventTarget {
-    constructor() {
+    constructor(reconnect) {
         super();
         this.conn = null;
         this.messageQueue = []; // Store messages here if not connected
+        this.reconnect = reconnect;
     }
 
     attach(conn) {
+        if (this.conn !== null) {
+            // Close any existing (dead?) connections
+            this.conn.close();
+        }
         this.conn = conn;
 
         conn.on("open", () => {
+            this.dispatchEvent(new Event("open"));
+
             // Send all messages that were waiting
             while (this.messageQueue.length > 0) {
                 const msg = this.messageQueue.shift();
                 console.log("Sending queued message: ", msg.event);
                 conn.send(msg);
             }
-
-            this.dispatchEvent(new Event("open"));
         });
 
         conn.on("data", (data) => {
