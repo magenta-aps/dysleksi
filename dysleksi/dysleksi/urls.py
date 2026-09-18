@@ -16,6 +16,7 @@ from dysleksi.views import (
     ClientErrorLogView,
     EditNoteView,
     PartResponseView,
+    QuestionResponseAnswerSoundDetail,
     RootView,
     StartAssignmentView,
     StudentDetailView,
@@ -86,5 +87,10 @@ urlpatterns: list[URLResolver | URLPattern] = [
         "edit-note/",
         EditNoteView.as_view(),
         name="edit_note",
+    ),
+    path(
+        "answer/<int:pk>",
+        QuestionResponseAnswerSoundDetail.as_view(),
+        name="question_response_answer_sound_detail",
     ),
 ]
