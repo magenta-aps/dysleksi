@@ -992,6 +992,10 @@ msgstr ""
 msgid "Du er færdig med opgaverne"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/screening/student.html
+msgid "Du er nu logget ud"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/window_blocked.html
 msgid "Din test er åbnet i et nyere vindue"
 msgstr ""
