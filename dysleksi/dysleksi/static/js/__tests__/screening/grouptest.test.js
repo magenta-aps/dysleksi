@@ -1930,6 +1930,32 @@ describe("Pause and resume", () => {
 
         expect(view.partTimeoutId).toBeNull();
     });
+
+    it("keeps the remembered timers when a second pause arrives", () => {
+        const setupReminder = vi.spyOn(view, "setupReminder");
+        view.questionTimeoutId = 123;
+
+        view.onChatMessage({ event: "test.paused" });
+        // The teacher repeats the pause to students who (re)join
+        view.onChatMessage({ event: "test.paused" });
+        view.onChatMessage({ event: "test.resume" });
+
+        expect(setupReminder).toHaveBeenCalledTimes(1);
+    });
+
+    it("stays frozen when resumed without a teacher", () => {
+        const setupReminder = vi.spyOn(view, "setupReminder");
+        view.questionTimeoutId = 123;
+
+        view.onChatMessage({ event: "test.paused" });
+        view.onConnectionLost();
+        view.onChatMessage({ event: "test.resume" });
+
+        expect(setupReminder).not.toHaveBeenCalled();
+
+        view.onChatMessage({ event: "teacher.ping" });
+        expect(setupReminder).toHaveBeenCalledTimes(1);
+    });
 });
 
 describe("A window that is taken over", () => {
