@@ -237,13 +237,13 @@ describe("AssetCache", () => {
             expect(global.FontFace).toHaveBeenCalledWith(
                 "OpenSans-Bold",
                 `url(${mockBlobUrl})`,
-                expect.objectContaining({ weight: "700" }),
+                expect.objectContaining({ weight: "normal" }),
             );
 
             expect(global.FontFace).toHaveBeenCalledWith(
                 "OpenSans-Italic",
                 `url(${mockBlobUrl})`,
-                expect.objectContaining({ weight: "400" }),
+                expect.objectContaining({ weight: "normal" }),
             );
 
             expect(document.fonts.add).toHaveBeenCalled();

@@ -138,7 +138,7 @@ export class AssetCache {
 
                 const fontFace = new FontFace(fileName, `url(${blobUrl})`, {
                     style: "normal",
-                    weight: fileName.toLowerCase().includes("bold") ? "700" : "400",
+                    weight: "normal",
                 });
 
                 const loadedFace = await fontFace.load();
