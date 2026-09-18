@@ -57,6 +57,10 @@ export class StudentTestView extends EventTarget {
         });
         document.addEventListener(WINDOW_BLOCKED_EVENT, () => {
             this.channel.close();
+            this.clearTimeout();
+            this.clearReminder();
+            this.clearPartTimeout();
+            this.audioContext.suspend();
         });
         window.addEventListener("offline", () => {
             this.onConnectionLost();

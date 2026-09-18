@@ -1971,17 +1971,25 @@ describe("A window that is taken over", () => {
         document.body.innerHTML = "";
     });
 
-    it("hangs up on the teacher", () => {
-        new GroupTestView(
+    it("hangs up on the teacher and goes quiet", () => {
+        vi.spyOn(global, "clearTimeout");
+        const view = new GroupTestView(
             new Test(groupTestData),
             1,
             new GroupTestDomElements(),
             student,
         );
+        view.questionTimeoutId = 111;
+        view.questionReminderId = 222;
+        view.partTimeoutId = 333;
 
         document.dispatchEvent(new Event(WINDOW_BLOCKED_EVENT));
 
         expect(mockP2P.close).toHaveBeenCalled();
+        expect(clearTimeout).toHaveBeenCalledWith(111);
+        expect(clearTimeout).toHaveBeenCalledWith(222);
+        expect(clearTimeout).toHaveBeenCalledWith(333);
+        expect(mockAudioContextInstance.suspend).toHaveBeenCalled();
     });
 });
 
