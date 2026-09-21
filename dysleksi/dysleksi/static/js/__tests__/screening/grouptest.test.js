@@ -1991,6 +1991,31 @@ describe("A window that is taken over", () => {
         expect(clearTimeout).toHaveBeenCalledWith(333);
         expect(mockAudioContextInstance.suspend).toHaveBeenCalled();
     });
+
+    it("never covers the window blocked message with the connection lost overlay", async () => {
+        vi.useFakeTimers();
+        const domElements = new GroupTestDomElements();
+        const view = new GroupTestView(
+            new Test(groupTestData),
+            1,
+            domElements,
+            student,
+        );
+        view.onChatMessage({ event: "teacher.ping" });
+        await vi.advanceTimersByTimeAsync(15000);
+        expect(domElements.connectionLostOverlay.style.display).toBe("flex");
+
+        document.dispatchEvent(new Event(WINDOW_BLOCKED_EVENT));
+        await vi.advanceTimersByTimeAsync(15000);
+
+        expect(domElements.connectionLostOverlay.style.display).toBe("none");
+
+        // Going offline afterwards does not bring the overlay back either
+        window.addEventListener.mock.calls.find(([event]) => event === "offline")[1]();
+        expect(domElements.connectionLostOverlay.style.display).toBe("none");
+
+        vi.useRealTimers();
+    });
 });
 
 describe("The student heartbeat", () => {
