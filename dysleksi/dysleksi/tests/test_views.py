@@ -251,6 +251,22 @@ class TestAssignmentView(DysleksiTest):
 
         self.assertIsNone(self.assignment1.start_date_time)
 
+    def test_student_is_sent_back_to_the_lobby_when_the_test_is_over(self):
+        # Simulate the teacher pressing "Afslut test
+        self.assignment1.end()
+
+        view = self.setup_view(
+            AssignmentView,
+            self.student1,
+            room_name="class_1",
+            test_id=self.individual_test.id,
+            pk=self.assignment1.id,
+        )
+
+        # Validate that a student cannot get into the assignment anymore
+        self.assertEqual(view.response.status_code, 302)
+        self.assertEqual(view.response.url, reverse("dysleksi:root"))
+
     def test_access(self):
         for assignment in (self.assignment1, self.assignment2):
             for user in (self.admin, self.teacher, self.student1, self.privileged_user):

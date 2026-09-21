@@ -192,12 +192,15 @@ class AssignmentView(
     context_object_name = "test_assignment"
 
     def get(self, request, *args, **kwargs):
-        response = super().get(request, *args, **kwargs)
-        if not self.user.is_student:
+        self.object = self.get_object()
+        if self.user.is_student:
+            if self.object.responses.filter(student=self.user, completed=True).exists():
+                return redirect("dysleksi:root")
+        else:
             # A teacher opening the test-room is what starts the test, and makes
             # it the test that its students are invited into from the lobby
             self.object.start()
-        return response
+        return super().get(request, *args, **kwargs)
 
     def get_template_names(self) -> list[str]:
         if self.user.is_superuser or self.user.is_teacher:
