@@ -63,7 +63,7 @@ describe("AutoLogout", () => {
 
         expect(window.location).toBe("");
         // The server is told about the activity, so the session lives on too
-        expect(global.fetch).toHaveBeenCalledWith(PING_URL);
+        expect(global.fetch).toHaveBeenCalledWith(PING_URL, expect.anything());
     });
 
     it("only tells the server about the user when something happened", async () => {
@@ -89,7 +89,7 @@ describe("AutoLogout", () => {
         await minutes(60);
 
         expect(window.location).toBe("");
-        expect(global.fetch).toHaveBeenCalledWith(PING_URL);
+        expect(global.fetch).toHaveBeenCalledWith(PING_URL, expect.anything());
     });
 
     it("survives a ping that does not reach the server", async () => {

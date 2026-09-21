@@ -24,27 +24,30 @@ export class WindowLock {
         const granted = await this._post({ windowId: this.windowId, acquire: true });
         if (granted) {
             this._keepAlive();
+
+            // Release the lock when a page is closed.
+            // Note: This does not trigger in case the browser is closed entirely. Only
+            // when a tab is closed. In case the browser is closed, we simply need to
+            // wait for the cache to time out, before the lock is released (16 seconds).
+            window.addEventListener("pagehide", () => {
+                clearTimeout(this.heartbeat);
+                this._post({ windowId: this.windowId, release: true });
+            });
         }
         return granted;
     }
 
     _keepAlive() {
-        this.heartbeat = setInterval(async () => {
-            if (!(await this._post({ windowId: this.windowId }))) {
+        // Each heartbeat is scheduled once the previous one has been answered, so a
+        // server that has stopped answering does not leave requests piling up.
+        this.heartbeat = setTimeout(async () => {
+            if (await this._post({ windowId: this.windowId })) {
+                this._keepAlive();
+            } else {
                 // We lost the lock, so another window is running the test now
-                clearInterval(this.heartbeat);
                 showWindowBlockedMessage();
             }
         }, HEARTBEAT_MS);
-
-        // Release the lock when a page is closed.
-        // Note: This does not trigger in case the browser is closed entirely. Only
-        // when a tab is closed. In case the browser is closed, we simply need to wait
-        // for the cache to time out, before the lock is released (16 seconds).
-        window.addEventListener("pagehide", () => {
-            clearInterval(this.heartbeat);
-            this._post({ windowId: this.windowId, release: true });
-        });
     }
 
     async _post(body) {
@@ -58,6 +61,7 @@ export class WindowLock {
                 },
                 body: JSON.stringify(body),
                 keepalive: true,
+                signal: AbortSignal.timeout(HEARTBEAT_MS),
             });
         } catch (error) {
             console.warn("Could not reach the window lock:", error);

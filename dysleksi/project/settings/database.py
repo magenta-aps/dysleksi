@@ -12,6 +12,13 @@ DATABASES = {
         "PASSWORD": os.environ["POSTGRES_PASSWORD"],
         "HOST": os.environ["POSTGRES_HOST"],
         "TIME_ZONE": os.environ["TZ"],
+        "OPTIONS": {
+            "pool": {
+                "min_size": int(os.environ.get("DB_POOL_MIN_SIZE", 2)),
+                "max_size": int(os.environ.get("DB_POOL_MAX_SIZE", 10)),
+                "timeout": int(os.environ.get("DB_POOL_TIMEOUT", 10)),
+            },
+        },
     },
 }
 

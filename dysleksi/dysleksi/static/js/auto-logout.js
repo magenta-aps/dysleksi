@@ -48,7 +48,11 @@ export class AutoLogout {
 
     async ping() {
         try {
-            await fetch(this.pingUrl);
+            // A ping must not outlive its interval, or an unreachable server
+            // leaves them piling up until it can be reached again
+            await fetch(this.pingUrl, {
+                signal: AbortSignal.timeout(this.pingIntervalMs),
+            });
         } catch (error) {
             console.warn("Could not reach the server to renew the session:", error);
         }
