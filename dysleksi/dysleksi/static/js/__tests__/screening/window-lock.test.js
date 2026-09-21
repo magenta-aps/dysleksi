@@ -75,6 +75,18 @@ describe("WindowLock", () => {
         ]);
     });
 
+    it("does not stack up heartbeats while the server does not answer", async () => {
+        answer(true);
+        await lock.acquire();
+
+        // The server takes the request, but never answers it
+        global.fetch.mockReturnValueOnce(new Promise(() => {}));
+        await vi.advanceTimersByTimeAsync(30 * 1000);
+
+        // Just the heartbeat that is still in flight, with no queue behind it
+        expect(requests()).toHaveLength(2);
+    });
+
     it("blocks the window if it loses the lock while running", async () => {
         document.body.innerHTML = `<div id="window-blocked" class="d-none"></div>`;
         answer(true);
