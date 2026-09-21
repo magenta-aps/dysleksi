@@ -26,6 +26,8 @@ export class StudentTestView extends EventTarget {
     isPracticing = false;
     repeatQuestionIndex = null;
     paused = false;
+    connectionLost = false;
+    frozen = false;
     rejoinIntervalId = null;
 
     constructor(test, assignmentId, domElements, student) {
@@ -138,14 +140,18 @@ export class StudentTestView extends EventTarget {
         clearTimeout(this.teacherTimeoutId);
         clearInterval(this.rejoinIntervalId);
         this.rejoinIntervalId = null;
+        this.connectionLost = false;
         this.domElements.hideConnectionLostOverlay();
+        this._unfreeze();
         this.teacherTimeoutId = setTimeout(() => {
             this.onConnectionLost();
         }, 3 * PING_MS);
     }
 
     onConnectionLost() {
+        this.connectionLost = true;
         this.domElements.showConnectionLostOverlay();
+        this._freeze();
         if (this.rejoinIntervalId !== null) {
             return;
         }
@@ -155,22 +161,52 @@ export class StudentTestView extends EventTarget {
         }, PING_MS);
     }
 
-    pauseTest() {
-        this.paused = true;
+    _freeze() {
+        if (this.frozen) {
+            return;
+        }
+        this.frozen = true;
 
-        // Remember which timers were running so that resuming restores exactly
-        // those (and no reminder sound fires while paused).
-        this._pausedHadQuestionTimers =
+        // Remember which timers were running so that unfreezing restores exactly
+        // those (and no reminder sound fires while frozen).
+        this._frozenHadQuestionTimers =
             this.questionTimeoutId != null || this.questionReminderId != null;
-        this._pausedHadPartTimeout = this.partTimeoutId != null;
+        this._frozenHadPartTimeout = this.partTimeoutId != null;
 
-        // Clear all timeouts so nothing (including reminder sounds) fires while
-        // the test is paused.
         this.clearTimeout();
         this.clearReminder();
         this.clearPartTimeout();
 
         this.audioContext.suspend();
+    }
+
+    _unfreeze() {
+        // A test that is still paused, or still without a teacher, stays frozen.
+        if (!this.frozen || this.paused || this.connectionLost) {
+            return;
+        }
+        this.frozen = false;
+
+        this.audioContext.resume();
+
+        // Re-initiate the question timeout and reminder sounds.
+        if (this._frozenHadQuestionTimers && this.currentQuestion) {
+            this.setupReminder();
+        }
+
+        // Re-initiate the part timeout.
+        if (
+            this._frozenHadPartTimeout &&
+            this.currentPart &&
+            typeof this.onPartTimeout === "function"
+        ) {
+            this.setupPartTimeout();
+        }
+    }
+
+    pauseTest() {
+        this.paused = true;
+        this._freeze();
 
         // Cover the student's interface with the pause overlay. It sits on top
         // of everything and intercepts all clicks/taps, so all buttons are
@@ -189,21 +225,7 @@ export class StudentTestView extends EventTarget {
         // Uncover the interface so the student can interact with it again.
         this.domElements.hidePauseOverlay();
 
-        this.audioContext.resume();
-
-        // Re-initiate the question timeout and reminder sounds.
-        if (this._pausedHadQuestionTimers && this.currentQuestion) {
-            this.setupReminder();
-        }
-
-        // Re-initiate the part timeout.
-        if (
-            this._pausedHadPartTimeout &&
-            this.currentPart &&
-            typeof this.onPartTimeout === "function"
-        ) {
-            this.setupPartTimeout();
-        }
+        this._unfreeze();
 
         this.send({
             event: "test.resumed",
