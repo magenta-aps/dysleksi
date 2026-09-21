@@ -27,6 +27,7 @@ export class StudentTestView extends EventTarget {
     repeatQuestionIndex = null;
     paused = false;
     connectionLost = false;
+    windowBlocked = false;
     frozen = false;
     rejoinIntervalId = null;
 
@@ -56,6 +57,13 @@ export class StudentTestView extends EventTarget {
             },
         });
         document.addEventListener(WINDOW_BLOCKED_EVENT, () => {
+            this.windowBlocked = true;
+            clearTimeout(this.teacherTimeoutId);
+            clearInterval(this.rejoinIntervalId);
+            if (this.connectionLost) {
+                this.connectionLost = false;
+                this.domElements.hideConnectionLostOverlay();
+            }
             this.channel.close();
             this.clearTimeout();
             this.clearReminder();
@@ -153,6 +161,9 @@ export class StudentTestView extends EventTarget {
     }
 
     onConnectionLost() {
+        if (this.windowBlocked) {
+            return;
+        }
         this.connectionLost = true;
         this.domElements.showConnectionLostOverlay();
         this._freeze();
