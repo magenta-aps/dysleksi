@@ -142,7 +142,8 @@ class RelayConsumer(AsyncJsonWebsocketConsumer):
         student_ids = content["studentIds"]
         assignment_id = content["assignmentId"]
 
-        start_date_time = TestAssignment.objects.get(pk=assignment_id).start_date_time
+        assignment = TestAssignment.objects.get(pk=assignment_id)
+        start_date_time = assignment.start_date_time
 
         students_with_newer_assignments = set(
             Student.objects.filter(
@@ -156,13 +157,26 @@ class RelayConsumer(AsyncJsonWebsocketConsumer):
             ).values_list("pk", flat=True)
         )
 
+        students_who_are_done = set(
+            assignment.responses.filter(
+                completed=True, student__in=student_ids
+            ).values_list("student_id", flat=True)
+        )
+
         if students_with_newer_assignments:
             logger.info(
                 "Not inviting students %s to assignment '%s'; they have a newer one",
                 sorted(students_with_newer_assignments),
-                content["assignmentId"],
+                assignment_id,
             )
-        return [id for id in student_ids if id not in students_with_newer_assignments]
+        if students_who_are_done:
+            logger.info(
+                "Not inviting students %s to assignment '%s'; they already finished it",
+                sorted(students_who_are_done),
+                assignment_id,
+            )
+        uninvited = students_with_newer_assignments | students_who_are_done
+        return [id for id in student_ids if id not in uninvited]
 
     async def relay_message(self, message: dict):
         await self.send_json({k: v for k, v in message.items() if k != "type"})

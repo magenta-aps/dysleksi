@@ -240,6 +240,14 @@ class TestLobbyInvitations(TransactionTestCase):
 
         self.assertIsNone(relayed)
 
+    def test_skips_students_who_are_done_with_the_assignment(self):
+        # Simulate the teacher pressing "Afslut test"
+        self.individual_assignment.end()
+
+        # Validate that nobody gets an invite
+        relayed = self.invite(self.individual_assignment, [self.student1])
+        self.assertIsNone(relayed)
+
     def test_a_student_subset_only_concerns_the_students_in_it(self):
         # The teacher started a newer group test for student1 alone
         subset_assignment = TestAssignment.objects.create(
