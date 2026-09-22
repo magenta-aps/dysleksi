@@ -258,6 +258,12 @@ class AssignmentView(
         self.add_navigation_context(context, assignment.class_for_nav, None)
         context["class"] = assignment.class_for_nav
 
+        if assignment.class_for_nav:  # pragma: no branch
+            context["cancel_url"] = reverse(
+                "dysleksi:class_assignment_list",
+                kwargs={"class_pk": assignment.class_for_nav.pk},
+            )
+
         return context
 
     def get_room_type(self) -> str:

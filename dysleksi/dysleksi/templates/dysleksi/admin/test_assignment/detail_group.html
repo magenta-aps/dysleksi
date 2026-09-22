@@ -63,7 +63,8 @@
 <div data-role="teacher"
      data-test-type="{{ test_type }}"
      data-room-name="{{ room_name }}"
-     data-assignment-id="{{ object.pk }}">
+     data-assignment-id="{{ object.pk }}"
+     data-cancel-url="{{ cancel_url }}">
 
     <div class="screening-header">
         <h2 class="mt-2 mb-4">{% blocktranslate trimmed with class_name=class_name test_name=test_name %}Klasse {{ class_name }} - Screening {{ test_name }}{% endblocktranslate %}</h2>
