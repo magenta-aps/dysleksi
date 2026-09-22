@@ -363,7 +363,6 @@ msgid "Tid"
 msgstr ""
 
 #: dysleksi/tables.py
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Bemærkning"
 msgstr ""
 
@@ -541,14 +540,19 @@ msgstr ""
 msgid "Sprunget over"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/part_response/group/column_answer.html
 #: dysleksi/templates/dysleksi/admin/part_response/group/column_resource.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Korrekt"
+msgid "Forkert"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/part_response/group/column_answer.html
+msgid "Eleven svarede"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/column_resource.html
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Forkert"
+msgid "Korrekt"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
@@ -888,10 +892,6 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Resultat"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
-msgid "Svarede:"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/list.html

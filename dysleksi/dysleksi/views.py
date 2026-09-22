@@ -32,6 +32,7 @@ from django.db.models.functions import Coalesce, Length, Replace, RowNumber
 from django.http.response import (
     Http404,
     HttpResponse,
+    HttpResponseBadRequest,
     HttpResponseRedirect,
     JsonResponse,
 )
@@ -1608,7 +1609,15 @@ class PartResponseView(
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.GET.get("only_table") == "true":
-            return HttpResponse(context["responses_table"].as_html(self.request))
+            # Return HTML fragment containing only the table itself, wrapped in a form
+            # element.
+            return self.response_class(
+                request=self.request,
+                template=["dysleksi/admin/part_response/group/only_table.html"],
+                context=context,
+                using=self.template_engine,
+                **response_kwargs,
+            )
         else:
             return super().render_to_response(context, **response_kwargs)
 
@@ -1834,18 +1843,23 @@ class ClientErrorLogView(View):
         return "\n".join(lines)
 
 
-class EditNoteView(GroupRequiredMixin, ObjectPermissionsMixin, View):
+class QuestionResponseUpdateView(GroupRequiredMixin, ObjectPermissionsMixin, View):
     def post(self, request, *args, **kwargs):
+        pk = self.request.POST.get("pk")
+        attr = self.request.POST.get("attr")
+        value = self.request.POST.get("value")
+
+        if attr not in ["note", "actual_pronunciation"]:
+            return HttpResponseBadRequest("attr %r is not allowed" % attr)
+
         try:
-            pk = self.request.POST.get("pk")
-            note = self.request.POST.get("note")
             obj = QuestionResponse.objects.get(pk=pk)
         except QuestionResponse.DoesNotExist:
             raise Http404(f"QuestionResponse {pk} does not exist")
         else:
             self.test_permissions(obj)
-            obj.note = note
-            obj.save(update_fields=["note"])
+            setattr(obj, attr, value)
+            obj.save(update_fields=[attr])
             return HttpResponse("ok")
 
 

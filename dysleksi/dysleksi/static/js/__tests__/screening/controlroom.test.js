@@ -2710,14 +2710,11 @@ describe("EventTable", () => {
             table.updateTable({
                 event: "question.feedback",
                 correctness: item.correctness,
-                note: "Et notat",
                 ...data,
             });
 
             const button = document.querySelector("td.result button");
             expect(button.textContent).toBe(item.label);
-            const noteInput = document.querySelector("td.note input[type='text']");
-            expect(noteInput.value).toBe("Et notat");
 
             // Test that result can be revised by using the dropdown menu
             const dropdownItem = document.querySelector(
@@ -2738,31 +2735,19 @@ describe("EventTable", () => {
         table.updateTable({
             event: "question.feedback",
             correctness: "skipped",
-            note: "Et notat",
             ...data,
         });
         // Assert: add event listener verifying event data
         table.addEventListener("questionFeedbackEdited", (evt) => {
             expect(evt.detail).not.toBeUndefined();
             expect(evt.detail.correctness).toBe("wrong");
-            expect(evt.detail.note).toBe("En anden værdi");
-            expect(evt.actualPronunciation.note).toBe("En anden værdi");
         });
-        // Arrange: edit value of each relevant form element
-        for (const selector of [
-            "td.result button",
-            "td.result input",
-            "td.note input",
-        ]) {
-            const elem = document.querySelector(selector);
-            if (elem.tagName === "button") {
-                elem.dataset.correctness = "wrong";
-            } else {
-                elem.value = "En anden værdi";
-            }
-            // Act: dispatch 'blur' event on the user-editable fields on the new row
-            elem.dispatchEvent(new Event("blur"));
-        }
+
+        // Arrange: edit value of the form element
+        const elem = document.querySelector("td.result button");
+        elem.value = "En anden værdi";
+        // Act: dispatch 'blur' event on the user-editable fields on the new row
+        elem.dispatchEvent(new Event("blur"));
     });
 
     it("renders question cells for non-practice questions", () => {
