@@ -186,6 +186,12 @@ class TestAssignmentView(DysleksiTest):
         )
         context = view.get_context_data()
         self.assertIn("test_contents", context)
+        self.assertEqual(
+            context["cancel_url"],
+            reverse(
+                "dysleksi:class_assignment_list", kwargs={"class_pk": self.klasse.pk}
+            ),
+        )
 
     def test_test_part_names_are_localized(self):
         part = TestPart.objects.create(

@@ -112,6 +112,8 @@ const CANCEL_INDIVIDUAL_TEST_MODAL_HTML = cancelTestModalHtml(`
 `);
 
 const GROUP_DOM_HTML = `
+<div data-cancel-url="foo"></div>
+
 <template id="student-card-template">
     <div class="student-card">
         <div class="student-top-row">
@@ -236,6 +238,8 @@ ${CANCEL_GROUP_TEST_MODAL_HTML}
 `;
 
 const INDIVIDUAL_DOM_HTML = `
+<div data-cancel-url="foo"></div>
+
 <div class="screening-header">
     <div class="screening-title">
         <h2>Anna Andersen - Screening Test</h2>
@@ -1192,7 +1196,7 @@ describe("Teacher Individual test View", () => {
 
         document.querySelector("#cancel-test .confirm-btn").click();
         expect(p2pChannel.send).toHaveBeenCalledWith(expectedContent);
-        expect(buttons.cancelButton().classList.contains("disabled")).toBe(true);
+        expect(buttons.cancelButton().classList.contains("disabled")).toBe(false);
     });
 
     it("pauses and resumes the test when the pause button is clicked", () => {
@@ -2478,6 +2482,9 @@ describe("TeacherView cancel test modal", () => {
 
         expect(spySendTestCancelled).toHaveBeenCalled();
         expect(spyHide).toHaveBeenCalled();
+
+        // User is sent to URL in `data-cancel-url` attribute
+        expect(global.window.location).toBe("foo");
     });
 });
 

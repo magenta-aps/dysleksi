@@ -1216,9 +1216,9 @@ export class CancelTestModal {
         );
         this.studentList = this.domElement.querySelector(".student-list");
         this.confirmButton = this.domElement.querySelector(".confirm-btn");
-        this.confirmButton.addEventListener("click", () => {
+        this.confirmButton.addEventListener("click", async () => {
             this.modal.hide();
-            this.onConfirm();
+            await this.onConfirm();
         });
     }
 
@@ -1783,6 +1783,7 @@ export class TeacherView {
             this.messageQueue.length > 0 &&
             this.syncSocket.readyState === WebSocket.OPEN
         ) {
+            this.onMessageQueueFlushing();
             const isOnline = await serverOnline();
             if (isOnline) {
                 console.log(
@@ -1797,11 +1798,24 @@ export class TeacherView {
                     }
                     this.messageQueue = [];
                     this._persistQueue();
+                    this.onMessageQueueFlushed();
                 } catch (err) {
                     console.error("Sync failed, keeping messages in storage:", err);
                 }
             }
         }
+    }
+
+    onMessageQueueFlushing() {
+        // Don't permit teacher to leave test session while queue is being flushed
+        this.buttons.cancelButton().disabled = true;
+        this.cancelTestModal.confirmButton.disabled = true;
+    }
+
+    onMessageQueueFlushed() {
+        // Permit teacher to leave test session once queue is flushed
+        this.buttons.cancelButton().disabled = false;
+        this.cancelTestModal.confirmButton.disabled = false;
     }
 
     uncompletedStudents() {
@@ -1814,10 +1828,18 @@ export class TeacherView {
         this.buttons.addClickListener((e) => {
             const val = e.target.id || e.target.parentElement.id;
             if (val === "cancelled") {
-                this.cancelTestModal.show(this.uncompletedStudents(), () => {
-                    this.sendTestCancelled();
+                this.cancelTestModal.show(this.uncompletedStudents(), async () => {
+                    await this.sendTestCancelled();
                     this.buttons.disableButtons();
                     this.elapsedTimeView.stop();
+                    const cancelUrlElem = document.querySelector("[data-cancel-url]");
+                    /* istanbul ignore else -- @preserve */
+                    if (
+                        cancelUrlElem !== null &&
+                        cancelUrlElem.dataset.cancelUrl !== null
+                    ) {
+                        window.location = cancelUrlElem.dataset.cancelUrl;
+                    }
                 });
             } else if (val === "paused") {
                 if (this.testPaused) {
@@ -1923,7 +1945,7 @@ export class TeacherView {
         }
     }
 
-    sendTestCancelled() {
+    async sendTestCancelled() {
         const data = {
             uuid: crypto.randomUUID(),
             event: "test.cancelled",
@@ -1941,7 +1963,7 @@ export class TeacherView {
         // Tell the server that the test is over.
         this.messageQueue.push(data);
         this._persistQueue();
-        this._flushMessageQueue();
+        await this._flushMessageQueue();
         showResultLink();
     }
 
