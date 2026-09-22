@@ -303,7 +303,7 @@
     <h6>{% translate "Elevens svar" %}</h6>
     <div class="row">
         <div class="col-12" id="test-results-table">
-            <form class="form" data-edit-url="{% url 'dysleksi:edit_note' %}">
+            <form class="form" data-edit-url="{% url 'dysleksi:question_response_update' %}">
                 {% render_table responses_table %}
             </form>
         </div>
@@ -341,14 +341,15 @@
     <script type="module">
         import { initialize_audio_players } from '{% static 'js/admin/audioplayer.js' %}';
         import { initialize_pagination } from '{% static 'js/admin/pagination.js' %}';
-        import { initEditNote } from '{% static 'js/admin/edit-note.js' %}';
+        import { initUpdateQuestionResponse } from '{% static 'js/admin/update-question-response.js' %}';
 
         const container = document.getElementById("test-results-table");
         const init_audio = initialize_audio_players.bind(null, container);
 
         document.addEventListener("DOMContentLoaded", initialize_pagination);
         document.addEventListener("DOMContentLoaded", init_audio);
-        document.addEventListener("DOMContentLoaded", initEditNote);
+        document.addEventListener("DOMContentLoaded", initUpdateQuestionResponse);
         container.addEventListener("pagination_resolved", init_audio);
+        container.addEventListener("pagination_resolved", initUpdateQuestionResponse);
     </script>
 {% endblock %}

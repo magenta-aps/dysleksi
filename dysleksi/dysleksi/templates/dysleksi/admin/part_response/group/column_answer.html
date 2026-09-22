@@ -42,13 +42,7 @@
             {% elif record.correctness == "skipped" %}
                 <div class="answer">{% translate "Sprunget over" %}</div>
             {% else %}
-                <div class="answer answer-incorrect">
-                    {% if record.actual_pronunciation %}
-                        {{ record.actual_pronunciation }}
-                    {% else %}
-                        -
-                    {% endif%}
-                </div>
+                <div class="answer answer-incorrect">{% translate "Forkert" %}</div>
             {% endif %}
         {% if record.answer_sound %}
             <div class="audio">
@@ -56,6 +50,15 @@
                 <i class="ph-fill ph-play"></i>
                 <span class="ms-1"></span>
             </div>
+        {% endif %}
+        {% if record.correctness == "wrong" or record.correctness == "incorrect" %}
+            <input type="text"
+                   value="{{ record.actual_pronunciation|default_if_none:"" }}"
+                   placeholder="{% translate 'Eleven svarede' %}"
+                   class="actual-pronunciation form-control d-inline w-50 ms-1"
+                   data-attr="actual_pronunciation"
+                   data-pk="{{ record.pk }}"
+            />
         {% endif %}
     {% endif %}
 {% endwith %}

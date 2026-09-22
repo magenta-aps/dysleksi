@@ -125,28 +125,26 @@ export class EventTable extends EventTarget {
         let questionEl;
         let resultEl;
         let answerEl;
-        let noteEl;
 
         if (data.event === "question.feedback") {
             // Add new row to table
             rowEl = document.createElement("tr");
             partNameEl = this.createTd("part-name");
             questionEl = this.createTd("question");
-            resultEl = this.createTd("result d-flex");
+            resultEl = this.createTd("result");
             answerEl = this.createTd("answer");
-            noteEl = this.createTd("note");
-            rowEl.append(partNameEl, questionEl, resultEl, answerEl, noteEl);
+            rowEl.append(partNameEl, questionEl, resultEl, answerEl);
             this.eventsEl.prepend(rowEl);
         } else if (data.event === "test.started") {
+            // Add new row to table, saying "Test is started"
             rowEl = document.createElement("tr");
             partNameEl = this.createTd("part-name");
             questionEl = this.createTd("question");
             resultEl = this.createTd("result");
             answerEl = this.createTd("answer");
-            noteEl = this.createTd("note");
-            rowEl.append(partNameEl, questionEl, resultEl, answerEl, noteEl);
+            rowEl.append(partNameEl, questionEl, resultEl, answerEl);
             this.eventsEl.prepend(rowEl);
-            noteEl.textContent = data.message;
+            answerEl.textContent = data.message;
             return;
         } else {
             // Modify existing row (created when handling `question.feedback` event)
@@ -156,7 +154,6 @@ export class EventTable extends EventTarget {
                 questionEl = rowEl.querySelector("td.question");
                 resultEl = rowEl.querySelector("td.result");
                 answerEl = rowEl.querySelector("td.answer");
-                noteEl = rowEl.querySelector("td.note");
             } catch {
                 console.warn("no previous row found, doing nothing");
                 return;
@@ -174,8 +171,6 @@ export class EventTable extends EventTarget {
             const template = document.querySelector("template#edit-result");
             const clone = document.importNode(template.content, true);
             const button = clone.querySelector("button");
-            const input = clone.querySelector("input");
-            input.value = data.actualPronunciation || "";
             this.updateResultButtonState(button, data.correctness);
             const choices = clone.querySelectorAll("a.dropdown-item");
             for (const choice of choices) {
@@ -192,14 +187,6 @@ export class EventTable extends EventTarget {
             this.prevAnswer = null;
         }
 
-        // Update `note` cell
-        const inputEl = this.getOrCreateEl(noteEl, "input");
-        inputEl.type = "text";
-        inputEl.classList.add("form-control");
-        if (data.event === "question.feedback" && data.note !== undefined) {
-            inputEl.value = data.note;
-        }
-
         // Hook "blur" events after adding all row elements
         if (data.event === "question.feedback") {
             this.addBlurEventListener(rowEl, data);
@@ -212,10 +199,6 @@ export class EventTable extends EventTarget {
             formElem.addEventListener("blur", () => {
                 const correctnessBtn = rowEl.querySelector("button");
                 const correctness = correctnessBtn.dataset.correctness;
-                const noteField = rowEl.querySelector("td.note input");
-                const note = noteField.value;
-                const actualPronunciationField = rowEl.querySelector("td.result input");
-                const actualPronunciation = actualPronunciationField.value;
                 const detail = {
                     uuid: crypto.randomUUID(),
                     event: "question.feedback",
@@ -226,8 +209,6 @@ export class EventTable extends EventTarget {
                     questionId: data.questionId,
                     practice: false,
                     correctness: correctness,
-                    note: note,
-                    actualPronunciation: actualPronunciation,
                 };
                 this.dispatchEvent(
                     new CustomEvent("questionFeedbackEdited", { detail: detail }),
@@ -265,8 +246,6 @@ export class EventTable extends EventTarget {
                   : "btn-danger",
         );
         button.dataset.correctness = state;
-        const actualPronunciationEl = button.parentElement.nextElementSibling;
-        actualPronunciationEl.classList.toggle("d-none", !(state === "wrong"));
     }
 
     handleResultButtonChange(evt) {
@@ -374,17 +353,6 @@ export class EventTable extends EventTarget {
             td.classList.add(cl);
         }
         return td;
-    }
-
-    getOrCreateEl(el, tag) {
-        const oldEl = el.querySelector(tag);
-        if (oldEl !== null) {
-            return oldEl;
-        } else {
-            const newEl = document.createElement(tag);
-            el.append(newEl);
-            return newEl;
-        }
     }
 }
 

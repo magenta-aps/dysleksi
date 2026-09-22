@@ -12,7 +12,12 @@ from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.files.base import ContentFile
 from django.core.management import call_command
-from django.http.response import Http404, HttpResponse, HttpResponseRedirect
+from django.http.response import (
+    Http404,
+    HttpResponse,
+    HttpResponseBadRequest,
+    HttpResponseRedirect,
+)
 from django.test import RequestFactory, override_settings
 from django.urls import reverse
 from django.utils import timezone, translation
@@ -45,10 +50,10 @@ from dysleksi.views import (
     ClassDetailView,
     ClassListView,
     ClientErrorLogView,
-    EditNoteView,
     PaginationMixin,
     PartResponseView,
     QuestionResponseAnswerSoundDetail,
+    QuestionResponseUpdateView,
     RootView,
     StudentDetailView,
     TestAssignmentListView,
@@ -2019,7 +2024,11 @@ class TestPartResponseView(ResponseTest):
             testpart_pk=self.group_test_part.pk,
         )
         response = view.response
+        response.render()
         soup = BeautifulSoup(response.content, "html.parser")
+        form = soup.find("form")
+        self.assertIsNotNone(form)
+        self.assertIsNotNone(form.attrs.get("data-edit-url"))
         table = self.html_table_to_list(soup.find("table"))
         self.assertEqual(
             table,
@@ -2315,7 +2324,7 @@ class WindowLockViewTest(DysleksiTest):
         self.assertGranted(self.acquire("window-b", self.test_assignment_class), True)
 
 
-class TestEditNoteView(ResponseTest):
+class TestQuestionResponseUpdateView(ResponseTest):
     @classmethod
     def setUpTestData(cls):
         super().setUpTestData()
@@ -2324,7 +2333,8 @@ class TestEditNoteView(ResponseTest):
     def test_post_valid_question_response_pk(self):
         question_response = QuestionResponse.objects.earliest("pk")
         response = self.post(
-            self.teacher, {"pk": question_response.pk, "note": "Mit notat"}
+            self.teacher,
+            {"pk": question_response.pk, "attr": "note", "value": "Mit notat"},
         )
         self.assertIsInstance(response, HttpResponse)
         question_response.refresh_from_db()
@@ -2332,13 +2342,23 @@ class TestEditNoteView(ResponseTest):
 
     def test_post_invalid_question_response_pk(self):
         with self.assertRaises(Http404):
-            self.post(self.teacher, {"pk": -1, "note": "Mit notat"})
+            self.post(
+                self.teacher,
+                {"pk": -1, "attr": "note", "value": "Mit notat"},
+            )
+
+    def test_post_invalid_attr(self):
+        response = self.post(
+            self.teacher,
+            {"pk": -1, "attr": "invalid", "value": "Mit notat"},
+        )
+        self.assertIsInstance(response, HttpResponseBadRequest)
 
     def post(self, user, data):
         request_factory = RequestFactory()
         request = request_factory.post("")
         request.user = user
         request.POST = data
-        view = EditNoteView()
+        view = QuestionResponseUpdateView()
         view.setup(request)
         return view.post(request)

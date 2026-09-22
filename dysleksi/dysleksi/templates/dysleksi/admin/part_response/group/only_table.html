@@ -1,0 +1,4 @@
+{% load render_table from django_tables2 %}
+<form class="form" data-edit-url="{% url 'dysleksi:question_response_update' %}">
+    {% render_table responses_table %}
+</form>
