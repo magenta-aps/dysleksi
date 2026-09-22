@@ -508,7 +508,6 @@ export class StudentTestView extends EventTarget {
         this.domElements.showQuestionChallenge();
 
         if (cancelled) {
-            alert("Testen er afbrudt");
             this.student.cancelled = true;
             this.send({
                 event: "test.cancelled",

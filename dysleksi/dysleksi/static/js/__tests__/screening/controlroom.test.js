@@ -22,6 +22,7 @@ import { WebSocketChannel } from "../../webSocketChannel.js";
 import { getAssignmentSocket, getSyncSocket } from "../../ws.js";
 import { DetailsPopup } from "../../screening/controlroom.js";
 import { StudentPresenceIndicator } from "../../screening/controlroom.js";
+import { serverOnline } from "../../screening/utils.js";
 
 vi.mock("../../screening/utils.js");
 
@@ -2366,6 +2367,9 @@ describe("TeacherView cancel test modal", () => {
         completedByStudent: () => false,
     });
 
+    const sendFromStudent = (detail) =>
+        p2pChannel.dispatchEvent(new CustomEvent("message", { detail: detail }));
+
     /* Open the modal the way the teacher does, and report the warning it gives
        about the students, or null when it does not warn. The list of names in
        the group test modal is reported as an array. */
@@ -2469,11 +2473,12 @@ describe("TeacherView cancel test modal", () => {
         expect(openModal(view)).toBeNull();
     });
 
-    it("does not cancel the test until the teacher confirms it", () => {
+    it("does not cancel the test until the teacher confirms it", async () => {
         document.body.innerHTML = INDIVIDUAL_DOM_HTML;
         const view = createView(individualTest(), [classStudents[0]]);
         const spySendTestCancelled = vi.spyOn(view, "sendTestCancelled");
         const spyHide = vi.spyOn(view.cancelTestModal.modal, "hide");
+        vi.mocked(serverOnline).mockResolvedValue(true);
 
         openModal(view);
         expect(spySendTestCancelled).not.toHaveBeenCalled();
@@ -2484,6 +2489,46 @@ describe("TeacherView cancel test modal", () => {
         expect(spyHide).toHaveBeenCalled();
 
         // User is sent to URL in `data-cancel-url` attribute
+        await vi.waitFor(() => expect(global.window.location).toBe("foo"));
+    });
+
+    it("stays on the page until the message queue has been sent", async () => {
+        document.body.innerHTML = INDIVIDUAL_DOM_HTML;
+        const view = createView(individualTest(), [classStudents[0]]);
+        global.window.location = "not-redirected";
+        vi.mocked(serverOnline).mockResolvedValue(false);
+
+        openModal(view);
+        document.querySelector("#cancel-test .confirm-btn").click();
+
+        await vi.advanceTimersByTimeAsync(3000);
+        expect(view.messageQueue.length).toBe(1);
+        expect(global.window.location).toBe("not-redirected");
+
+        vi.mocked(serverOnline).mockResolvedValue(true);
+
+        await vi.advanceTimersByTimeAsync(1000);
+        expect(global.window.location).toBe("foo");
+    });
+
+    it("stays on the page until the students have confirmed the cancellation", async () => {
+        document.body.innerHTML = INDIVIDUAL_DOM_HTML;
+        const view = createView(individualTest(), [classStudents[0]]);
+        global.window.location = "not-redirected";
+        vi.mocked(serverOnline).mockResolvedValue(true);
+
+        // The student says hello, so the teacher knows to wait for them
+        sendFromStudent({ event: "student.heartbeat", student: { id: studentId } });
+
+        openModal(view);
+        document.querySelector("#cancel-test .confirm-btn").click();
+
+        await vi.advanceTimersByTimeAsync(3000);
+        expect(global.window.location).toBe("not-redirected");
+
+        sendFromStudent({ event: "test.cancelled", student: { id: studentId } });
+
+        await vi.advanceTimersByTimeAsync(1000);
         expect(global.window.location).toBe("foo");
     });
 });
@@ -3130,7 +3175,7 @@ describe("TeacherView Sync Logic", () => {
             view.messageQueue = [];
             serverOnlineMock.mockResolvedValue(true);
 
-            await view._flushMessageQueue();
+            expect(await view._flushMessageQueue()).toBe(true);
 
             expect(socket.send).not.toHaveBeenCalled();
         });
@@ -3144,7 +3189,7 @@ describe("TeacherView Sync Logic", () => {
             serverOnlineMock.mockResolvedValue(true);
             const persistSpy = vi.spyOn(view, "_persistQueue");
 
-            await view._flushMessageQueue();
+            expect(await view._flushMessageQueue()).toBe(true);
 
             // Verify WebSocket behavior
             expect(socket.send).toHaveBeenCalledTimes(2);
@@ -3160,7 +3205,7 @@ describe("TeacherView Sync Logic", () => {
             view.messageQueue = [{ event: "test" }];
             serverOnlineMock.mockResolvedValue(false);
 
-            await view._flushMessageQueue();
+            expect(await view._flushMessageQueue()).toBe(false);
 
             expect(socket.send).not.toHaveBeenCalled();
             expect(view.messageQueue.length).toBe(1);
@@ -3196,7 +3241,7 @@ describe("TeacherView Sync Logic", () => {
                 throw new Error("Network Error");
             });
 
-            await view._flushMessageQueue();
+            expect(await view._flushMessageQueue()).toBe(false);
 
             // Queue should still contain the message
             expect(view.messageQueue.length).toBe(1);
