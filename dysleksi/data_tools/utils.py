@@ -13,8 +13,11 @@ def update_or_create_wordreading_2_test(
     update_contents=True,
 ):
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/wordreading_2/Enhanced/Deltest/7e.2 (Ny).mp3",
-        sound="resources/wordreading_2/Enhanced/Deltest/7e.2 (Ny).mp3",
+        # Replaces "7c.2"
+        name="resources/wordreading_2/Enhanced/Øveopgave 1 og 2/"
+        "7b.10_7b.11_5b.13_glued.mp3",
+        sound="resources/wordreading_2/Enhanced/Øveopgave 1 og 2/"
+        "7b.10_7b.11_5b.13_glued.mp3",
     )
     completion, created = TestResource.objects.get_or_create(
         name="resources/wordreading_2/Enhanced/Deltest/7e.3.mp3",

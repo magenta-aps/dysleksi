@@ -33,7 +33,7 @@
                 // "Ordlæsningen varer i 10 minutter"
                 // "Oqaatsinik atuarneq minutsini qulini sivisussuseqassaaq"
                 "action": "playSound",
-                "resource": "resources/wordreading_2/Enhanced/Deltest/7e.1.mp3",
+                "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7e.1x.mp3",
                 "delayAfter": 1250
             },
             {
