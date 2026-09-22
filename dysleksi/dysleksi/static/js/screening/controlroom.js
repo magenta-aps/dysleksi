@@ -1297,6 +1297,8 @@ export class TeacherView {
                 .filter((student) => this.test.completedByStudent(student))
                 .map((student) => student.id),
         );
+        // The students who have confirmed that their test was cancelled
+        this.cancelledStudentIds = new Set();
 
         this.table = table || new EventTable();
         /* istanbul ignore next */
@@ -1483,6 +1485,10 @@ export class TeacherView {
                     return;
                 }
                 this.handledMessages.add(data.uuid);
+            }
+
+            if (data.event === "test.cancelled") {
+                this.cancelledStudentIds.add(data.student.id);
             }
 
             if (this.test.testType === "individual") {
@@ -1763,23 +1769,18 @@ export class TeacherView {
         }, 1000);
     }
 
+    // Returns whether the queue is empty, i.e. everything reached the server
     async _flushMessageQueue() {
         if (this.syncSocket.readyState === WebSocket.CONNECTING) {
             console.log("Socket is currently connecting... waiting.");
-            return;
-        }
-
-        if (
+        } else if (
             this.syncSocket.readyState === WebSocket.CLOSED ||
             this.syncSocket.readyState === WebSocket.CLOSING
         ) {
             console.log("Socket closed. Attempting to reconnect...");
             this._initSyncSocket();
-            return;
-        }
-
-        // Only attempt to send if the server is online and we have messages
-        if (
+        } else if (
+            // Only attempt to send if the server is online and we have messages
             this.messageQueue.length > 0 &&
             this.syncSocket.readyState === WebSocket.OPEN
         ) {
@@ -1804,6 +1805,22 @@ export class TeacherView {
                 }
             }
         }
+
+        return this.messageQueue.length === 0;
+    }
+
+    async _leaveCancelledTest() {
+        const studentsPending = () =>
+            this.studentsLastSeen
+                .keys()
+                .some((studentId) => !this.cancelledStudentIds.has(studentId));
+
+        while (!(await this._flushMessageQueue()) || studentsPending()) {
+            console.log("Waiting for students and message queue before leaving...");
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+
+        window.location = document.querySelector("[data-cancel-url]").dataset.cancelUrl;
     }
 
     onMessageQueueFlushing() {
@@ -1832,14 +1849,7 @@ export class TeacherView {
                     await this.sendTestCancelled();
                     this.buttons.disableButtons();
                     this.elapsedTimeView.stop();
-                    const cancelUrlElem = document.querySelector("[data-cancel-url]");
-                    /* istanbul ignore else -- @preserve */
-                    if (
-                        cancelUrlElem !== null &&
-                        cancelUrlElem.dataset.cancelUrl !== null
-                    ) {
-                        window.location = cancelUrlElem.dataset.cancelUrl;
-                    }
+                    await this._leaveCancelledTest();
                 });
             } else if (val === "paused") {
                 if (this.testPaused) {
