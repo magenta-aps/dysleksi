@@ -698,7 +698,8 @@ body.show-instructions .sound-btn.pulse {
 }
 
 #pause-overlay,
-#connection-lost-overlay {
+#connection-lost-overlay,
+#mic-lost-overlay {
   position: fixed;
   inset: 0;
   z-index: 100000;
@@ -713,7 +714,8 @@ body.show-instructions .sound-btn.pulse {
   }
 }
 
-#connection-lost-overlay {
+#connection-lost-overlay,
+#mic-lost-overlay {
   flex-direction: column;
   gap: 2rem;
   text-align: center;

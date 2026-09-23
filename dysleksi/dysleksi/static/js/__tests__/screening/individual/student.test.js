@@ -22,18 +22,39 @@ vi.mock("../../../ws.js", () => ({
 }));
 
 // Mock DOM elements as a proper class
+const mockShowMicLostOverlay = vi.fn();
+const mockHideMicLostOverlay = vi.fn();
+let restoreMicListener;
+
 vi.mock("../../../screening/dom.js", () => ({
-    IndividualTestDomElements: class {},
+    IndividualTestDomElements: class {
+        showMicLostOverlay = mockShowMicLostOverlay;
+        hideMicLostOverlay = mockHideMicLostOverlay;
+        setRestoreMicButtonListener = (listener) => {
+            restoreMicListener = listener;
+        };
+    },
 }));
 
 // Mock MediaRecorder as a class
 const mockSetup = vi.fn();
 
+let micLostHandler;
+let micRestoredHandler;
+
 vi.mock("../../../screening/media.js", () => ({
     TestMediaRecorder: class {
         constructor() {}
-        setup() {
-            return mockSetup();
+        addEventListener(event, cb) {
+            if (event === "mic.lost") micLostHandler = cb;
+            if (event === "mic.restored") micRestoredHandler = cb;
+        }
+        async setup() {
+            await mockSetup();
+            this.mediaRecorder = {};
+        }
+        async restore() {
+            await this.setup().catch(() => {});
         }
     },
 }));
@@ -90,7 +111,8 @@ describe("initStudent", () => {
         expect(viewInstance.start).toHaveBeenCalled();
     });
 
-    it("covers setup error path", async () => {
+    it("waits for microphone permission before starting the test", async () => {
+        mockSetup.mockRejectedValueOnce(new Error("mic failed"));
         mockSetup.mockRejectedValueOnce(new Error("mic failed"));
 
         const mockStudent = {
@@ -99,18 +121,54 @@ describe("initStudent", () => {
 
         initStudent(42, {}, mockStudent);
 
-        await openHandler();
+        const started = openHandler();
+        await vi.waitFor(() => expect(mockShowMicLostOverlay).toHaveBeenCalled());
 
         expect(mockSend).toHaveBeenCalledWith(
             JSON.stringify({
                 uuid: "uuid-123",
+                studentDisplayName: mockStudent.displayName,
                 event: "setup.error",
                 error: "Error: mic failed",
-                studentDisplayName: mockStudent.displayName,
             }),
         );
 
-        // View should still be constructed & started
+        // Permission is still denied when the student tries again
+        restoreMicListener();
+        await vi.waitFor(() => expect(mockShowMicLostOverlay).toHaveBeenCalledTimes(2));
+
+        // Permission is granted, so the test starts
+        restoreMicListener();
+        await started;
+        expect(mockHideMicLostOverlay).toHaveBeenCalled();
         expect(viewInstance.start).toHaveBeenCalled();
+    });
+
+    it("reports a microphone lost and restored during the test", async () => {
+        mockSetup.mockResolvedValueOnce();
+
+        initStudent(42, {}, { displayName: "Elev E." });
+
+        await openHandler();
+        micLostHandler();
+
+        expect(mockSend).toHaveBeenCalledWith(
+            JSON.stringify({
+                uuid: "uuid-123",
+                studentDisplayName: "Elev E.",
+                event: "setup.error",
+                error: "microphone access lost",
+            }),
+        );
+
+        micRestoredHandler();
+
+        expect(mockSend).toHaveBeenCalledWith(
+            JSON.stringify({
+                uuid: "uuid-123",
+                studentDisplayName: "Elev E.",
+                event: "setup.restored",
+            }),
+        );
     });
 });

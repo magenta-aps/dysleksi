@@ -5,14 +5,29 @@ import { describe, it, expect, expectTypeOf, vi, beforeEach, afterEach } from "v
 import { AudioDetector, TestMediaRecorder } from "../../screening/media";
 import { MockAudioContext } from "../mock_audio.js";
 
+const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0));
+
 describe("TestMediaRecorder", () => {
     let recorder;
     let mockMediaRecorderInstance;
     const mockInterval = 1000;
-    const mockStream = { getTracks: vi.fn() };
+    let mockTrack;
+    const mockStream = {
+        getTracks: vi.fn(),
+        getAudioTracks: () => [mockTrack],
+    };
 
     beforeEach(() => {
         vi.restoreAllMocks();
+
+        mockTrack = {
+            muted: false,
+            readyState: "live",
+            listeners: {},
+            addEventListener: vi.fn(function (event, cb) {
+                this.listeners[event] = cb;
+            }),
+        };
 
         mockMediaRecorderInstance = {
             start: vi.fn(),
@@ -176,6 +191,73 @@ describe("TestMediaRecorder", () => {
         // so we check that it wasn't called with the interval again here)
         expect(mockMediaRecorderInstance.start).not.toHaveBeenCalled();
     });
+
+    it("should dispatch mic.lost once when the track stops for good", async () => {
+        vi.useFakeTimers();
+        await recorder.setup();
+        const dispatchSpy = vi.spyOn(recorder, "dispatchEvent");
+
+        mockTrack.muted = true;
+        mockTrack.listeners["mute"]();
+        mockTrack.readyState = "ended";
+        mockTrack.listeners["ended"]();
+        vi.runAllTimers();
+
+        expect(dispatchSpy).toHaveBeenCalledTimes(1);
+        expect(dispatchSpy.mock.calls[0][0].type).toBe("mic.lost");
+        vi.useRealTimers();
+    });
+
+    it("should not dispatch mic.lost when the track recovers", async () => {
+        vi.useFakeTimers();
+        await recorder.setup();
+        const dispatchSpy = vi.spyOn(recorder, "dispatchEvent");
+
+        mockTrack.listeners["mute"]();
+        vi.runAllTimers();
+
+        expect(dispatchSpy).not.toHaveBeenCalled();
+        vi.useRealTimers();
+    });
+
+    it("updates mic-lost flag when unmuting", async () => {
+        await recorder.setup();
+        recorder.micLost = true;
+
+        mockTrack.listeners["unmute"]();
+        expect(recorder.micLost).toBe(false);
+    });
+
+    it("should start recording when the student reconnects", async () => {
+        await recorder.setup();
+        const events = [];
+        for (const event of ["mic.lost", "mic.restored"]) {
+            recorder.addEventListener(event, (e) => events.push(e.type));
+        }
+
+        // The mic is revoked, and the first attempt to get it back is refused
+        navigator.mediaDevices.getUserMedia.mockRejectedValue(
+            new Error("Permission denied"),
+        );
+        recorder._onMicLost();
+        document.dispatchEvent(new Event("visibilitychange"));
+        await flushPromises();
+        expect(events).toEqual(["mic.lost"]);
+
+        // The student restores the permission and taps the page again
+        const restoredStream = { getAudioTracks: () => [mockTrack] };
+        navigator.mediaDevices.getUserMedia.mockResolvedValue(restoredStream);
+        document.dispatchEvent(new Event("visibilitychange"));
+        await flushPromises();
+        expect(events).toEqual(["mic.lost", "mic.restored"]);
+        expect(recorder.stream).toBe(restoredStream);
+
+        // Retrying stops once the mic is back
+        navigator.mediaDevices.getUserMedia.mockResolvedValue(mockStream);
+        document.dispatchEvent(new Event("visibilitychange"));
+        await flushPromises();
+        expect(recorder.stream).toBe(restoredStream);
+    });
 });
 
 describe("AudioDetector", () => {
@@ -219,6 +301,15 @@ describe("AudioDetector", () => {
         instance.addEventListener("audio.detected", onDetected);
         instance.run();
         expect(onDetected).toHaveBeenCalled();
+    });
+
+    it("detects nothing once stopped", () => {
+        const onDetected = vi.fn();
+        const instance = getInstance([256.0]);
+        instance.addEventListener("audio.detected", onDetected);
+        instance.stop();
+        instance.run();
+        expect(onDetected).not.toHaveBeenCalled();
     });
 
     it("detects quietness", () => {

@@ -67,6 +67,7 @@ describe("IndividualTestFlow", () => {
         document.body.innerHTML = `
             <div id="fade-overlay" style="opacity: 0;"></div>
             <div id="audio-indicator" style="display: none"></div>
+            <div id="mic-lost-overlay"><button id="restore-mic"></button></div>
             <h1 id="student-header" class="student-header"></h1>
             <audio id="instructions-sound"></audio>
             <audio id="reminder-sound"></audio>
@@ -96,17 +97,17 @@ describe("IndividualTestFlow", () => {
             spyAttributes(test, ["chatSocket", "domElements", "summary"]);
         };
 
-        mediaRecorder = {
+        mediaRecorder = Object.assign(new EventTarget(), {
             start: vi.fn(),
             stop: vi.fn(),
             streamn: vi.fn(),
-        };
+        });
         mediaRecorder.interval = vi.fn().mockResolvedValue("BASE64_AUDIO");
 
         stopSpy = vi.fn().mockResolvedValue(undefined);
         mediaRecorder.stop = stopSpy;
 
-        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue({});
+        vi.spyOn(utils, "unlockAudioOnGesture").mockReturnValue(new MockAudioContext());
         vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
 
         mockP2P.addEventListener.mockImplementation((eventName, cb) => {
@@ -623,6 +624,29 @@ describe("IndividualTestFlow", () => {
         }
     });
 
+    it("asks the student to restore a lost microphone", () => {
+        view.mediaRecorder.restore = vi.fn();
+
+        view.mediaRecorder.dispatchEvent(new Event("mic.lost"));
+        expect(document.querySelector("#mic-lost-overlay").style.display).toBe("flex");
+
+        // Act: the student taps "Prøv igen"
+        document.querySelector("#restore-mic").click();
+        expect(view.mediaRecorder.restore).toHaveBeenCalled();
+    });
+
+    it("listens to the new stream when the microphone is restored", () => {
+        const deadDetector = view.audioDetector;
+        vi.spyOn(deadDetector, "stop");
+
+        view.mediaRecorder.dispatchEvent(new Event("mic.restored"));
+
+        expect(deadDetector.stop).toHaveBeenCalled();
+        expect(view.audioDetector).not.toBe(deadDetector);
+        expect(view.mediaRecorder.start).toHaveBeenCalled();
+        expect(document.querySelector("#mic-lost-overlay").style.display).toBe("none");
+    });
+
     it("passes 'audio.silent' events on to teacher's session once instructions are completed", async () => {
         // Arrange: complete the instructions by showing the first question
         view.setPart(0);
@@ -655,10 +679,10 @@ describe("Individual Test - Timer and Reminder Cleanup", () => {
 
         domElements = new IndividualTestDomElements();
 
-        mediaRecorder = {
+        mediaRecorder = Object.assign(new EventTarget(), {
             start: vi.fn(),
             stop: vi.fn(),
-        };
+        });
 
         view = new IndividualTestView(test, 1, domElements, mediaRecorder, student);
         view.setPart(0);

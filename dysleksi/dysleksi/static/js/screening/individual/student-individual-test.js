@@ -6,10 +6,30 @@ export class IndividualTestView extends StudentTestView {
     audioDetector;
     recordedAudio;
     isPracticing = false;
+    onSilence = (e) => this.onAudioEvent(e.type);
 
     constructor(test, assignmentId, domElements, mediaRecorder, student) {
         super(test, assignmentId, domElements, student);
         this.mediaRecorder = mediaRecorder;
+        this.startAudioDetector();
+        this.mediaRecorder.addEventListener("mic.lost", () => {
+            this.domElements.showMicLostOverlay();
+        });
+        this.mediaRecorder.addEventListener("mic.restored", () => {
+            this.domElements.hideMicLostOverlay();
+            // The old detector listens to a stream that is gone
+            this.startAudioDetector();
+            this.mediaRecorder.start();
+        });
+        this.domElements.setRestoreMicButtonListener(() =>
+            this.mediaRecorder.restore(),
+        );
+    }
+
+    startAudioDetector() {
+        if (this.audioDetector) {
+            this.audioDetector.stop();
+        }
         this.audioDetector = new AudioDetector(this.mediaRecorder.stream);
         for (const event of ["audio.detected", "audio.quiet"]) {
             this.audioDetector.addEventListener(event, (e) => {
@@ -49,6 +69,7 @@ export class IndividualTestView extends StudentTestView {
 
     // ---- Parts ----
     onPartComplete() {
+        this.audioDetector.removeEventListener("audio.silent", this.onSilence);
         this.answeredAt = document.timeline.currentTime;
         const duration = this.answeredAt - this.displayedAt;
         this.send({
@@ -107,9 +128,8 @@ export class IndividualTestView extends StudentTestView {
                 practice: this.isPracticing,
             });
 
-            this.audioDetector.addEventListener("audio.silent", (e) => {
-                this.onAudioEvent(e.type);
-            });
+            this.audioDetector.addEventListener("audio.silent", this.onSilence);
+            this.audioDetector.reset();
 
             //this.domElements.toggleAudioIndicator(true);
             this.mediaRecorder.start();

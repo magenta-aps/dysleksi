@@ -2,6 +2,7 @@ class FakeStreamSource {
     connect() {
         return this;
     }
+    disconnect() {}
 }
 
 class FakeAnalyser {
@@ -15,4 +16,5 @@ export class MockAudioContext {
     createAnalyser() {
         return new FakeAnalyser();
     }
+    close() {}
 }
