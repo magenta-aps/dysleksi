@@ -1525,6 +1525,14 @@ describe("Teacher Individual test View", () => {
         expect(modalBody.innerHTML).not.toBe("");
     });
 
+    it("hides the error modal when the student microphone works again", () => {
+        const hideSpy = vi.spyOn(view.errorModal, "hide");
+        mainSocketHandler({
+            data: JSON.stringify({ event: "setup.restored" }),
+        });
+        expect(hideSpy).toHaveBeenCalled();
+    });
+
     it("displays an error modal if student audio input is silent", () => {
         // Act: send "audio.silent" event
         p2pChannel.dispatchEvent(

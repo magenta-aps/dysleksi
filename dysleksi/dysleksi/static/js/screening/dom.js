@@ -54,6 +54,8 @@ class TestDomElements {
         this.speakerButton = document.querySelector("#speaker");
         this.pauseOverlay = document.querySelector("#pause-overlay");
         this.connectionLostOverlay = document.querySelector("#connection-lost-overlay");
+        this.micLostOverlay = document.querySelector("#mic-lost-overlay");
+        this.restoreMicBtn = document.querySelector("#restore-mic");
 
         this.currentAudioSource = null;
         this.inputLocked = false;
@@ -174,6 +176,17 @@ class TestDomElements {
     }
     hideConnectionLostOverlay() {
         this.connectionLostOverlay.style.display = "none";
+    }
+
+    showMicLostOverlay() {
+        this.micLostOverlay.style.display = "flex";
+    }
+    hideMicLostOverlay() {
+        this.micLostOverlay.style.display = "none";
+    }
+
+    setRestoreMicButtonListener(listener) {
+        this._setButtonListener(this.restoreMicBtn, listener);
     }
 
     showLoggedOut() {

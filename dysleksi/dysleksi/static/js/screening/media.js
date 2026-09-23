@@ -1,7 +1,10 @@
+import { unlockAudioOnGesture } from "./utils.js";
+
 export class TestMediaRecorder extends EventTarget {
     mediaRecorder;
     recording;
     recordingUpdateInterval;
+    micLost = false;
 
     constructor(recordingUpdateInterval) {
         super();
@@ -21,6 +24,8 @@ export class TestMediaRecorder extends EventTarget {
                     .getUserMedia({ audio: true })
                     .then((stream) => {
                         this.stream = stream;
+                        this.micLost = false;
+                        this._watchMicPermission(stream.getAudioTracks()[0]);
                         this.mediaRecorder = new MediaRecorder(stream);
                         this.mediaRecorder.addEventListener("dataavailable", (evt) => {
                             this.recording.push(evt.data);
@@ -34,6 +39,43 @@ export class TestMediaRecorder extends EventTarget {
                     });
             }
         });
+    }
+
+    _watchMicPermission(track) {
+        const check = () => {
+            setTimeout(() => {
+                if (!this.micLost && (track.muted || track.readyState === "ended")) {
+                    this._onMicLost();
+                }
+            }, 2000);
+        };
+        track.addEventListener("mute", check);
+        track.addEventListener("ended", check);
+        track.addEventListener("unmute", () => {
+            this.micLost = false;
+        });
+    }
+
+    _onMicLost() {
+        this.micLost = true;
+        this.dispatchEvent(new Event("mic.lost"));
+
+        const retry = async () => {
+            await this.restore();
+            if (!this.micLost) {
+                document.removeEventListener("visibilitychange", retry);
+            }
+        };
+        document.addEventListener("visibilitychange", retry);
+    }
+
+    async restore() {
+        await this.setup()
+            .then(() => {
+                console.log("Microphone restored");
+                this.dispatchEvent(new Event("mic.restored"));
+            })
+            .catch(() => console.log("Microphone is still unavailable"));
     }
 
     start() {
@@ -85,20 +127,36 @@ export class AudioDetector extends EventTarget {
         this.minLevel = minLevel;
         this.silenceTimeThreshold = silenceTimeThreshold;
         this.silentDuration = 0;
+        this.silentSince = null;
 
         this.state = null;
         this.lastEventAt = null;
         this.silenceDetectedOnce = false;
+        this.stopped = false;
 
-        // Connect analyser node to media stream source
-        const context = new window.AudioContext();
-        const input = context.createMediaStreamSource(stream);
-        this.analyser = context.createAnalyser();
+        this.context = unlockAudioOnGesture();
+        this.input = this.context.createMediaStreamSource(stream);
+        this.analyser = this.context.createAnalyser();
         this.analyser.fftSize = 32; // fewest possible bins
-        input.connect(this.analyser);
+        this.input.connect(this.analyser);
     }
 
-    run(t) {
+    stop() {
+        this.stopped = true;
+        this.input.disconnect();
+    }
+
+    reset() {
+        this.silentDuration = 0;
+        this.silentSince = null;
+        this.silenceDetectedOnce = false;
+    }
+
+    run(t = 0) {
+        if (this.stopped) {
+            return;
+        }
+
         // Take the average level of all frequency bins (scaled to 0.0-1.0)
         let avg = 0;
         for (const bin of this.getBins()) {
@@ -109,23 +167,25 @@ export class AudioDetector extends EventTarget {
         if (avg > this.detectionLevelThreshold) {
             // Audio volume exceeds detection threshold
             this.dispatchDebounced("audio.detected");
-        } else if (avg < this.detectionLevelThreshold && avg > this.minLevel) {
-            // Audio volume is low but not completely silent
-            this.dispatchDebounced("audio.quiet");
         } else {
             // Current `avg` is below minimum level.
             // Update length of silent duration.
-            this.silentDuration = t !== undefined ? t : 0;
+            if (this.silentSince === null) {
+                this.silentSince = t;
+            }
+            this.silentDuration = t - this.silentSince;
+            if (avg > this.minLevel) {
+                this.dispatchDebounced("audio.quiet");
+            }
         }
 
         // Check if audio has been silent for too long
         if (
             this.silentDuration > this.silenceTimeThreshold &&
-            this.state !== "audio.detected" &&
             !this.silenceDetectedOnce
         ) {
-            this.dispatchDebounced("audio.silent");
             this.silenceDetectedOnce = true;
+            this.dispatchDebounced("audio.silent");
         }
 
         // Process next frame
@@ -152,7 +212,9 @@ export class AudioDetector extends EventTarget {
             }
         }
 
-        this.silentDuration = 0; // reset counter
+        if (event === "audio.detected") {
+            this.reset();
+        }
     }
 
     getBins() {

@@ -1575,6 +1575,7 @@ export class TeacherView {
                 }
                 if (data.event === "audio.detected") {
                     this.audioIndicator.start();
+                    this.errorModal.hide();
                 }
                 if (data.event === "audio.quiet") {
                     this.audioIndicator.stop();
@@ -1644,6 +1645,10 @@ export class TeacherView {
 
             if (data.event === "setup.error") {
                 this.onStudentSetupError(data);
+            }
+
+            if (data.event === "setup.restored") {
+                this.errorModal.hide();
             }
         });
     }

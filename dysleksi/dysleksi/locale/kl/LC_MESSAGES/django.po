@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-02-20 12:09-0200\n"
+"POT-Creation-Date: 2026-09-21 12:36-0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -990,6 +990,14 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/screening/student.html
 msgid "Ingen forbindelse til læreren"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/screening/student.html
+msgid "Giv adgang til mikrofonen"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/screening/student.html
+msgid "Prøv igen"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/screening/student.html
