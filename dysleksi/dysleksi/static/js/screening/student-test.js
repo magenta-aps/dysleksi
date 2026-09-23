@@ -503,6 +503,7 @@ export class StudentTestView extends EventTarget {
         releaseWakeLock();
         // A student who is done with the test does not need the teacher anymore
         clearTimeout(this.teacherTimeoutId);
+        this.clearReminder();
         clearInterval(this.rejoinIntervalId);
         this.domElements.hideInstructions();
         this.domElements.showQuestionChallenge();
