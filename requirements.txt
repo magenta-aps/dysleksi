@@ -137,7 +137,7 @@ types-requests==2.33.0.20260906
 rjsmin==1.2.5
 service-identity==26.1.0
 six==1.17.0
-soupsieve==2.9.2
+soupsieve==2.10
 sqlparse==0.6.0
 Twisted==25.5.0
 txaio==26.6.1
