@@ -1757,7 +1757,6 @@ export class TeacherView {
             this.messageQueue.length > 0 &&
             this.syncSocket.readyState === WebSocket.OPEN
         ) {
-            this.onMessageQueueFlushing();
             const isOnline = await serverOnline();
             if (isOnline) {
                 console.log(
@@ -1772,7 +1771,6 @@ export class TeacherView {
                     }
                     this.messageQueue = [];
                     this._persistQueue();
-                    this.onMessageQueueFlushed();
                 } catch (err) {
                     console.error("Sync failed, keeping messages in storage:", err);
                 }
@@ -1794,18 +1792,6 @@ export class TeacherView {
         }
 
         window.location = document.querySelector("[data-cancel-url]").dataset.cancelUrl;
-    }
-
-    onMessageQueueFlushing() {
-        // Don't permit teacher to leave test session while queue is being flushed
-        this.buttons.cancelButton().disabled = true;
-        this.cancelTestModal.confirmButton.disabled = true;
-    }
-
-    onMessageQueueFlushed() {
-        // Permit teacher to leave test session once queue is flushed
-        this.buttons.cancelButton().disabled = false;
-        this.cancelTestModal.confirmButton.disabled = false;
     }
 
     uncompletedStudents() {
