@@ -56,6 +56,8 @@ from dysleksi.models import (
     Class,
     Correctness,
     CorrectnessCategory,
+    HandledEvent,
+    Message,
     PartResponse,
     PartResponseQuerySet,
 )
@@ -255,6 +257,11 @@ class AssignmentView(
             "url": reverse("dysleksi:window_lock", kwargs={"pk": assignment.pk}),
             "csrf_token": get_token(self.request),
         }
+        # Where and how the teacher's `controlroom.js` should store its messages
+        context["message_sync_config"] = {
+            "url": reverse("dysleksi:store_message", kwargs={"pk": assignment.pk}),
+            "csrf_token": get_token(self.request),
+        }
 
         self.add_navigation_context(context, assignment.class_for_nav, None)
         context["class"] = assignment.class_for_nav
@@ -329,6 +336,42 @@ class WindowLockView(
         # can have multiple teachers. When teacher1 starts a test, teacher2 should not
         # be able to also come in and try and control the test.
         return f"window_lock:teacher:{assignment.pk}"
+
+
+class MessageStorageView(
+    LoginRequiredMixin, ObjectPermissionsMixin, SingleObjectMixin, View
+):
+    model = TestAssignment
+    http_method_names = ["post"]
+
+    def post(self, request, *args, **kwargs) -> HttpResponse:
+        # Refuses the request if this user has no business in the assignment
+        self.get_object()
+
+        content = json.loads(request.body)
+        if content["event"] in HandledEvent:
+            self.store_message(content)
+        return HttpResponse(status=204)
+
+    def store_message(self, content: dict) -> None:
+        # Messages about a student contain a "student" key.
+        # Messages about the test itself do not
+        student = content.get("student")
+        message, created = Message.objects.get_or_create(
+            uuid=content["uuid"],
+            defaults={
+                "event": content["event"],
+                "data": content,
+                "user": (
+                    Student.objects.get(id=student["id"])
+                    if student is not None
+                    else self.user
+                ),
+            },
+        )
+        if created:
+            # Only handle messages that were not already stored
+            message.handle()
 
 
 class ClassListView(GroupRequiredMixin, NavigationMixin, SingleTableView):

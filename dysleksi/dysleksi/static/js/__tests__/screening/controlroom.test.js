@@ -19,16 +19,14 @@ import { StudentCard } from "../../screening/controlroom.js";
 import { Student } from "../../screening/model.js";
 import { WebRTCPeer } from "../../webRTC.js";
 import { WebSocketChannel } from "../../webSocketChannel.js";
-import { getAssignmentSocket, getSyncSocket } from "../../ws.js";
+import { getAssignmentSocket } from "../../ws.js";
 import { DetailsPopup } from "../../screening/controlroom.js";
 import { StudentPresenceIndicator } from "../../screening/controlroom.js";
-import { serverOnline } from "../../screening/utils.js";
 
 vi.mock("../../screening/utils.js");
 
 vi.mock("../../ws.js", () => ({
     getAssignmentSocket: vi.fn(),
-    getSyncSocket: vi.fn(),
 }));
 
 const mockSocket = (readyState) => {
@@ -38,8 +36,13 @@ const mockSocket = (readyState) => {
         readyState: readyState,
     };
     getAssignmentSocket.mockReturnValue(socket);
-    getSyncSocket.mockReturnValue(socket);
     return socket;
+};
+
+// Play a server which stores every message it is posted
+const mockMessageStorage = () => {
+    global.fetch = vi.fn().mockResolvedValue({ ok: true, status: 204 });
+    return global.fetch;
 };
 
 // The handler the view attached to the signalling socket
@@ -112,8 +115,15 @@ const CANCEL_INDIVIDUAL_TEST_MODAL_HTML = cancelTestModalHtml(`
     <p>Hvis testen afbrydes, kan eleven ikke gennemføre den på et senere tidspunkt.</p>
 `);
 
+const MESSAGE_SYNC_CONFIG_HTML = `
+<script id="message-sync-config" type="application/json">
+{"url": "/assignment/1/messages/", "csrf_token": "token"}
+</script>
+`;
+
 const GROUP_DOM_HTML = `
 <div data-cancel-url="foo"></div>
+${MESSAGE_SYNC_CONFIG_HTML}
 
 <template id="student-card-template">
     <div class="student-card">
@@ -240,6 +250,7 @@ ${CANCEL_GROUP_TEST_MODAL_HTML}
 
 const INDIVIDUAL_DOM_HTML = `
 <div data-cancel-url="foo"></div>
+${MESSAGE_SYNC_CONFIG_HTML}
 
 <div class="screening-header">
     <div class="screening-title">
@@ -2312,6 +2323,7 @@ describe("TeacherView student presence", () => {
 describe("TeacherView cancel test modal", () => {
     let socket;
     let p2pChannel;
+    let storage;
     const studentId = 123;
     const classStudents = [
         { id: 1, firstName: "Alice", lastName: "Smith" },
@@ -2355,6 +2367,7 @@ describe("TeacherView cancel test modal", () => {
 
     beforeEach(() => {
         vi.useFakeTimers();
+        storage = mockMessageStorage();
         vi.stubGlobal("localStorage", {
             getItem: vi.fn(),
             setItem: vi.fn(),
@@ -2486,7 +2499,6 @@ describe("TeacherView cancel test modal", () => {
         const view = createView(individualTest(), [classStudents[0]]);
         const spySendTestCancelled = vi.spyOn(view, "sendTestCancelled");
         const spyHide = vi.spyOn(view.cancelTestModal.modal, "hide");
-        vi.mocked(serverOnline).mockResolvedValue(true);
 
         openModal(view);
         expect(spySendTestCancelled).not.toHaveBeenCalled();
@@ -2504,7 +2516,7 @@ describe("TeacherView cancel test modal", () => {
         document.body.innerHTML = INDIVIDUAL_DOM_HTML;
         const view = createView(individualTest(), [classStudents[0]]);
         global.window.location = "not-redirected";
-        vi.mocked(serverOnline).mockResolvedValue(false);
+        storage.mockRejectedValue(new Error("The server is out of reach"));
 
         openModal(view);
         document.querySelector("#cancel-test .confirm-btn").click();
@@ -2513,7 +2525,7 @@ describe("TeacherView cancel test modal", () => {
         expect(view.messageQueue.length).toBe(1);
         expect(global.window.location).toBe("not-redirected");
 
-        vi.mocked(serverOnline).mockResolvedValue(true);
+        storage.mockResolvedValue({ ok: true, status: 204 });
 
         await vi.advanceTimersByTimeAsync(1000);
         expect(global.window.location).toBe("foo");
@@ -2523,7 +2535,6 @@ describe("TeacherView cancel test modal", () => {
         document.body.innerHTML = INDIVIDUAL_DOM_HTML;
         const view = createView(individualTest(), [classStudents[0]]);
         global.window.location = "not-redirected";
-        vi.mocked(serverOnline).mockResolvedValue(true);
 
         // The student says hello, so the teacher knows to wait for them
         sendFromStudent({ event: "student.heartbeat", student: { id: studentId } });
@@ -3123,17 +3134,16 @@ describe("StudentCard", () => {
 });
 
 describe("TeacherView Sync Logic", () => {
-    let socket;
     let view;
-    let serverOnlineMock;
+    let storage;
 
-    beforeEach(async () => {
+    beforeEach(() => {
         vi.useFakeTimers();
+        document.body.innerHTML = INDIVIDUAL_DOM_HTML;
+        vi.stubGlobal("localStorage", { getItem: vi.fn(), setItem: vi.fn() });
 
-        const utils = await import("../../screening/utils.js");
-        serverOnlineMock = vi.mocked(utils.serverOnline);
-
-        socket = mockSocket(1); // OPEN
+        mockSocket(1); // OPEN
+        storage = mockMessageStorage();
 
         view = new TeacherView(
             { parts: [] },
@@ -3149,6 +3159,7 @@ describe("TeacherView Sync Logic", () => {
         vi.clearAllTimers();
         vi.useRealTimers();
         vi.clearAllMocks();
+        vi.unstubAllGlobals();
     });
 
     describe("_startSyncInterval", () => {
@@ -3166,78 +3177,54 @@ describe("TeacherView Sync Logic", () => {
     describe("_flushMessageQueue", () => {
         it("does nothing if the queue is empty", async () => {
             view.messageQueue = [];
-            serverOnlineMock.mockResolvedValue(true);
 
             expect(await view._flushMessageQueue()).toBe(true);
 
-            expect(socket.send).not.toHaveBeenCalled();
+            expect(storage).not.toHaveBeenCalled();
         });
 
-        it("sends all messages in queue and clears it when online", async () => {
-            // Setup queue
-            const msg1 = { event: "test", id: 1 };
-            const msg2 = { event: "test", id: 2 };
+        it("posts the messages in the queue, oldest first", async () => {
+            const msg1 = { event: "test", uuid: "1" };
+            const msg2 = { event: "test", uuid: "2" };
             view.messageQueue = [msg1, msg2];
-
-            serverOnlineMock.mockResolvedValue(true);
             const persistSpy = vi.spyOn(view, "_persistQueue");
 
             expect(await view._flushMessageQueue()).toBe(true);
 
-            // Verify WebSocket behavior
-            expect(socket.send).toHaveBeenCalledTimes(2);
-            expect(socket.send).toHaveBeenNthCalledWith(1, JSON.stringify(msg1));
-            expect(socket.send).toHaveBeenNthCalledWith(2, JSON.stringify(msg2));
-
-            // Verify queue state
-            expect(view.messageQueue.length).toBe(0);
-            expect(persistSpy).toHaveBeenCalled();
+            expect(storage).toHaveBeenCalledTimes(2);
+            expect(storage).toHaveBeenNthCalledWith(1, "/assignment/1/messages/", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": "token",
+                },
+                body: JSON.stringify(msg1),
+            });
+            expect(JSON.parse(storage.mock.calls[1][1].body)).toEqual(msg2);
+            expect(view.messageQueue).toEqual([]);
+            expect(persistSpy).toHaveBeenCalledTimes(2);
         });
 
         it("keeps messages in queue if server is offline", async () => {
-            view.messageQueue = [{ event: "test" }];
-            serverOnlineMock.mockResolvedValue(false);
+            view.messageQueue = [
+                { event: "test", uuid: "1" },
+                { event: "test", uuid: "2" },
+            ];
+            storage.mockResolvedValue({ ok: false, status: 500 });
 
             expect(await view._flushMessageQueue()).toBe(false);
 
-            expect(socket.send).not.toHaveBeenCalled();
-            expect(view.messageQueue.length).toBe(1);
+            // Messages are stored in order, so the first one holds up the rest
+            expect(storage).toHaveBeenCalledTimes(1);
+            expect(view.messageQueue).toHaveLength(2);
         });
 
-        it("attempts to reconnect if socket is CLOSED", async () => {
-            socket.readyState = 3; // CLOSED
-            const initSpy = vi.spyOn(view, "_initSyncSocket");
+        it("does not start a second flush while one is underway", async () => {
+            view.messageQueue = [{ event: "test", uuid: "1" }];
 
-            await view._flushMessageQueue();
+            await Promise.all([view._flushMessageQueue(), view._flushMessageQueue()]);
 
-            expect(initSpy).toHaveBeenCalled();
-            expect(socket.send).not.toHaveBeenCalled();
-        });
-
-        it("waits if socket is CONNECTING", async () => {
-            socket.send.mockClear();
-            serverOnlineMock.mockClear();
-            socket.readyState = 0; // CONNECTING
-
-            await view._flushMessageQueue();
-
-            expect(socket.send).not.toHaveBeenCalled();
-            expect(serverOnlineMock).not.toHaveBeenCalled();
-        });
-
-        it("keeps messages in storage if sending fails", async () => {
-            view.messageQueue = [{ event: "fail" }];
-            serverOnlineMock.mockResolvedValue(true);
-
-            // Force an error on send
-            socket.send.mockImplementation(() => {
-                throw new Error("Network Error");
-            });
-
-            expect(await view._flushMessageQueue()).toBe(false);
-
-            // Queue should still contain the message
-            expect(view.messageQueue.length).toBe(1);
+            expect(storage).toHaveBeenCalledTimes(1);
         });
     });
 });

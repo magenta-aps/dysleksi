@@ -136,7 +136,7 @@ The project uses `django-channels` to synchronize events between teacher and stu
 `django-channels` provides backend support for writing a WebSocket server, and is used in two ways in the project:
 
 * All teachers and students begin by entering a "lobby." This lets teachers know which students are present at their screens.
-* To begin an individual screening session, a separate "room" is created for that particular session. In this "room", all session events are communicated between the teacher's and the student's browser. 
+* To begin an individual screening session, a separate "room" is created for that particular session. In this "room", the teacher and student give eachother a handshake, after which they switch to a webRTC connection.
 
 Messages in the lobby and in the session-specific rooms take the form `{"event": "some.event", "id": 1234}`.
 

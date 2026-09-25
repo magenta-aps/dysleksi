@@ -5,6 +5,7 @@ import json
 from datetime import datetime, timedelta
 from operator import attrgetter
 from unittest.mock import patch
+from uuid import uuid4
 
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import AnonymousUser
@@ -29,6 +30,7 @@ from dysleksi.models import (
     Correctness,
     CorrectnessCategory,
     Institution,
+    Message,
     PartResponse,
     QuestionResponse,
     Test,
@@ -2322,6 +2324,83 @@ class WindowLockViewTest(DysleksiTest):
         self.client.force_login(self.teacher)
         self.assertGranted(self.acquire("window-a", self.test_assignment_student), True)
         self.assertGranted(self.acquire("window-b", self.test_assignment_class), True)
+
+
+class MessageStorageViewTest(DysleksiTest):
+
+    def url(self, assignment=None):
+        assignment = assignment or self.test_assignment_student
+        return reverse("dysleksi:store_message", kwargs={"pk": assignment.pk})
+
+    def post(self, message, assignment=None):
+        return self.client.post(
+            self.url(assignment),
+            data=json.dumps(message),
+            content_type="application/json",
+        )
+
+    def message(self, **overrides):
+        return {
+            "uuid": str(uuid4()),
+            "event": "question.answered",
+            "assignmentId": self.test_assignment_student.pk,
+            "student": {"id": self.student1.pk},
+            **overrides,
+        }
+
+    @patch.object(Message, "handle")
+    def test_stores_a_message(self, handle):
+        self.client.force_login(self.teacher)
+        message = self.message()
+
+        response = self.post(message)
+
+        self.assertEqual(response.status_code, 204)
+        stored = Message.objects.get(uuid=message["uuid"])
+        self.assertEqual(stored.event, "question.answered")
+        self.assertEqual(stored.data, message)
+        self.assertEqual(stored.user.pk, self.student1.pk)
+        handle.assert_called_once()
+
+    @patch.object(Message, "handle")
+    def test_attributes_a_message_about_the_test_to_its_sender(self, handle):
+        # Messages about the test itself, such as the teacher ending it, name
+        # no student
+        self.client.force_login(self.teacher)
+        message = self.message(event="test.cancelled")
+        del message["student"]
+
+        self.post(message)
+
+        stored = Message.objects.get(uuid=message["uuid"])
+        self.assertEqual(stored.user.pk, self.teacher.pk)
+
+    @patch.object(Message, "handle")
+    def test_stores_a_message_only_once(self, handle):
+        # The browser repeats a message it did not hear back about
+        self.client.force_login(self.teacher)
+        message = self.message()
+        self.post(message)
+
+        self.assertEqual(self.post(message).status_code, 204)
+
+        self.assertEqual(Message.objects.filter(uuid=message["uuid"]).count(), 1)
+        handle.assert_called_once()
+
+    @patch.object(Message, "handle")
+    def test_ignores_an_event_it_does_not_handle(self, handle):
+        self.client.force_login(self.teacher)
+        message = self.message(event="student.heartbeat")
+
+        self.assertEqual(self.post(message).status_code, 204)
+
+        self.assertFalse(Message.objects.filter(uuid=message["uuid"]).exists())
+        handle.assert_not_called()
+
+    def test_refuses_an_assignment_that_is_none_of_the_users_business(self):
+        self.client.force_login(self.other_teacher)
+
+        self.assertEqual(self.post(self.message()).status_code, 403)
 
 
 class TestQuestionResponseUpdateView(ResponseTest):

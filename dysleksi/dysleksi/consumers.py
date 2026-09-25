@@ -1,18 +1,14 @@
 import logging
-from datetime import datetime
 
 from asgiref.sync import sync_to_async
 from channels.db import database_sync_to_async
 from channels.exceptions import DenyConnection
 from channels.generic.websocket import AsyncJsonWebsocketConsumer
-from django.core.cache import caches
 from django.db.models import Q
-from django_redis.cache import RedisCache
 
-from dysleksi.models import HandledEvent, Message, Student, TestAssignment
+from dysleksi.models import Student, TestAssignment
 
 logger = logging.getLogger(__name__)
-cache: RedisCache = caches["chat"]  # As defined in settings/cache.py
 
 
 def db_sync_to_async(func):
@@ -23,95 +19,12 @@ def db_sync_to_async(func):
 describe = sync_to_async(str, thread_sensitive=False)
 
 
-class ChatConsumer(AsyncJsonWebsocketConsumer):
-
-    def __init__(self):
-        super().__init__()
-        self.connected = False
-
-    async def connect(self):
-        # Ensure user is authenticated
-        # cf https://www.w3tutorials.net/blog/require-login-in-a-django-channels-socket/
-        self.user = self.scope["user"]
-        # Reject connection if user is not authenticated
-        if self.user is None or not self.user.is_authenticated:
-            raise DenyConnection("User not authenticated")
-        self.user_name = await describe(self.user)
-
-        # Join room group
-        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
-        self.room_group_name = f"chat_{self.room_name}"
-        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
-        await self.accept()
-        logger.info("'%s' joined room '%s'", self.user_name, self.room_name)
-        self.connected = True
-
-    async def disconnect(self, close_code):
-        if not self.connected:
-            return
-        # Leave room group
-        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-        logger.info("'%s' left room '%s'", self.user_name, self.room_name)
-
-    # Receive message from WebSocket
-    async def receive_json(self, content: dict, **kwargs):
-        # required by `django-channels`, must match our method name in this class
-        # (dots are replaced with underscores,
-        # then the class is checked for a method with that name)
-        content["type"] = "chat.message"
-        log_content = content.copy()
-        if log_content.get("recordingBase64"):
-            log_content["recordingBase64"] = "<redacted>"  # pragma: no cover
-
-        # Send message to room group
-        await self.channel_layer.group_send(self.room_group_name, content)
-        logger.info("'%s' sent '%s'", self.user_name, log_content)
-
-        # Store message in cache
-        await cache.aset(
-            f"{self.room_group_name}_{datetime.now().timestamp()}",
-            content,
-            timeout=300,
-        )
-
-        # Store message in database
-        if content["event"] in HandledEvent:
-            await self.store_message(content)
-
-    @db_sync_to_async
-    def store_message(self, content: dict):
-        # Messages send by a student contain a "student" key.
-        # Messages sent by teachers do not
-        student = content.get("student")
-        message, created = Message.objects.get_or_create(
-            uuid=content["uuid"],
-            defaults={
-                "event": content["event"],
-                "data": content,
-                "user": (
-                    Student.objects.get(id=student["id"])
-                    if student is not None
-                    else self.user
-                ),
-            },
-        )
-        if created:
-            # Only handle messages that were not already stored
-            message.handle()
-
-    # Receive message from room group
-    # method name must match the type attribute in the received json
-    async def chat_message(self, message: dict):
-        # Send message to WebSocket
-        await self.send_json({k: v for k, v in message.items() if k != "type"})
-
-
 class RelayConsumer(AsyncJsonWebsocketConsumer):
     """
     Consumer which allows teacher and student to talk to each other in case the webRTC
     connection fails
 
-    Does not store anything to the database; That is what the ChatConsumer is for.
+    Does not store anything to the database; That is what `MessageStorageView` is for.
     """
 
     def __init__(self):

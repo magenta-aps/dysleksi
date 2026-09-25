@@ -1,5 +1,5 @@
 const { chromium } = require('playwright');
-const WS_PATH = '/ws/chat/lobby/';
+const WS_PATH = '/ws/relay/lobby/';
 const students = Array.from({ length: 5 }, (_, i) => ({
     user: `elev${i}`,
     pass: `elev${i}`
