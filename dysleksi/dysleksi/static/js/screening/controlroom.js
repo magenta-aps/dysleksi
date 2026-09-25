@@ -1,8 +1,8 @@
-import { getAssignmentSocket, getSyncSocket } from "..//ws.js";
+import { getAssignmentSocket } from "..//ws.js";
 import { Student } from "./model.js";
 import { WebRTCPeer } from "../webRTC.js";
 import { WebSocketChannel } from "../webSocketChannel.js";
-import { serverOnline, PING_MS } from "./utils.js";
+import { PING_MS } from "./utils.js";
 import { gettext, blocktranslate } from "../i18n.js";
 import { Modal } from "bootstrap";
 
@@ -1246,7 +1246,6 @@ export class TeacherView {
     ) {
         this.assignmentId = assignmentId;
         this.assignmentSocket = null;
-        this.syncSocket = null;
         this.test = test;
         this.testPaused = false;
 
@@ -1308,9 +1307,10 @@ export class TeacherView {
 
         const savedQueue = localStorage.getItem(`msg_queue_${this.assignmentId}`);
         this.messageQueue = savedQueue ? JSON.parse(savedQueue) : [];
+        // Whether a flush is underway, so the interval does not start a second one
+        this.flushing = false;
 
         this._initSocket();
-        this._initSyncSocket();
         this._initButtonListeners();
         this._initFilterButtonSelection();
         this._startSyncInterval();
@@ -1597,10 +1597,6 @@ export class TeacherView {
         });
     }
 
-    _initSyncSocket() {
-        this.syncSocket = getSyncSocket(this.assignmentId);
-    }
-
     _initSocket() {
         this.assignmentSocket = getAssignmentSocket(this.assignmentId);
         this.assignmentSocket.addEventListener("message", (e) => {
@@ -1744,40 +1740,51 @@ export class TeacherView {
 
     // Returns whether the queue is empty, i.e. everything reached the server
     async _flushMessageQueue() {
-        if (this.syncSocket.readyState === WebSocket.CONNECTING) {
-            console.log("Socket is currently connecting... waiting.");
-        } else if (
-            this.syncSocket.readyState === WebSocket.CLOSED ||
-            this.syncSocket.readyState === WebSocket.CLOSING
-        ) {
-            console.log("Socket closed. Attempting to reconnect...");
-            this._initSyncSocket();
-        } else if (
-            // Only attempt to send if the server is online and we have messages
-            this.messageQueue.length > 0 &&
-            this.syncSocket.readyState === WebSocket.OPEN
-        ) {
-            const isOnline = await serverOnline();
-            if (isOnline) {
-                console.log(
-                    `Syncing ${this.messageQueue.length} messages to server...`,
-                );
-
-                const queueToProcess = [...this.messageQueue];
-
-                try {
-                    for (const msg of queueToProcess) {
-                        this.syncSocket.send(JSON.stringify(msg));
-                    }
-                    this.messageQueue = [];
-                    this._persistQueue();
-                } catch (err) {
-                    console.error("Sync failed, keeping messages in storage:", err);
-                }
-            }
+        if (this.flushing || this.messageQueue.length === 0) {
+            return this.messageQueue.length === 0;
         }
 
+        this.flushing = true;
+        console.log(`Syncing ${this.messageQueue.length} messages to server...`);
+
+        while (this.messageQueue.length > 0) {
+            if (!(await this._storeMessage(this.messageQueue[0]))) {
+                // Abort if the message was not stored successfully
+                break;
+            }
+            // Delete the message from the queue if the server responds with "ok"
+            this.messageQueue.shift();
+            this._persistQueue();
+        }
+
+        this.flushing = false;
         return this.messageQueue.length === 0;
+    }
+
+    // Returns whether the server stored the message, so we may let go of it
+    async _storeMessage(message) {
+        const config = JSON.parse(
+            document.getElementById("message-sync-config").textContent,
+        );
+
+        let response;
+        try {
+            response = await fetch(config.url, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRFToken": config.csrf_token,
+                },
+                body: JSON.stringify(message),
+            });
+        } catch (error) {
+            console.log("Could not reach the server, keeping the message:", error);
+            return false;
+        }
+        if (!response.ok) {
+            console.warn(`Storing a message answered ${response.status}`);
+        }
+        return response.ok;
     }
 
     async _leaveCancelledTest() {

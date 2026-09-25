@@ -170,5 +170,6 @@
 {{ static_files|json_script:"static_files" }}
 {{ assignment|json_script:"assignment" }}
 {{ window_lock_config|json_script:"window-lock-config" }}
+{{ message_sync_config|json_script:"message-sync-config" }}
 <script type="module" src="{% static 'js/screening/index.js' %}"></script>
 {% endblock %}

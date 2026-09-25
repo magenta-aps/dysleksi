@@ -1,10 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from "vitest";
-import {
-    getLobbySocket,
-    getAssignmentSocket,
-    getSyncSocket,
-    resetSockets,
-} from "../ws.js";
+import { getLobbySocket, getAssignmentSocket, resetSockets } from "../ws.js";
 
 describe("getWebSocket", () => {
     let originalWebSocket;
@@ -55,11 +50,6 @@ describe("getWebSocket", () => {
     it("joins a named assignment room when getAssignmentSocket is used", () => {
         const ws = getAssignmentSocket(42);
         expect(ws.url).toBe("wss://example.com/ws/relay/assignment_42/");
-    });
-
-    it("joins a named data-sync room when getSyncSocket is used", () => {
-        const ws = getSyncSocket(42);
-        expect(ws.url).toBe("wss://example.com/ws/chat/sync_assignment_42/");
     });
 
     it("removes the socket from the cache when it closes", () => {

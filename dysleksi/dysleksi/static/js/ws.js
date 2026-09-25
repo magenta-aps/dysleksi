@@ -1,7 +1,6 @@
 let sockets = {};
 
-// path = "chat" forwards and stores messages on the server
-// path = "relay" only forwards messages. Nothing is stored.
+// Sockets only forward messages. Storing them is what `MessageStorageView` is for.
 function getWebSocket(chatId, path) {
     const protocol = window.location.protocol === "https:" ? "wss" : "ws";
     const key = `${path}/${chatId}`;
@@ -32,9 +31,6 @@ function getWebSocket(chatId, path) {
 
 export function getAssignmentSocket(assignmentId) {
     return getWebSocket(`assignment_${assignmentId}`, "relay");
-}
-export function getSyncSocket(assignmentId) {
-    return getWebSocket(`sync_assignment_${assignmentId}`, "chat");
 }
 export function getLobbySocket() {
     return getWebSocket("lobby", "relay");
