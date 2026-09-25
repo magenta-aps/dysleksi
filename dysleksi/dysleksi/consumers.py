@@ -24,6 +24,11 @@ describe = sync_to_async(str, thread_sensitive=False)
 
 
 class ChatConsumer(AsyncJsonWebsocketConsumer):
+
+    def __init__(self):
+        super().__init__()
+        self.connected = False
+
     async def connect(self):
         # Ensure user is authenticated
         # cf https://www.w3tutorials.net/blog/require-login-in-a-django-channels-socket/
@@ -39,8 +44,11 @@ class ChatConsumer(AsyncJsonWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
         logger.info("'%s' joined room '%s'", self.user_name, self.room_name)
+        self.connected = True
 
     async def disconnect(self, close_code):
+        if not self.connected:
+            return
         # Leave room group
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         logger.info("'%s' left room '%s'", self.user_name, self.room_name)
@@ -106,6 +114,10 @@ class RelayConsumer(AsyncJsonWebsocketConsumer):
     Does not store anything to the database; That is what the ChatConsumer is for.
     """
 
+    def __init__(self):
+        super().__init__()
+        self.connected = False
+
     async def connect(self):
         self.user = self.scope["user"]
         if self.user is None or not self.user.is_authenticated:
@@ -117,8 +129,12 @@ class RelayConsumer(AsyncJsonWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
         logger.info("'%s' joined relay '%s'", self.user_name, self.room_name)
+        self.connected = True
 
     async def disconnect(self, close_code):
+        if not self.connected:
+            return
+
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
         logger.info("'%s' left relay '%s'", self.user_name, self.room_name)
 

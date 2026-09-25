@@ -80,6 +80,15 @@ class TestChatConsumer(TestCase):
         communicator.scope["user"] = AnonymousUser()
         await communicator.connect()
 
+    async def test_rejects_anonymous_users(self):
+        communicator = await self._get_communicator()
+        communicator.scope["user"] = AnonymousUser()
+        connected, subprotocol = await communicator.connect()
+        self.assertFalse(connected)
+
+        # Leaving a room which was never joined must not raise
+        await communicator.disconnect()
+
 
 class TestRelayConsumer(TestCase):
 
@@ -111,6 +120,9 @@ class TestRelayConsumer(TestCase):
         communicator.scope["user"] = AnonymousUser()
         connected, subprotocol = await communicator.connect()
         self.assertFalse(connected)
+
+        # Leaving a room which was never joined must not raise
+        await communicator.disconnect()
 
     async def test_forwards_to_the_room(self):
         message: str = json.dumps(
