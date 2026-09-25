@@ -2097,13 +2097,13 @@ $border-radius-student-card: $spacer / 4 * 3;
     font-size: 14px;
     padding: 0 12px;
   }
+}
 
-  // Paused state: give the button a solid look to signal the timer is stopped
-  #paused.is-paused {
-    background-color: $blue-dark;
-    border-color: $blue-dark;
-    color: $white;
-  }
+// Paused state: give the button a solid look to signal the timer is stopped
+#paused.is-paused {
+  background-color: $blue-dark;
+  border-color: $blue-dark;
+  color: $white;
 }
 
 .details-wrapper {

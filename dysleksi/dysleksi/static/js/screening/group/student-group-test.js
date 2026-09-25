@@ -3,7 +3,6 @@ import { calculateStudentProgress, isVisible } from "../utils.js";
 import { gettext } from "../../i18n.js";
 
 export class GroupTestView extends StudentTestView {
-    questionDisplayedAt;
     selectedAnswer;
     textAnswer;
     questionTimeoutId;
@@ -174,7 +173,7 @@ export class GroupTestView extends StudentTestView {
                 this.setupReminder();
             }
 
-            this.questionDisplayedAt = document.timeline.currentTime;
+            this.startAnswerTimer();
 
             // When we are no longer practicing, disable the CSS rules used during
             // instructions and practice questions.
@@ -191,7 +190,7 @@ export class GroupTestView extends StudentTestView {
                     partId: this.currentPart.id,
                     questionIndex: this.currentQuestionIndex,
                     questionId: this.currentQuestion.id,
-                    displayedAt: this.questionDisplayedAt,
+                    displayedAt: this.displayedAt,
                     questionTitle: this.questionTitle(),
                 });
             }
@@ -295,7 +294,7 @@ export class GroupTestView extends StudentTestView {
                 if (outOfTime) {
                     messageText = `Elev besvarede ikke spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1} indenfor tidsfristen`;
                 }
-                const duration = questionAnsweredAt - this.questionDisplayedAt;
+                const duration = this.answerDuration(questionAnsweredAt);
                 this.student.progress = calculateStudentProgress(
                     this.test,
                     this.currentPartIndex,
@@ -317,7 +316,7 @@ export class GroupTestView extends StudentTestView {
                     questionIndex: this.currentQuestionIndex,
                     questionId: this.currentQuestion.id,
                     questionTitle: this.questionTitle(),
-                    displayedAt: this.questionDisplayedAt,
+                    displayedAt: this.displayedAt,
                     answeredAt: questionAnsweredAt,
                     duration: duration,
                     correctness: correctness,

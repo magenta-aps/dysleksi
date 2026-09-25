@@ -66,6 +66,7 @@ describe("IndividualTestFlow", () => {
 
         document.body.innerHTML = `
             <div id="fade-overlay" style="opacity: 0;"></div>
+            <div id="pause-overlay"></div>
             <div id="audio-indicator" style="display: none"></div>
             <div id="mic-lost-overlay"><button id="restore-mic"></button></div>
             <h1 id="student-header" class="student-header"></h1>
@@ -399,6 +400,27 @@ describe("IndividualTestFlow", () => {
             duration: 45,
             assignmentId: 1,
         });
+    });
+
+    it("leaves the time the test spent paused out of the answer time", () => {
+        view.setPart(0);
+        view.showQuestion(false, 0);
+
+        view.displayedAt = 10;
+        // Of the 45 units the student had the question on screen, 30 were spent
+        // on pause
+        document.timeline.currentTime = 20;
+        view.pauseTest();
+        document.timeline.currentTime = 50;
+        view.resumeTest();
+        view.answeredAt = 55;
+
+        vi.spyOn(view, "showNextQuestion").mockReturnValue(true);
+        view.onQuestionComplete();
+
+        expect(view.send).toHaveBeenCalledWith(
+            expect.objectContaining({ event: "question.answered", duration: 15 }),
+        );
     });
 
     it("onQuestionComplete shows next question when available", () => {

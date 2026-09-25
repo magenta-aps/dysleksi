@@ -1,5 +1,4 @@
 from copy import copy
-from datetime import timedelta
 from itertools import count
 from math import ceil
 from typing import Callable, Collection, List, Tuple
@@ -491,5 +490,6 @@ class AnswerTimeTable(NonOrderableTableMixin, HeaderlessTableMixin, Table):
     metric = Column()
     answer_time = Column()
 
-    def render_answer_time(self, value: timedelta):
-        return format_time(value.seconds)
+    def render_answer_time(self, value):
+        # Convert ms to s
+        return format_time(ceil(0.001 * value))
