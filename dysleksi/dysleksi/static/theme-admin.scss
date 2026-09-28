@@ -348,53 +348,15 @@ h6 {
   }
 }
 
-@include media-breakpoint-down(lg) {
-  // Layout where sidebar navigation is "medium size"
-  // and sidebar is not manually expanded
-  .main .navigation:not(.show,.showing) {
-    width: $sidebar-navigation-min-width;
-    flex: 0 0 $sidebar-navigation-min-width;
-  }
-  .main .navigation:not(.show,.showing) nav {
-    justify-content: center;
-  }
-  .main .navigation:not(.show,.showing) a.nav-link {
-    justify-content: center;
-  }
-  .main .navigation:not(.show,.showing) a.nav-link span {
-    display: none;
-  }
-  .main .navigation:not(.show,.showing) .about {
-    padding: $spacer 0;
-  }
-  .main .navigation:not(.show,.showing) .logo {
-    min-height: 3 * $spacer;
-    margin: 0;
-    background: url("./images/Nanoq_logo_hvid-outline_favicon.svg") no-repeat top center;
-    background-size: contain;
-  }
-  .main .navigation:not(.show,.showing) .version {
-    display: none;
-  }
-  .main .content .inner-content {
-    padding: 1.5 * $spacer;
-  }
-  .main .content nav.navbar {
-    padding: 0.5 * $spacer 1.5 * $spacer;
-  }
-}
-
-@include media-breakpoint-down(md) {
+@include media-breakpoint-down(xxl) {
   // Layout when sidebar navigation is collapsed
   .main {
-    flex-direction: column;
-
     #toggle-sidebar-nav {
       box-sizing: border-box;
-      height: (1.5 * $spacer) + (2 * $btn-padding-y) + 0.2 * $spacer;
+      height: 100vh;
       align-items: center;
       color: $white;
-      background: $mono-gray-dark-2;
+      background: $offcanvas-bg-color !important;
       border-radius: 0;
     }
 
@@ -404,6 +366,13 @@ h6 {
 
     .content {
       flex: max-content;
+
+      .inner-content {
+        padding: 1.5 * $spacer $spacer;
+      }
+      nav.navbar {
+        padding: 0.5 * $spacer $spacer;
+      }
     }
 
     .navigation {
@@ -986,6 +955,21 @@ div[data-role='teacher'][data-test-type='individual'] {
     }
   }
 }
+
+@include media-breakpoint-down(xxl) {
+  .group-test-header {
+    height: 2 * $spacer;
+
+    .btn {
+      font-size: 0.875 * $spacer;
+    }
+  }
+
+  .group-test-toolbar {
+    padding: $spacer 1.5 * $spacer;
+  }
+}
+
 .group-test-footer {
   background: $mono-gray-lightest;
   display: flex;
