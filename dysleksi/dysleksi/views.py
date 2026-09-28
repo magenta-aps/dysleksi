@@ -1558,10 +1558,7 @@ class PartResponseView(
 
     def get_questionresponse_qs_annotations(self) -> Dict[str, BaseExpression]:
         annotations: Dict[str, BaseExpression] = {}
-        if (
-            self.part.answer_time_data_breakdown_ranges
-            or self.part.show_answer_time_statistics
-        ):
+        if self.part.answer_time_data_breakdown_ranges:
             annotations["submitted_after"] = ExpressionWrapper(
                 F("submitted_at") - F("partresponse__started_at"),
                 output_field=DurationField(),
@@ -1621,8 +1618,9 @@ class PartResponseView(
             )
 
         if self.part.show_answer_time_statistics:
-            aggregations["total_answer_time"] = Sum("submitted_after")
-            aggregations["average_answer_time"] = Avg("submitted_after")
+            # The time each answer took the student, as reported by their device
+            aggregations["total_answer_time"] = Sum("finished_after")
+            aggregations["average_answer_time"] = Avg("finished_after")
 
         return aggregations
 

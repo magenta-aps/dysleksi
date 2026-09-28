@@ -71,7 +71,7 @@ export class IndividualTestView extends StudentTestView {
     onPartComplete() {
         this.audioDetector.removeEventListener("audio.silent", this.onSilence);
         this.answeredAt = document.timeline.currentTime;
-        const duration = this.answeredAt - this.displayedAt;
+        const duration = this.answerDuration(this.answeredAt);
         this.send({
             event: "part.complete",
             partIndex: this.currentPartIndex,
@@ -110,7 +110,7 @@ export class IndividualTestView extends StudentTestView {
                 this.domElements.toggleRepeatButton(false);
             }
 
-            this.displayedAt = document.timeline.currentTime;
+            this.startAnswerTimer();
             this.domElements.showQuestionChallenge(
                 this.currentQuestion.challengeText,
                 this.currentQuestion.challengeSoundUrl,
@@ -138,7 +138,7 @@ export class IndividualTestView extends StudentTestView {
     }
 
     async onQuestionComplete() {
-        const duration = this.answeredAt - this.displayedAt;
+        const duration = this.answerDuration(this.answeredAt);
         let message = `Elev har gennemført spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1}`;
         if (this.isPracticing) {
             message = `Elev har gennemført øve-spørgsmål ${this.currentPartIndex + 1}.${this.currentQuestionIndex + 1}`;

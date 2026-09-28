@@ -25,6 +25,9 @@ export class StudentTestView extends EventTarget {
     showingInstructions = false;
     isPracticing = false;
     repeatQuestionIndex = null;
+    displayedAt = null;
+    pausedSince = null;
+    pausedDuration = 0;
     paused = false;
     connectionLost = false;
     windowBlocked = false;
@@ -219,7 +222,21 @@ export class StudentTestView extends EventTarget {
         }
     }
 
+    // Called when a question is put on screen. The student's answer time is
+    // measured from here, leaving out whatever time the test spends on pause.
+    startAnswerTimer() {
+        this.displayedAt = document.timeline.currentTime;
+        this.pausedDuration = 0;
+    }
+
+    answerDuration(answeredAt) {
+        return answeredAt - this.displayedAt - this.pausedDuration;
+    }
+
     pauseTest() {
+        if (!this.paused) {
+            this.pausedSince = document.timeline.currentTime;
+        }
         this.paused = true;
         this._freeze();
 
@@ -236,6 +253,7 @@ export class StudentTestView extends EventTarget {
 
     resumeTest() {
         this.paused = false;
+        this.pausedDuration += document.timeline.currentTime - this.pausedSince;
 
         // Uncover the interface so the student can interact with it again.
         this.domElements.hidePauseOverlay();

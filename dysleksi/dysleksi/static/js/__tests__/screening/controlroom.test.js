@@ -361,6 +361,8 @@ describe("ActionButtons", () => {
         // Test disabled state
         instance.disableButtons();
         expect(buttons.classList).include(["disabled"]);
+        // The teacher can pause at any time, also while the other buttons are disabled
+        expect(instance.pauseButton().classList).not.include(["disabled"]);
         // Test enabled state
         instance.enableButtons();
         expect(buttons.classList).not.include(["disabled"]);
@@ -1247,6 +1249,34 @@ describe("Teacher Individual test View", () => {
             event: "test.resume",
             assignmentId: 1,
         });
+    });
+
+    it("keeps the teacher from marking answers while the test is paused", () => {
+        const pauseButton = buttons.pauseButton();
+        const questionButtons = ["correct", "wrong", "skipped", "next"].map((id) =>
+            buttons.buttonById(id),
+        );
+        // The teacher must mark the answer before the 'next' button opens up
+        buttons.disableNextButton();
+
+        pauseButton.click();
+
+        expect(questionButtons.map((el) => el.classList.contains("disabled"))).toEqual([
+            true,
+            true,
+            true,
+            true,
+        ]);
+
+        pauseButton.click();
+
+        // Resuming hands the question flow back in the state it was left in
+        expect(questionButtons.map((el) => el.classList.contains("disabled"))).toEqual([
+            false,
+            false,
+            false,
+            true,
+        ]);
     });
 
     it("updates the event table when handling question feedback", () => {
@@ -2544,6 +2574,8 @@ describe("TeacherView cancel test modal", () => {
 
         await vi.advanceTimersByTimeAsync(3000);
         expect(global.window.location).toBe("not-redirected");
+        // A cancelled test can no longer be paused
+        expect(view.buttons.pauseButton().disabled).toBe(true);
 
         sendFromStudent({ event: "test.cancelled", student: { id: studentId } });
 

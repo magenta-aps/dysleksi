@@ -866,12 +866,41 @@ export class ActionButtons {
         this.active = null;
     }
 
+    #toggleButtons(disabled) {
+        this.buttons
+            .filter((el) => el.id !== "paused")
+            .forEach((el) => el.classList.toggle("disabled", disabled));
+    }
+
     disableButtons() {
-        this.buttons.forEach((el) => el.classList.toggle("disabled", true));
+        this.#toggleButtons(true);
     }
 
     enableButtons() {
-        this.buttons.forEach((el) => el.classList.toggle("disabled", false));
+        this.#toggleButtons(false);
+    }
+
+    #questionFlowButtons() {
+        const ids = ["correct", "wrong", "skipped", "next"];
+        return this.buttons.filter((el) => ids.includes(el.id));
+    }
+
+    freezeQuestionFlow() {
+        this.frozenButtons = new Map(
+            this.#questionFlowButtons().map((el) => [
+                el,
+                el.classList.contains("disabled"),
+            ]),
+        );
+        this.#questionFlowButtons().forEach((el) =>
+            el.classList.toggle("disabled", true),
+        );
+    }
+
+    unfreezeQuestionFlow() {
+        this.frozenButtons.forEach((disabled, el) =>
+            el.classList.toggle("disabled", disabled),
+        );
     }
 
     hideButtons() {
@@ -1320,6 +1349,8 @@ export class TeacherView {
     pauseTest() {
         this.testPaused = true;
         this.elapsedTimeView.pause();
+        this.buttons.freezeQuestionFlow();
+        this.updateGotoNextResultGroupButtonState();
         this.buttons.pauseButton().classList.add("is-paused");
         this.buttons.pauseButton().querySelector("i").className = "ph-fill ph-play";
         this.sendTestPaused();
@@ -1328,6 +1359,8 @@ export class TeacherView {
     resumeTest() {
         this.testPaused = false;
         this.elapsedTimeView.resume();
+        this.buttons.unfreezeQuestionFlow();
+        this.updateGotoNextResultGroupButtonState();
         this.buttons.pauseButton().classList.remove("is-paused");
         this.buttons.pauseButton().querySelector("i").className = "ph-fill ph-pause";
         this.sendTestResumed();
@@ -1547,11 +1580,11 @@ export class TeacherView {
                     this.buttons.pauseButton().disabled = false;
                     this.buttons.cancelButton().disabled = false;
                 }
+            }
 
-                if (data.event === "test.started" && this.testPaused === true) {
-                    // Send a paused-message to newly joined students
-                    this.sendTestPaused();
-                }
+            if (data.event === "test.started" && this.testPaused === true) {
+                // Send a paused-message to newly joined students
+                this.sendTestPaused();
             }
 
             if (data.event === "test.paused" && this.test.testType === "group") {
@@ -1814,6 +1847,7 @@ export class TeacherView {
                 this.cancelTestModal.show(this.uncompletedStudents(), async () => {
                     await this.sendTestCancelled();
                     this.buttons.disableButtons();
+                    this.buttons.pauseButton().disabled = true;
                     this.elapsedTimeView.stop();
                     await this._leaveCancelledTest();
                 });
@@ -1862,7 +1896,9 @@ export class TeacherView {
         const inLastPart = this.currentPart.index === this.test.parts.length - 1;
         const { inLastResultGroup, _questionIndex } = this.getNextResultGroup();
         const buttonDisabled =
-            this.currentIsPractice || (inLastPart && inLastResultGroup);
+            this.testPaused ||
+            this.currentIsPractice ||
+            (inLastPart && inLastResultGroup);
         this.gotoNextResultGroupButton.classList.toggle("disabled", buttonDisabled);
     }
 

@@ -17,4 +17,6 @@ export class MockAudioContext {
         return new FakeAnalyser();
     }
     close() {}
+    suspend() {}
+    resume() {}
 }

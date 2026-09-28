@@ -2,7 +2,7 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 import json
-from datetime import datetime, timedelta
+from datetime import datetime
 from operator import attrgetter
 from unittest.mock import patch
 from uuid import uuid4
@@ -1876,11 +1876,8 @@ class TestPartResponseView(ResponseTest):
         self.assertEqual(
             table_data,
             [
-                {"metric": "Totalt tidsforbrug", "answer_time": timedelta(seconds=90)},
-                {
-                    "metric": "Gennemsnitlig svartid",
-                    "answer_time": timedelta(seconds=22, microseconds=500000),
-                },
+                {"metric": "Totalt tidsforbrug", "answer_time": 18000},
+                {"metric": "Gennemsnitlig svartid", "answer_time": 4500.0},
             ],
         )
 
@@ -1891,8 +1888,8 @@ class TestPartResponseView(ResponseTest):
         self.assertEqual(
             table,
             [
-                [["Totalt tidsforbrug"], ["1 min. 30 sek."]],
-                [["Gennemsnitlig svartid"], ["22 sek."]],
+                [["Totalt tidsforbrug"], ["18 sek."]],
+                [["Gennemsnitlig svartid"], ["5 sek."]],
             ],
         )
 
