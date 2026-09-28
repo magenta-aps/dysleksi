@@ -2229,6 +2229,10 @@ LOCMEM_CACHES = {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
         "LOCATION": "window-lock-tests",
     },
+    "sessions": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "sessions",
+    },
 }
 
 
