@@ -267,10 +267,7 @@ class AssignmentView(
         context["class"] = assignment.class_for_nav
 
         if assignment.class_for_nav:  # pragma: no branch
-            context["cancel_url"] = reverse(
-                "dysleksi:class_assignment_list",
-                kwargs={"class_pk": assignment.class_for_nav.pk},
-            )
+            context["cancel_url"] = reverse("dysleksi:class_list")
 
         return context
 

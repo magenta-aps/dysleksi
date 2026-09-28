@@ -48,7 +48,6 @@ urlpatterns: list[URLResolver | URLPattern] = [
         MessageStorageView.as_view(),
         name="store_message",
     ),
-    path("class/", ClassListView.as_view(), name="class_list"),
     path("admin/classes/", ClassListView.as_view(), name="class_list"),
     path("admin/classes/<int:pk>/", ClassDetailView.as_view(), name="class_detail"),
     path(
