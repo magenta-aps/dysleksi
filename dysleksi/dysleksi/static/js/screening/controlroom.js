@@ -355,11 +355,9 @@ export class StudentCard {
         this.testParts = test.parts;
         this.el = this._createMarkup();
         this.foldedArea = this.el.querySelector(".folded-area");
-        this.progressFill = this.el.querySelector(".progress-fill");
         this.topRow = this.el.querySelector(".student-top-row");
         this.partsProgress = this.el.querySelector(".parts-progress");
         this.nameText = this.el.querySelector(".student-name");
-        this.currentPartText = this.el.querySelector(".student-current-part");
         this.arrowIcon = this.el.querySelector("#foldout-arrow");
         this.markBtn = this.el.querySelector(".mark-button");
         this.markIcon = this.el.querySelector(".mark-button i");
@@ -374,11 +372,11 @@ export class StudentCard {
         this.pauseOverlay = this.el.querySelector("#pause-overlay");
 
         this.currentViewPartIndex = 0;
+        this.isHidden = true;
 
         // Initial setup
         this.nameText.textContent = this.student.displayName;
         this._initEventListeners();
-        this.foldOut();
     }
 
     _initEventListeners() {
@@ -427,15 +425,15 @@ export class StudentCard {
     }
 
     foldIn() {
-        this.foldedArea.style.display = "none";
-        this.el.classList.toggle("is-expanded", false);
+        this.questionIndex.style.display = "none";
+        this.dotsContainer.style.display = "none";
         this.isHidden = true;
         this.arrowIcon.className = "ph-fill ph-caret-down";
     }
 
     foldOut() {
-        this.foldedArea.style.display = "flex";
-        this.el.classList.toggle("is-expanded", true);
+        this.questionIndex.style.display = "flex";
+        this.dotsContainer.style.display = "flex";
         this._updateDotsHeight();
         this.isHidden = false;
         this.arrowIcon.className = "ph-fill ph-caret-up";
@@ -472,7 +470,6 @@ export class StudentCard {
                 segment.classList.add("completed");
             } else if (index === this.student.currentPartIndex) {
                 segment.classList.add("current");
-                this.currentPartText.textContent = this.testParts[index].name;
             } else {
                 segment.classList.add("future");
             }
@@ -502,17 +499,13 @@ export class StudentCard {
         this._renderPartsProgress();
         const isCurrentPart =
             this.currentViewPartIndex === this.student.currentPartIndex;
-        this.progressFill.style.width = `${this.student.progress}%`;
 
         this.statusIcon.style.display = "none";
         if (this.student.progress === 100) {
-            this.progressFill.classList.add("is-complete");
             this.topRow.classList.add("is-complete");
             this.statusIcon.style.display = "block";
             this.statusIcon.className = "ph-fill ph-check-circle green";
-            this.currentPartText.textContent = "-";
         } else if (this.student.cancelled) {
-            this.progressFill.classList.add("is-cancelled");
             this.topRow.classList.add("is-cancelled");
         }
 
