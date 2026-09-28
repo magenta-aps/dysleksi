@@ -14,6 +14,7 @@ include(
     "logging.py",
     "login.py",
     "cache.py",
+    "sessions.py",
     "staticfiles.py",
     "bootstrap5.py",
     "channels.py",

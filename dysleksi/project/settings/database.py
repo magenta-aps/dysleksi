@@ -15,7 +15,8 @@ DATABASES = {
         "OPTIONS": {
             "pool": {
                 "min_size": int(os.environ.get("DB_POOL_MIN_SIZE", 2)),
-                "max_size": int(os.environ.get("DB_POOL_MAX_SIZE", 10)),
+                # Use up to 80 of the 100 connections available in Postgres by default
+                "max_size": int(os.environ.get("DB_POOL_MAX_SIZE", 80)),
                 "timeout": int(os.environ.get("DB_POOL_TIMEOUT", 10)),
             },
         },
