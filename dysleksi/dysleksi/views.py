@@ -291,6 +291,20 @@ class WindowLockView(
     # Amount of seconds to wait before releasing the lock (if not renewed)
     timeout = 16
 
+    def get_object(self, queryset=None):
+        # Fast path: check if we already have a cached version of the requested object
+        cache = caches["chat"]
+        pk = self.kwargs.get(self.pk_url_kwarg)
+        key = f"assignment.{pk}"
+        cached_obj = cache.get(key)
+        if cached_obj is not None:
+            return cached_obj
+        # Slow path: query database and check permissions. Store object in cache if
+        # found.
+        obj = super().get_object(queryset=queryset)
+        cache.set(key, obj)
+        return obj
+
     def post(self, request, *args, **kwargs) -> HttpResponse:
         payload = json.loads(request.body)
         window_id = payload["windowId"]
