@@ -1632,19 +1632,26 @@ describe("Teacher Individual test View", () => {
         expect(spyEnableNextButton).toHaveBeenCalled();
     });
 
-    it("shows the result link on `test.complete` student events", () => {
-        // Arrange
+    it("shows the result link on `test.complete` student events if queue is empty", async () => {
+        // Arrange: the server is out of reach
+        const storage = mockMessageStorage();
+        storage.mockRejectedValue(new Error("The server is out of reach"));
         const disabled = document.getElementById("result-link-disabled");
         const enabled = document.getElementById("result-link-enabled");
-        expect(disabled.classList.contains("d-none")).toBe(false);
-        expect(enabled.classList.contains("d-none")).toBe(true);
         // Act
         p2pChannel.dispatchEvent(
             new CustomEvent("message", {
                 detail: { event: "test.complete", student: { id: studentId } },
             }),
         );
-        // Assert
+        // Assert: the results are not offered until the messages are stored
+        await vi.advanceTimersByTimeAsync(3000);
+        expect(disabled.classList.contains("d-none")).toBe(false);
+        expect(enabled.classList.contains("d-none")).toBe(true);
+
+        storage.mockResolvedValue({ ok: true, status: 204 });
+
+        await vi.advanceTimersByTimeAsync(1000);
         expect(disabled.classList.contains("d-none")).toBe(true);
         expect(enabled.classList.contains("d-none")).toBe(false);
     });

@@ -6,13 +6,6 @@ import { PING_MS } from "./utils.js";
 import { gettext, blocktranslate } from "../i18n.js";
 import { Modal } from "bootstrap";
 
-export const showResultLink = () => {
-    const disabled = document.getElementById("result-link-disabled");
-    const enabled = document.getElementById("result-link-enabled");
-    disabled.classList.add("d-none");
-    enabled.classList.remove("d-none");
-};
-
 const formatDuration = (milliseconds) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
     const hours = String(Math.floor(totalSeconds / 3600)).padStart(2, "0");
@@ -848,11 +841,10 @@ export class GroupTestContainer {
         }
         this.updateCounts();
         this.updateProgressBar();
-        if (this.students.values().every((student) => student.progress === 100)) {
-            // Alle studerende som vi har fået beskeder fra er nu på progress==100
-            // Dette kan ske selvom vi kun har fået fra én
-            showResultLink();
-        }
+    }
+
+    allStudentsFinished() {
+        return this.students.values().every((student) => student.progress === 100);
     }
 }
 
@@ -1472,6 +1464,7 @@ export class TeacherView {
     _initTestSocket(channel) {
         channel.addEventListener("message", (e) => {
             const data = e.detail;
+            let testComplete = false;
 
             if (data.event === "student.heartbeat") {
                 this._markStudentSeen(data.student.id);
@@ -1507,7 +1500,7 @@ export class TeacherView {
                 }
                 if (data.event === "test.complete") {
                     this.completedStudentIds.add(data.student.id);
-                    showResultLink();
+                    testComplete = true;
                 }
             }
 
@@ -1571,6 +1564,8 @@ export class TeacherView {
                     this.completedStudentIds.add(data.student.id);
                 }
 
+                testComplete = this.groupTestContainer.allStudentsFinished();
+
                 if (
                     data.event === "test.started" &&
                     this.elapsedTimeView.running === false &&
@@ -1626,6 +1621,10 @@ export class TeacherView {
             if (!data.event.startsWith("audio.")) {
                 this.messageQueue.push(data);
                 this._persistQueue(); // Persistent save
+            }
+
+            if (testComplete) {
+                this.showResultLink();
             }
         });
     }
@@ -1820,18 +1819,28 @@ export class TeacherView {
         return response.ok;
     }
 
+    async _awaitMessageQueue(studentsPending = () => false) {
+        while (!(await this._flushMessageQueue()) || studentsPending()) {
+            console.log("Waiting for students and message queue...");
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+        }
+    }
+
     async _leaveCancelledTest() {
         const studentsPending = () =>
             this.studentsLastSeen
                 .keys()
                 .some((studentId) => !this.cancelledStudentIds.has(studentId));
 
-        while (!(await this._flushMessageQueue()) || studentsPending()) {
-            console.log("Waiting for students and message queue before leaving...");
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-        }
-
+        await this._awaitMessageQueue(studentsPending);
         window.location = document.querySelector("[data-cancel-url]").dataset.cancelUrl;
+    }
+
+    // The results are only worth looking at once every message reached the server
+    async showResultLink() {
+        await this._awaitMessageQueue();
+        document.getElementById("result-link-disabled").classList.add("d-none");
+        document.getElementById("result-link-enabled").classList.remove("d-none");
     }
 
     uncompletedStudents() {
@@ -1976,7 +1985,7 @@ export class TeacherView {
         this.messageQueue.push(data);
         this._persistQueue();
         await this._flushMessageQueue();
-        showResultLink();
+        this.showResultLink();
     }
 
     sendTestPaused() {
