@@ -1270,6 +1270,43 @@ export class NavigateAwayWarning {
     }
 }
 
+export class MessageQueueIndicator {
+    /* Warns next to the page heading while we are offline, and shows how many
+       messages are waiting in the queue to be sent to the server. */
+    constructor(selector = "#message-queue") {
+        this.domElement = document.querySelector(selector);
+        this.messagesElement = this.domElement.querySelector(".message-queue-messages");
+        this.countElement = this.domElement.querySelector(".message-queue-count");
+        this.offline = !navigator.onLine;
+        this.messagesUnsent = false;
+        this.queueLength = 0;
+
+        window.addEventListener("offline", () => {
+            this.offline = true;
+            this.render();
+        });
+        window.addEventListener("online", () => {
+            this.offline = false;
+            this.render();
+        });
+    }
+
+    update(messagesUnsent, queueLength) {
+        this.messagesUnsent = messagesUnsent;
+        this.queueLength = queueLength;
+        this.render();
+    }
+
+    render() {
+        const warn = this.offline || this.messagesUnsent;
+        const showQueueLength = warn && this.queueLength > 0;
+
+        this.domElement.classList.toggle("d-none", !warn);
+        this.messagesElement.classList.toggle("d-none", !showQueueLength);
+        this.countElement.textContent = this.queueLength;
+    }
+}
+
 export class TeacherView {
     constructor(
         test,
@@ -1325,6 +1362,7 @@ export class TeacherView {
         this.audioIndicator = audioIndicator;
         this.detailsPopup = new DetailsPopup();
         this.studentPresence = new StudentPresenceIndicator();
+        this.messageQueueIndicator = new MessageQueueIndicator();
         this.cancelTestModal = new CancelTestModal();
         this.navigateAway = new NavigateAwayWarning();
 
@@ -1349,6 +1387,8 @@ export class TeacherView {
         this.messageQueue = savedQueue ? JSON.parse(savedQueue) : [];
         // Whether a flush is underway, so the interval does not start a second one
         this.flushing = false;
+        // Whether a message failed to reach the server since the queue was last empty
+        this.messagesUnsent = false;
 
         this._initSocket();
         this._initButtonListeners();
@@ -1808,24 +1848,32 @@ export class TeacherView {
 
     // Returns whether the queue is empty, i.e. everything reached the server
     async _flushMessageQueue() {
-        if (this.flushing || this.messageQueue.length === 0) {
-            return this.messageQueue.length === 0;
-        }
+        if (!this.flushing && this.messageQueue.length > 0) {
+            this.flushing = true;
+            console.log(`Syncing ${this.messageQueue.length} messages to server...`);
 
-        this.flushing = true;
-        console.log(`Syncing ${this.messageQueue.length} messages to server...`);
-
-        while (this.messageQueue.length > 0) {
-            if (!(await this._storeMessage(this.messageQueue[0]))) {
-                // Abort if the message was not stored successfully
-                break;
+            while (this.messageQueue.length > 0) {
+                if (!(await this._storeMessage(this.messageQueue[0]))) {
+                    // Abort if the message was not stored successfully
+                    this.messagesUnsent = true;
+                    break;
+                }
+                // Delete the message from the queue if the server responds with "ok"
+                this.messageQueue.shift();
+                this._persistQueue();
             }
-            // Delete the message from the queue if the server responds with "ok"
-            this.messageQueue.shift();
-            this._persistQueue();
+
+            this.flushing = false;
         }
 
-        this.flushing = false;
+        if (this.messageQueue.length === 0) {
+            // Everything reached the server, so there is nothing to warn about
+            this.messagesUnsent = false;
+        }
+        this.messageQueueIndicator.update(
+            this.messagesUnsent,
+            this.messageQueue.length,
+        );
         return this.messageQueue.length === 0;
     }
 
@@ -1844,6 +1892,9 @@ export class TeacherView {
                     "X-CSRFToken": config.csrf_token,
                 },
                 body: JSON.stringify(message),
+                // Give up on a server which does not answer, so the next flush
+                // may try again rather than wait for this one forever
+                signal: AbortSignal.timeout(PING_MS),
             });
         } catch (error) {
             console.log("Could not reach the server, keeping the message:", error);

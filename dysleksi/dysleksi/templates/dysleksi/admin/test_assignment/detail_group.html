@@ -65,7 +65,10 @@
      data-cancel-url="{{ cancel_url }}">
 
     <div class="screening-header">
-        <h2 class="mt-2 mb-4">{% blocktranslate trimmed with class_name=class_name test_name=test_name %}Klasse {{ class_name }} - Screening {{ test_name }}{% endblocktranslate %}</h2>
+        <div class="screening-title">
+            <h2 class="mt-2 mb-4">{% blocktranslate trimmed with class_name=class_name test_name=test_name %}Klasse {{ class_name }} - Screening {{ test_name }}{% endblocktranslate %}</h2>
+            {% include "dysleksi/message_queue.html" %}
+        </div>
         <div class="screening-controls">
             <div class="screening-progress-wrapper">
                 <span id="test-progress-label" class="screening-progress-label">0%</span>
