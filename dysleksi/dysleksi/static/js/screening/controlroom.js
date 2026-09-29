@@ -631,8 +631,6 @@ export class GroupTestContainer {
         this.ongoingStudentsButton.onclick = () => this.filterCards("ongoing");
         this.finishedStudentsButton.onclick = () => this.filterCards("finished");
         this.markedStudentsButton.onclick = () => this.filterCards("marked");
-        this.progressBar = document.getElementById("test-progress-bar");
-        this.progressLabel = document.getElementById("test-progress-label");
 
         this.foldAllBtn.onclick = () => this.foldAllCards();
         this.sortBtn.onclick = () => this.sortCards();
@@ -777,18 +775,6 @@ export class GroupTestContainer {
         this.ongoingStudentsCount.innerHTML = ongoingStudents;
     }
 
-    updateProgressBar() {
-        // The overall progress is the average progress across all students.
-        const progresses = Array.from(this.students.values()).map(
-            (student) => student.progress,
-        );
-        const avgProgress = Math.round(
-            progresses.reduce((sum, progress) => sum + progress, 0) / progresses.length,
-        );
-        this.progressBar.style.width = `${avgProgress}%`;
-        this.progressLabel.textContent = `${avgProgress}%`;
-    }
-
     setStudentConnected(studentId, connected) {
         this.cards.get(studentId)?.setConnected(connected);
     }
@@ -833,7 +819,6 @@ export class GroupTestContainer {
             this.cards.get(student.id).setPart(student.currentPartIndex);
         }
         this.updateCounts();
-        this.updateProgressBar();
     }
 
     allStudentsFinished() {

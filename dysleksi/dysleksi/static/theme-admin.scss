@@ -2029,29 +2029,9 @@ $border-radius-student-card: $spacer / 4 * 3;
 .screening-controls {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 24px;
   flex: 1;
-
-  .screening-progress-wrapper {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex: 1 1 auto;
-  }
-
-  .screening-progress-label {
-    flex: 0 0 auto;
-    white-space: nowrap;
-  }
-
-  .screening-progress {
-    flex: 1 1 auto;
-    height: 6px;
-
-    .progress-bar {
-      background-color: $blue-light;
-    }
-  }
 
   .btn i {
     margin-right: 0.25 * $spacer;
