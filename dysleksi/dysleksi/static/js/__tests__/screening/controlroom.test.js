@@ -182,13 +182,7 @@ ${MESSAGE_SYNC_CONFIG_HTML}
         ${MESSAGE_QUEUE_HTML}
     </div>
     <div class="screening-controls">
-        <div class="screening-progress-wrapper">
-            <span id="test-progress-label" class="screening-progress-label">0%</span>
-            <div class="progress screening-progress" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
-                <div id="test-progress-bar" class="progress-bar" style="width: 0%"></div>
-            </div>
-            <div id="elapsed-time"></div>
-        </div>
+        <div id="elapsed-time"></div>
         <button id="paused" class="btn btn-outline-secondary">
             <i class="ph-fill ph-pause"></i>
             <span class="pause-label">Pause</span>
@@ -1729,37 +1723,6 @@ describe("GroupTestContainer", () => {
         // The student has now completed the first part and is viewing the next part
         // The teacher's card follows the student progress and shows part 1
         expect(card.currentViewPartIndex).toBe(1);
-    });
-
-    it("updates the progress bar to the average progress across all students", () => {
-        const makeStudent = (id, progress) => ({
-            student: {
-                id,
-                firstName: `Student${id}`,
-                lastName: "Test",
-                progress,
-                currentPartIndex: 0,
-                currentQuestionIndex: 0,
-                resultsByPart: {},
-            },
-        });
-
-        const progressBar = document.getElementById("test-progress-bar");
-        const progressLabel = document.getElementById("test-progress-label");
-
-        instance.updateData(makeStudent(1, 60));
-        expect(progressBar.style.width).toBe("60%");
-        expect(progressLabel.textContent).toBe("60%");
-
-        // The bar shows the average of the two students: (60 + 20) / 2 = 40
-        instance.updateData(makeStudent(2, 20));
-        expect(progressBar.style.width).toBe("40%");
-        expect(progressLabel.textContent).toBe("40%");
-
-        // Non-integer averages are rounded: (60 + 20 + 35) / 3 = 38.33 -> 38
-        instance.updateData(makeStudent(3, 35));
-        expect(progressBar.style.width).toBe("38%");
-        expect(progressLabel.textContent).toBe("38%");
     });
 
     it("toggles folded element even when clicking on child elements (name text)", () => {
