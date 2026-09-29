@@ -3200,7 +3200,7 @@ describe("TeacherView Sync Logic", () => {
             expect(storage).not.toHaveBeenCalled();
         });
 
-        it("posts the messages in the queue, oldest first", async () => {
+        it("posts the messages in the queue in one request, oldest first", async () => {
             const msg1 = { event: "test", uuid: "1" };
             const msg2 = { event: "test", uuid: "2" };
             view.messageQueue = [msg1, msg2];
@@ -3208,19 +3208,41 @@ describe("TeacherView Sync Logic", () => {
 
             expect(await view._flushMessageQueue()).toBe(true);
 
-            expect(storage).toHaveBeenCalledTimes(2);
-            expect(storage).toHaveBeenNthCalledWith(1, "/assignment/1/messages/", {
+            expect(storage).toHaveBeenCalledExactlyOnceWith("/assignment/1/messages/", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                     "X-CSRFToken": "token",
                 },
-                body: JSON.stringify(msg1),
+                body: JSON.stringify([msg1, msg2]),
                 signal: expect.any(AbortSignal),
             });
-            expect(JSON.parse(storage.mock.calls[1][1].body)).toEqual(msg2);
             expect(view.messageQueue).toEqual([]);
-            expect(persistSpy).toHaveBeenCalledTimes(2);
+            expect(persistSpy).toHaveBeenCalledOnce();
+        });
+
+        it("posts at most 50 messages per request", async () => {
+            view.messageQueue = Array.from({ length: 60 }, (_, i) => ({
+                event: "test",
+                uuid: `${i}`,
+            }));
+
+            expect(await view._flushMessageQueue()).toBe(true);
+
+            const batches = storage.mock.calls.map(([, { body }]) => JSON.parse(body));
+            expect(batches.map((batch) => batch.length)).toEqual([50, 10]);
+        });
+
+        it("posts large recordings in separate requests", async () => {
+            const recording = "x".repeat(600_000);
+            view.messageQueue = [
+                { event: "test", uuid: "1", recordingBase64: recording },
+                { event: "test", uuid: "2", recordingBase64: recording },
+            ];
+
+            expect(await view._flushMessageQueue()).toBe(true);
+
+            expect(storage).toHaveBeenCalledTimes(2);
         });
 
         it("keeps messages in queue if server is offline", async () => {
@@ -3232,7 +3254,6 @@ describe("TeacherView Sync Logic", () => {
 
             expect(await view._flushMessageQueue()).toBe(false);
 
-            // Messages are stored in order, so the first one holds up the rest
             expect(storage).toHaveBeenCalledTimes(1);
             expect(view.messageQueue).toHaveLength(2);
         });
@@ -3240,16 +3261,18 @@ describe("TeacherView Sync Logic", () => {
         it("warns about unsent messages until the queue is empty", async () => {
             const indicator = document.querySelector("#message-queue");
             const count = indicator.querySelector(".message-queue-count");
-            view.messageQueue = [{ event: "test", uuid: "1" }];
+            view.messageQueue = Array.from({ length: 51 }, (_, i) => ({
+                event: "test",
+                uuid: `${i}`,
+            }));
             storage.mockRejectedValue(new Error("offline"));
 
             await view._flushMessageQueue();
 
             expect(indicator.classList.contains("d-none")).toBe(false);
-            expect(count.textContent).toBe("1");
+            expect(count.textContent).toBe("51");
 
             // The warning stays until the last message has reached the server
-            view.messageQueue.push({ event: "test", uuid: "2" });
             storage.mockResolvedValueOnce({ ok: true, status: 204 });
             await view._flushMessageQueue();
 

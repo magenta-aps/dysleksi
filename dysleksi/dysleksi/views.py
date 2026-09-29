@@ -359,9 +359,9 @@ class MessageStorageView(
         # Refuses the request if this user has no business in the assignment
         self.get_object()
 
-        content = json.loads(request.body)
-        if content["event"] in HandledEvent:
-            self.store_message(content)
+        for content in json.loads(request.body):
+            if content["event"] in HandledEvent:
+                self.store_message(content)
         return HttpResponse(status=204)
 
     def store_message(self, content: dict) -> None:
@@ -373,11 +373,7 @@ class MessageStorageView(
             defaults={
                 "event": content["event"],
                 "data": content,
-                "user": (
-                    Student.objects.get(id=student["id"])
-                    if student is not None
-                    else self.user
-                ),
+                "user_id": student["id"] if student is not None else self.user.pk,
             },
         )
         if created:
