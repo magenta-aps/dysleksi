@@ -989,6 +989,14 @@ msgstr ""
 msgid "Start gruppetest"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/message_queue.html
+msgid "Der er ikke forbindelse til serveren"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/message_queue.html
+msgid "Beskeder er ikke blevet gemt"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/screening/student.html
 msgid "Ingen forbindelse til læreren"
 msgstr ""

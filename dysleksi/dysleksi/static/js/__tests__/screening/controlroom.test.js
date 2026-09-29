@@ -22,6 +22,7 @@ import { WebSocketChannel } from "../../webSocketChannel.js";
 import { getAssignmentSocket } from "../../ws.js";
 import { DetailsPopup } from "../../screening/controlroom.js";
 import { StudentPresenceIndicator } from "../../screening/controlroom.js";
+import { MessageQueueIndicator } from "../../screening/controlroom.js";
 
 vi.mock("../../screening/utils.js");
 
@@ -121,6 +122,16 @@ const MESSAGE_SYNC_CONFIG_HTML = `
 </script>
 `;
 
+const MESSAGE_QUEUE_HTML = `
+<div id="message-queue" class="message-queue d-none" title="Der er ikke forbindelse til serveren: beskeder er ikke blevet gemt">
+    <i class="ph-fill ph-warning" aria-hidden="true"></i>
+    <span class="message-queue-messages d-none">
+        <i class="ph-fill ph-envelope" aria-hidden="true"></i>
+        <span class="message-queue-count">0</span>
+    </span>
+</div>
+`;
+
 const GROUP_DOM_HTML = `
 <div data-cancel-url="foo"></div>
 ${MESSAGE_SYNC_CONFIG_HTML}
@@ -166,7 +177,10 @@ ${MESSAGE_SYNC_CONFIG_HTML}
 </template>
 
 <div class="screening-header">
-    <h2>Klasse 1A - Screening Test</h2>
+    <div class="screening-title">
+        <h2>Klasse 1A - Screening Test</h2>
+        ${MESSAGE_QUEUE_HTML}
+    </div>
     <div class="screening-controls">
         <div class="screening-progress-wrapper">
             <span id="test-progress-label" class="screening-progress-label">0%</span>
@@ -263,6 +277,7 @@ ${MESSAGE_SYNC_CONFIG_HTML}
                 <span class="visually-hidden">Eleven er kommet ind i testrummet</span>
             </span>
         </div>
+        ${MESSAGE_QUEUE_HTML}
     </div>
 </div>
 <div id="question-container">
@@ -1920,6 +1935,7 @@ describe("TeacherView _initFilterButtonSelection", () => {
             <div id="cancel-test">
                 <button class="btn confirm-btn"></button>
             </div>
+            ${MESSAGE_QUEUE_HTML}
         `;
 
         mockSocket();
@@ -3200,6 +3216,7 @@ describe("TeacherView Sync Logic", () => {
                     "X-CSRFToken": "token",
                 },
                 body: JSON.stringify(msg1),
+                signal: expect.any(AbortSignal),
             });
             expect(JSON.parse(storage.mock.calls[1][1].body)).toEqual(msg2);
             expect(view.messageQueue).toEqual([]);
@@ -3218,6 +3235,31 @@ describe("TeacherView Sync Logic", () => {
             // Messages are stored in order, so the first one holds up the rest
             expect(storage).toHaveBeenCalledTimes(1);
             expect(view.messageQueue).toHaveLength(2);
+        });
+
+        it("warns about unsent messages until the queue is empty", async () => {
+            const indicator = document.querySelector("#message-queue");
+            const count = indicator.querySelector(".message-queue-count");
+            view.messageQueue = [{ event: "test", uuid: "1" }];
+            storage.mockRejectedValue(new Error("offline"));
+
+            await view._flushMessageQueue();
+
+            expect(indicator.classList.contains("d-none")).toBe(false);
+            expect(count.textContent).toBe("1");
+
+            // The warning stays until the last message has reached the server
+            view.messageQueue.push({ event: "test", uuid: "2" });
+            storage.mockResolvedValueOnce({ ok: true, status: 204 });
+            await view._flushMessageQueue();
+
+            expect(indicator.classList.contains("d-none")).toBe(false);
+            expect(count.textContent).toBe("1");
+
+            storage.mockResolvedValue({ ok: true, status: 204 });
+            await view._flushMessageQueue();
+
+            expect(indicator.classList.contains("d-none")).toBe(true);
         });
 
         it("does not start a second flush while one is underway", async () => {
@@ -3665,6 +3707,42 @@ describe("StudentPresenceIndicator", () => {
         const indicator = new StudentPresenceIndicator();
         expect(indicator.domElement).toBeNull();
         expect(() => indicator.markStudentArrived()).not.toThrow();
+    });
+});
+
+describe("MessageQueueIndicator", () => {
+    let indicator;
+    let messages;
+
+    beforeEach(() => {
+        document.body.innerHTML = MESSAGE_QUEUE_HTML;
+        indicator = new MessageQueueIndicator();
+        messages = document.querySelector(".message-queue-messages");
+    });
+
+    it("warns while the browser is offline", () => {
+        window.dispatchEvent(new Event("offline"));
+
+        expect(indicator.domElement.classList.contains("d-none")).toBe(false);
+        // Nothing is queued up yet, so there are no messages to tell about
+        expect(messages.classList.contains("d-none")).toBe(true);
+
+        window.dispatchEvent(new Event("online"));
+
+        expect(indicator.domElement.classList.contains("d-none")).toBe(true);
+    });
+
+    it("counts the messages waiting in the queue", () => {
+        indicator.update(true, 2);
+
+        expect(indicator.domElement.classList.contains("d-none")).toBe(false);
+        expect(messages.classList.contains("d-none")).toBe(false);
+        expect(indicator.countElement.textContent).toBe("2");
+
+        indicator.update(false, 0);
+
+        expect(indicator.domElement.classList.contains("d-none")).toBe(true);
+        expect(messages.classList.contains("d-none")).toBe(true);
     });
 });
 

@@ -1,6 +1,6 @@
 const { chromium } = require('playwright');
 const WS_PATH = '/ws/relay/lobby/';
-const students = Array.from({ length: 40 }, (_, i) => ({
+const students = Array.from({ length: 5 }, (_, i) => ({
     user: `elev${i}`,
     pass: `elev${i}`
 }));
