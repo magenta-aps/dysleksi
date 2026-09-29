@@ -2328,10 +2328,10 @@ class MessageStorageViewTest(DysleksiTest):
         assignment = assignment or self.test_assignment_student
         return reverse("dysleksi:store_message", kwargs={"pk": assignment.pk})
 
-    def post(self, message, assignment=None):
+    def post(self, *messages, assignment=None):
         return self.client.post(
             self.url(assignment),
-            data=json.dumps(message),
+            data=json.dumps(messages),
             content_type="application/json",
         )
 
@@ -2357,6 +2357,18 @@ class MessageStorageViewTest(DysleksiTest):
         self.assertEqual(stored.data, message)
         self.assertEqual(stored.user.pk, self.student1.pk)
         handle.assert_called_once()
+
+    @patch.object(Message, "handle")
+    def test_stores_several_messages_at_once(self, handle):
+        self.client.force_login(self.teacher)
+        messages = [self.message(), self.message(event="part.complete")]
+
+        self.assertEqual(self.post(*messages).status_code, 204)
+
+        self.assertEqual(
+            Message.objects.filter(uuid__in=[m["uuid"] for m in messages]).count(), 2
+        )
+        self.assertEqual(handle.call_count, 2)
 
     @patch.object(Message, "handle")
     def test_attributes_a_message_about_the_test_to_its_sender(self, handle):

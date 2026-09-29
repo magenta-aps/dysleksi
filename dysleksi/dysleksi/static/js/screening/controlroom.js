@@ -1853,13 +1853,14 @@ export class TeacherView {
             console.log(`Syncing ${this.messageQueue.length} messages to server...`);
 
             while (this.messageQueue.length > 0) {
-                if (!(await this._storeMessage(this.messageQueue[0]))) {
-                    // Abort if the message was not stored successfully
+                const batch = this._nextBatch();
+                if (!(await this._storeMessages(batch))) {
+                    // Abort if the messages were not stored successfully
                     this.messagesUnsent = true;
                     break;
                 }
-                // Delete the message from the queue if the server responds with "ok"
-                this.messageQueue.shift();
+                // Delete the messages from the queue if the server responds with "ok"
+                this.messageQueue.splice(0, batch.length);
                 this._persistQueue();
             }
 
@@ -1877,8 +1878,22 @@ export class TeacherView {
         return this.messageQueue.length === 0;
     }
 
-    // Returns whether the server stored the message, so we may let go of it
-    async _storeMessage(message) {
+    // Stays well below Django's 2.5MB request limit, as answers may hold recordings
+    _nextBatch() {
+        const batch = [];
+        let size = 0;
+        for (const message of this.messageQueue.slice(0, 50)) {
+            size += JSON.stringify(message).length;
+            if (batch.length > 0 && size > 1_000_000) {
+                break;
+            }
+            batch.push(message);
+        }
+        return batch;
+    }
+
+    // Returns whether the server stored the messages, so we may let go of them
+    async _storeMessages(messages) {
         const config = JSON.parse(
             document.getElementById("message-sync-config").textContent,
         );
@@ -1891,17 +1906,17 @@ export class TeacherView {
                     "Content-Type": "application/json",
                     "X-CSRFToken": config.csrf_token,
                 },
-                body: JSON.stringify(message),
+                body: JSON.stringify(messages),
                 // Give up on a server which does not answer, so the next flush
                 // may try again rather than wait for this one forever
                 signal: AbortSignal.timeout(PING_MS),
             });
         } catch (error) {
-            console.log("Could not reach the server, keeping the message:", error);
+            console.log("Could not reach the server, keeping the messages:", error);
             return false;
         }
         if (!response.ok) {
-            console.warn(`Storing a message answered ${response.status}`);
+            console.warn(`Storing messages answered ${response.status}`);
         }
         return response.ok;
     }
