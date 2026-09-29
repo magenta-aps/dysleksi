@@ -2152,6 +2152,30 @@ describe("TeacherView socket 'test.started' handling", () => {
         );
         expect(markSpy).toHaveBeenCalledWith(expect.anything(), false);
     });
+
+    it("stops 'navigation away' when all students complete the test", () => {
+        const spyHandle = vi.spyOn(view.navigateAway, "handle");
+
+        const student = {
+            id: 1,
+            firstName: "Alice",
+            lastName: "Smith",
+            progress: 0,
+            currentPartIndex: 0,
+            currentQuestionIndex: 0,
+            resultsByPart: {},
+        };
+        const msgTestComplete = {
+            event: "test.complete",
+            student: student,
+        };
+
+        // Student completes the test
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", { detail: msgTestComplete }),
+        );
+        expect(spyHandle).not.toBeCalled();
+    });
 });
 
 describe("TeacherView student presence", () => {

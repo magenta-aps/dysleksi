@@ -1246,6 +1246,30 @@ export class StudentPresenceIndicator {
     }
 }
 
+export class NavigateAwayWarning {
+    #listening = false;
+
+    handle(evt) {
+        // MDN docs recommend to always call `event.preventDefault` here
+        evt.preventDefault();
+    }
+
+    toggle(state) {
+        if (state && this.#listening) {
+            // We are already listening for `beforeunload` so do nothing
+            return;
+        }
+
+        if (state && !this.#listening) {
+            window.addEventListener("beforeunload", this.handle);
+            this.#listening = true;
+        } else {
+            window.removeEventListener("beforeunload", this.handle);
+            this.#listening = false;
+        }
+    }
+}
+
 export class TeacherView {
     constructor(
         test,
@@ -1260,6 +1284,7 @@ export class TeacherView {
     ) {
         this.assignmentId = assignmentId;
         this.assignmentSocket = null;
+        this.syncSocket = null;
         this.test = test;
         this.testPaused = false;
 
@@ -1301,6 +1326,7 @@ export class TeacherView {
         this.detailsPopup = new DetailsPopup();
         this.studentPresence = new StudentPresenceIndicator();
         this.cancelTestModal = new CancelTestModal();
+        this.navigateAway = new NavigateAwayWarning();
 
         this.filterButtons = document.querySelectorAll(".group-test-header .btn");
         this.gotoNextResultGroupButton = document.querySelector(
@@ -1329,6 +1355,8 @@ export class TeacherView {
         this._initFilterButtonSelection();
         this._startSyncInterval();
         this._startPresenceInterval();
+
+        this.navigateAway.toggle(false);
     }
 
     pauseTest() {
@@ -1476,6 +1504,7 @@ export class TeacherView {
 
             if (data.event === "test.cancelled") {
                 this.cancelledStudentIds.add(data.student.id);
+                this.navigateAway.toggle(false);
             }
 
             if (this.test.testType === "individual") {
@@ -1490,10 +1519,12 @@ export class TeacherView {
                 if (data.event === "test.started") {
                     this.table.updateTable(data);
                     this.studentPresence.markStudentArrived();
+                    this.navigateAway.toggle(true);
                 }
                 if (data.event === "test.complete") {
                     this.completedStudentIds.add(data.student.id);
                     testComplete = true;
+                    this.navigateAway.toggle(false);
                 }
             }
 
@@ -1567,6 +1598,18 @@ export class TeacherView {
                     this.elapsedTimeView.start();
                     this.buttons.pauseButton().disabled = false;
                     this.buttons.cancelButton().disabled = false;
+                }
+            }
+
+            if (data.event === "test.started" && this.test.testType === "group") {
+                this.navigateAway.toggle(true);
+            }
+
+            if (data.event === "test.complete" && this.test.testType === "group") {
+                /* istanbul ignore else -- @preserve */
+                if (this.uncompletedStudents().length === 0) {
+                    // All students have completed all test parts
+                    this.navigateAway.toggle(false);
                 }
             }
 
