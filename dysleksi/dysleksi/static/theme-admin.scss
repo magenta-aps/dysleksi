@@ -1123,13 +1123,6 @@ $border-radius-student-card: $spacer / 4 * 3;
   padding-bottom: 0;
   overflow: hidden; // allow folded area to expand
 
-  &.is-expanded {
-    .student-top-row {
-      // Flatten the bottom corners: Top-Left, Top-Right, Bottom-Right, Bottom-Left
-      border-radius: $border-radius-student-card $border-radius-student-card 0 0;
-    }
-  }
-
   /* Top row */
   .student-top-row {
     background-color: $bright-blue-lightest-2;
@@ -1145,6 +1138,7 @@ $border-radius-student-card: $spacer / 4 * 3;
     border: 1px solid $blue-lighter-1;
     border-radius: $border-radius-student-card;
     justify-content: space-between;
+    border-radius: $border-radius-student-card $border-radius-student-card 0 0;
 
     #pause-overlay {
       position: absolute;
@@ -1176,9 +1170,6 @@ $border-radius-student-card: $spacer / 4 * 3;
       background-color: $red-lightest;
       border: 1px solid $red-lighter;
 
-      .progress-fill {
-        background-color: $red-lighter;
-      }
     }
 
     .student-controls {
@@ -1225,26 +1216,6 @@ $border-radius-student-card: $spacer / 4 * 3;
     }
   }
 
-  /* Progress bar inside top row */
-  .progress-fill {
-    position: absolute;
-    left: 0;
-    top: 0;
-    width: 0%;
-    height: 100%;
-    background-color: $blue-lighter-2;
-    z-index: 0;
-    transition: width 0.5s ease;
-
-    &.is-complete {
-      background-color: $green-lightest;
-    }
-
-    &.is-cancelled {
-      background-color: $mono-gray-lighter;
-    }
-  }
-
   /* Text inside top row */
   .student-text {
     position: relative;
@@ -1262,19 +1233,10 @@ $border-radius-student-card: $spacer / 4 * 3;
       font-size: 14px;
     }
 
-    .student-current-part {
-      font-size: 12px;
-      font-weight: normal;
-      color: $mono-gray-dark-1;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
   }
 
   /* Folded area below */
   .folded-area {
-    display: none;
     margin-top: 0;
     gap: $spacer / 4;
     flex-direction: column;
@@ -1295,7 +1257,7 @@ $border-radius-student-card: $spacer / 4 * 3;
     justify-content: space-between;
     width: 100%;
     font-size: 12px;
-    margin-bottom: $spacer;
+    margin-bottom: 12px;
     color: $blue-darker;
 
     .nav-group-left {
@@ -1320,7 +1282,7 @@ $border-radius-student-card: $spacer / 4 * 3;
   }
 
   .dots-container {
-    display: flex;
+    display: none;
     flex-wrap: wrap;
     gap: $spacer / 4;
     justify-content: flex-start;
@@ -1329,7 +1291,12 @@ $border-radius-student-card: $spacer / 4 * 3;
   }
 
   .question-index {
+    display: none;
     font-size: 10px;
+    color: $blue-darker;
+  }
+  .part-label {
+    font-size: 16px;
     color: $blue-darker;
   }
 

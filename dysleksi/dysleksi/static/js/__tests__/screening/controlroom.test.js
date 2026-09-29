@@ -128,10 +128,8 @@ ${MESSAGE_SYNC_CONFIG_HTML}
 <template id="student-card-template">
     <div class="student-card">
         <div class="student-top-row">
-            <div class="progress-fill" style="width: 0%"></div>
             <div class="student-text">
                 <span class="student-name"></span>
-                <span class="student-current-part">-</span>
             </div>
         <div class="student-controls">
             <span class="status-icon">
@@ -161,8 +159,8 @@ ${MESSAGE_SYNC_CONFIG_HTML}
                 <i class="ph ph-caret-right nav-arrow"></i>
             </div>
             <span class="part-label"></span>
-            <span class="question-index"></span>
-            <div class="dots-container"></div>
+            <span class="question-index" style="display: none"></span>
+            <div class="dots-container" style="display: none"></div>
         </div>
     </div>
 </template>
@@ -1749,7 +1747,7 @@ describe("GroupTestContainer", () => {
         expect(progressLabel.textContent).toBe("38%");
     });
 
-    it("toggles folded area even when clicking on child elements (name text)", () => {
+    it("toggles folded element even when clicking on child elements (name text)", () => {
         const studentData = {
             student: {
                 id: 5,
@@ -1764,16 +1762,13 @@ describe("GroupTestContainer", () => {
         instance.updateData(studentData);
 
         const card = instance.cards.get(5);
-        const folded = card.el.querySelector(".folded-area");
+        const foldedElement = card.el.querySelector(".dots-container");
         const nameSpan = card.el.querySelector(".student-name");
-
-        // Ensure it's hidden initially
-        card.foldIn();
 
         // Click on the span (target is NOT .folded-area, so it should NOT return early)
         nameSpan.click();
 
-        expect(folded.style.display).toBe("flex");
+        expect(foldedElement.style.display).toBe("flex");
     });
 
     it("does NOT toggle folded area when clicking directly on the folded area content", () => {
@@ -1829,9 +1824,6 @@ describe("GroupTestContainer", () => {
         const text = card.el.querySelector(".student-name").textContent;
         expect(text).toBe("Alice S.");
 
-        const fill = card.el.querySelector(".progress-fill");
-        expect(fill.style.width).toBe("50%");
-
         const folded = card.el.querySelector(".folded-area");
         expect(folded).not.toBeNull();
     });
@@ -1856,39 +1848,7 @@ describe("GroupTestContainer", () => {
         expect(text).toBe("Alice");
     });
 
-    it("updates an existing student card progress", () => {
-        const studentData = {
-            student: {
-                id: 2,
-                firstName: "Bob",
-                lastName: "Jones",
-                progress: 30,
-                currentPartIndex: 0,
-                currentQuestionIndex: 0,
-                resultsByPart: {},
-            },
-        };
-        instance.updateData(studentData);
-
-        const updatedData = {
-            student: {
-                id: 2,
-                firstName: "Bob",
-                lastName: "Jones",
-                progress: 80,
-                currentPartIndex: 0,
-                currentQuestionIndex: 0,
-                resultsByPart: {},
-            },
-        };
-        instance.updateData(updatedData);
-
-        const card = instance.cards.get(2);
-        const fill = card.el.querySelector(".progress-fill");
-        expect(fill.style.width).toBe("80%");
-    });
-
-    it("greys out the card of a cancelled student, keeping its progress", () => {
+    it("greys out the card of a cancelled student", () => {
         const studentData = {
             student: {
                 id: 3,
@@ -1904,14 +1864,11 @@ describe("GroupTestContainer", () => {
         instance.updateData(studentData);
 
         const card = instance.cards.get(3);
-        const fill = card.el.querySelector(".progress-fill");
-        expect(fill.style.width).toBe("40%");
-        expect(fill.classList.contains("is-cancelled")).toBe(true);
         expect(card.topRow.classList.contains("is-cancelled")).toBe(true);
         expect(card.statusIcon.style.display).toBe("none");
     });
 
-    it("toggles folded area when card is clicked", () => {
+    it("toggles folded elements when card is clicked", () => {
         const studentData = {
             student: {
                 id: 4,
@@ -1926,21 +1883,21 @@ describe("GroupTestContainer", () => {
         instance.updateData(studentData);
 
         const card = instance.cards.get(4);
-        const folded = card.el.querySelector(".folded-area");
+        const foldedElement = card.el.querySelector(".dots-container");
         const arrowSpan = card.el.querySelector("#foldout-arrow");
 
-        // Initially folded out
-        expect(folded.style.display).toBe("flex");
+        // Initially folded in
+        expect(foldedElement.style.display).toBe("none");
         const initialArrowClass = arrowSpan.className;
 
-        // Click to fold in
+        // Click to fold out
         card.el.click();
-        expect(folded.style.display).toBe("none");
+        expect(foldedElement.style.display).toBe("flex");
         expect(arrowSpan.className).not.toBe(initialArrowClass);
 
-        // Click to unfold again
+        // Click to fold again
         card.el.click();
-        expect(folded.style.display).toBe("flex");
+        expect(foldedElement.style.display).toBe("none");
         expect(arrowSpan.className).toBe(initialArrowClass);
     });
 });
@@ -2990,28 +2947,9 @@ describe("StudentCard", () => {
         });
     };
 
-    it("initializes with correct student name and progress", () => {
+    it("initializes with correct student name", () => {
         const card = new StudentCard(mockStudent, mockTest);
-
         expect(card.nameText.textContent).toBe("John D.");
-        card.update();
-        expect(card.progressFill.style.width).toBe("45%");
-    });
-
-    it("toggles the 'is-expanded' class and display style when clicked", () => {
-        const card = new StudentCard(mockStudent, mockTest);
-
-        expect(card.foldedArea.style.display).toBe("flex");
-        expect(card.el.classList.contains("is-expanded")).toBe(true);
-        expect(card.arrowIcon.className).toBe("ph-fill ph-caret-up");
-
-        card.el.click();
-        expect(card.foldedArea.style.display).toBe("none");
-        expect(card.el.classList.contains("is-expanded")).toBe(false);
-
-        card.el.click();
-        expect(card.foldedArea.style.display).toBe("flex");
-        expect(card.el.classList.contains("is-expanded")).toBe(true);
     });
 
     it("changes viewable part when navigation arrows are clicked", () => {
@@ -3862,18 +3800,20 @@ describe("GroupTestContainer foldAllCards", () => {
     });
 
     it("folds all cards out when all are folded in", () => {
-        container.cards.forEach((card) => card.foldIn());
         btn.click();
         container.cards.forEach((card) => {
-            expect(card.foldedArea.style.display).toBe("flex");
+            expect(card.questionIndex.style.display).toBe("flex");
+            expect(card.dotsContainer.style.display).toBe("flex");
             expect(card.isHidden).toBe(false);
         });
     });
 
     it("folds all cards in when all are folded out", () => {
+        container.cards.forEach((card) => card.foldOut());
         btn.click();
         container.cards.forEach((card) => {
-            expect(card.foldedArea.style.display).toBe("none");
+            expect(card.questionIndex.style.display).toBe("none");
+            expect(card.dotsContainer.style.display).toBe("none");
             expect(card.isHidden).toBe(true);
         });
     });
@@ -3885,7 +3825,8 @@ describe("GroupTestContainer foldAllCards", () => {
 
         btn.click();
         container.cards.forEach((card) => {
-            expect(card.foldedArea.style.display).toBe("none");
+            expect(card.questionIndex.style.display).toBe("none");
+            expect(card.dotsContainer.style.display).toBe("none");
             expect(card.isHidden).toBe(true);
         });
     });

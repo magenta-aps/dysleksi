@@ -18,10 +18,8 @@
 <template id="student-card-template">
     <div class="student-card">
         <div class="student-top-row">
-            <div class="progress-fill" style="width: 0%"></div>
             <div class="student-text">
                 <span class="student-name"></span>
-                <span class="student-current-part">-</span>
             </div>
 
             <div class="student-controls">
@@ -44,7 +42,7 @@
                 <i class="ph-fill ph-pause"></i>
             </div>
         </div>
-        <div class="folded-area" style="display: none">
+        <div class="folded-area">
             <div class="parts-progress"></div>
             <div class="part-navigation">
                 <div class="nav-group-left">
@@ -54,8 +52,8 @@
                 <i class="ph ph-caret-right nav-arrow"></i>
             </div>
             <span class="part-label"></span>
-            <span class="question-index"></span>
-            <div class="dots-container"></div>
+            <span class="question-index" style="display: none"></span>
+            <div class="dots-container" style="display: none"></div>
         </div>
     </div>
 </template>
