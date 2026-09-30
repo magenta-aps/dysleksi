@@ -214,7 +214,7 @@
             {
                 // Nu kan du se bogstaver, som hører sammen.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.15.mp3",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.15 (Ny).mp3",
                 "delayAfter": 1250
             },
             {
