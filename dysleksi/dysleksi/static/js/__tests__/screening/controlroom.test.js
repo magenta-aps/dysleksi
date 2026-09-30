@@ -1643,6 +1643,7 @@ describe("Teacher Individual test View", () => {
         storage.mockRejectedValue(new Error("The server is out of reach"));
         const disabled = document.getElementById("result-link-disabled");
         const enabled = document.getElementById("result-link-enabled");
+        const spyToggle = vi.spyOn(view.navigateAway, "toggle");
         // Act
         p2pChannel.dispatchEvent(
             new CustomEvent("message", {
@@ -1659,6 +1660,7 @@ describe("Teacher Individual test View", () => {
         await vi.advanceTimersByTimeAsync(1000);
         expect(disabled.classList.contains("d-none")).toBe(true);
         expect(enabled.classList.contains("d-none")).toBe(false);
+        expect(spyToggle).toHaveBeenLastCalledWith(false);
     });
 });
 
@@ -2128,30 +2130,6 @@ describe("TeacherView socket 'test.started' handling", () => {
             }),
         );
         expect(markSpy).toHaveBeenCalledWith(expect.anything(), false);
-    });
-
-    it("stops 'navigation away' when all students complete the test", () => {
-        const spyHandle = vi.spyOn(view.navigateAway, "handle");
-
-        const student = {
-            id: 1,
-            firstName: "Alice",
-            lastName: "Smith",
-            progress: 0,
-            currentPartIndex: 0,
-            currentQuestionIndex: 0,
-            resultsByPart: {},
-        };
-        const msgTestComplete = {
-            event: "test.complete",
-            student: student,
-        };
-
-        // Student completes the test
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", { detail: msgTestComplete }),
-        );
-        expect(spyHandle).not.toBeCalled();
     });
 });
 
