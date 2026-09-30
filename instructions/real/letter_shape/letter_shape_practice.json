@@ -102,7 +102,7 @@
                 // Skal først finde bogstaver, der hører sammen nemlig ét stort bogstav
                 // og ét lille bogstav, således:
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.6.mp3",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.6 (Ny).mp3",
                 "delayAfter": 1250
             },
 
