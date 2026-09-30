@@ -181,8 +181,8 @@ def update_or_create_letter_shape_test(
         sound="resources/letter_shape/Enhanced/Deltests/3e.2.mp3",
     )
     completion, created = TestResource.objects.get_or_create(
-        name="resources/letter_shape/Enhanced/Deltests/3e.3.mp3",
-        sound="resources/letter_shape/Enhanced/Deltests/3e.3.mp3",
+        name="resources/letter_shape/Enhanced/Deltests/3e.3 (Ny).mp3",
+        sound="resources/letter_shape/Enhanced/Deltests/3e.3 (Ny).mp3",
     )
     practice_correct_feedback, created = TestResource.objects.get_or_create(
         name="resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.6.mp3",
