@@ -1158,6 +1158,7 @@ $border-radius-student-card: $spacer / 4 * 3;
     }
 
     &.is-complete {
+      background-color: $green-lightest;
       border: 1px solid $green-lighter;
     }
 
