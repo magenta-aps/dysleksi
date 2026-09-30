@@ -230,7 +230,7 @@
             {
                 // Derfor skal du nu vælge det store B og det lille b.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.16.mp3",
+                "resource": "resources/letter_shape/Enhanced/Instruktion/3b.16 (Ny).mp3",
                 "delayAfter": 1250
             },
 
