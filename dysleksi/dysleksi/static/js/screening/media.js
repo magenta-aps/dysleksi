@@ -28,7 +28,15 @@ export class TestMediaRecorder extends EventTarget {
                         this._watchMicPermission(stream.getAudioTracks()[0]);
                         this.mediaRecorder = new MediaRecorder(stream);
                         this.mediaRecorder.addEventListener("dataavailable", (evt) => {
-                            this.recording.push(evt.data);
+                            // Keep audio size under 1MB
+                            // Note: Base64 grows the recording by about a third
+                            const size = this.recording.reduce(
+                                (sum, b) => sum + b.size,
+                                0,
+                            );
+                            if (size + evt.data.size <= 750_000) {
+                                this.recording.push(evt.data);
+                            }
                             this.dispatchEvent(new Event("recording.updated", {}));
                         });
                         resolve(); // mediaRecorder is ready

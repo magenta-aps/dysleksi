@@ -92,6 +92,21 @@ describe("TestMediaRecorder", () => {
         expect(dispatchedEvent.type).toBe("recording.updated");
     });
 
+    it("should drop data beyond the size limit", async () => {
+        const dispatchSpy = vi.spyOn(recorder, "dispatchEvent");
+        await recorder.setup();
+        const callback = mockMediaRecorderInstance.addEventListener.mock.calls.find(
+            (call) => call[0] === "dataavailable",
+        )[1];
+
+        const firstBlob = { size: 700_000, type: "audio/webm" };
+        callback({ data: firstBlob });
+        callback({ data: { size: 100_000, type: "audio/webm" } });
+
+        expect(recorder.recording).toEqual([firstBlob]);
+        expect(dispatchSpy).toHaveBeenCalledTimes(2);
+    });
+
     it("should initialize with empty recording and interval", () => {
         expect(recorder.recording).toEqual([]);
         expect(recorder.recordingUpdateInterval).toBe(mockInterval);
