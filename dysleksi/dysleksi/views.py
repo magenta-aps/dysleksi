@@ -160,7 +160,7 @@ class NavigationMixin:
             # Add context for navigation menu (results)
             context_data["teacher_results"] = (
                 user.accessible_assignments.annotate_status()
-                .filter(status=TestAssignmentStatus.COMPLETED)
+                .filter_finished()
                 .order_by("klasse__name", "student__last_name")
             )
             context_data["current_assignment"] = current_assignment
@@ -425,9 +425,7 @@ class ClassDetailView(
         context_data["active_tab"] = self.request.GET.get("tab", "master-data-tab")
 
         assignments = self.object.testassignment_set.annotate_status()
-        context_data["completed_test_assignments"] = assignments.filter(
-            status=TestAssignmentStatus.COMPLETED
-        )
+        context_data["completed_test_assignments"] = assignments.filter_finished()
         context_data["planned_test_assignments"] = assignments.filter(
             status__in=(TestAssignmentStatus.CREATED, TestAssignmentStatus.IN_PROGRESS)
         )
@@ -467,9 +465,7 @@ class StudentDetailView(
         assignments = TestAssignment.objects.filter(
             Q(student=self.object) | Q(klasse__students=self.object)
         ).annotate_status()
-        context_data["completed_test_assignments"] = assignments.filter(
-            status=TestAssignmentStatus.COMPLETED
-        )
+        context_data["completed_test_assignments"] = assignments.filter_finished()
 
         skills = self.get_skills()
         context_data["skills"] = skills
@@ -768,9 +764,7 @@ class AssignmentResultListView(TestAssignmentListView):
     table_class = TestAssignmentResultTable
 
     def get_queryset(self):
-        qs = super().get_queryset()
-        qs = qs.filter(status=TestAssignmentStatus.COMPLETED)
-        return qs
+        return super().get_queryset().filter_finished()
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)

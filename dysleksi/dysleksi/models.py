@@ -710,6 +710,11 @@ class TestAssignmentQuerySet(PermissionsQuerySet):
             ),
         )
 
+    def filter_finished(self):
+        return self.filter(
+            status__in=[TestAssignmentStatus.COMPLETED, TestAssignmentStatus.CANCELLED]
+        )
+
     def _get_student_class_query(self):
         return Class.objects.filter(is_main=True, students=OuterRef("student"))
 
