@@ -18,7 +18,7 @@
             {
                 // Bogstavers form er nu ved at starte.
                 "action": "playSound",
-                "resource": "resources/letter_shape/Enhanced/Indledning/3a.1.mp3",
+                "resource": "resources/letter_shape/Enhanced/Indledning/3a.1 (Ny).mp3",
                 "delayAfter": 250
             },
             {
