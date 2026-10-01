@@ -2152,7 +2152,7 @@ $border-radius-student-card: $spacer / 4 * 3;
 
 // Covers the whole window when the assignment is already being run in another
 // window
-.window-blocked {
+.blocking-popup {
   position: fixed;
   inset: 0;
   z-index: 1080; // above the sidebar navigation and any modal backdrop
@@ -2162,7 +2162,7 @@ $border-radius-student-card: $spacer / 4 * 3;
   padding: 2 * $spacer;
   background-color: rgba($mono-gray-darkest, 0.6);
 
-  .window-blocked-message {
+  .blocking-popup-message {
     max-width: 32rem;
     padding: 2 * $spacer;
     border-radius: $border-radius;

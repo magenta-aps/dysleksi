@@ -115,6 +115,7 @@ const SHARED_DOM_HTML = `
     <button id="skip-sound-calibration"></button>
     <div id="test-summary"></div>
     <div id="test-exit"></div>
+    <div id="test-cancelled" class="d-none"><button id="test-cancelled-log-out"></button></div>
     <div id="testpart-outro"></div>
     <div id="test-intro"></div>
     <div id="test-break"></div>
@@ -1282,6 +1283,51 @@ describe("GroupTestFlow", () => {
             uuid: expect.any(String),
             student: expect.any(Object),
         });
+    });
+
+    it("Shows the cancelled popup instead of the exit screen when cancelled", async () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, 1, domElements, new Student({ id: 1 }));
+        testSpy(view);
+        vi.spyOn(view, "clearTimeout");
+        vi.spyOn(view, "clearPartTimeout");
+        domElements.logOut.mockResolvedValue();
+
+        // Cancelled in the middle of an instruction sequence, which locks the input
+        domElements.lockInput();
+        await view.onTestComplete(true);
+
+        expect(view.send).toHaveBeenCalledWith(
+            expect.objectContaining({ event: "test.cancelled" }),
+        );
+        expect(view.clearTimeout).toHaveBeenCalled();
+        expect(view.clearPartTimeout).toHaveBeenCalled();
+        expect(mockAudioContextInstance.suspend).toHaveBeenCalled();
+        expect(domElements.showTestCancelled).toHaveBeenCalled();
+        expect(domElements.showSummary).not.toHaveBeenCalled();
+        expect(domElements.showTestExit).not.toHaveBeenCalled();
+        expect(domElements.testCancelled.classList.contains("d-none")).toBe(false);
+        expect(domElements.testCancelledLogOutButton.style.pointerEvents).toBe("");
+
+        domElements.testCancelledLogOutButton.click();
+        expect(domElements.testCancelled.classList.contains("d-none")).toBe(true);
+        expect(domElements.logOut).toHaveBeenCalled();
+    });
+
+    it("never shows the connection lost overlay once the test is cancelled", async () => {
+        const view = new GroupTestView(
+            new Test(groupTestData),
+            1,
+            domElements,
+            new Student({ id: 1 }),
+        );
+
+        await view.onTestComplete(true);
+        // The teacher leaves once every student has confirmed the cancellation
+        view.onChatMessage({ event: "teacher.ping" });
+        await vi.advanceTimersByTimeAsync(15000);
+
+        expect(domElements.showConnectionLostOverlay).not.toHaveBeenCalled();
     });
 
     it("Answer last question in last part", async () => {

@@ -1,6 +1,6 @@
 {% load i18n %}
-<div id="window-blocked" class="window-blocked d-none" role="alert">
-    <div class="window-blocked-message">
+<div id="window-blocked" class="blocking-popup d-none" role="alert">
+    <div class="blocking-popup-message">
         <i class="ph ph-lock"></i>
         {% if user.is_student %}
         <h2>{% translate 'Din test er åbnet i et nyere vindue' %}</h2>
