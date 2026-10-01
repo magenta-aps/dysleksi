@@ -1657,7 +1657,8 @@ describe("Teacher Individual test View", () => {
 
         storage.mockResolvedValue({ ok: true, status: 204 });
 
-        await vi.advanceTimersByTimeAsync(1000);
+        // Retries back off while the server is out of reach
+        await vi.runOnlyPendingTimersAsync();
         expect(disabled.classList.contains("d-none")).toBe(true);
         expect(enabled.classList.contains("d-none")).toBe(false);
         expect(spyToggle).toHaveBeenLastCalledWith(false);
@@ -3119,14 +3120,30 @@ describe("TeacherView Sync Logic", () => {
     });
 
     describe("_startSyncInterval", () => {
-        it("triggers _flushMessageQueue every second", () => {
+        it("triggers _flushMessageQueue every second", async () => {
             const flushSpy = vi.spyOn(view, "_flushMessageQueue");
 
-            vi.advanceTimersByTime(1000);
+            await vi.advanceTimersByTimeAsync(1000);
             expect(flushSpy).toHaveBeenCalledTimes(1);
 
-            vi.advanceTimersByTime(1000);
+            await vi.advanceTimersByTimeAsync(1000);
             expect(flushSpy).toHaveBeenCalledTimes(2);
+        });
+
+        it("backs off while the server fails, up to 30 seconds", async () => {
+            view.messageQueue = [{ event: "test", uuid: "1" }];
+            storage.mockResolvedValue({ ok: false, status: 500 });
+            await vi.advanceTimersByTimeAsync(0);
+
+            for (let i = 0; i < 5; i++) {
+                await view._flushMessageQueue();
+            }
+            expect(view.syncDelay).toBe(30_000);
+
+            storage.mockResolvedValue({ ok: true, status: 204 });
+            await vi.runOnlyPendingTimersAsync();
+            expect(view.syncDelay).toBe(1000);
+            expect(view.messageQueue).toEqual([]);
         });
     });
 

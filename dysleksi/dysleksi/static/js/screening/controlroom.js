@@ -1368,6 +1368,8 @@ export class TeacherView {
         this.flushing = false;
         // Whether a message failed to reach the server since the queue was last empty
         this.messagesUnsent = false;
+        // Backs off while the server fails, so a struggling server is not flooded
+        this.syncDelay = 1000;
 
         this._initSocket();
         this._initButtonListeners();
@@ -1810,10 +1812,11 @@ export class TeacherView {
     }
 
     _startSyncInterval() {
-        this._flushMessageQueue();
-        setInterval(() => {
-            this._flushMessageQueue();
-        }, 1000);
+        const sync = async () => {
+            await this._flushMessageQueue();
+            setTimeout(sync, this.syncDelay);
+        };
+        sync();
     }
 
     // Returns whether the queue is empty, i.e. everything reached the server
@@ -1827,8 +1830,10 @@ export class TeacherView {
                 if (!(await this._storeMessages(batch))) {
                     // Abort if the messages were not stored successfully
                     this.messagesUnsent = true;
+                    this.syncDelay = Math.min(this.syncDelay * 2, 30_000);
                     break;
                 }
+                this.syncDelay = 1000;
                 // Delete the messages from the queue if the server responds with "ok"
                 this.messageQueue.splice(0, batch.length);
                 this._persistQueue();
@@ -1878,8 +1883,9 @@ export class TeacherView {
                 },
                 body: JSON.stringify(messages),
                 // Give up on a server which does not answer, so the next flush
-                // may try again rather than wait for this one forever
-                signal: AbortSignal.timeout(PING_MS),
+                // may try again rather than wait for this one forever.
+                // A busy server keeps working on an aborted batch, so be patient
+                signal: AbortSignal.timeout(60_000),
             });
         } catch (error) {
             console.log("Could not reach the server, keeping the messages:", error);
@@ -1894,7 +1900,7 @@ export class TeacherView {
     async _awaitMessageQueue(studentsPending = () => false) {
         while (!(await this._flushMessageQueue()) || studentsPending()) {
             console.log("Waiting for students and message queue...");
-            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await new Promise((resolve) => setTimeout(resolve, this.syncDelay));
         }
     }
 
