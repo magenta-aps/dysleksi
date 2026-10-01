@@ -103,8 +103,8 @@ def update_or_create_fore_sound_test(
 ):
 
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/fore_sound/Enhanced/Instruktion/2b.20.mp3",
-        sound="resources/fore_sound/Enhanced/Instruktion/2b.20.mp3",
+        name="resources/fore_sound/Enhanced/Instruktion/2e.4.mp3",
+        sound="resources/fore_sound/Enhanced/Instruktion/2e.4.mp3",
     )
 
     completion, created = TestResource.objects.get_or_create(

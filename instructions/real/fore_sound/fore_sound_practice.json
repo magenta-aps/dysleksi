@@ -323,7 +323,7 @@
             "resources/fore_sound/Opgave/Svamp2.jpg",
             "resources/fore_sound/Opgave/Skur.jpg"
         ],
-        "reminder_source": "/resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.mp3",
+        "reminder_source": "/resources/fore_sound/Enhanced/Øveopgave 1 og 2/2b.20.mp3",
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
             {
@@ -394,7 +394,7 @@
             "resources/fore_sound/Opgave/Frø.jpg",
             "resources/fore_sound/Opgave/Svamp2.jpg"
         ],
-        "reminder_source": "/resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.mp3"
+        "reminder_source": "/resources/fore_sound/Enhanced/Øveopgave 1 og 2/2b.20.mp3"
     },
     {
         "question_type": "no_input_required",
