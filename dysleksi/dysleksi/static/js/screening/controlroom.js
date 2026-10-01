@@ -1212,22 +1212,16 @@ export class CancelTestModal {
 
 export class StudentPresenceIndicator {
     /* Shows "waiting for student" next to the page heading until the student
-       enters the test room, then briefly shows a confirmation instead. */
-    constructor(selector = "#student-presence", hideDelay = 5000) {
+       enters the test room, then shows a confirmation instead. */
+    constructor(selector = "#student-presence") {
         this.domElement = document.querySelector(selector);
-        this.hideDelay = hideDelay;
-        this.timeout = null;
     }
 
     markStudentArrived() {
         if (this.domElement === null) {
             return;
         }
-        clearTimeout(this.timeout);
         this.domElement.dataset.state = "arrived";
-        this.timeout = setTimeout(() => {
-            this.domElement.dataset.state = "done";
-        }, this.hideDelay);
     }
 }
 

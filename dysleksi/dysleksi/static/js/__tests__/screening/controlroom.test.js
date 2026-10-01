@@ -1456,12 +1456,10 @@ describe("Teacher Individual test View", () => {
                 },
             }),
         );
-        // Assert: the confirmation is shown, and hidden again after 5 seconds
+        // Assert: the confirmation is shown, and stays visible
         expect(presenceEl.dataset.state).toBe("arrived");
-        vi.advanceTimersByTime(4999);
+        vi.advanceTimersByTime(60000);
         expect(presenceEl.dataset.state).toBe("arrived");
-        vi.advanceTimersByTime(1);
-        expect(presenceEl.dataset.state).toBe("done");
     });
 
     it("runs animated audio indicator while the student answers", () => {
@@ -3673,21 +3671,6 @@ describe("StudentPresenceIndicator", () => {
         vi.advanceTimersByTime(60000);
         expect(indicator.domElement.dataset.state).toBe("waiting");
     });
-
-    it("restarts the delay when the student arrives again", () => {
-        const indicator = new StudentPresenceIndicator();
-
-        indicator.markStudentArrived();
-        vi.advanceTimersByTime(4000);
-        // The student re-enters the room before the confirmation is hidden
-        indicator.markStudentArrived();
-        vi.advanceTimersByTime(4000);
-        expect(indicator.domElement.dataset.state).toBe("arrived");
-
-        vi.advanceTimersByTime(1000);
-        expect(indicator.domElement.dataset.state).toBe("done");
-    });
-
     it("does not throw when the element is missing from the DOM", () => {
         document.body.innerHTML = "";
         const indicator = new StudentPresenceIndicator();
