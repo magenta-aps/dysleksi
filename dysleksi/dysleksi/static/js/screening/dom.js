@@ -35,6 +35,10 @@ class TestDomElements {
         this.logOutButton = document.querySelector("#log-out");
         this.summaryLogOutButton = document.querySelector("#summary-log-out");
         this.loggedOut = document.querySelector("#logged-out");
+        this.testCancelled = document.querySelector("#test-cancelled");
+        this.testCancelledLogOutButton = document.querySelector(
+            "#test-cancelled-log-out",
+        );
         this.testPartOutroText = document.querySelector("#testpart-outro-text");
         this.testPartOutroImage = document.querySelector("#testpart-outro-image");
         this.testSummary = document.querySelector("#test-summary");
@@ -309,6 +313,14 @@ class TestDomElements {
         this.setLogOutButtonListener(this.logOutButton);
     }
 
+    showTestCancelled() {
+        this.testCancelled.classList.remove("d-none");
+        this._setButtonListener(this.testCancelledLogOutButton, () => {
+            this.testCancelled.classList.add("d-none");
+            this.logOut();
+        });
+    }
+
     hideIntro() {
         this.testIntro.style.display = "none";
     }
@@ -483,7 +495,9 @@ class TestDomElements {
 
     _updateInputState(inputLocked) {
         this.inputLocked = inputLocked;
-        const buttons = document.querySelectorAll("button:not(.debug-button)");
+        const buttons = document.querySelectorAll(
+            "button:not(.debug-button, #test-cancelled-log-out)",
+        );
         buttons.forEach((btn) => {
             if (inputLocked) {
                 btn.style.pointerEvents = "none"; // disables clicks

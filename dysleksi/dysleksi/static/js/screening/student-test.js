@@ -11,7 +11,7 @@ import { listenForRedirect } from "../redirect.js";
 import { gettext } from "../i18n.js";
 import { getAssignmentSocket } from "../ws.js";
 
-export class StudentTestView extends EventTarget {
+export class StudentTestView {
     assignmentId;
     domElements;
     student;
@@ -35,7 +35,6 @@ export class StudentTestView extends EventTarget {
     rejoinIntervalId = null;
 
     constructor(test, assignmentId, domElements, student) {
-        super();
         preventDoubleTapZoom();
         this.test = test;
         this.peer = new WebRTCPeer();
@@ -164,7 +163,7 @@ export class StudentTestView extends EventTarget {
     }
 
     onConnectionLost() {
-        if (this.windowBlocked) {
+        if (this.windowBlocked || this.student.cancelled) {
             return;
         }
         this.connectionLost = true;
@@ -532,18 +531,18 @@ export class StudentTestView extends EventTarget {
                 event: "test.cancelled",
                 message: "Testen er afbrudt",
             });
-        } else {
-            this.send({
-                event: "test.complete",
-                message: "Testen er afsluttet",
-            });
+            this.clearTimeout();
+            this.clearPartTimeout();
+            this.audioContext.suspend();
+            this.domElements.showTestCancelled();
+            return;
         }
 
-        this.dispatchEvent(
-            new Event("test.complete", {
-                test: this.test,
-            }),
-        );
+        this.send({
+            event: "test.complete",
+            message: "Testen er afsluttet",
+        });
+
         this.domElements.hideAll();
 
         if (this.test.parts.length > 1) {
@@ -575,13 +574,6 @@ export class StudentTestView extends EventTarget {
 
     onPartComplete() {
         this.clearPartTimeout();
-        this.dispatchEvent(
-            new Event("part.complete", {
-                test: this.test,
-                part: this.currentPart,
-            }),
-        );
-
         const canShow = this.setPart(this.currentPartIndex + 1);
 
         if (canShow) {

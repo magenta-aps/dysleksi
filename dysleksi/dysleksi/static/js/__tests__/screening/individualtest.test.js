@@ -78,6 +78,7 @@ describe("IndividualTestFlow", () => {
             <div id="test-container"></div>
             <div id="testpart-outro"></div>
             <div id="test-intro"></div>
+            <div id="test-cancelled" class="d-none"><button id="test-cancelled-log-out"></button></div>
             <button id="next"></button>
             <button id="repeat"></button>
             <button id="start-testpart"></button>

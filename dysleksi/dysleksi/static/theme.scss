@@ -1049,26 +1049,26 @@ body.show-instructions .sound-btn.pulse {
   100% { content: "\e44a"; } // high
 }
 
-// Covers the whole window when the test is already open in another window of
-// the same student
-.window-blocked {
+// Covers the whole window, e.g. when the test is already open in another window of
+// the same student or when the teacher has cancelled the test
+.blocking-popup {
   position: fixed;
   inset: 0;
-  z-index: 1080; // above the pause overlay
+  z-index: 100001; // above the pause and mic lost overlays
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2 * $spacer;
   background-color: rgba($student-grey-darkest, 0.6);
 
-  .window-blocked-message {
+  .blocking-popup-message {
     max-width: 32rem;
     padding: 2 * $spacer;
     border-radius: 16px;
     background-color: $white;
     text-align: center;
 
-    i {
+    > i {
       font-size: 3rem;
       color: $student-purple;
     }

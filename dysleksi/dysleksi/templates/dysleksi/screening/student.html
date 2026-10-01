@@ -14,6 +14,16 @@
 {% block content %}
 {% include "dysleksi/window_blocked.html" %}
 
+<div id="test-cancelled" class="blocking-popup d-none" role="alert">
+    <div class="blocking-popup-message">
+        <h2>{% translate "Testen er afbrudt" %}</h2>
+        <p>{% translate "Din lærer har afbrudt testen." %}</p>
+        <button type="button" class="btn task-btn" id="test-cancelled-log-out">
+            {% translate "Log ud" %} <i class="ph-fill ph-sign-out"></i>
+        </button>
+    </div>
+</div>
+
 <div id="pause-overlay" class="center-screen">
     <i class="ph-fill ph-pause"></i>
 </div>

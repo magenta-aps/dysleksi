@@ -998,6 +998,14 @@ msgid "Beskeder er ikke blevet gemt"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/screening/student.html
+msgid "Testen er afbrudt"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/screening/student.html
+msgid "Din lærer har afbrudt testen."
+msgstr ""
+
+#: dysleksi/templates/dysleksi/screening/student.html
 msgid "Ingen forbindelse til læreren"
 msgstr ""
 
