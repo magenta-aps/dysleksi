@@ -1543,7 +1543,6 @@ export class TeacherView {
                 if (data.event === "test.complete") {
                     this.completedStudentIds.add(data.student.id);
                     testComplete = true;
-                    this.navigateAway.toggle(false);
                 }
             }
 
@@ -1622,14 +1621,6 @@ export class TeacherView {
 
             if (data.event === "test.started" && this.test.testType === "group") {
                 this.navigateAway.toggle(true);
-            }
-
-            if (data.event === "test.complete" && this.test.testType === "group") {
-                /* istanbul ignore else -- @preserve */
-                if (this.uncompletedStudents().length === 0) {
-                    // All students have completed all test parts
-                    this.navigateAway.toggle(false);
-                }
             }
 
             if (data.event === "test.started" && this.testPaused === true) {
@@ -1920,6 +1911,7 @@ export class TeacherView {
     // The results are only worth looking at once every message reached the server
     async showResultLink() {
         await this._awaitMessageQueue();
+        this.navigateAway.toggle(false);
         document.getElementById("result-link-disabled").classList.add("d-none");
         document.getElementById("result-link-enabled").classList.remove("d-none");
     }
