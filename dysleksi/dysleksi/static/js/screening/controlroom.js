@@ -1250,14 +1250,17 @@ export class NavigateAwayWarning {
 }
 
 export class MessageQueueIndicator {
-    /* Warns next to the page heading while we are offline, and shows how many
-       messages are waiting in the queue to be sent to the server. */
+    /* Warns next to the page heading while we are offline or the server is slow,
+       and shows how many messages are waiting in the queue to be sent to the server. */
     constructor(selector = "#message-queue") {
         this.domElement = document.querySelector(selector);
+        this.offlineElement = this.domElement.querySelector(".message-queue-offline");
+        this.slowElement = this.domElement.querySelector(".message-queue-slow");
         this.messagesElement = this.domElement.querySelector(".message-queue-messages");
         this.countElement = this.domElement.querySelector(".message-queue-count");
         this.offline = !navigator.onLine;
         this.messagesUnsent = false;
+        this.slow = false;
         this.queueLength = 0;
 
         window.addEventListener("offline", () => {
@@ -1270,17 +1273,21 @@ export class MessageQueueIndicator {
         });
     }
 
-    update(messagesUnsent, queueLength) {
+    update(messagesUnsent, queueLength, slow = false) {
         this.messagesUnsent = messagesUnsent;
         this.queueLength = queueLength;
+        this.slow = slow;
         this.render();
     }
 
     render() {
-        const warn = this.offline || this.messagesUnsent;
+        const failing = this.offline || this.messagesUnsent;
+        const warn = failing || this.slow;
         const showQueueLength = warn && this.queueLength > 0;
 
         this.domElement.classList.toggle("d-none", !warn);
+        this.offlineElement.classList.toggle("d-none", !failing);
+        this.slowElement.classList.toggle("d-none", failing || !this.slow);
         this.messagesElement.classList.toggle("d-none", !showQueueLength);
         this.countElement.textContent = this.queueLength;
     }
@@ -1368,6 +1375,8 @@ export class TeacherView {
         this.flushing = false;
         // Whether a message failed to reach the server since the queue was last empty
         this.messagesUnsent = false;
+        // Whether the server has kept a request waiting during the current flush
+        this.serverSlow = false;
         // Backs off while the server fails, so a struggling server is not flooded
         this.syncDelay = 1000;
 
@@ -1825,6 +1834,16 @@ export class TeacherView {
             this.flushing = true;
             console.log(`Syncing ${this.messageQueue.length} messages to server...`);
 
+            // Warn the teacher if it takes more than 5 seconds to process the queue
+            const slowWarning = setTimeout(() => {
+                this.serverSlow = true;
+                this.messageQueueIndicator.update(
+                    this.messagesUnsent,
+                    this.messageQueue.length,
+                    true,
+                );
+            }, 5000);
+
             while (this.messageQueue.length > 0) {
                 const batch = this._nextBatch();
                 if (!(await this._storeMessages(batch))) {
@@ -1839,7 +1858,12 @@ export class TeacherView {
                 this._persistQueue();
             }
 
+            clearTimeout(slowWarning);
             this.flushing = false;
+
+            // We only end up here when the queue is empty OR the request failed.
+            // So it is safe to clear the serverSlow flag at this point.
+            this.serverSlow = false;
         }
 
         if (this.messageQueue.length === 0) {
@@ -1849,6 +1873,7 @@ export class TeacherView {
         this.messageQueueIndicator.update(
             this.messagesUnsent,
             this.messageQueue.length,
+            this.serverSlow,
         );
         return this.messageQueue.length === 0;
     }

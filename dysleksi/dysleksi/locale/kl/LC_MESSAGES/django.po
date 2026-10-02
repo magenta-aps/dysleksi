@@ -994,7 +994,11 @@ msgid "Der er ikke forbindelse til serveren"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/message_queue.html
-msgid "Beskeder er ikke blevet gemt"
+msgid "Serveren svarer langsomt"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/message_queue.html
+msgid "Ikke alle data er gemt på serveren"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/screening/student.html
