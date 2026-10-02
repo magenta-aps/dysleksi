@@ -381,7 +381,7 @@
     {
         "question_type": "multiple_choice",
         "image": "resources/sentence_reading/Opgave/Opgave 45-46-47-48.jpg",
-        "text": "Arnat qaqortumik tujuuloarput",
+        "text": "Arnat qaqortumik tujuuloqarput",
         "correct": "false",
         "wrong": ["true"]
     },
