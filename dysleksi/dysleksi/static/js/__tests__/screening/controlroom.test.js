@@ -123,8 +123,9 @@ const MESSAGE_SYNC_CONFIG_HTML = `
 `;
 
 const MESSAGE_QUEUE_HTML = `
-<div id="message-queue" class="message-queue d-none" title="Der er ikke forbindelse til serveren: beskeder er ikke blevet gemt">
-    <i class="ph-fill ph-warning" aria-hidden="true"></i>
+<div id="message-queue" class="message-queue d-none">
+    <span class="message-queue-offline"></span>
+    <span class="message-queue-slow d-none"></span>
     <span class="message-queue-messages d-none">
         <i class="ph-fill ph-envelope" aria-hidden="true"></i>
         <span class="message-queue-count">0</span>
@@ -3241,6 +3242,43 @@ describe("TeacherView Sync Logic", () => {
             expect(indicator.classList.contains("d-none")).toBe(true);
         });
 
+        it("warns when the batches keep the teacher waiting for 5 seconds", async () => {
+            const indicator = document.querySelector("#message-queue");
+            const slow = indicator.querySelector(".message-queue-slow");
+            const offline = indicator.querySelector(".message-queue-offline");
+            const count = indicator.querySelector(".message-queue-count");
+            // Every batch is quick, but three of them take 9 seconds
+            storage.mockImplementation(
+                () =>
+                    new Promise((resolve) =>
+                        setTimeout(() => resolve({ ok: true, status: 204 }), 3000),
+                    ),
+            );
+            view.messageQueue = Array.from({ length: 150 }, (_, i) => ({
+                event: "test",
+                uuid: `${i}`,
+            }));
+            const flushing = view._flushMessageQueue();
+
+            await vi.advanceTimersByTimeAsync(4999);
+            expect(indicator.classList.contains("d-none")).toBe(true);
+
+            await vi.advanceTimersByTimeAsync(1);
+            expect(slow.classList.contains("d-none")).toBe(false);
+            expect(offline.classList.contains("d-none")).toBe(true);
+            expect(count.textContent).toBe("100");
+
+            // The warning stays up across sync ticks and batches, counting down
+            await vi.advanceTimersByTimeAsync(2000);
+            expect(slow.classList.contains("d-none")).toBe(false);
+            expect(count.textContent).toBe("50");
+
+            await vi.advanceTimersByTimeAsync(3000);
+            await flushing;
+
+            expect(indicator.classList.contains("d-none")).toBe(true);
+        });
+
         it("does not start a second flush while one is underway", async () => {
             view.messageQueue = [{ event: "test", uuid: "1" }];
 
@@ -3694,6 +3732,18 @@ describe("MessageQueueIndicator", () => {
         window.dispatchEvent(new Event("online"));
 
         expect(indicator.domElement.classList.contains("d-none")).toBe(true);
+    });
+
+    it("prefers the offline warning over the slow one", () => {
+        indicator.update(false, 1, true);
+
+        expect(indicator.offlineElement.classList.contains("d-none")).toBe(true);
+        expect(indicator.slowElement.classList.contains("d-none")).toBe(false);
+
+        window.dispatchEvent(new Event("offline"));
+
+        expect(indicator.offlineElement.classList.contains("d-none")).toBe(false);
+        expect(indicator.slowElement.classList.contains("d-none")).toBe(true);
     });
 
     it("counts the messages waiting in the queue", () => {

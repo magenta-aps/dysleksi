@@ -1,11 +1,18 @@
 {% load i18n %}
 {% translate 'Der er ikke forbindelse til serveren' as offline_message %}
-{% translate 'Beskeder er ikke blevet gemt' as unhealthy_message_queue_message %}
+{% translate 'Serveren svarer langsomt' as slow_message %}
+{% translate 'Ikke alle data er gemt på serveren' as unhealthy_message_queue_message %}
 <div id="message-queue" class="message-queue d-none" role="status" aria-live="polite">
-    <i class="ph-fill ph-warning" aria-hidden="true" title="{{ offline_message }}"></i>
+    <span class="message-queue-offline">
+        <i class="ph-fill ph-warning" aria-hidden="true" title="{{ offline_message }}"></i>
+        <span class="visually-hidden">{{ offline_message }}</span>
+    </span>
+    <span class="message-queue-slow d-none">
+        <i class="ph-fill ph-warning" aria-hidden="true" title="{{ slow_message }}"></i>
+        <span class="visually-hidden">{{ slow_message }}</span>
+    </span>
     <span class="message-queue-messages d-none">
         <i class="ph-fill ph-envelope" aria-hidden="true" title="{{ unhealthy_message_queue_message }}"></i>
         <span class="message-queue-count">0</span>
     </span>
-    <span class="visually-hidden">{{ offline_message }}</span>
 </div>

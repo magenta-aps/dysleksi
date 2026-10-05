@@ -1939,6 +1939,10 @@ $border-radius-student-card: $spacer / 4 * 3;
   .ph-warning {
     color: $red-normal;
   }
+
+  .message-queue-slow .ph-warning {
+    color: $orange-normal;
+  }
 }
 
 // The checkmark springs into place when the student enters the test room
