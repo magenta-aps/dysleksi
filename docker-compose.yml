@@ -39,6 +39,9 @@ services:
       - ./data:/data:ro
       - ./mypy.ini:/mypy.ini:ro
       - ./instructions:/upload/instructions/:ro
+      # Only required in dev, to let tests check that referenced resources exist
+      - ../dysleksi-binaries/real-data:/upload/resources/:ro
+      - ../dysleksi-binaries/dummy-data:/upload/dummy-resources/:ro
       # Note: Use /static/ instead of /static-copy/ to allow hot-reloading
       # In a production environment we would use /static-copy/
       - staticfiles-data:/static/
