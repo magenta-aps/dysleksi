@@ -17,7 +17,15 @@ from simple_history.models import HistoricalChanges
 
 from dysleksi.management.commands.import_test import remove_json_comments
 from dysleksi.management.commands.update_or_create_tests import answer_test
-from dysleksi.models import Class, QuestionResponse, Student, Test, TestPart, TestType
+from dysleksi.models import (
+    Class,
+    QuestionResponse,
+    Student,
+    Test,
+    TestPart,
+    TestResource,
+    TestType,
+)
 from dysleksi.tests.base import DysleksiTest
 
 
@@ -119,6 +127,15 @@ class CreateTests(DysleksiTest):
 
         self.assertEqual(word_reading_2_test.questions.count(), 105)
         self.assertEqual(wordspelling_test.questions.count(), 25)
+
+    def test_resource_files_exist(self):
+        media_root = Path(settings.RESOURCE_ROOT).parent
+        for resource in TestResource.objects.all():
+            for field in (resource.image, resource.sound):
+                if field:
+                    path = media_root / field.name.lstrip("/")
+                    with self.subTest(file=field.name):
+                        self.assertTrue(path.is_file())
 
     def test_dummy_user_creation(self):
         self.assertTrue(

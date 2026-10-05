@@ -198,12 +198,12 @@ Python Unittest:
   <<: *test-default
   script:
     - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@${CI_SERVER_HOST}/gronlandsprojekter/dysleksi-binaries.git
-    - mkdir -p ${CI_PROJECT_DIR}/file-data/upload/resources
-    - mkdir -p ${CI_PROJECT_DIR}/file-data/upload/dummy-resources
+    - mkdir -p ${CI_PROJECT_DIR}/file-data/resources
+    - mkdir -p ${CI_PROJECT_DIR}/file-data/dummy-resources
     - mkdir -p ${CI_PROJECT_DIR}/file-data/tabulex
     - mkdir -p ${CI_PROJECT_DIR}/file-data/instructions
-    - cp -r dysleksi-binaries/real-data/* ${CI_PROJECT_DIR}/file-data/upload/resources/.
-    - cp -r dysleksi-binaries/dummy-data/* ${CI_PROJECT_DIR}/file-data/upload/dummy-resources/.
+    - cp -r dysleksi-binaries/real-data/* ${CI_PROJECT_DIR}/file-data/resources/.
+    - cp -r dysleksi-binaries/dummy-data/* ${CI_PROJECT_DIR}/file-data/dummy-resources/.
     - cp -r data/tabulex/* ${CI_PROJECT_DIR}/file-data/tabulex/.
     - cp -r ${CI_PROJECT_DIR}/instructions/* ${CI_PROJECT_DIR}/file-data/instructions/.
     - cd /app
