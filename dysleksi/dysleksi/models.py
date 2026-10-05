@@ -1105,14 +1105,11 @@ class TestPart(models.Model):
                 question["timeout"] = data["timeout"]
             else:
                 question["timeout"] = 0
-            if "continue_when_instruction_is_complete" in data:
-                question["continue_when_instruction_is_complete"] = data[
-                    "continue_when_instruction_is_complete"
-                ]
-            if "advance_automatically" in data:
-                question["advance_automatically"] = data["advance_automatically"]
-            if "result_group" in data:
-                question["result_group"] = data["result_group"]
+            question["continue_when_instruction_is_complete"] = data.get(
+                "continue_when_instruction_is_complete", True
+            )
+            question["advance_automatically"] = data.get("advance_automatically", False)
+            question["result_group"] = data.get("result_group")
 
             question, _ = TestQuestion.objects.update_or_create(
                 part=self, is_practice=is_practice, order=order, defaults=question
@@ -1122,6 +1119,8 @@ class TestPart(models.Model):
 
             if "instruction_sequence" in data:
                 question.create_instruction_sequence(data["instruction_sequence"])
+            else:
+                InstructionSequence.objects.filter(question=question).delete()
 
             # Correct answer
             correct_index = data.get("correct_index")

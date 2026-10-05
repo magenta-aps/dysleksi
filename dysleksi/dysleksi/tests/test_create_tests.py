@@ -267,6 +267,15 @@ class CreateTests(DysleksiTest):
             10,
         )
 
+        # 11. Remove an entire instruction sequence
+        del self.json_data["fore_sound_practice"][2]["instruction_sequence"]
+        del self.json_data["fore_sound_practice"][2][
+            "continue_when_instruction_is_complete"
+        ]
+        self.assertIsNotNone(
+            self.get_json_part("fore_sound")["practice"][2]["instruction_sequence"]
+        )
+
         self.save_json_files()
 
         # Create tests again
@@ -365,6 +374,11 @@ class CreateTests(DysleksiTest):
             ),
             10,
         )
+
+        # 11. Validate that the instruction sequence was removed
+        question = self.get_json_part("fore_sound")["practice"][2]
+        self.assertIsNone(question["instruction_sequence"])
+        self.assertTrue(question["continue_when_instruction_is_complete"])
 
     def test_answer_test(self):
 
