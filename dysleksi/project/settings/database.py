@@ -15,9 +15,9 @@ DATABASES = {
         "OPTIONS": {
             "pool": {
                 "min_size": int(os.environ.get("DB_POOL_MIN_SIZE", 2)),
-                # Each gunicorn worker has its own pool. 4 workers use up to 80 of
+                # Each gunicorn worker has its own pool. 8 workers use up to 80 of
                 # the 100 connections available in Postgres by default
-                "max_size": int(os.environ.get("DB_POOL_MAX_SIZE", 20)),
+                "max_size": int(os.environ.get("DB_POOL_MAX_SIZE", 10)),
                 "timeout": int(os.environ.get("DB_POOL_TIMEOUT", 10)),
             },
         },
