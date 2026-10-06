@@ -5,7 +5,7 @@
 # Dependencies that we use directly in this project, each with a written purpose for being here
 
 ## Core Django & gunicorn
-Django==6.1.1
+Django==6.1.2
 django-stubs==6.1.2
 django-stubs-ext==6.1.2
 gunicorn==26.2.0
