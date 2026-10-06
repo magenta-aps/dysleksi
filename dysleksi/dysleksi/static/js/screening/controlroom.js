@@ -1676,8 +1676,7 @@ export class TeacherView {
             }
 
             if (!data.event.startsWith("audio.")) {
-                this.messageQueue.push(data);
-                this._persistQueue(); // Persistent save
+                this._enqueue(data);
             }
 
             if (testComplete) {
@@ -1820,6 +1819,20 @@ export class TeacherView {
         );
     }
 
+    _enqueue(data) {
+        this.messageQueue.push(data);
+        this._persistQueue();
+        this._updateQueueIndicator();
+    }
+
+    _updateQueueIndicator() {
+        this.messageQueueIndicator.update(
+            this.messagesUnsent,
+            this.messageQueue.length,
+            this.serverSlow,
+        );
+    }
+
     _startSyncInterval() {
         const sync = async () => {
             await this._flushMessageQueue();
@@ -1837,11 +1850,7 @@ export class TeacherView {
             // Warn the teacher if it takes more than 5 seconds to process the queue
             const slowWarning = setTimeout(() => {
                 this.serverSlow = true;
-                this.messageQueueIndicator.update(
-                    this.messagesUnsent,
-                    this.messageQueue.length,
-                    true,
-                );
+                this._updateQueueIndicator();
             }, 5000);
 
             while (this.messageQueue.length > 0) {
@@ -1856,6 +1865,7 @@ export class TeacherView {
                 // Delete the messages from the queue if the server responds with "ok"
                 this.messageQueue.splice(0, batch.length);
                 this._persistQueue();
+                this._updateQueueIndicator();
             }
 
             clearTimeout(slowWarning);
@@ -1870,11 +1880,7 @@ export class TeacherView {
             // Everything reached the server, so there is nothing to warn about
             this.messagesUnsent = false;
         }
-        this.messageQueueIndicator.update(
-            this.messagesUnsent,
-            this.messageQueue.length,
-            this.serverSlow,
-        );
+        this._updateQueueIndicator();
         return this.messageQueue.length === 0;
     }
 
@@ -2086,8 +2092,7 @@ export class TeacherView {
         this._sendToStudents(data);
 
         // Tell the server that the test is over.
-        this.messageQueue.push(data);
-        this._persistQueue();
+        this._enqueue(data);
         await this._flushMessageQueue();
         this.showResultLink();
     }
@@ -2143,8 +2148,7 @@ export class TeacherView {
                 const studentId = studentIds[0];
                 data.student = { id: studentId };
                 // Persist locally and (eventually) send to server
-                this.messageQueue.push(data);
-                this._persistQueue();
+                this._enqueue(data);
             } else {
                 console.warn(
                     "More than one student channel active in individual test!",

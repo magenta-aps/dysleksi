@@ -3258,9 +3258,9 @@ describe("TeacherView Sync Logic", () => {
                 event: "test",
                 uuid: `${i}`,
             }));
-            const flushing = view._flushMessageQueue();
 
-            await vi.advanceTimersByTimeAsync(4999);
+            // The next sync tick starts the flush
+            await vi.advanceTimersByTimeAsync(5999);
             expect(indicator.classList.contains("d-none")).toBe(true);
 
             await vi.advanceTimersByTimeAsync(1);
@@ -3268,14 +3268,16 @@ describe("TeacherView Sync Logic", () => {
             expect(offline.classList.contains("d-none")).toBe(true);
             expect(count.textContent).toBe("100");
 
-            // The warning stays up across sync ticks and batches, counting down
-            await vi.advanceTimersByTimeAsync(2000);
+            // The warning stays up across batches, counting down
+            await vi.advanceTimersByTimeAsync(1000);
             expect(slow.classList.contains("d-none")).toBe(false);
             expect(count.textContent).toBe("50");
 
-            await vi.advanceTimersByTimeAsync(3000);
-            await flushing;
+            // and counting up as new messages arrive
+            view._enqueue({ event: "test", uuid: "150" });
+            expect(count.textContent).toBe("51");
 
+            await vi.advanceTimersByTimeAsync(6000);
             expect(indicator.classList.contains("d-none")).toBe(true);
         });
 
