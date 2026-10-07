@@ -146,7 +146,7 @@ export class StudentTestView {
 
         console.log("Chat: received", data);
 
-        if (data.event === "test.cancelled") {
+        if (data.event === "test.cancelled" && !this.completed) {
             this.onTestComplete(true);
         }
 
@@ -547,6 +547,7 @@ export class StudentTestView {
             return;
         }
 
+        this.completed = true;
         this.send({
             event: "test.complete",
             message: "Testen er afsluttet",
