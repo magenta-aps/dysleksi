@@ -199,6 +199,12 @@ describe("IndividualTestFlow", () => {
         expect(view.mediaRecorder.stop).toHaveBeenCalled();
     });
 
+    it("ignores cancel when the test is completed", () => {
+        view.completed = true;
+        view.onChatMessage({ uuid: crypto.randomUUID(), event: "test.cancelled" });
+        expect(view.onTestComplete).not.toHaveBeenCalled();
+    });
+
     it("complete test", () => {
         vi.spyOn(StudentTestView.prototype, "onPartComplete");
         view.setPart(2);
