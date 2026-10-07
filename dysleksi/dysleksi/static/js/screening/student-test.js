@@ -106,21 +106,30 @@ export class StudentTestView {
 
         // Exclude audio.detected / audio.quiet / audio.silent
         if (!data.event.startsWith("audio.")) {
-            this.outbox.set(data.uuid, data);
+            this.outbox.set(data.uuid, { message: data, sentAt: Date.now() });
         }
         this.channel.send(data);
     }
 
     _resendUnconfirmed() {
         this.channel.messageQueue = [];
-        for (const message of this.outbox.values()) {
+        for (const { message } of this.outbox.values()) {
             this.channel.send(message);
+        }
+    }
+
+    _resendStale() {
+        for (const { message, sentAt } of this.outbox.values()) {
+            if (Date.now() - sentAt >= PING_MS) {
+                this.channel.send(message);
+            }
         }
     }
 
     onChatMessage(data) {
         if (data.event === "teacher.ping") {
             this._markTeacherSeen();
+            this._resendStale();
             // Answer the teacher, who is watching for closed browsers
             this.channel.send({
                 event: "student.heartbeat",

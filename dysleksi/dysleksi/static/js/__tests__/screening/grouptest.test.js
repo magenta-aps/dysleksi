@@ -2202,6 +2202,19 @@ describe("A student who lost the teacher", () => {
         expect(mockP2P.send).not.toHaveBeenCalled();
     });
 
+    it("repeats what the teacher has not confirmed for a ping interval", () => {
+        view.send({ event: "test.started" });
+        const message = mockP2P.send.mock.lastCall[0];
+        mockP2P.send.mockClear();
+
+        view.onChatMessage({ event: "teacher.ping" });
+        expect(mockP2P.send).not.toHaveBeenCalledWith(message);
+
+        vi.advanceTimersByTime(utils.PING_MS);
+        view.onChatMessage({ event: "teacher.ping" });
+        expect(mockP2P.send).toHaveBeenCalledWith(message);
+    });
+
     it("does not repeat microphone events", () => {
         view.send({ event: "audio.detected" });
         mockP2P.send.mockClear();
