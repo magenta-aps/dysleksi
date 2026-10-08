@@ -92,6 +92,15 @@ describe("AutoLogout", () => {
         expect(global.fetch).toHaveBeenCalledWith(PING_URL, expect.anything());
     });
 
+    it("does not log out while another window runs a test", async () => {
+        new AutoLogout(config()).start();
+        new AutoLogout(config({ logout_on_idle: false })).start();
+
+        await minutes(30);
+
+        expect(window.location).toBe("");
+    });
+
     it("survives a ping that does not reach the server", async () => {
         const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
         global.fetch.mockRejectedValue(new Error("offline"));
