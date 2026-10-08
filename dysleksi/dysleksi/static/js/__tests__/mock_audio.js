@@ -19,4 +19,5 @@ export class MockAudioContext {
     close() {}
     suspend() {}
     resume() {}
+    addEventListener() {}
 }

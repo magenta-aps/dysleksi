@@ -65,6 +65,7 @@ const createMockAudioContext = () => {
         state: "suspended",
         resume: vi.fn().mockResolvedValue(),
         suspend: vi.fn().mockResolvedValue(),
+        addEventListener: vi.fn(),
         decodeAudioData: vi.fn().mockResolvedValue({ duration: 1.0 }),
         createBufferSource: vi.fn(() => mockSource),
         destination: {},
@@ -81,6 +82,7 @@ const student = new Student({
 const mockSend = vi.fn();
 
 const SHARED_DOM_HTML = `
+    <div id="audio-lost-overlay" style="display: none"><button id="reload-test"></button></div>
     <div id="pause-overlay" style="display: none"><i class="ph ph-pause"></i></div>
     <div id="connection-lost-overlay" style="display: none"><i class="ph ph-wifi-slash"></i></div>
     <div id="fade-overlay"></div>
@@ -1987,6 +1989,36 @@ describe("Pause and resume", () => {
         view.onChatMessage({ event: "test.resume" });
 
         expect(setupReminder).toHaveBeenCalledTimes(1);
+    });
+
+    describe("swiped away", () => {
+        const swipeAway = (windowBlocked = false) => {
+            view = new GroupTestView(new Test(groupTestData), 1, domElements, student);
+            view.windowBlocked = windowBlocked;
+            mockAudioContextInstance.state = "interrupted";
+            mockAudioContextInstance.addEventListener.mock.calls.at(-1)[1]();
+        };
+
+        afterEach(() => {
+            mockAudioContextInstance.state = "suspended";
+        });
+
+        it("asks the student to reload the test", () => {
+            swipeAway();
+            expect(domElements.audioLostOverlay.style.display).toBe("flex");
+
+            const originalLocation = window.location;
+            delete window.location;
+            window.location = { reload: vi.fn() };
+            domElements.reloadBtn.click();
+            expect(window.location.reload).toHaveBeenCalled();
+            window.location = originalLocation;
+        });
+
+        it("leaves a blocked window alone", () => {
+            swipeAway(true);
+            expect(domElements.audioLostOverlay.style.display).toBe("none");
+        });
     });
 
     it("stays frozen when resumed without a teacher", () => {

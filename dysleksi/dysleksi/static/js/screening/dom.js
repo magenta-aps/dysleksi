@@ -60,6 +60,8 @@ class TestDomElements {
         this.connectionLostOverlay = document.querySelector("#connection-lost-overlay");
         this.micLostOverlay = document.querySelector("#mic-lost-overlay");
         this.restoreMicBtn = document.querySelector("#restore-mic");
+        this.audioLostOverlay = document.querySelector("#audio-lost-overlay");
+        this.reloadBtn = document.querySelector("#reload-test");
 
         this.currentAudioSource = null;
         this.inputLocked = false;
@@ -191,6 +193,14 @@ class TestDomElements {
 
     setRestoreMicButtonListener(listener) {
         this._setButtonListener(this.restoreMicBtn, listener);
+    }
+
+    showAudioLostOverlay() {
+        this.audioLostOverlay.style.display = "flex";
+    }
+
+    setReloadButtonListener(listener) {
+        this._setButtonListener(this.reloadBtn, listener);
     }
 
     showLoggedOut() {
@@ -496,7 +506,7 @@ class TestDomElements {
     _updateInputState(inputLocked) {
         this.inputLocked = inputLocked;
         const buttons = document.querySelectorAll(
-            "button:not(.debug-button, #test-cancelled-log-out)",
+            "button:not(.debug-button, #test-cancelled-log-out, #reload-test)",
         );
         buttons.forEach((btn) => {
             if (inputLocked) {
