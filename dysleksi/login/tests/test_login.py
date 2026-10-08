@@ -7,7 +7,7 @@ from http import HTTPStatus
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
-from django.test import TestCase
+from django.test import Client, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
 from django_otp.oath import totp
@@ -91,6 +91,19 @@ class LoginGeneralTest(LoginTest):
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], "/")
+
+    def test_csrf_failure_already_logged_in(self):
+        client = Client(enforce_csrf_checks=True)
+        client.force_login(self.staff_user)
+        url = reverse("login:login_forward", kwargs={"provider": "django"})
+        response = client.post(url)
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.headers["Location"], url)
+
+    def test_csrf_failure_not_logged_in(self):
+        client = Client(enforce_csrf_checks=True)
+        response = client.post(reverse("login:login"))
+        self.assertEqual(response.status_code, 403)
 
     def test_login_forward_invalid_provider(self):
         response = self.client.get(
