@@ -367,7 +367,7 @@
     {
         "question_type": "multiple_choice",
         "image": "resources/sentence_reading/Opgave/Opgave 45-46-47-48.jpg",
-        "text": "Umiaq motoorimik aquteqarpoq",
+        "text": "Umiaq motoorimik aquuteqarpoq",
         "correct": "false",
         "wrong": ["true"]
     },
