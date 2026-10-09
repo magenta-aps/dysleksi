@@ -368,7 +368,7 @@
         // Nu skal du selv prøve øveopgaverne.
         "action": "playSound",
         "delayAfter": 750,
-        "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.13.mp3"
+        "resource": "resources/wordreading_1/Enhanced/Instruktion/5b.11.mp3"
       },
 
       // 6b.14 - grøn knap vises
