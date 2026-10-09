@@ -6,26 +6,10 @@
 <div class="d-flex justify-content-between align-content-center mb-3">
     <h1>{% translate "Klasser" %}</h1>
     <div class="dropdown">
-        <button class="btn btn-primary" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+        <a href="{% url 'dysleksi:start_room' %}" class="btn btn-primary">
             <i class="ph ph-plus me-1"></i>
             {% translate 'Opret test' %}
-        </button>
-        <ul class="dropdown-menu">
-            <li>
-                <a class="dropdown-item" href="{% url 'dysleksi:start_room' %}">
-                    <i class="ph ph-plus me-1"></i>
-                    {% translate 'Ny test til målgruppen' %}
-                </a>
-            </li>
-            {% comment %}
-            <li>
-                <a class="dropdown-item" href="#">
-                    <i class="ph ph-plus me-1"></i>
-                    {% translate 'Ny test udenfor målgruppen' %}
-                </a>
-            </li>
-            {% endcomment %}
-        </ul>
+        </a>
     </div>
 </div>
 {% render_table table %}

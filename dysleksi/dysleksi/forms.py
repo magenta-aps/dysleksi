@@ -104,12 +104,12 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
         exclude = ("teacher", "test", "student_subset")
 
     name = forms.CharField(
-        initial=_("Ny test til målgruppen"),
+        initial=_("Ny test"),
         required=False,
         widget=forms.TextInput(
             attrs={
                 "class": "inline-field",
-                "placeholder": _("Ny test til målgruppen"),
+                "placeholder": _("Ny test"),
             }
         ),
     )
