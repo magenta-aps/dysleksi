@@ -25,8 +25,8 @@ msgstr ""
 msgid "Vælg venligst mindst én elev"
 msgstr ""
 
-#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/class/list.html
-msgid "Ny test til målgruppen"
+#: dysleksi/forms.py
+msgid "Ny test"
 msgstr ""
 
 #: dysleksi/forms.py dysleksi/views.py
@@ -978,7 +978,7 @@ msgid "Afbryd"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/start_room.html
-msgid "Bekræft og tildel test"
+msgid "Bekræft og opret test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/teacher.html
