@@ -12,6 +12,8 @@ export class AutoLogout {
         this.activity = false;
         this.idleTimer = null;
         this.pingTimer = null;
+        // Lets windows of the same session know that it is still in use
+        this.channel = new BroadcastChannel("auto-logout");
     }
 
     start() {
@@ -22,6 +24,7 @@ export class AutoLogout {
                     passive: true,
                 });
             }
+            this.channel.onmessage = () => this.restartIdleTimer();
             this.restartIdleTimer();
         }
         this.pingTimer = setInterval(() => this.keepAlive(), this.pingIntervalMs);
@@ -43,6 +46,7 @@ export class AutoLogout {
             return;
         }
         this.activity = false;
+        this.channel.postMessage("alive");
         this.ping();
     }
 
