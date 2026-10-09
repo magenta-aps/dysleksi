@@ -241,12 +241,20 @@ class AssignmentView(
             }
             for student in students
         ]
+        room_type = self.get_room_type()
+        testpart_count = test.parts.count()
         context["student_count"] = len(students) if assignment.klasse else None
-        context["test_type"] = self.get_room_type()
-        context["test_type_label"] = _("Test")
+        context["testpart_count"] = testpart_count
+        context["test_type"] = room_type
+        context["test_type_label"] = (
+            _("Gruppetest") if room_type == "group" else _("Individueltest")
+        )
         context["student"] = self.user
-        context["room_type"] = self.get_room_type()
-        context["test_name"] = test.name
+        context["room_type"] = room_type
+        if test.custom:
+            context["test_name"] = _("Deltest")
+        else:
+            context["test_name"] = _("Testpakke '{name}'").format(name=test.name)
         context["class_name"] = assignment.klasse_name or ", ".join(
             [c.name for c in assignment.student.classes.all()]
         )
