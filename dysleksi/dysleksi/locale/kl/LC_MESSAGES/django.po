@@ -29,7 +29,7 @@ msgstr ""
 msgid "Ny test til målgruppen"
 msgstr ""
 
-#: dysleksi/forms.py
+#: dysleksi/forms.py dysleksi/views.py
 msgid "Gruppetest"
 msgstr ""
 
@@ -49,12 +49,13 @@ msgstr ""
 msgid "Vælg elev"
 msgstr ""
 
-#: dysleksi/forms.py dysleksi/views.py
-msgid "Test"
+#: dysleksi/forms.py
+msgid "Testpakke"
 msgstr ""
 
 #: dysleksi/forms.py
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+#: dysleksi/views.py
 msgid "Deltest"
 msgstr ""
 
@@ -63,7 +64,7 @@ msgid "Vælg testsammensætning"
 msgstr ""
 
 #: dysleksi/forms.py
-msgid "Vælg test"
+msgid "Vælg testpakke"
 msgstr ""
 
 #: dysleksi/forms.py
@@ -71,7 +72,7 @@ msgid "Vælg deltests"
 msgstr ""
 
 #: dysleksi/forms.py
-msgid "Vælg tidsrummet for testen"
+msgid "Vælg starttidspunkt"
 msgstr ""
 
 #: dysleksi/forms.py
@@ -490,7 +491,7 @@ msgid "Planlagt %(start|date:\"SHORT_DATE_FORMAT\")s"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/class/list.html
-msgid "Tildel test"
+msgid "Opret test"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/class/students_table.html
@@ -791,6 +792,10 @@ msgid "Klasse %(class_name)s (%(student_count)s elever)"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
+msgid "Deltager:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
 #, python-format
 msgid "%(full_name)s (Klasse %(class_name)s)"
 msgstr ""
@@ -810,6 +815,10 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
 #, python-format
 msgid "%(part_name)s (%(question_count)s opgaver)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/templatetags/details_popup.html
+msgid "Deltest:"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_group.html
@@ -953,7 +962,7 @@ msgid "Administrator"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/start_room.html
-msgid "Tildel test:"
+msgid "Opret test:"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/start_room.html
@@ -1066,6 +1075,15 @@ msgstr ""
 #: dysleksi/utils.py
 #, python-format
 msgid "%(tim)s tim. %(min)s min. %(sek)s sek."
+msgstr ""
+
+#: dysleksi/views.py
+msgid "Individueltest"
+msgstr ""
+
+#: dysleksi/views.py
+#, python-brace-format
+msgid "Testpakke '{name}'"
 msgstr ""
 
 #: dysleksi/views.py

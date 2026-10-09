@@ -147,7 +147,7 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
     is_test_part = forms.ChoiceField(
         initial="test",
         required=True,
-        choices=[("test", _("Test")), ("part", _("Deltest"))],
+        choices=[("test", _("Testpakke")), ("part", _("Deltest"))],
         label=_("Vælg testsammensætning"),
         widget=forms.RadioSelect(),
     )
@@ -160,7 +160,7 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
             and form.data.get("klasse") is not None
         ),
         queryset=tests_of_type(TestType.GROUP),
-        label=_("Vælg test"),
+        label=_("Vælg testpakke"),
         widget=TestSelect(),
     )
 
@@ -184,7 +184,7 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
             and form.data.get("student") is not None
         ),
         queryset=tests_of_type(TestType.INDIVIDUAL),
-        label=_("Vælg test"),
+        label=_("Vælg testpakke"),
         widget=TestSelect(),
     )
 
@@ -205,7 +205,7 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
     is_immediate = forms.BooleanField(
         initial="y",
         required=True,
-        label=_("Vælg tidsrummet for testen"),
+        label=_("Vælg starttidspunkt"),
         widget=forms.RadioSelect(choices=[("y", _("Start nu")), ("n", _("Planlæg"))]),
     )
 

@@ -195,6 +195,24 @@ class TestAssignmentView(DysleksiTest):
         self.assertIn("test_contents", context)
         self.assertEqual(context["cancel_url"], reverse("dysleksi:class_list"))
 
+    def test_test_name(self):
+        for custom, expected_name in (
+            (False, "Testpakke 'Middle 2. grade'"),
+            (True, "Deltest"),
+        ):
+            with self.subTest(custom=custom):
+                self.test.custom = custom
+                self.test.save()
+                view = self.setup_view(
+                    AssignmentView,
+                    self.teacher,
+                    room_name="class_1",
+                    test_id=self.test.id,
+                    pk=self.assignment1.id,
+                )
+                context = view.get_context_data()
+                self.assertEqual(context["test_name"], expected_name)
+
     def test_test_part_names_are_localized(self):
         part = TestPart.objects.create(
             name="Ordlæsning 2",

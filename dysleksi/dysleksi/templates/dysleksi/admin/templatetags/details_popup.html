@@ -7,14 +7,15 @@
 
     <div id="details-popup" class="details-popup" hidden>
         <div class="details-row">
-            <span class="details-label">{% translate "Deltagere:" %}</span>
             {% if student_count %}
+                <span class="details-label">{% translate "Deltagere:" %}</span>
                 <span class="details-value">
                     {% blocktranslate trimmed with class_name=class_name student_count=student_count %}
                         Klasse {{ class_name }} ({{ student_count }} elever)
                     {% endblocktranslate %}
                 </span>
             {% else %}
+                <span class="details-label">{% translate "Deltager:" %}</span>
                 <span class="details-value">
                     {% blocktranslate trimmed with full_name=test_assignment.student.get_full_name class_name=class_name %}
                         {{ full_name }} (Klasse {{ class_name }})
@@ -31,6 +32,7 @@
             <span class="details-value">{{ test_name }}</span>
         </div>
         <div class="details-row">
+            {% if testpart_count > 1 %}
             <span class="details-label">{% translate "Deltests:" %}</span>
             <div class="details-value">
                 <ol>
@@ -43,6 +45,14 @@
                     {% endfor %}
                 </ol>
             </div>
+            {% else %}
+            <span class="details-label">{% translate "Deltest:" %}</span>
+            <span class="details-value">
+                {% blocktranslate trimmed with part_name=test_contents.parts.0.name question_count=test_contents.parts.0.questions|length %}
+                    {{ part_name }} ({{ question_count }} opgaver)
+                {% endblocktranslate %}
+            </span>
+            {% endif %}
         </div>
     </div>
 </div>
