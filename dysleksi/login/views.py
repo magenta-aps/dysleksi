@@ -7,6 +7,7 @@ from django.contrib.auth import REDIRECT_FIELD_NAME, logout
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.urls import reverse
+from django.views.csrf import csrf_failure as django_csrf_failure
 from django.views.generic import RedirectView
 from login.forms import AuthenticationForm, AuthenticationTokenForm
 from project.util import add_parameters_to_url
@@ -178,3 +179,10 @@ class LogoutView(RedirectView):
             else:
                 logout(self.request)
         return settings.LOGOUT_REDIRECT_URL
+
+
+def csrf_failure(request, reason=""):
+    # Repeated login submits fail because logging in rotates the CSRF token
+    if request.user.is_authenticated and request.resolver_match.namespace == "login":
+        return redirect(request.get_full_path())
+    return django_csrf_failure(request, reason)

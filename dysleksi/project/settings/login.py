@@ -53,6 +53,7 @@ LOGIN_REDIRECT_URL = reverse_lazy("dysleksi:root")
 LOGIN_URL = reverse_lazy("login:login")
 LOGOUT_URL = reverse_lazy("login:logout")
 LOGOUT_REDIRECT_URL = reverse_lazy("login:logged_out")
+CSRF_FAILURE_VIEW = "login.views.csrf_failure"
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # OIDC settings
