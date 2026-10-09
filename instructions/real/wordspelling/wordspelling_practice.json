@@ -458,6 +458,12 @@
   {
     "question_type": "no_input_required",
     "instruction_sequence": [
+      {
+        // Øvelserne er færdige.
+        "action": "playSound",
+        "resource": "resources/wordspelling/Enhanced/Øveopgave 1 og 2/6c.8.mp3",
+        "delayAfter": 1250
+      },
       // 6d.1
       {
         "action": "showFaded",
