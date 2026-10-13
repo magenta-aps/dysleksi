@@ -93,6 +93,7 @@ export class IndividualTestView extends StudentTestView {
                     this.currentPartIndex +
                     "." +
                     this.currentQuestionIndex,
+                this.isPracticing ? "(practice)" : "(test)",
             );
 
             this.domElements.fadeScreenOverlay();
@@ -163,6 +164,7 @@ export class IndividualTestView extends StudentTestView {
             // Next question is being shown
         } else {
             if (this.isPracticing) {
+                // No more practice questions - proceed to test questions
                 this.showFirstQuestion(false);
             } else {
                 // no more questions in part
