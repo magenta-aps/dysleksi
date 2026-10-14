@@ -626,6 +626,7 @@ export class GroupTestContainer {
         this.view2Btn = document.querySelector('.view-btn[data-columns="2"]');
         this.view3Btn = document.querySelector('.view-btn[data-columns="3"]');
         this.view4Btn = document.querySelector('.view-btn[data-columns="4"]');
+        this.numColumns = 4;
 
         this.allStudentsButton.onclick = () => this.filterCards("all");
         this.ongoingStudentsButton.onclick = () => this.filterCards("ongoing");
@@ -703,22 +704,21 @@ export class GroupTestContainer {
 
     setCardColumns(columns) {
         console.log(`Setting card grid to ${columns} columns`);
+        this.numColumns = columns;
 
         // Set the width to accomodate the desired amount of cards in each row
         // Taking into accound the gap of 16px between the cards
         this.cards.forEach((card) => {
+            card.el.style.width = this.getCardWidth(columns);
             if (columns === 4) {
-                card.el.style.width = "calc(25% - 12px)"; // 16*3/4 = 12
                 this.view2Btn.classList.remove("active");
                 this.view3Btn.classList.remove("active");
                 this.view4Btn.classList.add("active");
             } else if (columns === 3) {
-                card.el.style.width = "calc(33.3333% - 10.6666px)"; // 16*2/3 = 10.66
                 this.view2Btn.classList.remove("active");
                 this.view3Btn.classList.add("active");
                 this.view4Btn.classList.remove("active");
             } else if (columns === 2) {
-                card.el.style.width = "calc(50% - 8px)"; // 16*1/2 = 8
                 this.view2Btn.classList.add("active");
                 this.view3Btn.classList.remove("active");
                 this.view4Btn.classList.remove("active");
@@ -726,6 +726,18 @@ export class GroupTestContainer {
                 console.error("Invalid number of columns: ", columns);
             }
         });
+    }
+
+    getCardWidth(columns) {
+        if (columns === 4) {
+            return "calc(25% - 12px)"; // 16*3/4 = 12
+        } else if (columns === 3) {
+            return "calc(33.3333% - 10.6666px)"; // 16*2/3 = 10.66
+        } else if (columns === 2) {
+            return "calc(50% - 8px)"; // 16*1/2 = 8
+        } else {
+            console.error("Invalid number of columns: ", columns);
+        }
     }
 
     filterCards(criteria) {
@@ -799,6 +811,7 @@ export class GroupTestContainer {
             this.students.set(student.id, student);
 
             const card = new StudentCard(student, this.test);
+            card.el.style.width = this.getCardWidth(this.numColumns);
             this.cards.set(student.id, card);
             this.container.appendChild(card.el);
             newStudent = true;
