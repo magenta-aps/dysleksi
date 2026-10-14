@@ -2,7 +2,7 @@
   // 9a.1-9a.5 - indledning
   {
     "question_type": "no_input_required",
-    "text": " ",
+    "image": "/resources/letter_pronunciation/letter_pronunciation.png",
     "instruction_sequence": [
       // 9a.1 - skærmen vises tydeligt/normalt
       {
