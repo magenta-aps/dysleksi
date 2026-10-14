@@ -511,17 +511,16 @@ export class StudentTestView {
             "Showing first question",
             this.isPracticing ? "(practice)" : "(test)",
         );
-        this.domElements.showTestContainer();
         this.domElements.hideTestPartOutro();
-
         const firstUnanswered = this.isPracticing
             ? 0
             : this.currentPart.getFirstUnansweredQuestionIndex(this.student);
-        const result = await this.showQuestion(this.isPracticing, firstUnanswered);
+        const canShow = await this.showQuestion(this.isPracticing, firstUnanswered);
+        this.domElements.showTestContainer();
         if (!this.isPracticing && Number(this.currentPart.timeout) > 1) {
             this.setupPartTimeout();
         }
-        return result;
+        return canShow;
     }
 
     async onTestComplete(cancelled = false) {
