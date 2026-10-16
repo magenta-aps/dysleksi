@@ -76,6 +76,18 @@ export class StudentTestView {
             this.onConnectionLost();
         });
         this.audioContext = unlockAudioOnGesture();
+        // iOS interrupts the audio when the page is swiped away. The audio may
+        // stay silent after resuming, so the student must reload the test.
+        this.audioContext.addEventListener("statechange", () => {
+            if (
+                this.audioContext.state === "interrupted" &&
+                !this.windowBlocked &&
+                !this.student.cancelled
+            ) {
+                this.domElements.showAudioLostOverlay();
+            }
+        });
+        this.domElements.setReloadButtonListener(() => window.location.reload());
         this.failedAttempts = 0;
         this.cancelAudio = false;
         listenForRedirect(student.id, assignmentId, ["session.start"]);

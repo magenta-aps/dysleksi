@@ -1005,6 +1005,10 @@ msgid "Din lærer har afbrudt testen."
 msgstr ""
 
 #: dysleksi/templates/dysleksi/screening/student.html
+msgid "Genoptag testen"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/screening/student.html
 msgid "Ingen forbindelse til læreren"
 msgstr ""
 
