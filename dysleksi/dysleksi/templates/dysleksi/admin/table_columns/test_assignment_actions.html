@@ -1,6 +1,6 @@
 {% load i18n %}
 <div class="text-wrap">
-    {% if record.status == TestAssignmentStatus.CREATED %}
+    {% if record.status == TestAssignmentStatus.PLANNED %}
     <a href="{% url 'dysleksi:room' pk=record.pk %}" class="btn btn-outline-secondary text-nowrap mb-1">{% translate "Start" %}</a>
     {% elif record.status == TestAssignmentStatus.IN_PROGRESS %}
     <a href="{% url 'dysleksi:room' pk=record.pk %}" class="btn btn-outline-secondary text-nowrap mb-1">{% translate "Åbn" %}</a>

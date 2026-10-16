@@ -435,7 +435,7 @@ class ClassDetailView(
         assignments = self.object.testassignment_set.annotate_status()
         context_data["completed_test_assignments"] = assignments.filter_finished()
         context_data["planned_test_assignments"] = assignments.filter(
-            status__in=(TestAssignmentStatus.CREATED, TestAssignmentStatus.IN_PROGRESS)
+            status__in=(TestAssignmentStatus.PLANNED, TestAssignmentStatus.IN_PROGRESS)
         )
 
         return context_data

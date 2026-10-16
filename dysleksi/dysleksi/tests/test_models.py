@@ -630,13 +630,15 @@ class TestTestAssignment(ResponseTest):
 
     def test_end_without_any_responses(self):
         assignment = self.test_assignment_student
-        assignment.responses.all().delete()
-        self.assertEqual(self.status(assignment), TestAssignmentStatus.CREATED)
 
-        assignment.end()
+        # An assignment without a planned date/time, and without any recorded responses
+        # counts as "in progress" (if it has a planned date/time, it is "planned".)
+        assignment.responses.all().delete()
+        self.assertEqual(self.status(assignment), TestAssignmentStatus.IN_PROGRESS)
 
         # The student never answered anything, but there is still a (blank)
         # response to show on the results page
+        assignment.end()
         self.assertEqual(assignment.responses.count(), 1)
         self.assertEqual(self.status(assignment), TestAssignmentStatus.CANCELLED)
 

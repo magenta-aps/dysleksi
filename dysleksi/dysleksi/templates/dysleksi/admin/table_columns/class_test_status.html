@@ -1,12 +1,10 @@
 {% with record.test_status|label_from_choices:ClassTestStatus as test_status %}
 {% if record.test_status == ClassTestStatus.OPEN %}
-    <i class="ph ph-lock-open"></i>
+    <i class="ph ph-lock-simple-open me-1"></i>
     {{ test_status }}
 {% elif record.test_status == ClassTestStatus.LOCKED %}
-    <span class="text-success">
-        <i class="ph ph-lock"></i>
-        {{ test_status }}
-    </span>
+    <span class="text-success"><i class="ph ph-lock-simple"></i></span>
+    {{ test_status }}
 {% else %}
     -
 {% endif %}
