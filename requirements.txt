@@ -92,7 +92,7 @@ pipdeptree==4.2.8
 
 
 ## TODO: Remove when TOTP code is gone
-django-otp==1.7.4
+django-otp==1.7.5
 django-two-factor-auth==1.18.1
 
 
