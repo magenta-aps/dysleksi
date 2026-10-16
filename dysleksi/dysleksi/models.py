@@ -118,7 +118,7 @@ class TestType(TextChoices):
 
 
 class TestAssignmentStatus(TextChoices):
-    CREATED = "created", _("Oprettet")
+    PLANNED = "planned", _("Planlagt")
     IN_PROGRESS = "in_progress", _("I gang")
     COMPLETED = "completed", _("Gennemført")
     CANCELLED = "cancelled", _("Afbrudt")
@@ -699,14 +699,23 @@ class TestAssignmentQuerySet(PermissionsQuerySet):
                     then=Value(TestAssignmentStatus.CANCELLED),
                 ),
                 When(
-                    _all_completed=Value(False),
+                    # Assignments without a planned date/time are "in progress" from
+                    # the monment they are created.
+                    Q(planned_date_time__isnull=True)
+                    & (Q(_all_completed=Value(False)) | Q(_all_completed=None)),
+                    then=Value(TestAssignmentStatus.IN_PROGRESS),
+                ),
+                When(
+                    # Assignments with a planned date/time are only "in progress" once
+                    # at least one result has been collected.
+                    Q(planned_date_time__isnull=False) & Q(_all_completed=Value(False)),
                     then=Value(TestAssignmentStatus.IN_PROGRESS),
                 ),
                 When(
                     _all_completed=Value(True),
                     then=Value(TestAssignmentStatus.COMPLETED),
                 ),
-                default=Value(TestAssignmentStatus.CREATED),
+                default=Value(TestAssignmentStatus.PLANNED),
             ),
         )
 

@@ -163,6 +163,7 @@ h5 {
 h6 {
   font-weight: bold;
 }
+
 .btn {
   font-family: "DM Sans Medium", "Helvetica", sans-serif;
   font-size: 0.875 * $spacer;
@@ -170,6 +171,10 @@ h6 {
 .btn-borderless {
   border: 0 none;
   color: $btn-link-hover-color;
+}
+
+.text-orange {
+  color: $orange-normal;
 }
 
 // Layout when sidebar navigation is expanded to full size

@@ -1,23 +1,13 @@
 {% with record.status|label_from_choices:TestAssignmentStatus as status %}
-{% if record.status == TestAssignmentStatus.CREATED %}
-    <span class="text-success">
-        <i class="ph ph-lock-open"></i>
-        {{ status }}
-    </span>
-{% elif record.status == TestAssignment.IN_PROGRESS %}
-    <span class="text-danger">
-        <i class="ph ph-lock-open"></i>
-        {{ status }}
-    </span>
+{% if record.status == TestAssignmentStatus.PLANNED %}
+    <span><i class="ph ph-calendar-check me-1"></i></span>
+{% elif record.status == TestAssignmentStatus.IN_PROGRESS %}
+    <span class="text-orange"><i class="ph ph-lock-simple-open me-1"></i></span>
 {% elif record.status == TestAssignmentStatus.CANCELLED %}
-    <span class="text-danger">
-        <i class="ph ph-lock"></i>
-        {{ status }}
-    </span>
+    <span class="text-danger"><i class="ph ph-x me-1"></i></span>
 {% else %}
-    <span>
-        <i class="ph ph-lock"></i>
-        {{ status }}
-    </span>
+    {# TestAssignmentStatus.COMPLETED #}
+    <span class="text-success"><i class="ph ph-check me-1"></i></span>
 {% endif %}
+{{ status }}
 {% endwith %}
