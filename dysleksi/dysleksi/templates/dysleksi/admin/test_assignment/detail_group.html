@@ -78,10 +78,13 @@
                 <button id="paused" disabled=true class="btn btn-outline-secondary">
                     <i class="ph-fill ph-pause"></i>
                 </button>
-                <button id="cancelled" disabled=true class="btn btn-warning">
-                    <i class="ph-fill ph-stop"></i>
-                    {% translate 'Afslut' %}
-                </button>
+                <span class="d-inline-block">
+                    <button id="cancelled" disabled=true class="btn btn-warning"
+                            data-blocked-title="{% translate 'Testen kan ikke afsluttes, sålænge der ikke er forbindelse til serveren, eller serveren svarer langsomt' %}">
+                        <i class="ph-fill ph-stop"></i>
+                        {% translate 'Afslut' %}
+                    </button>
+                </span>
             </div>
             {% details_popup %}
         </div>

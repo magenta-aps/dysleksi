@@ -20,11 +20,16 @@ import { Student } from "../../screening/model.js";
 import { WebRTCPeer } from "../../webRTC.js";
 import { WebSocketChannel } from "../../webSocketChannel.js";
 import { getAssignmentSocket } from "../../ws.js";
+import { serverOnline } from "../../screening/utils.js";
 import { DetailsPopup } from "../../screening/controlroom.js";
 import { StudentPresenceIndicator } from "../../screening/controlroom.js";
 import { MessageQueueIndicator } from "../../screening/controlroom.js";
 
 vi.mock("../../screening/utils.js");
+
+beforeEach(() => {
+    serverOnline.mockResolvedValue(true);
+});
 
 vi.mock("../../ws.js", () => ({
     getAssignmentSocket: vi.fn(),
@@ -297,7 +302,7 @@ ${MESSAGE_SYNC_CONFIG_HTML}
 <table id="events"><tbody></tbody></table>
 <button id="correct"><span>Korrekt</span></button>
 <button id="wrong">Forkert</button>
-<button id="cancelled">Afslut test</button>
+<span><button id="cancelled" data-blocked-title="Kan ikke afsluttes">Afslut test</button></span>
 <button id="paused"><i class="ph-fill ph-pause"></i></button>
 <button id="skipped">Sprunget over</button>
 <button id="next">Næste</button>
@@ -1897,6 +1902,7 @@ describe("TeacherView _initFilterButtonSelection", () => {
                 <button class="btn" id="btn2">Filter 2</button>
                 <button class="btn" id="btn3">Filter 3</button>
             </div>
+            <span><button id="cancelled"></button></span>
             <div id="cancel-test">
                 <button class="btn confirm-btn"></button>
             </div>
@@ -3215,9 +3221,27 @@ describe("TeacherView Sync Logic", () => {
             expect(view.messageQueue).toHaveLength(2);
         });
 
+        it("warns while the server does not answer, even with an empty queue", async () => {
+            const indicator = document.querySelector("#message-queue");
+            const cancel = document.querySelector("#cancelled");
+
+            serverOnline.mockResolvedValue(false);
+            await vi.advanceTimersByTimeAsync(5000);
+
+            expect(indicator.classList.contains("d-none")).toBe(false);
+            expect(cancel.classList.contains("pe-none")).toBe(true);
+
+            serverOnline.mockResolvedValue(true);
+            await vi.advanceTimersByTimeAsync(5000);
+
+            expect(indicator.classList.contains("d-none")).toBe(true);
+            expect(cancel.classList.contains("pe-none")).toBe(false);
+        });
+
         it("warns about unsent messages until the queue is empty", async () => {
             const indicator = document.querySelector("#message-queue");
             const count = indicator.querySelector(".message-queue-count");
+            const cancel = document.querySelector("#cancelled");
             view.messageQueue = Array.from({ length: 51 }, (_, i) => ({
                 event: "test",
                 uuid: `${i}`,
@@ -3228,6 +3252,8 @@ describe("TeacherView Sync Logic", () => {
 
             expect(indicator.classList.contains("d-none")).toBe(false);
             expect(count.textContent).toBe("51");
+            expect(cancel.classList.contains("pe-none")).toBe(true);
+            expect(cancel.parentElement.title).toBe("Kan ikke afsluttes");
 
             // The warning stays until the last message has reached the server
             storage.mockResolvedValueOnce({ ok: true, status: 204 });
@@ -3240,6 +3266,8 @@ describe("TeacherView Sync Logic", () => {
             await view._flushMessageQueue();
 
             expect(indicator.classList.contains("d-none")).toBe(true);
+            expect(cancel.classList.contains("pe-none")).toBe(false);
+            expect(cancel.parentElement.title).toBe("");
         });
 
         it("warns when the batches keep the teacher waiting for 5 seconds", async () => {
