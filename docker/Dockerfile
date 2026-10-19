@@ -13,7 +13,6 @@ SHELL ["/bin/bash", "-o", "pipefail", "-c"]
 
 RUN mkdir /app && \
     mkdir -p /var/cache/idp && \
-    mkdir -p /upload/instructions && \
     mkdir -p /upload/resources && \
     mkdir -p /upload/dummy-resources && \
     mkdir -p /static/ && \

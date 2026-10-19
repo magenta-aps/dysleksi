@@ -36,7 +36,7 @@ AUTH_USER_MODEL = "dysleksi.User"
 MEDIA_ROOT = os.environ.get("MEDIA_ROOT", "/upload")
 RESOURCE_ROOT = MEDIA_ROOT + "/resources"
 DUMMY_RESOURCE_ROOT = MEDIA_ROOT + "/dummy-resources"
-INSTRUCTIONS_ROOT = MEDIA_ROOT + "/instructions"
+INSTRUCTIONS_ROOT = BASE_DIR.parent / "dysleksi" / "instructions"
 MEDIA_URL = "/media/"
 
 ROOT_URLCONF = "project.urls"

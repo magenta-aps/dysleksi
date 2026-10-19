@@ -34,6 +34,8 @@ if [ "${CREATE_DUMMY_DATA,,}" = true ]; then
   python manage.py update_or_create_tests --dummy --answer &
   wait $!
   python manage.py update_or_create_tests --answer &
+else
+  python manage.py update_or_create_tests
 fi
 
 echo 'creating cache table'
