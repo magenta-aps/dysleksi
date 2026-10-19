@@ -38,7 +38,6 @@ services:
       - ./dev-environment/cert:/ssl:ro
       - ./data:/data:ro
       - ./mypy.ini:/mypy.ini:ro
-      - ./instructions:/upload/instructions/:ro
       # Only required in dev, to let tests check that referenced resources exist
       - ../dysleksi-binaries/real-data:/upload/resources/:ro
       - ../dysleksi-binaries/dummy-data:/upload/dummy-resources/:ro

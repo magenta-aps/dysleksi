@@ -26,7 +26,7 @@ path = [
     "dev-idp/**",
     "rfc/**",
     "file-data/**",
-    "instructions/**",
+    "dysleksi/dysleksi/instructions/**",
     "js_coverage/**",
     "playwright/**",
 ]
