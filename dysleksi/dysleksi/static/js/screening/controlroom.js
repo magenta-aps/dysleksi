@@ -2,7 +2,7 @@ import { getAssignmentSocket } from "..//ws.js";
 import { Student } from "./model.js";
 import { WebRTCPeer } from "../webRTC.js";
 import { WebSocketChannel } from "../webSocketChannel.js";
-import { PING_MS } from "./utils.js";
+import { PING_MS, serverOnline } from "./utils.js";
 import { gettext, blocktranslate } from "../i18n.js";
 import { Modal } from "bootstrap";
 
@@ -953,6 +953,14 @@ export class ActionButtons {
     pauseButton() {
         return this.buttonById("paused");
     }
+
+    blockCancelButton(blocked) {
+        const button = this.cancelButton();
+        button.classList.toggle("pe-none", blocked);
+        button.classList.toggle("opacity-50", blocked);
+        button.parentElement.title = blocked ? button.dataset.blockedTitle : "";
+    }
+
     skipButton() {
         return this.buttonById("skipped");
     }
@@ -1265,13 +1273,15 @@ export class NavigateAwayWarning {
 export class MessageQueueIndicator {
     /* Warns next to the page heading while we are offline or the server is slow,
        and shows how many messages are waiting in the queue to be sent to the server. */
-    constructor(selector = "#message-queue") {
-        this.domElement = document.querySelector(selector);
+    constructor(onToggle = () => {}) {
+        this.domElement = document.querySelector("#message-queue");
+        this.onToggle = onToggle;
         this.offlineElement = this.domElement.querySelector(".message-queue-offline");
         this.slowElement = this.domElement.querySelector(".message-queue-slow");
         this.messagesElement = this.domElement.querySelector(".message-queue-messages");
         this.countElement = this.domElement.querySelector(".message-queue-count");
         this.offline = !navigator.onLine;
+        this.disconnected = false;
         this.messagesUnsent = false;
         this.slow = false;
         this.queueLength = 0;
@@ -1293,8 +1303,15 @@ export class MessageQueueIndicator {
         this.render();
     }
 
+    // In relay mode the students talk to us through the server, so while it is
+    // down nothing reaches the queue and only a ping tells us the server is gone
+    setDisconnected(disconnected) {
+        this.disconnected = disconnected;
+        this.render();
+    }
+
     render() {
-        const failing = this.offline || this.messagesUnsent;
+        const failing = this.offline || this.disconnected || this.messagesUnsent;
         const warn = failing || this.slow;
         const showQueueLength = warn && this.queueLength > 0;
 
@@ -1303,6 +1320,7 @@ export class MessageQueueIndicator {
         this.slowElement.classList.toggle("d-none", failing || !this.slow);
         this.messagesElement.classList.toggle("d-none", !showQueueLength);
         this.countElement.textContent = this.queueLength;
+        this.onToggle(warn);
     }
 }
 
@@ -1361,7 +1379,9 @@ export class TeacherView {
         this.audioIndicator = audioIndicator;
         this.detailsPopup = new DetailsPopup();
         this.studentPresence = new StudentPresenceIndicator();
-        this.messageQueueIndicator = new MessageQueueIndicator();
+        this.messageQueueIndicator = new MessageQueueIndicator((warn) =>
+            this.buttons.blockCancelButton(warn),
+        );
         this.cancelTestModal = new CancelTestModal();
         this.navigateAway = new NavigateAwayWarning();
 
@@ -1776,6 +1796,9 @@ export class TeacherView {
             }
 
             this._sendToStudents({ event: "teacher.ping" });
+            serverOnline().then((online) =>
+                this.messageQueueIndicator.setDisconnected(!online),
+            );
             for (const [studentId, lastSeen] of this.studentsLastSeen) {
                 if (new Date() - lastSeen > 3 * PING_MS) {
                     this._markStudentGone(studentId);
