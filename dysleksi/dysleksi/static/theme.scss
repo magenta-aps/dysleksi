@@ -638,21 +638,28 @@ body.show-instructions .sound-btn.pulse {
 }
 
 .student-header {
+  $icon-size: 2.625 * $spacer;
+  $circle-size: 9 * $spacer;
+  $circle-offset: -2.5 * $spacer;
+  $icon-offset: $spacer;
+
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
+  top: $circle-offset;
+  right: $circle-offset;
+  width: $circle-size;
+  height: $circle-size;
+  border-radius: 50%;
+  padding: ($icon-offset - $circle-offset) ($icon-offset - $circle-offset) 0 0;
+  text-align: right;
   background: $student-blue-lightest;
   margin: 0;
-  padding: 0.5 * $spacer;
-  font-size: 2.625 * $spacer;
+  font-size: $icon-size;
   line-height: 1;
-  text-align: right;
   z-index: 1;
   color: $student-blue-light;
 
   i.ph {
-    font-size: 2.625 * $spacer;
+    font-size: $icon-size;
   }
 }
 
