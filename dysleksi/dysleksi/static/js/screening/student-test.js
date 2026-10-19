@@ -8,7 +8,6 @@ import { WebRTCPeer } from "../webRTC.js";
 import { fallbackOnWebRTCFailure } from "../webSocketChannel.js";
 import { WINDOW_BLOCKED_EVENT } from "./window-lock.js";
 import { listenForRedirect } from "../redirect.js";
-import { gettext } from "../i18n.js";
 import { getAssignmentSocket } from "../ws.js";
 
 export class StudentTestView {
@@ -293,7 +292,6 @@ export class StudentTestView {
 
         this.send({
             event: "test.started",
-            message: gettext("Testen er startet"),
         });
         this.domElements.setRepeatButtonListener(() => this.repeat());
     }
