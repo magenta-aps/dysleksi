@@ -896,6 +896,7 @@ export class GroupTestDomElements extends TestDomElements {
         ]) {
             el.style.display = state;
             if (state == "flex") {
+                el.style.opacity = 1;
                 this.showElement(el);
             }
         }
