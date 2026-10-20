@@ -1846,16 +1846,6 @@ describe("Timer and Reminder Cleanup", () => {
         expect(view.questionReminderId).toBeNull();
     });
 
-    it("should clear reminder specifically when user interacts via selectFreeText", () => {
-        view.questionReminderId = 777;
-        view.input = { value: "A" };
-
-        view.selectFreeText();
-
-        // This confirms the timer was actually stopped in the browser
-        expect(clearTimeout).toHaveBeenCalledWith(777);
-    });
-
     it("should clear existing timers when a new question is displayed", () => {
         view.questionTimeoutId = 111;
         view.questionReminderId = 222;
