@@ -30,6 +30,10 @@ msgid "Opgave"
 msgstr ""
 
 #: dysleksi/static/js/screening/controlroom.js
+msgid "Vil du forlade den kørende test?"
+msgstr ""
+
+#: dysleksi/static/js/screening/controlroom.js
 msgid "Deltest %(current)s af %(total)s"
 msgstr ""
 

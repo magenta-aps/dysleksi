@@ -1247,25 +1247,60 @@ export class StudentPresenceIndicator {
 }
 
 export class NavigateAwayWarning {
-    #listening = false;
+    #state = false;
+    #listeningBeforeUnload = false;
 
-    handle(evt) {
+    constructor() {
+        if (window.navigation !== undefined) {
+            window.navigation.addEventListener(
+                "navigate",
+                this.handleNavigate.bind(this),
+            );
+        }
+    }
+
+    handleBeforeUnload(evt) {
         // MDN docs recommend to always call `event.preventDefault` here
         evt.preventDefault();
     }
 
+    hookBeforeUnload() {
+        window.addEventListener("beforeunload", this.handleBeforeUnload);
+        this.#listeningBeforeUnload = true;
+    }
+
+    unhookBeforeUnload() {
+        window.removeEventListener("beforeunload", this.handleBeforeUnload);
+        this.#listeningBeforeUnload = false;
+    }
+
+    handleNavigate(evt) {
+        if (!this.#state) {
+            return;
+        }
+
+        const choice = confirm(gettext("Vil du forlade den kørende test?"));
+        if (!choice) {
+            // Don't navigate away if user decides to stay on page
+            evt.preventDefault();
+        } else {
+            // Don't activate `beforeunload` handler
+            this.unhookBeforeUnload();
+        }
+    }
+
     toggle(state) {
-        if (state && this.#listening) {
+        this.#state = state;
+
+        if (state && this.#listeningBeforeUnload) {
             // We are already listening for `beforeunload` so do nothing
             return;
         }
 
-        if (state && !this.#listening) {
-            window.addEventListener("beforeunload", this.handle);
-            this.#listening = true;
+        if (state && !this.#listeningBeforeUnload) {
+            this.hookBeforeUnload();
         } else {
-            window.removeEventListener("beforeunload", this.handle);
-            this.#listening = false;
+            this.unhookBeforeUnload();
         }
     }
 }
