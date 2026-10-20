@@ -1,10 +1,14 @@
 {% with record.test_status|label_from_choices:ClassTestStatus as test_status %}
-{% if record.test_status == ClassTestStatus.OPEN %}
-    <i class="ph ph-lock-simple-open me-1"></i>
-    {{ test_status }}
+    {% if record.test_status == ClassTestStatus.OPEN %}
+    <span class="d-flex align-items-center">
+        <span class="d-flex align-items-center"><i class="ph ph-lock-simple-open fs-5 me-1"></i></span>
+        {{ test_status }}
+    </span>
 {% elif record.test_status == ClassTestStatus.LOCKED %}
-    <span class="text-success"><i class="ph ph-lock-simple"></i></span>
-    {{ test_status }}
+    <span class="d-flex align-items-center">
+        <span class="d-flex align-items-center text-success"><i class="ph ph-lock-simple fs-5 me-1"></i></span>
+        {{ test_status }}
+    </span>
 {% else %}
     -
 {% endif %}
