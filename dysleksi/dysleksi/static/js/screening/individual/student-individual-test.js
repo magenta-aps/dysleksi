@@ -99,6 +99,12 @@ export class IndividualTestView extends StudentTestView {
             this.domElements.fadeScreenOverlay();
             this.setStudentHeader();
             this.updateNextButtonClass();
+            this.domElements.showQuestionChallenge(
+                this.currentQuestion.challengeText,
+                this.currentQuestion.challengeSoundUrl,
+                this.currentQuestion.challengeImageUrl,
+                this.audioContext,
+            );
 
             if (this.currentQuestion.instruction_sequence) {
                 this.domElements.setNextButtonListener(() =>
@@ -112,12 +118,6 @@ export class IndividualTestView extends StudentTestView {
             }
 
             this.startAnswerTimer();
-            this.domElements.showQuestionChallenge(
-                this.currentQuestion.challengeText,
-                this.currentQuestion.challengeSoundUrl,
-                this.currentQuestion.challengeImageUrl,
-                this.audioContext,
-            );
             this.send({
                 event: "question.displayed",
                 partIndex: this.currentPartIndex,
