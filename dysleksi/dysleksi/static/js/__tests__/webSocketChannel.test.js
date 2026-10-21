@@ -236,10 +236,21 @@ describe("fallbackOnWebRTCFailure", () => {
         ]);
     });
 
+    it("falls back right away when the connection fails", () => {
+        arm();
+
+        p2p.dispatchEvent(new Event("error"));
+        vi.advanceTimersByTime(WEBRTC_DEADLINE_MS);
+
+        expect(onFallback).toHaveBeenCalledTimes(1);
+        expect(chatSocket.send).toHaveBeenCalledTimes(1);
+    });
+
     it("stands down once WebRTC connects", () => {
         arm();
 
         p2p.dispatchEvent(new Event("open"));
+        p2p.dispatchEvent(new Event("error"));
         vi.advanceTimersByTime(WEBRTC_DEADLINE_MS * 2);
 
         expect(onFallback).not.toHaveBeenCalled();

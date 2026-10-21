@@ -84,6 +84,7 @@ describe("WebRTCPeer", () => {
                 host: window.location.hostname,
                 path: "/webrtc",
                 secure: true,
+                config: { iceServers: [] },
             }),
         );
     });
@@ -197,6 +198,17 @@ describe("WebRTCChannel", () => {
         mockConn.dispatchEvent(new Event("close"));
 
         expect(closeSpy).toHaveBeenCalled();
+    });
+
+    it('should dispatch "error" event when the connection fails', () => {
+        const mockConn = new MockConnection();
+        const errorSpy = vi.fn();
+        channel.addEventListener("error", errorSpy);
+        channel.attach(mockConn);
+
+        mockConn.dispatchEvent(new Event("error"));
+
+        expect(errorSpy).toHaveBeenCalled();
     });
 
     it("close() should close the connection but leave the peer alone", () => {

@@ -97,7 +97,9 @@ export function fallbackOnWebRTCFailure(
     p2p,
     { chatSocket, assignmentId, studentId, onFallback },
 ) {
-    const deadline = setTimeout(() => {
+    const settled = new AbortController();
+    const fallBack = () => {
+        settled.abort();
         console.log("WebRTC did not connect, falling back to the server relay");
         announceWebRTCFailure(chatSocket, assignmentId, studentId);
 
@@ -105,7 +107,11 @@ export function fallbackOnWebRTCFailure(
         // Put unsent messages in the new queue
         channel.messageQueue = p2p.messageQueue || [];
         onFallback(channel);
-    }, WEBRTC_DEADLINE_MS);
+    };
+    const deadline = setTimeout(fallBack, WEBRTC_DEADLINE_MS);
 
-    p2p.addEventListener("open", () => clearTimeout(deadline), { once: true });
+    settled.signal.addEventListener("abort", () => clearTimeout(deadline));
+    // No route between the peers makes the connection fail before the deadline
+    p2p.addEventListener("error", fallBack, { signal: settled.signal });
+    p2p.addEventListener("open", () => settled.abort(), { signal: settled.signal });
 }
