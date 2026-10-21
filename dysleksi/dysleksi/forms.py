@@ -103,6 +103,14 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
         model = TestAssignment
         exclude = ("teacher", "test", "student_subset")
 
+    on_behalf_of_teacher = forms.ChoiceField(
+        initial="n",
+        required=False,
+        choices=[("n", _("Nej")), ("y", _("Ja"))],
+        label=_("Planlæg på vegne af lærer"),
+        widget=forms.RadioSelect(),
+    )
+
     name = forms.CharField(
         initial=_("Ny test"),
         required=False,
@@ -232,6 +240,8 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
     def __init__(self, teacher, *args, **kwargs):
         self.teacher = teacher
         super().__init__(*args, **kwargs)
+        if not teacher.is_reading_supervisor:
+            del self.fields["on_behalf_of_teacher"]
         self.instance.teacher = teacher
         self.period = (
             self.instance.planned_date_time.period

@@ -17,6 +17,10 @@
 
             {% bootstrap_form_errors form type="non_fields" %}
 
+            {% if form.teacher.is_reading_supervisor %}
+            {% bootstrap_field form.on_behalf_of_teacher field_class="d-flex" %}
+            {% endif %}
+
             {% bootstrap_field form.test_type wrapper_class="test-type-choice" field_class="d-flex" %}
             {% if form.is_group %}
             {% bootstrap_field form.klasse wrapper_class="class-choice" %}

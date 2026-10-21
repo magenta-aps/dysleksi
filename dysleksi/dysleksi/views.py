@@ -615,7 +615,7 @@ class StartAssignmentView(GroupRequiredMixin, NavigationMixin, CreateView):
         return kwargs
 
     def get_success_url(self):
-        if self.object.planned_date_time is not None:
+        if self.object.planned_date_time is not None or self.on_behalf_of_teacher:
             return reverse(
                 "dysleksi:class_assignment_list",
                 kwargs={"class_pk": self.object.class_for_nav.pk},
@@ -624,6 +624,7 @@ class StartAssignmentView(GroupRequiredMixin, NavigationMixin, CreateView):
             return reverse("dysleksi:room", kwargs={"pk": self.object.pk})
 
     def form_valid(self, form):
+        self.on_behalf_of_teacher = form.cleaned_data.get("on_behalf_of_teacher") == "y"
         student_subset = self._get_student_subset(form)
         with transaction.atomic():
             if student_subset:
