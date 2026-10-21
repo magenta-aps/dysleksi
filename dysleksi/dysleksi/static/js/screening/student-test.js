@@ -525,8 +525,8 @@ export class StudentTestView {
         const firstUnanswered = this.isPracticing
             ? 0
             : this.currentPart.getFirstUnansweredQuestionIndex(this.student);
-        const canShow = await this.showQuestion(this.isPracticing, firstUnanswered);
         this.domElements.showTestContainer();
+        const canShow = await this.showQuestion(this.isPracticing, firstUnanswered);
         if (!this.isPracticing && Number(this.currentPart.timeout) > 1) {
             this.setupPartTimeout();
         }
