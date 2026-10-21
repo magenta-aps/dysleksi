@@ -294,6 +294,7 @@ class TestDomElements {
         this.summaryContainer.addEventListener("scroll", () =>
             this.updateSummaryArrows(),
         );
+        window.addEventListener("resize", () => this.updateSummaryArrows());
 
         // Update initial state
         requestAnimationFrame(() => {

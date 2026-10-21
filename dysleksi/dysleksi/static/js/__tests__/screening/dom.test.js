@@ -303,6 +303,12 @@ describe("GroupTestDomElements.showSummary", () => {
 
         expect(dom.scrollSummaryUpArrow.classList.contains("disabled")).toBe(false);
         expect(dom.scrollSummaryDownArrow.classList.contains("disabled")).toBe(false);
+
+        // Make the window tall enough to show everything
+        setDimensions(dom.summaryContainer, { scrollHeight: 1000, clientHeight: 1000 });
+        window.dispatchEvent(new Event("resize"));
+
+        expect(dom.summaryScrollControls.style.display).toBe("none");
     });
 
     it("Shows summary for a completed test", async () => {
