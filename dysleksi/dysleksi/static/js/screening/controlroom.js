@@ -1587,6 +1587,7 @@ export class TeacherView {
 
             if (data.event === "student.heartbeat") {
                 this._markStudentSeen(data.student.id);
+                channel.send({ event: "teacher.heartbeat" });
                 return;
             }
 
@@ -1821,16 +1822,12 @@ export class TeacherView {
     }
 
     _startPresenceInterval() {
-        // A websocket channel stays open even when the student is gone, so we
-        // ask the students to say hello instead, and mark the ones who do not
-        // answer as gone.
         setInterval(() => {
             this.webRTCPeer.reconnect();
             if (this.assignmentSocket.readyState === WebSocket.CLOSED) {
                 this._initSocket();
             }
 
-            this._sendToStudents({ event: "teacher.ping" });
             serverOnline().then((online) =>
                 this.messageQueueIndicator.setDisconnected(!online),
             );

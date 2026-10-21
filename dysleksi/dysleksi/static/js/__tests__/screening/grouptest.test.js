@@ -707,7 +707,7 @@ describe("GroupTestFlow", () => {
         expect(view.endSoundCalibration).toHaveBeenCalled();
         expect(view.cancelAudio).toBe(true);
         // Advance past the voice-over sleep() so the cancelled flow settles.
-        await vi.runAllTimersAsync();
+        await vi.runOnlyPendingTimersAsync();
         await expect(calibrationPromise).resolves.toBeUndefined();
     });
 
@@ -764,7 +764,7 @@ describe("GroupTestFlow", () => {
         expect(view.endSummary).toHaveBeenCalled();
         expect(view.cancelAudio).toBe(true);
         // Advance past the voice-over sleep() so the cancelled flow settles.
-        await vi.runAllTimersAsync();
+        await vi.runOnlyPendingTimersAsync();
         await expect(calibrationPromise).resolves.toBeUndefined();
     });
 
@@ -832,7 +832,7 @@ describe("GroupTestFlow", () => {
         view.setPart(0);
         view.showFirstQuestion(false);
 
-        vi.runAllTimers();
+        vi.runOnlyPendingTimers();
         expect(view.domElements.playSound).toHaveBeenCalled();
     });
 
@@ -850,7 +850,7 @@ describe("GroupTestFlow", () => {
         const question = view.currentQuestion;
         const firstQuestionTitle = view.questionTitle();
 
-        vi.runAllTimers();
+        vi.runOnlyPendingTimers();
 
         expect(view.onQuestionComplete).toHaveBeenCalledWith(question, true);
         expect(view.send).toHaveBeenCalledWith({
@@ -890,7 +890,7 @@ describe("GroupTestFlow", () => {
         view.showQuestion(false, 1);
         const remainingQuestions = part.questions.slice(view.currentQuestionIndex);
 
-        vi.runAllTimers();
+        vi.runOnlyPendingTimers();
 
         remainingQuestions.forEach((question) => {
             expect(view.onQuestionComplete).toHaveBeenCalledWith(question, true);
@@ -1326,7 +1326,7 @@ describe("GroupTestFlow", () => {
 
         await view.onTestComplete(true);
         // The teacher leaves once every student has confirmed the cancellation
-        view.onChatMessage({ event: "teacher.ping" });
+        view.onChatMessage({ event: "teacher.heartbeat" });
         await vi.advanceTimersByTimeAsync(15000);
 
         expect(domElements.showConnectionLostOverlay).not.toHaveBeenCalled();
@@ -2021,7 +2021,7 @@ describe("Pause and resume", () => {
 
         expect(setupReminder).not.toHaveBeenCalled();
 
-        view.onChatMessage({ event: "teacher.ping" });
+        view.onChatMessage({ event: "teacher.heartbeat" });
         expect(setupReminder).toHaveBeenCalledTimes(1);
     });
 });
@@ -2069,7 +2069,7 @@ describe("A window that is taken over", () => {
             domElements,
             student,
         );
-        view.onChatMessage({ event: "teacher.ping" });
+        view.onChatMessage({ event: "teacher.heartbeat" });
         await vi.advanceTimersByTimeAsync(15000);
         expect(domElements.connectionLostOverlay.style.display).toBe("flex");
 
@@ -2099,24 +2099,32 @@ describe("The student heartbeat", () => {
         document.body.innerHTML = "";
     });
 
-    it("answers the teacher's ping", () => {
-        const view = new GroupTestView(
+    it("says hello to the teacher until the window is taken over", () => {
+        vi.useFakeTimers();
+        new GroupTestView(
             new Test(groupTestData),
             1,
             new GroupTestDomElements(),
             student,
         );
-
-        view.onChatMessage({ event: "teacher.ping" });
-
-        expect(mockP2P.send).toHaveBeenCalledWith({
+        const heartbeat = {
             event: "student.heartbeat",
             assignmentId: 1,
             student: student,
-        });
+        };
+
+        vi.advanceTimersByTime(utils.PING_MS);
+        expect(mockP2P.send).toHaveBeenCalledWith(heartbeat);
+
+        mockP2P.send.mockClear();
+        document.dispatchEvent(new Event(WINDOW_BLOCKED_EVENT));
+        vi.advanceTimersByTime(utils.PING_MS);
+        expect(mockP2P.send).not.toHaveBeenCalled();
+
+        vi.useRealTimers();
     });
 
-    it("covers the screen when the teacher stops pinging", async () => {
+    it("covers the screen when the teacher stops answering", async () => {
         vi.useFakeTimers();
         const domElements = new GroupTestDomElements();
         const view = new GroupTestView(
@@ -2126,14 +2134,14 @@ describe("The student heartbeat", () => {
             student,
         );
 
-        view.onChatMessage({ event: "teacher.ping" });
+        view.onChatMessage({ event: "teacher.heartbeat" });
         expect(domElements.connectionLostOverlay.style.display).toBe("none");
 
         await vi.advanceTimersByTimeAsync(15000);
         expect(domElements.connectionLostOverlay.style.display).toBe("flex");
 
         // The overlay goes away once the teacher is back
-        view.onChatMessage({ event: "teacher.ping" });
+        view.onChatMessage({ event: "teacher.heartbeat" });
         expect(domElements.connectionLostOverlay.style.display).toBe("none");
 
         vi.useRealTimers();
@@ -2188,8 +2196,8 @@ describe("A student who lost the teacher", () => {
         vi.advanceTimersByTime(utils.PING_MS);
         expect(mockP2P.reconnect).toHaveBeenCalledTimes(2);
 
-        // A ping means the teacher is back, so there is nothing left to ask for
-        view.onChatMessage({ event: "teacher.ping" });
+        // An answer means the teacher is back, so there is nothing left to ask for
+        view.onChatMessage({ event: "teacher.heartbeat" });
         vi.advanceTimersByTime(utils.PING_MS);
         expect(mockP2P.reconnect).toHaveBeenCalledTimes(2);
     });
@@ -2229,11 +2237,11 @@ describe("A student who lost the teacher", () => {
         const message = mockP2P.send.mock.lastCall[0];
         mockP2P.send.mockClear();
 
-        view.onChatMessage({ event: "teacher.ping" });
+        view.onChatMessage({ event: "teacher.heartbeat" });
         expect(mockP2P.send).not.toHaveBeenCalledWith(message);
 
         vi.advanceTimersByTime(utils.PING_MS);
-        view.onChatMessage({ event: "teacher.ping" });
+        view.onChatMessage({ event: "teacher.heartbeat" });
         expect(mockP2P.send).toHaveBeenCalledWith(message);
     });
 
