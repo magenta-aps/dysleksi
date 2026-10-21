@@ -57,8 +57,19 @@ export class StudentTestView {
                 this._listenOnChannel(channel);
             },
         });
+        // The teacher's timers are throttled while their window is hidden, but their
+        // answers are not. So the student asks whether the teacher is still there
+        // instead of the other way around
+        this.heartbeatIntervalId = setInterval(() => {
+            this.channel.send({
+                event: "student.heartbeat",
+                assignmentId: assignmentId,
+                student: student,
+            });
+        }, PING_MS);
         document.addEventListener(WINDOW_BLOCKED_EVENT, () => {
             this.windowBlocked = true;
+            clearInterval(this.heartbeatIntervalId);
             clearTimeout(this.teacherTimeoutId);
             clearInterval(this.rejoinIntervalId);
             if (this.connectionLost) {
@@ -138,15 +149,9 @@ export class StudentTestView {
     }
 
     onChatMessage(data) {
-        if (data.event === "teacher.ping") {
+        if (data.event === "teacher.heartbeat") {
             this._markTeacherSeen();
             this._resendStale();
-            // Answer the teacher, who is watching for closed browsers
-            this.channel.send({
-                event: "student.heartbeat",
-                assignmentId: this.assignmentId,
-                student: this.student,
-            });
             return;
         }
 

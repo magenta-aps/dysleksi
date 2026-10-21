@@ -2212,10 +2212,10 @@ describe("TeacherView student presence", () => {
         vi.unstubAllGlobals();
     });
 
-    it("asks the students whether they are still there", () => {
-        vi.advanceTimersByTime(5000);
+    it("answers the student's heartbeat", () => {
+        sendFromStudent({ event: "student.heartbeat", student: student });
 
-        expect(p2pChannel.send).toHaveBeenCalledWith({ event: "teacher.ping" });
+        expect(p2pChannel.send).toHaveBeenCalledWith({ event: "teacher.heartbeat" });
     });
 
     it("leaves the card alone as long as the student answers", () => {
