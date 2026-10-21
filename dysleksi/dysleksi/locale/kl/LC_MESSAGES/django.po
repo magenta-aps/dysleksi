@@ -26,6 +26,18 @@ msgid "Vælg venligst mindst én elev"
 msgstr ""
 
 #: dysleksi/forms.py
+msgid "Nej"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Ja"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Planlæg på vegne af lærer"
+msgstr ""
+
+#: dysleksi/forms.py
 msgid "Ny test"
 msgstr ""
 

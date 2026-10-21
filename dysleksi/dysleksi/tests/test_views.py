@@ -946,6 +946,33 @@ class TestStartRoomView(DysleksiTest):
             _("Startdato kan ikke være i fortiden"),
         )
 
+    def test_create_group_room_on_behalf_of_teacher(self):
+        data = {
+            "on_behalf_of_teacher": "y",
+            "test_type": "group",
+            "klasse": self.klasse.id,
+            "class_test": self.group_test.id,
+            "class_test_parts": [],
+            "is_test_part": "test",
+            "is_immediate": "y",
+            "has_end": "n",
+            "start_datetime": "",
+            "end_datetime": "",
+        }
+        self.client.force_login(self.create_reading_supervisor("Vejleder"))
+        response = self.client.post(reverse("dysleksi:start_room"), data=data)
+        self._assert_response_redirects(
+            response,
+            reverse(
+                "dysleksi:class_assignment_list",
+                kwargs={"class_pk": self.klasse.pk},
+            ),
+        )
+        self.assertEqual(
+            TestAssignment.objects.annotate_status().latest("pk").status,
+            TestAssignmentStatus.PLANNED,
+        )
+
     def _assert_response_redirects(self, response, redirect):
         self.assertIsInstance(response, HttpResponseRedirect)
         self.assertEqual(response["Location"], redirect)

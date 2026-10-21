@@ -700,9 +700,12 @@ class TestAssignmentQuerySet(PermissionsQuerySet):
                 ),
                 When(
                     # Assignments without a planned date/time are "in progress" from
-                    # the monment they are created.
+                    # the moment a teacher opens the test-room.
                     Q(planned_date_time__isnull=True)
-                    & (Q(_all_completed=Value(False)) | Q(_all_completed=None)),
+                    & (
+                        Q(_all_completed=Value(False))
+                        | Q(_all_completed=None, start_date_time__isnull=False)
+                    ),
                     then=Value(TestAssignmentStatus.IN_PROGRESS),
                 ),
                 When(

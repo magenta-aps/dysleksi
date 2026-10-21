@@ -632,8 +632,10 @@ class TestTestAssignment(ResponseTest):
         assignment = self.test_assignment_student
 
         # An assignment without a planned date/time, and without any recorded responses
-        # counts as "in progress" (if it has a planned date/time, it is "planned".)
+        # is "planned" until a teacher starts it
         assignment.responses.all().delete()
+        self.assertEqual(self.status(assignment), TestAssignmentStatus.PLANNED)
+        assignment.start()
         self.assertEqual(self.status(assignment), TestAssignmentStatus.IN_PROGRESS)
 
         # The student never answered anything, but there is still a (blank)
