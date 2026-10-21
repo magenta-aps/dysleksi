@@ -16,6 +16,8 @@ export class WebRTCPeer {
             path: "/webrtc",
             secure: true,
             key: config.key,
+            // Make sure we only attempt to connect over the local network.
+            config: { iceServers: [] },
         });
 
         this.opened = new Promise((resolve) => this.peer.on("open", resolve));
@@ -88,6 +90,10 @@ export class WebRTCChannel extends EventTarget {
 
         conn.on("data", (data) => {
             this.dispatchEvent(new CustomEvent("message", { detail: data }));
+        });
+
+        conn.on("error", () => {
+            this.dispatchEvent(new Event("error"));
         });
 
         // The window on the other end closed, reloaded, or hung up on us
