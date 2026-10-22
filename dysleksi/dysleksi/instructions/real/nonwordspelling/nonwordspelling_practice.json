@@ -312,14 +312,14 @@
     "question_type": "free_text",
     "correct": "si",
     "reminder": 20000,
-    "reminder_source": "resources/nonwordspelling/Enhanced/Deltests/4e.4.mp3"
+    "reminder_source": "resources/nonwordspelling/Enhanced/Deltests/4e.4-00.mp3"
   },
   {
     "sound": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4c.7.mp3",
     "question_type": "free_text",
     "correct": "ika",
     "reminder": 20000,
-    "reminder_source": "resources/nonwordspelling/Enhanced/Deltests/4e.4.mp3"
+    "reminder_source": "resources/nonwordspelling/Enhanced/Deltests/4e.4-00.mp3"
   },
   {
     "question_type": "no_input_required",

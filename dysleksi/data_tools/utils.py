@@ -264,8 +264,8 @@ def update_or_create_nonwordspelling_test(
     update_contents=True,
 ):
     reminder, created = TestResource.objects.get_or_create(
-        name="resources/nonwordspelling/Enhanced/Deltests/4e.4.mp3",
-        sound="resources/nonwordspelling/Enhanced/Deltests/4e.4.mp3",
+        name="resources/nonwordspelling/Enhanced/Deltests/4e.4-00.mp3",
+        sound="resources/nonwordspelling/Enhanced/Deltests/4e.4-00.mp3",
     )
     completion, created = TestResource.objects.get_or_create(
         name="resources/nonwordspelling/Enhanced/Deltests/4e.5.mp3",
