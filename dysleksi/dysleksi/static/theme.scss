@@ -872,6 +872,16 @@ body.show-instructions .sound-btn.pulse {
     gap: 40px;
     width: 100%;
     justify-content: center;
+    min-height: 0;
+}
+
+#test-summary .center-content {
+    min-height: 0;
+    padding: 10px 0;
+
+    > :not(.scroll-wrapper) {
+        flex-shrink: 0;
+    }
 }
 
 .scroll-controls {
@@ -885,7 +895,6 @@ body.show-instructions .sound-btn.pulse {
     flex-direction: column;
     align-items: center;
     gap: 0.5rem;
-    max-height: 50vh;
     overflow-y: auto;
     overflow-x: hidden;
     -ms-overflow-style: none;
