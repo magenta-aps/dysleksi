@@ -320,6 +320,31 @@ describe("IndividualTestFlow", () => {
         expect(view.domElements.playSound).toHaveBeenCalledTimes(1);
     });
 
+    it("Pressing a button restarts the reminder and interrupts the sound", async () => {
+        test.parts[0].timeout = 0;
+        test.parts[0].questions[0].reminder = 5000;
+        view.domElements.playSound = vi.fn();
+        view.domElements.interruptSound = vi.fn();
+        view.setPart(0);
+        view.showFirstQuestion(false);
+        const button = document.createElement("button");
+        document.body.appendChild(button);
+
+        await vi.advanceTimersByTimeAsync(3000);
+        document.body.click();
+        button.click();
+        expect(view.domElements.interruptSound).toHaveBeenCalledTimes(1);
+
+        await vi.advanceTimersByTimeAsync(4999);
+        expect(view.domElements.playSound).not.toHaveBeenCalled();
+
+        await vi.advanceTimersByTimeAsync(1);
+        expect(view.domElements.playSound).toHaveBeenCalledTimes(1);
+
+        button.click();
+        expect(view.domElements.interruptSound).toHaveBeenCalledTimes(1);
+    });
+
     it("question.feedback triggers teacherFeedback(correct)", () => {
         // Make sure part/question exists
         view.setPart(0);
