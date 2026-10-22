@@ -23,9 +23,9 @@ const students = Array.from({ length: 5 }, (_, i) => ({
                 lobby.on('pageerror', err => console.log(`BROWSER ERROR [${student.user}/lobby]: ${err.message}`));
                 console.log(`Logging in as ${student.user}...`);
                 await lobby.goto('https://dysleksi-web/login/forward/django?next=/');
-                await lobby.waitForSelector('input[name="auth-username"]', { timeout: 10000 });
-                await lobby.fill('input[name="auth-username"]', student.user);
-                await lobby.fill('input[name="auth-password"]', student.pass);
+                await lobby.waitForSelector('input[name="username"]', { timeout: 10000 });
+                await lobby.fill('input[name="username"]', student.user);
+                await lobby.fill('input[name="password"]', student.pass);
                 await Promise.all([
                     lobby.waitForNavigation(),
                     lobby.click('button[type="submit"]')

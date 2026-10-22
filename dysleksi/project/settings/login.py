@@ -9,7 +9,6 @@ from pathlib import Path
 
 from django.urls import reverse_lazy
 from project.settings.base import DEBUG
-from project.util import strtobool
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -42,11 +41,6 @@ if not DEBUG:
 SESSION_IDLE_TIMEOUT = int(os.environ.get("SESSION_IDLE_TIMEOUT", 10 * 60))
 SESSION_COOKIE_AGE = SESSION_IDLE_TIMEOUT
 SESSION_SAVE_EVERY_REQUEST = True
-
-TWO_FACTOR_LOGIN_TIMEOUT = 0  # Never timeout
-TWO_FACTOR_REMEMBER_COOKIE_AGE = 30 * 24 * 60 * 60  # Re-authenticate once per month
-BYPASS_2FA = bool(strtobool(os.environ.get("BYPASS_2FA", "False")))
-REQUIRE_2FA = bool(strtobool(os.environ.get("REQUIRE_2FA", "True")))
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 LOGIN_REDIRECT_URL = reverse_lazy("dysleksi:root")

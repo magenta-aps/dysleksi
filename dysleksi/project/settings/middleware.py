@@ -14,6 +14,5 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
     "csp.middleware.CSPMiddleware",
-    "django_otp.middleware.OTPMiddleware",
     "simple_history.middleware.HistoryRequestMiddleware",
 ]

@@ -28,11 +28,6 @@ msgstr "Isissutissaq"
 msgid "Kodeord"
 msgstr "Isissutissaq"
 
-#: login/forms.py
-#, python-brace-format
-msgid "Husk mig på denne maskine i {days} dage"
-msgstr ""
-
 #: login/templates/login/logged_out.html
 msgid "Du er nu logget ud"
 msgstr ""
@@ -62,13 +57,8 @@ msgstr ""
 #: login/templates/login/login_django.html
 #: login/templates/login/login_repeat.html
 #: login/templates/login/login_timeout.html
-#: login/templates/two_factor/_wizard_actions.html
 msgid "Log ind"
 msgstr "Iserit"
-
-#: login/templates/login/login_django.html
-msgid "Indtast venligst koden, der er genereret af din token-generator."
-msgstr ""
 
 #: login/templates/login/login_failed.html
 msgid "Login mislykkedes"
@@ -100,32 +90,4 @@ msgstr "Isissutissaq atorneqareerpoq. Misileqqiguk."
 
 #: login/templates/login/login_timeout.html
 msgid "Det anvendte login er timet ud. Prøv at logge ind igen."
-msgstr ""
-
-#: login/templates/two_factor/_wizard_actions.html
-msgid "Fortsæt"
-msgstr "Ingerlaqqigit"
-
-#: login/templates/two_factor/core/otp_required.html
-msgid "Ingen adgang"
-msgstr "Iserfigisinnaanngilat"
-
-#: login/templates/two_factor/core/otp_required.html
-msgid "Du skal logge ind med to-faktor-godkendelse for at kunne se denne side"
-msgstr ""
-
-#: login/templates/two_factor/core/otp_required.html
-#: login/templates/two_factor/core/setup.html
-msgid "Aktivér to-faktor-godkendelse"
-msgstr ""
-
-#: login/templates/two_factor/core/setup.html
-msgid ""
-"For at begynde at bruge en token-generator skal du bruge din smartphone til "
-"at scanne QR-koden nedenfor. Brug for eksempel Authy eller Google "
-"Authenticator."
-msgstr ""
-
-#: login/templates/two_factor/core/setup.html
-msgid "Indtast derefter koden, der er genereret af appen."
 msgstr ""

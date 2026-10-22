@@ -168,7 +168,6 @@ Lint Javascript:
     ENVIRONMENT: development
     ALLOWED_HOSTS: '["dysleksi-web", "localhost", "host.docker.internal"]'
     CREATE_DUMMY_USERS: True
-    BYPASS_2FA: 'True'
     MEDIA_ROOT: /builds/gronlandsprojekter/dysleksi/file-data
     TABULEX_MOCK: false
     TABULEX_DUMMY_DATA: /builds/gronlandsprojekter/dysleksi/file-data/tabulex/test.json
