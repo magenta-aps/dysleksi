@@ -1,3 +1,4 @@
+import ipaddress
 import logging
 
 from asgiref.sync import sync_to_async
@@ -19,6 +20,18 @@ def db_sync_to_async(func):
 describe = sync_to_async(str, thread_sensitive=False)
 
 
+def client_network(scope) -> str:
+    forwarded_for = dict(scope["headers"]).get(b"x-forwarded-for")
+    if forwarded_for:
+        # The client address is the first entry, the rest are proxies
+        address = forwarded_for.decode().split(",")[0].strip()
+    else:
+        address = scope["client"][0]
+    # Every IPv6 device has its own public address, but they share the prefix
+    prefix = 32 if ipaddress.ip_address(address).version == 4 else 64
+    return str(ipaddress.ip_network(f"{address}/{prefix}", strict=False))
+
+
 class RelayConsumer(AsyncJsonWebsocketConsumer):
     """
     Consumer which allows teacher and student to talk to each other in case the webRTC
@@ -36,6 +49,7 @@ class RelayConsumer(AsyncJsonWebsocketConsumer):
         if self.user is None or not self.user.is_authenticated:
             raise DenyConnection("User not authenticated")
         self.user_name = await describe(self.user)
+        self.network = client_network(self.scope)
 
         self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"relay_{self.room_name}"
@@ -64,6 +78,7 @@ class RelayConsumer(AsyncJsonWebsocketConsumer):
                 return
 
         content["type"] = "relay.message"
+        content["senderNetwork"] = self.network
         await self.channel_layer.group_send(self.room_group_name, content)
 
     @db_sync_to_async
@@ -108,4 +123,9 @@ class RelayConsumer(AsyncJsonWebsocketConsumer):
         return [id for id in student_ids if id not in uninvited]
 
     async def relay_message(self, message: dict):
-        await self.send_json({k: v for k, v in message.items() if k != "type"})
+        content = {
+            k: v for k, v in message.items() if k not in ("type", "senderNetwork")
+        }
+        # WebRTC is restricted to the local network, so it cannot reach other ones
+        content["sameNetwork"] = message["senderNetwork"] == self.network
+        await self.send_json(content)

@@ -39,11 +39,33 @@ class TestRelayConsumer(TestCase):
             username="RelayTestUser",
         )
 
-    async def _get_communicator(self) -> WebsocketCommunicator:
+    async def _get_communicator(
+        self, forwarded_for: str | None = None
+    ) -> WebsocketCommunicator:
         application = AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
-        communicator = WebsocketCommunicator(application, "/ws/relay/assignment_1234/")
+        headers = []
+        if forwarded_for:
+            headers.append((b"x-forwarded-for", forwarded_for.encode()))
+        communicator = WebsocketCommunicator(
+            application, "/ws/relay/assignment_1234/", headers=headers
+        )
         communicator.scope["user"] = self.test_user
+        communicator.scope["client"] = ("127.0.0.1", 1234)
         return communicator
+
+    async def _same_network(self, sender_ip: str, receiver_ip: str) -> bool:
+        sender = await self._get_communicator(f"{sender_ip}, 10.0.0.1")
+        receiver = await self._get_communicator(receiver_ip)
+        await sender.connect()
+        await receiver.connect()
+        await sender.send_json_to({"event": "student.joined"})
+
+        relayed = await receiver.receive_json_from()
+
+        await sender.disconnect()
+        await receiver.disconnect()
+        self.assertNotIn("senderNetwork", relayed)
+        return relayed["sameNetwork"]
 
     async def test_connect(self):
         communicator = await self._get_communicator()
@@ -70,8 +92,18 @@ class TestRelayConsumer(TestCase):
 
         response = await communicator.receive_from()
 
-        self.assertEqual(json.loads(response), json.loads(message))
+        self.assertEqual(
+            json.loads(response), {**json.loads(message), "sameNetwork": True}
+        )
         await communicator.disconnect()
+
+    async def test_tells_whether_the_sender_is_on_the_same_network(self):
+        self.assertTrue(await self._same_network("192.0.2.1", "192.0.2.1"))
+        self.assertFalse(await self._same_network("192.0.2.1", "198.51.100.1"))
+
+    async def test_devices_in_an_ipv6_network_share_its_prefix(self):
+        self.assertTrue(await self._same_network("2001:db8::1", "2001:db8::2"))
+        self.assertFalse(await self._same_network("2001:db8::1", "2001:db8:0:1::1"))
 
 
 class TestLobbyInvitations(TransactionTestCase):
@@ -134,6 +166,7 @@ class TestLobbyInvitations(TransactionTestCase):
         application = AuthMiddlewareStack(URLRouter(websocket_urlpatterns))
         communicator = WebsocketCommunicator(application, f"/ws/relay/{room}/")
         communicator.scope["user"] = self.teacher
+        communicator.scope["client"] = ("127.0.0.1", 1234)
         await communicator.connect()
         await communicator.send_json_to(
             {

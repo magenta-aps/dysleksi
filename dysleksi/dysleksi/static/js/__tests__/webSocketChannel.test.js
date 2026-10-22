@@ -178,7 +178,8 @@ describe("fallbackOnWebRTCFailure", () => {
 
         p2p = new EventTarget();
         p2p.messageQueue = [];
-        chatSocket = { send: vi.fn() };
+        chatSocket = new EventTarget();
+        chatSocket.send = vi.fn();
         onFallback = vi.fn();
     });
 
@@ -244,6 +245,23 @@ describe("fallbackOnWebRTCFailure", () => {
 
         expect(onFallback).toHaveBeenCalledTimes(1);
         expect(chatSocket.send).toHaveBeenCalledTimes(1);
+    });
+
+    it("falls back right away when the teacher is on another network", () => {
+        arm();
+        const unreachable = (studentId) =>
+            chatSocket.dispatchEvent(
+                new MessageEvent("message", {
+                    data: JSON.stringify({ event: "webrtc.unreachable", studentId }),
+                }),
+            );
+
+        unreachable(8);
+        expect(onFallback).not.toHaveBeenCalled();
+
+        unreachable(7);
+        unreachable(7);
+        expect(onFallback).toHaveBeenCalledTimes(1);
     });
 
     it("stands down once WebRTC connects", () => {

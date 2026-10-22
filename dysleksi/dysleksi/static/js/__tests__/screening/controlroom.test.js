@@ -684,6 +684,7 @@ describe("Teacher Individual test View", () => {
         mainSocketHandler({
             data: JSON.stringify({
                 event: "student.joined",
+                sameNetwork: true,
                 studentId,
                 assignmentId: 1,
             }),
@@ -2002,6 +2003,7 @@ describe("TeacherView socket 'test.started' handling", () => {
         mainSocketHandler({
             data: JSON.stringify({
                 event: "student.joined",
+                sameNetwork: true,
                 studentId: studentId,
                 assignmentId: 1,
             }),
@@ -2161,6 +2163,7 @@ describe("TeacherView student presence", () => {
         socketHandler({
             data: JSON.stringify({
                 event: "student.joined",
+                sameNetwork: true,
                 studentId: studentId,
                 assignmentId: 1,
             }),
@@ -2331,6 +2334,7 @@ describe("TeacherView cancel test modal", () => {
         mainSocketHandler({
             data: JSON.stringify({
                 event: "student.joined",
+                sameNetwork: true,
                 studentId: studentId,
                 assignmentId: 1,
             }),
@@ -3351,6 +3355,7 @@ describe("TeacherView _initSocket", () => {
         socketHandler({
             data: JSON.stringify({
                 event: "student.joined",
+                sameNetwork: true,
                 studentId,
                 webRTCId: "student-peer-id",
                 assignmentId: 1,
@@ -3361,6 +3366,27 @@ describe("TeacherView _initSocket", () => {
         expect(view.studentChannels[studentId]).toHaveLength(1);
     });
 
+    it("tells a student on another network not to wait for WebRTC", () => {
+        const socketHandler = getMainSocketHandler(socket);
+
+        socketHandler({
+            data: JSON.stringify({
+                event: "student.joined",
+                sameNetwork: false,
+                studentId,
+                webRTCId: "student-peer-id",
+                assignmentId: 1,
+            }),
+        });
+
+        expect(view.webRTCPeer.connect).not.toHaveBeenCalled();
+        expect(JSON.parse(socket.send.mock.calls[0][0])).toEqual({
+            event: "webrtc.unreachable",
+            assignmentId: 1,
+            studentId,
+        });
+    });
+
     it("opens every student channel on a single shared peer", () => {
         const socketHandler = getMainSocketHandler(socket);
 
@@ -3368,6 +3394,7 @@ describe("TeacherView _initSocket", () => {
             socketHandler({
                 data: JSON.stringify({
                     event: "student.joined",
+                    sameNetwork: true,
                     studentId: id,
                     webRTCId: `peer-${id}`,
                     assignmentId: 1,
@@ -3386,6 +3413,7 @@ describe("TeacherView _initSocket", () => {
         socketHandler({
             data: JSON.stringify({
                 event: "student.joined",
+                sameNetwork: true,
                 studentId,
                 assignmentId: 1,
             }),
@@ -3396,6 +3424,7 @@ describe("TeacherView _initSocket", () => {
         socketHandler({
             data: JSON.stringify({
                 event: "student.joined",
+                sameNetwork: true,
                 studentId,
                 assignmentId: 1,
             }),
@@ -3415,6 +3444,7 @@ describe("TeacherView _initSocket", () => {
             socketHandler({
                 data: JSON.stringify({
                     event: "student.joined",
+                    sameNetwork: true,
                     studentId,
                     assignmentId: 1,
                 }),
@@ -3436,6 +3466,7 @@ describe("TeacherView _initSocket", () => {
         socketHandler({
             data: JSON.stringify({
                 event: "student.joined",
+                sameNetwork: true,
                 studentId,
                 assignmentId: 1,
             }),
@@ -3465,6 +3496,7 @@ describe("TeacherView _initSocket", () => {
         socketHandler({
             data: JSON.stringify({
                 event: "student.joined",
+                sameNetwork: true,
                 studentId,
                 assignmentId: 1,
             }),
@@ -3494,6 +3526,7 @@ describe("TeacherView websocket fallback", () => {
         socketHandler({
             data: JSON.stringify({
                 event: "student.joined",
+                sameNetwork: true,
                 studentId,
                 assignmentId: 1,
             }),
