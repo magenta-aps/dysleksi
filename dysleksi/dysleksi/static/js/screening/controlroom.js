@@ -1761,6 +1761,22 @@ export class TeacherView {
 
             if (
                 data.event === "student.joined" &&
+                data.assignmentId === this.assignmentId &&
+                !data.sameNetwork
+            ) {
+                console.log("Student", data.studentId, "is on another network");
+                this.assignmentSocket.send(
+                    JSON.stringify({
+                        event: "webrtc.unreachable",
+                        assignmentId: this.assignmentId,
+                        studentId: data.studentId,
+                    }),
+                );
+                return;
+            }
+
+            if (
+                data.event === "student.joined" &&
                 data.assignmentId === this.assignmentId
             ) {
                 console.log("Setting up webRTC channel for student", data.studentId);
