@@ -4,7 +4,7 @@
 
 from django.urls import URLPattern, URLResolver, include, path
 from django.views.generic import TemplateView
-from login.views import LoginForwardView, LoginView, LogoutView, TwoFactorSetup
+from login.views import LoginForwardView, LoginView, LogoutView
 
 app_name = "login"
 
@@ -37,5 +37,4 @@ urlpatterns: list[URLResolver | URLPattern] = [
         TemplateView.as_view(template_name="login/logged_out.html"),
         name="logged_out",
     ),
-    path("two_factor/setup", TwoFactorSetup.as_view(), name="two_factor_setup"),
 ]

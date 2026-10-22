@@ -70,6 +70,12 @@ class LoginAttemptTest(TestCase):
         attempt = LoginAttempt.objects.get()
         self.assertEqual(attempt.ip_address, "192.0.2.10")
 
+    def test_ip_without_request(self):
+        authenticate(username="testuser", password="forkert")
+
+        attempt = LoginAttempt.objects.get()
+        self.assertIsNone(attempt.ip_address)
+
     def test_login_attempt_str(self):
         self.client.force_login(self.user)
         attempt = LoginAttempt.objects.get()
