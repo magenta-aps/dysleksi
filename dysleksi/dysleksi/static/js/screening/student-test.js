@@ -98,6 +98,7 @@ export class StudentTestView {
             }
         });
         this.domElements.setReloadButtonListener(() => window.location.reload());
+        document.addEventListener("click", (e) => this.restartReminder(e), true);
         this.failedAttempts = 0;
         this.cancelAudio = false;
         listenForRedirect(student.id, assignmentId, ["session.start"]);
@@ -753,6 +754,15 @@ export class StudentTestView {
             this.clearReminder();
             this.scheduleReminder(this.currentQuestion.reminder);
         }
+    }
+
+    restartReminder(e) {
+        if (this.questionReminderId == null || !e.target.closest("button")) {
+            return;
+        }
+        this.domElements.interruptSound();
+        this.clearReminder();
+        this.scheduleReminder(this.currentQuestion.reminder);
     }
 
     scheduleReminder(delay) {
