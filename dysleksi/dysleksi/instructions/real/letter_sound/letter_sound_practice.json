@@ -400,101 +400,20 @@
         "correct_index": 3,
         "wrong": ["c", "j", "g"]
     },
+    // Outro: forklaring på blå og grå knap
     {
-        "question_type": "no_input_required",
-        "instruction_sequence": [
-            {
-                "action": "fadeOut",
-                "delayAfter": 0,
-                "element": "next"
-            },
-            {
-                "action": "fadeOut",
-                "delayAfter": 0,
-                "element": "repeat"
-            },
-            {
-                // Sungiusarneq naammassivoq / Øvelserne er færdige
-                "action": "playSound",
-                "delayAfter": 1250,
-                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5c.6.mp3"
-            },
-            {
-                // Gentag-knappen skal gå tilbage til trin 1b.1 (øveopgaven med c, j, d, g.)
-                "action": "setRepeatButtonDestination",
-                "delayAfter": 0,
-                "data": "1"
-            },
-            {
-                // Aaku takusinnaavatit tuugassat marluk.
-                // Her kan du se to valgmuligheder.
-                // (Lånt fra "Ordlæsning 1")
-                "action": "playSound",
-                "delayAfter": 1250,
-                //"resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.1.mp3",
-                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.1.mp3"
-            },
-            {
-                "action": "showFaded",
-                "delayAfter": 0,
-                "element": "repeat"
-            },
-            {
-                "action": "showFaded",
-                "delayAfter": 1,
-                "element": "next"
-            },
-
-            {
-                "action": "fadeIn",
-                "delayAfter": 0,
-                "element": "next"
-            },
-
-            // Hvis du har forstået, hvad du skal gøre, skal du klikke på blåikon for
-            // at starte opgaverne.
-            {
-                "action": "playSound",
-                "delayAfter": 1250,
-                "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.2.mp3"
-            },
-            {
-                "action": "fadeIn",
-                "delayAfter": 0,
-                "element": "repeat"
-            },
-
-            // Men, hvis du ikke har forstået hvad du skal gøre, skal du klikke på øret
-            // grå ikon for at lytte til instruktionen igen
-            {
-                "action": "playSound",
-                "delayAfter": 1250,
-                "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.3.mp3"
-            },
-
-            // Vælg ikon (klik) / Toorseriarit
-            {
-                "action": "playSound",
-                "delayAfter": 1250,
-                "resource": "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.4.mp3"
-            },
-
-            // Sapinngisamik suliassat akiniarsarisassavatit.
-            // Du skal svare opgaverne så godt du kan.
-            // (Lånt fra "Forlyd")
-            {
-                "action": "playSound",
-                "delayAfter": 750,
-                "resource": "resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.1.mp3"
-            },
-
-            // Maanna akissutit eqqortuunersoq paasitinneqartassanngilatit.
-            // Nu får du ikke længere at vide om du har svaret rigtigt.
-            {
-                "action": "playSound",
-                "delayAfter": 750,
-                "resource": "resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.mp3"
-            }
+        "question_type": "instruction_sequence_outro",
+        "sounds": [
+            // Øvelserne er færdige.
+            "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5c.6.mp3",
+            // Her kan du se to valgmuligheder.
+            "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.1.mp3",
+            // Hvis du har forstået, hvad du skal gøre, skal du klikke på den blå.
+            "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.2.mp3",
+            // Hvis du ikke har forstået, hvad du skal gøre, skal du klikke på den grå.
+            "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.3.mp3",
+            // Vælg et ikon (klik).
+            "resources/letter_sound/Enhanced/Øveopgave 1 og 2/1d.4.mp3"
         ]
     }
 ]

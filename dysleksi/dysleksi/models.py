@@ -1074,8 +1074,36 @@ class TestPart(models.Model):
 
         return part_data
 
+    @staticmethod
+    def instruction_sequence_outro(sounds):
+        done, options, understood, not_understood, choose = sounds
+        return {
+            "question_type": QuestionType.NO_INPUT_REQUIRED,
+            "instruction_sequence": [
+                {"action": "playSound", "resource": done, "delayAfter": 1250},
+                {"action": "show", "element": "next"},
+                {"action": "show", "element": "repeat"},
+                {"action": "fadeOut", "element": "next"},
+                {"action": "fadeOut", "element": "repeat"},
+                {"action": "setRepeatButtonDestination", "data": "1"},
+                {"action": "fadeIn", "element": "repeat"},
+                {"action": "fadeIn", "element": "next", "delayAfter": 1},
+                {"action": "playSound", "resource": options, "delayAfter": 750},
+                {"action": "highlight", "element": "next"},
+                {"action": "playSound", "resource": understood, "delayAfter": 750},
+                {"action": "highlight", "element": "repeat"},
+                {"action": "playSound", "resource": not_understood, "delayAfter": 1250},
+                {"action": "highlight", "element": "next"},
+                {"action": "highlight", "element": "repeat"},
+                {"action": "playSound", "resource": choose, "delayAfter": 750},
+            ],
+        }
+
     def update_or_create_test_resources(self, questions_data, is_practice=False):
         for order, data in enumerate(questions_data):
+            if data.get("question_type") == "instruction_sequence_outro":
+                data = self.instruction_sequence_outro(data["sounds"])
+
             # Initialize new dict to avoid carry-over from previous question
             question = {}
 

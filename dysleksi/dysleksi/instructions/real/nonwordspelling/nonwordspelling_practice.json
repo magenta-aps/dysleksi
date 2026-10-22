@@ -321,74 +321,20 @@
     "reminder": 20000,
     "reminder_source": "resources/nonwordspelling/Enhanced/Deltests/4e.4-00.mp3"
   },
+  // Outro: forklaring på blå og grå knap
   {
-    "question_type": "no_input_required",
-    "instruction_sequence": [
-      {
-        "action": "setRepeatButtonDestination",
-        "data": 1
-      },
-      {
-        // Øvelserne er færdige.
-        "action": "playSound",
-        "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4c.8.mp3",
-        "delayAfter": 1500
-      },
-      {
-        "action": "showFaded",
-        "element": "repeat"
-      },
-      {
-        "action": "showFaded",
-        "element": "next"
-      },
-
-      {
-        // Her kan du se to knapper.
-        "action": "playSound",
-        "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.1.mp3",
-        "delayAfter": 500
-      },
-
-      // 9d.4a
-      {
-        "action": "fadeIn",
-        "element": "next"
-      },
-      {
-        // Hvis du har forstået, hvad du skal gøre,
-        // skal du klikke på den blå. Så starte opgaverne.
-        "action": "playSound",
-        "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.2.mp3",
-        "delayAfter": 500
-      },
-
-      // 6d.2b
-      {
-        "action": "fadeOut",
-        "element": "next"
-      },
-      {
-        "action": "fadeIn",
-        "element": "repeat"
-      },
-      {
-        // Men hvis du ikke har forstået, hvad du skal gøre,
-        // skal du klikke på den grå. Så skal du øve dig igen.
-        "action": "playSound",
-        "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.3.mp3",
-        "delayAfter": 500
-      },
-      {
-        "action": "fadeIn",
-        "element": "next"
-      },
-      {
-        // Vælg ikon (klik).
-        "action": "playSound",
-        "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.4.mp3",
-        "delayAfter": 500
-      }
+    "question_type": "instruction_sequence_outro",
+    "sounds": [
+      // Øvelserne er færdige.
+      "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4c.8.mp3",
+      // Her kan du se to valgmuligheder.
+      "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.1.mp3",
+      // Hvis du har forstået, hvad du skal gøre, skal du klikke på den blå.
+      "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.2.mp3",
+      // Hvis du ikke har forstået, hvad du skal gøre, skal du klikke på den grå.
+      "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.3.mp3",
+      // Vælg et ikon (klik).
+      "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4d.4.mp3"
     ]
   }
 ]
