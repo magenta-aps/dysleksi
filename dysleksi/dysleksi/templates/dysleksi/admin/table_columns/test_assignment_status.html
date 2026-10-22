@@ -1,13 +1,15 @@
 {% with record.status|label_from_choices:TestAssignmentStatus as status %}
-{% if record.status == TestAssignmentStatus.PLANNED %}
-    <span><i class="ph ph-calendar-check me-1"></i></span>
-{% elif record.status == TestAssignmentStatus.IN_PROGRESS %}
-    <span class="text-orange"><i class="ph ph-lock-simple-open me-1"></i></span>
-{% elif record.status == TestAssignmentStatus.CANCELLED %}
-    <span class="text-danger"><i class="ph ph-x me-1"></i></span>
-{% else %}
+<span class="d-flex align-items-center">
+    {% if record.status == TestAssignmentStatus.PLANNED %}
+    <span class="d-flex align-items-center"><i class="ph-fill ph-calendar-check fs-5 me-1"></i></span>
+    {% elif record.status == TestAssignmentStatus.IN_PROGRESS %}
+    <span class="d-flex align-items-center text-orange"><i class="ph-fill ph-lock-simple-open fs-5 me-1"></i></span>
+    {% elif record.status == TestAssignmentStatus.CANCELLED %}
+    <span class="d-flex align-items-center text-danger"><i class="ph-fill ph-x fs-5 me-1"></i></span>
+    {% else %}
     {# TestAssignmentStatus.COMPLETED #}
-    <span class="text-success"><i class="ph ph-check me-1"></i></span>
-{% endif %}
-{{ status }}
+    <span class="d-flex align-items-center text-success"><i class="ph-fill ph-check fs-5 me-1"></i></span>
+    {% endif %}
+    {{ status }}
+</span>
 {% endwith %}
