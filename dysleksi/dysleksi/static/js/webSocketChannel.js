@@ -114,4 +114,14 @@ export function fallbackOnWebRTCFailure(
     // No route between the peers makes the connection fail before the deadline
     p2p.addEventListener("error", fallBack, { signal: settled.signal });
     p2p.addEventListener("open", () => settled.abort(), { signal: settled.signal });
+    chatSocket.addEventListener(
+        "message",
+        (e) => {
+            const data = JSON.parse(e.data);
+            if (data.event === "webrtc.unreachable" && data.studentId === studentId) {
+                fallBack();
+            }
+        },
+        { signal: settled.signal },
+    );
 }
