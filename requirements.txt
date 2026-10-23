@@ -93,7 +93,7 @@ pipdeptree==4.2.9
 
 # Dependencies of dependencies, pinned to specific versions.
 
-asgiref==3.12.1
+asgiref==3.13.0
 attrs==26.1.0
 autobahn==26.10.2
 Automat==25.4.16
