@@ -374,103 +374,20 @@
         "reminder_source": "/resources/letter_shape/Enhanced/Instruktion/3c.1.mp3",
         "hint_source": "/resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.5_v2.mp3"
     },
+    // Outro: forklaring på blå og grå knap
     {
-        "question_type": "no_input_required",
-        "instruction_sequence": [
-            // "Næste" og "Gentag" vises i "fade out" tilstand
-            {
-                "action": "show",
-                "delayAfter": 0,
-                "element": "next"
-            },
-            {
-                "action": "show",
-                "delayAfter": 0,
-                "element": "repeat"
-            },
-            {
-                "action": "fadeOut",
-                "delayAfter": 0,
-                "element": "next"
-            },
-            {
-                "action": "fadeOut",
-                "delayAfter": 750,
-                "element": "repeat"
-            },
-            {
-                // "Øvelserne er færdige" / "Sungiusarneq naammassivoq"
-                "action": "playSound",
-                "delayAfter": 1250,
-                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.9.mp3"
-            },
-
-            {
-                // Gentag-knappen skal gå til trin 3b.1 ("Bb")
-                "action": "setRepeatButtonDestination",
-                "delayAfter": 0,
-                "data": "1"
-            },
-
-            {
-                "action": "fadeIn",
-                "delayAfter": 0,
-                "element": "repeat"
-            },
-            {
-                "action": "fadeIn",
-                "delayAfter": 1,
-                "element": "next"
-            },
-            {
-                // Her er to valgmuligheder.
-                "action": "playSound",
-                "delayAfter": 750,
-                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.1.mp3"
-            },
-
-            {
-                "action": "highlight",
-                "delayAfter": 0,
-                "element": "next"
-            },
-            {
-                // Hvis du har forstået, hvad du skal gøre, skal du trykke på den blå.
-                // Så starter opgaverne.
-                "action": "playSound",
-                "delayAfter": 750,
-                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.2.mp3"
-            },
-
-            {
-                "action": "highlight",
-                "delayAfter": 0,
-                "element": "repeat"
-            },
-            {
-                // Hvis du ikke har forstået, hvad du skal gøre, skal du trykke på den
-                // grå. Så skal du øve dig igen.
-                "action": "playSound",
-                "delayAfter": 1250,
-                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.3.mp3"
-            },
-
-            {
-                "action": "highlight",
-                "delayAfter": 0,
-                "element": "next"
-            },
-            {
-                "action": "highlight",
-                "delayAfter": 0,
-                "element": "repeat"
-            },
-            {
-                // "Vælg et ikon (klik)"
-                "action": "playSound",
-                "delayAfter": 750,
-                "resource": "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.4.mp3"
-            }
+        "question_type": "instruction_sequence_outro",
+        "sounds": [
+            // Øvelserne er færdige.
+            "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3c.9.mp3",
+            // Her kan du se to valgmuligheder.
+            "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.1.mp3",
+            // Hvis du har forstået, hvad du skal gøre, skal du klikke på den blå.
+            "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.2.mp3",
+            // Hvis du ikke har forstået, hvad du skal gøre, skal du klikke på den grå.
+            "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.3.mp3",
+            // Vælg et ikon (klik).
+            "resources/letter_shape/Enhanced/Øveopgave 1 og 2/3d.4.mp3"
         ]
     }
 ]

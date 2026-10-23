@@ -36,6 +36,25 @@ Possible question types are:
 - `free_text`
 - `no_input_required`
 - `multiple_choice_match`
+- `instruction_sequence_outro`
+
+`instruction_sequence_outro` is the last question of a practice file. It explains the
+blue "next" and grey "repeat" buttons and only needs five sound files. It is imported as
+a `no_input_required` question with a fixed instruction sequence (see
+`TestPart.instruction_sequence_outro`):
+
+```
+{
+    "question_type": "instruction_sequence_outro",
+    "sounds": [
+        "resources/.../done.mp3",
+        "resources/.../two_options.mp3",
+        "resources/.../blue.mp3",
+        "resources/.../grey.mp3",
+        "resources/.../choose.mp3"
+    ]
+}
+```
 
 ## Practice questions
 

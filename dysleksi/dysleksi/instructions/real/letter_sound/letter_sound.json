@@ -8,6 +8,19 @@
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
             {
+                // Du skal svare opgaverne så godt du kan.
+                // (Lånt fra "Forlyd")
+                "action": "playSound",
+                "delayAfter": 750,
+                "resource": "resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.1.mp3"
+            },
+            {
+                // Nu får du ikke længere at vide om du har svaret rigtigt.
+                "action": "playSound",
+                "delayAfter": 750,
+                "resource": "resources/fore_sound/Enhanced/Øveopgave 1 og 2/2e.2.mp3"
+            },
+            {
                 // Aallartipputit.
                 // Du starter nu.
                 // (Lånt fra "Sætningslæsning")

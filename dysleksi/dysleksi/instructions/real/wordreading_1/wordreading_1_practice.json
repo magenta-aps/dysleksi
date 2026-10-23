@@ -392,79 +392,20 @@
         "resources/wordreading_1/Opgave/Gris.jpg"
       ]
     },
+    // Outro: forklaring på blå og grå knap
     {
-        "question_type": "no_input_required",
-        "instruction_sequence": [
-            {
-                "action": "fadeOut",
-                "delayAfter": 0,
-                "element": "next"
-            },
-            {
-                "action": "fadeOut",
-                "delayAfter": 0,
-                "element": "repeat"
-            },
-            {
-                "action": "show",
-                "delayAfter": 0,
-                "element": "repeat"
-            },
-            {
-                "action": "show",
-                "delayAfter": 750,
-                "element": "next"
-            },
-            {
-                // Sungiusarneq naammassivoq / Øvelserne er færdige
-                "action": "playSound",
-                "delayAfter": 1250,
-                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5c.6.mp3"
-            },
+        "question_type": "instruction_sequence_outro",
+        "sounds": [
+            // Øvelserne er færdige.
+            "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5c.6.mp3",
             // Her kan du se to valgmuligheder.
-            {
-                "action": "playSound",
-                "delayAfter": 0,
-                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.1.mp3"
-            },
-            {
-                // Gentag-knappen skal gå tilbage til trin 5b.1 (blomst)
-                "action": "setRepeatButtonDestination",
-                "delayAfter": 0,
-                "data": "1"
-            },
-            {
-                "action": "fadeIn",
-                "delayAfter": 750,
-                "element": "next"
-            },
-            // Hvis du har forstået, hvad du skal gøre, skal du klikke på den blå. Så
-            // starter opgaverne.
-            {
-                "action": "playSound",
-                "delayAfter": 0,
-                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.2.mp3"
-            },
-            {
-                "action": "fadeIn",
-                "delayAfter": 750,
-                "element": "repeat"
-            },
-            // Suliassatilli paasilluanngitsoorukkit, qasertoq tuussavat. Taava sungiusaqqissaatit.
-            // Men, hvis du ikke har forstået hvad du skal gøre, skal du klikke på øret grå ikon for at lytte til instruktionen igen
-            // (Lånt fra "Ordlæsning 2")
-            {
-                "action": "playSound",
-                "delayAfter": 1250,
-                //"resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.3.mp3"
-                    "resource": "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7d.3.mp3"
-            },
-            // Vælg ikon (klik).
-            {
-                "action": "playSound",
-                "delayAfter": 0,
-                "resource": "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.4.mp3"
-            }
+            "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.1.mp3",
+            // Hvis du har forstået, hvad du skal gøre, skal du klikke på den blå.
+            "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.2.mp3",
+            // Hvis du ikke har forstået, hvad du skal gøre, skal du klikke på den grå.
+            "resources/wordreading_2/Enhanced/Øveopgave 1 og 2/7d.3.mp3",
+            // Vælg et ikon (klik).
+            "resources/wordreading_1/Enhanced/+veopgave 1 og 2/5d.4.mp3"
         ]
     }
 ]
