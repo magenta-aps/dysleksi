@@ -88,7 +88,7 @@ mypy==2.4.0
 tblib==3.2.2
 
 ## Package dependencies
-pipdeptree==4.2.9
+pipdeptree==4.2.10
 
 
 # Dependencies of dependencies, pinned to specific versions.
