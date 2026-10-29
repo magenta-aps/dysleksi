@@ -20,4 +20,5 @@ include(
     "channels.py",
     "tabulex.py",
     "pitu.py",
+    "eboks.py",
 )

@@ -46,6 +46,8 @@ services:
       - staticfiles-data:/static/
       - static-copy:/static-copy
       - file-data:/upload:rw
+      # Only required in dev to let unittests read and write e-Boks PDF files
+      - /tmp/:/upload/eboks/:rw
     environment:
       - MAKE_MIGRATIONS=true
       - MIGRATE=true
