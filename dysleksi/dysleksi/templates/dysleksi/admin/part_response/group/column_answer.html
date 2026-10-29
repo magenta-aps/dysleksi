@@ -51,9 +51,13 @@
                 <span class="ms-1"></span>
             </div>
         {% endif %}
-        {% if record.correctness == "wrong" or record.correctness == "incorrect" %}
+        {% if record.correctness != "skipped" %}
             <input type="text"
+                   {% if record.correctness == "wrong" %}
                    value="{{ record.actual_pronunciation|default_if_none:"" }}"
+                   {% else %}
+                   value="{{ record.question.challenge.text|default_if_none:"" }}"
+                   {% endif %}
                    placeholder="{% translate 'Eleven svarede' %}"
                    class="actual-pronunciation form-control d-inline w-50 ms-1"
                    data-attr="actual_pronunciation"

@@ -6,6 +6,7 @@ import { initUpdateQuestionResponse } from "../../admin/update-question-response
 
 const mockDoc = `
     <form data-edit-url="mock-edit-url">
+        <div class="answer"></div>
         <input type="hidden" name="csrfmiddlewaretoken" value="12345" />
         <input type="text" class="note" data-pk="-1" data-attr="attr" value="foo" />
     </form>
@@ -16,6 +17,7 @@ describe("UpdateQuestionResponse", () => {
         Promise.resolve({
             status: 200,
             ok: true,
+            json: async () => ({ correctness: "correct", correct_answer: "iga" }),
         });
 
     beforeEach(() => {

@@ -1909,9 +1909,24 @@ class QuestionResponseUpdateView(GroupRequiredMixin, ObjectPermissionsMixin, Vie
             raise Http404(f"QuestionResponse {pk} does not exist")
         else:
             self.test_permissions(obj)
+            old_value = getattr(obj, attr)
             setattr(obj, attr, value)
-            obj.save(update_fields=[attr])
-            return HttpResponse("ok")
+            update_fields = [attr]
+            correct_answer = None
+            if attr == "actual_pronunciation" and value != old_value:
+                # Re-assess whether student's answer was actually correct
+                challenge = obj.question.challenge
+                if challenge is not None and challenge.text is not None:
+                    is_correct = value.lower() == challenge.text.lower()
+                    obj.correctness = (
+                        Correctness.CORRECT if is_correct else Correctness.WRONG
+                    )
+                    update_fields += ["correctness"]
+                    correct_answer = challenge.text
+            obj.save(update_fields=update_fields)
+            return JsonResponse(
+                {"correctness": obj.correctness, "correct_answer": correct_answer}
+            )
 
 
 class QuestionResponseAnswerSoundDetail(
