@@ -2472,6 +2472,35 @@ class TestQuestionResponseUpdateView(ResponseTest):
         question_response.refresh_from_db()
         self.assertEqual(question_response.note, "Mit notat")
 
+    def test_post_can_update_correctness(self):
+        question_response = QuestionResponse.objects.earliest("pk")
+        self.assertEqual(question_response.correctness, Correctness.CORRECT)
+        response = self.post(
+            self.teacher,
+            {"pk": question_response.pk, "attr": "actual_pronunciation", "value": "uh"},
+        )
+        self.assertIsInstance(response, HttpResponse)
+        question_response.refresh_from_db()
+        self.assertEqual(question_response.actual_pronunciation, "uh")
+        self.assertEqual(question_response.correctness, Correctness.WRONG)
+
+    def test_post_skips_updating_correctness_if_no_challenge_text(self):
+        question_response = QuestionResponse.objects.earliest("pk")
+        # Remove challenge from question
+        question_response.question.challenge = None
+        question_response.question.save(update_fields=["challenge"])
+        self.assertEqual(question_response.correctness, Correctness.CORRECT)
+        response = self.post(
+            self.teacher,
+            {"pk": question_response.pk, "attr": "actual_pronunciation", "value": "uh"},
+        )
+        self.assertIsInstance(response, HttpResponse)
+        question_response.refresh_from_db()
+        self.assertEqual(question_response.actual_pronunciation, "uh")
+        # Verify that correctness is left intact (as we do not have a challenge text to
+        # compare it to.)
+        self.assertEqual(question_response.correctness, Correctness.CORRECT)
+
     def test_post_invalid_question_response_pk(self):
         with self.assertRaises(Http404):
             self.post(
