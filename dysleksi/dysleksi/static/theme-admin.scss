@@ -512,7 +512,6 @@ form .grid {
       padding: $spacer $spacer 0.5 * $spacer $spacer;
       color: $mono-gray-dark-3;
       background-color: $white;
-      text-transform: uppercase;
     }
 
     th a {
@@ -1405,7 +1404,7 @@ $border-radius-student-card: $spacer / 4 * 3;
       font-weight: normal;
       vertical-align: top;
 
-      text-transform: capitalize !important;
+      text-transform: none;
 
       &:first-child {
         width: 20%;
