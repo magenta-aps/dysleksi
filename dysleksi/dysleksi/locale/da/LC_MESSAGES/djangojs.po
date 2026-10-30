@@ -18,6 +18,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
+#: dysleksi/static/js/admin/update-question-response.js
+msgid "Forkert"
+msgstr ""
+
 #: dysleksi/static/js/screening/controlroom.js
 msgid "Ingen forbindelse til eleven"
 msgstr ""
