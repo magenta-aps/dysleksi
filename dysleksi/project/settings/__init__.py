@@ -19,4 +19,5 @@ include(
     "bootstrap5.py",
     "channels.py",
     "tabulex.py",
+    "pitu.py",
 )
