@@ -97,7 +97,7 @@ asgiref==3.13.0
 attrs==26.1.0
 autobahn==26.10.2
 Automat==25.4.16
-cbor2==6.1.5
+cbor2==6.2.0
 certifi==2026.10.23
 cffi==2.1.1
 charset-normalizer==3.5.2
