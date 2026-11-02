@@ -1104,7 +1104,10 @@ class AssignmentPartResultsView(
         return context
 
     def get_table(self) -> PartResultTable:
-        return PartResultTable(data=self.object_list)
+        exclude = (
+            () if self.part.has_partially_correct_answers else ("almost_correct_count",)
+        )
+        return PartResultTable(data=self.object_list, exclude=exclude)
 
     def get_plot_data(self) -> List[Tuple[float, float]]:  # pragma: no cover
         # x-værdier: normscore (correct_proportion)

@@ -1382,12 +1382,11 @@ class TestAssignmentPartResultsView(ResponseTest):
                     ["Elev"],
                     ["Forsøgte"],
                     ["Rigtige"],
-                    ["Næsten rigtige"],
                     ["Rigtighedsprocent"],
                     ["Normscore (0-100)"],
                 ],
-                [["Test1 Elev"], ["4"], ["4"], ["0"], ["100%"], ["100"]],
-                [["Test2 Elev"], ["4"], ["1"], ["0"], ["25%"], ["25"]],
+                [["Test1 Elev"], ["4"], ["4"], ["100%"], ["100"]],
+                [["Test2 Elev"], ["4"], ["1"], ["25%"], ["25"]],
             ],
         )
 
