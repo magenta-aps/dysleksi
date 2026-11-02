@@ -52,6 +52,7 @@ services:
       - MAKEMESSAGES=true
       - CREATE_DUMMY_USERS=true
       - CREATE_DUMMY_DATA=true
+      - UPDATE_TESTS=true
       - TEST=true
       - ECHO_INTERFACE=https://dysleksi-web
       - STATICFILES_DESTINATION_DIR=/static-copy

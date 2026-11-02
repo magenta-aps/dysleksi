@@ -12,6 +12,7 @@ MAKEMESSAGES=${MAKEMESSAGES:=false}
 PULL_IDP_METADATA=${PULL_IDP_METADATA:=false}
 CREATE_DUMMY_DATA=${CREATE_DUMMY_DATA:=false}
 CREATE_DUMMY_USERS=${CREATE_DUMMY_USERS:=false}
+UPDATE_TESTS=${UPDATE_TESTS:=false}
 STATICFILES_DESTINATION_DIR=${STATICFILES_DESTINATION_DIR:=""}
 
 python manage.py wait_for_db
@@ -29,13 +30,15 @@ fi
 echo 'creating groups'
 python manage.py create_groups
 
-if [ "${CREATE_DUMMY_DATA,,}" = true ]; then
-  python manage.py create_dummy_classes_and_users
-  python manage.py update_or_create_tests --dummy --answer &
-  wait $!
-  python manage.py update_or_create_tests --answer &
-else
-  python manage.py update_or_create_tests
+if [ "${UPDATE_TESTS,,}" = true ]; then
+  if [ "${CREATE_DUMMY_DATA,,}" = true ]; then
+    python manage.py create_dummy_classes_and_users
+    python manage.py update_or_create_tests --dummy --answer &
+    wait $!
+    python manage.py update_or_create_tests --answer &
+  else
+    python manage.py update_or_create_tests
+  fi
 fi
 
 echo 'creating cache table'
