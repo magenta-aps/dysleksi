@@ -1,23 +1,28 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
+import base64
 import logging
 import mimetypes
 import os
 import re
+import uuid
 from base64 import b64decode
 from dataclasses import dataclass
 from datetime import date
 from functools import partial
+from io import BytesIO
 from math import floor
 from typing import Any, Dict, List, Self, Tuple
 
+from django.conf import settings
 from django.contrib.auth.models import AbstractUser, Group
 from django.contrib.postgres.aggregates import BoolAnd, BoolOr
 from django.contrib.postgres.fields import DateTimeRangeField
 from django.core.exceptions import ValidationError
+from django.core.files import File
 from django.core.files.base import ContentFile
-from django.core.validators import MaxValueValidator, MinValueValidator
+from django.core.validators import MaxValueValidator, MinValueValidator, RegexValidator
 from django.db import models
 from django.db.models import (
     Case,
@@ -42,6 +47,8 @@ from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import get_language, gettext
 from django.utils.translation import gettext_lazy as _
+from integrations.eboks.client import EboksClient, MessageFailureException
+from lxml import etree
 from simple_history.models import HistoricalRecords
 
 from dysleksi.exceptions import MissingIdException
@@ -2463,3 +2470,198 @@ class ReadingSpeedCategory(Category):
             pk_map[category.pk] = category.scaled(upper_scale if first else lower_scale)
             first = False
         return pk_map
+
+
+class EboksMessage(PermissionsMixin, models.Model):
+    created = models.DateTimeField(
+        auto_now_add=True,
+    )
+    sent = models.DateTimeField(
+        null=True,
+    )
+    cpr_cvr = models.CharField(
+        validators=[RegexValidator(r"\d{8,10}")],
+    )
+    title = models.CharField(
+        max_length=255,
+    )
+    content_type = models.IntegerField()
+    message_id = models.CharField(
+        max_length=255,
+    )
+    status = models.CharField(
+        choices=(
+            ("created", _("Genereret")),
+            # sent means that the message was successfully delivered to e-boks.
+            ("sent", _("Afsendt")),
+            # Successfully sent to proxy but awaiting post-processing
+            ("post_processing", _("Afventer efterbehandling")),
+            # Could not deliver message.
+            ("failed", _("Afsendelse fejlet")),
+        ),
+        max_length=20,
+    )
+    recipient_status = models.CharField(
+        choices=(
+            ("", _("Gyldig e-Boks modtager")),
+            ("exempt", _("Fritaget modtager")),
+            ("invalid", _("Ugyldig E-boks modtager (sendes til efterbehandling)")),
+            ("dead", _("Afdød")),
+            ("minor", _("Mindreårig")),
+        ),
+        max_length=8,
+    )
+    post_processing_status = models.CharField(
+        choices=(
+            ("", ""),
+            ("pending", _("Afventer processering")),
+            ("address resolved", _("Fundet gyldig postadresse")),
+            ("address not found", _("Ingen gyldig postadresse")),
+            ("remote printed", _("Overført til fjernprint")),
+        ),
+        default="",
+        blank=True,
+        max_length=20,
+    )
+    is_postprocessing = models.BooleanField(
+        default=False,
+        db_index=True,
+    )
+    contents = models.FileField(
+        null=True, upload_to=settings.LOCAL_EBOKS_PDF_STORAGE  # type: ignore
+    )
+
+    @classmethod
+    def dispatch(
+        cls,
+        cpr_cvr: str,
+        title: str,
+        content_type: int,
+        pdf_data: bytes,
+        client: EboksClient | None = None,
+    ) -> EboksMessage:
+        message = cls(cpr_cvr=cpr_cvr, title=title, content_type=content_type)
+        message.set_pdf_data(pdf_data)
+        message.send(client=client)
+        return message
+
+    def set_pdf_data(self, pdf_data: bytes):
+        name = f"{uuid.uuid4()}.pdf"
+        self.contents.save(
+            content=File(BytesIO(pdf_data), name=name), name=name, save=False
+        )
+
+    @cached_property
+    def xml(self):
+        pdf_data = self.contents.read()
+        return self.generate_xml(self.cpr_cvr, self.title, self.content_type, pdf_data)
+
+    def send(self, client: EboksClient | None = None) -> None:
+        self.sent = timezone.now()
+        created_client = False
+        if not self.pk:
+            self.save()
+        if client is None:
+            client = EboksClient.from_settings()
+            created_client = True
+        try:
+            message_id = client.get_message_id()
+            self.message_id = message_id
+            response = client.send_message(self, message_id, 5)
+            response_json = response.json()
+        except MessageFailureException as e:
+            self.status = "failed"
+            self.message_id = e.message_id
+            self.save(update_fields=["status", "message_id", "sent"])
+            raise
+        else:
+            # message_id might have changed so get it from the response
+            self.message_id = response_json["message_id"]
+            # we always only have 1 recipient
+            recipient = response_json["recipients"][0]
+            self.recipient_status = recipient["status"]
+            self.sent = timezone.now()
+            if recipient["post_processing_status"] == "":
+                self.status = "sent"
+                self.is_postprocessing = False
+            else:
+                self.status = "post_processing"
+                self.is_postprocessing = True
+            self.save(
+                update_fields=[
+                    "status",
+                    "message_id",
+                    "sent",
+                    "is_postprocessing",
+                    "recipient_status",
+                ]
+            )
+        finally:
+            if created_client:
+                client.close()
+
+    @staticmethod
+    def generate_xml(
+        cpr_cvr: str, title: str, content_type_id: int, pdf_data: bytes
+    ) -> bytes:
+        if not cpr_cvr.isdigit():
+            raise ValueError("cpr/cvr must be all digits")
+        root = etree.Element("Dispatch", xmlns="urn:eboks:en:3.0.0")
+        recipient = etree.Element("DispatchRecipient")
+        recipient_id = etree.Element("Id")
+        recipient_id.text = cpr_cvr
+        recipient.append(recipient_id)
+        r_type = etree.Element("Type")
+        if len(cpr_cvr) == 10:
+            r_type.text = "P"
+        elif len(cpr_cvr) == 8:
+            r_type.text = "V"
+        else:
+            raise ValueError(f"unknown recipient type for: {cpr_cvr}")
+        recipient.append(r_type)
+        nationality = etree.Element("Nationality")
+        nationality.text = "DK"
+        recipient.append(nationality)
+        root.append(recipient)
+
+        content_type = etree.Element("ContentTypeId")
+        content_type.text = str(content_type_id)
+        root.append(content_type)
+
+        title_elemt = etree.Element("Title")
+        title_elemt.text = title
+        root.append(title_elemt)
+
+        content = etree.Element("Content")
+        data = etree.Element("Data")
+        data.text = base64.b64encode(pdf_data).decode("utf-8")
+        content.append(data)
+        file_extension = etree.Element("FileExtension")
+        file_extension.text = "pdf"
+        content.append(file_extension)
+        root.append(content)
+        return etree.tostring(root, xml_declaration=True, encoding="UTF-8")
+
+    @staticmethod
+    def update_final_statuses(client: EboksClient | None = None):
+        if EboksMessage.objects.filter(is_postprocessing=True).exists():
+            if client is None:
+                client = EboksClient.from_settings()
+            qs = EboksMessage.objects.filter(is_postprocessing=True)
+            messages = {message.message_id: message for message in qs}
+            response = client.get_recipient_status(list(messages.keys()))
+            for response_message in response.json():
+                message_id = response_message["message_id"]
+                message = messages[message_id]
+                recipient = response_message["recipients"][0]
+                if recipient["post_processing_status"] != "pending":
+                    message.status = "sent"
+                    message.post_processing_status = recipient["post_processing_status"]
+                    message.is_postprocessing = False
+                    message.save(
+                        update_fields=[
+                            "status",
+                            "post_processing_status",
+                            "is_postprocessing",
+                        ]
+                    )

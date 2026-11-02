@@ -182,7 +182,13 @@ Lint Javascript:
     OIDC_OP_TOKEN_ENDPOINT: http://dysleksi-oidc-provider:9000/token
     OIDC_OP_USER_ENDPOINT: http://dysleksi-oidc-provider:9000/me
     OIDC_AUTHENTICATION_CALLBACK_URL: https://dysleksi-web/oidc/callback/
-
+    EBOKS_HOST: https://eboxtest.nanoq.gl
+    EBOKS_HOST_VERIFY: ""
+    EBOKS_CLIENT_CERT: /ssl/eboks/client.crt
+    EBOKS_CLIENT_KEY: /ssl/eboks/client.key
+    EBOKS_CLIENT_ID: 99
+    EBOKS_SYSTEM_ID: 3994
+    EBOKS_CONTENT_TYPE_ID: 179343
 
   image: ${IMAGE_SHA}
   before_script:

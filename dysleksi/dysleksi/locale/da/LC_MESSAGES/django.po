@@ -237,6 +237,58 @@ msgstr ""
 msgid "Completion time in milliseconds"
 msgstr ""
 
+#: dysleksi/models.py
+msgid "Genereret"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Afsendt"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Afventer efterbehandling"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Afsendelse fejlet"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Gyldig e-Boks modtager"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Fritaget modtager"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Ugyldig E-boks modtager (sendes til efterbehandling)"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Afdød"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Mindreårig"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Afventer processering"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Fundet gyldig postadresse"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Ingen gyldig postadresse"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Overført til fjernprint"
+msgstr ""
+
 #: dysleksi/tables.py
 msgid "ID"
 msgstr ""
