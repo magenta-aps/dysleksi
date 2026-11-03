@@ -821,7 +821,7 @@ msgid "Giv adgang"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
-msgid "Åbn"
+msgid "Fortsæt"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_type.html
@@ -987,10 +987,6 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/test_response/detail.html
 #: dysleksi/templates/dysleksi/admin/test_response/footer.html
 msgid "Se elevens svar"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/test_response/detail.html
-msgid "Deltests"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_response/footer.html
