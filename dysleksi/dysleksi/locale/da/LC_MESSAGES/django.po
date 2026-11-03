@@ -947,6 +947,10 @@ msgid "Eleven er kommet ind i testrummet"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
+msgid "Der er ikke forbindelse til eleven"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/test_assignment/detail_individual.html
 msgid "Del"
 msgstr ""
 
