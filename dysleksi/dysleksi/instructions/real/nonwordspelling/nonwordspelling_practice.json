@@ -316,8 +316,13 @@
       "instruction_sequence": [
           {
               "action": "playSound",
-              "delayAfter": 500,
+              "delayAfter": 1250,
               "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4c.2 (Ny).mp3"
+          },
+          {
+              "action": "playSound",
+              "delayAfter": 500,
+              "resource": "resources/nonwordspelling/Enhanced/Øveopgave 1 og 2/4c.3.mp3"
           }
       ],
       "continue_when_instruction_is_complete": false
