@@ -375,12 +375,7 @@
             {
                 "action": "fadeIn",
                 "element": "choices",
-                "delayAfter": 0
-            },
-            {
-                "action": "clickButton",
-                "delayAfter": 0,
-                "element": "challenge-sound-btn"
+                "delayAfter": 500
             }
         ]
     },
