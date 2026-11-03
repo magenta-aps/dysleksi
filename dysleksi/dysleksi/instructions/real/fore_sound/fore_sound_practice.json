@@ -199,12 +199,12 @@
                 // Da hesten har denne forlyd, skal du vælge hesten.
                 "action": "playSound",
                 "resource": "resources/fore_sound/Enhanced/Instruktion/2b.13 (Ny).mp3",
-                "delayAfter": 1250
+                "delayAfter": 0
             },
             {
                 "action": "select",
                 "element": "choice-Hest.jpg",
-                "delayAfter": 0
+                "delayAfter": 1250
             },
             {
                 // Hvis du ikke hører forlyden så godt, kan du høre det igen ved at
