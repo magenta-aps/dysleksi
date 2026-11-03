@@ -40,27 +40,20 @@
             {% endfor %}
 
             {% bootstrap_field form.is_test_part wrapper_class="mt-3 is-test-part-choice" field_class="d-flex" %}
-            {% if form.is_group and form.is_test %}
-            {% bootstrap_field form.class_test wrapper_class="my-3 class-test-choice" %}
-            {% bootstrap_field form.class_test_parts wrapper_class="my-3 class-test-part-choice d-none" %}
-            {% bootstrap_field form.student_test wrapper_class="my-3 student-test-choice d-none" %}
-            {% bootstrap_field form.student_test_parts wrapper_class="my-3 student-test-part-choice d-none" %}
-            {% elif form.is_group and not form.is_test %}
-            {% bootstrap_field form.class_test wrapper_class="my-3 class-test-choice d-none" %}
-            {% bootstrap_field form.class_test_parts wrapper_class="my-3 class-test-part-choice" %}
-            {% bootstrap_field form.student_test wrapper_class="my-3 student-test-choice d-none" %}
-            {% bootstrap_field form.student_test_parts wrapper_class="my-3 student-test-part-choice d-none" %}
-            {% elif not form.is_group and form.is_test %}
-            {% bootstrap_field form.class_test wrapper_class="my-3 class-test-choice d-none" %}
-            {% bootstrap_field form.class_test_parts wrapper_class="my-3 class-test-part-choice d-none" %}
-            {% bootstrap_field form.student_test wrapper_class="my-3 student-test-choice" %}
-            {% bootstrap_field form.student_test_parts wrapper_class="my-3 student-test-part-choice d-none" %}
-            {% elif not form.is_group and not form.is_test %}
-            {% bootstrap_field form.class_test wrapper_class="my-3 class-test-choice d-none" %}
-            {% bootstrap_field form.class_test_parts wrapper_class="my-3 class-test-part-choice d-none" %}
-            {% bootstrap_field form.student_test wrapper_class="my-3 student-test-choice d-none" %}
-            {% bootstrap_field form.student_test_parts wrapper_class="my-3 student-test-part-choice" %}
-            {% endif %}
+            <div class="my-3 class-test-choice {% if not form.is_group or not form.is_test %}d-none{% endif %}">
+                {% bootstrap_field form.class_test wrapper_class="mb-2" %}
+                <ul class="test-contents d-none"></ul>
+            </div>
+            <div class="my-3 class-test-part-choice {% if not form.is_group or form.is_test %}d-none{% endif %}">
+                {% bootstrap_field form.class_test_parts wrapper_class="" %}
+            </div>
+            <div class="my-3 student-test-choice {% if form.is_group or not form.is_test %}d-none{% endif %}">
+                {% bootstrap_field form.student_test wrapper_class="mb-2" %}
+                <ul class="test-contents d-none"></ul>
+            </div>
+            <div class="my-3 student-test-part-choice {% if form.is_group or form.is_test %}d-none{% endif %}">
+                {% bootstrap_field form.student_test_parts wrapper_class="" %}
+            </div>
 
             {% bootstrap_field form.is_immediate wrapper_class="is-immediate-choice" field_class="d-flex" %}
             {{ form.has_end }}{# Hidden field, updated by JS #}

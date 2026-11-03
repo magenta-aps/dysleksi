@@ -26,6 +26,12 @@ export class Form {
         this.endDateTime = this.element(".end-datetime");
         this.hasEnd = this.element("#id_has_end");
 
+        for (const choice of [this.classTestChoice, this.studentTestChoice]) {
+            const select = choice.querySelector("select");
+            select.addEventListener("change", () => this.updateTestContents(choice));
+            this.updateTestContents(choice);
+        }
+
         // Internal state
         this.state = {
             isGroup: true,
@@ -77,13 +83,26 @@ export class Form {
         );
     }
 
+    updateTestContents(choice) {
+        const select = choice.querySelector("select");
+        const parts = select.options[select.selectedIndex].dataset.parts ?? "[]";
+        const list = choice.querySelector(".test-contents");
+        list.replaceChildren(
+            ...JSON.parse(parts).map((name) => {
+                const item = document.createElement("li");
+                item.textContent = name;
+                return item;
+            }),
+        );
+        this.display(list, list.children.length > 0);
+    }
+
     updateIsImmediate(evt) {
         this.updateState(evt, "isImmediate", "y");
         this.display(this.startDateTime, !this.state.isImmediate);
         if (this.state.isImmediate) {
-            this.display(this.endDateTime, false);
+            this.#toggleEnd(false);
             this.clearDateValue(this.startDateTime);
-            this.clearDateValue(this.endDateTime);
         }
     }
 
@@ -94,15 +113,16 @@ export class Form {
     }
 
     addEnd(evt) {
-        this.#toggleEnd(evt, true);
+        evt.preventDefault();
+        this.#toggleEnd(true);
     }
 
     removeEnd(evt) {
-        this.#toggleEnd(evt, false);
+        evt.preventDefault();
+        this.#toggleEnd(false);
     }
 
-    #toggleEnd(evt, state) {
-        evt.preventDefault();
+    #toggleEnd(state) {
         this.state.hasEndDate = state;
         this.display(this.endDateTime, this.state.hasEndDate);
         this.display(this.addEndBtn, !this.state.hasEndDate);
