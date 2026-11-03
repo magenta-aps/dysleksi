@@ -1244,6 +1244,12 @@ export class StudentPresenceIndicator {
         }
         this.domElement.dataset.state = "arrived";
     }
+
+    setConnected(connected) {
+        if (this.domElement.dataset.state !== "waiting") {
+            this.domElement.dataset.state = connected ? "arrived" : "disconnected";
+        }
+    }
 }
 
 export class NavigateAwayWarning {
@@ -1585,8 +1591,9 @@ export class TeacherView {
             const data = e.detail;
             let testComplete = false;
 
+            this._markStudentSeen(data.student.id);
+
             if (data.event === "student.heartbeat") {
-                this._markStudentSeen(data.student.id);
                 channel.send({ event: "teacher.heartbeat" });
                 return;
             }
@@ -1872,6 +1879,8 @@ export class TeacherView {
     _setStudentConnected(studentId, connected) {
         if (this.test.testType === "group") {
             this.groupTestContainer.setStudentConnected(studentId, connected);
+        } else {
+            this.studentPresence.setConnected(connected);
         }
     }
 

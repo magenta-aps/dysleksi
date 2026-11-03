@@ -1988,7 +1988,8 @@ $border-radius-student-card: $spacer / 4 * 3;
   color: $mono-gray-dark-2;
 
   .student-presence-waiting,
-  .student-presence-arrived {
+  .student-presence-arrived,
+  .student-presence-disconnected {
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -2003,18 +2004,22 @@ $border-radius-student-card: $spacer / 4 * 3;
     font-size: 24px;
   }
 
-  &[data-state="waiting"] .student-presence-arrived {
+  .student-presence-disconnected i {
+    color: $red-normal;
+    font-size: 24px;
+  }
+
+  &:not([data-state="arrived"]) .student-presence-arrived,
+  &:not([data-state="disconnected"]) .student-presence-disconnected {
     display: none;
   }
 
-  &[data-state="arrived"] {
-    .student-presence-waiting {
-      display: none;
-    }
+  &:not([data-state="waiting"]) .student-presence-waiting {
+    display: none;
+  }
 
-    .student-presence-arrived {
-      animation: student-presence-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-    }
+  &[data-state="arrived"] .student-presence-arrived {
+    animation: student-presence-pop 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) both;
   }
 }
 

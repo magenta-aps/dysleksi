@@ -276,6 +276,10 @@ ${MESSAGE_SYNC_CONFIG_HTML}
                 <i class="ph-fill ph-check-circle" aria-hidden="true"></i>
                 <span class="visually-hidden">Eleven er kommet ind i testrummet</span>
             </span>
+            <span class="student-presence-disconnected" title="Der er ikke forbindelse til eleven">
+                <i class="ph-fill ph-cloud-warning" aria-hidden="true"></i>
+                <span class="visually-hidden">Der er ikke forbindelse til eleven</span>
+            </span>
         </div>
         ${MESSAGE_QUEUE_HTML}
     </div>
@@ -642,6 +646,13 @@ describe("Teacher Individual test View", () => {
     let p2pChannel;
     const studentId = 123;
 
+    const sendFromStudent = (detail) =>
+        p2pChannel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: { student: { id: studentId }, ...detail },
+            }),
+        );
+
     beforeEach(() => {
         vi.useFakeTimers();
         vi.stubGlobal("localStorage", {
@@ -730,17 +741,13 @@ describe("Teacher Individual test View", () => {
 
         // 2. Trigger 'question.answered'
         // This hits the outer IF but fails the 'question.displayed' IF
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.answered",
-                    partIndex: 0,
-                    questionIndex: 0,
-                    practice: false,
-                    answeredAt: "10:00:05",
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.answered",
+            partIndex: 0,
+            questionIndex: 0,
+            practice: false,
+            answeredAt: "10:00:05",
+        });
 
         // Buttons should REMAIN disabled (because the 'question.displayed' block was skipped)
         const btn = document.querySelector("#correct");
@@ -897,17 +904,13 @@ describe("Teacher Individual test View", () => {
 
     it("enables buttons on question.displayed", () => {
         // trigger a question.displayed event
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.displayed",
-                    partIndex: 0,
-                    questionIndex: 0,
-                    questionTitle: "Q1",
-                    displayedAt: 1000,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.displayed",
+            partIndex: 0,
+            questionIndex: 0,
+            questionTitle: "Q1",
+            displayedAt: 1000,
+        });
 
         const btn = document.querySelector("button");
         expect(btn.classList.contains("disabled")).toBe(false);
@@ -915,15 +918,11 @@ describe("Teacher Individual test View", () => {
 
     it("disables 'next' button on 'question.displayed' (individual tests)", () => {
         // trigger first question.displayed event - question type is "free_text"
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.displayed",
-                    partIndex: 0,
-                    questionIndex: 0,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.displayed",
+            partIndex: 0,
+            questionIndex: 0,
+        });
         const btn = document.querySelector("button");
         expect(btn.classList.contains("disabled")).toBe(false);
 
@@ -931,46 +930,34 @@ describe("Teacher Individual test View", () => {
         // "no_input_required" and it is a practice question, and the instructions are
         // currently displaying.
         view.showingInstructions = true;
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.displayed",
-                    practice: true,
-                    partIndex: 0,
-                    questionIndex: 2,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.displayed",
+            practice: true,
+            partIndex: 0,
+            questionIndex: 2,
+        });
         expect(buttons.nextButton().classList).to.include(["disabled"]);
 
         // Trigger another `question.displayed` event - this time the question type is
         // "no_input_required" and it is a practice question, and the instructions are
         // completed.
         view.showingInstructions = false;
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.displayed",
-                    practice: true,
-                    partIndex: 0,
-                    questionIndex: 2,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.displayed",
+            practice: true,
+            partIndex: 0,
+            questionIndex: 2,
+        });
         expect(buttons.nextButton().classList).not.to.include(["disabled"]);
 
         // Trigger another `question.displayed` event - this time the question type is
         // "no_input_required" and it is an actual question.
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.displayed",
-                    practice: false,
-                    partIndex: 0,
-                    questionIndex: 1,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.displayed",
+            practice: false,
+            partIndex: 0,
+            questionIndex: 1,
+        });
         expect(buttons.nextButton().classList).to.include(["disabled"]);
     });
 
@@ -979,27 +966,19 @@ describe("Teacher Individual test View", () => {
         expect(questionView.containerElement.classList.contains("d-none")).toBe(false);
 
         // trigger a question.displayed event
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.displayed",
-                    partIndex: 0,
-                    questionIndex: 0,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.displayed",
+            partIndex: 0,
+            questionIndex: 0,
+        });
 
         expect(questionView.titleElement.textContent).toBe("1/3 (Individuel deltest)");
 
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.displayed",
-                    partIndex: 0,
-                    questionIndex: 1,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.displayed",
+            partIndex: 0,
+            questionIndex: 1,
+        });
 
         expect(questionView.titleElement.textContent).toBe("2/3 (Individuel deltest)");
     });
@@ -1083,16 +1062,12 @@ describe("Teacher Individual test View", () => {
         // Arrange
         const spyStart = vi.spyOn(elapsedTimeView, "start");
         // Act: send "question.displayed"
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.displayed",
-                    partIndex: 0,
-                    questionIndex: 0,
-                    practice: false,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.displayed",
+            partIndex: 0,
+            questionIndex: 0,
+            practice: false,
+        });
         // Assert
         expect(spyStart).toHaveBeenCalled();
     });
@@ -1101,16 +1076,12 @@ describe("Teacher Individual test View", () => {
         // Arrange
         const spyStop = vi.spyOn(elapsedTimeView, "stop");
         // Act: send "question.answered"
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.answered",
-                    partIndex: 0,
-                    questionIndex: 0,
-                    practice: false,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.answered",
+            partIndex: 0,
+            questionIndex: 0,
+            practice: false,
+        });
         // Assert
         expect(spyStop).toHaveBeenCalled();
     });
@@ -1120,29 +1091,21 @@ describe("Teacher Individual test View", () => {
         const spyStart = vi.spyOn(elapsedTimeView, "start");
         const spyStop = vi.spyOn(elapsedTimeView, "stop");
         // Act: send "question.displayed"
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.displayed",
-                    partIndex: 0,
-                    questionIndex: 0,
-                    practice: true,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.displayed",
+            partIndex: 0,
+            questionIndex: 0,
+            practice: true,
+        });
         // Assert
         expect(spyStart).not.toHaveBeenCalled();
         // Act: send "question.answered"
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.answered",
-                    partIndex: 0,
-                    questionIndex: 0,
-                    practice: true,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.answered",
+            partIndex: 0,
+            questionIndex: 0,
+            practice: true,
+        });
         // Assert
         expect(spyStop).not.toHaveBeenCalled();
     });
@@ -1152,29 +1115,21 @@ describe("Teacher Individual test View", () => {
         const spyStart = vi.spyOn(elapsedTimeView, "stop");
         const spyStop = vi.spyOn(elapsedTimeView, "stop");
         // Act: send "question.displayed"
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.displayed",
-                    partIndex: 0,
-                    questionIndex: 0,
-                    practice: true,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.displayed",
+            partIndex: 0,
+            questionIndex: 0,
+            practice: true,
+        });
         expect(spyStart).not.toHaveBeenCalled();
         expect(spyStop).not.toHaveBeenCalled();
         // Act: send practice "question.answered"
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.answered",
-                    partIndex: 0,
-                    questionIndex: 0,
-                    practice: true,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.answered",
+            partIndex: 0,
+            questionIndex: 0,
+            practice: true,
+        });
         // Assert
         expect(spyStart).not.toHaveBeenCalled();
         expect(spyStop).not.toHaveBeenCalled();
@@ -1185,16 +1140,12 @@ describe("Teacher Individual test View", () => {
         view.elapsedTimeView = null;
         const spyStart = vi.spyOn(elapsedTimeView, "stop");
         // Act: send relevant message
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "question.displayed",
-                    partIndex: 0,
-                    questionIndex: 0,
-                    practice: false,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "question.displayed",
+            partIndex: 0,
+            questionIndex: 0,
+            practice: false,
+        });
         // Assert
         expect(spyStart).not.toHaveBeenCalled();
     });
@@ -1436,15 +1387,11 @@ describe("Teacher Individual test View", () => {
         // Arrange
         const spyRender = vi.spyOn(audioIndicator, "render");
         // Act: start test
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "test.started",
-                    partIndex: 0,
-                    questionIndex: 0,
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "test.started",
+            partIndex: 0,
+            questionIndex: 0,
+        });
         // Assert: audio indicator renders paused
         expect(spyRender).toHaveBeenCalledWith(0);
     });
@@ -1454,28 +1401,49 @@ describe("Teacher Individual test View", () => {
         const presenceEl = document.querySelector("#student-presence");
         expect(presenceEl.dataset.state).toBe("waiting");
         // Act: start test
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "test.started",
-                    partIndex: 0,
-                    questionIndex: 0,
-                },
-            }),
+        sendFromStudent({
+            event: "test.started",
+            partIndex: 0,
+            questionIndex: 0,
+        });
+        // Assert: the confirmation is shown
+        expect(presenceEl.dataset.state).toBe("arrived");
+    });
+
+    it("warns when the student leaves the test and clears it when they return", () => {
+        const presenceEl = document.querySelector("#student-presence");
+        sendFromStudent({ event: "test.started" });
+
+        p2pChannel.dispatchEvent(new Event("close"));
+        expect(presenceEl.dataset.state).toBe("disconnected");
+
+        sendFromStudent({ event: "student.heartbeat" });
+        expect(presenceEl.dataset.state).toBe("arrived");
+    });
+
+    it("warns when the student vanishes before their first heartbeat", () => {
+        sendFromStudent({ event: "test.started" });
+
+        vi.advanceTimersByTime(20000);
+
+        expect(document.querySelector("#student-presence").dataset.state).toBe(
+            "disconnected",
         );
-        // Assert: the confirmation is shown, and stays visible
-        expect(presenceEl.dataset.state).toBe("arrived");
-        vi.advanceTimersByTime(60000);
-        expect(presenceEl.dataset.state).toBe("arrived");
+    });
+
+    it("keeps waiting when the student leaves before the test starts", () => {
+        p2pChannel.dispatchEvent(new Event("close"));
+
+        expect(document.querySelector("#student-presence").dataset.state).toBe(
+            "waiting",
+        );
     });
 
     it("runs animated audio indicator while the student answers", () => {
         // Arrange
         const spyStart = vi.spyOn(audioIndicator, "start");
         // Act: send "audio.detected" event
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", { detail: { event: "audio.detected" } }),
-        );
+        sendFromStudent({ event: "audio.detected" });
         // Assert: audio indicator animation is started
         expect(spyStart).toHaveBeenCalled();
     });
@@ -1484,9 +1452,7 @@ describe("Teacher Individual test View", () => {
         // Arrange
         const spyStop = vi.spyOn(audioIndicator, "stop");
         // Act: send "audio.quiet" event
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", { detail: { event: "audio.quiet" } }),
-        );
+        sendFromStudent({ event: "audio.quiet" });
         // Assert: audio indicator animation is started
         expect(spyStop).toHaveBeenCalled();
     });
@@ -1499,16 +1465,12 @@ describe("Teacher Individual test View", () => {
 
     it("updates the enabled/disabled state of the 'go to next result group' button", () => {
         const gotoQuestion = (practice, questionIndex, partIndex) => {
-            p2pChannel.dispatchEvent(
-                new CustomEvent("message", {
-                    detail: {
-                        event: "question.displayed",
-                        partIndex: partIndex,
-                        questionIndex: questionIndex,
-                        practice: practice,
-                    },
-                }),
-            );
+            sendFromStudent({
+                event: "question.displayed",
+                partIndex: partIndex,
+                questionIndex: questionIndex,
+                practice: practice,
+            });
         };
 
         // Act: go to practice question
@@ -1588,16 +1550,12 @@ describe("Teacher Individual test View", () => {
 
     it("displays an error modal if student audio input is silent", () => {
         // Act: send "audio.silent" event
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: {
-                    event: "audio.silent",
-                    student: {
-                        displayName: "Elev E.",
-                    },
-                },
-            }),
-        );
+        sendFromStudent({
+            event: "audio.silent",
+            student: {
+                displayName: "Elev E.",
+            },
+        });
         // Assert: modal is displayed
         const modal = document.querySelector("#error");
         const modalBody = modal.querySelector(".modal-body-inner");
@@ -1624,9 +1582,7 @@ describe("Teacher Individual test View", () => {
         // Arrange
         const spyDisableNextButton = vi.spyOn(view.buttons, "disableNextButton");
         // Act
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", { detail: { event: "instructions.started" } }),
-        );
+        sendFromStudent({ event: "instructions.started" });
         // Assert
         expect(view.showingInstructions).toBeTruthy();
         expect(spyDisableNextButton).toHaveBeenCalled();
@@ -1636,9 +1592,7 @@ describe("Teacher Individual test View", () => {
         // Arrange
         const spyEnableNextButton = vi.spyOn(view.buttons, "enableNextButton");
         // Act
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", { detail: { event: "instructions.completed" } }),
-        );
+        sendFromStudent({ event: "instructions.completed" });
         // Assert
         expect(view.showingInstructions).toBeFalsy();
         expect(spyEnableNextButton).toHaveBeenCalled();
@@ -1652,11 +1606,8 @@ describe("Teacher Individual test View", () => {
         const enabled = document.getElementById("result-link-enabled");
         const spyToggle = vi.spyOn(view.navigateAway, "toggle");
         // Act
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: { event: "test.complete", student: { id: studentId } },
-            }),
-        );
+        sendFromStudent({ event: "test.complete", student: { id: studentId } });
+        // Assert: pause button is disabled upon completion
         expect(document.getElementById("paused").disabled).toBe(true);
         // Assert: the results are not offered until the messages are stored
         await vi.advanceTimersByTimeAsync(3000);
