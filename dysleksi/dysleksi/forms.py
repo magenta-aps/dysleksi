@@ -1,3 +1,5 @@
+import json
+
 from django import forms
 from django.db.models import Prefetch
 from django.forms import (
@@ -37,8 +39,8 @@ class TestSelect(forms.Select):
     def create_option(self, name, value, *args, **kwargs):
         option = super().create_option(name, value, *args, **kwargs)
         if value:
-            option["attrs"]["data-parts"] = ", ".join(
-                part.name for part in value.instance.parts.all()
+            option["attrs"]["data-parts"] = json.dumps(
+                [part.name for part in value.instance.parts.all()]
             )
         return option
 

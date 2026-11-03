@@ -38,8 +38,9 @@ const mockDoc = `
         <div class="class-test-choice">
             <select name="class_test" class="form-select" id="id_class_test">
                 <option value="" selected>- Vælg en valgmulighed -</option>
-                <option value="1">Midt 1. klasse (dummy)</option>
+                <option value="1" data-parts='["Bogstavlyde", "Forlyd"]'>Midt 1. klasse (dummy)</option>
             </select>
+            <ul class="test-contents d-none"></ul>
         </div>
         <div class="class-test-part-choice d-none">
             <input class="form-check-input" type="checkbox" name="class_test_parts" value="1" id="id_class_test_parts_0">
@@ -49,6 +50,7 @@ const mockDoc = `
                 <option value="" selected>- Vælg en valgmulighed -</option>
                 <option value="2">Midt 1. klasse (dummy)</option>
             </select>
+            <ul class="test-contents d-none"></ul>
         </div>
         <div class="student-test-part-choice d-none">
             <input class="form-check-input" type="checkbox" name="student_test_parts" value="4" id="id_student_test_parts_0">
@@ -135,10 +137,12 @@ describe("Form", () => {
         // Switch away from default state
         no.dispatchEvent(new Event("click", { bubbles: true }));
         expect(form.state["isImmediate"]).toBeFalsy();
+        form.addEndBtn.dispatchEvent(new Event("click", { bubbles: true }));
         // Switch back to default state
         yes.dispatchEvent(new Event("click", { bubbles: true }));
         expect(form.state["isImmediate"]).toBeTruthy();
-        expect(form.endDateTime.classList).not.to.include(["d-none"]);
+        expect(form.endDateTime.classList).toContain("d-none");
+        expect(form.hasEnd.value).toBe("n");
     });
 
     it("handles combining choices", () => {
@@ -186,6 +190,26 @@ describe("Form", () => {
         // Assert: check that matching student list is shown
         expect(studentList1.classList).not.to.include(["d-none"]);
         expect(studentList2.classList).to.include(["d-none"]);
+    });
+
+    it("shows the contents of the selected test", () => {
+        const form = getInstance();
+        const select = form.classTestChoice.querySelector("select");
+        const list = form.classTestChoice.querySelector(".test-contents");
+        expect(list.classList).toContain("d-none");
+
+        select.value = "1";
+        select.dispatchEvent(new Event("change"));
+        expect(list.classList).not.toContain("d-none");
+        expect([...list.children].map((li) => li.textContent)).toStrictEqual([
+            "Bogstavlyde",
+            "Forlyd",
+        ]);
+
+        select.value = "";
+        select.dispatchEvent(new Event("change"));
+        expect(list.classList).toContain("d-none");
+        expect(list.children.length).toBe(0);
     });
 });
 
