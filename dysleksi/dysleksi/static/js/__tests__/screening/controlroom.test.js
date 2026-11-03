@@ -1657,6 +1657,7 @@ describe("Teacher Individual test View", () => {
                 detail: { event: "test.complete", student: { id: studentId } },
             }),
         );
+        expect(document.getElementById("paused").disabled).toBe(true);
         // Assert: the results are not offered until the messages are stored
         await vi.advanceTimersByTimeAsync(3000);
         expect(disabled.classList.contains("d-none")).toBe(false);

@@ -1622,6 +1622,7 @@ export class TeacherView {
                 }
                 if (data.event === "test.complete") {
                     this.completedStudentIds.add(data.student.id);
+                    this.buttons.pauseButton().disabled = true;
                     testComplete = true;
                 }
             }
