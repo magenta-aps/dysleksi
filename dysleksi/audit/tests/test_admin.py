@@ -2,13 +2,23 @@
 #
 # SPDX-License-Identifier: MPL-2.0
 
-from audit.admin import ItemViewAdmin, ItemViewInline, LoginAttemptAdmin, PageViewAdmin
-from audit.models import ItemView, LoginAttempt, LoginResult, PageView
+from audit.admin import (
+    ItemViewAdmin,
+    ItemViewInline,
+    LoginAttemptAdmin,
+    ObjectChangeAdmin,
+    PageViewAdmin,
+    describe,
+    label,
+    object_changes,
+)
+from audit.models import ItemView, LoginAttempt, LoginResult, ObjectChange, PageView
 from django.contrib.admin.sites import AdminSite
+from django.contrib.auth.models import update_last_login
 from django.test import TestCase
 from django.urls import reverse
 
-from dysleksi.models import User
+from dysleksi.models import Teacher, Test, TestPart, TestType, User
 from dysleksi.tests.base import DysleksiTest
 
 
@@ -41,6 +51,7 @@ class AuditAdminTest(TestCase):
             (LoginAttemptAdmin, LoginAttempt),
             (PageViewAdmin, PageView),
             (ItemViewAdmin, ItemView),
+            (ObjectChangeAdmin, ObjectChange),
         ):
             model_admin = self.get_model_admin(admin_class, model)
             self.assertFalse(model_admin.has_add_permission(None))
@@ -125,3 +136,52 @@ class HistoryAdminTest(DysleksiTest):
         # Who made the change, and what the change was
         self.assertContains(response, str(self.admin))
         self.assertContains(response, "Omdøbt test")
+
+    def test_unchanged_saves_are_not_listed(self):
+        def changes(model, obj):
+            return [c for c in object_changes(model) if c["object_id"] == obj.pk]
+
+        test_changes = changes(Test, self.individual_test)
+        teacher_changes = changes(Teacher, self.teacher)
+        self.individual_test.save()
+        update_last_login(None, self.teacher)
+        self.part.tests.add(self.group_test)
+        self.assertEqual(changes(Test, self.individual_test), test_changes)
+        self.assertEqual(changes(Teacher, self.teacher), teacher_changes)
+        self.assertTrue(
+            changes(TestPart, self.part)[-1]["changes"].endswith(
+                f"→ [{self.individual_test.pk}, {self.group_test.pk}]"
+            )
+        )
+
+    def test_object_changes_are_listed(self):
+        url = reverse("admin:audit_objectchange_changelist")
+        self.assertEqual(self.client.get(url).status_code, 200)
+
+        old_name = self.individual_test.name
+        self.individual_test.name = "Omdøbt test"
+        self.individual_test._history_user = self.admin
+        self.individual_test.save()
+        response = self.client.get(url, {"model": "test"})
+        latest = response.context["page"][0]
+        self.assertEqual(latest["user"], self.admin)
+        self.assertEqual(latest["changes"], f"name: {old_name} → Omdøbt test")
+        self.assertEqual(latest["object"], "Omdøbt test")
+        self.assertContains(
+            response,
+            reverse("admin:dysleksi_test_history", args=[self.individual_test.pk]),
+        )
+
+        self.individual_test.custom = True
+        self.individual_test.test_type = TestType.GROUP
+        self.individual_test.save()
+        latest = self.client.get(url, {"model": "test"}).context["page"][0]
+        self.assertCountEqual(latest["changes"].split(", "), ["custom", "test_type"])
+
+    def test_password_is_not_shown(self):
+        self.assertEqual(describe({"password": ("old hash", "new hash")}), "password")
+
+    def test_label_of_object_whose_related_object_is_deleted(self):
+        answer = self.possible_correct_answer1
+        self.question1.delete()
+        self.assertEqual(label(answer.history.first()), answer.pk)
