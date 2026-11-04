@@ -95,7 +95,7 @@ pipdeptree==4.2.13
 
 asgiref==3.13.0
 attrs==26.1.0
-autobahn==26.10.2
+autobahn==26.11.1
 Automat==25.4.16
 cbor2==6.2.0.post2
 certifi==2026.10.23
