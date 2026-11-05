@@ -181,11 +181,6 @@
                 "delayAfter": 0
             },
             {
-                "action": "highlight",
-                "element": "question-challenge",
-                "delayAfter": 0
-            },
-            {
                 "action": "clickButton",
                 "delayAfter": 1500,
                 "element": "challenge-sound-btn"

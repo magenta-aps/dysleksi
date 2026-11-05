@@ -137,11 +137,6 @@
         "resource": "resources/nonwordspelling/Enhanced/Instruktion/4b.4 (Ny).mp3"
       },
       {
-        "action": "highlight",
-        "delayAfter": 0,
-        "element": "question-challenge"
-      },
-      {
         "action": "clickButton",
         "delayAfter": 2250,
         "element": "challenge-sound-btn"
