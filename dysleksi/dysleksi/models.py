@@ -1087,6 +1087,8 @@ class TestPart(models.Model):
         return {
             "question_type": QuestionType.NO_INPUT_REQUIRED,
             "instruction_sequence": [
+                {"action": "hide", "element": "next"},
+                {"action": "hide", "element": "repeat", "delayAfter": 750},
                 {"action": "playSound", "resource": done, "delayAfter": 1250},
                 {"action": "show", "element": "next"},
                 {"action": "show", "element": "repeat"},
