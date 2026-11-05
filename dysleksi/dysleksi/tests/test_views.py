@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 import json
 from datetime import datetime
+from io import BytesIO
 from operator import attrgetter
 from unittest.mock import patch
 from uuid import uuid4
@@ -24,6 +25,7 @@ from django.urls import reverse
 from django.utils import timezone, translation
 from django.utils.translation import gettext_lazy as _
 from django.views import View
+from openpyxl import load_workbook
 
 from dysleksi.models import (
     Class,
@@ -1091,6 +1093,40 @@ class TestAssignmentResultsView(ResponseTest):
         self.assertIsNone(soup.find(id="results-by-category"))
 
     @override_settings(RESULT_TABLE_SIZE=3)
+    def test_export(self):
+        for export_format, content_type in (
+            ("csv", "text/csv; charset=utf-8"),
+            (
+                "xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ),
+            ("pdf", "application/pdf"),
+        ):
+            with self.subTest(export_format):
+                response = self.setup_view(
+                    AssignmentResultsView,
+                    self.teacher,
+                    query_params={"export": export_format},
+                    pk=self.test_assignment_class.pk,
+                ).response
+                self.assertEqual(response["Content-Type"], content_type)
+                self.assertIn(
+                    f'filename="klasse-1a-test2.{export_format}"',
+                    response["Content-Disposition"],
+                )
+                if export_format == "csv":
+                    self.assertEqual(
+                        response.content.decode().splitlines(),
+                        [
+                            "Elev;GroupTestPart1 (antal korrekte svar)",
+                            "Test1 Elev;4,0",
+                            "Test2 Elev;1,0",
+                        ],
+                    )
+                if export_format == "pdf":
+                    self.assertTrue(response.content.startswith(b"%PDF"))
+
+    @override_settings(RESULT_TABLE_SIZE=3)
     def test_get_pagination(self):
         view = self.setup_view(
             AssignmentResultsView, self.teacher, pk=self.test_assignment_class.pk
@@ -1389,6 +1425,45 @@ class TestAssignmentPartResultsView(ResponseTest):
                 [["Test2 Elev"], ["4"], ["1"], ["25%"], ["25"]],
             ],
         )
+
+    def test_export(self):
+        for export_format, content_type in (
+            ("csv", "text/csv; charset=utf-8"),
+            (
+                "xlsx",
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            ),
+            ("pdf", "application/pdf"),
+        ):
+            with self.subTest(export_format):
+                response = self.setup_view(
+                    AssignmentPartResultsView,
+                    self.teacher,
+                    query_params={"export": export_format},
+                    assignment_pk=self.test_assignment_class.pk,
+                    testpart_pk=self.group_test_part.pk,
+                ).response
+                self.assertEqual(response["Content-Type"], content_type)
+                self.assertIn(
+                    f'filename="klasse-1a-test2-grouptestpart1.{export_format}"',
+                    response["Content-Disposition"],
+                )
+                if export_format == "csv":
+                    self.assertEqual(
+                        response.content.decode().splitlines(),
+                        [
+                            "Elev;Forsøgte;Rigtige;Rigtighedsprocent;"
+                            "Normscore (0-100)",
+                            "Test1 Elev;4;4;1,0;100",
+                            "Test2 Elev;4;1;0,25;25",
+                        ],
+                    )
+                if export_format == "xlsx":
+                    sheet = load_workbook(BytesIO(response.content)).active
+                    self.assertEqual(sheet["D3"].value, 0.25)
+                    self.assertEqual(sheet["D3"].number_format, "0%")
+                if export_format == "pdf":
+                    self.assertTrue(response.content.startswith(b"%PDF"))
 
     def test_access(self):
         self.setup_view(

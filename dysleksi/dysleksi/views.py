@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
+import csv
 import json
 import logging
 from datetime import timedelta
@@ -38,8 +39,10 @@ from django.http.response import (
 )
 from django.middleware.csrf import get_token
 from django.shortcuts import get_object_or_404, redirect
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.utils.functional import Promise
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.views import View
 from django.views.generic import CreateView, DetailView, ListView, TemplateView
@@ -48,6 +51,8 @@ from django.views.generic.edit import UpdateView
 from django_stubs_ext import StrOrPromise
 from django_tables2 import Column, SingleTableMixin, SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
+from openpyxl import Workbook
+from weasyprint import HTML
 
 from dysleksi.forms import ClassStudentFormSet, StartRoomForm
 from dysleksi.models import (
@@ -85,6 +90,7 @@ from dysleksi.tables import (
     ClassTable,
     EmptyColumn,
     PartResultTable,
+    PercentageColumn,
     QuestionResponsesTable,
     ReadingWordCountResultsTable,
     ReadingWordLengthResultsTable,
@@ -768,6 +774,77 @@ class PaginationMixin:
         return context_data
 
 
+class TableExportMixin:
+
+    def get_export_title(self) -> str:
+        raise NotImplementedError  # pragma: no cover
+
+    def render_to_response(self, context, **response_kwargs):
+        export_format = self.request.GET.get("export")  # type: ignore[attr-defined]
+        if export_format is None:
+            return super().render_to_response(  # type: ignore[misc]
+                context, **response_kwargs
+            )
+        title = self.get_export_title()
+        filename = f"{slugify(title)}.{export_format}"
+        headers = {"Content-Disposition": f'attachment; filename="{filename}"'}
+        table = context["table"]
+        columns = [
+            column.column
+            for column in table.columns.iterall()
+            if not column.column.exclude_from_export
+        ]
+        if export_format == "pdf":
+            header, *rows = table.as_values()
+            rows = [
+                [
+                    (
+                        column.render(value)
+                        if isinstance(column, PercentageColumn)
+                        else value
+                    )
+                    for column, value in zip(columns, row)
+                ]
+                for row in rows
+            ]
+            html = render_to_string(
+                "dysleksi/admin/export.html",
+                {"title": title, "headers": header, "rows": rows},
+            )
+            return HttpResponse(
+                HTML(string=html).write_pdf(),
+                content_type="application/pdf",
+                headers=headers,
+            )
+        if export_format == "csv":
+            response = HttpResponse(
+                content_type="text/csv; charset=utf-8", headers=headers
+            )
+            writer = csv.writer(response, delimiter=";")
+            for row in table.as_values():
+                writer.writerow(
+                    str(value).replace(".", ",") if isinstance(value, float) else value
+                    for value in row
+                )
+            return response
+        workbook = Workbook()
+        sheet = workbook.active
+        for row in table.as_values():
+            sheet.append(row)
+        for column, cells in zip(columns, sheet.iter_cols(min_row=2)):
+            if isinstance(column, PercentageColumn):
+                for cell in cells:
+                    cell.number_format = "0%"
+        response = HttpResponse(
+            content_type=(
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+            ),
+            headers=headers,
+        )
+        workbook.save(response)
+        return response
+
+
 class AssignmentResultListView(TestAssignmentListView):
     template_name = "dysleksi/admin/test_assignment/result_list.html"
     table_class = TestAssignmentResultTable
@@ -787,6 +864,7 @@ class AssignmentResultsView(
     ObjectPermissionsMixin,
     NavigationMixin,
     DetailViewLogMixin,
+    TableExportMixin,
     DetailView,
 ):
     # Results view of as Class' responses to an entire Test
@@ -852,7 +930,8 @@ class AssignmentResultsView(
             # Annotér med rangering ud fra rækkefølge
             .annotate_ordering("total_score", "rank", False)
         )
-        parts = self.get_current_items()
+        exporting = "export" in self.request.GET
+        parts = self.get_items() if exporting else self.get_current_items()
         extra_columns = []
         for part in parts:
             key = f"part_{part.pk}_correct"
@@ -884,7 +963,12 @@ class AssignmentResultsView(
                         template_name="dysleksi/admin/test_responses/group/score.html",
                         footer_template_name="dysleksi/admin/"
                         "test_responses/group/footer.html",
-                        verbose_name=part.localized_name,
+                        verbose_name=(
+                            _("%(part_name)s (antal korrekte svar)")
+                            % {"part_name": part.localized_name}
+                            if exporting
+                            else part.localized_name
+                        ),
                         accessor=count_key,
                         extra_context={  # til brug i template for celle
                             "count_key": count_key,
@@ -923,7 +1007,7 @@ class AssignmentResultsView(
                 )
             )
         e = 0
-        while len(extra_columns) % self.get_page_size() != 0:
+        while not exporting and len(extra_columns) % self.get_page_size() != 0:
             extra_columns.append((f"empty_{e}", EmptyColumn()))
             e += 1
         qs = qs.order_by(*self.get_ordering())
@@ -934,6 +1018,12 @@ class AssignmentResultsView(
 
     def get_items(self) -> QuerySet[TestPart]:
         return self.object.test.parts.all()
+
+    def get_export_title(self) -> str:
+        return _("Klasse %(class_name)s - %(test_name)s") % {
+            "class_name": self.object.klasse_name,
+            "test_name": self.object.test.name,
+        }
 
     def render_to_response(self, context, **response_kwargs):
         if self.request.GET.get("only_table") == "true":
@@ -1000,6 +1090,7 @@ class AssignmentPartResultsView(
     ObjectPermissionsMixin,
     NavigationMixin,
     ListViewLogMixin,
+    TableExportMixin,
     ListView,
 ):
     # Results view of as Class' responses to a single TestPart
@@ -1108,6 +1199,13 @@ class AssignmentPartResultsView(
             () if self.part.has_partially_correct_answers else ("almost_correct_count",)
         )
         return PartResultTable(data=self.object_list, exclude=exclude)
+
+    def get_export_title(self) -> str:
+        return _("Klasse %(class_name)s - %(test_name)s - %(part_name)s") % {
+            "class_name": self.assignment.klasse_name,
+            "test_name": self.assignment.test.name,
+            "part_name": self.part.localized_name,
+        }
 
     def get_plot_data(self) -> List[Tuple[float, float]]:  # pragma: no cover
         # x-værdier: normscore (correct_proportion)
