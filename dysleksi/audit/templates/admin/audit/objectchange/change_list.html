@@ -1,0 +1,38 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<p>
+  {% if selected %}<a href="?">Alle</a>{% else %}<strong>Alle</strong>{% endif %}
+  {% for name, label in models %}
+    | {% if name == selected %}<strong>{{ label|capfirst }}</strong>{% else %}<a href="?model={{ name }}">{{ label|capfirst }}</a>{% endif %}
+  {% endfor %}
+</p>
+<table>
+  <thead>
+    <tr>
+      <th>Tidspunkt</th>
+      <th>Ændret af</th>
+      <th>Handling</th>
+      <th>Datatype</th>
+      <th>Objekt</th>
+      <th>Ændrede felter</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for change in page %}
+    <tr>
+      <td>{{ change.timestamp }}</td>
+      <td>{{ change.user|default:"-" }}</td>
+      <td>{{ change.change_type }}</td>
+      <td>{{ change.model|capfirst }}</td>
+      <td><a href="{{ change.url }}">{{ change.object }}</a></td>
+      <td>{{ change.changes }}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<p class="paginator">
+  {% if page.has_previous %}<a href="?{% if selected %}model={{ selected }}&amp;{% endif %}p={{ page.previous_page_number }}">&lsaquo;</a>{% endif %}
+  {{ page.number }} / {{ page.paginator.num_pages }}
+  {% if page.has_next %}<a href="?{% if selected %}model={{ selected }}&amp;{% endif %}p={{ page.next_page_number }}">&rsaquo;</a>{% endif %}
+</p>
+{% endblock %}

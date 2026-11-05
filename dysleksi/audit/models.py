@@ -145,3 +145,13 @@ class ItemView(models.Model):
 
     def __str__(self) -> str:
         return f"{self.content_type}: {self.item_label}"
+
+
+class ObjectChange(models.Model):
+    """Has no table. Gives the change log page in `ObjectChangeAdmin` a place in
+    the admin, next to the other logs."""
+
+    class Meta:
+        managed = False
+        verbose_name = "Ændring"
+        verbose_name_plural = "Ændringer"

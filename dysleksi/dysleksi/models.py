@@ -2539,7 +2539,7 @@ class EboksMessage(PermissionsMixin, models.Model):
         content_type: int,
         pdf_data: bytes,
         client: EboksClient | None = None,
-    ) -> EboksMessage:
+    ) -> Self:
         message = cls(cpr_cvr=cpr_cvr, title=title, content_type=content_type)
         message.set_pdf_data(pdf_data)
         message.send(client=client)

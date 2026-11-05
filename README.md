@@ -57,6 +57,9 @@ django-admin:
 - https://dysleksi-web/django-admin/audit/pageview/
 - https://dysleksi-web/django-admin/audit/itemview/
 
+Changes to user profiles and test contents can also be viewed in the django-admin:
+- https://dysleksi-web/django-admin/audit/objectchange/
+
 
 ## Testing
 
