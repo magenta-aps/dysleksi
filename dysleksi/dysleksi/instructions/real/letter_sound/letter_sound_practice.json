@@ -198,6 +198,16 @@
                 "resource": "resources/letter_sound/Enhanced/Instruktion/1b.12.mp3"
             },
             {
+                "action": "highlight",
+                "delayAfter": 500,
+                "element": "choice-c"
+            },
+            {
+                "action": "select",
+                "delayAfter": 750,
+                "element": "choice-c"
+            },
+            {
                 // Hvis du ikke hører bogstavlyden så godt, kan du høre det igen ved at
                 // trykke på lydikonet. Prøv at trykke.
                 "action": "playSound",
@@ -209,17 +219,6 @@
                 "element": "challenge-sound-btn",
                 "delayAfter": 1250
             },
-            {
-                "action": "highlight",
-                "delayAfter": 500,
-                "element": "choice-c"
-            },
-            {
-                "action": "select",
-                "delayAfter": 750,
-                "element": "choice-c"
-            },
-
             {
                 // Hvis du vælger forkert, kan du ændre dit valg. Du må også gerne
                 // gætte, hvis du ikke kan finde ud af opgaven
