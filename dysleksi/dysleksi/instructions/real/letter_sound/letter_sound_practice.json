@@ -227,7 +227,12 @@
                 "delayAfter": 750,
                 "resource": "resources/letter_sound/Enhanced/Instruktion/1b.13.mp3"
             },
-
+            {
+                // Når du har valgt,
+                "action": "playSound",
+                "delayAfter": 0,
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.14-00.mp3"
+            },
             {
                 "action": "highlight",
                 "delayAfter": 0,
@@ -238,12 +243,11 @@
                 "delayAfter": 0,
                 "element": "next"
             },
-
             {
-                // Når du har valgt, går du videre til næste opgave ved at trykke  på pilen.
+                // går du videre til næste opgave ved at trykke  på pilen.
                 "action": "playSound",
                 "delayAfter": 750,
-                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.14.mp3"
+                "resource": "resources/letter_sound/Enhanced/Instruktion/1b.14-01.mp3"
             },
             {
                 "action": "fadeOut",
