@@ -22,6 +22,8 @@ DEBUG = strtobool(os.environ.get("DJANGO_DEBUG", "False"))
 
 SHOW_DEBUG_CONSOLE = strtobool(os.environ.get("SHOW_DEBUG_CONSOLE", "False"))
 TESTING = len(sys.argv) > 1 and sys.argv[1] == "test"
+if TESTING:
+    PASSWORD_HASHERS = ["django.contrib.auth.hashers.MD5PasswordHasher"]
 PUBLIC = strtobool(os.environ.get("PUBLIC", "True"))
 CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "")
 
