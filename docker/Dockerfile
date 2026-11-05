@@ -42,7 +42,7 @@ COPY ./docker/postgresql.gpg /etc/apt/trusted.gpg.d/postgresql.gpg
 RUN sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list' && \
     apt-get update && \
     apt-get install -y --no-install-recommends \
-        gettext graphviz libxmlsec1-dev xmlsec1 libssl-dev libsasl2-dev postgresql-client-common postgresql-client-16 logrotate locales && \
+        gettext graphviz libpango-1.0-0 libpangoft2-1.0-0 libharfbuzz-subset0 libxmlsec1-dev xmlsec1 libssl-dev libsasl2-dev postgresql-client-common postgresql-client-16 logrotate locales && \
     apt-get clean && rm -rf /var/lib/apt/lists/* && \
     sed -i '/en_GB.UTF-8/s/^# //g' /etc/locale.gen && \
     locale-gen en_GB.UTF-8 && \

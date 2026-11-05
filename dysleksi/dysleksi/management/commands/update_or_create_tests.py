@@ -350,7 +350,7 @@ def answer_test(test):
     if test.test_type == TestType.GROUP:
         klasse = (
             Class.objects.annotate(students_count=Count("students"))
-            .filter(students_count__gt=0)
+            .filter(students_count__gt=0, teachers__username="lærer")
             .order_by("?")
             .first()
         )

@@ -134,7 +134,6 @@ class TestAssignmentTable(Table):
         orderable=False,
         verbose_name=_("Handlinger"),
         extra_context={"TestAssignmentStatus": TestAssignmentStatus},
-        attrs={"td": {"class": "wide"}},
     )
 
     def order_type(
@@ -274,6 +273,17 @@ class TestResultColumn(FooterColumnMixin, TemplateColumn):
             value = self.average_value_modifier(value)
         return value
 
+    def value(self, value):
+        return value
+
+
+class PercentageColumn(Column):
+    def render(self, value):
+        return f"{int(value * 100)}%"
+
+    def value(self, value):
+        return value
+
 
 class PartResultTable(Table):
     student = Column(
@@ -304,7 +314,7 @@ class PartResultTable(Table):
         verbose_name=_("Næsten rigtige"),
         accessor=A("almost_correct_count"),
     )
-    correct_proportion = Column(
+    correct_proportion = PercentageColumn(
         verbose_name=_("Rigtighedsprocent"),
         accessor=A("correct_proportion"),
     )
@@ -317,8 +327,8 @@ class PartResultTable(Table):
     def render_student(self, value, record):
         return value.get_full_name()
 
-    def render_correct_proportion(self, value):
-        return f"{int(value * 100)}%"
+    def value_normscore(self, value):
+        return value
 
 
 class EmptyColumn(Column):

@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>{{ title }}</title>
+    <style>
+        @page { size: A4 landscape; margin: 1.5cm; }
+        body { font-family: sans-serif; font-size: 10pt; }
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #ccc; padding: 4px 6px; text-align: left; }
+        th { background: #eee; }
+    </style>
+</head>
+<body>
+    <h1>{{ title }}</h1>
+    <table>
+        <tr>{% for header in headers %}<th>{{ header }}</th>{% endfor %}</tr>
+        {% for row in rows %}
+        <tr>{% for value in row %}<td>{{ value }}</td>{% endfor %}</tr>
+        {% endfor %}
+    </table>
+</body>
+</html>

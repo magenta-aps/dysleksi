@@ -27,6 +27,8 @@ services:
     container_name: dysleksi-web
     image: dysleksi:latest
     read_only: true
+    tmpfs:
+      - /tmp
     build:
       context: .
       dockerfile: docker/Dockerfile
@@ -58,6 +60,7 @@ services:
       - TEST=true
       - ECHO_INTERFACE=https://dysleksi-web
       - STATICFILES_DESTINATION_DIR=/static-copy
+      - HOME=/tmp
     networks:
       - default
       - database

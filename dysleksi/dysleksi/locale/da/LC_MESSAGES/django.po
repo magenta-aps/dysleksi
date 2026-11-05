@@ -561,6 +561,10 @@ msgstr ""
 msgid "næste"
 msgstr ""
 
+#: dysleksi/templates/dysleksi/admin/export_dropdown.html
+msgid "Eksportér"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/modals/base.html
 msgid "OK"
 msgstr ""
@@ -624,6 +628,7 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
 #: dysleksi/templates/dysleksi/admin/test_response/detail.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
+#: dysleksi/views.py
 #, python-format
 msgid "Klasse %(class_name)s - %(test_name)s"
 msgstr ""
@@ -703,11 +708,6 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
 #, python-format
 msgid "Klasse %(klasse_name)s - %(test_name)s"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
-#: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
-msgid "Eksportér som PDF"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_responses/group/list.html
@@ -813,11 +813,6 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/table_columns/class_actions.html
 msgid "Se testoversigt"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_access.html
-#: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
-msgid "Giv adgang"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/table_columns/test_assignment_actions.html
@@ -1155,6 +1150,16 @@ msgstr ""
 #: dysleksi/views.py
 #, python-brace-format
 msgid "{num} deltests"
+msgstr ""
+
+#: dysleksi/views.py
+#, python-format
+msgid "%(part_name)s (antal korrekte svar)"
+msgstr ""
+
+#: dysleksi/views.py
+#, python-format
+msgid "Klasse %(class_name)s - %(test_name)s - %(part_name)s"
 msgstr ""
 
 #: dysleksi/views.py
