@@ -396,6 +396,7 @@ class ScanStaticFilesTests(TestCase):
             "images/icon.svg": "keep",
             "images/icon.abc12345.svg.map": "skip",
             "images/photo.gz": "skip",
+            "images/photo.svg.br": "skip",
             "images/nested/deep.png": "keep",
             "images/nested/deep.aabbccddeeff.png": "skip",
             "audio/beep.mp3": "keep",
@@ -439,10 +440,9 @@ class ScanStaticFilesTests(TestCase):
         self.assertNotIn("/static/audio/beep.0123456789ab.mp3", urls)
         self.assertNotIn("/static/vendor/fonts/myfont.fedcba987654.woff2", urls)
 
-    def test_skips_map_and_gz_files(self):
+    def test_skips_map_and_compressed_files(self):
         urls = self._run()
-        self.assertFalse(any(u.endswith(".map") for u in urls))
-        self.assertFalse(any(u.endswith(".gz") for u in urls))
+        self.assertFalse(any(u.endswith((".map", ".gz", ".br")) for u in urls))
 
     def test_recurses_into_subdirectories(self):
         urls = self._run()
