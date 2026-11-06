@@ -1,0 +1,282 @@
+[
+    // Siku qerivoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L056.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Iseqarputit
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L057.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Siut arpappoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L058.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Qingaqarputit
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L059.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Imeq kuuttarpoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L060.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Anaana arnaavoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L061.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Qitsuk teriaavoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L062.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Allarut qisuuvoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L063.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Siutit tusaapput
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L064.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Illu igalaaqarpoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L065.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Isitit marluupput
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L066.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Bussit arpattarput
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L067.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Qimmeq oqaluttarpoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L068.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Kikiak qisuminiuvoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L069.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Arsaq kipparissuuvoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L070.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Illu kaakkami nerivoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L071.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Aput aappat aasassaaq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L072.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Umiarsuaq talittarpoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L073.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Biili sisoraarutaavoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L074.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Biilit assakaasoqarput
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L075.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Iipili orpimmeersuuvoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L076.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Nunatsinni puiseqarpoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L077.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Ujarak assut manngerpoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L078.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Alussaat pujoorfeqarpoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L079.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Aqqusineq ingerlasarpoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L080.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Ukiukkut aputeqartaqaaq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L081.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Nutsatit tallineq ajorput
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L082.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Iluliarsuaq kissartuuvoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L083.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Sanasut illumik sanasarput
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L084.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Anaana marlunnik ukioqarpoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L085.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Qimmeq uagutsinni igasuuvoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L086.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Terissap nanoq angeqqatigaa
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L087.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Pulateriaarsuk nioqanngilaq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L088.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Ullorissat qilammi qaamasarput
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L089.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Nattoralik takisuunik suloqarpoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L090.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Sikkili marlunnik assakaasoqarpoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L091.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Naluttarfimmi ippernat sulisuupput
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L092.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Allattarfissuaq nammineq allattarpoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L093.mp3",
+        "correct": "false",
+        "wrong": ["true"]
+    },
+    // Iga nerisassiornermi atorneqartarpoq
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L094.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    },
+    // Timmissat amerlasuut manniliortarput
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L095.mp3",
+        "correct": "true",
+        "wrong": ["false"]
+    }
+]

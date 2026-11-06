@@ -1,0 +1,6 @@
+{% load i18n %}
+{% if record.status == TestAssignmentStatus.COMPLETED or record.status == TestAssignmentStatus.CANCELLED %}
+<a href="{% url 'dysleksi:test_assignment_results' pk=record.pk %}" class="btn btn-outline-secondary text-nowrap">{% translate "Se resultater" %}</a>
+{% else %}
+<a href="{% url 'dysleksi:room' pk=record.pk %}" class="btn btn-outline-secondary text-nowrap">{% translate "Åbn" %}</a>
+{% endif %}

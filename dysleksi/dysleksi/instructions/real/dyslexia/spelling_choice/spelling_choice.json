@@ -1,0 +1,610 @@
+[
+    // Opgave 1
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "imi",
+        "correct_index": 3,
+        "wrong": ["ima", "ivi", "ipu", "pip"]
+    },
+    // Opgave 2
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "nuk",
+        "correct_index": 2,
+        "wrong": ["nut", "nak", "nit", "naq"]
+    },
+    // Opgave 3
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "aseq",
+        "correct_index": 4,
+        "wrong": ["atoq", "aqaq", "ataq", "asoq"]
+    },
+    // Opgave 4
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "ulli",
+        "correct_index": 0,
+        "wrong": ["ulla", "uggi", "uffi", "ullu"]
+    },
+    // Opgave 5
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "sivak",
+        "correct_index": 2,
+        "wrong": ["sikat", "sakak", "savak", "sigak"]
+    },
+    // Opgave 6
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "qatsit",
+        "correct_index": 1,
+        "wrong": ["qutsik", "qassik", "qatsik", "qitsak"]
+    },
+    // Opgave 7
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "kagutit",
+        "correct_index": 4,
+        "wrong": ["kugatit", "kagatik", "kavutit", "kagutik"]
+    },
+    // Opgave 8
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "appernaq",
+        "correct_index": 1,
+        "wrong": ["apporneq", "apeernaq", "apparneq", "apperneq"]
+    },
+    // Opgave 9
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "uulisataq",
+        "correct_index": 4,
+        "wrong": ["uulisitaq", "uullisaaq", "uulisatoq", "ullisataq"]
+    },
+    // Opgave 10
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "aninguusaq",
+        "correct_index": 3,
+        "wrong": ["aminguusaq", "aningaaseq", "anungiisaq", "aningussaq"]
+    },
+    // Opgave 11
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "maa",
+        "correct_index": 4,
+        "wrong": ["muu", "maq", "mui", "mai"]
+    },
+    // Opgave 12
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "qiu",
+        "correct_index": 1,
+        "wrong": ["qai", "qii", "quu", "qia"]
+    },
+    // Opgave 13
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "kiuk",
+        "correct_index": 3,
+        "wrong": ["kioq", "kitu", "kuik", "kanu"]
+    },
+    // Opgave 14
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "eqia",
+        "correct_index": 0,
+        "wrong": ["eqii", "eqai", "eqqu", "eqqa"]
+    },
+    // Opgave 15
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "kanaq",
+        "correct_index": 0,
+        "wrong": ["ippat", "imaat", "ivaat", "ipuut"]
+    },
+    // Opgave 16
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "ukiseq",
+        "correct_index": 1,
+        "wrong": ["ukisit", "ugiseq", "ukkisi", "ukuseq"]
+    },
+    // Opgave 17
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "ujagoq",
+        "correct_index": 2,
+        "wrong": ["ugajoq", "ujagak", "uvajoq", "ujakoq"]
+    },
+    // Opgave 18
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "talerpak",
+        "correct_index": 4,
+        "wrong": ["talarpak", "tallipak", "taverpak", "talerpuk"]
+    },
+    // Opgave 19
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "kiparnersat",
+        "correct_index": 0,
+        "wrong": ["kipanarsat", "kipanersaq", "kipunersat", "kapinersat"]
+    },
+    // Opgave 20
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "taq",
+        "correct_index": 3,
+        "wrong": ["tap", "toq", "teq", "tat"]
+    },
+    // Opgave 21
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "ika",
+        "correct_index": 1,
+        "wrong": ["ima", "ita", "ipa", "iku"]
+    },
+    // Opgave 22
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "kaaq",
+        "correct_index": 3,
+        "wrong": ["keeq", "kooq", "kaqa", "kuaq"]
+    },
+    // Opgave 23
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "uuta",
+        "correct_index": 2,
+        "wrong": ["utti", "utsa", "ussi", "ullu"]
+    },
+    // Opgave 24
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "agiat",
+        "correct_index": 4,
+        "wrong": ["akiat", "agiak", "aguit", "ajuak"]
+    },
+    // Opgave 25
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "qaataq",
+        "correct_index": 1,
+        "wrong": ["qaaqaq", "qaatuk", "qaakaq", "qattak"]
+    },
+    // Opgave 26
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "agutsik",
+        "correct_index": 3,
+        "wrong": ["agatsik", "aggutik", "angutsi", "agutseq"]
+    },
+    // Opgave 27
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "imarajoq",
+        "correct_index": 3,
+        "wrong": ["immajooq", "imaragoq", "inarajoq", "imerajoq"]
+    },
+    // Opgave 28
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "norseqat",
+        "correct_index": 0,
+        "wrong": ["narsequt", "norsaqat", "norseqak", "noorseqa"]
+    },
+    // Opgave 29
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "mannaaliit",
+        "correct_index": 1,
+        "wrong": ["mammaaliit", "mannalliit", "maanaaliit", "manniilaat"]
+    },
+    // Opgave 30
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "sik",
+        "correct_index": 0,
+        "wrong": ["sit", "sak", "suk", "seq"]
+    },
+    // Opgave 31
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "ali",
+        "correct_index": 2,
+        "wrong": ["ata", "aqu", "asu", "aqu"]
+    },
+    // Opgave 32
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "umaa",
+        "correct_index": 4,
+        "wrong": ["unga", "unaa", "uma", "umuu"]
+    },
+    // Opgave 33
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "uupak",
+        "correct_index": 2,
+        "wrong": ["uupat", "uunak", "uumak", "upaak"]
+    },
+    // Opgave 34
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "atisut",
+        "correct_index": 4,
+        "wrong": ["asisut", "atsiut", "atisak", "atisuk"]
+    },
+    // Opgave 35
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "iimasut",
+        "correct_index": 0,
+        "wrong": ["immasut", "iimisut", "imasuut", "imassut"]
+    },
+    // Opgave 36
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "naviitaq",
+        "correct_index": 2,
+        "wrong": ["naviikaq", "naviiteq", "navitaaq", "naavitaq"]
+    },
+    // Opgave 37
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "itsavilik",
+        "correct_index": 1,
+        "wrong": ["ittavilik", "itsavilak", "issavilik", "iitsavik"]
+    },
+    // Opgave 38
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "perianniaq",
+        "correct_index": 2,
+        "wrong": ["periangiaq", "peerianiaq", "periaaniaq", "periammiaq"]
+    },
+    // Opgave 39
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "kaa",
+        "correct_index": 2,
+        "wrong": ["kai", "kii", "kaq", "kua"]
+    },
+    // Opgave 40
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "piu",
+        "correct_index": 4,
+        "wrong": ["puu", "pii", "pai", "pui"]
+    },
+    // Opgave 41
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "innik",
+        "correct_index": 1,
+        "wrong": ["immik", "innuk", "ingak", "innak"]
+    },
+    // Opgave 42
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "maagga",
+        "correct_index": 4,
+        "wrong": ["maaggu", "maggaa", "maakka", "maarra"]
+    },
+    // Opgave 43
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "panniaq",
+        "correct_index": 2,
+        "wrong": ["panniak", "paaniaq", "pammiaq", "panngik"]
+    },
+    // Opgave 44
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "ullaavik",
+        "correct_index": 1,
+        "wrong": ["ullaavak", "ulaaffik", "uullavik", "ulliivak"]
+    },
+    // Opgave 45
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "qalilugaq",
+        "correct_index": 3,
+        "wrong": ["qalitulaq", "qaluligaq", "qalliugaq", "qalilugak"]
+    },
+    // Opgave 46
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "alluutivik",
+        "correct_index": 4,
+        "wrong": ["aluutsivik", "alluutavik", "allutsivik", "alliitivik"]
+    },
+    // Opgave 47
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "ungut",
+        "correct_index": 3,
+        "wrong": ["unguk", "unnut", "ungit", "ungak"]
+    },
+    // Opgave 48
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "oorlak",
+        "correct_index": 2,
+        "wrong": ["oorlaq", "orlaak", "oorluk", "oorloq"]
+    },
+    // Opgave 49
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "ullarut",
+        "correct_index": 3,
+        "wrong": ["ullaruk", "uularut", "uularak", "ulaarut"]
+    },
+    // Opgave 50
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "kingunai",
+        "correct_index": 3,
+        "wrong": ["kinganai", "kinganui", "kinnunai", "kingunui"]
+    },
+    // Opgave 51
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "akkanisaq",
+        "correct_index": 2,
+        "wrong": ["akkaniseq", "akkunisaq", "akannisaq", "akkamisaq"]
+    },
+    // Opgave 52
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "eqarasuuat",
+        "correct_index": 0,
+        "wrong": ["eqqarasuat", "eqarisuaat", "eqarasuaat", "eqarusuaat"]
+    },
+    // Opgave 53
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "saaki",
+        "correct_index": 2,
+        "wrong": ["saaku", "saati", "sakki", "saagi"]
+    },
+    // Opgave 54
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "asivoq",
+        "correct_index": 3,
+        "wrong": ["asuvoq", "asavoq", "ativoq", "asivaq"]
+    },
+    // Opgave 55
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "ikuliaq",
+        "correct_index": 4,
+        "wrong": ["ikkulia", "ikuviaq", "ikuluaq", "ikaliaq"]
+    },
+    // Opgave 56
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "ammissak",
+        "correct_index": 1,
+        "wrong": ["ammisaaq", "amiissak", "ammassak", "ammisaak"]
+    },
+    // Opgave 57
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "tanguareq",
+        "correct_index": 4,
+        "wrong": ["tangueraq", "tannuareq", "tinguareq", "tannguaraq"]
+    },
+    // Opgave 58
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "satorsalik",
+        "correct_index": 4,
+        "wrong": ["satorsaluk", "satortalik", "sutorsalik", "sattusalik"]
+    },
+    // Opgave 59
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "taffi",
+        "correct_index": 4,
+        "wrong": ["taggi", "talli", "tiffa", "taffu"]
+    },
+    // Opgave 60
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "kannik",
+        "correct_index": 2,
+        "wrong": ["kaniik", "kammik", "kangik", "kannak"]
+    },
+    // Opgave 61
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "sapanga",
+        "correct_index": 1,
+        "wrong": ["sapunga", "sappana", "supanga", "sapanna"]
+    },
+    // Opgave 62
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "quujalik",
+        "correct_index": 2,
+        "wrong": ["qujaalik", "qugaalik", "qajuulik", "qujallik"]
+    },
+    // Opgave 63
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "maarlequt",
+        "correct_index": 1,
+        "wrong": ["maarlequk", "maarleqat", "marleequk", "maalequuk"]
+    },
+    // Opgave 64
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "tinniaarak",
+        "correct_index": 3,
+        "wrong": ["tinniaraak", "timmiaarak", "tiniiarak", "tinniaraq"]
+    },
+    // Opgave 65
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "illaq",
+        "correct_index": 4,
+        "wrong": ["illuk", "illoq", "illak", "iggaq"]
+    },
+    // Opgave 66
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "pallaq",
+        "correct_index": 0,
+        "wrong": ["pallak", "parlaq", "palloq", "palaaq"]
+    },
+    // Opgave 67
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "nakusik",
+        "correct_index": 2,
+        "wrong": ["nakutik", "nakasik", "nagusik", "naqusik"]
+    },
+    // Opgave 68
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "saniffak",
+        "correct_index": 1,
+        "wrong": ["sinaffik", "saanivak", "sannifak", "samiffak"]
+    },
+    // Opgave 69
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "pimmaluaq",
+        "correct_index": 1,
+        "wrong": ["pimalluaq", "pimaaluaq", "pimmuluaq", "pammiluaq"]
+    },
+    // Opgave 70
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "kiniiartaa",
+        "correct_index": 2,
+        "wrong": ["kingiarta", "kimiiartaa", "kiiniartaa", "kiniiarpaa"]
+    },
+    // Opgave 71
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "tilak",
+        "correct_index": 0,
+        "wrong": ["innat", "ingak", "ingut", "arpik"]
+    },
+    // Opgave 72
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "taamaq",
+        "correct_index": 4,
+        "wrong": ["taamak", "tamaaq", "tammaq", "taanak"]
+    },
+    // Opgave 73
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "aggivik",
+        "correct_index": 0,
+        "wrong": ["agiffik", "agguvik", "aggiveq", "aggavik"]
+    },
+    // Opgave 74
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "parraata",
+        "correct_index": 2,
+        "wrong": ["parraaka", "parrutaa", "paarataa", "paaritaa"]
+    },
+    // Opgave 75
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "siffiinat",
+        "correct_index": 4,
+        "wrong": ["siifiinat", "siffiinut", "siifinnat", "siiffiinit"]
+    },
+    // Opgave 76
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
+        "correct": "ikernullak",
+        "correct_index": 1,
+        "wrong": ["ikernalluk", "ikkernulak", "ikarnerluk", "ikermullak"]
+    }
+]

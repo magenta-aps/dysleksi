@@ -146,25 +146,12 @@ describe("TestMediaRecorder", () => {
         expect(mockMediaRecorderInstance.stop).toHaveBeenCalled();
     });
 
-    it("should call start directly in interval if not recording", async () => {
-        await recorder.setup();
-        mockMediaRecorderInstance.state = "inactive";
-
-        // Use a small timeout to let the sync part of the promise run
-        recorder.interval();
-
-        expect(mockMediaRecorderInstance.start).toHaveBeenCalled();
-    });
-
     it("should resolve with base64 data and reset recording when in recording state", async () => {
         await recorder.setup();
 
-        // 1. Force the mock to update its state when stop/start are called
+        // 1. Force the mock to update its state when stop is called
         mockMediaRecorderInstance.stop.mockImplementation(() => {
             mockMediaRecorderInstance.state = "inactive";
-        });
-        mockMediaRecorderInstance.start.mockImplementation(() => {
-            mockMediaRecorderInstance.state = "recording";
         });
 
         // 2. Initial state
@@ -188,7 +175,7 @@ describe("TestMediaRecorder", () => {
 
         // --- Assertions ---
         expect(mockMediaRecorderInstance.stop).toHaveBeenCalled();
-        expect(mockMediaRecorderInstance.start).toHaveBeenCalled();
+        expect(mockMediaRecorderInstance.start).not.toHaveBeenCalled();
         expect(result).toBe("data:audio/webm;base64,mockdata");
         expect(recorder.recording.length).toBe(0);
     });
@@ -312,10 +299,13 @@ describe("AudioDetector", () => {
 
     it("detects audio", () => {
         const onDetected = vi.fn();
+        const onHeard = vi.fn();
         const instance = getInstance([256.0]);
         instance.addEventListener("audio.detected", onDetected);
+        instance.addEventListener("audio.heard", onHeard);
         instance.run();
         expect(onDetected).toHaveBeenCalled();
+        expect(onHeard).toHaveBeenCalled();
     });
 
     it("detects nothing once stopped", () => {

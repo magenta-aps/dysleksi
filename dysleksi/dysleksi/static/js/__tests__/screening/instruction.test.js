@@ -54,6 +54,8 @@ describe("InstructionSequenceRunner", () => {
             addText: vi.fn(),
             removeText: vi.fn(),
             explicitHighlight: vi.fn(),
+            makeButtonAngry: vi.fn(),
+            makeButtonHappy: vi.fn(),
         };
         fakeContext = createFakeAudioContext();
 
@@ -87,6 +89,8 @@ describe("InstructionSequenceRunner", () => {
             { action: "fadeOut", element: "el1" },
             { action: "highlight", element: "el1" },
             { action: "select", element: "btn1" },
+            { action: "makeButtonAngry", element: "btn1" },
+            { action: "makeButtonHappy", element: "btn1" },
             { action: "showFaded", element: "btn1" },
             { action: "explicitHighlight", element: "el1" },
         ];
@@ -112,6 +116,8 @@ describe("InstructionSequenceRunner", () => {
             document.getElementById("btn1"),
             true,
         );
+        expect(domElements.makeButtonAngry).toHaveBeenCalledWith("btn1");
+        expect(domElements.makeButtonHappy).toHaveBeenCalledWith("btn1");
         expect(domElements.showFaded).toHaveBeenCalledWith(
             document.getElementById("btn1"),
         );
@@ -341,6 +347,21 @@ describe("InstructionSequenceRunner", () => {
         expect(clickSpy).toHaveBeenCalledTimes(1);
     });
 
+    it("clicks a disabled element when the sequence is skipped", async () => {
+        runner = new InstructionSequenceRunner(null, [], domElements, fakeContext);
+        const btn = document.getElementById("btn1");
+        const onClick = vi.fn();
+        btn.addEventListener("click", onClick);
+        btn.disabled = true;
+
+        await runner.executeInstruction({ action: "clickButton", element: "btn1" });
+        expect(onClick).not.toHaveBeenCalled();
+
+        runner.skipToEnd();
+        await runner.executeInstruction({ action: "clickButton", element: "btn1" });
+        expect(onClick).toHaveBeenCalledTimes(1);
+    });
+
     it("set marker in element text", () => {
         runner = new InstructionSequenceRunner(null, [], domElements, fakeContext);
         const element = document.getElementById("input1");
@@ -535,6 +556,18 @@ describe("InstructionSequenceRunner", () => {
             expect(btn.classList.contains("pulse-instruction")).toBe(false);
             expect(btn.style.pointerEvents).toBe("none");
             expect(btn.tabIndex).toBe(-1);
+        });
+
+        it("stops waiting when the rest of the sequence is skipped", async () => {
+            runner = new InstructionSequenceRunner(null, [], domElements, fakeContext);
+            const btn = document.getElementById("btn1");
+
+            const waitPromise = runner.waitForClick(btn);
+            runner.skipToEnd();
+            await waitPromise;
+
+            expect(btn.classList.contains("pulse-instruction")).toBe(false);
+            expect(runner._currentSkipResolver).toBe(null);
         });
 
         it("returns immediately if skipAll is true", async () => {

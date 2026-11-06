@@ -1,0 +1,35 @@
+{% extends "dysleksi/admin/base.html" %}
+{% load i18n %}
+{% load django_bootstrap5 %}
+
+{% block inner_content %}
+<div class="d-flex justify-content-center align-items-center h-100">
+    <button type="button" class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#start-dyslexia-test">
+        {% translate "Tildel test" %}
+    </button>
+</div>
+{% endblock %}
+
+{% block modals %}
+<div class="modal fade" id="start-dyslexia-test" tabindex="-1" aria-labelledby="start-dyslexia-test-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <form method="post" action="{% url 'dysleksi:start_dyslexia_test' %}" class="modal-content">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="start-dyslexia-test-label">{% translate "Tildel test" %}</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="{% translate 'Luk' %}"></button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-body-inner">
+                    {% bootstrap_field form.test_person %}
+                    {% bootstrap_field form.test %}
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{% translate "Annuller" %}</button>
+                <button type="submit" class="btn btn-primary">{% translate "Start test" %}</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

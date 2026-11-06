@@ -103,6 +103,14 @@ export class InstructionSequenceRunner {
                 this.domElements.toggleButtonSelected(this.getEl(element), true);
                 break;
 
+            case "makeButtonAngry":
+                this.domElements.makeButtonAngry(element);
+                break;
+
+            case "makeButtonHappy":
+                this.domElements.makeButtonHappy(element);
+                break;
+
             case "playSound":
                 await this.playSound(url);
                 break;
@@ -113,6 +121,11 @@ export class InstructionSequenceRunner {
 
             case "clickButton":
                 const el1 = this.getEl(element);
+                // A skipped sequence does not wait for the sound which enables e.g. the
+                // letters of a free text question
+                if (this.skipAll) {
+                    el1.disabled = false;
+                }
                 el1.click();
                 el1.focus();
                 setTimeout(() => {
@@ -170,9 +183,11 @@ export class InstructionSequenceRunner {
                 el.removeEventListener("click", onClick);
                 el.style.pointerEvents = "none";
                 el.tabIndex = -1;
+                this._currentSkipResolver = null;
                 resolve();
             };
             el.addEventListener("click", onClick);
+            this._currentSkipResolver = onClick;
         });
     }
 

@@ -307,7 +307,7 @@ ${MESSAGE_SYNC_CONFIG_HTML}
 <button id="correct"><span>Korrekt</span></button>
 <button id="wrong">Forkert</button>
 <span><button id="cancelled" data-blocked-title="Kan ikke afsluttes">Afslut test</button></span>
-<button id="paused"><i class="ph-fill ph-pause"></i></button>
+<button id="paused" disabled><i class="ph-fill ph-pause"></i></button>
 <button id="skipped">Sprunget over</button>
 <button id="next">Næste</button>
 <button id="goto-next-result-group">Hop til næste</button>
@@ -1072,6 +1072,26 @@ describe("Teacher Individual test View", () => {
         expect(spyStart).toHaveBeenCalled();
     });
 
+    it("starts the elapsed time once the instructions have played", () => {
+        const spyStart = vi.spyOn(elapsedTimeView, "start");
+        view.test.parts[0].questions[0].instruction_sequence = { instructions: [] };
+
+        sendFromStudent({
+            event: "question.displayed",
+            partIndex: 0,
+            questionIndex: 0,
+            practice: false,
+        });
+        expect(spyStart).not.toHaveBeenCalled();
+
+        sendFromStudent({ event: "instructions.completed" });
+        expect(spyStart).toHaveBeenCalledTimes(1);
+
+        // E.g. the student replays the instructions
+        sendFromStudent({ event: "instructions.completed" });
+        expect(spyStart).toHaveBeenCalledTimes(1);
+    });
+
     it("pauses the total elapsed time on `question.answered`", () => {
         // Arrange
         const spyStop = vi.spyOn(elapsedTimeView, "stop");
@@ -1184,6 +1204,11 @@ describe("Teacher Individual test View", () => {
         const spyResume = vi.spyOn(elapsedTimeView, "resume");
         const pauseButton = buttons.pauseButton();
 
+        sendFromStudent({
+            event: "question.displayed",
+            partIndex: 0,
+            questionIndex: 0,
+        });
         // Initial state: the test is running
         expect(view.testPaused).toBe(false);
 
@@ -1221,6 +1246,11 @@ describe("Teacher Individual test View", () => {
         const questionButtons = ["correct", "wrong", "skipped", "next"].map((id) =>
             buttons.buttonById(id),
         );
+        sendFromStudent({
+            event: "question.displayed",
+            partIndex: 0,
+            questionIndex: 0,
+        });
         // The teacher must mark the answer before the 'next' button opens up
         buttons.disableNextButton();
 
@@ -1371,6 +1401,19 @@ describe("Teacher Individual test View", () => {
         expect(container.querySelector("#challenge-text")).toBeNull();
     });
 
+    it("questionview shrinks long texts to fit the box", () => {
+        const container = document.querySelector("#question-content");
+        Object.defineProperty(container, "clientHeight", { value: 100 });
+        Object.defineProperty(container, "scrollHeight", {
+            get: () =>
+                parseInt(container.querySelector("#challenge-text").style.fontSize) * 4,
+        });
+
+        questionView.showContent("Atuarsinnaanngornissat sapernartittarpiuk?");
+
+        expect(container.querySelector("#challenge-text").style.fontSize).toBe("25px");
+    });
+
     it("handles action button events inside 'span' elements", () => {
         // Arrange
         const spySendQuestionFeedback = vi.spyOn(view, "sendQuestionFeedback");
@@ -1518,13 +1561,36 @@ describe("Teacher Individual test View", () => {
         // the student to the next test part (if any.)
         view.gotoNextResultGroup();
         expect(view.currentPart.index).toBe(2); // changed
+        // The student starts with the practice questions of the new test part
+        expect(view.currentIsPractice).toBe(true);
         expect(view.currentQuestion.index).toBe(0);
         expect(view.currentQuestion.resultGroup).toBeUndefined();
-        // Act: go to next result group in the new test part. As there are no
+        // Act: go to next result group in the last test part. As there are no
         // result groups defined in this test part, this does nothing.
+        view.setQuestionIndex(0, false);
         view.gotoNextResultGroup();
         expect(view.currentPart.index).toBe(2); // unchanged
         expect(view.currentQuestion.index).toBe(0); // unchanged
+    });
+
+    it("waits for the student to get through the outro", () => {
+        sendFromStudent({
+            event: "question.displayed",
+            partIndex: 1,
+            questionIndex: 0,
+            practice: false,
+        });
+        expect(view.gotoNextResultGroupButton.classList).not.toContain("disabled");
+        expect(view.buttons.pauseButton().disabled).toBe(false);
+
+        sendFromStudent({ event: "part.complete", partIndex: 1 });
+        expect(view.buttons.pauseButton().disabled).toBe(true);
+
+        for (const id of ["correct", "wrong", "skipped", "next"]) {
+            expect(document.getElementById(id).classList).toContain("disabled");
+        }
+        expect(view.gotoNextResultGroupButton.classList).toContain("disabled");
+        expect(questionView.titleElement.textContent).toBe("");
     });
 
     it("displays an error modal if student audio setup fails", () => {
@@ -1621,6 +1687,229 @@ describe("Teacher Individual test View", () => {
         expect(disabled.classList.contains("d-none")).toBe(true);
         expect(enabled.classList.contains("d-none")).toBe(false);
         expect(spyToggle).toHaveBeenLastCalledWith(false);
+    });
+});
+
+describe("Teacher dyslexia test View", () => {
+    let buttons;
+    let note;
+    let view;
+    let channel;
+    const studentId = 123;
+
+    const question = (id, data) => ({
+        id: id,
+        possible_answers: [],
+        existing_answers: {},
+        instruction_sequence: null,
+        ...data,
+    });
+    const instruction = { instructions: [{ action: "show", element: "next" }] };
+    const dyslexiaTestData = {
+        id: 1,
+        name: "Dysleksitest (voksen)",
+        test_type: "dyslexia",
+        parts: [
+            {
+                id: 1,
+                name: "Spørgeskema (voksne)",
+                practice: [
+                    question(10, {
+                        question_type: "no_input_required",
+                        instruction_sequence: instruction,
+                    }),
+                ],
+                questions: [
+                    question(11, {
+                        question_type: "multiple_choice",
+                        challenge_text: "Ilaannikkut?",
+                        localized_challenge_text: "Nogle gange?",
+                        is_questionnaire: true,
+                        possible_answers: [
+                            {
+                                id: 1,
+                                resource_name: "Ilaannikkut",
+                                resource_text: "Ilaannikkut",
+                                localized_resource_text: "Nogle gange",
+                                correctness: "correct",
+                            },
+                            {
+                                id: 2,
+                                resource_name: "Tamatigut",
+                                resource_text: "Tamatigut",
+                                localized_resource_text: "Altid",
+                                correctness: "correct",
+                                locked: true,
+                            },
+                        ],
+                    }),
+                    question(12, { question_type: "multiple_choice" }),
+                ],
+            },
+            {
+                id: 2,
+                name: "Læs nonord højt",
+                practice: [
+                    question(20, { question_type: "no_input_required", text: "ni" }),
+                ],
+                questions: [
+                    question(21, { question_type: "no_input_required", text: "ali" }),
+                ],
+            },
+        ],
+    };
+
+    const receive = (detail) =>
+        channel.dispatchEvent(
+            new CustomEvent("message", {
+                detail: { student: { id: studentId }, ...detail },
+            }),
+        );
+    const display = (partIndex, questionIndex, practice) =>
+        receive({ event: "question.displayed", partIndex, questionIndex, practice });
+    const isDisabled = (id) =>
+        document.getElementById(id).classList.contains("disabled");
+
+    beforeEach(() => {
+        vi.useFakeTimers();
+        vi.stubGlobal("localStorage", {
+            getItem: vi.fn(),
+            setItem: vi.fn(),
+            clear: vi.fn(),
+        });
+        const socket = mockSocket();
+        document.body.innerHTML =
+            INDIVIDUAL_DOM_HTML + `<div id="questionnaire-choices"></div>`;
+        vi.spyOn(Test.prototype, "preload").mockResolvedValue(new Map());
+        const test = new Test(dyslexiaTestData);
+
+        buttons = new ActionButtons();
+        note = new NoteField();
+        view = new TeacherView(
+            test,
+            1,
+            new EventTable(test),
+            buttons,
+            note,
+            new QuestionView(),
+            new ElapsedTimeView("#elapsed-time"),
+            new AudioIndicator("#audio-indicator"),
+        );
+        getMainSocketHandler(socket)({
+            data: JSON.stringify({
+                event: "student.joined",
+                sameNetwork: true,
+                studentId,
+                assignmentId: 1,
+            }),
+        });
+        [channel] = view.studentChannels[studentId];
+    });
+
+    afterEach(() => {
+        vi.clearAllTimers();
+        vi.useRealTimers();
+        vi.restoreAllMocks();
+        vi.unstubAllGlobals();
+    });
+
+    it("leaves the questions the student answers on their own to the student", () => {
+        display(0, 1, false);
+
+        for (const id of ["correct", "wrong", "skipped", "next"]) {
+            expect(isDisabled(id)).toBe(true);
+        }
+        expect(note.noteEl.classList).toContain("d-none");
+    });
+
+    it("does not let the test leader move on from instructions", () => {
+        display(0, 0, true);
+        receive({ event: "instructions.started" });
+        receive({ event: "instructions.completed" });
+
+        expect(isDisabled("next")).toBe(true);
+    });
+
+    it("leaves the words read aloud to the student", () => {
+        display(1, 0, false);
+
+        expect(isDisabled("correct")).toBe(true);
+        expect(isDisabled("next")).toBe(true);
+
+        receive({
+            event: "question.answered",
+            recordingBase64: "data:audio/wav;base64,UklGR...",
+            correctness: null,
+            partIndex: 1,
+            questionIndex: 0,
+        });
+
+        const row = document.querySelector("#events tbody tr");
+        expect(row.querySelector("td.result").textContent).toBe("");
+        expect(row.querySelector("td.answer audio")).not.toBeNull();
+    });
+
+    it("lets the test leader answer the questionnaire", () => {
+        vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID");
+        display(0, 0, false);
+
+        const choices = () =>
+            document.querySelectorAll("#questionnaire-choices button");
+        const [chosen, locked] = choices();
+        expect(note.noteEl.classList).not.toContain("d-none");
+        expect(isDisabled("next")).toBe(true);
+        expect(buttons.correctButton().classList).toContain("d-none");
+        expect(locked.disabled).toBe(true);
+        // The test leader sees the questionnaire in their own language
+        expect(chosen.textContent).toBe("Nogle gange");
+        expect(document.querySelector("#question-content").textContent).toBe(
+            "Nogle gange?",
+        );
+
+        chosen.click();
+        expect(chosen.classList).toContain("active");
+        expect(isDisabled("next")).toBe(false);
+
+        note.noteEl.value = "Tøvede";
+        buttons.nextButton().click();
+
+        expect(channel.send).toHaveBeenCalledWith(
+            expect.objectContaining({
+                event: "question.feedback",
+                questionId: 11,
+                correctness: "correct",
+                choiceId: 1,
+                note: "Tøvede",
+            }),
+        );
+        expect(note.getNote()).toBe("");
+        expect(isDisabled("next")).toBe(true);
+        expect(chosen.classList).toContain("disabled");
+        expect(document.querySelector("#events td.result button").textContent).toBe(
+            "Nogle gange",
+        );
+
+        display(0, 1, false);
+        expect(choices()).toHaveLength(0);
+        expect(buttons.correctButton().classList).not.toContain("d-none");
+    });
+
+    it("skips to the practice questions of the next part, if it has any", () => {
+        const skip = () => {
+            display(0, 1, false);
+            view.gotoNextResultGroup();
+            return channel.send.mock.calls.at(-1)[0];
+        };
+
+        expect(skip()).toMatchObject({
+            event: "question.changed",
+            partIndex: 1,
+            questionIndex: 0,
+            practice: true,
+        });
+
+        view.test.parts[1].practice = [];
+        expect(skip()).toMatchObject({ partIndex: 1, practice: false });
     });
 });
 
@@ -2624,32 +2913,129 @@ describe("EventTable", () => {
         vi.useRealTimers();
     });
 
-    it("renders textAnswer when no audio is present", () => {
-        const data = {
-            textAnswer: "This is my answer",
-            partIndex: 0,
-            questionIndex: 0,
-        };
+    it("renders a dash when there is no recording", () => {
+        const data = { textAnswer: "aput", partIndex: 0, questionIndex: 0 };
 
         table.updateTable({ event: "question.answered", ...data });
         table.updateTable({ event: "question.feedback", ...data });
 
-        const answerCell = document.querySelector("td.answer");
-        expect(answerCell.textContent).toBe("This is my answer");
+        expect(document.querySelector("td.answer").textContent).toBe("-");
     });
 
-    it("renders choiceId when neither audio nor textAnswer is present", () => {
-        const data = {
-            choiceId: "option_a",
+    it("adds a row when the test starts", () => {
+        // The student does not tell which part the test starts in
+        table.updateTable({ event: "test.started", message: "Testen er startet" });
+
+        const rows = document.querySelectorAll("#events tbody tr");
+        expect(rows.length).toBe(1);
+        expect(rows[0].querySelector("td.answer").textContent).toBe(
+            "Testen er startet",
+        );
+    });
+
+    it("adds a row with the result when the student judges their own answer", () => {
+        table.updateTable({
+            event: "question.answered",
+            choiceId: 8,
+            correctness: "wrong",
+            partIndex: 0,
+            questionIndex: 1,
+        });
+
+        const rows = document.querySelectorAll("#events tbody tr");
+        expect(rows.length).toBe(1);
+        expect(rows[0].querySelector("td.result").textContent).toBe("Forkert");
+        expect(rows[0].querySelector("td.result button")).toBeNull();
+        expect(rows[0].querySelector("td.answer").textContent).toBe("-");
+    });
+
+    it("shows the typed answer as the result when the student judges their own answer", () => {
+        table.updateTable({
+            event: "question.answered",
+            textAnswer: "tutilak",
+            correctness: "correct",
+            partIndex: 0,
+            questionIndex: 1,
+        });
+
+        expect(document.querySelector("td.result").textContent).toBe("tutilak");
+    });
+
+    it("shows the sound of a question without text", () => {
+        const question = individualTest.parts[0].questions[0];
+        question.challengeText = "";
+        question.challengeSoundUrl = "/resources/L056.mp3";
+
+        table.updateTable({
+            event: "question.feedback",
+            correctness: "correct",
             partIndex: 0,
             questionIndex: 0,
-        };
+        });
 
-        table.updateTable({ event: "question.answered", ...data });
-        table.updateTable({ event: "question.feedback", ...data });
+        const audio = document.querySelector("#events td.question audio");
+        expect(audio.src).toContain("/resources/L056.mp3");
+    });
 
-        const answerCell = document.querySelector("td.answer");
-        expect(answerCell.textContent).toBe("option_a");
+    it("shows the answers of a multiple choice question without a challenge", () => {
+        const question = individualTest.parts[0].questions[0];
+        question.type = "multiple_choice";
+        question.challengeId = undefined;
+        question.possibleAnswers = [{ resourceText: "ika" }, { resourceText: "iki" }];
+
+        table.updateTable({
+            event: "question.feedback",
+            correctness: "correct",
+            partIndex: 0,
+            questionIndex: 0,
+        });
+
+        expect(
+            document.querySelector("#events td.question .challenge").textContent,
+        ).toBe("ika, iki");
+    });
+
+    it("shows the chosen answer as the result of questionnaire questions", () => {
+        const question = individualTest.parts[0].questions[0];
+        question.isQuestionnaire = true;
+        question.possibleAnswers.push(
+            { id: 9, localizedResourceText: "Nogle gange", locked: false },
+            { id: 10, localizedResourceText: "Altid", locked: false },
+            { id: 11, localizedResourceText: "Sjældent", locked: true },
+        );
+        const data = { partIndex: 0, questionIndex: 0, questionId: 5 };
+        table.updateTable({
+            event: "question.feedback",
+            correctness: "correct",
+            choiceId: 10,
+            ...data,
+        });
+        table.updateTable({ event: "question.answered", choiceId: 10, ...data });
+
+        const rows = document.querySelectorAll("#events tbody tr");
+        const button = rows[0].querySelector("td.result button");
+        const items = rows[0].querySelectorAll("td.result a.dropdown-item");
+        expect(rows.length).toBe(1);
+        expect(button.textContent).toBe("Altid");
+        expect(items).toHaveLength(3);
+        expect(items[2].classList).toContain("disabled");
+        expect(rows[0].querySelector("td.answer").textContent).toBe("-");
+
+        // The test leader changes the answer afterwards
+        const edited = vi.fn();
+        table.addEventListener("questionFeedbackEdited", (evt) => edited(evt.detail));
+        button.dispatchEvent(new Event("blur"));
+        items[0].click();
+
+        expect(button.textContent).toBe("Nogle gange");
+        expect(edited).toHaveBeenCalledExactlyOnceWith(
+            expect.objectContaining({
+                event: "question.feedback",
+                questionId: 5,
+                correctness: "correct",
+                choiceId: 9,
+            }),
+        );
     });
 
     it("renders result and note cells when `question.feedback` event is received", () => {

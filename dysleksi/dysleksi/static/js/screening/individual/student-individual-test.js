@@ -1,47 +1,16 @@
 import { StudentTestView } from "../student-test.js";
-import { AudioDetector } from "../media.js";
+import { setupRecording } from "../media.js";
 
 export class IndividualTestView extends StudentTestView {
-    mediaRecorder;
-    audioDetector;
-    recordedAudio;
     isPracticing = false;
-    onSilence = (e) => this.onAudioEvent(e.type);
 
     constructor(test, assignmentId, domElements, mediaRecorder, student) {
         super(test, assignmentId, domElements, student);
-        this.mediaRecorder = mediaRecorder;
-        this.startAudioDetector();
-        this.mediaRecorder.addEventListener("mic.lost", () => {
-            this.domElements.showMicLostOverlay();
-        });
-        this.mediaRecorder.addEventListener("mic.restored", () => {
-            this.domElements.hideMicLostOverlay();
-            // The old detector listens to a stream that is gone
-            this.startAudioDetector();
-            this.mediaRecorder.start();
-        });
-        this.domElements.setRestoreMicButtonListener(() =>
-            this.mediaRecorder.restore(),
-        );
+        setupRecording(this, mediaRecorder);
     }
 
-    startAudioDetector() {
-        if (this.audioDetector) {
-            this.audioDetector.stop();
-        }
-        this.audioDetector = new AudioDetector(this.mediaRecorder.stream);
-        for (const event of ["audio.detected", "audio.quiet"]) {
-            this.audioDetector.addEventListener(event, (e) => {
-                this.onAudioEvent(e.type);
-            });
-        }
-        this.audioDetector.run();
-    }
-
-    onAudioEvent(event) {
-        // Pass audio events on to teacher's session
-        this.send({ event: event });
+    needsMicrophone() {
+        return true;
     }
 
     onChatMessage(data) {
@@ -50,35 +19,12 @@ export class IndividualTestView extends StudentTestView {
             this.teacherFeedback(data.correct);
         }
         if (data.event === "question.changed") {
-            // If teacher changes current test part, tell the student that this
-            // test part is complete and the next test part will begin shortly.
             if (data.partIndex !== this.currentPartIndex) {
-                this.onPartComplete();
+                this.skipPart();
+            } else {
+                this.showQuestion(data.practice, data.questionIndex);
             }
-            this.showQuestion(data.practice, data.questionIndex);
         }
-    }
-
-    async onTestComplete(cancelled = false) {
-        if (this.mediaRecorder) {
-            //this.domElements.toggleAudioIndicator(false);
-            await this.mediaRecorder.stop();
-        }
-        super.onTestComplete(cancelled);
-    }
-
-    // ---- Parts ----
-    onPartComplete() {
-        this.audioDetector.removeEventListener("audio.silent", this.onSilence);
-        this.answeredAt = document.timeline.currentTime;
-        const duration = this.answerDuration(this.answeredAt);
-        this.send({
-            event: "part.complete",
-            partIndex: this.currentPartIndex,
-            partId: this.currentPart.id,
-            duration: duration,
-        });
-        super.onPartComplete();
     }
 
     // ---- Questions ----
@@ -106,6 +52,8 @@ export class IndividualTestView extends StudentTestView {
                 this.audioContext,
             );
 
+            this.sendQuestionDisplayed();
+
             if (this.currentQuestion.instruction_sequence) {
                 this.domElements.setNextButtonListener(() =>
                     this.onQuestionComplete(this.currentQuestion),
@@ -118,16 +66,6 @@ export class IndividualTestView extends StudentTestView {
             }
 
             this.startAnswerTimer();
-            this.send({
-                event: "question.displayed",
-                partIndex: this.currentPartIndex,
-                partId: this.currentPart.id,
-                questionIndex: this.currentQuestionIndex,
-                questionId: this.currentQuestion.id,
-                displayedAt: this.displayedAt,
-                questionTitle: this.questionTitle(this.isPracticing),
-                practice: this.isPracticing,
-            });
 
             this.audioDetector.addEventListener("audio.silent", this.onSilence);
             this.audioDetector.reset();

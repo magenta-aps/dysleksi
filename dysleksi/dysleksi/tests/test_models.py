@@ -1089,6 +1089,31 @@ class TestMessage(DysleksiTest):
         self.assertEqual(questionresponse.answer_option, self.possible_correct_answer1)
         self.assertTrue(questionresponse.correctness == Correctness.CORRECT)
 
+    def test_test_leader_answers_questionnaire(self):
+        self.question1.is_questionnaire = True
+        self.question1.save()
+        ids = {
+            "assignmentId": self.individual_assignment.pk,
+            "partId": self.part.pk,
+            "questionId": self.question1.pk,
+        }
+
+        def handle(event, user, **data):
+            Message.objects.create(
+                uuid=uuid4(), event=event, data={**ids, **data}, user=user
+            ).handle()
+
+        first, changed = self.possible_correct_answer1, self.possible_wrong_answer1
+        handle("question.feedback", self.student1, choiceId=first.pk, note="Tøvede")
+        # The answer is changed in the results table
+        handle("question.feedback", self.student1, choiceId=changed.pk)
+        # The student's message may arrive after the test leader's
+        handle("question.answered", self.student1, choiceId=first.pk)
+
+        response = QuestionResponse.objects.get(question=self.question1)
+        self.assertEqual(response.answer_option, changed)
+        self.assertEqual(response.note, "Tøvede")
+
     def test_question_answer_with_sound(self):
         with open(
             os.path.join(settings.MEDIA_ROOT, "wordspelling_dummy", "iki.mp3"), "rb"

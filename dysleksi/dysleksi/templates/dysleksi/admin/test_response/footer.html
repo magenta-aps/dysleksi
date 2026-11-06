@@ -1,5 +1,6 @@
 {% load i18n %}
 {% with key=value.category.color_key part=value.part response=value.response %}
+{% if not value.is_questionnaire %}
 <div class="result-score category-{{ key }}">
     {% if key == "red" %}
         {% translate "Elendigt" %}
@@ -13,6 +14,7 @@
         {% translate "Ikke fuldført" %}
     {% endif %}
 </div>
+{% endif %}
 <div class="text-center">
     {% if value.total_answers > 0 %}
     <a href="{% url 'dysleksi:test_assignment_part_result' assignment_pk=response.assignment_id testpart_pk=part.pk testresponse_pk=response.pk %}">

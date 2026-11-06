@@ -1,0 +1,14 @@
+{% extends "dysleksi/admin/test_assignment/detail_individual.html" %}
+{% load i18n %}
+
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="{% url 'dysleksi:root' %}">{% translate 'Tildel test' %}</a></li>
+<li class="breadcrumb-item active" aria-current="page">
+    {{ test_assignment.student.get_full_name }} - {{ test_assignment.test.name }}
+</li>
+{% endblock %}
+
+{% block note %}
+<div id="questionnaire-choices" class="buttons"></div>
+<textarea id="note" class="form-control mb-3 d-none" rows="3" placeholder="{% translate 'Note' %}"></textarea>
+{% endblock %}

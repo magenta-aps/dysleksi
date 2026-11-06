@@ -53,7 +53,9 @@ class TestDomElements {
             "#skip-sound-calibration",
         );
         this.skipSummaryButton = document.querySelector("#skip-summary");
+        this.skipToPartButtons = document.querySelector("#skip-to-part");
         this.repeatBtn = document.querySelector("#repeat");
+        this.replayInstructionsBtn = document.querySelector("#replay-instructions");
         this.testFinishedRow = document.querySelector("#test-finished-row");
         this.speakerButton = document.querySelector("#speaker");
         this.pauseOverlay = document.querySelector("#pause-overlay");
@@ -146,6 +148,21 @@ class TestDomElements {
 
     toggleBodyClass(className, show) {
         document.body.classList.toggle(className, show);
+    }
+
+    // Buttons to allow skipping ahead to a specific testpart
+    // Only shown in DEBUG mode
+    showSkipToPartButtons(parts, listener) {
+        if (this.skipToPartButtons) {
+            parts.forEach((part, index) => {
+                const button = document.createElement("button");
+                button.className = "debug-button";
+                button.style.display = "flex";
+                button.textContent = `DEBUG: ${index + 1}. ${part.nameDa}`;
+                button.addEventListener("click", () => listener(index));
+                this.skipToPartButtons.append(button);
+            });
+        }
     }
 
     showSoundCalibration() {
@@ -262,15 +279,15 @@ class TestDomElements {
                 textContainer.innerHTML = part.name;
             }
 
-            // Create image element
-            const img = document.createElement("img");
-            img.src = part.image;
-            img.alt = "TestPart icon";
-            img.style.height = "60px";
-
-            // Append text and image to block
             block.appendChild(textContainer);
-            block.appendChild(img);
+
+            if (part.image) {
+                const img = document.createElement("img");
+                img.src = part.image;
+                img.alt = "TestPart icon";
+                img.style.height = "60px";
+                block.appendChild(img);
+            }
 
             this.summaryContainer.appendChild(block);
         });
@@ -334,6 +351,9 @@ class TestDomElements {
 
     hideIntro() {
         this.testIntro.style.display = "none";
+        if (this.skipToPartButtons) {
+            this.skipToPartButtons.replaceChildren();
+        }
     }
 
     hideAll() {
@@ -368,6 +388,14 @@ class TestDomElements {
         }
     }
 
+    toggleReplayInstructionsButton(show) {
+        if (show) {
+            this.showElement(this.replayInstructionsBtn);
+        } else {
+            this.hideElement(this.replayInstructionsBtn);
+        }
+    }
+
     disableNextButton() {
         this.nextBtn.style.transition = "";
         this.nextBtn.style.opacity = "";
@@ -395,6 +423,10 @@ class TestDomElements {
         if (this.repeatBtn) {
             this._setButtonListener(this.repeatBtn, listener);
         }
+    }
+
+    setReplayInstructionsButtonListener(listener) {
+        this._setButtonListener(this.replayInstructionsBtn, listener);
     }
 
     showElement(el) {
@@ -762,11 +794,23 @@ class TestDomElements {
         }
     }
 
-    showQuestionFreeText(listener) {
+    // With a guide, the word to write is shown in grey, and onWrongLetter is called
+    // instead of adding a letter which does not match it
+    showQuestionFreeText(listener, guide = null, onWrongLetter = null) {
         // Shows a free text field, as well as a screen-keyboard
 
-        function updateEraseBtnState() {
+        // The written letters and the rest of the guide are shown in the same element,
+        // so the written letters cover their guide letters exactly
+        const writtenEl = document.createElement("span");
+        const restEl = document.createElement("span");
+        restEl.className = "rest";
+
+        function onTextChanged() {
             eraseBtn.disabled = displayField.value.length === 0;
+            if (guide) {
+                writtenEl.textContent = displayField.value;
+                restEl.textContent = guide.slice(displayField.value.length);
+            }
         }
 
         const wrapper = document.createElement("div");
@@ -821,11 +865,11 @@ class TestDomElements {
         eraseBtn.innerHTML = '<i class="ph-fill ph-backspace"></i>';
         eraseBtn.className = "btn erase-btn";
         eraseBtn.id = "free-text-erase-btn";
-        updateEraseBtnState();
+        onTextChanged();
 
         eraseBtn.addEventListener("click", () => {
             this.removeText(displayField, 1);
-            updateEraseBtnState();
+            onTextChanged();
             listener({ target: { value: displayField.value } });
             this.makeButtonGlow(eraseBtn.id);
         });
@@ -833,6 +877,13 @@ class TestDomElements {
         eraseBtn.addEventListener("contextmenu", (e) => e.preventDefault());
 
         textFieldWrapper.append(displayField);
+        if (guide) {
+            const guideEl = document.createElement("div");
+            guideEl.className = "form-control display-field writing-guidance";
+            guideEl.append(writtenEl, restEl);
+            textFieldWrapper.classList.add("guided");
+            textFieldWrapper.prepend(guideEl);
+        }
 
         // --- Letter buttons ---
         const buttonsWrapper = document.createElement("div");
@@ -848,8 +899,19 @@ class TestDomElements {
                 btn.disabled = true;
                 btn.id = "free-text-" + letter;
                 btn.addEventListener("click", () => {
+                    const position = displayField.selectionStart;
+                    const value = displayField.value;
+                    if (
+                        guide &&
+                        !guide.startsWith(
+                            value.slice(0, position) + letter + value.slice(position),
+                        )
+                    ) {
+                        onWrongLetter(btn.id);
+                        return;
+                    }
                     this.addText(displayField, letter);
-                    updateEraseBtnState();
+                    onTextChanged();
                     listener({ target: { value: displayField.value } });
                     this.makeButtonGlow(btn.id);
                 });
@@ -868,7 +930,8 @@ class TestDomElements {
         wrapper.append(buttonsWrapper); // below display
 
         this.choicesEl.append(wrapper);
-        this.toggleNextButton(true);
+        // With a guide, the "next" button only appears once the word is written
+        this.toggleNextButton(!guide);
         this.disableNextButton();
 
         return displayField;

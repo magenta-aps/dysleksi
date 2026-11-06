@@ -16,13 +16,20 @@ from django.test.utils import override_settings
 from simple_history.models import HistoricalChanges
 
 from dysleksi.management.commands.import_test import remove_json_comments
-from dysleksi.management.commands.update_or_create_tests import answer_test
+from dysleksi.management.commands.update_or_create_tests import (
+    answer_test,
+    create_dyslexia_tests,
+    make_import_test,
+)
 from dysleksi.models import (
+    DYSLEXIA_TEST_ADULT,
+    DYSLEXIA_TEST_CHILD,
     Class,
     QuestionResponse,
     Student,
     Test,
     TestPart,
+    TestPerson,
     TestResource,
     TestType,
 )
@@ -127,6 +134,37 @@ class CreateTests(DysleksiTest):
 
         self.assertEqual(word_reading_2_test.questions.count(), 105)
         self.assertEqual(wordspelling_test.questions.count(), 25)
+
+    def test_dyslexia_test_creation(self):
+        for test_name, questionnaire in (
+            (DYSLEXIA_TEST_ADULT, "Spørgeskema (voksne)"),
+            (DYSLEXIA_TEST_CHILD, "Spørgeskema (børn)"),
+        ):
+            with self.subTest(test_name=test_name):
+                test = Test.objects.get(name=test_name, test_type=TestType.DYSLEXIA)
+                self.assertEqual(
+                    [part["name"] for part in test.to_json(None)["parts"]],
+                    [
+                        questionnaire,
+                        "Lytteforståelse",
+                        "Hvad er nonord?",
+                        "3a – Vælg det, der ikke er et ord",
+                        "Stavemåde",
+                        "Læs nonord højt",
+                        "Stav nonord",
+                        "3b – Lexical Decision",
+                    ],
+                )
+        self.assertEqual(
+            TestPart.objects.get(name="Lytteforståelse").completion_source.name,
+            "resources/Enhanced L001-L014/L002.mp3",
+        )
+        self.assertEqual(
+            TestPart.objects.get(name="Stavemåde").completion_source.name,
+            "resources/Enhanced L001-L014/L011.mp3",
+        )
+        self.assertEqual(TestPart.objects.get(name="Stavemåde").timeout, 8 * 60 * 1000)
+        self.assertEqual(TestPart.objects.get(name="Lytteforståelse").timeout, 0)
 
     def test_resource_files_exist(self):
         media_root = Path(settings.RESOURCE_ROOT).parent
@@ -408,7 +446,7 @@ class CreateTests(DysleksiTest):
         with patch("builtins.print") as mock_print:
             call_command("answer_test", pk)
             mock_print.assert_called_with(
-                "Must specify --student for an individual test"
+                "Must specify --student for an individual or dyslexia test"
             )
 
     @patch("dysleksi.management.commands.update_or_create_tests.call_command")
@@ -418,6 +456,26 @@ class CreateTests(DysleksiTest):
 
         answer_test(test)
         mock_call_command.assert_not_called()
+
+    @patch("dysleksi.management.commands.update_or_create_tests.call_command")
+    def test_answer_dyslexia_test(self, mock_call_command):
+        test = Test.objects.filter(test_type=TestType.DYSLEXIA).first()
+        test_person = TestPerson.objects.get()
+
+        answer_test(test)
+        mock_call_command.assert_called_with(
+            "answer_test", test.pk, student=test_person.pk
+        )
+
+        TestPerson.objects.all().delete()
+        mock_call_command.reset_mock()
+        answer_test(test)
+        mock_call_command.assert_not_called()
+
+    @patch("dysleksi.management.commands.update_or_create_tests.answer_test")
+    def test_create_dyslexia_tests_with_answers(self, mock_answer_test):
+        create_dyslexia_tests(make_import_test(), create_answers=True)
+        self.assertEqual(mock_answer_test.call_count, 2)
 
     @patch("dysleksi.management.commands.update_or_create_tests.call_command")
     def test_answer_test_if_no_class(self, mock_call_command):

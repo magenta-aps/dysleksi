@@ -756,8 +756,9 @@ td.result {
   }
 }
 
-// Teacher UI for running individual tests
-div[data-role='teacher'][data-test-type='individual'] {
+// Teacher UI for running individual tests and dyslexia tests
+div[data-role='teacher'][data-test-type='individual'],
+div[data-role='teacher'][data-test-type='dyslexia'] {
   .card-header {
     background: $blue-lightest;
     border: 1px solid $blue-lighter-1;
@@ -896,7 +897,22 @@ div[data-role='teacher'][data-test-type='individual'] {
       text-align: center;
       font-family: "Karinika", "DM Sans Regular", sans-serif;
       font-weight: bold;
+
+      .audio {
+        padding: 0;
+        background: none;
+      }
     }
+  }
+}
+
+// The box keeps its size, however long the question is
+div[data-role='teacher'][data-test-type='dyslexia'] #question-container {
+  min-width: 0;
+
+  .current-question p {
+    margin: 0;
+    text-align: center;
   }
 }
 

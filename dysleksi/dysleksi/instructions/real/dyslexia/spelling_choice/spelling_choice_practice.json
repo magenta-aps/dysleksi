@@ -1,0 +1,223 @@
+[
+    {
+        "question_type": "multiple_choice",
+        "correct": "numi",
+        "sound": "resources/Enhanced L100-L109/L104.mp3",
+        "correct_index": 3,
+        "wrong": ["tupi", "tagi", "taga", "tati"],
+        "continue_when_instruction_is_complete": false,
+        "confirm_correct_answer": false,
+        "play_sound_when_instruction_is_complete": false,
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "choices"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "challenge-sound-btn"
+            },
+            // Nu skal du prøve at vælge nonord.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L100-L109/L100.mp3",
+                "delayAfter": 500
+            },
+            // I denne test skal du vælge det nonord, der bliver sagt.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L100-L109/L101.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "choices"
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "challenge-sound-btn"
+            },
+            // Eksempel
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L003.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choices"
+            },
+            // Her ser du fem nonord: tupi, tagi, taga, numi, tati.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L100-L109/L102.mp3",
+                "delayAfter": 750
+            },
+            // Det nonord, du skal vælge, siges:
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L100-L109/L103.mp3",
+                "delayAfter": 500
+            },
+            // numi
+            {
+                "action": "clickButton",
+                "element": "challenge-sound-btn",
+                "delayAfter": 1500
+            },
+            // Når "numi" findes blandt ordene og vælges, markeres det som det korrekte svar.
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-numi"
+            },
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L100-L109/L105.mp3",
+                "delayAfter": 500
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 0,
+                "element": "choice-numi"
+            }
+        ]
+    },
+    {
+        "question_type": "dyslexia_instruction_sequence_outro"
+    },
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L107.mp3",
+        "correct": "isii",
+        "correct_index": 2,
+        "wrong": ["isuu", "itii", "isiu", "ipii"],
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // Nu skal du prøve opgaven.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L004.mp3",
+                "delayAfter": 750
+            },
+            // Hvis du svarer forkert i øvelsen, bliver dit svar markeret med rødt.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L005.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 1500,
+                "element": "challenge-sound-btn"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "choice-isuu"
+            },
+            {
+                "action": "makeButtonAngry",
+                "delayAfter": 1250,
+                "element": "choice-isuu"
+            },
+            // Når du svarer rigtigt, bliver svaret grønt.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L006.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "choice-isii"
+            },
+            {
+                "action": "makeButtonHappy",
+                "delayAfter": 1250,
+                "element": "choice-isii"
+            },
+            // Du skal klikke på det nonord, som du hører.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L100-L109/L106.mp3",
+                "delayAfter": 1500
+            }
+        ],
+        "continue_when_instruction_is_complete": false,
+        "confirm_correct_answer": false,
+        "play_sound_when_instruction_is_complete": false
+    },
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L108.mp3",
+        "correct": "aagu",
+        "correct_index": 3,
+        "wrong": ["aava", "aavu", "aavi", "aaja"]
+    },
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L100-L109/L109.mp3",
+        "correct": "pama",
+        "correct_index": 4,
+        "wrong": ["pata", "patu", "pali", "pasi"]
+    },
+    {
+        "question_type": "no_input_required",
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "repeat"
+            },
+            // Nu er øvelsen slut.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L007.mp3",
+                "delayAfter": 750
+            },
+            // Nu begynder selve testen.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L008.mp3",
+                "delayAfter": 750
+            },
+            // I denne opgave får du ikke at vide, om dit svar er korrekt eller forkert. Hvis du er i tvivl, må du gerne gætte eller gå videre til næste opgave.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L009.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // Tryk på "Videre" for at starte testen.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L010.mp3",
+                "delayAfter": 0
+            }
+        ]
+    }
+]

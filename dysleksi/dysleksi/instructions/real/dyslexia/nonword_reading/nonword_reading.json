@@ -1,0 +1,322 @@
+[
+    {
+        "text": "ali",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "aqu",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "koq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "puu",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "iku",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "iik",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "aaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "uuk",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "nua",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "sai",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "kuna",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "nunu",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "ajuk",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "ukku",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "miut",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "amai",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "aamu",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "utsa",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "mooq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "tinu",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "muluk",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "iisak",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "uuteq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "iviaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "anila",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "kaava",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "takku",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "illat",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "arsoq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "sivoq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "kalasi",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "uusiak",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "naagoq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "alivoq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "siigut",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "punnaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "kituaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "tuttit",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "ungooq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "ikasik",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "qamitit",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "arnutaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "taloroq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "igilaaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "paseraq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "ivinnak",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "unussuk",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "atiliut",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "orfigaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "pinnaku",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "sinaffik",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "tiilutaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "ussiavik",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "iverutat",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "aapakooq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "ukittaat",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "inulugaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "taqussit",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "allaffak",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "affarfik",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "oqalussik",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "qimmernaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "taaterooq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "pinguaraq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "qappiaraq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "nilalugaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "ikiaqutat",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "toqqialik",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "mernertoq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "qaasuusaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "anungaasaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "puulliaraq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "qerianniaq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "meerlutooq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "kimmiaaraq",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "natuersaat",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "torrarsuut",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "pingunerut",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "mattoralik",
+        "question_type": "no_input_required"
+    },
+    {
+        "text": "nukkulivik",
+        "question_type": "no_input_required"
+    }
+]

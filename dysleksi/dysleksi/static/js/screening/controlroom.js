@@ -111,24 +111,13 @@ export class EventTable extends EventTarget {
             this.prevAnswer = data;
         }
 
-        const part = this.test.parts[data.partIndex];
-
         let rowEl;
         let partNameEl;
         let questionEl;
         let resultEl;
         let answerEl;
 
-        if (data.event === "question.feedback") {
-            // Add new row to table
-            rowEl = document.createElement("tr");
-            partNameEl = this.createTd("part-name");
-            questionEl = this.createTd("question");
-            resultEl = this.createTd("result");
-            answerEl = this.createTd("answer");
-            rowEl.append(partNameEl, questionEl, resultEl, answerEl);
-            this.eventsEl.prepend(rowEl);
-        } else if (data.event === "test.started") {
+        if (data.event === "test.started") {
             // Add new row to table, saying "Test is started"
             rowEl = document.createElement("tr");
             partNameEl = this.createTd("part-name");
@@ -139,6 +128,25 @@ export class EventTable extends EventTarget {
             this.eventsEl.prepend(rowEl);
             answerEl.textContent = data.message;
             return;
+        }
+
+        const part = this.test.parts[data.partIndex];
+        const question = part.questions[data.questionIndex];
+        // In a dyslexia test the student judges most answers by choosing an option
+        const answeredByStudent =
+            data.event === "question.answered" &&
+            data.correctness !== undefined &&
+            !question.isQuestionnaire;
+
+        if (data.event === "question.feedback" || answeredByStudent) {
+            // Add new row to table
+            rowEl = document.createElement("tr");
+            partNameEl = this.createTd("part-name");
+            questionEl = this.createTd("question");
+            resultEl = this.createTd("result");
+            answerEl = this.createTd("answer");
+            rowEl.append(partNameEl, questionEl, resultEl, answerEl);
+            this.eventsEl.prepend(rowEl);
         } else {
             // Modify existing row (created when handling `question.feedback` event)
             try {
@@ -157,10 +165,22 @@ export class EventTable extends EventTarget {
         partNameEl.textContent = part.name;
 
         // Update `question` cell
-        this.updateQuestionEl(questionEl, part.questions[data.questionIndex]);
+        this.updateQuestionEl(questionEl, question);
 
-        // Update `result` cell (teacher's assessment)
-        if (data.event === "question.feedback" && data.correctness !== undefined) {
+        // A word read aloud has no result
+        if (answeredByStudent && data.correctness !== null) {
+            resultEl.textContent =
+                data.textAnswer || this.correctnessLabel(data.correctness);
+        }
+
+        // The answer of a questionnaire is its result
+        if (data.event === "question.feedback" && question.isQuestionnaire) {
+            resultEl.append(this.createAnswerDropdown(data, question));
+        } else if (
+            data.event === "question.feedback" &&
+            data.correctness !== undefined
+        ) {
+            // Update `result` cell (teacher's assessment)
             const template = document.querySelector("template#edit-result");
             const clone = document.importNode(template.content, true);
             const button = clone.querySelector("button");
@@ -181,7 +201,7 @@ export class EventTable extends EventTarget {
         }
 
         // Hook "blur" events after adding all row elements
-        if (data.event === "question.feedback") {
+        if (data.event === "question.feedback" && !question.isQuestionnaire) {
             this.addBlurEventListener(rowEl, data);
         }
     }
@@ -191,23 +211,59 @@ export class EventTable extends EventTarget {
         for (const formElem of formElems) {
             formElem.addEventListener("blur", () => {
                 const correctnessBtn = rowEl.querySelector("button");
-                const correctness = correctnessBtn.dataset.correctness;
-                const detail = {
-                    uuid: crypto.randomUUID(),
-                    event: "question.feedback",
-                    assignmentId: data.assignmentId,
-                    partIndex: data.partIndex,
-                    partId: data.partId,
-                    questionIndex: data.questionIndex,
-                    questionId: data.questionId,
-                    practice: false,
-                    correctness: correctness,
-                };
-                this.dispatchEvent(
-                    new CustomEvent("questionFeedbackEdited", { detail: detail }),
-                );
+                this.editFeedback(data, {
+                    correctness: correctnessBtn.dataset.correctness,
+                });
             });
         }
+    }
+
+    editFeedback(data, changes) {
+        const detail = {
+            uuid: crypto.randomUUID(),
+            event: "question.feedback",
+            assignmentId: data.assignmentId,
+            partIndex: data.partIndex,
+            partId: data.partId,
+            questionIndex: data.questionIndex,
+            questionId: data.questionId,
+            practice: false,
+            ...changes,
+        };
+        this.dispatchEvent(
+            new CustomEvent("questionFeedbackEdited", { detail: detail }),
+        );
+    }
+
+    // The test leader may change the answer of a questionnaire afterwards
+    createAnswerDropdown(data, question) {
+        const template = document.querySelector("template#edit-result");
+        const clone = document.importNode(template.content, true);
+        const button = clone.querySelector("button");
+        button.classList.add("btn-outline-secondary");
+        button.textContent = question.possibleAnswers.find(
+            (a) => a.id === data.choiceId,
+        ).localizedResourceText;
+        const items = question.possibleAnswers.map((answer) => {
+            const item = document.createElement("a");
+            item.className = "dropdown-item";
+            item.classList.toggle("disabled", answer.locked);
+            item.href = "#";
+            item.textContent = answer.localizedResourceText;
+            item.addEventListener("click", (evt) => {
+                evt.preventDefault();
+                button.textContent = answer.localizedResourceText;
+                this.editFeedback(data, {
+                    correctness: "correct",
+                    choiceId: answer.id,
+                });
+            });
+            const li = document.createElement("li");
+            li.append(item);
+            return li;
+        });
+        clone.querySelector("ul").replaceChildren(...items);
+        return clone;
     }
 
     updateQuestionEl(questionEl, question) {
@@ -219,18 +275,32 @@ export class EventTable extends EventTarget {
         questionEl.append(numberEl);
         // Add challenge
         const challengeEl = document.createElement("span");
-        challengeEl.textContent = question.challengeText;
+        challengeEl.textContent = question.localizedChallengeText;
         challengeEl.classList.add("challenge");
         questionEl.append(challengeEl);
+        // A question without text, such as in "Lytteforståelse", shows its sound
+        if (!question.challengeText && question.challengeSoundUrl) {
+            challengeEl.append(this.createAudioEl(question.challengeSoundUrl));
+        }
+        // A question without a challenge, such as in "Vælg det, der ikke er et ord",
+        // shows the words on the student's screen
+        if (question.type === "multiple_choice" && !question.challengeId) {
+            challengeEl.textContent = question.possibleAnswers
+                .map((answer) => answer.resourceText)
+                .join(", ");
+        }
+    }
+
+    correctnessLabel(state) {
+        return state === "skipped"
+            ? "Sprunget over"
+            : state === "correct"
+              ? "Korrekt"
+              : "Forkert";
     }
 
     updateResultButtonState(button, state) {
-        button.textContent =
-            state === "skipped"
-                ? "Sprunget over"
-                : state === "correct"
-                  ? "Korrekt"
-                  : "Forkert";
+        button.textContent = this.correctnessLabel(state);
         button.classList.add(
             state === "skipped"
                 ? "btn-secondary"
@@ -256,18 +326,16 @@ export class EventTable extends EventTarget {
     updateAnswerEl(answerEl, data) {
         if (data.recordingBase64) {
             answerEl.append(this.createAudioEl(data.recordingBase64));
-        } else if (data.textAnswer) {
-            answerEl.textContent = data.textAnswer;
         } else {
-            answerEl.textContent = data.choiceId || "";
+            answerEl.textContent = "-";
         }
     }
 
-    createAudioEl(recordingBase64) {
+    createAudioEl(src) {
         const uiEl = document.createElement("div");
         uiEl.classList.add("audio");
         const audioEl = document.createElement("audio");
-        audioEl.src = recordingBase64;
+        audioEl.src = src;
         audioEl.preload = "auto";
         const playBtnEl = document.createElement("i");
         playBtnEl.classList.add("ph-fill", "ph-play");
@@ -847,12 +915,15 @@ export class ActionButtons {
             ),
         ];
         this.active = null;
+        this.choiceButtons = [];
+        this.chosenAnswer = null;
     }
 
     #toggleButtons(disabled) {
-        this.buttons
-            .filter((el) => el.id !== "paused")
-            .forEach((el) => el.classList.toggle("disabled", disabled));
+        [
+            ...this.buttons.filter((el) => el.id !== "paused"),
+            ...this.choiceButtons,
+        ].forEach((el) => el.classList.toggle("disabled", disabled));
     }
 
     disableButtons() {
@@ -865,7 +936,10 @@ export class ActionButtons {
 
     #questionFlowButtons() {
         const ids = ["correct", "wrong", "skipped", "next"];
-        return this.buttons.filter((el) => ids.includes(el.id));
+        return [
+            ...this.buttons.filter((el) => ids.includes(el.id)),
+            ...this.choiceButtons,
+        ];
     }
 
     freezeQuestionFlow() {
@@ -911,6 +985,36 @@ export class ActionButtons {
             this.skipButton(),
         ]) {
             btn.classList.toggle("disabled", !state);
+        }
+    }
+
+    // The test leader answers a questionnaire in place of correct, wrong or skipped.
+    // A locked answer is shown, but cannot be chosen
+    showQuestionnaireChoices(answers) {
+        this.chosenAnswer = null;
+        this.choiceButtons = answers.map((answer) => {
+            const button = document.createElement("button");
+            button.className = "btn btn-outline-primary";
+            button.textContent = answer.localizedResourceText;
+            button.disabled = answer.locked;
+            button.addEventListener("click", () => {
+                this.chosenAnswer = answer;
+                this.choiceButtons.forEach((el) =>
+                    el.classList.toggle("active", el === button),
+                );
+                this.enableNextButton();
+            });
+            return button;
+        });
+        document
+            .querySelector("#questionnaire-choices")
+            .replaceChildren(...this.choiceButtons);
+        for (const btn of [
+            this.correctButton(),
+            this.wrongButton(),
+            this.skipButton(),
+        ]) {
+            btn.classList.toggle("d-none", answers.length > 0);
         }
     }
 
@@ -1003,8 +1107,12 @@ export class NoteField {
     }
 
     show() {
+        this.toggle(true);
+    }
+
+    toggle(show) {
         if (this.noteEl !== null) {
-            this.noteEl.classList.toggle("d-none", false);
+            this.noteEl.classList.toggle("d-none", !show);
         }
     }
 }
@@ -1064,10 +1172,24 @@ export class QuestionView {
             } else {
                 txt.style.fontSize = "40px";
             }
+            this.shrinkToFit(txt);
         } else {
             if (txt) {
                 txt.remove();
             }
+        }
+    }
+
+    // Long texts, such as the questions of a questionnaire, shrink to fit the box
+    shrinkToFit(txt) {
+        const box = this.contentElement;
+        let size = parseInt(txt.style.fontSize);
+        while (
+            size > 12 &&
+            (box.scrollHeight > box.clientHeight || box.scrollWidth > box.clientWidth)
+        ) {
+            size--;
+            txt.style.fontSize = `${size}px`;
         }
     }
 
@@ -1613,19 +1735,36 @@ export class TeacherView {
                 this.navigateAway.toggle(false);
             }
 
-            if (this.test.testType === "individual") {
+            if (this.test.testType !== "group") {
                 if (data.event === "instructions.started") {
                     this.showingInstructions = true;
                     this.buttons.disableNextButton();
                 }
                 if (data.event === "instructions.completed") {
                     this.showingInstructions = false;
-                    this.buttons.enableNextButton();
+                    if (
+                        this.elapsedTimeView !== null &&
+                        !this.currentIsPractice &&
+                        !this.elapsedTimeView.running
+                    ) {
+                        this.elapsedTimeView.start();
+                    }
+                    // In a dyslexia test the student moves on from the instructions
+                    if (this.test.testType !== "dyslexia") {
+                        this.buttons.enableNextButton();
+                    }
                 }
                 if (data.event === "test.started") {
                     this.table.updateTable(data);
                     this.studentPresence.markStudentArrived();
                     this.navigateAway.toggle(true);
+                }
+                if (data.event === "part.complete") {
+                    // The student sees the outro until the next question is displayed
+                    this.hideQuestion();
+                    this.buttons.disableButtons();
+                    this.buttons.pauseButton().disabled = true;
+                    this.gotoNextResultGroupButton.classList.add("disabled");
                 }
                 if (data.event === "test.complete") {
                     this.completedStudentIds.add(data.student.id);
@@ -1636,13 +1775,24 @@ export class TeacherView {
 
             if (
                 ["question.answered", "question.displayed"].includes(data.event) &&
-                this.test.testType === "individual"
+                this.test.testType !== "group"
             ) {
                 if (data.event === "question.displayed") {
                     this.setPartIndex(data.partIndex);
                     this.setQuestionIndex(data.questionIndex, data.practice);
                     this.buttons.enableButtons();
-                    if (this.currentQuestionRequiresNoStudentInput()) {
+                    this.buttons.pauseButton().disabled = false;
+                    this.noteField.toggle(
+                        Boolean(this.currentQuestion.isQuestionnaire),
+                    );
+                    if (this.test.testType === "dyslexia") {
+                        this.buttons.toggleCorrectnessChoices(false);
+                        this.buttons.showQuestionnaireChoices(
+                            this.currentQuestion.isQuestionnaire
+                                ? this.currentQuestion.possibleAnswers
+                                : [],
+                        );
+                    } else if (this.currentQuestionRequiresNoStudentInput()) {
                         // Disable "correct", "wrong", "skipped" buttons during practice questions
                         this.buttons.toggleCorrectnessChoices(!data.practice);
                         // Let teacher continue flow using "next" button in practice questions.
@@ -1666,10 +1816,13 @@ export class TeacherView {
                     this.showQuestion();
                 }
 
-                // Update "elapsed time"
+                // Update "elapsed time". It starts once the instructions have played.
                 if (this.elapsedTimeView !== null) {
                     if (!data.practice) {
-                        if (data.event === "question.displayed") {
+                        if (
+                            data.event === "question.displayed" &&
+                            !this.currentQuestion.instruction_sequence
+                        ) {
                             this.elapsedTimeView.start();
                         }
                         if (data.event === "question.answered") {
@@ -1726,12 +1879,12 @@ export class TeacherView {
 
             if (
                 ["question.answered", "question.feedback"].includes(data.event) &&
-                this.test.testType === "individual"
+                this.test.testType !== "group"
             ) {
                 this.table.updateTable(data);
             }
 
-            if (this.test.testType === "individual" && this.audioIndicator !== null) {
+            if (this.test.testType !== "group" && this.audioIndicator !== null) {
                 if (data.event === "test.started") {
                     this.audioIndicator.render(0); // Render initial (inanimate) state
                 }
@@ -1744,7 +1897,7 @@ export class TeacherView {
                 }
             }
 
-            if (this.test.testType === "individual" && data.event === "audio.silent") {
+            if (this.test.testType !== "group" && data.event === "audio.silent") {
                 // Display error on teacher's device
                 const student = new Student(data.student);
                 this.onStudentSetupError({ studentDisplayName: student.displayName });
@@ -2082,6 +2235,12 @@ export class TeacherView {
                         // Delay sending feedback until teacher clicks 'Next' button
                         this.buttons.setActive(val);
                     }
+                } else if (this.currentQuestion.isQuestionnaire) {
+                    // Any answer to a questionnaire counts as correct
+                    this.sendQuestionFeedback("correct", this.buttons.chosenAnswer.id);
+                    this.hideQuestion();
+                    this.noteField.clearNote();
+                    this.buttons.disableButtons();
                 } else {
                     // Send feedback immediately
                     this.sendQuestionFeedback(val);
@@ -2154,7 +2313,7 @@ export class TeacherView {
             );
             try {
                 this.setPartIndex(nextPartIndex);
-                this.setQuestionIndex(0, false);
+                this.setQuestionIndex(0, this.currentPart.practice.length > 0);
                 this.sendQuestionChanged();
             } catch {
                 console.debug(
@@ -2207,7 +2366,7 @@ export class TeacherView {
         });
     }
 
-    sendQuestionFeedback(correctness) {
+    sendQuestionFeedback(correctness, choiceId) {
         const data = {
             uuid: crypto.randomUUID(),
             event: "question.feedback",
@@ -2217,6 +2376,7 @@ export class TeacherView {
             partId: this.currentPart.id,
             assignmentId: this.assignmentId,
             correctness: correctness,
+            choiceId: choiceId,
             note: this.noteField.getNote(),
             practice: this.currentIsPractice,
         };
@@ -2235,7 +2395,7 @@ export class TeacherView {
     sendQuestionFeedbackToServer(data) {
         // Send question feedback to the server
         /* istanbul ignore next */
-        if (this.test.testType === "individual") {
+        if (this.test.testType !== "group") {
             // Get the student ID
             const studentIds = Object.keys(this.studentChannels);
             if (studentIds.length === 1) {
@@ -2269,7 +2429,7 @@ export class TeacherView {
             `${this.questionIndex + 1}/${this.currentPart.questions.length} (${this.currentPart.name})`,
         );
         this.questionView.showContent(
-            this.currentQuestion.challengeText,
+            this.currentQuestion.localizedChallengeText,
             this.currentQuestion.challengeImageUrl,
         );
     }

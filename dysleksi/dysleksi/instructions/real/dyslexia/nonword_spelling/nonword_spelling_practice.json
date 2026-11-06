@@ -1,0 +1,287 @@
+[
+    {
+        "question_type": "free_text",
+        "sound": "resources/Enhanced L400-L412/L402.mp3",
+        "correct": "ukaloq",
+        "continue_when_instruction_is_complete": false,
+        "play_sound_when_instruction_is_complete": false,
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "choices"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "challenge-sound-btn"
+            },
+            // Du skal nu gennemføre en skrivetest.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L400-L412/L400.mp3",
+                "delayAfter": 500
+            },
+            // I denne test skal du høre det nonord, der skal skrives.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L400-L412/L401.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "choices"
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "challenge-sound-btn"
+            },
+            // ukaloq
+            {
+                "action": "waitForUserClick",
+                "element": "challenge-sound-btn",
+                "delayAfter": 2000
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "free-text-u"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "free-text-k"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "free-text-a"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "free-text-l"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "free-text-o"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "free-text-q"
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "waitForUserClick",
+                "element": "next",
+                "delayAfter": 0
+            }
+        ]
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/Enhanced L400-L412/L404.mp3",
+        "correct": "tutilak",
+        "continue_when_instruction_is_complete": false,
+        "play_sound_when_instruction_is_complete": false,
+        "instruction_sequence": [
+            // Eksempel
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L003.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "free-text-field"
+            },
+            // Det nonord, der skal skrives, siges:
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L400-L412/L403.mp3",
+                "delayAfter": 500
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 2000,
+                "element": "challenge-sound-btn"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "free-text-t"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "free-text-u"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "free-text-t"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "free-text-i"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "free-text-l"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "free-text-a"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 750,
+                "element": "free-text-q"
+            },
+            // Hvis du vil ændre dit svar, kan du slette det, du har skrevet, og skrive igen.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L400-L412/L405.mp3",
+                "delayAfter": 500
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 1250,
+                "element": "free-text-erase-btn"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 1250,
+                "element": "free-text-k"
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "waitForUserClick",
+                "delayAfter": 0,
+                "element": "next"
+            }
+        ]
+    },
+    {
+        "question_type": "dyslexia_instruction_sequence_outro"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/Enhanced L400-L412/L407.mp3",
+        "correct": "toq",
+        "writing_guidance": true,
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // Nu skal du prøve opgaven.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L004.mp3",
+                "delayAfter": 750
+            },
+            // Du skal skrive det nonord, du hører.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L400-L412/L406.mp3",
+                "delayAfter": 0
+            }
+        ],
+        "continue_when_instruction_is_complete": false
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/Enhanced L400-L412/L408.mp3",
+        "correct": "ullakkat",
+        "writing_guidance": true
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/Enhanced L400-L412/L410.mp3",
+        "correct": "sana",
+        // Hvis du er færdig med at taste, kan du nu trykke på knappen "Videre".
+        "reminder": 10000,
+        "reminder_source": "resources/Enhanced L400-L412/L411.mp3",
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // Nu skal du selv skrive.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L400-L412/L409.mp3",
+                "delayAfter": 0
+            }
+        ],
+        "continue_when_instruction_is_complete": false
+    },
+    {
+        "question_type": "no_input_required",
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // Nu er øvelsen slut.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L007.mp3",
+                "delayAfter": 750
+            },
+            // Nu begynder selve testen.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L008.mp3",
+                "delayAfter": 750
+            },
+            // I denne opgave får du ikke at vide, hvilke bogstaver du skal skrive. Hvis du er i tvivl om, hvad du skal skrive, kan du gætte.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L400-L412/L412.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // Tryk på "Videre" for at starte testen.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L010.mp3",
+                "delayAfter": 0
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            }
+        ]
+    }
+]

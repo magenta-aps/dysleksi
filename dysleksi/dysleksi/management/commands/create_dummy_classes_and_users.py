@@ -5,7 +5,15 @@ from datetime import date
 
 from django.core.management.base import BaseCommand
 
-from dysleksi.models import Class, Institution, ReadingSupervisor, Student, Teacher
+from dysleksi.models import (
+    Class,
+    Institution,
+    ReadingSupervisor,
+    Student,
+    Teacher,
+    TestLeader,
+    TestPerson,
+)
 
 
 class Command(BaseCommand):
@@ -80,6 +88,26 @@ class Command(BaseCommand):
             reading_supervisor.set_password("læsevejleder")
             reading_supervisor.save()
         reading_supervisor.institutions.add(school)
+
+        # Create test leader and test person for the dyslexia test
+        test_leader, created = TestLeader.objects.update_or_create(
+            username="testleder",
+            defaults={"first_name": "Test", "last_name": "Ledersen"},
+        )
+        if created:
+            test_leader.set_password("testleder")
+            test_leader.save()
+
+        test_person, created = TestPerson.objects.update_or_create(
+            username="testperson",
+            defaults={
+                "first_name": "Test",
+                "last_name": "Persen",
+            },
+        )
+        if created:
+            test_person.set_password("testperson")
+            test_person.save()
 
         # Create student who is in idp
         student, created = Student.objects.update_or_create(

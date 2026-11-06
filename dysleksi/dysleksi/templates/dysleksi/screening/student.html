@@ -17,7 +17,11 @@
 <div id="test-cancelled" class="blocking-popup d-none" role="alert">
     <div class="blocking-popup-message">
         <h2>{% translate "Testen er afbrudt" %}</h2>
+        {% if test_type == "dyslexia" %}
+        <p>{% translate "Din testleder har afbrudt testen." %}</p>
+        {% else %}
         <p>{% translate "Din lærer har afbrudt testen." %}</p>
+        {% endif %}
         <button type="button" class="btn task-btn" id="test-cancelled-log-out">
             {% translate "Log ud" %} <i class="ph-fill ph-sign-out"></i>
         </button>
@@ -37,7 +41,11 @@
 
 <div id="connection-lost-overlay" class="center-screen">
     <i class="ph-fill ph-wifi-slash"></i>
+    {% if test_type == "dyslexia" %}
+    <h2>{% translate "Ingen forbindelse til testlederen" %}</h2>
+    {% else %}
     <h2>{% translate "Ingen forbindelse til læreren" %}</h2>
+    {% endif %}
 </div>
 
 <div id="mic-lost-overlay" class="center-screen">
@@ -70,6 +78,8 @@
 <button id="skip-summary" class="debug-button">
     DEBUG: Skip summary
 </button>
+
+<div id="skip-to-part"></div>
 
 </div>
 {% endif %}
@@ -190,6 +200,9 @@
         </div>
         <button id="next" class="btn next-btn" style="visibility: hidden;"></button>
         <button id="repeat" class="btn repeat-btn" data-hide-display="true" style="display: none;"></button>
+        <button id="replay-instructions" class="replay-instructions-btn" style="visibility: hidden;">
+            <i class="ph ph-speaker-high"></i>
+        </button>
     </div>
 </div>
 

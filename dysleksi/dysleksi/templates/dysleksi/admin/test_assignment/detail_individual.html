@@ -63,7 +63,7 @@
                     <i class="ph-fill ph-skip-forward"></i>
                     {% translate 'Hop til næste del' %}
                 </button>
-                <button id="paused" class="btn btn-outline-secondary me-2">
+                <button id="paused" disabled=true class="btn btn-outline-secondary me-2">
                     <i class="ph-fill ph-pause"></i>
                 </button>
                 <span class="d-inline-block">
@@ -106,16 +106,20 @@
                         </button>
                     </div>
                 </div>
+                {% block note %}
+                {% endblock %}
                 <button id="next" class="btn btn-primary disabled">
                     {% translate 'Næste opgave' %}
                 </button>
             </div>
             <div id="audio-indicator" class="d-flex"></div>
             <div class="result-link ms-auto mt-auto">
+                {% block result_link %}
                 <div id="result-link-disabled" class="d-inline" title="{% translate 'Testen skal gennemføres først' %}">
                     <button class="btn btn-outline-secondary" disabled="disabled" aria-disabled="true">{% translate "Se resultater" %}</button>
                 </div>
                 <a id="result-link-enabled" class="btn btn-outline-secondary d-none" href="{% url 'dysleksi:test_assignment_results' pk=object.pk %}">{% translate "Se resultater" %}</a>
+                {% endblock %}
             </div>
         </div>
     </div>
@@ -138,7 +142,8 @@
 
 <template id="edit-result">
     <div class="btn-group">
-        <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <button type="button" class="btn dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false"
+                data-bs-popper-config='{"strategy": "fixed"}'>
         </button>
         <ul class="dropdown-menu">
             <li><a class="dropdown-item" href="#correct">{% translate 'Korrekt' %}</a></li>

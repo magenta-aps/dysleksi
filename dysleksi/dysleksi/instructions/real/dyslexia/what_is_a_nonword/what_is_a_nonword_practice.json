@@ -1,0 +1,285 @@
+[
+    {
+        "question_type": "no_input_required",
+        "text": "kavaallit",
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "question-challenge"
+            },
+            // Før øvelserne starter, får du først en instruktion om, hvad et nonord er.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L600-L611/L600.mp3",
+                "delayAfter": 750
+            },
+            // Et nonord er ikke et ord.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L600-L611/L601.mp3",
+                "delayAfter": 750
+            },
+            // Det har ingen betydning.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L600-L611/L602.mp3",
+                "delayAfter": 750
+            },
+            // Nonordet kan udtales og læses.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L600-L611/L603.mp3",
+                "delayAfter": 750
+            },
+            // Eksempel
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L003.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "question-challenge"
+            },
+            // kavaallit
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L600-L611/L604.mp3",
+                "delayAfter": 750
+            },
+            // Det er et nonord, som kan ligne rigtige ord både i udtale og udseende.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L600-L611/L605.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            }
+        ]
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "taffi",
+        "sound": "resources/Enhanced L600-L611/L606.mp3",
+        "correct": "false",
+        "wrong": ["true"],
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "question-challenge"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "choices"
+            },
+            // Nu skal du prøve opgaven.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L004.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "question-challenge"
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "choices"
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "challenge-text"
+            },
+            // taffi
+            {
+                "action": "clickButton",
+                "element": "challenge-sound-btn",
+                "delayAfter": 1500
+            },
+            // Er det et ord?
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L013.mp3",
+                "delayAfter": 0
+            }
+        ],
+        "continue_when_instruction_is_complete": false,
+        "play_sound_when_instruction_is_complete": false
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "meeraq",
+        "sound": "resources/Enhanced L600-L611/L607.mp3",
+        "correct": "true",
+        "wrong": ["false"],
+        "instruction_sequence": [
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "challenge-text"
+            },
+            // meeraq
+            {
+                "action": "clickButton",
+                "element": "challenge-sound-btn",
+                "delayAfter": 1750
+            },
+            // Er det et ord?
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L013.mp3",
+                "delayAfter": 0
+            }
+        ],
+        "continue_when_instruction_is_complete": false,
+        "play_sound_when_instruction_is_complete": false
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "iillaat",
+        "sound": "resources/Enhanced L600-L611/L608.mp3",
+        "correct": "false",
+        "wrong": ["true"],
+        "instruction_sequence": [
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "challenge-text"
+            },
+            // iillaat
+            {
+                "action": "clickButton",
+                "element": "challenge-sound-btn",
+                "delayAfter": 2000
+            },
+            // Er det et ord?
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L013.mp3",
+                "delayAfter": 0
+            }
+        ],
+        "continue_when_instruction_is_complete": false,
+        "play_sound_when_instruction_is_complete": false
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "ullaajutit",
+        "sound": "resources/Enhanced L600-L611/L609.mp3",
+        "correct": "false",
+        "wrong": ["true"],
+        "instruction_sequence": [
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "challenge-text"
+            },
+            // ullaajutit
+            {
+                "action": "clickButton",
+                "element": "challenge-sound-btn",
+                "delayAfter": 2250
+            },
+            // Er det et ord?
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L013.mp3",
+                "delayAfter": 0
+            }
+        ],
+        "continue_when_instruction_is_complete": false,
+        "play_sound_when_instruction_is_complete": false
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "kamisat",
+        "sound": "resources/Enhanced L600-L611/L610.mp3",
+        "correct": "true",
+        "wrong": ["false"],
+        "instruction_sequence": [
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "challenge-text"
+            },
+            // kamisat
+            {
+                "action": "clickButton",
+                "element": "challenge-sound-btn",
+                "delayAfter": 1750
+            },
+            // Er det et ord?
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L013.mp3",
+                "delayAfter": 0
+            }
+        ],
+        "continue_when_instruction_is_complete": false,
+        "play_sound_when_instruction_is_complete": false
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "aput",
+        "sound": "resources/Enhanced L600-L611/L611.mp3",
+        "correct": "true",
+        "wrong": ["false"],
+        "instruction_sequence": [
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "challenge-text"
+            },
+            // aput
+            {
+                "action": "clickButton",
+                "element": "challenge-sound-btn",
+                "delayAfter": 1500
+            },
+            // Er det et ord?
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L013.mp3",
+                "delayAfter": 0
+            }
+        ],
+        "continue_when_instruction_is_complete": false,
+        "play_sound_when_instruction_is_complete": false
+    },
+    {
+        "question_type": "no_input_required",
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // Nu er øvelsen slut.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L007.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            }
+        ]
+    }
+]

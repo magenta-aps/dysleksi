@@ -1,0 +1,345 @@
+[
+    // Opgave 1
+    {
+        "question_type": "multiple_choice",
+        "correct": "ika",
+        "correct_index": 0,
+        "wrong": ["iki", "kia", "aki", "isi"]
+    },
+    // Opgave 2
+    {
+        "question_type": "multiple_choice",
+        "correct": "amu",
+        "correct_index": 3,
+        "wrong": ["anu", "niu", "una", "ani"]
+    },
+    // Opgave 3
+    {
+        "question_type": "multiple_choice",
+        "correct": "amoq",
+        "correct_index": 1,
+        "wrong": ["imeq", "imaq", "ameq", "oqaq"]
+    },
+    // Opgave 4
+    {
+        "question_type": "multiple_choice",
+        "correct": "eqat",
+        "correct_index": 0,
+        "wrong": ["oqaq", "akka", "inuk", "ateq"]
+    },
+    // Opgave 5
+    {
+        "question_type": "multiple_choice",
+        "correct": "kiiga",
+        "correct_index": 2,
+        "wrong": ["kaagi", "agiaq", "iigaq", "naaja"]
+    },
+    // Opgave 6
+    {
+        "question_type": "multiple_choice",
+        "correct": "saleq",
+        "correct_index": 1,
+        "wrong": ["suluk", "qisuk", "taleq", "sinik"]
+    },
+    // Opgave 7
+    {
+        "question_type": "multiple_choice",
+        "correct": "kaateq",
+        "correct_index": 2,
+        "wrong": ["ikusik", "qaqqaq", "kalleq", "kaataq"]
+    },
+    // Opgave 8
+    {
+        "question_type": "multiple_choice",
+        "correct": "satsik",
+        "correct_index": 3,
+        "wrong": ["tatsit", "sakkut", "nissut", "qitsuk"]
+    },
+    // Opgave 9
+    {
+        "question_type": "multiple_choice",
+        "correct": "naanoq",
+        "correct_index": 4,
+        "wrong": ["qooroq", "naavoq", "qaqqa", "naasoq"]
+    },
+    // Opgave 10
+    {
+        "question_type": "multiple_choice",
+        "correct": "qarsak",
+        "correct_index": 1,
+        "wrong": ["qorsuk", "kassoq", "qarsoq", "qarmaq"]
+    },
+    // Opgave 11
+    {
+        "question_type": "multiple_choice",
+        "correct": "uti",
+        "correct_index": 1,
+        "wrong": ["ulu", "asi", "uta", "usi"]
+    },
+    // Opgave 12
+    {
+        "question_type": "multiple_choice",
+        "correct": "kaa",
+        "correct_index": 2,
+        "wrong": ["aak", "kia", "qaa", "aap"]
+    },
+    // Opgave 13
+    {
+        "question_type": "multiple_choice",
+        "correct": "issa",
+        "correct_index": 2,
+        "wrong": ["issi", "sila", "siku", "timi"]
+    },
+    // Opgave 14
+    {
+        "question_type": "multiple_choice",
+        "correct": "papa",
+        "correct_index": 3,
+        "wrong": ["ipeq", "paaq", "pana", "appa"]
+    },
+    // Opgave 15
+    {
+        "question_type": "multiple_choice",
+        "correct": "quuva",
+        "correct_index": 4,
+        "wrong": ["qania", "qaava", "paava", "taava"]
+    },
+    // Opgave 16
+    {
+        "question_type": "multiple_choice",
+        "correct": "akioq",
+        "correct_index": 3,
+        "wrong": ["umiaq", "aamaq", "kaneq", "ukioq"]
+    },
+    // Opgave 17
+    {
+        "question_type": "multiple_choice",
+        "correct": "nammik",
+        "correct_index": 4,
+        "wrong": ["mannik", "nannut", "maani", "meeraq"]
+    },
+    // Opgave 18
+    {
+        "question_type": "multiple_choice",
+        "correct": "agivoq",
+        "correct_index": 1,
+        "wrong": ["igavoq", "anivoq", "qiavoq", "anivoq"]
+    },
+    // Opgave 19
+    {
+        "question_type": "multiple_choice",
+        "correct": "teqinaq",
+        "correct_index": 2,
+        "wrong": ["saqisoq", "seqineq", "teqqiaq", "qaqivoq"]
+    },
+    // Opgave 20
+    {
+        "question_type": "multiple_choice",
+        "correct": "palitaq",
+        "correct_index": 0,
+        "wrong": ["pilutaq", "tupilak", "nipisak", "tigusaq"]
+    },
+    // Opgave 21
+    {
+        "question_type": "multiple_choice",
+        "correct": "nuni",
+        "correct_index": 4,
+        "wrong": ["timi", "nuka", "nuna", "nanu"]
+    },
+    // Opgave 22
+    {
+        "question_type": "multiple_choice",
+        "correct": "ikai",
+        "correct_index": 2,
+        "wrong": ["ilai", "isai", "ipai", "inai"]
+    },
+    // Opgave 23
+    {
+        "question_type": "multiple_choice",
+        "correct": "aveeq",
+        "correct_index": 3,
+        "wrong": ["qanoq", "aasaq", "qajaq", "aaveq"]
+    },
+    // Opgave 24
+    {
+        "question_type": "multiple_choice",
+        "correct": "tavik",
+        "correct_index": 2,
+        "wrong": ["tikeq", "kumak", "taleq", "savik"]
+    },
+    // Opgave 25
+    {
+        "question_type": "multiple_choice",
+        "correct": "kasoq",
+        "correct_index": 0,
+        "wrong": ["kaneq", "issoq", "orsoq", "tikeq"]
+    },
+    // Opgave 26
+    {
+        "question_type": "multiple_choice",
+        "correct": "unnaq",
+        "correct_index": 1,
+        "wrong": ["unneq", "innaq", "aaveq", "inneq"]
+    },
+    // Opgave 27
+    {
+        "question_type": "multiple_choice",
+        "correct": "tattut",
+        "correct_index": 4,
+        "wrong": ["taallaq", "uukkat", "tuttut", "tarraq"]
+    },
+    // Opgave 28
+    {
+        "question_type": "multiple_choice",
+        "correct": "kulleq",
+        "correct_index": 3,
+        "wrong": ["qarsoq", "kulloq", "qorfik", "kalleq"]
+    },
+    // Opgave 29
+    {
+        "question_type": "multiple_choice",
+        "correct": "atuagoq",
+        "correct_index": 1,
+        "wrong": ["allarut", "aggerit", "atugaq", "qiuutit"]
+    },
+    // Opgave 30
+    {
+        "question_type": "multiple_choice",
+        "correct": "neraseq",
+        "correct_index": 3,
+        "wrong": ["qarasaq", "nerisoq", "naraseq", "miseraq"]
+    },
+    // Opgave 31
+    {
+        "question_type": "multiple_choice",
+        "correct": "assu",
+        "correct_index": 4,
+        "wrong": ["atsa", "akka", "illu", "sila"]
+    },
+    // Opgave 32
+    {
+        "question_type": "multiple_choice",
+        "correct": "affu",
+        "correct_index": 1,
+        "wrong": ["appa", "illu", "sila", "inai"]
+    },
+    // Opgave 33
+    {
+        "question_type": "multiple_choice",
+        "correct": "miisa",
+        "correct_index": 0,
+        "wrong": ["maani", "niisa", "malik", "sinik"]
+    },
+    // Opgave 34
+    {
+        "question_type": "multiple_choice",
+        "correct": "atsoq",
+        "correct_index": 1,
+        "wrong": ["asseq", "itsaq", "orsoq", "arsaq"]
+    },
+    // Opgave 35
+    {
+        "question_type": "multiple_choice",
+        "correct": "aateq",
+        "correct_index": 2,
+        "wrong": ["arnaq", "aasaq", "erneq", "tikeq"]
+    },
+    // Opgave 36
+    {
+        "question_type": "multiple_choice",
+        "correct": "angoq",
+        "correct_index": 3,
+        "wrong": ["angut", "qanoq", "arsaq", "qaneq"]
+    },
+    // Opgave 37
+    {
+        "question_type": "multiple_choice",
+        "correct": "asiguk",
+        "correct_index": 1,
+        "wrong": ["akiseq", "isigak", "sigguk", "kiggeq"]
+    },
+    // Opgave 38
+    {
+        "question_type": "multiple_choice",
+        "correct": "maareq",
+        "correct_index": 0,
+        "wrong": ["qeeraq", "meeraq", "meqqut", "qaqqaq"]
+    },
+    // Opgave 39
+    {
+        "question_type": "multiple_choice",
+        "correct": "siinalik",
+        "correct_index": 4,
+        "wrong": ["sialuit", "inuusaq", "saaniluk", "iipilit"]
+    },
+    // Opgave 40
+    {
+        "question_type": "multiple_choice",
+        "correct": "igitsoq",
+        "correct_index": 1,
+        "wrong": ["ikitsit", "igutsak", "iggavik", "inuusaq"]
+    },
+    // Opgave 41
+    {
+        "question_type": "multiple_choice",
+        "correct": "sisa",
+        "correct_index": 3,
+        "wrong": ["issi", "sava", "isaa", "siku"]
+    },
+    // Opgave 42
+    {
+        "question_type": "multiple_choice",
+        "correct": "amioq",
+        "correct_index": 4,
+        "wrong": ["aasaq", "ukioq", "umiaq", "aamma"]
+    },
+    // Opgave 43
+    {
+        "question_type": "multiple_choice",
+        "correct": "arnoq",
+        "correct_index": 0,
+        "wrong": ["erneq", "arnaq", "orpik", "arsaq"]
+    },
+    // Opgave 44
+    {
+        "question_type": "multiple_choice",
+        "correct": "tarruk",
+        "correct_index": 4,
+        "wrong": ["torrak", "taallaq", "kalleq", "kulloq"]
+    },
+    // Opgave 45
+    {
+        "question_type": "multiple_choice",
+        "correct": "aqiluk",
+        "correct_index": 0,
+        "wrong": ["ukaleq", "eqaluk", "akiseq", "isigak"]
+    },
+    // Opgave 46
+    {
+        "question_type": "multiple_choice",
+        "correct": "naggut",
+        "correct_index": 2,
+        "wrong": ["naggat", "marluk", "nilleq", "kiggeq"]
+    },
+    // Opgave 47
+    {
+        "question_type": "multiple_choice",
+        "correct": "muivoq",
+        "correct_index": 0,
+        "wrong": ["nuivoq", "kuivoq", "niuvoq", "usivoq"]
+    },
+    // Opgave 48
+    {
+        "question_type": "multiple_choice",
+        "correct": "saniffak",
+        "correct_index": 2,
+        "wrong": ["ulloriaq", "siniffik", "uffarfik", "saaniluk"]
+    },
+    // Opgave 49
+    {
+        "question_type": "multiple_choice",
+        "correct": "pattoqat",
+        "correct_index": 2,
+        "wrong": ["puttaqut", "allaffik", "annoraaq", "allakkat"]
+    }
+]

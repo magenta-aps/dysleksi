@@ -1,0 +1,256 @@
+[
+    {
+        "question_type": "multiple_choice",
+        "text": "nasaq",
+        "correct": "true",
+        "wrong": ["false"],
+        "continue_when_instruction_is_complete": false,
+        "confirm_correct_answer": false,
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "choices"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "question-challenge"
+            },
+            // Nu skal du gennemføre en test med ord og nonord.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L300-L309/L300.mp3",
+                "delayAfter": 500
+            },
+            // I denne opgave skal du vælge imellem et ord og et nonord.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L300-L309/L301.mp3",
+                "delayAfter": 750
+            },
+            // Eksempel
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L003.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "question-challenge"
+            },
+            // Her er det, der skal læses.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L300-L309/L302.mp3",
+                "delayAfter": 500
+            },
+            // Der står "nasaq".
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L300-L309/L303.mp3",
+                "delayAfter": 750
+            },
+            // Er "nasaq" et ord?
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L300-L309/L304.mp3",
+                "delayAfter": 0
+            },
+            {
+                "action": "show",
+                "delayAfter": 1500,
+                "element": "choices"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 1000,
+                "element": "choice-true"
+            },
+            {
+                "action": "waitForUserClick",
+                "element": "next",
+                "delayAfter": 0
+             }
+        ]
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "nusoq",
+        "correct": "false",
+        "wrong": ["true"],
+        "continue_when_instruction_is_complete": false,
+        "confirm_correct_answer": false,
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "show",
+                "delayAfter": 1000,
+                "element": "question-challenge"
+            },
+            // nusoq
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L300-L309/L305.mp3",
+                "delayAfter": 750
+            },
+            // Er "nusoq" et ord?
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L300-L309/L306.mp3",
+                "delayAfter": 500
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 1000,
+                "element": "choice-false"
+            },
+            {
+                "action": "waitForUserClick",
+                "element": "next",
+                "delayAfter": 0
+             }
+        ]
+    },
+    {
+        "question_type": "dyslexia_instruction_sequence_outro"
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "nuka",
+        "correct": "true",
+        "wrong": ["false"],
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // Nu skal du prøve opgaven.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L004.mp3",
+                "delayAfter": 750
+            },
+            // nuka
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L300-L309/L307.mp3",
+                "delayAfter": 750
+            },
+            // Er det et ord?
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L013.mp3",
+                "delayAfter": 0
+            }
+        ],
+        "continue_when_instruction_is_complete": false
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "qasaq",
+        "correct": "false",
+        "wrong": ["true"],
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // qasaq
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L300-L309/L308.mp3",
+                "delayAfter": 750
+            },
+            // Er det et ord?
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L013.mp3",
+                "delayAfter": 0
+            }
+        ],
+        "continue_when_instruction_is_complete": false
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "mittarfik",
+        "correct": "true",
+        "wrong": ["false"],
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // mittarfik
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L300-L309/L309.mp3",
+                "delayAfter": 750
+            },
+            // Er det et ord?
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L013.mp3",
+                "delayAfter": 0
+            }
+        ],
+        "continue_when_instruction_is_complete": false
+    },
+    {
+        "question_type": "no_input_required",
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // Nu er øvelsen slut.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L007.mp3",
+                "delayAfter": 750
+            },
+            // Nu begynder selve testen.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L008.mp3",
+                "delayAfter": 750
+            },
+            // I denne opgave får du ikke at vide, om dit svar er korrekt eller forkert. Hvis du er i tvivl, må du gerne gætte eller gå videre til næste opgave.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L009.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // Tryk på "Videre" for at starte testen.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L010.mp3",
+                "delayAfter": 0
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            }
+        ]
+    }
+]

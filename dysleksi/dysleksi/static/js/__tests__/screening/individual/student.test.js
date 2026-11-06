@@ -26,15 +26,19 @@ const mockShowMicLostOverlay = vi.fn();
 const mockHideMicLostOverlay = vi.fn();
 let restoreMicListener;
 
-vi.mock("../../../screening/dom.js", () => ({
-    IndividualTestDomElements: class {
+vi.mock("../../../screening/dom.js", () => {
+    class DomElements {
         showMicLostOverlay = mockShowMicLostOverlay;
         hideMicLostOverlay = mockHideMicLostOverlay;
         setRestoreMicButtonListener = (listener) => {
             restoreMicListener = listener;
         };
-    },
-}));
+    }
+    return {
+        IndividualTestDomElements: class extends DomElements {},
+        GroupTestDomElements: class extends DomElements {},
+    };
+});
 
 // Mock MediaRecorder as a class
 const mockSetup = vi.fn();
@@ -62,18 +66,34 @@ vi.mock("../../../screening/media.js", () => ({
 // Mock View as a class
 let viewInstance;
 
-vi.mock("../../../screening/individual/student-individual-test.js", () => ({
-    IndividualTestView: class {
-        constructor() {
+const { MockView } = vi.hoisted(() => ({
+    MockView: class {
+        constructor(...args) {
             viewInstance = this;
+            this.args = args;
         }
         addEventListener = vi.fn();
         start = vi.fn();
+        needsMicrophone = vi.fn(() => true);
     },
+}));
+
+vi.mock("../../../screening/individual/student-individual-test.js", () => ({
+    IndividualTestView: class extends MockView {},
+}));
+
+vi.mock("../../../screening/dyslexia/student-dyslexia-test.js", () => ({
+    DyslexiaTestView: class extends MockView {},
 }));
 
 // ---- Import after mocks ----
 import { initStudent } from "../../../screening/individual/student.js";
+import { IndividualTestView } from "../../../screening/individual/student-individual-test.js";
+import { DyslexiaTestView } from "../../../screening/dyslexia/student-dyslexia-test.js";
+import {
+    GroupTestDomElements,
+    IndividualTestDomElements,
+} from "../../../screening/dom.js";
 
 describe("initStudent", () => {
     let originalLocation;
@@ -108,6 +128,19 @@ describe("initStudent", () => {
         expect(mockSetup).toHaveBeenCalled();
 
         // view was started
+        expect(viewInstance).toBeInstanceOf(IndividualTestView);
+        expect(viewInstance.args[2]).toBeInstanceOf(IndividualTestDomElements);
+        expect(viewInstance.start).toHaveBeenCalled();
+    });
+
+    it("starts a dyslexia test with the group test elements", async () => {
+        mockSetup.mockResolvedValueOnce();
+
+        initStudent(42, {}, {}, "dyslexia");
+        await openHandler();
+
+        expect(viewInstance).toBeInstanceOf(DyslexiaTestView);
+        expect(viewInstance.args[2]).toBeInstanceOf(GroupTestDomElements);
         expect(viewInstance.start).toHaveBeenCalled();
     });
 
@@ -142,6 +175,28 @@ describe("initStudent", () => {
         await started;
         expect(mockHideMicLostOverlay).toHaveBeenCalled();
         expect(viewInstance.start).toHaveBeenCalled();
+    });
+
+    it("only reports a lost microphone when the test needs it", async () => {
+        mockSetup.mockResolvedValueOnce();
+        initStudent(42, {}, { displayName: "Elev E." });
+        const lost = JSON.stringify({
+            uuid: "uuid-123",
+            studentDisplayName: "Elev E.",
+            event: "setup.error",
+            error: "microphone access lost",
+        });
+
+        // Before the test starts
+        const started = openHandler();
+        micLostHandler();
+        expect(mockSend).toHaveBeenCalledWith(lost);
+
+        await started;
+        mockSend.mockClear();
+        viewInstance.needsMicrophone.mockReturnValue(false);
+        micLostHandler();
+        expect(mockSend).not.toHaveBeenCalled();
     });
 
     it("reports a microphone lost and restored during the test", async () => {

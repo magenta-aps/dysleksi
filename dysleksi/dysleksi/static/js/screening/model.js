@@ -249,6 +249,7 @@ export class TestPart {
         this.index = index;
         this.id = data.id;
         this.name = data.name;
+        this.nameDa = data.name_da;
         this.image = data.image;
         this.instructionsUrl = data.instructions_url;
         this.timeout = data.timeout;
@@ -256,6 +257,7 @@ export class TestPart {
         this.completionSource = data.completion_source;
         this.practiceCorrectFeedbackSource = data.practice_correct_feedback_source;
         this.practiceWrongFeedbackSource = data.practice_wrong_feedback_source;
+        this.completedBy = data.completed_by;
         this.questionIndex = 0;
         this.currentQuestion = null;
         const questionClass = this.getQuestionClass();
@@ -276,7 +278,7 @@ export class TestPart {
     }
 
     completedByStudent(student) {
-        return this.questions.every((q) => q.answeredByStudent(student) === true);
+        return this.completedBy.includes(student.id);
     }
 
     getFirstUnansweredQuestionIndex(student) {
@@ -294,6 +296,8 @@ export class Question {
     challengeImageUrl;
     challengeSoundUrl;
     challengeText;
+    // In the test leader's language, e.g. Danish texts of the questionnaire
+    localizedChallengeText;
     possibleAnswers;
     displayedAt;
     answeredAt;
@@ -305,6 +309,11 @@ export class Question {
     hintSource;
     timeout;
     continueWhenInstructionIsComplete;
+    playSoundWhenInstructionIsComplete;
+    confirmCorrectAnswer;
+    isQuestionnaire;
+    allowReplayingInstructionSequence;
+    writingGuidance;
     resultGroup;
     existingAnswers;
 
@@ -319,6 +328,7 @@ export class Question {
         this.challengeImageUrl = data.challenge_image_url;
         this.challengeSoundUrl = data.challenge_sound_url;
         this.challengeText = data.challenge_text;
+        this.localizedChallengeText = data.localized_challenge_text;
         const answerClass = this.getAnswerClass();
         this.possibleAnswers = data.possible_answers.map(
             (dataItem) => new answerClass(dataItem, this),
@@ -331,7 +341,14 @@ export class Question {
         this.timeout = data.timeout;
         this.continueWhenInstructionIsComplete =
             data.continue_when_instruction_is_complete;
+        this.playSoundWhenInstructionIsComplete =
+            data.play_sound_when_instruction_is_complete;
+        this.confirmCorrectAnswer = data.confirm_correct_answer;
         this.advanceAutomatically = data.advance_automatically;
+        this.isQuestionnaire = data.is_questionnaire;
+        this.allowReplayingInstructionSequence =
+            data.allow_replaying_instruction_sequence;
+        this.writingGuidance = data.writing_guidance;
         this.resultGroup = data.result_group;
         this.existingAnswers = data.existing_answers;
     }
@@ -359,6 +376,7 @@ export class PossibleAnswer {
     resourceImageUrl;
     resourceSoundUrl;
     resourceText;
+    localizedResourceText;
     correctness;
     button;
     textAnswer;
@@ -373,7 +391,9 @@ export class PossibleAnswer {
         this.resourceImageUrl = data.resource_image_url;
         this.resourceSoundUrl = data.resource_sound_url;
         this.resourceText = data.resource_text;
+        this.localizedResourceText = data.localized_resource_text;
         this.correctness = data.correctness;
+        this.locked = data.locked;
         this.textAnswer = null;
         this.buttonId = "choice-" + this.resourceName;
         this.index = data.index;

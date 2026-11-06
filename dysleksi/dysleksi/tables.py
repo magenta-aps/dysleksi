@@ -9,7 +9,7 @@ from django.template import Context
 from django.template.loader import get_template
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
-from django_tables2 import A, Column, Table, TemplateColumn, tables
+from django_tables2 import A, Column, DateTimeColumn, Table, TemplateColumn, tables
 
 from dysleksi.models import (
     CategoryRange,
@@ -169,6 +169,40 @@ class TestAssignmentTable(Table):
             ),
             True,
         )
+
+
+class DyslexiaTestAssignmentTable(Table):
+    class Meta:
+        model = TestAssignment
+        fields: List[str] = []
+        orderable = False
+
+    student = tables.Column(
+        accessor=A("student__get_full_name"),
+        verbose_name=_("Testperson"),
+    )
+
+    test = tables.Column(
+        accessor=A("test__name"),
+        verbose_name=_("Test"),
+    )
+
+    start_date_time = DateTimeColumn(
+        verbose_name=_("Startet"),
+        format="DATETIME_FORMAT",
+    )
+
+    status = TemplateColumn(
+        template_name="dysleksi/admin/table_columns/test_assignment_status.html",
+        verbose_name=_("Teststatus"),
+        extra_context={"TestAssignmentStatus": TestAssignmentStatus},
+    )
+
+    actions = TemplateColumn(
+        template_name="dysleksi/admin/table_columns/dyslexia_test_actions.html",
+        verbose_name=_("Handlinger"),
+        extra_context={"TestAssignmentStatus": TestAssignmentStatus},
+    )
 
 
 class TestAssignmentResultTable(TestAssignmentTable):

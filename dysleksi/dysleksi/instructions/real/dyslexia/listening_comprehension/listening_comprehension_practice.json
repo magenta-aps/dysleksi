@@ -1,0 +1,130 @@
+[
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L052.mp3",
+        "correct": "false",
+        "wrong": ["true"],
+        "continue_when_instruction_is_complete": false,
+        "play_sound_when_instruction_is_complete": false,
+        "confirm_correct_answer": false,
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "challenge-sound-btn"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "choice-true"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "choice-false"
+            },
+            // Denne test handler om, hvorvidt de viste sætninger er korrekte.
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L050-L095/L050.mp3",
+                "delayAfter": 500
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "choice-true"
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "choice-false"
+            },
+            // Du vil høre nogle sætninger. Du skal svare ved kun at bruge "ja" eller "nej".
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L050-L095/L051.mp3",
+                "delayAfter": 750
+            },
+            // Eksempel
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "challenge-sound-btn"
+            },
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L003.mp3",
+                "delayAfter": 1500
+            },
+            // En dør spiser.
+            {
+                "action": "clickButton",
+                "delayAfter": 2750,
+                "element": "challenge-sound-btn"
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-false"
+            },
+            // Nej
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L050-L095/L053.mp3",
+                "delayAfter": 500
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 0,
+                "element": "choice-false"
+            }
+        ]
+    },
+    {
+        "question_type": "multiple_choice",
+        "sound": "resources/Enhanced L050-L095/L054.mp3",
+        "correct": "true",
+        "wrong": ["false"],
+        "continue_when_instruction_is_complete": false,
+        "play_sound_when_instruction_is_complete": false,
+        "confirm_correct_answer": false,
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            // En hund er et dyr.
+            {
+                "action": "clickButton",
+                "delayAfter": 2250,
+                "element": "challenge-sound-btn"
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-true"
+            },
+            // Ja
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L050-L095/L055.mp3",
+                "delayAfter": 500
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 0,
+                "element": "choice-true"
+            }
+        ]
+    },
+    {
+        "question_type": "dyslexia_instruction_sequence_outro",
+        "start_test": true
+    }
+]

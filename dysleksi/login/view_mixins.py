@@ -22,9 +22,10 @@ class GroupRequiredMixin(LoginRequiredMixin):
     groups_required: List[str] = []
 
     def get_group_filter(self) -> Q:
+        # The user must be in one of the required groups
         q = Q()
         for group in self.groups_required:
-            q &= Q(name=group)
+            q |= Q(name=group)
         return q
 
     def get(self, request, *args, **kwargs):

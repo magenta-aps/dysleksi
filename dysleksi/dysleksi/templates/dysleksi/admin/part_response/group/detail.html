@@ -12,6 +12,7 @@
 {% block breadcrumb %}
     <li class="breadcrumb-item"><a href="{% url 'dysleksi:test_assignment_result_list' %}">{% translate 'Resultater' %}</a></li>
 
+    {% if not request.user.is_test_leader %}
     <li class="breadcrumb-item">
         <a href="{% url 'dysleksi:test_assignment_results' object.testresponse.assignment.pk %}">
             {% blocktranslate trimmed with class_name=object.testresponse.assignment.class_for_nav.name test_name=object.testresponse.assignment.test.name %}
@@ -19,6 +20,7 @@
             {% endblocktranslate %}
         </a>
     </li>
+    {% endif %}
     <li class="breadcrumb-item">
         <a href="{% url 'dysleksi:test_assignment_student_results' assignment_pk=object.testresponse.assignment.pk response_pk=object.testresponse.pk %}">
         {{ object.testresponse.student.get_full_name }}
@@ -46,6 +48,7 @@
         </div>
     </div>
 
+    {% if not is_questionnaire %}
     <div class="row">
         <div class="col-3">
             {% with category=object.correctness_category_answered %}
@@ -262,6 +265,7 @@
         </div>
         <div class="col-6 autocolumn-col"></div>
     </div>
+    {% endif %}
 
     <script>
     // Spread `items` as even as possible over a number of columns, maintaining order.
