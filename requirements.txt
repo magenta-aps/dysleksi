@@ -108,7 +108,7 @@ cbor2==6.2.0.post2
 certifi==2026.10.23
 cffi==2.1.1
 charset-normalizer==3.5.2
-click==8.5.0
+click==8.5.1
 constantly==23.10.4
 cryptography==50.0.2
 cssselect2==0.10.1
