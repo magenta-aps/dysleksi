@@ -8,10 +8,6 @@ export class GroupTestView extends StudentTestView {
     questionTimeoutId;
     partTimeoutId;
 
-    constructor(test, assignmentId, domElements, student) {
-        super(test, assignmentId, domElements, student);
-    }
-
     start() {
         super.start();
         this.domElements.setNextButtonListener(() =>
@@ -58,6 +54,7 @@ export class GroupTestView extends StudentTestView {
             this.domElements.fadeScreenOverlay();
             this.setStudentHeader();
             this.domElements.toggleRepeatButton(false);
+            this.domElements.toggleReplayInstructionsButton(false);
             this.domElements.toggleNextButton(false);
             this.failedAttempts = 0;
 
@@ -95,7 +92,10 @@ export class GroupTestView extends StudentTestView {
                 this.domElements.multipleChoiceMatchContainer.style.display = "none";
             }
 
-            if (
+            // The test leader answers a questionnaire
+            if (this.currentQuestion.isQuestionnaire) {
+                this.answerButtons = [];
+            } else if (
                 this.currentQuestion.type === "multiple_choice" ||
                 this.currentQuestion.type === "multiple_choice_with_display_field"
             ) {
@@ -117,8 +117,10 @@ export class GroupTestView extends StudentTestView {
                     this.answerButtons.push({ button: button, answer: answer });
                 });
             } else if (this.currentQuestion.type === "free_text") {
-                this.input = this.domElements.showQuestionFreeText(() =>
-                    this.selectFreeText(),
+                this.input = this.domElements.showQuestionFreeText(
+                    () => this.selectFreeText(),
+                    this.currentQuestion.writingGuidance && this.correctText(),
+                    (buttonId) => this.rejectAnswer(buttonId),
                 );
             } else if (this.currentQuestion.type === "multiple_choice_match") {
                 this.answerButtons = [];
@@ -147,6 +149,8 @@ export class GroupTestView extends StudentTestView {
                 renderGroup(set2Answers, this.domElements.choicesElRight);
             }
 
+            this.sendQuestionDisplayed();
+
             if (this.currentQuestion.instruction_sequence) {
                 await this.runInstructions(() => {
                     if (this.currentQuestion.continueWhenInstructionIsComplete) {
@@ -154,11 +158,16 @@ export class GroupTestView extends StudentTestView {
                         // (This is the default behavior.)
                         this.domElements.toggleQuestionDisplay("none");
                         console.debug("Hiding current question");
+                    } else if (this.currentQuestion.type === "no_input_required") {
+                        // There is nothing to answer, so the user may continue
+                        this.domElements.enableNextButton();
                     } else {
                         // Keep the question on screen - the user must give an answer
                         // before they can continue.
                         console.debug("Waiting for user input ...");
-                        this.playChallengeSound(domEls.playBtn);
+                        if (this.currentQuestion.playSoundWhenInstructionIsComplete) {
+                            this.playChallengeSound(domEls.playBtn);
+                        }
                         this.setupReminder();
                     }
                 });
@@ -179,20 +188,6 @@ export class GroupTestView extends StudentTestView {
             // instructions and practice questions.
             if (!this.isPracticing) {
                 this.domElements.toggleBodyClass("show-instructions", false);
-            }
-
-            if (!this.isPracticing) {
-                // It is important to only send this when displaying real questions, not practice,
-                // because we save the timestamp and compare it to answer timestamps of the questions
-                this.send({
-                    event: "question.displayed",
-                    partIndex: this.currentPartIndex,
-                    partId: this.currentPart.id,
-                    questionIndex: this.currentQuestionIndex,
-                    questionId: this.currentQuestion.id,
-                    displayedAt: this.displayedAt,
-                    questionTitle: this.questionTitle(),
-                });
             }
         }
 
@@ -217,10 +212,12 @@ export class GroupTestView extends StudentTestView {
         const questionAnsweredAt = document.timeline.currentTime;
         this.domElements.interruptSound();
 
+        // There is nothing to answer in an instruction without input
         if (
             !(
-                question.continueWhenInstructionIsComplete &&
-                question.instruction_sequence
+                question.instruction_sequence &&
+                (question.continueWhenInstructionIsComplete ||
+                    question.type === "no_input_required")
             )
         ) {
             if (!this.selectedAnswer && !this.textAnswer && !outOfTime) {
@@ -233,18 +230,20 @@ export class GroupTestView extends StudentTestView {
             if (this.isPracticing) {
                 if (!this.textAnswer || this.isMatchPair) {
                     if (this.answerIsCorrect()) {
-                        this.domElements.lockInput();
-                        this.getSelectedButtons().forEach((btn) =>
-                            this.domElements.makeButtonHappy(btn.id),
-                        );
+                        if (question.confirmCorrectAnswer) {
+                            this.domElements.lockInput();
+                            this.getSelectedButtons().forEach((btn) =>
+                                this.domElements.makeButtonHappy(btn.id),
+                            );
 
-                        // Play "you guessed correct" sound snippet
-                        await this.domElements.playSound(
-                            this.currentPart.practiceCorrectFeedbackSource ||
-                                "/static/audio/7c.4.wav",
-                            this.audioContext,
-                        );
-                        this.domElements.unlockInput();
+                            // Play "you guessed correct" sound snippet
+                            await this.domElements.playSound(
+                                this.currentPart.practiceCorrectFeedbackSource ||
+                                    "/static/audio/7c.4.wav",
+                                this.audioContext,
+                            );
+                            this.domElements.unlockInput();
+                        }
                     } else {
                         this.failedAttempts += 1;
 
@@ -276,13 +275,7 @@ export class GroupTestView extends StudentTestView {
                             }
                         } else {
                             this.getSelectedButtons().forEach((btn) =>
-                                this.domElements.makeButtonAngry(btn.id),
-                            );
-                            // Play "you guessed wrong" sound snippet
-                            this.domElements.playSound(
-                                this.currentPart.practiceWrongFeedbackSource ||
-                                    "/static/audio/7c.3.wav",
-                                this.audioContext,
+                                this.rejectAnswer(btn.id),
                             );
                         }
 
@@ -351,6 +344,19 @@ export class GroupTestView extends StudentTestView {
                 this.onPartComplete();
             }
         }
+    }
+
+    rejectAnswer(buttonId) {
+        this.domElements.makeButtonAngry(buttonId);
+        // Play "you guessed wrong" sound snippet
+        this.domElements.playSound(
+            this.currentPart.practiceWrongFeedbackSource || "/static/audio/7c.3.wav",
+            this.audioContext,
+        );
+    }
+
+    correctText() {
+        return this.currentQuestion.possibleAnswers[0].resourceText;
     }
 
     getSelectedButtons() {
@@ -480,10 +486,14 @@ export class GroupTestView extends StudentTestView {
             this.textAnswer = answer;
             this.selectedAnswer = this.currentQuestion.possibleAnswers[0];
         }
-        this.domElements.toggleNextButton(
-            this.showingInstructions || answer.length >= 1,
-            true,
-        );
+        if (this.currentQuestion.writingGuidance) {
+            this.domElements.toggleNextButton(answer === this.correctText());
+        } else {
+            this.domElements.toggleNextButton(
+                this.showingInstructions || answer.length >= 1,
+                true,
+            );
+        }
     }
 
     regexWhitespaces = /\s+/g;

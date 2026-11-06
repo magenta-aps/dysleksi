@@ -58,6 +58,12 @@ from dysleksi.exceptions import MissingIdException
 TEACHERS = "Lærere"
 STUDENTS = "Elever"
 READING_SUPERVISORS = "Læsevejledere"
+TEST_LEADERS = "Testledere"
+TEST_PERSONS = "Testpersoner"
+
+# Adults and children are given different questionnaires in the dyslexia test
+DYSLEXIA_TEST_ADULT = "Dysleksitest (voksen)"
+DYSLEXIA_TEST_CHILD = "Dysleksitest (barn)"
 
 logger = logging.getLogger(__name__)
 
@@ -89,6 +95,8 @@ class InstructionAction(TextChoices):
     HIGHLIGHT = "highlight"
     EXPLICIT_HIGHLIGHT = "explicitHighlight"
     SELECT = "select"
+    MAKE_BUTTON_ANGRY = "makeButtonAngry"
+    MAKE_BUTTON_HAPPY = "makeButtonHappy"
     SET_TEXT = "setText"
     SET_BUTTON_SOUND_ONCE = "setButtonSoundOnce"
     SET_REPEAT_BUTTON_DESTINATION = "setRepeatButtonDestination"
@@ -122,6 +130,7 @@ class QuestionType(TextChoices):
 class TestType(TextChoices):
     INDIVIDUAL = "individual"
     GROUP = "group"
+    DYSLEXIA = "dyslexia"
 
 
 class TestAssignmentStatus(TextChoices):
@@ -174,6 +183,10 @@ class User(AbstractUser):
             return "Læsevejleder"
         if self.is_teacher:
             return "Lærer"
+        if self.is_test_leader:
+            return "Testleder"
+        if self.is_test_person:
+            return "Testperson"
         if self.is_student:
             return "Elev"
         return "Ukendt brugertype"
@@ -190,6 +203,14 @@ class User(AbstractUser):
     def is_student(self):
         return self.has_group(STUDENTS)
 
+    @cached_property
+    def is_test_leader(self):
+        return self.has_group(TEST_LEADERS)
+
+    @cached_property
+    def is_test_person(self):
+        return self.has_group(TEST_PERSONS)
+
     def __str__(self) -> str:
         return (
             f"{' '.join(filter(None, [self.first_name, self.last_name]))} "
@@ -203,6 +224,10 @@ class User(AbstractUser):
             return ReadingSupervisor.objects.get_or_create(user_ptr=self)[0]
         elif self.is_teacher:
             return Teacher.objects.get_or_create(user_ptr=self)[0]
+        elif self.is_test_leader:
+            return TestLeader.objects.get_or_create(user_ptr=self)[0]
+        elif self.is_test_person:
+            return TestPerson.objects.get(user_ptr=self)
         elif self.is_student:
             return Student.objects.get_or_create(user_ptr=self)[0]
         return self
@@ -419,6 +444,43 @@ def on_update_reading_supervisor(
         instance.groups.add(Group.objects.get(name=READING_SUPERVISORS))
 
 
+class TestLeader(User):
+    is_student = False
+    is_teacher = False
+    is_reading_supervisor = False
+    is_test_leader = True
+    is_test_person = False
+
+    class Meta:
+        verbose_name = _("testleder")
+        verbose_name_plural = _("testledere")
+
+
+@receiver(post_save, sender=TestLeader)
+def on_update_test_leader(sender, instance: TestLeader, created: bool, **kwargs):
+    if created:  # pragma: no branch
+        instance.groups.add(Group.objects.get(name=TEST_LEADERS))
+
+
+class TestPerson(Student):
+    """A participant of the dyslexia test. Takes the test like a student does"""
+
+    is_test_leader = False
+    is_test_person = True
+
+    class Meta:
+        verbose_name = _("testperson")
+        verbose_name_plural = _("testpersoner")
+
+
+@receiver(post_save, sender=TestPerson)
+def on_update_test_person(sender, instance: TestPerson, created: bool, **kwargs):
+    if created:  # pragma: no branch
+        instance.groups.add(
+            Group.objects.get(name=STUDENTS), Group.objects.get(name=TEST_PERSONS)
+        )
+
+
 class ClassQuerySet(PermissionsQuerySet):
 
     def current(self):
@@ -549,6 +611,9 @@ class TestResource(models.Model):
     image = models.ImageField(upload_to="images", blank=True, null=True)
     sound = models.FileField(upload_to="sounds", blank=True, null=True)
     text = models.CharField(max_length=200, blank=True, null=True, default=None)
+    # The test leader may see a questionnaire in Danish, while the test person always
+    # sees the Greenlandic text
+    text_da = models.CharField(max_length=200, blank=True, default="")
 
     class Meta:
         constraints = [
@@ -565,6 +630,12 @@ class TestResource(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+    @property
+    def localized_text(self) -> str | None:
+        if get_language() == "da":
+            return self.text_da or self.text
+        return self.text
 
     @property
     def url(self):
@@ -602,7 +673,7 @@ class Test(models.Model):
             "parts": [],
         }
 
-        for part in self.parts.all().order_by("id"):
+        for part in self.parts.all():
             test_data["parts"].append(part.to_json(assignment))
 
         return test_data
@@ -644,6 +715,8 @@ class TestAssignmentQuerySet(PermissionsQuerySet):
                 | Q(klasse__in=classes)
                 | Q(student__in=Student.objects.filter(classes__in=classes))
             )
+        if user.is_test_leader:
+            return self.filter(teacher=user)
         if user.is_student:
             return self.filter(Q(student=user) | Q(klasse__students=user))
 
@@ -968,6 +1041,14 @@ class TestPart(models.Model):
         TestPartResultsBreakdownRange,
         related_name="wordcount_data_breakdown_parts",
     )
+    order = models.PositiveIntegerField(
+        blank=True,
+        null=True,
+        help_text="Position of the part in its tests. Parts without one come last",
+    )
+
+    class Meta:
+        ordering = [F("order").asc(nulls_last=True), "pk"]
 
     def __str__(self) -> str:
         return self.localized_name
@@ -993,6 +1074,8 @@ class TestPart(models.Model):
         part_data: dict = {
             "id": self.id,
             "name": self.localized_name,
+            # For the debug buttons, which are always in Danish
+            "name_da": self.name,
             "image": self.image_url,
             "instructions_url": (self.instructions.url if self.instructions else None),
             "timeout": self.timeout,
@@ -1005,6 +1088,11 @@ class TestPart(models.Model):
             ),
             "practice_wrong_feedback_source": url_or_none(
                 self.practice_wrong_feedback_source
+            ),
+            "completed_by": list(
+                PartResponse.objects.filter(
+                    testpart=self, testresponse__assignment=assignment, completed=True
+                ).values_list("testresponse__student", flat=True)
             ),
         }
 
@@ -1029,7 +1117,16 @@ class TestPart(models.Model):
                     "continue_when_instruction_is_complete": (
                         question.continue_when_instruction_is_complete
                     ),
+                    "play_sound_when_instruction_is_complete": (
+                        question.play_sound_when_instruction_is_complete
+                    ),
+                    "confirm_correct_answer": question.confirm_correct_answer,
                     "advance_automatically": question.advance_automatically,
+                    "is_questionnaire": question.is_questionnaire,
+                    "allow_replaying_instruction_sequence": (
+                        question.allow_replaying_instruction_sequence
+                    ),
+                    "writing_guidance": question.writing_guidance,
                     "result_group": question.result_group,
                 }
                 question_data["existing_answers"] = question.get_existing_answers(
@@ -1046,6 +1143,9 @@ class TestPart(models.Model):
                             "challenge_id": question.challenge.id,
                             "challenge_name": question.challenge.name,
                             "challenge_text": question.challenge.text,
+                            "localized_challenge_text": (
+                                question.challenge.localized_text
+                            ),
                             "challenge_image_url": None,
                             "challenge_sound_url": None,
                         }
@@ -1072,7 +1172,9 @@ class TestPart(models.Model):
                             answer.resource.sound.url if answer.resource.sound else None
                         ),
                         "resource_text": answer.resource.text,
+                        "localized_resource_text": answer.resource.localized_text,
                         "correctness": answer.correctness,
+                        "locked": answer.locked,
                     }
                     question_data["possible_answers"].append(answer_data)
 
@@ -1108,23 +1210,49 @@ class TestPart(models.Model):
             ],
         }
 
+    @staticmethod
+    def dyslexia_instruction_sequence_outro(start_test):
+        sounds = "resources/Enhanced L001-L014"
+        sequence = [
+            {"action": "show", "element": "next"},
+            {"action": "show", "element": "repeat"},
+            {"action": "setRepeatButtonDestination", "data": "0"},
+            {"action": "playSound", "resource": f"{sounds}/L014.mp3"},
+            {"action": "highlight", "element": "repeat"},
+            {"action": "highlight", "element": "next", "delayAfter": 750},
+        ]
+        if start_test:
+            # A part without practice questions starts the test right away
+            sequence += [
+                {"action": "playSound", "resource": f"{sounds}/L001.mp3"},
+                {"action": "highlight", "element": "next"},
+            ]
+        return {
+            "question_type": QuestionType.NO_INPUT_REQUIRED,
+            "instruction_sequence": sequence,
+        }
+
     def update_or_create_test_resources(self, questions_data, is_practice=False):
         for order, data in enumerate(questions_data):
             if data.get("question_type") == "instruction_sequence_outro":
                 data = self.instruction_sequence_outro(data["sounds"])
+            elif data.get("question_type") == "dyslexia_instruction_sequence_outro":
+                data = self.dyslexia_instruction_sequence_outro(
+                    data.get("start_test", False)
+                )
 
             # Initialize new dict to avoid carry-over from previous question
             question = {}
 
             # Challenge resource (image)
-            test_resource_kwargs = {"name": "challenge"}
-
-            if "image" in data:
-                test_resource_kwargs["image"] = data["image"]
-            if "sound" in data:
-                test_resource_kwargs["sound"] = data["sound"]
-            if "text" in data:
-                test_resource_kwargs["text"] = data["text"]
+            test_resource_kwargs = {
+                "name": "challenge",
+                "image": data.get("image", ""),
+                "sound": data.get("sound", ""),
+                "text": data.get("text"),
+            }
+            if "text_da" in data:
+                test_resource_kwargs["text_da"] = data["text_da"]
 
             if "image" in data or "sound" in data or "text" in data:
                 question["challenge"], created = TestResource.objects.get_or_create(
@@ -1157,7 +1285,18 @@ class TestPart(models.Model):
             question["continue_when_instruction_is_complete"] = data.get(
                 "continue_when_instruction_is_complete", True
             )
+            question["play_sound_when_instruction_is_complete"] = data.get(
+                "play_sound_when_instruction_is_complete", True
+            )
+            question["confirm_correct_answer"] = data.get(
+                "confirm_correct_answer", True
+            )
             question["advance_automatically"] = data.get("advance_automatically", False)
+            question["is_questionnaire"] = data.get("is_questionnaire", False)
+            question["allow_replaying_instruction_sequence"] = data.get(
+                "allow_replaying_instruction_sequence", False
+            )
+            question["writing_guidance"] = data.get("writing_guidance", False)
             question["result_group"] = data.get("result_group")
 
             question, _ = TestQuestion.objects.update_or_create(
@@ -1247,6 +1386,26 @@ class TestPart(models.Model):
                         },
                     )
                     kept_answer_pks.add(pa.pk)
+
+            # Options of a question without a wrong answer, e.g. in a questionnaire
+            options = data.get("options", [])
+            for option_index, (option, option_da) in enumerate(
+                zip(options, data.get("options_da", [""] * len(options)))
+            ):
+                option_resource, _ = TestResource.objects.get_or_create(
+                    name=option, text=option, text_da=option_da
+                )
+                pa, _ = PossibleAnswer.objects.update_or_create(
+                    question=question,
+                    resource=option_resource,
+                    defaults={
+                        "correctness": Correctness.CORRECT,
+                        "index": option_index,
+                        "locked": option in data.get("locked_options", []),
+                    },
+                )
+                kept_answer_pks.add(pa.pk)
+
             if data.get("set1") and data.get("set2"):
                 for possible_answer_index, possible_answer in enumerate(
                     data["set1"] + data["set2"]
@@ -1409,7 +1568,17 @@ class TestQuestion(models.Model):
         related_name="hint_testquestion",
     )
     continue_when_instruction_is_complete = models.BooleanField(default=True)
+    play_sound_when_instruction_is_complete = models.BooleanField(default=True)
+    # Whether a correct answer to a practice question turns green and plays a sound
+    confirm_correct_answer = models.BooleanField(default=True)
     advance_automatically = models.BooleanField(default=False)
+    # The test leader answers a questionnaire, while the test person sees the question
+    is_questionnaire = models.BooleanField(default=False)
+    allow_replaying_instruction_sequence = models.BooleanField(default=False)
+    writing_guidance = models.BooleanField(
+        default=False,
+        help_text="Show the correct answer of a free text question in grey",
+    )
     result_group = models.CharField(
         blank=True,
         null=True,
@@ -1600,6 +1769,11 @@ class PossibleAnswer(models.Model):
         help_text="index where this answer should be shown in mutiple-choice questions",
     )
 
+    locked = models.BooleanField(
+        default=False,
+        help_text="A locked answer is shown, but cannot be chosen",
+    )
+
     def __str__(self) -> str:
         return f"{self.question} / {self.get_correctness_display()}"
 
@@ -1618,7 +1792,7 @@ class TestResponseQuerySet(PermissionsQuerySet):
         if user.is_reading_supervisor:
             institutions = user.institutions.all()  # type: ignore[attr-defined]
             return self.filter(student__institution__in=institutions)
-        if user.is_teacher:
+        if user.is_teacher or user.is_test_leader:
             return self.filter(
                 assignment__in=TestAssignment.objects.filter_user_object_permissions(
                     user, action
@@ -1781,7 +1955,7 @@ class PartResponseQuerySet(PermissionsQuerySet):
         if user.is_reading_supervisor:
             institutions = user.institutions.all()  # type: ignore[attr-defined]
             return self.filter(testresponse__student__institution__in=institutions)
-        if user.is_teacher:
+        if user.is_teacher or user.is_test_leader:
             return self.filter(
                 testresponse__assignment__in=(
                     TestAssignment.objects.filter_user_object_permissions(user, action)
@@ -1999,6 +2173,9 @@ class PartResponse(PermissionsMixin, models.Model):
             + responses.filter(correctness=Correctness.PARTIAL).count() * PARTIAL_SCORE
         )
         responses_count = responses.count()
+        if responses_count == 0:
+            # E.g. a part which was skipped during its practice questions
+            return CorrectnessCategory.default()
         correct_proportion_of_answered = score / float(responses_count)
         return CorrectnessCategory.categorize_proportion(correct_proportion_of_answered)
 
@@ -2015,7 +2192,7 @@ class QuestionResponseQuerySet(PermissionsQuerySet):
             return self.filter(
                 partresponse__testresponse__student__institution__in=institutions
             )
-        if user.is_teacher:
+        if user.is_teacher or user.is_test_leader:
             return self.filter(
                 partresponse__testresponse__assignment__in=(
                     TestAssignment.objects.filter_user_object_permissions(user, action)
@@ -2185,7 +2362,10 @@ class Message(models.Model):
 
         # Message is new, process it so that significant data is stored in other models
         try:
-            if self.event == HandledEvent.QUESTION_DISPLAYED:
+            # Answer times are measured from the first real question of a part
+            if self.event == HandledEvent.QUESTION_DISPLAYED and not self.data.get(
+                "practice"
+            ):
                 part = self.part_response
                 if part.started_at is None:
                     part.started_at = timezone.now()
@@ -2201,7 +2381,9 @@ class Message(models.Model):
                 )
                 question_response = self.question_response
 
-                question_response.answer_option = choice
+                # The test leader answers a questionnaire, see QUESTION_FEEDBACK
+                if not self.question.is_questionnaire:
+                    question_response.answer_option = choice
                 question_response.answer_text = self.data.get("textAnswer")
                 if "correctness" in self.data:
                     question_response.correctness = self.data["correctness"]
@@ -2240,7 +2422,13 @@ class Message(models.Model):
             elif self.event == HandledEvent.QUESTION_FEEDBACK:
                 question_response = self.question_response
                 question_response.correctness = self.data.get("correctness")
-                question_response.note = self.data.get("note")
+                # An answer changed afterwards in the results table has no note
+                if "note" in self.data:
+                    question_response.note = self.data["note"]
+                if "choiceId" in self.data:
+                    question_response.answer_option = (
+                        self.question.possible_answers.get(pk=self.data["choiceId"])
+                    )
                 question_response.actual_pronunciation = self.data.get(
                     "actualPronunciation"
                 )

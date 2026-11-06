@@ -527,6 +527,7 @@ describe("GroupTestDomElements DOM utilities", () => {
       <div id="question-challenge"></div>
       <div id="choices"></div>
       <button id="repeat" data-hide-display="true"></button>
+      <button id="replay-instructions"></button>
       <button id="next"></button>
       <div id="test-el"></div>
       <div id="test-el2" data-hide-display="true"></div>
@@ -634,6 +635,12 @@ describe("GroupTestDomElements DOM utilities", () => {
     it("toggleRepeatButton shows button", () => {
         dom.toggleRepeatButton(true);
         expect(dom.repeatBtn.style.display).toBe("block");
+    });
+    it("toggleReplayInstructionsButton shows and hides button", () => {
+        dom.toggleReplayInstructionsButton(true);
+        expect(dom.replayInstructionsBtn.style.visibility).toBe("visible");
+        dom.toggleReplayInstructionsButton(false);
+        expect(dom.replayInstructionsBtn.style.visibility).toBe("hidden");
     });
 
     it("fadeIn sets opacity to 1", async () => {

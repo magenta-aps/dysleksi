@@ -21,6 +21,7 @@ from dysleksi.models import (
     Test,
     TestAssignment,
     TestPart,
+    TestPerson,
     TestType,
 )
 
@@ -364,3 +365,21 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
             else:
                 return None  # pragma: no cover
         return None
+
+
+class TestPersonChoiceField(ModelChoiceField):
+    def label_from_instance(self, obj):
+        return obj.get_full_name()
+
+
+class StartDyslexiaTestForm(forms.Form):
+    test_person = TestPersonChoiceField(
+        queryset=TestPerson.objects.order_by("first_name", "last_name"),
+        label=_("Testperson"),
+        widget=forms.RadioSelect,
+    )
+    test = ModelChoiceField(
+        queryset=Test.objects.filter(test_type=TestType.DYSLEXIA).order_by("pk"),
+        label=_("Test"),
+        widget=forms.RadioSelect,
+    )

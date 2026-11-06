@@ -1,0 +1,249 @@
+[
+    {
+        "question_type": "multiple_choice",
+        "text": "Atuarsinnaanngornissat sapernartittarpiuk?",
+        "text_da": "Har du svært ved at lære at læse?",
+        "options": [
+            "Aap",
+            "Naamik",
+            "Ajornartorsiutaanngilaq / Taamaattoqanngilaq",
+            "Qaqutikkut / Immannguaq",
+            "Ilaannikkut",
+            "Akulikitsumik / Annertulaartumik",
+            "Tamatigut / Annertuumik"
+        ],
+        "options_da": [
+            "Ja",
+            "Nej",
+            "Aldrig / slet ikke",
+            "Sjældent / lidt",
+            "Nogle gange",
+            "Hyppigt / ret meget",
+            "Altid / en stor del"
+        ],
+        "is_questionnaire": true
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "Allassinnaanngornissat sapernartittarpiuk?",
+        "text_da": "Har du svært ved at lære at skrive?",
+        "options": [
+            "Aap",
+            "Naamik",
+            "Ajornartorsiutaanngilaq / Taamaattoqanngilaq",
+            "Qaqutikkut / Immannguaq",
+            "Ilaannikkut",
+            "Akulikitsumik / Annertulaartumik",
+            "Tamatigut / Annertuumik"
+        ],
+        "options_da": [
+            "Ja",
+            "Nej",
+            "Aldrig / slet ikke",
+            "Sjældent / lidt",
+            "Nogle gange",
+            "Hyppigt / ret meget",
+            "Altid / en stor del"
+        ],
+        "is_questionnaire": true
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "Naqinnerit ilikkarnissaat sarpernartitarpiuk?",
+        "text_da": "Har du svært ved at lære bogstavnavne?",
+        "options": [
+            "Aap",
+            "Naamik",
+            "Ajornartorsiutaanngilaq / Taamaattoqanngilaq",
+            "Qaqutikkut / Immannguaq",
+            "Ilaannikkut",
+            "Akulikitsumik / Annertulaartumik",
+            "Tamatigut / Annertuumik"
+        ],
+        "options_da": [
+            "Ja",
+            "Nej",
+            "Aldrig / slet ikke",
+            "Sjældent / lidt",
+            "Nogle gange",
+            "Hyppigt / ret meget",
+            "Altid / en stor del"
+        ],
+        "is_questionnaire": true
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "Atuaraangavit atuakkavit imarisaa paasiniarlugu uteqattaartarpiuk?",
+        "text_da": "Skal du ofte læse den samme tekst flere gange for at forstå indholdet?",
+        "options": [
+            "Aap",
+            "Naamik",
+            "Ajornartorsiutaanngilaq / Taamaattoqanngilaq",
+            "Qaqutikkut / Immannguaq",
+            "Ilaannikkut",
+            "Akulikitsumik / Annertulaartumik",
+            "Tamatigut / Annertuumik"
+        ],
+        "options_da": [
+            "Ja",
+            "Nej",
+            "Aldrig / slet ikke",
+            "Sjældent / lidt",
+            "Nogle gange",
+            "Hyppigt / ret meget",
+            "Altid / en stor del"
+        ],
+        "is_questionnaire": true
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "Allanneq atuarnermit sapernartinnerusarpiuk?",
+        "text_da": "Synes du, at det er sværere at skrive end at læse?",
+        "options": [
+            "Aap",
+            "Naamik",
+            "Ajornartorsiutaanngilaq / Taamaattoqanngilaq",
+            "Qaqutikkut / Immannguaq",
+            "Ilaannikkut",
+            "Akulikitsumik / Annertulaartumik",
+            "Tamatigut / Annertuumik"
+        ],
+        "options_da": [
+            "Ja",
+            "Nej",
+            "Aldrig / slet ikke",
+            "Sjældent / lidt",
+            "Nogle gange",
+            "Hyppigt / ret meget",
+            "Altid / en stor del"
+        ],
+        "is_questionnaire": true
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "Atuarneq allannermit sapernartinnerusarpiuk?",
+        "text_da": "Synes du, at det er sværere at læse end at skrive?",
+        "options": [
+            "Aap",
+            "Naamik",
+            "Ajornartorsiutaanngilaq / Taamaattoqanngilaq",
+            "Qaqutikkut / Immannguaq",
+            "Ilaannikkut",
+            "Akulikitsumik / Annertulaartumik",
+            "Tamatigut / Annertuumik"
+        ],
+        "options_da": [
+            "Ja",
+            "Nej",
+            "Aldrig / slet ikke",
+            "Sjældent / lidt",
+            "Nogle gange",
+            "Hyppigt / ret meget",
+            "Altid / en stor del"
+        ],
+        "is_questionnaire": true
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "Atuarniaraangavit allanniaraangavilluunnit ikiorneqartarpit?",
+        "text_da": "Får du hjælp til læsning og skrivning?",
+        "options": [
+            "Aap",
+            "Naamik",
+            "Ajornartorsiutaanngilaq / Taamaattoqanngilaq",
+            "Qaqutikkut / Immannguaq",
+            "Ilaannikkut",
+            "Akulikitsumik / Annertulaartumik",
+            "Tamatigut / Annertuumik"
+        ],
+        "options_da": [
+            "Ja",
+            "Nej",
+            "Aldrig / slet ikke",
+            "Sjældent / lidt",
+            "Nogle gange",
+            "Hyppigt / ret meget",
+            "Altid / en stor del"
+        ],
+        "is_questionnaire": true
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "Allanneq atuarnerlu nuannariviuk?",
+        "text_da": "Kan du godt lide at læse og skrive?",
+        "options": [
+            "Aap",
+            "Naamik",
+            "Ajornartorsiutaanngilaq / Taamaattoqanngilaq",
+            "Qaqutikkut / Immannguaq",
+            "Ilaannikkut",
+            "Akulikitsumik / Annertulaartumik",
+            "Tamatigut / Annertuumik"
+        ],
+        "options_da": [
+            "Ja",
+            "Nej",
+            "Aldrig / slet ikke",
+            "Sjældent / lidt",
+            "Nogle gange",
+            "Hyppigt / ret meget",
+            "Altid / en stor del"
+        ],
+        "is_questionnaire": true
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "Isiginiarnikkut ajornartorsiuteqarpit?",
+        "text_da": "Har du problemer med synet?",
+        "options": [
+            "Aap",
+            "Naamik",
+            "Ajornartorsiutaanngilaq / Taamaattoqanngilaq",
+            "Qaqutikkut / Immannguaq",
+            "Ilaannikkut",
+            "Akulikitsumik / Annertulaartumik",
+            "Tamatigut / Annertuumik"
+        ],
+        "options_da": [
+            "Ja",
+            "Nej",
+            "Aldrig / slet ikke",
+            "Sjældent / lidt",
+            "Nogle gange",
+            "Hyppigt / ret meget",
+            "Altid / en stor del"
+        ],
+        "locked_options": [
+            "Ajornartorsiutaanngilaq / Taamaattoqanngilaq",
+            "Qaqutikkut / Immannguaq",
+            "Ilaannikkut",
+            "Akulikitsumik / Annertulaartumik",
+            "Tamatigut / Annertuumik"
+        ],
+        "is_questionnaire": true
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "Tusaaniarnikkut ajornartorsiuteqarpit?",
+        "text_da": "Har du problemer med hørelsen?",
+        "options": [
+            "Aap",
+            "Naamik",
+            "Ajornartorsiutaanngilaq / Taamaattoqanngilaq",
+            "Qaqutikkut / Immannguaq",
+            "Ilaannikkut",
+            "Akulikitsumik / Annertulaartumik",
+            "Tamatigut / Annertuumik"
+        ],
+        "options_da": [
+            "Ja",
+            "Nej",
+            "Aldrig / slet ikke",
+            "Sjældent / lidt",
+            "Nogle gange",
+            "Hyppigt / ret meget",
+            "Altid / en stor del"
+        ],
+        "is_questionnaire": true
+    }
+]

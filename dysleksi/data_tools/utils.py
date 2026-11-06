@@ -434,3 +434,62 @@ def update_or_create_sentence_reading_test(
         part.set_data_breakdown_ranges("wordcount_data_breakdown", [(1, 2), (3, 4)])
 
     test.parts.add(part)
+
+
+# The parts are shown in this order
+DYSLEXIA_PART_NAMES_KL = {
+    "questionnaire_adult": "Apeqqutit inersimasunut",
+    "questionnaire_child": "Apeqqutit meeqqanut",
+    "listening_comprehension": "Oqaaseqatigiit eqqortuunerannik misiligut",
+    "what_is_a_nonword": "Oqaasiusaq pillugu ilitsersuut",
+    "choose_the_nonword": "Oqaasiusaq toqqaruk",
+    "spelling_choice": "Oqaasiusaq taaneqartoq toqqaruk",
+    "nonword_reading": "Oqaasiusanik nipituumik atuarneq",
+    "nonword_spelling": "Oqaasiusanik allanneq",
+    "lexical_decision": "Oqaaseq oqaasiusarluunnit",
+}
+
+
+def update_or_create_dyslexia_test_part(
+    test,
+    code_name,
+    questions_data,
+    practice_questions_data=None,
+    name="",
+    update_contents=True,
+):
+    completion_sound = (
+        "resources/Enhanced L001-L014/L002.mp3"
+        if code_name == "listening_comprehension"
+        else "resources/Enhanced L001-L014/L011.mp3"
+    )
+    completion_resource, created = TestResource.objects.get_or_create(
+        name=completion_sound, sound=completion_sound
+    )
+
+    part, created = TestPart.objects.update_or_create(
+        name=name,
+        defaults={
+            "name_kl": DYSLEXIA_PART_NAMES_KL[code_name],
+            "order": list(DYSLEXIA_PART_NAMES_KL).index(code_name),
+            "timeout": (
+                8 * 60 * 1000  # 8 minutes
+                if code_name
+                in (
+                    "choose_the_nonword",
+                    "spelling_choice",
+                    "nonword_spelling",
+                    "lexical_decision",
+                )
+                else 0
+            ),
+            "partial_score_after": 0,
+            "completion_source": completion_resource,
+        },
+    )
+    if update_contents:
+        part.update_or_create_test_resources(questions_data, False)
+        if practice_questions_data:
+            part.update_or_create_test_resources(practice_questions_data, True)
+
+    test.parts.add(part)

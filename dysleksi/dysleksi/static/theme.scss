@@ -272,6 +272,11 @@ body.show-instructions {
     }
   }
 
+  // E.g. the "next" button, while an instruction points it out
+  .svg-btn:disabled {
+    opacity: 1;
+  }
+
   .letter-btn {
     &:disabled {
       color: black !important;
@@ -482,6 +487,32 @@ body.show-instructions {
 
 .display-field-wrapper {
   margin: 0 12 * $spacer 3 * $spacer 12 * $spacer;
+
+  // The guide shows the written letters as well, behind the field which only shows
+  // the caret
+  &.guided {
+    position: relative;
+
+    // Covers the field exactly, like #free-text-field without margin
+    .writing-guidance {
+      position: absolute;
+      inset: 0;
+      margin: 0;
+      width: auto;
+      height: auto;
+
+      .rest {
+        color: $student-grey;
+      }
+    }
+
+    #free-text-field {
+      position: relative;
+      background-color: transparent !important;
+      color: transparent;
+      caret-color: black;
+    }
+  }
 }
 
 .display-field {
@@ -664,6 +695,17 @@ body.show-instructions .sound-btn.pulse {
   }
 }
 
+.replay-instructions-btn {
+  @extend .student-header;
+  position: fixed;
+  left: -2.5 * $spacer;
+  right: auto;
+  padding: 3.5 * $spacer 0 0 3.5 * $spacer;
+  display: flex;
+  align-items: flex-start;
+  border: none;
+}
+
 .center-screen {
   position: fixed;
   top: 0;
@@ -751,6 +793,10 @@ body.show-instructions .sound-btn.pulse {
 
 .debug-button {
     display: none;
+}
+
+#skip-to-part {
+  display: contents;
 }
 
 .smiley-image {

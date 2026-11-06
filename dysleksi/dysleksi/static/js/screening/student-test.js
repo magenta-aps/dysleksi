@@ -14,6 +14,8 @@ export class StudentTestView {
     assignmentId;
     domElements;
     student;
+    // Group tests have no recorder
+    mediaRecorder;
 
     currentPart = null;
     previousPart = null;
@@ -300,12 +302,25 @@ export class StudentTestView {
             event: "test.started",
         });
         this.domElements.setRepeatButtonListener(() => this.repeat());
+        this.domElements.setReplayInstructionsButtonListener(() =>
+            this.runInstructions(),
+        );
     }
 
     startIntro() {
         this.domElements._setButtonListener(this.domElements.endIntroButton, () =>
             this.endIntro(),
         );
+        this.domElements.showSkipToPartButtons(this.test.parts, (partIndex) =>
+            this.skipToPart(partIndex),
+        );
+    }
+
+    // Directly skip to a testpart. Only available in DEBUG mode
+    skipToPart(partIndex) {
+        this.domElements.hideIntro();
+        this.setPart(partIndex);
+        this.showFirstQuestion(this.canPractice());
     }
 
     startTestPartOutro() {
@@ -508,13 +523,22 @@ export class StudentTestView {
         return this.currentPart.practice.length > 0;
     }
 
+    isOutro() {
+        return Boolean(
+            this.currentQuestion.instruction_sequence?.instructions.some(
+                (instruction) => instruction.action === "setRepeatButtonDestination",
+            ),
+        );
+    }
+
     updateNextButtonClass() {
         if (
-            this.isPracticing &&
-            this.currentPart.practice.length > 0 &&
-            this.currentQuestionIndex === this.currentPart.practice.length - 1
+            this.isOutro() ||
+            (this.isPracticing &&
+                this.currentPart.practice.length > 0 &&
+                this.currentQuestionIndex === this.currentPart.practice.length - 1)
         ) {
-            // Sidste spørgsmål i øveopgave
+            // Outro eller sidste spørgsmål i øveopgave
             this.domElements.setNextButtonClass("start-part-btn"); // Blå knap
         } else {
             this.domElements.setNextButtonClass("next-btn"); // Grøn knap med pil
@@ -528,6 +552,11 @@ export class StudentTestView {
             this.isPracticing ? "(practice)" : "(test)",
         );
         this.domElements.hideTestPartOutro();
+        // E.g. "Hvad er nonord?", which only has practice questions
+        if (!this.isPracticing && this.currentPart.questions.length === 0) {
+            this.onPartComplete();
+            return false;
+        }
         const firstUnanswered = this.isPracticing
             ? 0
             : this.currentPart.getFirstUnansweredQuestionIndex(this.student);
@@ -540,6 +569,9 @@ export class StudentTestView {
     }
 
     async onTestComplete(cancelled = false) {
+        if (this.mediaRecorder) {
+            await this.mediaRecorder.stop();
+        }
         console.log("Test complete");
         releaseWakeLock();
         // A student who is done with the test does not need the teacher anymore
@@ -598,6 +630,16 @@ export class StudentTestView {
     }
 
     onPartComplete() {
+        if (this.mediaRecorder) {
+            this.audioDetector.removeEventListener("audio.silent", this.onSilence);
+        }
+        this.answeredAt = document.timeline.currentTime;
+        this.send({
+            event: "part.complete",
+            partIndex: this.currentPartIndex,
+            partId: this.currentPart.id,
+            duration: this.answerDuration(this.answeredAt),
+        });
         this.clearPartTimeout();
         const canShow = this.setPart(this.currentPartIndex + 1);
 
@@ -610,7 +652,25 @@ export class StudentTestView {
         }
     }
 
+    // The teacher skips the rest of the current part
+    skipPart() {
+        this.instructionRunner?.skipToEnd();
+        this.domElements.interruptSound();
+        this.onPartComplete();
+    }
+
     // ---- Questions ----
+
+    sendQuestionDisplayed() {
+        this.send({
+            event: "question.displayed",
+            partIndex: this.currentPartIndex,
+            partId: this.currentPart.id,
+            questionIndex: this.currentQuestionIndex,
+            questionId: this.currentQuestion.id,
+            practice: this.isPracticing,
+        });
+    }
 
     setQuestion(isPracticing, questionIndex) {
         this.currentQuestionIndex = questionIndex;
@@ -675,6 +735,7 @@ export class StudentTestView {
         this.send({ event: "instructions.started" });
         this.updateNextButtonClass();
         this.domElements.lockInput();
+        this.domElements.toggleReplayInstructionsButton(false);
         this.domElements.toggleBodyClass("show-instructions", true);
 
         const instructionRunner = new InstructionSequenceRunner(
@@ -683,6 +744,7 @@ export class StudentTestView {
             this.domElements,
             this.audioContext,
         );
+        this.instructionRunner = instructionRunner;
 
         if (this.domElements.skipInstructionButton) {
             this.domElements.skipInstructionButton.addEventListener("click", () => {
@@ -695,10 +757,14 @@ export class StudentTestView {
             this.domElements.skipAllInstructionsButton.style.display = "block";
         }
 
-        this.domElements.fadeScreenOverlay();
-
         return instructionRunner.run().then(() => {
+            if (this.instructionRunner !== instructionRunner) {
+                return;
+            }
             this.domElements.unlockInput();
+            this.domElements.toggleReplayInstructionsButton(
+                this.currentQuestion.allowReplayingInstructionSequence,
+            );
             if (this.domElements.skipInstructionButton) {
                 this.domElements.skipInstructionButton.style.display = "none";
                 this.domElements.skipAllInstructionsButton.style.display = "none";
@@ -713,6 +779,11 @@ export class StudentTestView {
             }
             if (this.currentQuestion.continueWhenInstructionIsComplete) {
                 this.domElements.enableNextButton();
+            }
+            // DEBUG only: Make sure that the "next" button is always shown after
+            // a skipped instruction sequence
+            if (instructionRunner.skipAll) {
+                this.domElements.toggleNextButton(true);
             }
         });
     }

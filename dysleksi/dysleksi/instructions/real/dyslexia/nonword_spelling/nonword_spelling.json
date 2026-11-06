@@ -1,0 +1,302 @@
+[
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3",
+        "correct": "ma"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.2.mp3",
+        "correct": "pu"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "ipa"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "uki"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "maru"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "sina"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "samik"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "iguut"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "talasi"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "equlak"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "tapiluk"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "kagutai"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "terrivik"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "navaataq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "kummeqqat"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.3.mp3",
+        "correct": "ni"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.4.mp3",
+        "correct": "aq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "agu"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "muu"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "ikut"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "uumi"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "qasut"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "ungut"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "matseq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "pimmut"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "armuseq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "parngut"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "illoriaq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "oqqaavik"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "tullugiaq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.5.mp3",
+        "correct": "uu"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.6.mp3",
+        "correct": "ua"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "kuk"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "sat"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "miaq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "atsu"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "arfoq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "sikku"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "uuggat"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "ukuleq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "saaluki"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "soqineq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "suuniluk"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "kuppasoq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "uulisagaq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "ooq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "sui"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "apaa"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "kooq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "piteq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "saasoq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "talugaq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "uggavik"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "utiliaq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "naarusuk"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "qaattuaq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "paleralik"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "orlavik"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "innoraaq"
+    },
+    {
+        "question_type": "free_text",
+        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "correct": "eqaleraq"
+    }
+]

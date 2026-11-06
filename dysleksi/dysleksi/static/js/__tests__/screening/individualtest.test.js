@@ -7,7 +7,6 @@ import { Student } from "../../screening/model.js";
 import * as individualTestData from "./individualtest.json" with { type: "json" };
 import { IndividualTestDomElements } from "../../screening/dom.js";
 import { Test } from "../../screening/model.js";
-import { StudentTestView } from "../../screening/student-test.js";
 import { spyAttributes } from "../utils.js";
 import * as utils from "../../screening/utils.js";
 import { InstructionSequenceRunner } from "../../screening/instruction.js";
@@ -206,7 +205,6 @@ describe("IndividualTestFlow", () => {
     });
 
     it("complete test", () => {
-        vi.spyOn(StudentTestView.prototype, "onPartComplete");
         view.setPart(2);
         view.onPartComplete();
         expect(view.onTestComplete).toHaveBeenCalled();
@@ -254,8 +252,6 @@ describe("IndividualTestFlow", () => {
             questionIndex: view.currentQuestionIndex,
             questionId: view.currentQuestion.id,
             practice: false,
-            displayedAt: 0,
-            questionTitle: "1/3 (Individuel deltest)",
             assignmentId: 1,
         });
         expect(mediaRecorder.start).toHaveBeenCalled();
@@ -375,8 +371,7 @@ describe("IndividualTestFlow", () => {
         expect(view.onQuestionComplete).toHaveBeenCalled();
     });
 
-    it("onPartComplete sends part.complete with duration and then calls super.onPartComplete()", () => {
-        const superSpy = vi.spyOn(StudentTestView.prototype, "onPartComplete");
+    it("onPartComplete sends part.complete with duration", () => {
         view.setPart(0);
         const partIndex = view.currentPartIndex;
         const partId = view.currentPart.id;
@@ -396,8 +391,7 @@ describe("IndividualTestFlow", () => {
             duration: 75,
             assignmentId: 1,
         });
-
-        expect(superSpy).toHaveBeenCalled();
+        expect(view.setPart).toHaveBeenCalledWith(1);
     });
 
     it("onQuestionComplete sends question.answered including recordingBase64 and duration", () => {
@@ -488,16 +482,10 @@ describe("IndividualTestFlow", () => {
         expect(view.onPartComplete).toHaveBeenCalled();
     });
 
-    it("onTestComplete stops mediaRecorder before calling super.onTestComplete()", async () => {
-        // Spy on parent method to ensure it's called
-        const superSpy = vi
-            .spyOn(StudentTestView.prototype, "onTestComplete")
-            .mockImplementation(() => {});
-
+    it("onTestComplete stops mediaRecorder", async () => {
+        view.setPart(0);
         await view.onTestComplete(false);
-
         expect(stopSpy).toHaveBeenCalled();
-        expect(superSpy).toHaveBeenCalledWith(false);
     });
 
     it("parses websocket message event and forwards to onChatMessage", () => {
@@ -647,34 +635,30 @@ describe("IndividualTestFlow", () => {
         expect(view.showQuestion).toHaveBeenCalledWith(isPractice, newQuestionIndex);
     });
 
-    it("handles 'question.changed' events that change part index", () => {
-        // Arrange
-        const newPartIndex = 1;
-        const newQuestionIndex = 1;
-        const isPractice = false;
+    it("shows the outro without starting the next part when the teacher skips a part", () => {
         view.setPart(0);
-        // Act
+        view.instructionRunner = { skipToEnd: vi.fn() };
+        const startTestPartOutro = vi.spyOn(view, "startTestPartOutro");
+
         view.onChatMessage({
-            uuid: crypto.randomUUID(),
             event: "question.changed",
-            partIndex: newPartIndex,
-            partId: 1,
-            questionIndex: newQuestionIndex,
-            questionId: 2,
-            assignmentId: 1,
-            practice: isPractice,
+            partIndex: 1,
+            questionIndex: 0,
         });
-        // Assert
-        expect(view.setPart).toHaveBeenCalledWith(newPartIndex);
-        expect(view.showQuestion).toHaveBeenCalledWith(isPractice, newQuestionIndex);
+
+        expect(view.instructionRunner.skipToEnd).toHaveBeenCalled();
+        expect(view.domElements.interruptSound).toHaveBeenCalled();
+        expect(startTestPartOutro).toHaveBeenCalled();
+        expect(view.showQuestion).not.toHaveBeenCalled();
     });
     it("passes 'audio.detected' and 'audio.quiet' events on to teacher's session", () => {
         for (const event of ["audio.detected", "audio.quiet"]) {
             // Act: pretend the audio detector dispatches an event
             view.audioDetector.dispatchEvent(new Event(event));
             // Assert that we pass the audio event on
-            expect(view.onAudioEvent).toHaveBeenCalledWith(event);
-            expect(view.send).toHaveBeenCalled();
+            expect(view.send).toHaveBeenCalledWith(
+                expect.objectContaining({ event: event }),
+            );
         }
     });
 
@@ -708,8 +692,9 @@ describe("IndividualTestFlow", () => {
         // Act: pretend the audio detector dispatches an event
         view.audioDetector.dispatchEvent(new Event("audio.silent"));
         // Assert that we pass the audio event on
-        expect(view.onAudioEvent).toHaveBeenCalledWith("audio.silent");
-        expect(view.send).toHaveBeenCalled();
+        expect(view.send).toHaveBeenCalledWith(
+            expect.objectContaining({ event: "audio.silent" }),
+        );
     });
 });
 

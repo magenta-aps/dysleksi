@@ -13,6 +13,7 @@ from dysleksi.models import (
     Student,
     Test,
     TestAssignment,
+    TestLeader,
     TestResponse,
     TestType,
 )
@@ -82,25 +83,22 @@ class Command(BaseCommand):
                 test=test, klasse=klasse, teacher=klasse.teachers.order_by("?").first()
             )
             students = klasse.students.all()
-        elif test.test_type == TestType.INDIVIDUAL:
+        else:
             student_pk = options.get("student")
             if student_pk is None:
-                print("Must specify --student for an individual test")
+                print("Must specify --student for an individual or dyslexia test")
                 return
             student = Student.objects.get(pk=student_pk)
+            if test.test_type == TestType.DYSLEXIA:
+                teacher = TestLeader.objects.order_by("?").first()
+            else:
+                teacher = (
+                    student.classes.order_by("?").first().teachers.order_by("?").first()
+                )
             assignment, _ = TestAssignment.objects.get_or_create(
-                test=test,
-                student=student,
-                teacher=student.classes.order_by("?")
-                .first()
-                .teachers.order_by("?")
-                .first(),
+                test=test, student=student, teacher=teacher
             )
             students = Student.objects.filter(pk=student_pk)
-        else:
-            raise ValueError(
-                f"Incorrect test type '{test.test_type}'"
-            )  # pragma: no cover
 
         for student in students:
             skill = random.randint(1, 100)
@@ -109,17 +107,19 @@ class Command(BaseCommand):
             )
             time = timezone.now() - timedelta(hours=1)
             for i, testpart in enumerate(test.parts.all()):
-                completed = random.randint(1, 100) < 20
                 partresponse = PartResponse.objects.create(
                     testresponse=testresponse,
                     testpart=testpart,
                     finished_after=random.randint(2000, 10000),
-                    completed=completed,
+                    completed=True,
                     started_at=time,
                 )
 
                 for question in testpart.questions.all():
-                    correct = random.randint(1, 100) < skill
+                    # Any answer to a questionnaire counts as correct
+                    correct = (
+                        question.is_questionnaire or random.randint(1, 100) < skill
+                    )
 
                     if testpart.has_partially_correct_answers:
                         correctness = (
@@ -156,7 +156,9 @@ class Command(BaseCommand):
                                         answer_text = self.repeat_letter(answer_text)
                     else:
                         answer_option = (
-                            question.possible_answers.filter(correctness=correctness)
+                            question.possible_answers.filter(
+                                correctness=correctness, locked=False
+                            )
                             .order_by("?")
                             .first()
                         )

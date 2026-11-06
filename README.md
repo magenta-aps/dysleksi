@@ -40,8 +40,14 @@ To login using username/password, go to https://dysleksi-web/login/forward/djang
 | Student 1                               | UniLogin/MitID    | `elev@dys.gl`    | `elev`           |
 | Student 2                               | UniLogin/MitID    | `elev2@dys.gl`   | `elev2`          |
 | Student 3 ("Steve Jobs", iPad testing)  | Username/password | `elev`           | `elev`           |
+| Test leader (dyslexia test)             | Username/password | `testleder`      | `testleder`      |
+| Test person (dyslexia test)             | Username/password | `testperson`     | `testperson`     |
 
 To begin a screening session, click "Start individueltest" in the teacher window. The "student window" should now automatically switch to a screening session.
+
+To begin a dyslexia test, log in as the test leader and click "Tildel test". Choose a
+test person and the test for adults or for children, and log in as that test person in
+a second browser. The two tests only differ in their questionnaire.
 
 ## Accessing Django admin
 

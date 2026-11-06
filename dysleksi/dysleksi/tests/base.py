@@ -17,6 +17,8 @@ from dysleksi.models import (
     READING_SUPERVISORS,
     STUDENTS,
     TEACHERS,
+    TEST_LEADERS,
+    TEST_PERSONS,
     CategoryColorChoice,
     Class,
     Correctness,
@@ -31,7 +33,9 @@ from dysleksi.models import (
     Teacher,
     Test,
     TestAssignment,
+    TestLeader,
     TestPart,
+    TestPerson,
     TestQuestion,
     TestResource,
     TestResponse,
@@ -47,6 +51,8 @@ class DysleksiTest(TestCase):
         Group.objects.get_or_create(name=TEACHERS)
         Group.objects.get_or_create(name=STUDENTS)
         Group.objects.get_or_create(name=READING_SUPERVISORS)
+        Group.objects.get_or_create(name=TEST_LEADERS)
+        Group.objects.get_or_create(name=TEST_PERSONS)
         cls.school = cls.create_school(number="test123", name="TestSkolen")
         cls.klasse = cls.create_class(2025, "1.A", is_main=True)
         cls.student1 = cls.create_student(
@@ -422,6 +428,18 @@ class DysleksiTest(TestCase):
             defaults=kwargs,
         )
         return student
+
+    @classmethod
+    def create_test_leader(cls, username: str) -> TestLeader:
+        test_leader, _ = TestLeader.objects.update_or_create(username=username)
+        return test_leader
+
+    @classmethod
+    def create_test_person(cls, username: str, **kwargs) -> TestPerson:
+        test_person, _ = TestPerson.objects.update_or_create(
+            username=username, defaults=kwargs
+        )
+        return test_person
 
     def setup_view(
         self,

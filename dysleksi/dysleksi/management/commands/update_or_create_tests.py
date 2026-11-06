@@ -10,7 +10,15 @@ from django.core.management import call_command
 from django.core.management.base import BaseCommand
 from django.db.models import Count
 
-from dysleksi.models import Class, Student, Test, TestType
+from dysleksi.models import (
+    DYSLEXIA_TEST_ADULT,
+    DYSLEXIA_TEST_CHILD,
+    Class,
+    Student,
+    Test,
+    TestPerson,
+    TestType,
+)
 
 
 def get_or_create_test(
@@ -346,6 +354,54 @@ def create_individual_test(
     return test
 
 
+DYSLEXIA_TESTS = (
+    (DYSLEXIA_TEST_ADULT, "questionnaire_adult", "Spørgeskema (voksne)"),
+    (DYSLEXIA_TEST_CHILD, "questionnaire_child", "Spørgeskema (børn)"),
+)
+
+DYSLEXIA_TEST_PARTS = (
+    ("listening_comprehension", "Lytteforståelse"),
+    ("what_is_a_nonword", "Hvad er nonord?"),
+    ("choose_the_nonword", "3a – Vælg det, der ikke er et ord"),
+    ("spelling_choice", "Stavemåde"),
+    ("nonword_reading", "Læs nonord højt"),
+    ("nonword_spelling", "Stav nonord"),
+    ("lexical_decision", "3b – Lexical Decision"),
+)
+
+
+def create_dyslexia_tests(import_test, create_answers):
+    """
+    Creates a dyslexia test for adults and one for children. They only differ in
+    their questionnaire.
+    """
+    root = Path(settings.INSTRUCTIONS_ROOT) / "real" / "dyslexia"  # type:ignore
+
+    def import_part(test, code_name, part_name):
+        practice_json_path = root / code_name / f"{code_name}_practice.json"
+        import_test(
+            test.name,
+            part_name,
+            root / code_name / f"{code_name}.json",
+            f"dyslexia_{code_name}",
+            TestType.DYSLEXIA,
+            # The questionnaires have no practice questions
+            practice_json_path=(
+                practice_json_path if practice_json_path.exists() else None
+            ),
+        )
+
+    for test_name, questionnaire, questionnaire_name in DYSLEXIA_TESTS:
+        test, _ = Test.objects.get_or_create(
+            name=test_name, test_type=TestType.DYSLEXIA
+        )
+        parts = ((questionnaire, questionnaire_name), *DYSLEXIA_TEST_PARTS)
+        for code_name, part_name in parts:
+            import_part(test, code_name, part_name)
+        if create_answers:
+            answer_test(test)
+
+
 def answer_test(test):
     if test.test_type == TestType.GROUP:
         klasse = (
@@ -356,8 +412,12 @@ def answer_test(test):
         )
         if klasse is not None:
             call_command("answer_test", test.pk, **{"class": klasse.pk})
+    elif test.test_type == TestType.DYSLEXIA:
+        test_person = TestPerson.objects.order_by("?").first()
+        if test_person is not None:
+            call_command("answer_test", test.pk, student=test_person.pk)
     else:
-        student = Student.objects.all().order_by("?").first()
+        student = Student.objects.filter(classes__isnull=False).order_by("?").first()
         if student is not None:
             call_command("answer_test", test.pk, student=student.pk)
 
@@ -381,6 +441,9 @@ class Command(BaseCommand):
         dummy = options["dummy"]
         create_answers = options["answer"]
         import_test = make_import_test()
+        if not dummy:
+            create_dyslexia_tests(import_test, create_answers)
+
         for grade in (1, 2, 3):
             for period in ("midt", "slut"):
                 test = create_group_test(grade, period, import_test, dummy=dummy)

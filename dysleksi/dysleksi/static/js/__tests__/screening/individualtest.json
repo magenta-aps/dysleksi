@@ -8,6 +8,7 @@
       "name": "Individuel deltest",
       "instructions_url": null,
       "timeout": 60000,
+      "completed_by": [],
       "partial_score_after": 30000,
       "completion_source": "/static/foo.mp3",
       "practice": [
@@ -19,6 +20,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "s",
+          "localized_challenge_text": "s",
           "possible_answers": [],
           "instruction_sequence": {
             "instructions": [
@@ -43,6 +45,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "s",
+          "localized_challenge_text": "s",
           "possible_answers": [],
           "existing_answers": {}
         },
@@ -54,6 +57,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "s",
+          "localized_challenge_text": "s",
           "possible_answers": [],
           "instruction_sequence": {
             "instructions": [
@@ -80,6 +84,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "s",
+          "localized_challenge_text": "s",
           "existing_answers": {},
           "possible_answers": []
         },
@@ -91,6 +96,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "v",
+          "localized_challenge_text": "v",
           "existing_answers": {},
           "possible_answers": []
         },
@@ -102,6 +108,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "k",
+          "localized_challenge_text": "k",
           "existing_answers": {},
           "possible_answers": []
         }
@@ -112,6 +119,7 @@
       "name": "Højtlæsning af ord",
       "instructions_url": null,
       "timeout": 60000,
+      "completed_by": [],
       "partial_score_after": 30000,
       "completion_source": "/static/foo.mp3",
       "practice": [],
@@ -124,6 +132,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "meeqqat",
+          "localized_challenge_text": "meeqqat",
           "possible_answers": [],
           "existing_answers": {},
           "result_group": "A"
@@ -136,6 +145,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "isuk",
+          "localized_challenge_text": "isuk",
           "possible_answers": [],
           "existing_answers": {},
           "result_group": "A"
@@ -148,6 +158,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "apa",
+          "localized_challenge_text": "apa",
           "possible_answers": [],
           "existing_answers": {},
           "result_group": "B"
@@ -159,6 +170,7 @@
       "name": "Individuel deltest",
       "instructions_url": null,
       "timeout": 60000,
+      "completed_by": [],
       "partial_score_after": 30000,
       "completion_source": "/static/foo.mp3",
       "practice": [
@@ -170,6 +182,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "s",
+          "localized_challenge_text": "s",
           "possible_answers": [],
           "instruction_sequence": {
             "instructions": [
@@ -194,6 +207,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "s",
+          "localized_challenge_text": "s",
           "possible_answers": [],
           "existing_answers": {}
         },
@@ -205,6 +219,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "s",
+          "localized_challenge_text": "s",
           "possible_answers": [],
           "instruction_sequence": {
             "instructions": [
@@ -231,6 +246,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "s",
+          "localized_challenge_text": "s",
           "existing_answers": {},
           "possible_answers": []
         },
@@ -242,6 +258,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "v",
+          "localized_challenge_text": "v",
           "existing_answers": {},
           "possible_answers": []
         },
@@ -253,6 +270,7 @@
           "challenge_image_url": null,
           "challenge_sound_url": null,
           "challenge_text": "k",
+          "localized_challenge_text": "k",
           "existing_answers": {},
           "possible_answers": []
         }

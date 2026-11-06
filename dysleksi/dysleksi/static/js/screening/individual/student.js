@@ -1,11 +1,16 @@
 import { getAssignmentSocket } from "../../ws.js";
-import { IndividualTestDomElements } from "../dom.js";
+import { GroupTestDomElements, IndividualTestDomElements } from "../dom.js";
 import { TestMediaRecorder } from "../media.js";
 import { IndividualTestView } from "./student-individual-test.js";
+import { DyslexiaTestView } from "../dyslexia/student-dyslexia-test.js";
 
-export function initStudent(assignmentId, test, student) {
+export function initStudent(assignmentId, test, student, testType) {
     const assignmentSocket = getAssignmentSocket(assignmentId);
-    const domElements = new IndividualTestDomElements();
+    const [TestView, TestDomElements] =
+        testType === "dyslexia"
+            ? [DyslexiaTestView, GroupTestDomElements]
+            : [IndividualTestView, IndividualTestDomElements];
+    const domElements = new TestDomElements();
 
     // Start when socket is ready
     assignmentSocket.addEventListener("open", async () => {
@@ -20,12 +25,15 @@ export function initStudent(assignmentId, test, student) {
                 }),
             );
         };
+        let view = null;
         testMediaRecorder.addEventListener("mic.lost", () => {
             console.error("Lost access to the microphone");
-            sendToTeacher({
-                event: "setup.error",
-                error: "microphone access lost",
-            });
+            if (view === null || view.needsMicrophone()) {
+                sendToTeacher({
+                    event: "setup.error",
+                    error: "microphone access lost",
+                });
+            }
         });
         testMediaRecorder.addEventListener("mic.restored", () => {
             sendToTeacher({ event: "setup.restored" });
@@ -48,7 +56,7 @@ export function initStudent(assignmentId, test, student) {
         domElements.hideMicLostOverlay();
 
         console.log("Audio recording setup complete");
-        const view = new IndividualTestView(
+        view = new TestView(
             test,
             assignmentId,
             domElements,

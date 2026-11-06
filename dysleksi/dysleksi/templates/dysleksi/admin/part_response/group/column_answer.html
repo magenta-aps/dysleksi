@@ -32,7 +32,7 @@
         >{{ record.answer_text|default_if_none:"&nbsp;" }}</div>
 
 
-    {% elif record.partresponse.testresponse.assignment.test.test_type == TestType.INDIVIDUAL %}
+    {% elif record.partresponse.testresponse.assignment.test.test_type != TestType.GROUP %}
             {% if record.correctness == "correct" %}
                 <div class="answer answer-correct">
                     {% if record.question.challenge.text %}

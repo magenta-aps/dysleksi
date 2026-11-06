@@ -30,7 +30,7 @@ export async function start() {
         student.initializeMockData(test);
     }
 
-    if (testType === "individual") {
+    if (testType === "individual" || testType === "dyslexia") {
         if (role === "student") {
             ({ initStudent } = await import("./individual/student.js"));
         }

@@ -7,6 +7,7 @@ import re
 from pathlib import Path
 
 from data_tools.utils import (
+    update_or_create_dyslexia_test_part,
     update_or_create_fore_sound_test,
     update_or_create_letter_pronunciation_test,
     update_or_create_letter_shape_test,
@@ -183,6 +184,15 @@ class Command(BaseCommand):
         elif test_code_name == "letter_shape":
             update_or_create_letter_shape_test(
                 test,
+                questions_data,
+                practice_data,
+                name=testpart_name,
+                update_contents=update_contents,
+            )
+        elif test_code_name.startswith("dyslexia_"):
+            update_or_create_dyslexia_test_part(
+                test,
+                test_code_name.removeprefix("dyslexia_"),
                 questions_data,
                 practice_data,
                 name=testpart_name,

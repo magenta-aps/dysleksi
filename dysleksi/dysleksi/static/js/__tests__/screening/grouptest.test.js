@@ -108,6 +108,7 @@ const SHARED_DOM_HTML = `
     </div>
     <button id="next"></button>
     <button id="repeat"></button>
+    <button id="replay-instructions"></button>
     <button id="log-out"></button>
     <button id="end-intro"></button>
     <button id="end-break"></button>
@@ -379,6 +380,11 @@ describe("GroupTestFlow", () => {
 
         // --- Assertions ---
 
+        // The test leader sees the question while its instructions play
+        expect(view.send).toHaveBeenCalledWith(
+            expect.objectContaining({ event: "question.displayed", practice: true }),
+        );
+
         // Verify buttons are made visible
         expect(localDomElements.skipInstructionButton.style.display).toBe("block");
         expect(localDomElements.skipAllInstructionsButton.style.display).toBe("block");
@@ -402,6 +408,8 @@ describe("GroupTestFlow", () => {
         });
 
         expect(view.showNextQuestion).toHaveBeenCalled();
+        // The skipped sequence did not show the "next" button itself
+        expect(localDomElements.nextBtn.style.visibility).toBe("visible");
     });
 
     it("should handle free_text selection and update next button state", () => {
@@ -476,10 +484,8 @@ describe("GroupTestFlow", () => {
     it("Render Summary with a couple of completed parts", () => {
         const testData = JSON.parse(JSON.stringify(groupTestData));
 
-        // Simulate that the student has completed all questions in the first testpart
-        testData.parts[0].questions.forEach((question) => {
-            question.existing_answers = { [student.id]: { correctness: "correct" } };
-        });
+        testData.parts[0].image = "/media/resources/wordreading_2/wordreading_2.png";
+        testData.parts[0].completed_by = [student.id];
 
         const test = new Test(testData);
         const view = new GroupTestView(test, 1, domElements, student);
@@ -539,13 +545,8 @@ describe("GroupTestFlow", () => {
     it("Render intro and move on to onTestComplete", () => {
         const testData = JSON.parse(JSON.stringify(groupTestData));
 
-        // Simulate that the student has completed all questions
         testData.parts.forEach((part) => {
-            part.questions.forEach((question) => {
-                question.existing_answers = {
-                    [student.id]: { correctness: "correct" },
-                };
-            });
+            part.completed_by = [student.id];
         });
 
         const test = new Test(testData);
@@ -625,10 +626,7 @@ describe("GroupTestFlow", () => {
         // Ensure first part has no practice questions
         testData.parts[0].practice = [];
 
-        // Simulate that the student has completed all questions in the first part
-        testData.parts[0].questions.forEach((question) => {
-            question.existing_answers = { [student.id]: { correctness: "correct" } };
-        });
+        testData.parts[0].completed_by = [student.id];
 
         const test = new Test(testData);
         const view = new GroupTestView(test, 1, domElements, student);
@@ -1000,6 +998,50 @@ describe("GroupTestFlow", () => {
         expect(view.showQuestion).toHaveBeenCalledWith(false, 1);
     });
 
+    it("replays the instruction sequence of a question that allows it", async () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, 1, domElements, student);
+        view.setPart(0);
+        view.setQuestion(true, 0);
+        view.currentQuestion.instruction_sequence = { instructions: [] };
+        view.currentQuestion.allowReplayingInstructionSequence = true;
+        view.currentQuestion.advanceAutomatically = false;
+
+        await view.runInstructions();
+        expect(domElements.toggleReplayInstructionsButton).toHaveBeenLastCalledWith(
+            true,
+        );
+
+        view.start();
+        await domElements.setReplayInstructionsButtonListener.mock.calls[0][0]();
+        expect(domElements.toggleReplayInstructionsButton).toHaveBeenCalledWith(false);
+        expect(domElements.fadeScreenOverlay).not.toHaveBeenCalled();
+    });
+
+    it("ignores the end of an instruction sequence which was replaced", async () => {
+        // For example when a teacher jumps to a new question.
+        const view = new GroupTestView(
+            new Test(groupTestData),
+            1,
+            domElements,
+            student,
+        );
+        view.setPart(0);
+        view.setQuestion(true, 0);
+        view.currentQuestion.instruction_sequence = { instructions: [] };
+        let endFirst;
+        vi.spyOn(InstructionSequenceRunner.prototype, "run")
+            .mockReturnValueOnce(new Promise((resolve) => (endFirst = resolve)))
+            .mockReturnValueOnce(new Promise(() => {}));
+
+        const first = view.runInstructions();
+        view.runInstructions();
+        endFirst();
+        await first;
+
+        expect(view.showingInstructions).toBe(true);
+    });
+
     it("plays the challenge sound on question display", () => {
         // Arrange
         const test = new Test(groupTestData);
@@ -1061,6 +1103,26 @@ describe("GroupTestFlow", () => {
             expect(view.showNextQuestion).toHaveBeenCalled();
         });
         expect(view.domElements.makeButtonHappy).toHaveBeenCalled();
+    });
+
+    it("Does not confirm a correct answer when told not to", async () => {
+        const test = new Test(groupTestData);
+        const view = new GroupTestView(test, 1, domElements, student);
+        testSpy(view);
+        view.setPart(0);
+
+        view.showQuestion(true, 1);
+        const question = view.currentQuestion;
+        question.confirmCorrectAnswer = false;
+        view.selectAnswer(
+            question.possibleAnswers.find((a) => a.correctness === "correct"),
+        );
+        view.onQuestionComplete(question);
+
+        await vi.waitFor(() => {
+            expect(view.showNextQuestion).toHaveBeenCalled();
+        });
+        expect(view.domElements.makeButtonHappy).not.toHaveBeenCalled();
     });
 
     it("Always has correct answer on the same index for practice question", () => {
@@ -1164,8 +1226,7 @@ describe("GroupTestFlow", () => {
             partId: 6,
             questionIndex: 0,
             questionId: 25,
-            displayedAt: 0,
-            questionTitle: "1/2 (Wordspelling 2B (dummy))",
+            practice: false,
             assignmentId: 1,
             uuid: expect.any(String),
             student: expect.any(Object),
@@ -1239,6 +1300,50 @@ describe("GroupTestFlow", () => {
             uuid: expect.any(String),
             student: expect.any(Object),
         });
+    });
+
+    it("guides the student through writing the answer", () => {
+        const view = new GroupTestView(
+            new Test(groupTestData),
+            1,
+            domElements,
+            student,
+        );
+        testSpy(view);
+        domElements.playSound.mockResolvedValue();
+        view.setPart(1);
+        view.test.parts[1].questions[0].writingGuidance = true;
+        view.showQuestion(false, 0);
+        document.querySelectorAll(".letter-btn").forEach((b) => (b.disabled = false));
+        const press = (letter) =>
+            document.getElementById("free-text-" + letter).click();
+
+        const guide = document.querySelector(".writing-guidance");
+        expect(guide.textContent).toBe("aput");
+        expect(domElements.nextBtn.style.visibility).toBe("hidden");
+
+        press("a");
+        press("t");
+        expect(view.input.value).toBe("a");
+        expect(guide.querySelector(".rest").textContent).toBe("put");
+        expect(domElements.makeButtonAngry).toHaveBeenCalledWith("free-text-t");
+        expect(domElements.playSound).toHaveBeenCalledWith(
+            "/static/audio/7c.3.wav",
+            view.audioContext,
+        );
+
+        press("p");
+        press("u");
+        expect(domElements.nextBtn.style.visibility).toBe("hidden");
+        press("t");
+        press("a");
+        expect(view.input.value).toBe("aput");
+        expect(domElements.nextBtn.style.visibility).toBe("visible");
+
+        document.getElementById("free-text-erase-btn").click();
+        expect(view.input.value).toBe("apu");
+        expect(guide.querySelector(".rest").textContent).toBe("t");
+        expect(domElements.nextBtn.style.visibility).toBe("hidden");
     });
 
     it("Answer freetext question with empty string", () => {
@@ -2285,6 +2390,18 @@ describe("StudentTestView - updateNextButtonClass", () => {
         // Move to the index of the last practice question
         const lastIndex = view.currentPart.practice.length - 1;
         view.setQuestion(true, lastIndex);
+
+        view.updateNextButtonClass();
+
+        expect(domElements.setNextButtonClass).toHaveBeenCalledWith("start-part-btn");
+    });
+
+    it("should set 'start-part-btn' (Blue) on an outro before the last practice question", () => {
+        view.isPracticing = true;
+        view.setQuestion(true, 0);
+        view.currentQuestion.instruction_sequence = {
+            instructions: [{ action: "setRepeatButtonDestination", data: "0" }],
+        };
 
         view.updateNextButtonClass();
 

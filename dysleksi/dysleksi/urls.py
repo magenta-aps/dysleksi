@@ -20,6 +20,7 @@ from dysleksi.views import (
     QuestionResponseUpdateView,
     RootView,
     StartAssignmentView,
+    StartDyslexiaTestView,
     StudentDetailView,
     TestAssignmentListView,
     TestResponseView,
@@ -36,6 +37,11 @@ urlpatterns: list[URLResolver | URLPattern] = [
         "assignment/setup/",
         StartAssignmentView.as_view(),
         name="start_room",
+    ),
+    path(
+        "assignment/dyslexia/",
+        StartDyslexiaTestView.as_view(),
+        name="start_dyslexia_test",
     ),
     path("assignment/<int:pk>/", AssignmentView.as_view(), name="room"),
     path(

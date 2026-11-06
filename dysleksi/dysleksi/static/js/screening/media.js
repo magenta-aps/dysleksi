@@ -107,11 +107,10 @@ export class TestMediaRecorder extends EventTarget {
                 });
                 reader.readAsDataURL(recordingBlob);
             };
-            if (this.mediaRecorder.state === "recording") {
-                this.addEventListener("recording.updated", listener);
-                this.stop(); // Apparently calling requestData results in invalid data that cannot be played back, so stop and restart instead
-            }
-            this.start();
+            this.addEventListener("recording.updated", listener);
+            // Apparently calling requestData results in invalid data that cannot be
+            // played back, so stop instead. The next question starts recording again
+            this.stop();
         });
     }
 
@@ -174,6 +173,7 @@ export class AudioDetector extends EventTarget {
 
         if (avg > this.detectionLevelThreshold) {
             // Audio volume exceeds detection threshold
+            this.dispatchEvent(new Event("audio.heard"));
             this.dispatchDebounced("audio.detected");
         } else {
             // Current `avg` is below minimum level.
@@ -231,4 +231,38 @@ export class AudioDetector extends EventTarget {
         this.analyser.getByteTimeDomainData(bins);
         return bins;
     }
+}
+
+// Individual and dyslexia tests record the student, so the teacher can judge what
+// the student says
+export function setupRecording(view, mediaRecorder, onAudioHeard = null) {
+    const startAudioDetector = () => {
+        view.audioDetector?.stop();
+        view.audioDetector = new AudioDetector(mediaRecorder.stream);
+        for (const event of ["audio.detected", "audio.quiet"]) {
+            view.audioDetector.addEventListener(event, (e) =>
+                view.send({ event: e.type }),
+            );
+        }
+        if (onAudioHeard) {
+            view.audioDetector.addEventListener("audio.heard", onAudioHeard);
+        }
+        view.audioDetector.run();
+    };
+
+    view.mediaRecorder = mediaRecorder;
+    view.onSilence = (e) => view.send({ event: e.type });
+    startAudioDetector();
+    mediaRecorder.addEventListener("mic.lost", () => {
+        if (view.needsMicrophone()) {
+            view.domElements.showMicLostOverlay();
+        }
+    });
+    mediaRecorder.addEventListener("mic.restored", () => {
+        view.domElements.hideMicLostOverlay();
+        // The old detector listens to a stream that is gone
+        startAudioDetector();
+        mediaRecorder.start();
+    });
+    view.domElements.setRestoreMicButtonListener(() => mediaRecorder.restore());
 }

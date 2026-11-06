@@ -8,6 +8,7 @@
       "name": "Wordreading 2 (dummy)",
       "instructions_url": null,
       "timeout": 60000,
+      "completed_by": [],
       "partial_score_after": 30000,
       "completion_source": "/static/foo.mp3",
       "practice": [
@@ -39,6 +40,7 @@
         },
         {
           "id": 24,
+          "confirm_correct_answer": true,
           "challenge_id": 1,
           "challenge_name": "challenge",
           "challenge_image_url": "/media/wordreading_2_dummy/dog.png",
@@ -92,6 +94,7 @@
         },
         {
           "id": 25,
+          "confirm_correct_answer": true,
           "challenge_id": 19,
           "challenge_name": "challenge",
           "challenge_image_url": "/media/wordreading_2_dummy/cat.jpeg",
@@ -402,6 +405,7 @@
       "name": "Wordspelling 2B (dummy)",
       "instructions_url": null,
       "timeout": 60000,
+      "completed_by": [],
       "partial_score_after": 30000,
       "completion_source": "/static/foo.mp3",
       "practice": [

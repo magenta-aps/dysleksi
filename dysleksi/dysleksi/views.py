@@ -20,6 +20,7 @@ from django.db.models import (
     CharField,
     Count,
     DurationField,
+    Exists,
     ExpressionWrapper,
     F,
     IntegerField,
@@ -54,10 +55,11 @@ from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
 from openpyxl import Workbook
 from weasyprint import HTML
 
-from dysleksi.forms import ClassStudentFormSet, StartRoomForm
+from dysleksi.forms import ClassStudentFormSet, StartDyslexiaTestForm, StartRoomForm
 from dysleksi.models import (
     PARTIAL_SCORE,
     TEACHERS,
+    TEST_LEADERS,
     Class,
     Correctness,
     CorrectnessCategory,
@@ -88,6 +90,7 @@ from dysleksi.tables import (
     AnswerTimeTable,
     ClassStudentTable,
     ClassTable,
+    DyslexiaTestAssignmentTable,
     EmptyColumn,
     PartResultTable,
     PercentageColumn,
@@ -121,6 +124,8 @@ class UserTypeMixin(LoginRequiredMixin):
         # Find template name matching prefix and user type
         prefix = self.get_template_prefix()
         if isinstance(self.user, User):
+            if self.user.is_test_leader:
+                return [f"{prefix}/test_leader.html"]
             if self.user.is_teacher:
                 return [f"{prefix}/teacher.html"]
             if self.user.is_student:
@@ -187,6 +192,8 @@ class RootView(UserTypeMixin, NavigationMixin, TemplateView):
             context_data["student"] = self.user
         elif not self.user.is_anonymous and self.user.is_teacher:
             self.add_navigation_context(context_data, None, None)
+        elif not self.user.is_anonymous and self.user.is_test_leader:
+            context_data["form"] = StartDyslexiaTestForm()
         return context_data
 
 
@@ -212,6 +219,8 @@ class AssignmentView(
         return super().get(request, *args, **kwargs)
 
     def get_template_names(self) -> list[str]:
+        if self.user.is_test_leader:
+            return ["dysleksi/admin/test_assignment/detail_dyslexia.html"]
         if self.user.is_superuser or self.user.is_teacher:
             if self.object.test.test_type == TestType.INDIVIDUAL:
                 return ["dysleksi/admin/test_assignment/detail_individual.html"]
@@ -252,9 +261,11 @@ class AssignmentView(
         context["student_count"] = len(students) if assignment.klasse else None
         context["testpart_count"] = testpart_count
         context["test_type"] = room_type
-        context["test_type_label"] = (
-            _("Gruppetest") if room_type == "group" else _("Individueltest")
-        )
+        context["test_type_label"] = {
+            "group": _("Gruppetest"),
+            "individual": _("Individueltest"),
+            "dyslexia": _("Dysleksitest"),
+        }[room_type]
         context["student"] = self.user
         context["room_type"] = room_type
         if test.custom:
@@ -280,16 +291,37 @@ class AssignmentView(
         self.add_navigation_context(context, assignment.class_for_nav, None)
         context["class"] = assignment.class_for_nav
 
-        if assignment.class_for_nav:  # pragma: no branch
+        if assignment.class_for_nav:
             context["cancel_url"] = reverse("dysleksi:class_list")
+        else:
+            context["cancel_url"] = reverse("dysleksi:root")
 
         return context
 
     def get_room_type(self) -> str:
         if self.object.klasse is not None:
             return "group"
+        elif self.object.test.test_type == TestType.DYSLEXIA:
+            return "dyslexia"
         else:
             return "individual"
+
+
+class StartDyslexiaTestView(LoginRequiredMixin, View):
+    http_method_names = ["post"]
+
+    def post(self, request, *args, **kwargs):
+        if not self.user.is_test_leader:
+            raise PermissionDenied
+        form = StartDyslexiaTestForm(request.POST)
+        if not form.is_valid():
+            return HttpResponseBadRequest()
+        assignment = TestAssignment.objects.create(
+            test=form.cleaned_data["test"],
+            teacher=self.user,
+            student=form.cleaned_data["test_person"],
+        )
+        return redirect("dysleksi:room", pk=assignment.pk)
 
 
 class WindowLockView(
@@ -847,10 +879,19 @@ class TableExportMixin:
 
 class AssignmentResultListView(TestAssignmentListView):
     template_name = "dysleksi/admin/test_assignment/result_list.html"
-    table_class = TestAssignmentResultTable
+    groups_required = [TEACHERS, TEST_LEADERS]
+
+    def get_table_class(self):
+        if self.user.is_test_leader:
+            return DyslexiaTestAssignmentTable
+        return TestAssignmentResultTable
 
     def get_queryset(self):
-        return super().get_queryset().filter_finished()
+        qs = super().get_queryset().select_related("student", "test")
+        if self.user.is_test_leader:
+            # A test leader may open an unfinished dyslexia test again
+            return qs
+        return qs.filter_finished()
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
@@ -868,7 +909,7 @@ class AssignmentResultsView(
     DetailView,
 ):
     # Results view of as Class' responses to an entire Test
-    groups_required = [TEACHERS]
+    groups_required = [TEACHERS, TEST_LEADERS]
     model = TestAssignment
     table_class = TestResultTable
     template_name = "dysleksi/admin/test_responses/group/list.html"
@@ -879,7 +920,7 @@ class AssignmentResultsView(
 
     def get(self, request, *args, **kwargs):
         self.object = self.get_object()
-        if self.object.test.test_type == TestType.INDIVIDUAL:
+        if self.object.test.test_type != TestType.GROUP:
             return redirect(
                 "dysleksi:test_assignment_student_results",
                 assignment_pk=self.kwargs["pk"],
@@ -1225,7 +1266,7 @@ class TestResponseView(
     model = TestResponse
     template_name = "dysleksi/admin/test_response/detail.html"
     chart_template_name = "dysleksi/admin/test_response/chart.html"
-    groups_required = [TEACHERS]
+    groups_required = [TEACHERS, TEST_LEADERS]
 
     @cached_property
     def test_type(self) -> TestType:
@@ -1244,7 +1285,9 @@ class TestResponseView(
         return settings.RESULT_TABLE_SIZE  # type: ignore[misc]
 
     def get_items(self) -> QuerySet[TestPart]:
-        return self.object.assignment.test.parts.all().order_by("pk")
+        return self.object.assignment.test.parts.filter(
+            Exists(TestQuestion.objects.filter(part=OuterRef("pk"), is_practice=False))
+        )
 
     @cached_property
     def group_map(self) -> Dict[int, Dict[str | None, Dict[str | None, str | None]]]:
@@ -1339,7 +1382,7 @@ class TestResponseView(
                     f"correct_proportion_of_all{suffix}", f"correct_pct_of_all{suffix}"
                 )
             )
-            if self.test_type == TestType.INDIVIDUAL:
+            if self.test_type != TestType.GROUP:
                 qs = qs.annotate_questionresponses_count(
                     f"skipped_count{suffix}",
                     Q(question__is_practice=False, correctness=Correctness.SKIPPED)
@@ -1360,7 +1403,7 @@ class TestResponseView(
         field_spec: List[Tuple[StrOrPromise, str, str | None]] = [
             (_("Antal forsøgte"), "responses_count", None)
         ]
-        if self.test_type == TestType.INDIVIDUAL:
+        if self.test_type != TestType.GROUP:
             # Kun ved individuelle tests kan læreren springe en opgave over
             field_spec += [
                 (_("Antal oversprungne"), "skipped_count", None),
@@ -1424,6 +1467,9 @@ class TestResponseView(
                             "response": self.object,
                             "part": part,
                             "total_answers": column_values[responses_row] or 0,
+                            "is_questionnaire": part.questions.filter(
+                                is_questionnaire=True
+                            ).exists(),
                             "category": CorrectnessCategory.categorize_proportion(
                                 (
                                     (
@@ -1550,7 +1596,7 @@ class PartResponseView(
     # Results view of as Student's responses to a single TestPart
     model = PartResponse
     template_name = "dysleksi/admin/part_response/group/detail.html"
-    groups_required = [TEACHERS]
+    groups_required = [TEACHERS, TEST_LEADERS]
 
     def get_object(self, queryset=...):
         qs = (
@@ -1897,27 +1943,40 @@ class PartResponseView(
             )
         )
         if count_type_qs["teacher_judged"] > 0:
-            show_type = "image"
+            show_type = max(("image", "sound"), key=lambda t: count_type_qs[t])
         elif count_type_qs["multiple_match"] > 0:
             show_type = None
         else:
             show_type = max(count_type_qs, key=lambda t: count_type_qs[t])
+        if show_type is not None and count_type_qs[show_type] == 0:
+            show_type = None
 
         exclude_columns = [
             f"challenge_{x}" for x in ("image", "text", "sound") if x != show_type
         ]
-        if count_type_qs["teacher_judged"] == 0:
+        if count_type_qs["teacher_judged"] == 0 or count_type_qs["text"] == 0:
             exclude_columns.append("challenge_sentence")
         if self.object.testresponse.assignment.test.test_type == TestType.GROUP:
             exclude_columns.append("note")
+        # Any answer to a questionnaire is correct
+        is_questionnaire = self.object.testpart.questions.filter(
+            is_questionnaire=True
+        ).exists()
+        if is_questionnaire:
+            exclude_columns.append("correct_answer")
 
         context["responses_table"] = QuestionResponsesTable(
             data=self.get_current_items(),
             exclude=exclude_columns,
         )
+        if is_questionnaire:
+            context["responses_table"].columns["challenge_text"].column.verbose_name = (
+                _("Spørgsmål")
+            )
 
         self.add_navigation_context(context, None, self.object.testresponse.assignment)
         context["assignment"] = self.object.testresponse.assignment
+        context["is_questionnaire"] = is_questionnaire
 
         return context
 

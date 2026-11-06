@@ -20,6 +20,24 @@
             <button type="button" class="btn ph ph-caret-left" data-bs-dismiss="offcanvas" data-bs-target="#offcanvasResponsive" aria-label="{% translate 'Luk' %}"></button>
         </div>
         <div class="offcanvas-body">
+            {% if request.user.is_test_leader %}
+            <nav class="navbar">
+                <div class="navbar-nav">
+                    <li class="nav-item">
+                        <a href="{% url 'dysleksi:root' %}" class="nav-link mb-3 d-flex align-items-center {% if current_view == 'dysleksi:root' %}active{% endif %}">
+                            <i class="ph ph-user-plus fs-5"></i>
+                            {% translate "Tildel test" %}
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="{% url 'dysleksi:test_assignment_result_list' %}" class="nav-link mb-3 d-flex align-items-center {% if current_view == 'dysleksi:test_assignment_result_list' %}active{% endif %}">
+                            <i class="ph ph-list-bullets fs-5"></i>
+                            {% translate "Resultater" %}
+                        </a>
+                    </li>
+                </div>
+            </nav>
+            {% else %}
             <nav class="navbar">
                 <div class="navbar-nav">
                     <li class="nav-item">
@@ -104,6 +122,7 @@
                     </ul>
                 </div>
             </nav>
+            {% endif %}
             <div>
                 <div class="language-picker d-flex">
                     <i class="ph ph-globe"></i>
@@ -137,12 +156,16 @@
                     {% endblock %}
                 </ol>
             </nav>
+            {% if request.user.is_test_leader %}
+            <div class="ms-auto"></div>
+            {% else %}
             <form role="search" class="ms-auto me-5">
                 <div class="input-group">
                     <div class="input-group-text"><i class="ph ph-magnifying-glass"></i></div>
                     <input class="form-control" type="search" placeholder="{% translate 'Søg efter test, klasse eller elev' %}" aria-label="{% translate 'Søg' %}" />
                 </div>
             </form>
+            {% endif %}
             <ul class="navbar-nav me-1">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
