@@ -814,7 +814,8 @@ describe("GroupTestDomElements.fadeScreenOverlay", () => {
         vi.advanceTimersByTime(200);
 
         expect(overlay.style.opacity).toBe("0");
-        expect(overlay.style.transition).toBe("opacity 700ms ease");
+        // jsdom >= 31 drops the default "ease" timing function when serializing
+        expect(overlay.style.transition).toMatch(/^opacity 700ms( ease)?$/);
 
         vi.useRealTimers();
         vi.unstubAllGlobals();

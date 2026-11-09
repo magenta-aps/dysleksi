@@ -1615,13 +1615,27 @@ describe("Teacher Individual test View", () => {
     });
 
     it("displays an error modal if student audio input is silent", () => {
+        // The handler throws on purpose so the error is reported to the server.
+        // Exceptions in event listeners are reported on `window`; catch it here.
+        const reported = [];
+        const onError = (evt) => {
+            evt.preventDefault();
+            reported.push(evt.error);
+        };
+        window.addEventListener("error", onError);
         // Act: send "audio.silent" event
-        sendFromStudent({
-            event: "audio.silent",
-            student: {
-                displayName: "Elev E.",
-            },
-        });
+        try {
+            sendFromStudent({
+                event: "audio.silent",
+                student: {
+                    displayName: "Elev E.",
+                },
+            });
+        } finally {
+            window.removeEventListener("error", onError);
+        }
+        expect(reported).toHaveLength(1);
+        expect(reported[0].message).toMatch(/^mic audio is silent for/);
         // Assert: modal is displayed
         const modal = document.querySelector("#error");
         const modalBody = modal.querySelector(".modal-body-inner");
@@ -1632,16 +1646,15 @@ describe("Teacher Individual test View", () => {
 
     it("listens for 'questionFeedbackEdited' events from `EventTable`", () => {
         // Arrange
-        const spySendQuestionFeedbackToServer = vi.spyOn(
-            view,
-            "sendQuestionFeedbackToServer",
-        );
+        // Only the wiring is under test here, so don't run the real handler
+        const spySendQuestionFeedbackToServer = vi
+            .spyOn(view, "sendQuestionFeedbackToServer")
+            .mockImplementation(() => {});
+        const detail = { event: "question.feedback" };
         // Act
-        view.table.dispatchEvent(
-            new CustomEvent("questionFeedbackEdited", { detail: null }),
-        );
+        view.table.dispatchEvent(new CustomEvent("questionFeedbackEdited", { detail }));
         // Assert
-        expect(spySendQuestionFeedbackToServer).toHaveBeenCalled();
+        expect(spySendQuestionFeedbackToServer).toHaveBeenCalledWith(detail);
     });
 
     it("listens for `instructions.started` student events", () => {
@@ -3081,10 +3094,11 @@ describe("EventTable", () => {
             correctness: "skipped",
             ...data,
         });
-        // Assert: add event listener verifying event data
+        // Collect the dispatched events (assertions inside a listener are
+        // reported as uncaught errors instead of failing the test)
+        const details = [];
         table.addEventListener("questionFeedbackEdited", (evt) => {
-            expect(evt.detail).not.toBeUndefined();
-            expect(evt.detail.correctness).toBe("wrong");
+            details.push(evt.detail);
         });
 
         // Arrange: edit value of the form element
@@ -3092,6 +3106,11 @@ describe("EventTable", () => {
         elem.value = "En anden værdi";
         // Act: dispatch 'blur' event on the user-editable fields on the new row
         elem.dispatchEvent(new Event("blur"));
+
+        // Assert: the current correctness of the row is sent
+        expect(details).toHaveLength(1);
+        expect(details[0].correctness).toBe("skipped");
+        expect(details[0].event).toBe("question.feedback");
     });
 
     it("renders question cells for non-practice questions", () => {
