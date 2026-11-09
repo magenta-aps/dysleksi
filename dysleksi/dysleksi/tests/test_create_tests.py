@@ -6,7 +6,7 @@ import random
 import shutil
 import tempfile
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from django.apps import apps
 from django.conf import settings
@@ -19,7 +19,6 @@ from dysleksi.management.commands.import_test import remove_json_comments
 from dysleksi.management.commands.update_or_create_tests import (
     answer_test,
     create_dyslexia_tests,
-    make_import_test,
 )
 from dysleksi.models import (
     DYSLEXIA_TEST_ADULT,
@@ -36,11 +35,10 @@ from dysleksi.models import (
 from dysleksi.tests.base import DysleksiTest
 
 
-class CreateTests(DysleksiTest):
+class UpdateOrCreateTestsBase(DysleksiTest):
 
     @classmethod
     def setUpTestData(cls):
-        """Runs once for the entire class."""
         super().setUpTestData()
         random.seed(42)
 
@@ -50,75 +48,23 @@ class CreateTests(DysleksiTest):
         shutil.copytree(settings.INSTRUCTIONS_ROOT, cls.instruction_path)
         cls.addClassCleanup(cls._tmpdir.cleanup)
 
-        cls._override = override_settings(INSTRUCTIONS_ROOT=str(cls.instruction_path))
+        cls._override = override_settings(
+            INSTRUCTIONS_ROOT=str(cls.instruction_path), SIMPLE_HISTORY_ENABLED=False
+        )
         cls._override.enable()
         cls.addClassCleanup(cls._override.disable)
 
+        call_command("update_or_create_tests")
+
+
+class CreateTests(UpdateOrCreateTestsBase):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
         call_command("create_groups")
         call_command("create_dummy_classes_and_users")
-        call_command("update_or_create_tests")
-        call_command("update_or_create_tests", dummy=True, answer=True)
-
-        base_json_path = cls.instruction_path / "real"
-
-        cls.test_name_dict = {
-            "nonsense_word_pronunciation": "Højtlæsning af nonsensord",
-            "word_pronunciation": "Højtlæsning af ord",
-            "letter_pronunciation": "Bogstavbenævnelse",
-            "sentence_reading": "Sætningslæsning",
-            "wordreading_2": "Ordlæsning 2",
-            "wordspelling": "Ordstavning",
-            "wordreading_1": "Ordlæsning 1",
-            "nonwordspelling": "Nonordstavning",
-            "letter_shape": "Bogstavers form",
-            "fore_sound": "Forlyd",
-            "letter_sound": "Bogstavlyde",
-        }
-
-        cls.json_data = {}
-        cls.json_paths = {}
-
-        for test in cls.test_name_dict.keys():
-            cls.json_paths[f"{test}"] = base_json_path / test / f"{test}.json"
-            cls.json_paths[f"{test}_practice"] = (
-                base_json_path / test / f"{test}_practice.json"
-            )
-
-        for json_filename, json_path in cls.json_paths.items():
-            cls.json_data[json_filename] = cls.load_json_file(cls, json_path)
-
-    def load_json_file(self, json_path):
-        return json.loads(remove_json_comments(json_path.read_text(encoding="utf-8")))
-
-    def save_json_file(self, json_path, data):
-        json_path.write_text(
-            json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
-        )
-
-    def save_json_files(self):
-        for key, path in self.json_paths.items():
-            self.save_json_file(path, self.json_data[key])
-
-    def get_json_part(self, key):
-        test_name = self.test_name_dict[key]
-        return TestPart.objects.get(name=test_name).to_json(
-            self.test_assignment_student
-        )
-
-    def snapshot(self):
-        # Serialize every row of every model, ordered by pk so the comparison
-        # is stable. Captures field values too, not just row counts.
-        models = [
-            model
-            for model in apps.get_app_config("dysleksi").get_models()
-            if not issubclass(model, HistoricalChanges)
-        ]
-        return {
-            model._meta.label: serializers.serialize(
-                "json", model.objects.all().order_by("pk")
-            )
-            for model in models
-        }
+        call_command("update_or_create_tests", dummy=True)
 
     def test_dummy_data_creation(self):
         # We expect exactly one "word reading 2" test part, which is reused/referenced
@@ -187,40 +133,93 @@ class CreateTests(DysleksiTest):
         self.assertEqual(amount_of_students, Student.objects.all().count())
 
     def test_dummy_test_answers_creation(self):
-        word_reading_2_test: TestPart = TestPart.objects.filter(
-            name="Ordlæsning 2"
-        ).first()
+        for test_type in (TestType.GROUP, TestType.INDIVIDUAL):
+            with self.subTest(test_type=test_type):
+                test = Test.objects.get(
+                    name="Slut 1. klasse (dummy)", test_type=test_type
+                )
+                answer_test(test)
+                for part in test.parts.all():
+                    self.assertTrue(part.partresponses.exists())
+                    self.assertEqual(
+                        QuestionResponse.objects.filter(
+                            partresponse__testpart=part
+                        ).count(),
+                        part.partresponses.count() * part.questions.count(),
+                    )
 
-        students_participating: int = sum(
-            [
-                assignment.klasse.students.count()
-                for test in word_reading_2_test.tests.all()
-                for assignment in test.testassignment_set.all()
-            ]
-        )
-        question_count: int = word_reading_2_test.questions.count()
-        self.assertEqual(
-            word_reading_2_test.partresponses.count(), students_participating
-        )
-        self.assertEqual(
-            QuestionResponse.objects.filter(
-                partresponse__testpart_id=word_reading_2_test.pk
-            ).count(),
-            students_participating * question_count,
+    @patch("dysleksi.management.commands.update_or_create_tests.answer_test")
+    def test_create_tests_with_answers(self, mock_answer_test):
+        call_command("update_or_create_tests", dummy=True, answer=True)
+        self.assertEqual(mock_answer_test.call_count, 12)
+
+    def test_answer_test(self):
+
+        pk = Test.objects.filter(test_type=TestType.GROUP).first().pk
+        with patch("builtins.print") as mock_print:
+            call_command("answer_test", pk)
+            mock_print.assert_called_with("Must specify --class for a group test")
+
+        pk = Test.objects.filter(test_type=TestType.INDIVIDUAL).first().pk
+        with patch("builtins.print") as mock_print:
+            call_command("answer_test", pk)
+            mock_print.assert_called_with(
+                "Must specify --student for an individual or dyslexia test"
+            )
+
+    @patch("dysleksi.management.commands.update_or_create_tests.call_command")
+    def test_answer_test_if_no_student(self, mock_call_command):
+        Student.objects.all().delete()
+        test = Test.objects.filter(test_type=TestType.INDIVIDUAL).first()
+
+        answer_test(test)
+        mock_call_command.assert_not_called()
+
+    @patch("dysleksi.management.commands.update_or_create_tests.call_command")
+    def test_answer_dyslexia_test(self, mock_call_command):
+        test = Test.objects.filter(test_type=TestType.DYSLEXIA).first()
+        test_person = TestPerson.objects.get()
+
+        answer_test(test)
+        mock_call_command.assert_called_with(
+            "answer_test", test.pk, student=test_person.pk
         )
 
-    def test_dummy_test_answers_creation_no_classes_or_students(self):
-        word_reading_2_test: TestPart = TestPart.objects.filter(
-            name="Ordlæsning 2"
-        ).first()
+        TestPerson.objects.all().delete()
+        mock_call_command.reset_mock()
+        answer_test(test)
+        mock_call_command.assert_not_called()
 
-        self.assertEqual(word_reading_2_test.partresponses.count(), 0)
-        self.assertEqual(
-            QuestionResponse.objects.filter(
-                partresponse__testpart_id=word_reading_2_test.pk
-            ).count(),
-            0,
-        )
+    @patch("dysleksi.management.commands.update_or_create_tests.answer_test")
+    def test_create_dyslexia_tests_with_answers(self, mock_answer_test):
+        create_dyslexia_tests(Mock(), create_answers=True)
+        self.assertEqual(mock_answer_test.call_count, 2)
+
+    @patch("dysleksi.management.commands.update_or_create_tests.call_command")
+    def test_answer_test_if_no_class(self, mock_call_command):
+        Class.objects.all().delete()
+        test = Test.objects.filter(test_type=TestType.GROUP).first()
+
+        answer_test(test)
+        mock_call_command.assert_not_called()
+
+
+class IdempotencyTests(UpdateOrCreateTestsBase):
+
+    def snapshot(self):
+        # Serialize every row of every model, ordered by pk so the comparison
+        # is stable. Captures field values too, not just row counts.
+        models = [
+            model
+            for model in apps.get_app_config("dysleksi").get_models()
+            if not issubclass(model, HistoricalChanges)
+        ]
+        return {
+            model._meta.label: serializers.serialize(
+                "json", model.objects.all().order_by("pk")
+            )
+            for model in models
+        }
 
     def test_idempotency(self):
         """
@@ -248,6 +247,58 @@ class CreateTests(DysleksiTest):
                     f"{label} changed on re-run"
                 ),
             )
+
+
+class UpdateTests(UpdateOrCreateTestsBase):
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        base_json_path = cls.instruction_path / "real"
+
+        cls.test_name_dict = {
+            "nonsense_word_pronunciation": "Højtlæsning af nonsensord",
+            "word_pronunciation": "Højtlæsning af ord",
+            "letter_pronunciation": "Bogstavbenævnelse",
+            "sentence_reading": "Sætningslæsning",
+            "wordreading_2": "Ordlæsning 2",
+            "wordspelling": "Ordstavning",
+            "wordreading_1": "Ordlæsning 1",
+            "nonwordspelling": "Nonordstavning",
+            "letter_shape": "Bogstavers form",
+            "fore_sound": "Forlyd",
+            "letter_sound": "Bogstavlyde",
+        }
+
+        cls.json_data = {}
+        cls.json_paths = {}
+
+        for test in cls.test_name_dict.keys():
+            cls.json_paths[f"{test}"] = base_json_path / test / f"{test}.json"
+            cls.json_paths[f"{test}_practice"] = (
+                base_json_path / test / f"{test}_practice.json"
+            )
+
+        for json_filename, json_path in cls.json_paths.items():
+            cls.json_data[json_filename] = cls.load_json_file(cls, json_path)
+
+    def load_json_file(self, json_path):
+        return json.loads(remove_json_comments(json_path.read_text(encoding="utf-8")))
+
+    def save_json_file(self, json_path, data):
+        json_path.write_text(
+            json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
+
+    def save_json_files(self):
+        for key, path in self.json_paths.items():
+            self.save_json_file(path, self.json_data[key])
+
+    def get_json_part(self, key):
+        test_name = self.test_name_dict[key]
+        return TestPart.objects.get(name=test_name).to_json(
+            self.test_assignment_student
+        )
 
     def test_update_test(self):
 
@@ -434,53 +485,3 @@ class CreateTests(DysleksiTest):
         question = self.get_json_part("fore_sound")["practice"][2]
         self.assertIsNone(question["instruction_sequence"])
         self.assertTrue(question["continue_when_instruction_is_complete"])
-
-    def test_answer_test(self):
-
-        pk = Test.objects.filter(test_type=TestType.GROUP).first().pk
-        with patch("builtins.print") as mock_print:
-            call_command("answer_test", pk)
-            mock_print.assert_called_with("Must specify --class for a group test")
-
-        pk = Test.objects.filter(test_type=TestType.INDIVIDUAL).first().pk
-        with patch("builtins.print") as mock_print:
-            call_command("answer_test", pk)
-            mock_print.assert_called_with(
-                "Must specify --student for an individual or dyslexia test"
-            )
-
-    @patch("dysleksi.management.commands.update_or_create_tests.call_command")
-    def test_answer_test_if_no_student(self, mock_call_command):
-        Student.objects.all().delete()
-        test = Test.objects.filter(test_type=TestType.INDIVIDUAL).first()
-
-        answer_test(test)
-        mock_call_command.assert_not_called()
-
-    @patch("dysleksi.management.commands.update_or_create_tests.call_command")
-    def test_answer_dyslexia_test(self, mock_call_command):
-        test = Test.objects.filter(test_type=TestType.DYSLEXIA).first()
-        test_person = TestPerson.objects.get()
-
-        answer_test(test)
-        mock_call_command.assert_called_with(
-            "answer_test", test.pk, student=test_person.pk
-        )
-
-        TestPerson.objects.all().delete()
-        mock_call_command.reset_mock()
-        answer_test(test)
-        mock_call_command.assert_not_called()
-
-    @patch("dysleksi.management.commands.update_or_create_tests.answer_test")
-    def test_create_dyslexia_tests_with_answers(self, mock_answer_test):
-        create_dyslexia_tests(make_import_test(), create_answers=True)
-        self.assertEqual(mock_answer_test.call_count, 2)
-
-    @patch("dysleksi.management.commands.update_or_create_tests.call_command")
-    def test_answer_test_if_no_class(self, mock_call_command):
-        Class.objects.all().delete()
-        test = Test.objects.filter(test_type=TestType.GROUP).first()
-
-        answer_test(test)
-        mock_call_command.assert_not_called()
