@@ -154,6 +154,21 @@ class Command(BaseCommand):
                                         answer_text = self.replace_letter(answer_text)
                                     else:
                                         answer_text = self.repeat_letter(answer_text)
+                    elif question.question_type == QuestionType.MULTIPLE_CHOICE_MATCH:
+                        answer_option = None
+                        sides = [
+                            question.possible_answers.filter(
+                                resource__name__endswith=s
+                            ).order_by("?")
+                            for s in ("set1", "set2")
+                        ]
+                        pair = [
+                            side.get(correctness=Correctness.CORRECT) for side in sides
+                        ]
+                        if not correct:
+                            i = random.randint(0, 1)
+                            pair[i] = sides[i].filter(correctness=Correctness.WRONG)[0]
+                        answer_text = pair[0].resource.text + pair[1].resource.text
                     else:
                         answer_option = (
                             question.possible_answers.filter(
