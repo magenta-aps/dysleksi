@@ -245,7 +245,7 @@
         "sound": "resources/Enhanced L100-L109/L107.mp3", // TODO: Replace me
         "correct": "ali",
         "correct_index": 2,
-        "wrong": ["ata", "aqu", "asu", "aqu"]
+        "wrong": ["ata", "aqu", "asu", "api"]
     },
     // Opgave 32
     {
