@@ -19,11 +19,7 @@
         {% with record.answer_text|make_list as sides %}
         <div
                 class="answer {% if record.correctness == "correct" %}answer-correct{% else %}answer-incorrect{% endif %}"
-        >{{ sides.0 }}</div>
-        /
-        <div
-                class="answer {% if record.correctness == "correct" %}answer-correct{% else %}answer-incorrect{% endif %}"
-        >{{ sides.1 }}</div>
+        >{{ sides.0 }} / {{ sides.1 }}</div>
         {% endwith %}
 
     {% elif question_type == QuestionType.FREE_TEXT %}
