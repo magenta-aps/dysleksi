@@ -958,6 +958,26 @@ describe("GroupTestFlow", () => {
         }
     });
 
+    it("Splits more than four choices in two rows", () => {
+        const data = structuredClone(groupTestData);
+        const answers = data.parts[0].questions[0].possible_answers;
+        while (answers.length < 5) {
+            answers.push({ ...answers[0], id: 1000 + answers.length });
+        }
+        const view = new GroupTestView(new Test(data), 1, domElements, student);
+        testSpy(view);
+        view.setPart(0);
+
+        view.showFirstQuestion(false);
+        const rows = domElements.choicesEl.querySelectorAll(".choices-row");
+        expect(domElements.choicesEl.classList).toContain("two-row-layout");
+        expect(rows[0].children.length).toBe(2);
+        expect(rows[1].children.length).toBe(3);
+
+        domElements.clearQuestionChoices();
+        expect(domElements.choicesEl.classList).not.toContain("two-row-layout");
+    });
+
     it("Go to next question", () => {
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, 1, domElements, student);

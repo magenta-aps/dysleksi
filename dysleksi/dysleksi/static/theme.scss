@@ -570,6 +570,16 @@ body.show-instructions {
     gap: 32px;
   }
 
+  &.two-row-layout {
+    flex-direction: column;
+  }
+
+  .choices-row {
+    display: flex;
+    width: 100%;
+    gap: 32px;
+  }
+
   &:has(.square-btn) {
     width: fit-content;
     max-width: 90vw;

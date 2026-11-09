@@ -100,14 +100,15 @@ export class GroupTestView extends StudentTestView {
                 this.currentQuestion.type === "multiple_choice_with_display_field"
             ) {
                 this.answerButtons = [];
-                answers.forEach((answer) => {
+                const containers = this.domElements.choiceContainers(answers.length);
+                answers.forEach((answer, index) => {
                     const button = this.domElements.showQuestionChoice(
                         answer,
                         () => {
                             this.selectAnswer(answer);
                         },
                         answers.length,
-                        this.domElements.choicesEl,
+                        containers[index],
                         answers.length < 6 &&
                             answers.some((a) => a.resourceText?.length === 1),
                     );

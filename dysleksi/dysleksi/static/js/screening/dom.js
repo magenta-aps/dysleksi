@@ -968,9 +968,27 @@ export class GroupTestDomElements extends TestDomElements {
 
     clearQuestionChoices() {
         this.choicesEl.innerHTML = "";
-        this.choicesEl.classList.remove("true-false-layout");
+        this.choicesEl.classList.remove("true-false-layout", "two-row-layout");
         this.choicesElLeft.innerHTML = "";
         this.choicesElRight.innerHTML = "";
+    }
+
+    // More than four choices are split in two rows, with the most choices on the bottom row
+    choiceContainers(answerCount) {
+        if (answerCount <= 4) {
+            return Array(answerCount).fill(this.choicesEl);
+        }
+        this.choicesEl.classList.add("two-row-layout");
+        const rows = [document.createElement("div"), document.createElement("div")];
+        for (const row of rows) {
+            row.className = "choices-row";
+            this.choicesEl.append(row);
+        }
+        const topCount = Math.floor(answerCount / 2);
+        return Array.from(
+            { length: answerCount },
+            (_, i) => rows[i < topCount ? 0 : 1],
+        );
     }
 
     showQuestionChoice(answer, listener, answerCount, container, squareButton = false) {
