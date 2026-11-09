@@ -2061,8 +2061,8 @@ class TestPartResponseView(ResponseTest):
             table,
             [
                 [["Opg."], ["Rigtigt svar"], ["Elevens svar"], ["Tid"]],
-                [["1"], ["A / a"], ["A", "/", "a"], ["5 sek."]],
-                [["2"], ["B / b"], ["C", "/", "c"], ["5 sek."]],
+                [["1"], ["A / a"], ["A / a"], ["5 sek."]],
+                [["2"], ["B / b"], ["C / c"], ["5 sek."]],
                 [[], [], [], ["10 sek."]],
             ],
         )
