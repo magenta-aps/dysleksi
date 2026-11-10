@@ -55,10 +55,12 @@
             <span class="divider">/</span>
             <span id="current-test-part-number" class="ms-2">{% translate 'Del' %}</span>
             <div class="align-items-center ms-auto">
+                {% block elapsed_time %}
                 <span class="d-inline-flex align-items-baseline me-5">
                     <i class="ph ph-clock me-2"></i>
                     <span id="total-elapsed-time"></span>
                 </span>
+                {% endblock %}
                 <button id="goto-next-result-group" class="btn btn-outline-secondary me-2">
                     <i class="ph-fill ph-skip-forward"></i>
                     {% translate 'Hop til næste del' %}

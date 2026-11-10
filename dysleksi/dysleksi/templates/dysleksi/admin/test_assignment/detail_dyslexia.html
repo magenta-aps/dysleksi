@@ -8,6 +8,10 @@
 </li>
 {% endblock %}
 
+{% block elapsed_time %}
+<span id="total-elapsed-time" hidden></span>
+{% endblock %}
+
 {% block note %}
 <div id="questionnaire-choices" class="buttons"></div>
 <textarea id="note" class="form-control mb-3 d-none" rows="3" placeholder="{% translate 'Note' %}"></textarea>
