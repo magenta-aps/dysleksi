@@ -3,6 +3,7 @@
 # SPDX-License-Identifier: MPL-2.0
 from django.conf import settings
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.sessions.backends.signed_cookies import SessionStore
 from django.http import HttpRequest
 from django.test import SimpleTestCase
 from django.urls import ResolverMatch, reverse
@@ -44,6 +45,7 @@ class TestAutoLogoutContext(SimpleTestCase):
     def request(self, user, url_name: str) -> HttpRequest:
         request = HttpRequest()
         request.user = user  # type: ignore
+        request.session = SessionStore()
         request.resolver_match = ResolverMatch(
             None,  # type: ignore
             None,  # type: ignore
@@ -54,11 +56,15 @@ class TestAutoLogoutContext(SimpleTestCase):
         return request
 
     def test_logs_out_an_inactive_user(self):
+        # Arrange: the user has just left a test
+        request = self.request(User(), "class_list")
+        request.session.set_expiry(settings.SESSION_TEST_TIMEOUT)
         # Act
-        config = auto_logout_context(self.request(User(), "class_list"))[
-            "AUTO_LOGOUT_CONFIG"
-        ]
+        config = auto_logout_context(request)["AUTO_LOGOUT_CONFIG"]
         # Assert
+        self.assertEqual(
+            request.session.get_expiry_age(), settings.SESSION_IDLE_TIMEOUT
+        )
         self.assertTrue(config["enabled"])
         self.assertTrue(config["logout_on_idle"])
         self.assertEqual(config["timeout"], settings.SESSION_IDLE_TIMEOUT)
@@ -67,8 +73,12 @@ class TestAutoLogoutContext(SimpleTestCase):
 
     def test_does_not_log_out_during_a_test(self):
         # Act: the page of a test, seen by teachers as well as students
-        config = auto_logout_context(self.request(User(), "room"))["AUTO_LOGOUT_CONFIG"]
+        request = self.request(User(), "room")
+        config = auto_logout_context(request)["AUTO_LOGOUT_CONFIG"]
         # Assert
+        self.assertEqual(
+            request.session.get_expiry_age(), settings.SESSION_TEST_TIMEOUT
+        )
         self.assertTrue(config["enabled"])
         self.assertFalse(config["logout_on_idle"])
 

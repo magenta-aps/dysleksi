@@ -40,6 +40,8 @@ if not DEBUG:
 # Note: SESSION_IDLE_TIMEOUT is not a default Django session parameter
 SESSION_IDLE_TIMEOUT = int(os.environ.get("SESSION_IDLE_TIMEOUT", 10 * 60))
 SESSION_COOKIE_AGE = SESSION_IDLE_TIMEOUT
+# Lets a test survive the server being unreachable for a while
+SESSION_TEST_TIMEOUT = int(os.environ.get("SESSION_TEST_TIMEOUT", 2 * 60 * 60))
 SESSION_SAVE_EVERY_REQUEST = True
 
 BASE_DIR = Path(__file__).resolve().parent.parent

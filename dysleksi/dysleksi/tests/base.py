@@ -7,6 +7,7 @@ from datetime import datetime
 from pathlib import Path
 
 from django.contrib.auth.models import AnonymousUser, Group, Permission
+from django.contrib.sessions.backends.signed_cookies import SessionStore
 from django.core.files.images import ImageFile
 from django.core.management import call_command
 from django.test import TestCase, override_settings
@@ -452,6 +453,7 @@ class DysleksiTest(TestCase):
         request_factory = RequestFactory()
         request = request_factory.get("", query_params=query_params)
         request.user = user
+        request.session = SessionStore()
         view = view_class()
         view.setup(request, **kwargs)
         if get:
