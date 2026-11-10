@@ -34,6 +34,7 @@ export class StudentTestView {
     windowBlocked = false;
     frozen = false;
     rejoinIntervalId = null;
+    summaryVoiceOver = true;
 
     constructor(test, assignmentId, domElements, student) {
         preventDoubleTapZoom();
@@ -448,25 +449,27 @@ export class StudentTestView {
         });
 
         try {
-            // Du kommer til at arbejde med forskellige opgaver.
-            await this.domElements.playSound(
-                "/static/audio/1t.5.wav",
-                this.audioContext,
-            );
-            await this.sleep(750);
+            if (this.summaryVoiceOver) {
+                // Du kommer til at arbejde med forskellige opgaver.
+                await this.domElements.playSound(
+                    "/static/audio/1t.5.wav",
+                    this.audioContext,
+                );
+                await this.sleep(750);
 
-            // Du får at vide, hvergang en ny deltests skal starte.
-            await this.domElements.playSound(
-                "/static/audio/1t.6.wav",
-                this.audioContext,
-            );
-            await this.sleep(750);
+                // Du får at vide, hvergang en ny deltests skal starte.
+                await this.domElements.playSound(
+                    "/static/audio/1t.6.wav",
+                    this.audioContext,
+                );
+                await this.sleep(750);
 
-            // Tryk grøn når du er klar.
-            await this.domElements.playSound(
-                "/static/audio/1t.7.wav",
-                this.audioContext,
-            );
+                // Tryk grøn når du er klar.
+                await this.domElements.playSound(
+                    "/static/audio/1t.7.wav",
+                    this.audioContext,
+                );
+            }
 
             this.domElements.showElement(this.domElements.endSummaryButton);
         } catch (e) {
@@ -605,8 +608,13 @@ export class StudentTestView {
         if (this.test.parts.length > 1) {
             this.domElements.showSummary(this.test.parts, this.student, true);
 
-            // Du er færdig med alle deltest. Tak.
-            this.domElements.playSound("/static/audio/1t.10.wav", this.audioContext);
+            if (this.summaryVoiceOver) {
+                // Du er færdig med alle deltest. Tak.
+                this.domElements.playSound(
+                    "/static/audio/1t.10.wav",
+                    this.audioContext,
+                );
+            }
         } else {
             this.domElements.showTestExit();
             this.domElements.playSound(

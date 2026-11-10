@@ -9,6 +9,7 @@ import { setupRecording } from "../media.js";
 // individual test)
 export class DyslexiaTestView extends GroupTestView {
     readingAloud = false;
+    summaryVoiceOver = false;
 
     constructor(test, assignmentId, domElements, mediaRecorder, student) {
         super(test, assignmentId, domElements, student);
