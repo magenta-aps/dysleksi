@@ -132,22 +132,6 @@
             </nav>
             {% endif %}
             <div>
-                <div class="language-picker d-flex">
-                    <i class="ph ph-globe"></i>
-                    <form action="{% url 'set_language' %}" method="post" class="d-flex">
-                        {% csrf_token %}
-                        <select name="language" onchange="this.form.submit()">
-                            {% get_current_language as LANGUAGE_CODE %}
-                            {% get_available_languages as LANGUAGES %}
-                            {% get_language_info_list for LANGUAGES as languages %}
-                            {% for language in languages %}
-                            <option value="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} selected="selected"{% endif %}>
-                                {{ language.name_local|capfirst }}
-                            </option>
-                            {% endfor %}
-                        </select>
-                    </form>
-                </div>
                 <div class="about">
                     <div class="logo"></div>
                     <div class="version">{{ version }}</div>
@@ -156,7 +140,7 @@
         </div>
     </div>
     <div class="content">
-        {# Secondary navigation: breadcrumb, search, and user menu #}
+        {# Secondary navigation: breadcrumb, language picker, and user menu #}
         <nav class="navbar">
             <nav aria-label="breadcrumb">
                 <ol class="breadcrumb">
@@ -164,16 +148,18 @@
                     {% endblock %}
                 </ol>
             </nav>
-            {% if request.user.is_test_leader %}
-            <div class="ms-auto"></div>
-            {% else %}
-            <form role="search" class="ms-auto me-5">
-                <div class="input-group">
-                    <div class="input-group-text"><i class="ph ph-magnifying-glass"></i></div>
-                    <input class="form-control" type="search" placeholder="{% translate 'Søg efter test, klasse eller elev' %}" aria-label="{% translate 'Søg' %}" />
-                </div>
+            <form action="{% url 'set_language' %}" method="post" class="language-picker d-flex ms-auto me-5">
+                {% csrf_token %}
+                {% get_current_language as LANGUAGE_CODE %}
+                {% get_available_languages as LANGUAGES %}
+                {% get_language_info_list for LANGUAGES as languages %}
+                {% for language in languages %}
+                <button type="submit" name="language" value="{{ language.code }}" lang="{{ language.code }}"{% if language.code == LANGUAGE_CODE %} class="active" aria-current="true"{% endif %}>
+                    <img src="{% static 'images/flag-'|add:language.code|add:'.svg' %}" alt="">
+                    <span>{{ language.name_local|capfirst }}</span>
+                </button>
+                {% endfor %}
             </form>
-            {% endif %}
             <ul class="navbar-nav me-1">
                 <li class="nav-item dropdown">
                     <a class="nav-link dropdown-toggle d-flex align-items-center text-black" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">

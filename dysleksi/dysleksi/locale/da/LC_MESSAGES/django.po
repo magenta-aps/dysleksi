@@ -600,14 +600,6 @@ msgid "Statistik"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/base.html
-msgid "Søg efter test, klasse eller elev"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/base.html
-msgid "Søg"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/base.html
 #: dysleksi/templates/dysleksi/screening/student.html
 msgid "Log ud"
 msgstr ""

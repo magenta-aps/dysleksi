@@ -235,36 +235,6 @@ h6 {
       }
     }
 
-    .language-picker {
-      flex-direction: row;
-      justify-content: space-between;
-      align-items: anchor-center;
-      padding: $spacer;
-      color: $mono-white;
-
-      i.ph {
-        margin: 0 0.25 * $spacer 0 0;
-      }
-
-      form {
-        flex: 1 1 0;
-      }
-
-      select {
-        flex: 1 1 0;
-        padding: 0.25 * $spacer;
-        background: transparent;
-        border: none;
-        color: $mono-white;
-
-        option {
-          color: $mono-gray-dark-2;
-          background: $mono-white;
-        }
-      }
-    }
-
-
     .about {
       flex-direction: column;
       padding: $spacer;
@@ -292,7 +262,7 @@ h6 {
       padding: 1.5 * $spacer 2.5 * $spacer;
     }
 
-    // Secondary navigation: breadcrumb, search field and user menu
+    // Secondary navigation: breadcrumb, language picker and user menu
     nav.navbar {
       flex-flow: row nowrap;
       justify-items: center;
@@ -316,23 +286,26 @@ h6 {
         }
       }
 
-      form {
-        .input-group {
-          .input-group-text {
-            border-radius: 5 * $spacer;
-            border-right: none;
-            background: transparent;
+      .language-picker {
+        gap: $spacer;
+
+        button {
+          display: flex;
+          align-items: center;
+          gap: 0.5 * $spacer;
+          padding: 0;
+          background: transparent;
+          border: none;
+          color: $mono-gray-darkest;
+
+          img {
+            height: 1em;
+            box-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
           }
 
-          .form-control {
-            border-radius: 5 * $spacer;
-            background: transparent;
-            border-left: none;
-            padding-left: 0;
-          }
-
-          .form-control:focus {
-            box-shadow: none;
+          &.active span {
+            text-decoration: underline;
+            text-underline-offset: 0.3em;
           }
         }
       }
