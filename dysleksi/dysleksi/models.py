@@ -8,6 +8,7 @@ import os
 import re
 import uuid
 from base64 import b64decode
+from collections import defaultdict
 from dataclasses import dataclass
 from datetime import date
 from functools import partial
@@ -50,6 +51,7 @@ from django.utils.translation import gettext_lazy as _
 from integrations.eboks.client import EboksClient, MessageFailureException
 from lxml import etree
 from simple_history.models import HistoricalRecords
+from simple_history.utils import bulk_create_with_history, bulk_update_with_history
 
 from dysleksi.exceptions import MissingIdException
 
@@ -631,6 +633,50 @@ class TestResource(models.Model):
     def __str__(self) -> str:
         return self.name
 
+    @classmethod
+    def get_or_create_many(cls, lookups: list[tuple]) -> dict[tuple, int]:
+        candidates: dict[str, list[TestResource]] = defaultdict(list)
+        names = {dict(lookup)["name"] for lookup in lookups}
+        for existing in cls.objects.filter(name__in=names).order_by("pk"):
+            candidates[existing.name].append(existing)
+
+        def find(fields):
+            """
+            Finds a test-resource given its name and its attributes
+
+            For example:
+
+            >>> fields = {"name": "res1", image : "foo.jpg"}
+            >>> find(fields)
+
+            Will loop through all test-resources with name = "res1" and return the first
+            one with image = "foo.jpg"
+
+            This function is needed becuase the "name" attribute  on the
+            TestResourceis not unique. For example all challenges have
+            name = "challenge"
+            """
+            for candidate in candidates[fields["name"]]:
+                if all(getattr(candidate, f) == v for f, v in fields.items()):
+                    return candidate
+            return None
+
+        resources = {}
+        created = []
+        for lookup in lookups:
+            fields = dict(lookup)
+            resource = find(fields)
+            if resource is None:
+                resource = cls(**fields)
+                candidates[resource.name].append(resource)
+                created.append(resource)
+            resources[lookup] = resource
+
+        bulk_create_with_history(created, cls)
+
+        # Return the primary key for each lookup
+        return {lookup: resource.pk for lookup, resource in resources.items()}
+
     @property
     def localized_text(self) -> str | None:
         if get_language() == "da":
@@ -955,6 +1001,37 @@ class TestPartResultsBreakdownRange(models.Model):
         return self.lower, self.upper
 
 
+def sync_rows(model: Any, existing: dict, desired: dict):
+    """
+    Make the rows in `existing` match the field values in `desired`. Both dicts need to
+    be keyed using the same indexers. The keys can be integers or tuples.
+
+    If a row is in `existing` but not in `desired` it is deleted, if it is in both dicts
+    it is updated and if it is in `desired` but not in `existing` it is created.
+    """
+
+    rows = {}
+    created = []
+    updated = []
+    for key, values in desired.items():
+        row = existing.pop(key, None)
+        if row is None:
+            row = model(**values)
+            created.append(row)
+        elif any(getattr(row, field) != value for field, value in values.items()):
+            for field, value in values.items():
+                setattr(row, field, value)
+            updated.append(row)
+        rows[key] = row
+
+    bulk_create_with_history(created, model)
+    if updated:
+        fields = {field for values in desired.values() for field in values}
+        bulk_update_with_history(updated, model, fields)
+    model.objects.filter(pk__in=[row.pk for row in existing.values()]).delete()
+    return rows
+
+
 class TestPart(models.Model):
     history = HistoricalRecords(m2m_fields=["tests"])
 
@@ -1233,6 +1310,20 @@ class TestPart(models.Model):
         }
 
     def update_or_create_test_resources(self, questions_data, is_practice=False):
+        lookups: list[tuple] = []
+
+        def resource(**lookup):
+            key = tuple(sorted(lookup.items()))
+            lookups.append(key)
+            return key
+
+        def answer_resource(answer):
+            mime_type, _ = mimetypes.guess_type(answer)
+            if mime_type and mime_type.startswith("image"):
+                return resource(name=os.path.basename(answer), image=answer)
+            return resource(name=answer, text=answer)
+
+        questions: list[tuple] = []
         for order, data in enumerate(questions_data):
             if data.get("question_type") == "instruction_sequence_outro":
                 data = self.instruction_sequence_outro(data["sounds"])
@@ -1241,25 +1332,20 @@ class TestPart(models.Model):
                     data.get("start_test", False)
                 )
 
-            # Initialize new dict to avoid carry-over from previous question
-            question = {}
-
-            # Challenge resource (image)
-            test_resource_kwargs = {
-                "name": "challenge",
-                "image": data.get("image", ""),
-                "sound": data.get("sound", ""),
-                "text": data.get("text"),
-            }
-            if "text_da" in data:
-                test_resource_kwargs["text_da"] = data["text_da"]
+            question = {"part_id": self.pk, "is_practice": is_practice, "order": order}
 
             if "image" in data or "sound" in data or "text" in data:
-                question["challenge"], created = TestResource.objects.get_or_create(
-                    **test_resource_kwargs
-                )
+                challenge = {
+                    "name": "challenge",
+                    "image": data.get("image", ""),
+                    "sound": data.get("sound", ""),
+                    "text": data.get("text"),
+                }
+                if "text_da" in data:
+                    challenge["text_da"] = data["text_da"]
+                question["challenge_id"] = resource(**challenge)
             else:
-                question["challenge"] = None
+                question["challenge_id"] = None
 
             question["question_type"] = data.get(
                 "question_type", QuestionType.NO_INPUT_REQUIRED
@@ -1270,12 +1356,13 @@ class TestPart(models.Model):
             )
             question_reminder_source = data.get("reminder_source", self.reminder_source)
             if question_reminder_source is not None:
-                question["reminder_source"], _ = TestResource.objects.get_or_create(
-                    name=question_reminder_source, sound=question_reminder_source
+                question["reminder_source_id"] = resource(
+                    name=str(question_reminder_source),
+                    sound=str(question_reminder_source),
                 )
             question_hint_source = data.get("hint_source")
             if question_hint_source is not None:
-                question["hint_source"], _ = TestResource.objects.get_or_create(
+                question["hint_source_id"] = resource(
                     name=question_hint_source, sound=question_hint_source
                 )
             if "timeout" in data and not is_practice:
@@ -1299,158 +1386,167 @@ class TestPart(models.Model):
             question["writing_guidance"] = data.get("writing_guidance", False)
             question["result_group"] = data.get("result_group")
 
-            question, _ = TestQuestion.objects.update_or_create(
-                part=self, is_practice=is_practice, order=order, defaults=question
-            )
-
-            kept_answer_pks = set()
-
+            instructions = None
             if "instruction_sequence" in data:
-                question.create_instruction_sequence(data["instruction_sequence"])
-            else:
-                InstructionSequence.objects.filter(question=question).delete()
+                instructions = [
+                    {
+                        "order": instruction_order,
+                        "action": instruction["action"],
+                        "element": instruction.get("element"),
+                        "resource_id": (
+                            None
+                            if instruction.get("resource") is None
+                            else resource(
+                                name=instruction["resource"],
+                                sound=instruction["resource"],
+                            )
+                        ),
+                        "data": instruction.get("data"),
+                        "delay_after": instruction.get("delayAfter", 0),
+                    }
+                    for instruction_order, instruction in enumerate(
+                        data["instruction_sequence"]
+                    )
+                ]
 
-            # Correct answer
+            possible_answers = []
             correct_index = data.get("correct_index")
             if data.get("correct"):
-                correct_answer = data["correct"]
-                test_resource_kwargs = {}
-
-                mime_type, _ = mimetypes.guess_type(correct_answer)
-                if mime_type and mime_type.startswith("image"):
-
-                    test_resource_kwargs["name"] = os.path.basename(correct_answer)
-                    test_resource_kwargs["image"] = correct_answer
-                else:
-                    test_resource_kwargs["name"] = correct_answer
-                    test_resource_kwargs["text"] = correct_answer
-                correct_resource, created = TestResource.objects.get_or_create(
-                    **test_resource_kwargs
+                possible_answers.append(
+                    (
+                        answer_resource(data["correct"]),
+                        {"correctness": Correctness.CORRECT, "index": correct_index},
+                    )
                 )
 
-                pa, _ = PossibleAnswer.objects.update_or_create(
-                    question=question,
-                    resource=correct_resource,
-                    defaults={
-                        "correctness": Correctness.CORRECT,
-                        "index": correct_index,
-                    },
+            for answer in data.get("partially_correct") or []:
+                possible_answers.append(
+                    (
+                        resource(name=answer, text=answer),
+                        {"correctness": Correctness.PARTIAL},
+                    )
                 )
-                kept_answer_pks.add(pa.pk)
 
-            # Almost correct answer
-            if data.get("partially_correct"):
-                for answer in data["partially_correct"]:
-                    partially_correct_resource, _ = TestResource.objects.get_or_create(
-                        name=answer, text=answer
+            for index, answer in enumerate(data.get("wrong") or []):
+                if correct_index is not None and index >= correct_index:
+                    index += 1
+                possible_answers.append(
+                    (
+                        answer_resource(answer),
+                        {"correctness": Correctness.WRONG, "index": index},
                     )
-                    pa, _ = PossibleAnswer.objects.update_or_create(
-                        question=question,
-                        resource=partially_correct_resource,
-                        defaults={"correctness": Correctness.PARTIAL},
-                    )
-                    kept_answer_pks.add(pa.pk)
-
-            # Wrong answers
-            if data.get("wrong"):
-                for wrong_answer_index, wrong_answer in enumerate(data["wrong"]):
-
-                    test_resource_kwargs = {}
-
-                    mime_type, _ = mimetypes.guess_type(wrong_answer)
-                    if mime_type and mime_type.startswith("image"):
-                        test_resource_kwargs["name"] = os.path.basename(wrong_answer)
-                        test_resource_kwargs["image"] = wrong_answer
-                    else:
-                        test_resource_kwargs["name"] = wrong_answer
-                        test_resource_kwargs["text"] = wrong_answer
-
-                    wrong_resource, created = TestResource.objects.get_or_create(
-                        **test_resource_kwargs
-                    )
-
-                    if (
-                        correct_index is not None
-                        and wrong_answer_index >= correct_index
-                    ):
-                        possible_answer_index = wrong_answer_index + 1
-                    else:
-                        possible_answer_index = wrong_answer_index
-
-                    pa, _ = PossibleAnswer.objects.update_or_create(
-                        question=question,
-                        resource=wrong_resource,
-                        defaults={
-                            "correctness": Correctness.WRONG,
-                            "index": possible_answer_index,
-                        },
-                    )
-                    kept_answer_pks.add(pa.pk)
+                )
 
             # Options of a question without a wrong answer, e.g. in a questionnaire
             options = data.get("options", [])
-            for option_index, (option, option_da) in enumerate(
+            for index, (option, option_da) in enumerate(
                 zip(options, data.get("options_da", [""] * len(options)))
             ):
-                option_resource, _ = TestResource.objects.get_or_create(
-                    name=option, text=option, text_da=option_da
+                possible_answers.append(
+                    (
+                        resource(name=option, text=option, text_da=option_da),
+                        {
+                            "correctness": Correctness.CORRECT,
+                            "index": index,
+                            "locked": option in data.get("locked_options", []),
+                        },
+                    )
                 )
-                pa, _ = PossibleAnswer.objects.update_or_create(
-                    question=question,
-                    resource=option_resource,
-                    defaults={
-                        "correctness": Correctness.CORRECT,
-                        "index": option_index,
-                        "locked": option in data.get("locked_options", []),
-                    },
-                )
-                kept_answer_pks.add(pa.pk)
 
             if data.get("set1") and data.get("set2"):
-                for possible_answer_index, possible_answer in enumerate(
-                    data["set1"] + data["set2"]
-                ):
-                    resource, created = TestResource.objects.get_or_create(
-                        text=possible_answer,
-                        name=(
-                            possible_answer
-                            + "-"
-                            + ("set1" if possible_answer in data["set1"] else "set2")
-                        ),
-                    )
-
-                    if (
-                        possible_answer in data["set1"]
-                        and possible_answer == data["correct"][0]
-                    ):
+                for index, answer in enumerate(data["set1"] + data["set2"]):
+                    if answer in data["set1"] and answer == data["correct"][0]:
                         correctness = Correctness.CORRECT
-                    elif (
-                        possible_answer in data["set2"]
-                        and possible_answer == data["correct"][1]
-                    ):
+                    elif answer in data["set2"] and answer == data["correct"][1]:
                         correctness = Correctness.CORRECT
                     else:
                         correctness = Correctness.WRONG
-
-                    pa, _ = PossibleAnswer.objects.update_or_create(
-                        question=question,
-                        resource=resource,
-                        defaults={
-                            "correctness": correctness,
-                            "index": possible_answer_index,
-                        },
+                    set_name = "set1" if answer in data["set1"] else "set2"
+                    possible_answers.append(
+                        (
+                            resource(text=answer, name=f"{answer}-{set_name}"),
+                            {"correctness": correctness, "index": index},
+                        )
                     )
-                    kept_answer_pks.add(pa.pk)
 
-            # Delete all orphaned answers linked to this question
-            question.possible_answers.exclude(pk__in=kept_answer_pks).delete()
+            questions.append((question, instructions, possible_answers))
 
-        # Remove questions that no longer exist in the JSON definition.
-        # Questions are keyed by their order (0..len-1), so any question with an
-        # order beyond the current question count has been removed from the JSON.
-        self.questions.filter(
-            is_practice=is_practice, order__gte=len(questions_data)
-        ).delete()
+        resource_pks = TestResource.get_or_create_many(lookups)
+
+        for question, instructions, possible_answers in questions:
+            for field in ("challenge_id", "reminder_source_id", "hint_source_id"):
+                question[field] = resource_pks.get(question.get(field))
+            for instruction in instructions or []:
+                instruction["resource_id"] = resource_pks.get(
+                    instruction["resource_id"]
+                )
+
+        # Synchronize questions
+        existing_questions = {
+            question.order: question
+            for question in self.questions.filter(is_practice=is_practice)
+        }
+        desired_questions = {
+            question["order"]: question
+            for question, instructions, possible_answers in questions
+        }
+        question_rows = sync_rows(TestQuestion, existing_questions, desired_questions)
+        question_ids = {order: row.pk for order, row in question_rows.items()}
+
+        # Synchronize instruction sequences
+        existing_sequences = {
+            sequence.question_id: sequence
+            for sequence in InstructionSequence.objects.filter(
+                question__in=question_ids.values()
+            )
+        }
+        desired_sequences = {}
+        for question, instructions, possible_answers in questions:
+            if instructions is not None:
+                question_id = question_ids[question["order"]]
+                desired_sequences[question_id] = {"question_id": question_id}
+        sequences = sync_rows(
+            InstructionSequence, existing_sequences, desired_sequences
+        )
+
+        # Synchronize instructions
+        existing_instructions = {
+            (instruction.sequence_id, instruction.order): instruction
+            for instruction in Instruction.objects.filter(
+                sequence__in=sequences.values()
+            )
+        }
+        desired_instructions = {}
+        for question, instructions, possible_answers in questions:
+            if instructions is None:
+                continue
+            question_id = question_ids[question["order"]]
+            sequence_id = sequences[question_id].pk
+            for instruction in instructions:
+                key = (sequence_id, instruction["order"])
+                desired_instructions[key] = {"sequence_id": sequence_id, **instruction}
+        sync_rows(Instruction, existing_instructions, desired_instructions)
+
+        # Synchronize possible answers
+        existing_possible_answers = {
+            (answer.question_id, answer.resource_id): answer
+            for answer in PossibleAnswer.objects.filter(
+                question__in=question_ids.values()
+            )
+        }
+        desired_possible_answers = {}
+        for question, instructions, possible_answers in questions:
+            question_id = question_ids[question["order"]]
+            for lookup, values in possible_answers:
+                resource_id = resource_pks[lookup]
+                key = (question_id, resource_id)
+                if key not in desired_possible_answers:
+                    desired_possible_answers[key] = {
+                        "question_id": question_id,
+                        "resource_id": resource_id,
+                    }
+                desired_possible_answers[key].update(values)
+        sync_rows(PossibleAnswer, existing_possible_answers, desired_possible_answers)
 
     def set_data_breakdown_ranges(self, field_name, ranges: List[Tuple[int, int]]):
         if field_name not in (
@@ -1602,34 +1698,6 @@ class TestQuestion(models.Model):
 
     def __str__(self) -> str:
         return f"{str(self.part)} / {self.pk}"
-
-    def create_instruction_sequence(self, instructions_data):
-        sequence, _ = InstructionSequence.objects.get_or_create(question=self)
-
-        for order, data in enumerate(instructions_data):
-            if data.get("resource") is None:
-                resource = None
-            else:
-                resource, _ = TestResource.objects.get_or_create(
-                    name=data["resource"], sound=data["resource"]
-                )
-
-            Instruction.objects.update_or_create(
-                sequence=sequence,
-                order=order,
-                defaults={
-                    "action": data["action"],
-                    "element": data.get("element"),
-                    "resource": resource,
-                    "data": data.get("data"),
-                    "delay_after": data.get("delayAfter", 0),
-                },
-            )
-
-        # Remove instructions that no longer exist in the JSON definition.
-        # Instructions are keyed by their order (0..len-1), so any instruction with
-        # an order beyond the current instruction count has been removed from the JSON.
-        sequence.instructions.filter(order__gte=len(instructions_data)).delete()
 
 
 class InstructionSequence(models.Model):
