@@ -31,6 +31,10 @@ msgid "Deltest"
 msgstr ""
 
 #: dysleksi/static/js/screening/controlroom.js
+msgid "Instruktion"
+msgstr ""
+
+#: dysleksi/static/js/screening/controlroom.js
 msgid "Opgave"
 msgstr ""
 
@@ -40,10 +44,6 @@ msgstr ""
 
 #: dysleksi/static/js/screening/controlroom.js
 msgid "Deltest %(current)s af %(total)s"
-msgstr ""
-
-#: dysleksi/static/js/screening/controlroom.js
-msgid "Instruktion"
 msgstr ""
 
 #: dysleksi/static/js/screening/controlroom.js

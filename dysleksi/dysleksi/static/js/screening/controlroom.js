@@ -599,11 +599,11 @@ export class StudentCard {
         this.partIndex.textContent = gettext("Deltest");
         this.partIndex.textContent += ` ${this.currentViewPartIndex + 1}/${this.testParts.length}`;
 
-        this.questionIndex.textContent = gettext("Opgave");
-        if (isCurrentPart) {
-            this.questionIndex.textContent += ` ${this.student.currentQuestionIndex + 1}/${part.questions.length}`;
+        if (isCurrentPart && this.student.practice) {
+            this.questionIndex.textContent = `${gettext("Instruktion")} ${this.student.currentQuestionIndex + 1}/${part.practice.length}`;
         } else {
-            this.questionIndex.textContent += ` -/${part.questions.length}`;
+            const current = isCurrentPart ? this.student.currentQuestionIndex + 1 : "-";
+            this.questionIndex.textContent = `${gettext("Opgave")} ${current}/${part.questions.length}`;
         }
         // Render Dots
         this.dotsContainer.innerHTML = "";
@@ -889,6 +889,7 @@ export class GroupTestContainer {
         student.cancelled = studentData.cancelled;
         student.currentPartIndex = studentData.currentPartIndex;
         student.currentQuestionIndex = studentData.currentQuestionIndex;
+        student.practice = data.practice;
         student.resultsByPart = studentData.resultsByPart;
 
         this.cards.get(student.id).update();
