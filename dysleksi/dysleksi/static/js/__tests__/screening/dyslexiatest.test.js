@@ -46,6 +46,7 @@ const DOM_HTML = `
     <div class="debug-buttons"><div id="skip-to-part"></div></div>
     <div id="test-intro"></div>
     <h1 id="student-header" class="student-header"></h1>
+    <div id="instructions-sound"></div>
     <div id="question-challenge"></div>
     <div id="choices"></div>
     <div id="multiple-choice-match-container">
@@ -59,6 +60,15 @@ const DOM_HTML = `
     <h2 id="testpart-outro-text"></h2>
     <img id="testpart-outro-image">
     <button id="end-testpart-outro"></button>
+    <div id="test-summary">
+        <div id="summary-container"></div>
+        <div id="summary-scroll-controls">
+            <div id="scroll-summary-up"></div>
+            <div id="scroll-summary-down"></div>
+        </div>
+        <button id="end-summary"></button>
+        <div id="test-finished-row"><button id="summary-log-out"></button></div>
+    </div>
 `;
 
 const question = (id, data) => ({
@@ -86,6 +96,7 @@ const TEST_DATA = {
             name: "Apeqqutit inersimasunut",
             name_da: "Spørgeskema (voksne)",
             practice: [],
+            completed_by: [],
             questions: [
                 question(11, {
                     question_type: "multiple_choice",
@@ -108,6 +119,7 @@ const TEST_DATA = {
             name: "Oqaasiusanik nipituumik atuarneq",
             name_da: "Læs nonord højt",
             practice: [question(20, { question_type: "no_input_required" })],
+            completed_by: [],
             questions: [
                 question(21, { question_type: "no_input_required" }),
                 question(22, { question_type: "no_input_required" }),
@@ -161,6 +173,17 @@ describe("DyslexiaTestView", () => {
         vi.clearAllTimers();
         vi.useRealTimers();
         vi.clearAllMocks();
+    });
+
+    it("shows the summaries without a voice-over", async () => {
+        const playSound = vi.spyOn(view.domElements, "playSound");
+
+        await view.startSummary();
+        expect(document.getElementById("end-summary").style.visibility).toBe("visible");
+
+        await view.onTestComplete();
+        expect(document.getElementById("test-finished-row").style.display).toBe("flex");
+        expect(playSound).not.toHaveBeenCalled();
     });
 
     it("only shows the questionnaire question, which the test leader answers", async () => {
