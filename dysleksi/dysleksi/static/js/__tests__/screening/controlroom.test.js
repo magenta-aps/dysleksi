@@ -3315,6 +3315,20 @@ describe("StudentCard", () => {
         expect(card.currentViewPartIndex).toBe(0);
     });
 
+    it("shows the question counter of the current part", () => {
+        mockTest.parts[0].practice = [{}, {}, {}, {}, {}];
+        const card = new StudentCard(mockStudent, mockTest);
+        card.update();
+        expect(card.questionIndex.textContent).toBe("Opgave 2/4");
+
+        mockStudent.practice = true;
+        card.update();
+        expect(card.questionIndex.textContent).toBe("Instruktion 2/5");
+
+        card.setPart(1);
+        expect(card.questionIndex.textContent).toBe("Opgave -/2");
+    });
+
     it("renders the correct number of dots for the current part", () => {
         const card = new StudentCard(mockStudent, mockTest);
         card.update();
