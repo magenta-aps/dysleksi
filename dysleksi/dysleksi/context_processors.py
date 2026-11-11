@@ -35,11 +35,17 @@ def client_error_log_context(request: HttpRequest):
 
 
 def auto_logout_context(request: HttpRequest):
+    # Never log the user out if he is taking a test
+    in_test = nav_context(request)["current_view"] == "dysleksi:room"
+
+    # Note: `None` sets the expiry to the global default (SESSION_COOKIE_AGE)
+    request.session.set_expiry(
+        settings.SESSION_TEST_TIMEOUT if in_test else None  # type: ignore
+    )
     return {
         "AUTO_LOGOUT_CONFIG": {
             "enabled": request.user.is_authenticated,
-            # Never log the user out if he is taking a test
-            "logout_on_idle": nav_context(request)["current_view"] != "dysleksi:room",
+            "logout_on_idle": not in_test,
             "timeout": settings.SESSION_IDLE_TIMEOUT,  # type: ignore
             "ping_url": reverse("dysleksi:ping"),
             "logout_url": reverse("login:logout"),
