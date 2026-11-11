@@ -120,6 +120,14 @@
                         </li>
                         {% endfor %}
                     </ul>
+                    {% if request.user.is_reading_supervisor or request.user.is_superuser %}
+                    <li class="nav-item">
+                        <a href="{% url 'dysleksi:stats' %}" class="nav-link mb-3 d-flex align-items-center {% if current_view == 'dysleksi:stats' %}active{% endif %}">
+                            <i class="ph ph-chart-bar fs-5"></i>
+                            {% translate "Statistik" %}
+                        </a>
+                    </li>
+                    {% endif %}
                 </div>
             </nav>
             {% endif %}

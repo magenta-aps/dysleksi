@@ -11,11 +11,15 @@ from django.forms import (
     widgets,
 )
 from django.utils import timezone
+from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from dynamic_forms import DynamicField, DynamicFormMixin
 
 from dysleksi.models import (
+    GRADES,
     Class,
+    Gender,
+    Institution,
     PlannedDateTime,
     Student,
     Test,
@@ -383,3 +387,55 @@ class StartDyslexiaTestForm(forms.Form):
         label=_("Test"),
         widget=forms.RadioSelect,
     )
+
+
+class StatsFilterForm(forms.Form):
+    school_year = forms.TypedChoiceField(coerce=int)
+    school = ModelChoiceField(queryset=Institution.objects.none(), required=False)
+    grades = forms.TypedMultipleChoiceField(
+        choices=[(grade, f"{grade}. klasse") for grade in GRADES],
+        coerce=int,
+        required=False,
+        initial=GRADES,
+    )
+    gender = forms.ChoiceField(
+        choices=[
+            ("total", _("Samlet")),
+            ("split", _("Opdelt")),
+            (Gender.FEMALE, Gender.FEMALE.label),
+            (Gender.MALE, Gender.MALE.label),
+        ],
+        initial="split",
+    )
+    test_type = forms.ChoiceField(
+        choices=[
+            ("both", _("Begge")),
+            (TestType.GROUP, _("Gruppetest")),
+            (TestType.INDIVIDUAL, _("Individuel test")),
+        ],
+        initial="both",
+    )
+    untested = forms.BooleanField(required=False, initial=True)
+
+    def __init__(self, institutions, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["school"].queryset = institutions.order_by("name")
+        years = (
+            Class.objects.filter(institution__in=institutions, level__in=GRADES)
+            .values_list("school_year_start", flat=True)
+            .distinct()
+            .order_by("-school_year_start")
+        )
+        self.fields["school_year"].choices = [
+            (year, f"{year}/{str(year + 1)[2:]}") for year in years
+        ]
+        self.fields["school_year"].initial = years.first()
+
+    @cached_property
+    def filters(self) -> dict:
+        if self.is_bound and self.is_valid():
+            return self.cleaned_data
+        return {
+            name: self.get_initial_for_field(field, name)
+            for name, field in self.fields.items()
+        }

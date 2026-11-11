@@ -31,14 +31,17 @@ from dysleksi.models import (
     Class,
     Correctness,
     CorrectnessCategory,
+    Gender,
     Institution,
     Message,
     PartResponse,
     QuestionResponse,
+    Student,
     Test,
     TestAssignment,
     TestAssignmentStatus,
     TestPart,
+    TestQuestion,
     TestResponse,
     TestType,
     User,
@@ -672,6 +675,157 @@ class TestTestAssignmentListView(ResponseTest):
     def _get_url(self, **kwargs):
         kwargs.setdefault("class_pk", self.klasse.pk)
         return reverse("dysleksi:class_assignment_list", kwargs=kwargs)
+
+
+class TestStatsView(DysleksiTest):
+
+    url = reverse("dysleksi:stats")
+
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        Class.objects.filter(pk=cls.klasse.pk).update(level=1)
+        cls.student3 = cls.create_student("TestStudent3")
+        cls.klasse.students.add(cls.student3)
+        daycare = cls.create_class(2025, "Børnehave", is_main=True, level="DT")
+        daycare.students.add(cls.create_student("Barn", cpr=2222222222))
+        cls.other_school = cls.create_school(number="test456", name="AndenSkole")
+        other_class = Class.objects.create(
+            institution=cls.other_school,
+            school_year_start=2025,
+            name="1.B",
+            group_id="1.B",
+            is_main=True,
+            level=1,
+        )
+        other_student = Student.objects.create(username="AndenElev", cpr=1111111111)
+        other_class.students.add(other_student)
+        cls.supervisor = cls.create_reading_supervisor("Vejleder")
+
+        part = TestPart.objects.create(
+            name="Stats", timeout=60000, partial_score_after=30000
+        )
+        TestQuestion.objects.create(part=part, is_practice=True)
+        questions = [TestQuestion.objects.create(part=part) for _ in range(2)]
+
+        def respond(test, student, correct_count):
+            response = TestResponse.objects.create(
+                assignment=TestAssignment.objects.create(
+                    test=test, teacher=cls.teacher, student=student
+                ),
+                student=student,
+                completed=True,
+            )
+            part_response = PartResponse.objects.create(
+                testresponse=response, testpart=part
+            )
+            for i, question in enumerate(questions):
+                QuestionResponse.objects.create(
+                    partresponse=part_response,
+                    question=question,
+                    correctness=(
+                        Correctness.CORRECT if i < correct_count else Correctness.WRONG
+                    ),
+                )
+
+        group_test = Test.objects.create(
+            name="Midt 1. klasse", test_type=TestType.GROUP
+        )
+        individual_test = Test.objects.create(
+            name="Midt 1. klasse", test_type=TestType.INDIVIDUAL
+        )
+        group_test.parts.add(part)
+        individual_test.parts.add(part)
+        respond(group_test, cls.student1, 2)
+        respond(group_test, cls.student1, 0)
+        respond(group_test, cls.student2, 2)
+        respond(individual_test, cls.student2, 1)
+        respond(group_test, other_student, 2)
+        # A test for another grade than the one of the student is left out
+        respond(
+            Test.objects.create(name="Midt 2. klasse", test_type=TestType.GROUP),
+            cls.student1,
+            2,
+        )
+
+    def params(self, **kwargs):
+        return {
+            "school_year": 2025,
+            "school": "",
+            "grades": [1, 2, 3],
+            "gender": "split",
+            "test_type": "both",
+            "untested": "on",
+            **kwargs,
+        }
+
+    def test_access(self):
+        for user, status_code in (
+            (self.student1, 403),
+            (self.teacher, 403),
+            (self.supervisor, 200),
+        ):
+            self.client.force_login(user)
+            self.assertEqual(self.client.get(self.url).status_code, status_code)
+
+    def test_rows(self):
+        self.client.force_login(self.supervisor)
+        response = self.client.get(self.url)
+        rows = {
+            (row["test_package"], row["gender"]): row
+            for row in response.context["table"].data
+        }
+        # Only the latest response of a student counts
+        self.assertEqual(rows["Midt 1. klasse", Gender.FEMALE]["at_risk_group"], 1)
+        self.assertEqual(rows["Midt 1. klasse", Gender.MALE]["ok_group"], 1)
+        self.assertEqual(rows["Midt 1. klasse", Gender.MALE]["potential_individual"], 1)
+        self.assertEqual(rows["Midt 1. klasse", Gender.UNKNOWN]["untested_group"], 1)
+        self.assertEqual(
+            rows["Midt 1. klasse", "total"],
+            {
+                "grade": 1,
+                "test_package": "Midt 1. klasse",
+                "gender": "total",
+                "students": 3,
+                "tested_group": 2,
+                "at_risk_group": 1,
+                "potential_group": 0,
+                "ok_group": 1,
+                "untested_group": 1,
+                "tested_individual": 1,
+                "at_risk_individual": 0,
+                "potential_individual": 1,
+                "ok_individual": 0,
+                "untested_individual": 2,
+            },
+        )
+        self.assertEqual(rows["Midt 2. klasse", "total"]["students"], 0)
+        self.assertEqual(rows["Midt 2. klasse", "total"]["tested_group"], 0)
+        self.assertNotIn(("Midt 2. klasse", Gender.UNKNOWN), rows)
+
+    def test_school_filter(self):
+        self.client.force_login(self.admin)
+        response = self.client.get(self.url, self.params(school=self.other_school.pk))
+        total = next(
+            row for row in response.context["table"].data if row["gender"] == "total"
+        )
+        self.assertEqual(total["students"], 1)
+        self.assertEqual(total["ok_group"], 1)
+
+    def test_export_shows_what_is_on_the_screen(self):
+        self.client.force_login(self.supervisor)
+        params = self.params(grades=[1], gender="total", test_type="group")
+        del params["untested"]
+        response = self.client.get(self.url, {**params, "export": "csv"})
+        self.assertEqual(
+            response.content.decode().splitlines(),
+            [
+                "Anvendelsestidspunkt;Køn;Elever;Gruppetest: testet;Gruppetest: risiko;"
+                "Gruppetest: kan være i risiko;Gruppetest: ikke i risiko",
+                "Midt 1. klasse;Alle;3;2;50,0 % (1);0,0 % (0);50,0 % (1)",
+                "Slut 1. klasse;Alle;3;0;– (0);– (0);– (0)",
+            ],
+        )
 
 
 class TestAssignmentResultListView(DysleksiTest):

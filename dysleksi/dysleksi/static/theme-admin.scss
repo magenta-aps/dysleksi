@@ -2227,3 +2227,96 @@ $border-radius-student-card: $spacer / 4 * 3;
     }
   }
 }
+
+// Statistics for læsevejledere
+.stats {
+  background: $white;
+  border: 1px solid $mono-gray-lighter;
+  border-radius: 0.75 * $spacer;
+  padding: 1.5 * $spacer;
+
+  .school-list {
+    max-height: 300px;
+    overflow-y: auto;
+  }
+  .grade-checks {
+    background: $white;
+    border: 1px solid $mono-gray-lighter;
+    border-radius: 0.375 * $spacer;
+    padding: 0.375 * $spacer 0.75 * $spacer;
+  }
+  .table-container {
+    overflow-x: auto !important;
+  }
+  .form-check-input:checked {
+    background-color: $blue-darker;
+    border-color: $blue-darker;
+    background-image: escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path fill='none' stroke='#{$white}' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/></svg>"));
+  }
+  .dot.wrong {
+    background-color: $red-normal;
+  }
+  .dot.correct {
+    background-color: $green-darker;
+  }
+}
+
+.stats .stats-table {
+  th {
+    background: $mono-gray-lightest;
+    border-bottom: 1px solid $mono-gray-lighter;
+    text-transform: uppercase;
+    vertical-align: middle;
+  }
+  thead tr:first-child th {
+    font-size: 0.875 * $spacer;
+    text-align: left;
+    text-transform: none;
+  }
+  td:not(:first-child, :nth-child(2)),
+  th:not(:first-child, :nth-child(2)) {
+    text-align: right;
+  }
+  th,
+  td {
+    padding: 0.75 * $spacer;
+  }
+  td {
+    border-bottom: 0;
+    border-top: 1px solid $mono-gray-lighter;
+  }
+  .group-start {
+    border-left: 1px solid $mono-gray-lighter;
+  }
+  .grade-heading td {
+    background: $mono-white;
+    font-family: "DM Sans SemiBold", "Helvetica", sans-serif;
+    font-size: 0.75 * $spacer;
+    text-transform: uppercase;
+  }
+
+  // One row per gender: show the test package once, and only a dotted line
+  // between its rows
+  &[data-gender="split"] tr[data-gender]:not([data-gender="female"]) {
+    .test-package {
+      visibility: hidden;
+    }
+    td {
+      border-top-style: dotted;
+    }
+  }
+
+  // The filters above the table show and hide its rows and columns
+  &:not([data-grades~="1"]) [data-grade="1"],
+  &:not([data-grades~="2"]) [data-grade="2"],
+  &:not([data-grades~="3"]) [data-grade="3"],
+  &[data-gender="total"] tr[data-gender]:not([data-gender="total"]),
+  &[data-gender="split"] tr[data-gender="total"],
+  &[data-gender="female"] tr[data-gender]:not([data-gender="female"]),
+  &[data-gender="male"] tr[data-gender]:not([data-gender="male"]),
+  &[data-test-type="group"] .col-individual,
+  &[data-test-type="individual"] .col-group,
+  &[data-untested="false"] .col-untested {
+    display: none;
+  }
+}

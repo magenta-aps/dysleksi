@@ -135,6 +135,20 @@ class TestType(TextChoices):
     DYSLEXIA = "dyslexia"
 
 
+class Gender(TextChoices):
+    FEMALE = "female", _("Piger")
+    MALE = "male", _("Drenge")
+    UNKNOWN = "unknown", _("Ukendt")
+
+
+GRADES = (1, 2, 3)
+TEST_PERIODS = ("midt", "slut")
+
+
+def test_package_name(grade: int, period: str) -> str:
+    return f"{period} {grade}. klasse".capitalize()
+
+
 class TestAssignmentStatus(TextChoices):
     PLANNED = "planned", _("Planlagt")
     IN_PROGRESS = "in_progress", _("I gang")
@@ -372,6 +386,13 @@ class Student(PermissionsMixin, User):
     is_teacher = False
     is_reading_supervisor = False
 
+    @property
+    def gender(self) -> Gender:
+        if self.cpr is None:
+            return Gender.UNKNOWN
+        # The last digit of a CPR number is even for women and odd for men
+        return Gender.FEMALE if self.cpr % 2 == 0 else Gender.MALE
+
     class Meta:
         verbose_name = _("elev")
         verbose_name_plural = _("elever")
@@ -594,6 +615,27 @@ class Class(PermissionsMixin, models.Model):
 
     is_main = models.BooleanField(
         default=False,
+    )
+
+    # The level is the "trin" of the class in Tabulex, e.g. "1" for 1. klasse
+    #
+    # Can also be "DT" for "dagtilbud"
+    # or "VU" for "Voksenuddannelse. Therefore this field is a CharField
+    #
+    # References:
+    #
+    # https://brugerdatabasen-et.stil.dk/bpi/wsieksport/7?xsd=data-export-common.xsd
+    # "Stamklassens/hovedgruppens trin. Skal angives for grupper med groupType
+    # "Hovedgruppe" og kun da"
+    #
+    # https://brugerdatabasen-et.stil.dk/bpi/wsieksport/7?xsd=../../common/v3/common.xsd
+    # "DT er dagtilbud, 1 svarer til 1. klassetrin i grundskolen, U1 er første trin på
+    # en ungdomsuddannelse, og VU er voksenuddannelse."
+    level = models.CharField(
+        max_length=5,
+        null=True,
+        blank=True,
+        verbose_name=_("Klassetrin"),
     )
 
     def __str__(self) -> str:

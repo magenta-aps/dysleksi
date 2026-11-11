@@ -83,6 +83,11 @@ WEBRTC_KEY = os.environ.get("WEBRTC_KEY")
 RESULT_TABLE_SIZE = int(os.environ.get("RESULT_TABLE_SIZE", 3))
 QUESTIONRESPONSES_TABLE_SIZE = int(os.environ.get("QUESTIONRESPONSES_TABLE_SIZE", 20))
 
+# A student scoring below these percentages of a test is "at risk" (red) or
+# "potentially at risk" (yellow). Otherwise the student is "not at risk" (green)
+RISK_GROUP_AT_RISK_BELOW = float(os.environ.get("RISK_GROUP_AT_RISK_BELOW", 50))
+RISK_GROUP_POTENTIAL_BELOW = float(os.environ.get("RISK_GROUP_POTENTIAL_BELOW", 80))
+
 RESPONSE_AUDIO_RETENTION_SECONDS = int(
     os.environ.get("RESPONSE_AUDIO_RETENTION_SECONDS", 1209600)
 )  # default 14 days
