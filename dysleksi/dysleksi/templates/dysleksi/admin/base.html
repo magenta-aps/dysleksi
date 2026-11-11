@@ -47,7 +47,7 @@
                                 {% translate "Klasser" %}
                             </span>
                             <span data-bs-toggle="collapse" data-bs-target="#collapseClasses" aria-expanded="false" aria-controls="collapseClasses">
-                                {% if teacher_classes %}
+                                {% if class != None and current_class == class %}
                                 <i class="ph ph-caret-up"></i>
                                 {% else %}
                                 <i class="ph ph-caret-down"></i>
@@ -92,7 +92,7 @@
                                 {% translate "Resultater" %}
                             </span>
                             <span data-bs-toggle="collapse" data-bs-target="#collapseResults" aria-expanded="false" aria-controls="collapseResults">
-                                {% if teacher_results %}
+                                {% if assignment != None and current_assignment == assignment %}
                                 <i class="ph ph-caret-up"></i>
                                 {% else %}
                                 <i class="ph ph-caret-down"></i>
