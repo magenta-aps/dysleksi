@@ -38,6 +38,10 @@ export class DyslexiaTestView extends GroupTestView {
         );
     }
 
+    startSoundCalibration() {
+        this.endSoundCalibration();
+    }
+
     onPartComplete() {
         this.readingAloud = false;
         super.onPartComplete();

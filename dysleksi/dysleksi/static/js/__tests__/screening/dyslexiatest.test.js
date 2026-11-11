@@ -60,6 +60,7 @@ const DOM_HTML = `
     <h2 id="testpart-outro-text"></h2>
     <img id="testpart-outro-image">
     <button id="end-testpart-outro"></button>
+    <div id="test-sound-calibration"></div>
     <div id="test-summary">
         <div id="summary-container"></div>
         <div id="summary-scroll-controls">
@@ -173,6 +174,15 @@ describe("DyslexiaTestView", () => {
         vi.clearAllTimers();
         vi.useRealTimers();
         vi.clearAllMocks();
+    });
+
+    it("skips the sound calibration", () => {
+        vi.spyOn(view.domElements, "playSound").mockResolvedValue();
+        view.endIntro();
+        expect(document.getElementById("test-sound-calibration").style.display).toBe(
+            "none",
+        );
+        expect(document.getElementById("test-summary").style.display).toBe("flex");
     });
 
     it("shows the summaries without a voice-over", async () => {
