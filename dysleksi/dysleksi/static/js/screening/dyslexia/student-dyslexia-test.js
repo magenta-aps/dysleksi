@@ -24,6 +24,7 @@ export class DyslexiaTestView extends GroupTestView {
     isReadAloud(question = this.currentQuestion) {
         return (
             question.type === "no_input_required" &&
+            !question.advanceAutomatically &&
             !question.instruction_sequence?.instructions.some(
                 (instruction) =>
                     instruction.action === "show" && instruction.element === "next",

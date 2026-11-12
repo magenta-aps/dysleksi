@@ -58,14 +58,10 @@
             {
                 "action": "playSound",
                 "resource": "resources/Enhanced L600-L611/L605.mp3",
-                "delayAfter": 750
-            },
-            {
-                "action": "show",
-                "delayAfter": 0,
-                "element": "next"
+                "delayAfter": 1500
             }
-        ]
+        ],
+        "advance_automatically": true
     },
     {
         "question_type": "multiple_choice",
