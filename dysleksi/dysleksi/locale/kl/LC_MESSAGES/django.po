@@ -41,11 +41,12 @@ msgstr ""
 msgid "Ny test"
 msgstr ""
 
-#: dysleksi/forms.py dysleksi/views.py
+#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/stats/table.html
+#: dysleksi/views.py
 msgid "Gruppetest"
 msgstr ""
 
-#: dysleksi/forms.py
+#: dysleksi/forms.py dysleksi/templates/dysleksi/admin/stats/table.html
 msgid "Individuel test"
 msgstr ""
 
@@ -124,6 +125,18 @@ msgstr ""
 msgid "Test"
 msgstr ""
 
+#: dysleksi/forms.py
+msgid "Samlet"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Opdelt"
+msgstr ""
+
+#: dysleksi/forms.py
+msgid "Begge"
+msgstr ""
+
 #: dysleksi/management/commands/create_result_categories.py
 #: dysleksi/templates/dysleksi/admin/test_response/footer.html
 #: dysleksi/templates/dysleksi/admin/test_responses/group/footer.html
@@ -161,6 +174,18 @@ msgstr ""
 
 #: dysleksi/management/commands/create_result_categories.py
 msgid "Højt"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Piger"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Drenge"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "Ukendt"
 msgstr ""
 
 #: dysleksi/models.py
@@ -228,7 +253,13 @@ msgstr ""
 msgid "testpersoner"
 msgstr ""
 
-#: dysleksi/models.py
+#: dysleksi/models.py dysleksi/templates/dysleksi/admin/stats/stats.html
+#, fuzzy
+#| msgid "Klasser"
+msgid "Klassetrin"
+msgstr "Klassit"
+
+#: dysleksi/models.py dysleksi/templates/dysleksi/admin/stats/table.html
 #, fuzzy
 #| msgid "Klasser"
 msgid "klasse"
@@ -340,7 +371,7 @@ msgstr ""
 msgid "Navn"
 msgstr ""
 
-#: dysleksi/tables.py
+#: dysleksi/tables.py dysleksi/templates/dysleksi/admin/stats/stats.html
 msgid "Skoleår"
 msgstr ""
 
@@ -348,7 +379,7 @@ msgstr ""
 msgid "Test til"
 msgstr ""
 
-#: dysleksi/tables.py
+#: dysleksi/tables.py dysleksi/templates/dysleksi/admin/stats/table.html
 msgid "Anvendelsestidspunkt"
 msgstr ""
 
@@ -462,6 +493,57 @@ msgstr ""
 msgid "Bemærkning"
 msgstr ""
 
+#: dysleksi/tables.py dysleksi/templates/dysleksi/admin/stats/stats.html
+#: dysleksi/templates/dysleksi/admin/stats/table.html
+msgid "Køn"
+msgstr ""
+
+#: dysleksi/tables.py dysleksi/templates/dysleksi/admin/class/detail.html
+#: dysleksi/templates/dysleksi/admin/stats/table.html
+#: dysleksi/templates/dysleksi/admin/student/list.html
+msgid "Elever"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Gruppetest: testet"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Gruppetest: risiko"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Gruppetest: kan være i risiko"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Gruppetest: ikke i risiko"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Gruppetest: ikke testet"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Individuel test: testet"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Individuel test: risiko"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Individuel test: kan være i risiko"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Individuel test: ikke i risiko"
+msgstr ""
+
+#: dysleksi/tables.py
+msgid "Individuel test: ikke testet"
+msgstr ""
+
 #: dysleksi/templates/dysleksi/admin/base.html
 #: dysleksi/templates/dysleksi/admin/modals/base.html
 #: dysleksi/templates/dysleksi/lobby/test_leader.html
@@ -519,6 +601,10 @@ msgid "%(student_name)s - %(test_name)s"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/base.html
+msgid "Statistik"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/base.html
 msgid "Søg efter test, klasse eller elev"
 msgstr ""
 
@@ -540,11 +626,6 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/class/detail.html
 #: dysleksi/templates/dysleksi/admin/student/detail.html
 msgid "Overblik"
-msgstr ""
-
-#: dysleksi/templates/dysleksi/admin/class/detail.html
-#: dysleksi/templates/dysleksi/admin/student/list.html
-msgid "Elever"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/class/detail.html
@@ -684,6 +765,7 @@ msgid "Resultater for %(name)s - %(part_name)s"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/part_response/group/detail.html
+#: dysleksi/templates/dysleksi/admin/stats/stats.html
 msgid "Oversigt"
 msgstr ""
 
@@ -808,6 +890,61 @@ msgstr ""
 #: dysleksi/templates/dysleksi/admin/test_response/detail.html
 #: dysleksi/views.py
 msgid "Normscore"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/stats/stats.html
+msgid "Statistik for elever i målgruppen"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/stats/stats.html
+msgid "Skole"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/stats/stats.html
+msgid "Alle skoler"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/stats/stats.html
+msgid "Søg efter skole"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/stats/stats.html
+msgid "Testtype"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/stats/stats.html
+msgid "Vis ikke testet"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/stats/stats.html
+msgid "Risikogrupper:"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/stats/stats.html
+#: dysleksi/templates/dysleksi/admin/stats/table.html
+msgid "Risiko"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/stats/stats.html
+#: dysleksi/templates/dysleksi/admin/stats/table.html
+msgid "Kan være i risiko"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/stats/stats.html
+#: dysleksi/templates/dysleksi/admin/stats/table.html
+msgid "Ikke i risiko"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/stats/stats.html
+msgid "Download data"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/stats/table.html
+msgid "Testet"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/admin/stats/table.html
+msgid "Ikke testet"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/student/detail.html
@@ -1227,6 +1364,11 @@ msgstr ""
 #: dysleksi/views.py
 #, python-brace-format
 msgid "{num} deltests"
+msgstr ""
+
+#: dysleksi/views.py
+#, python-format
+msgid "Elever i risikogrupper, skoleåret %(school_year)s"
 msgstr ""
 
 #: dysleksi/views.py

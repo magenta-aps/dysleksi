@@ -4,6 +4,7 @@
 import csv
 import json
 import logging
+from collections import Counter, defaultdict
 from datetime import timedelta
 from functools import cached_property, partial
 from math import ceil
@@ -30,7 +31,7 @@ from django.db.models import (
     Value,
 )
 from django.db.models.expressions import BaseExpression, OuterRef, Subquery, Window
-from django.db.models.functions import Coalesce, Length, Replace, RowNumber
+from django.db.models.functions import Cast, Coalesce, Length, Replace, RowNumber
 from django.http.response import (
     Http404,
     HttpResponse,
@@ -55,15 +56,25 @@ from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
 from openpyxl import Workbook
 from weasyprint import HTML
 
-from dysleksi.forms import ClassStudentFormSet, StartDyslexiaTestForm, StartRoomForm
+from dysleksi.forms import (
+    ClassStudentFormSet,
+    StartDyslexiaTestForm,
+    StartRoomForm,
+    StatsFilterForm,
+)
 from dysleksi.models import (
+    GRADES,
     PARTIAL_SCORE,
+    READING_SUPERVISORS,
     TEACHERS,
     TEST_LEADERS,
+    TEST_PERIODS,
     Class,
     Correctness,
     CorrectnessCategory,
+    Gender,
     HandledEvent,
+    Institution,
     Message,
     PartResponse,
     PartResponseQuerySet,
@@ -84,6 +95,7 @@ from dysleksi.models import (
     TestResponseQuerySet,
     TestType,
     User,
+    test_package_name,
 )
 from dysleksi.tables import (
     AnswerByTimeResultsTable,
@@ -97,6 +109,7 @@ from dysleksi.tables import (
     QuestionResponsesTable,
     ReadingWordCountResultsTable,
     ReadingWordLengthResultsTable,
+    StatsTable,
     StudentTestResponseTable,
     StudentTestResultsColumn,
     TestAssignmentResultTable,
@@ -875,6 +888,178 @@ class TableExportMixin:
         )
         workbook.save(response)
         return response
+
+
+class StatsView(
+    GroupRequiredMixin,
+    NavigationMixin,
+    TableExportMixin,
+    SingleTableMixin,
+    TemplateView,
+):
+    groups_required = [READING_SUPERVISORS]
+    table_class = StatsTable
+    table_pagination = False
+    template_name = "dysleksi/admin/stats/stats.html"
+
+    @cached_property
+    def institutions(self) -> QuerySet[Institution]:
+        if self.user.is_superuser:
+            return Institution.objects.all()
+        return self.user.institutions.all()
+
+    @cached_property
+    def form(self) -> StatsFilterForm:
+        return StatsFilterForm(self.institutions, self.request.GET or None)
+
+    @staticmethod
+    def risk_group(proportion: float) -> str:
+        percentage = 100 * proportion
+        if percentage < settings.RISK_GROUP_AT_RISK_BELOW:  # type: ignore[misc]
+            return "at_risk"
+        if percentage < settings.RISK_GROUP_POTENTIAL_BELOW:  # type: ignore[misc]
+            return "potential"
+        return "ok"
+
+    def get_rows(self) -> List[Dict[str, Any]]:
+        filters = self.form.filters
+        packages = {
+            test_package_name(grade, period): grade
+            for grade in GRADES
+            for period in TEST_PERIODS
+        }
+        tests = {
+            test.pk: test
+            for test in Test.objects.filter(
+                name__in=packages,
+                custom=False,
+                test_type__in=[TestType.GROUP, TestType.INDIVIDUAL],
+            ).annotate(
+                questions_count=Count(
+                    "parts__questions", filter=Q(parts__questions__is_practice=False)
+                )
+            )
+        }
+        students = (
+            Student.objects.filter(
+                classes__is_main=True,
+                classes__school_year_start=filters["school_year"],
+                classes__level__in=GRADES,
+                classes__institution__in=(
+                    [filters["school"]] if filters["school"] else self.institutions
+                ),
+            )
+            .annotate(level=Cast("classes__level", IntegerField()))
+            .only("cpr")
+        )
+        # A student who took a test more than once is judged by the latest response
+        latest_responses = (
+            TestResponse.objects.filter(
+                student__in=students.values("pk"),
+                assignment__test__in=tests,
+                completed=True,
+                cancelled=False,
+            )
+            .order_by("student", "assignment__test", "-pk")
+            .distinct("student", "assignment__test")
+        )
+        responses = (
+            TestResponse.objects.filter(pk__in=latest_responses.values("pk"))
+            .annotate_correct_count("correct_count")
+            .values_list("student_id", "assignment__test_id", "correct_count")
+        )
+
+        counts: Dict[Tuple[str, str], Counter] = defaultdict(Counter)
+        students_by_pk = {student.pk: student for student in students}
+        for student in students_by_pk.values():
+            for package, grade in packages.items():
+                if grade == student.level:
+                    counts[package, student.gender]["students"] += 1
+        for student_pk, test_pk, correct_count in responses:
+            student = students_by_pk[student_pk]
+            test = tests[test_pk]
+            if packages[test.name] == student.level:
+                risk = self.risk_group(correct_count / test.questions_count)
+                counts[test.name, student.gender][f"tested_{test.test_type}"] += 1
+                counts[test.name, student.gender][f"{risk}_{test.test_type}"] += 1
+
+        rows = []
+        for package, grade in packages.items():
+            by_gender = {gender: counts[package, gender] for gender in Gender}
+            total = sum(by_gender.values(), Counter())
+            for gender, count in [*by_gender.items(), ("total", total)]:
+                if gender == Gender.UNKNOWN and not count:
+                    continue
+                row = {
+                    "grade": grade,
+                    "test_package": package,
+                    "gender": gender,
+                    "students": count["students"],
+                }
+                for test_type in (TestType.GROUP, TestType.INDIVIDUAL):
+                    for key in ("tested", "at_risk", "potential", "ok"):
+                        row[f"{key}_{test_type}"] = count[f"{key}_{test_type}"]
+                    row[f"untested_{test_type}"] = (
+                        count["students"] - count[f"tested_{test_type}"]
+                    )
+                rows.append(row)
+        return rows
+
+    def is_shown(self, row: Dict[str, Any]) -> bool:
+        filters = self.form.filters
+        return row["grade"] in filters["grades"] and (
+            row["gender"] != "total"
+            if filters["gender"] == "split"
+            else row["gender"] == filters["gender"]
+        )
+
+    def get_table_data(self):
+        rows = self.get_rows()
+        if "export" in self.request.GET:
+            # Export the rows and columns which are shown on the screen
+            rows = [row for row in rows if self.is_shown(row)]
+        return rows
+
+    def get_table_kwargs(self):
+        filters = self.form.filters
+        test_types = {TestType.GROUP, TestType.INDIVIDUAL}
+        if filters["test_type"] != "both":
+            test_types = {filters["test_type"]}
+        hidden_columns = [
+            name
+            for name in StatsTable.base_columns
+            if name.endswith(("_group", "_individual"))
+            and (
+                name.rsplit("_", 1)[1] not in test_types
+                or (name.startswith("untested_") and not filters["untested"])
+            )
+        ]
+        return {
+            "exclude": hidden_columns if "export" in self.request.GET else (),
+            "attrs": {
+                "class": "table stats-table",
+                "data-grades": " ".join(map(str, filters["grades"])),
+                "data-gender": filters["gender"],
+                "data-test-type": filters["test_type"],
+                "data-untested": "true" if filters["untested"] else "false",
+            },
+        }
+
+    def get_export_title(self) -> str:
+        school_years = dict(
+            self.form.fields["school_year"].choices  # type: ignore[attr-defined]
+        )
+        return _("Elever i risikogrupper, skoleåret %(school_year)s") % {
+            "school_year": school_years.get(self.form.filters["school_year"], "")
+        }
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        self.add_navigation_context(context_data, None, None)
+        context_data["form"] = self.form
+        context_data["filters"] = self.form.filters
+        context_data["title"] = self.get_export_title()
+        return context_data
 
 
 class AssignmentResultListView(TestAssignmentListView):

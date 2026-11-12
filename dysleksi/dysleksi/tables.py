@@ -8,6 +8,8 @@ from django.db.models.functions import Lower
 from django.template import Context
 from django.template.loader import get_template
 from django.urls import reverse
+from django.utils.formats import number_format
+from django.utils.html import format_html
 from django.utils.translation import gettext_lazy as _
 from django_tables2 import A, Column, DateTimeColumn, Table, TemplateColumn, tables
 
@@ -15,6 +17,7 @@ from dysleksi.models import (
     CategoryRange,
     Class,
     ClassTestStatus,
+    Gender,
     QuestionType,
     Student,
     TestAssignment,
@@ -537,3 +540,71 @@ class AnswerTimeTable(NonOrderableTableMixin, HeaderlessTableMixin, Table):
     def render_answer_time(self, value):
         # Convert ms to s
         return format_time(ceil(0.001 * value))
+
+
+class RiskColumn(Column):
+    def __init__(self, test_type: TestType, **kwargs):
+        self.test_type = test_type
+        super().__init__(attrs={"td": {"class": f"col-{test_type}"}}, **kwargs)
+
+    def percentage(self, value, record) -> str:
+        tested = record[f"tested_{self.test_type}"]
+        return (
+            f"{number_format(round(100 * value / tested, 1), 1)} %" if tested else "–"
+        )
+
+    def render(self, value, record):
+        return format_html(
+            '{}<small class="d-block">{}</small>', self.percentage(value, record), value
+        )
+
+    def value(self, value, record):
+        return f"{self.percentage(value, record)} ({value})"
+
+
+class StatsTable(NonOrderableTableMixin, Table):
+    class Meta:
+        template_name = "dysleksi/admin/stats/table.html"
+        row_attrs = {
+            "data-grade": lambda record: record["grade"],
+            "data-gender": lambda record: record["gender"],
+        }
+
+    test_package = Column(
+        verbose_name=_("Anvendelsestidspunkt"), attrs={"td": {"class": "test-package"}}
+    )
+    gender = Column(verbose_name=_("Køn"))
+    students = Column(verbose_name=_("Elever"))
+    tested_group = Column(
+        verbose_name=_("Gruppetest: testet"),
+        attrs={"td": {"class": "col-group group-start"}},
+    )
+    at_risk_group = RiskColumn(TestType.GROUP, verbose_name=_("Gruppetest: risiko"))
+    potential_group = RiskColumn(
+        TestType.GROUP, verbose_name=_("Gruppetest: kan være i risiko")
+    )
+    ok_group = RiskColumn(TestType.GROUP, verbose_name=_("Gruppetest: ikke i risiko"))
+    untested_group = Column(
+        verbose_name=_("Gruppetest: ikke testet"),
+        attrs={"td": {"class": "col-group col-untested"}},
+    )
+    tested_individual = Column(
+        verbose_name=_("Individuel test: testet"),
+        attrs={"td": {"class": "col-individual group-start"}},
+    )
+    at_risk_individual = RiskColumn(
+        TestType.INDIVIDUAL, verbose_name=_("Individuel test: risiko")
+    )
+    potential_individual = RiskColumn(
+        TestType.INDIVIDUAL, verbose_name=_("Individuel test: kan være i risiko")
+    )
+    ok_individual = RiskColumn(
+        TestType.INDIVIDUAL, verbose_name=_("Individuel test: ikke i risiko")
+    )
+    untested_individual = Column(
+        verbose_name=_("Individuel test: ikke testet"),
+        attrs={"td": {"class": "col-individual col-untested"}},
+    )
+
+    def render_gender(self, value):
+        return Gender(value).label if value in Gender else _("Alle")

@@ -13,11 +13,14 @@ from django.db.models import Count
 from dysleksi.models import (
     DYSLEXIA_TEST_ADULT,
     DYSLEXIA_TEST_CHILD,
+    GRADES,
+    TEST_PERIODS,
     Class,
     Student,
     Test,
     TestPerson,
     TestType,
+    test_package_name,
 )
 
 
@@ -27,7 +30,7 @@ def get_or_create_test(
     test_type: TestType,
     dummy=False,
 ):
-    name = f"{period} {grade}. klasse".capitalize()
+    name = test_package_name(grade, period)
     if dummy:
         name += " (dummy)"
     test, _ = Test.objects.get_or_create(name=name, test_type=test_type)
@@ -403,6 +406,7 @@ def create_dyslexia_tests(import_test, create_answers):
 
 
 def answer_test(test):
+    # Generate some answers for lærer:lærer to see
     if test.test_type == TestType.GROUP:
         klasse = (
             Class.objects.annotate(students_count=Count("students"))
@@ -419,6 +423,18 @@ def answer_test(test):
     else:
         student = Student.objects.filter(classes__isnull=False).order_by("?").first()
         if student is not None:
+            call_command("answer_test", test.pk, student=student.pk)
+
+
+def answer_test_for_grade(test, grade):
+    # Generate a bunch of answers to populate the statistics view
+    if test.test_type == TestType.GROUP:
+        for klasse in Class.objects.filter(
+            level=grade, students__isnull=False
+        ).distinct():
+            call_command("answer_test", test.pk, **{"class": klasse.pk})
+    else:
+        for student in Student.objects.filter(classes__level=grade).order_by("?")[:10]:
             call_command("answer_test", test.pk, student=student.pk)
 
 
@@ -444,12 +460,10 @@ class Command(BaseCommand):
         if not dummy:
             create_dyslexia_tests(import_test, create_answers)
 
-        for grade in (1, 2, 3):
-            for period in ("midt", "slut"):
-                test = create_group_test(grade, period, import_test, dummy=dummy)
-                if create_answers and test is not None:
-                    answer_test(test)
-
-                test = create_individual_test(grade, period, import_test, dummy=dummy)
-                if create_answers and test is not None:
-                    answer_test(test)
+        for grade in GRADES:
+            for period in TEST_PERIODS:
+                for create_test in (create_group_test, create_individual_test):
+                    test = create_test(grade, period, import_test, dummy=dummy)
+                    if create_answers and test is not None:
+                        answer_test(test)
+                        answer_test_for_grade(test, grade)

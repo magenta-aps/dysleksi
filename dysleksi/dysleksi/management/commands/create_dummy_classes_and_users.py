@@ -6,6 +6,7 @@ from datetime import date
 from django.core.management.base import BaseCommand
 
 from dysleksi.models import (
+    GRADES,
     Class,
     Institution,
     ReadingSupervisor,
@@ -190,9 +191,54 @@ class Command(BaseCommand):
                         "name": f"{classnumber}.{letter}",
                         "is_main": True,
                         "institution": school,
+                        "level": classnumber,
                     },
                 )
                 c.teachers.set([teacher, teacher3])
+                # Populate the statistics of the læsevejleder
+                if classnumber in GRADES:
+                    for n in range(8):
+                        stats_student, _ = Student.objects.update_or_create(
+                            username=f"elev_{classnumber}{letter}_{n}",
+                            defaults={
+                                "first_name": f"Elev {classnumber}.{letter}",
+                                "last_name": str(n),
+                                "cpr": f"01010{classnumber}{'ABC'.index(letter)}{n:03}",
+                                "institution": school,
+                            },
+                        )
+                        c.students.add(stats_student)
+
+        # More schools and school years for the filters of the statistics
+        for i, name in enumerate(("Nuuk Skole", "Sisimiut Skole", "Ilulissat Skole")):
+            other_school, _ = Institution.objects.get_or_create(
+                name=name, number=f"900{i}"
+            )
+            reading_supervisor.institutions.add(other_school)
+            for year in (school_year_start - 1, school_year_start):
+                for grade in GRADES:
+                    c, _ = Class.objects.get_or_create(
+                        group_id=f"{grade}_A_{name}_{year}",
+                        institution=other_school,
+                        school_year_start=year,
+                        defaults={
+                            "name": f"{grade}.A",
+                            "is_main": True,
+                            "level": grade,
+                        },
+                    )
+                    c.teachers.add(teacher3)
+                    for n in range(4):
+                        stats_student, _ = Student.objects.update_or_create(
+                            username=f"elev_{i}_{year}_{grade}_{n}",
+                            defaults={
+                                "first_name": f"Elev {grade}.A",
+                                "last_name": name,
+                                "cpr": f"0202{i}{year % 10}{grade}{n:03}",
+                                "institution": other_school,
+                            },
+                        )
+                        c.students.add(stats_student)
 
         # Add students to classes
 
@@ -205,13 +251,19 @@ class Command(BaseCommand):
         )
         secondary_class.teachers.set([teacher, teacher3])
 
-        klasse = Class.objects.get(school_year_start=school_year_start, name="2.A")
+        klasse = Class.objects.get(
+            institution=school, school_year_start=school_year_start, name="2.A"
+        )
         klasse.students.add(student)
 
-        klasse = Class.objects.get(school_year_start=school_year_start, name="0.B")
+        klasse = Class.objects.get(
+            institution=school, school_year_start=school_year_start, name="0.B"
+        )
         klasse.students.add(student2)
 
-        klasse = Class.objects.get(school_year_start=school_year_start, name="0.C")
+        klasse = Class.objects.get(
+            institution=school, school_year_start=school_year_start, name="0.C"
+        )
         klasse.students.add(student3)
         klasse.teachers.add(teacher2)
         secondary_class.students.add(student3)

@@ -18,6 +18,7 @@ from simple_history.models import HistoricalChanges
 from dysleksi.management.commands.import_test import remove_json_comments
 from dysleksi.management.commands.update_or_create_tests import (
     answer_test,
+    answer_test_for_grade,
     create_dyslexia_tests,
 )
 from dysleksi.models import (
@@ -139,6 +140,7 @@ class CreateTests(UpdateOrCreateTestsBase):
                     name="Slut 1. klasse (dummy)", test_type=test_type
                 )
                 answer_test(test)
+                answer_test_for_grade(test, 1)
                 for part in test.parts.all():
                     self.assertTrue(part.partresponses.exists())
                     self.assertEqual(
@@ -148,10 +150,12 @@ class CreateTests(UpdateOrCreateTestsBase):
                         part.partresponses.count() * part.questions.count(),
                     )
 
+    @patch("dysleksi.management.commands.update_or_create_tests.answer_test_for_grade")
     @patch("dysleksi.management.commands.update_or_create_tests.answer_test")
-    def test_create_tests_with_answers(self, mock_answer_test):
+    def test_create_tests_with_answers(self, mock_answer_test, mock_answer_for_grade):
         call_command("update_or_create_tests", dummy=True, answer=True)
         self.assertEqual(mock_answer_test.call_count, 12)
+        self.assertEqual(mock_answer_for_grade.call_count, 12)
 
     def test_answer_test(self):
 

@@ -1,0 +1,108 @@
+{% extends "dysleksi/admin/base.html" %}
+{% load i18n %}
+{% load static %}
+{% load render_table from django_tables2 %}
+
+{% block inner_content %}
+<h1>{% translate "Statistik for elever i målgruppen" %}</h1>
+<h2 class="mt-4 mb-3">{% translate "Oversigt" %}</h2>
+<div class="stats">
+<form id="stats-filter" method="get">
+    <div class="row g-3 mb-2">
+        <div class="col-md-6">
+            <label for="school-year" class="form-label">{% translate "Skoleår" %}</label>
+            <select id="school-year" name="school_year" class="form-select" onchange="this.form.submit()">
+                {% for value, label in form.fields.school_year.choices %}
+                <option value="{{ value }}"{% if value == filters.school_year %} selected{% endif %}>{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-6">
+            <label class="form-label">{% translate "Skole" %}</label>
+            <input type="hidden" name="school" value="{{ filters.school.pk|default:'' }}">
+            <div class="dropdown school-picker">
+                <button class="form-select text-start" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
+                    {% if filters.school %}{{ filters.school.name }}{% else %}{% translate "Alle skoler" %}{% endif %}
+                </button>
+                <div class="dropdown-menu w-100">
+                    <div class="px-2 pb-2">
+                        <input type="search" class="form-control" placeholder="{% translate 'Søg efter skole' %}" aria-label="{% translate 'Søg efter skole' %}">
+                    </div>
+                    <div class="school-list">
+                        <button type="button" class="dropdown-item" data-school="">{% translate "Alle skoler" %}</button>
+                        {% for school in form.fields.school.queryset %}
+                        <button type="button" class="dropdown-item" data-school="{{ school.pk }}">{{ school.name }}</button>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="d-flex flex-wrap align-items-end gap-4">
+        <div>
+            <label class="form-label">{% translate "Klassetrin" %}</label>
+            <div class="grade-checks d-flex gap-3">
+                {% for value, label in form.fields.grades.choices %}
+                <div class="form-check mb-0">
+                    <input class="form-check-input" type="checkbox" name="grades" value="{{ value }}" id="grade-{{ value }}"{% if value in filters.grades %} checked{% endif %}>
+                    <label class="form-check-label" for="grade-{{ value }}">{{ label }}</label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            <label class="form-label">{% translate "Køn" %}</label>
+            <div class="btn-group d-flex" role="group">
+                {% for value, label in form.fields.gender.choices %}
+                <input type="radio" class="btn-check" name="gender" value="{{ value }}" id="gender-{{ value }}"{% if value == filters.gender %} checked{% endif %}>
+                <label class="btn btn-outline-primary" for="gender-{{ value }}">{{ label }}</label>
+                {% endfor %}
+            </div>
+        </div>
+        <div>
+            <label class="form-label">{% translate "Testtype" %}</label>
+            <div class="btn-group d-flex" role="group">
+                {% for value, label in form.fields.test_type.choices %}
+                <input type="radio" class="btn-check" name="test_type" value="{{ value }}" id="test-type-{{ value }}"{% if value == filters.test_type %} checked{% endif %}>
+                <label class="btn btn-outline-primary" for="test-type-{{ value }}">{{ label }}</label>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="form-check mb-2">
+            <input class="form-check-input" type="checkbox" name="untested" id="untested"{% if filters.untested %} checked{% endif %}>
+            <label class="form-check-label" for="untested">{% translate "Vis ikke testet" %}</label>
+        </div>
+    </div>
+    <hr class="my-4">
+    <div class="d-flex justify-content-between align-items-start mb-3">
+        <div>
+            <h3>{{ title }}</h3>
+            <div class="small d-flex gap-3">
+                {% translate "Risikogrupper:" %}
+                <span class="dot-legend"><span class="dot wrong"></span>{% translate "Risiko" %}</span>
+                <span class="dot-legend"><span class="dot partially-correct"></span>{% translate "Kan være i risiko" %}</span>
+                <span class="dot-legend"><span class="dot correct"></span>{% translate "Ikke i risiko" %}</span>
+            </div>
+        </div>
+        <div class="dropdown">
+            <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="ph ph-download-simple"></i>{% translate "Download data" %}
+            </button>
+            <ul class="dropdown-menu dropdown-menu-end">
+                <li><button class="dropdown-item" type="submit" name="export" value="csv">CSV</button></li>
+                <li><button class="dropdown-item" type="submit" name="export" value="xlsx">Excel</button></li>
+            </ul>
+        </div>
+    </div>
+</form>
+{% render_table table %}
+</div>
+{% endblock %}
+
+{% block js_module %}
+    {{ block.super }}
+    <script type="module">
+        import { initializeStats } from "{% static 'js/admin/stats.js' %}";
+        document.addEventListener("DOMContentLoaded", initializeStats);
+    </script>
+{% endblock %}

@@ -290,6 +290,7 @@ class DysleksiTabulexClient(TabulexClient):
                 defaults={
                     "name": group.GroupName,
                     "is_main": group.GroupType == "Hovedgruppe",
+                    "level": group.GroupLevel,
                 },
             )
             if verbose:  # pragma: no branch

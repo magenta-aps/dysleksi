@@ -58,7 +58,7 @@ class Group:
     GroupId: str
     GroupName: str
     GroupType: str
-    GroupLevel: int | None
+    GroupLevel: str | None
     Line: str | None
     FromDate: date | None
     ToDate: date | None

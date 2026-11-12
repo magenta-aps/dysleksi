@@ -26,6 +26,7 @@ from dysleksi.models import (
     ClassTestStatus,
     Correctness,
     CorrectnessCategory,
+    Gender,
     Institution,
     Instruction,
     InstructionAction,
@@ -213,6 +214,19 @@ class TestReadingSupervisor(DysleksiTest):
             TestAssignment.objects.filter_user_permissions(self.other_teacher, "view"),
             [],
         )
+
+
+class TestStudent(DysleksiTest):
+    def test_gender(self):
+        # Even CPR numbers indicate that the person is female
+        self.assertEqual(self.student1.cpr % 2, 0)
+        self.assertEqual(self.student1.gender, Gender.FEMALE)
+
+        # Odd CPR numbers indicate that the person is male
+        self.assertEqual(self.student2.cpr % 2, 1)
+        self.assertEqual(self.student2.gender, Gender.MALE)
+
+        self.assertEqual(Student(cpr=None).gender, Gender.UNKNOWN)
 
 
 class TestStudentQuerySet(DysleksiTest):

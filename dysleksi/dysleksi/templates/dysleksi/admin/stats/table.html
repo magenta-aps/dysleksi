@@ -1,0 +1,38 @@
+{% extends "django_tables2/table.html" %}
+{% load i18n %}
+
+{% block table.thead %}
+<thead>
+    <tr>
+        <th colspan="3"></th>
+        <th colspan="4" class="col-group group-start">{% translate "Gruppetest" %}</th>
+        <th class="col-group col-untested"></th>
+        <th colspan="4" class="col-individual group-start">{% translate "Individuel test" %}</th>
+        <th class="col-individual col-untested"></th>
+    </tr>
+    <tr>
+        <th>{% translate "Anvendelsestidspunkt" %}</th>
+        <th>{% translate "Køn" %}</th>
+        <th>{% translate "Elever" %}</th>
+        <th class="col-group group-start">{% translate "Testet" %}</th>
+        <th class="col-group"><span class="dot wrong" title="{% translate 'Risiko' %}"></span></th>
+        <th class="col-group"><span class="dot partially-correct" title="{% translate 'Kan være i risiko' %}"></span></th>
+        <th class="col-group"><span class="dot correct" title="{% translate 'Ikke i risiko' %}"></span></th>
+        <th class="col-group col-untested">{% translate "Ikke testet" %}</th>
+        <th class="col-individual group-start">{% translate "Testet" %}</th>
+        <th class="col-individual"><span class="dot wrong" title="{% translate 'Risiko' %}"></span></th>
+        <th class="col-individual"><span class="dot partially-correct" title="{% translate 'Kan være i risiko' %}"></span></th>
+        <th class="col-individual"><span class="dot correct" title="{% translate 'Ikke i risiko' %}"></span></th>
+        <th class="col-individual col-untested">{% translate "Ikke testet" %}</th>
+    </tr>
+</thead>
+{% endblock table.thead %}
+
+{% block table.tbody.row %}
+{% ifchanged row.record.grade %}
+<tr class="grade-heading" data-grade="{{ row.record.grade }}">
+    <td colspan="{{ table.columns|length }}">{{ row.record.grade }}. {% translate "klasse" %}</td>
+</tr>
+{% endifchanged %}
+{{ block.super }}
+{% endblock table.tbody.row %}
