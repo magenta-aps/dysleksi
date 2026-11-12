@@ -37,7 +37,7 @@ django-csp-helpers==1.0.4
 django-libsass==0.9
 
 ## Compress css & js
-django_compressor==4.6.0
+django_compressor==4.7.0
 
 ## Image field
 pillow==13.0.0
