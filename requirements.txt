@@ -82,7 +82,7 @@ weasyprint==70.0
 beautifulsoup4==4.15.0
 
 ## Code coverage
-coverage==7.17.2
+coverage==7.17.3
 
 ## For specifying a given run time in tests (lets us define the return value of datetime.now etc.)
 freezegun==1.5.5
