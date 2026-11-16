@@ -356,6 +356,13 @@ describe("DyslexiaTestView", () => {
         expect(sent("question.answered")).toHaveLength(0);
     });
 
+    it("does not listen during instructions which advance automatically", async () => {
+        view.setPart(1);
+        view.currentPart.practice[0].advanceAutomatically = true;
+        await view.showQuestion(true, 0);
+        expect(mediaRecorder.start).not.toHaveBeenCalled();
+    });
+
     it("listens for the word once the instructions are over", async () => {
         view.setPart(1);
         const question = view.currentPart.practice[0];
