@@ -68,6 +68,7 @@ const mockDoc = `
             <input type="datetime-local" name="end_datetime" class="form-control" id="id_end_datetime">
             <button class="remove-end"></button>
         </div>
+        <button type="submit"><i class="ph ph-check"></i></button>
     </form>
 `;
 
@@ -210,6 +211,16 @@ describe("Form", () => {
         select.dispatchEvent(new Event("change"));
         expect(list.classList).toContain("d-none");
         expect(list.children.length).toBe(0);
+    });
+
+    it("disables the submit button and shows a spinner on submit", () => {
+        const form = getInstance();
+        const button = form.domElem.querySelector("button[type=submit]");
+        form.domElem.dispatchEvent(new Event("submit"));
+        expect(button.disabled).toBe(true);
+        expect(button.querySelector("i").className).toBe(
+            "spinner-border spinner-border-sm",
+        );
     });
 });
 

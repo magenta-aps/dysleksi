@@ -15,6 +15,7 @@ export class Form {
         this.addEndBtn = this.element(".add-end", this.addEnd);
         this.removeEndBtn = this.element(".remove-end", this.removeEnd);
         this.classChoice = this.element(".class-choice", this.updateClassChoice);
+        this.domElem.addEventListener("submit", () => this.disableSubmit());
 
         // Elements that are updated by event handlers
         this.studentChoice = this.element(".student-choice");
@@ -128,6 +129,12 @@ export class Form {
         this.display(this.addEndBtn, !this.state.hasEndDate);
         this.clearDateValue(this.endDateTime);
         this.hasEnd.value = state ? "y" : "n";
+    }
+
+    disableSubmit() {
+        const button = this.domElem.querySelector("button[type=submit]");
+        button.disabled = true;
+        button.querySelector("i").className = "spinner-border spinner-border-sm";
     }
 
     updateState(evt, name, value) {
