@@ -173,7 +173,6 @@ export class AudioDetector extends EventTarget {
 
         if (avg > this.detectionLevelThreshold) {
             // Audio volume exceeds detection threshold
-            this.dispatchEvent(new Event("audio.heard"));
             this.dispatchDebounced("audio.detected");
         } else {
             // Current `avg` is below minimum level.
@@ -235,7 +234,7 @@ export class AudioDetector extends EventTarget {
 
 // Individual and dyslexia tests record the student, so the teacher can judge what
 // the student says
-export function setupRecording(view, mediaRecorder, onAudioHeard = null) {
+export function setupRecording(view, mediaRecorder) {
     const startAudioDetector = () => {
         view.audioDetector?.stop();
         view.audioDetector = new AudioDetector(mediaRecorder.stream);
@@ -243,9 +242,6 @@ export function setupRecording(view, mediaRecorder, onAudioHeard = null) {
             view.audioDetector.addEventListener(event, (e) =>
                 view.send({ event: e.type }),
             );
-        }
-        if (onAudioHeard) {
-            view.audioDetector.addEventListener("audio.heard", onAudioHeard);
         }
         view.audioDetector.run();
     };

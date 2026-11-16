@@ -292,8 +292,7 @@ describe("DyslexiaTestView", () => {
         expect(sent("question.answered")).toHaveLength(0);
     });
 
-    it("lets the student move on once they have read the word aloud", async () => {
-        const next = document.getElementById("next");
+    it("lets the test leader move on once the student has read the word aloud", async () => {
         view.setPart(1);
         await view.showQuestion(true, 0);
 
@@ -302,34 +301,20 @@ describe("DyslexiaTestView", () => {
             practice: true,
         });
         expect(mediaRecorder.start).toHaveBeenCalled();
-        expect(next.style.visibility).toBe("hidden");
+        expect(document.getElementById("next").style.visibility).toBe("hidden");
 
-        view.audioDetector.dispatchEvent(new Event("audio.heard"));
-        expect(next.style.visibility).toBe("visible");
-
-        await view.onQuestionComplete();
+        receive({ event: "question.feedback", correctness: null });
+        await vi.waitFor(() => expect(view.currentQuestion.id).toBe(21));
 
         expect(sent("question.answered")[0]).toMatchObject({
             questionId: 20,
             recordingBase64: "BASE64_AUDIO",
-            correctness: null,
             practice: true,
         });
-        expect(view.currentQuestion.id).toBe(21);
-        expect(next.style.visibility).toBe("hidden");
-    });
-
-    it("only lets the student move on to the next word", async () => {
-        view.setPart(1);
-        await view.showQuestion(false, 0);
+        expect(sent("question.answered")[0]).not.toHaveProperty("correctness");
 
         receive({ event: "question.feedback", correctness: "correct" });
-
-        expect(sent("question.answered")).toHaveLength(0);
-        expect(view.currentQuestion.id).toBe(21);
-
-        await view.onQuestionComplete();
-        expect(view.currentQuestion.id).toBe(22);
+        await vi.waitFor(() => expect(view.currentQuestion.id).toBe(22));
     });
 
     it("moves on from the instructions without an answer", async () => {
@@ -346,8 +331,8 @@ describe("DyslexiaTestView", () => {
         await view.showQuestion(true, 0);
         expect(document.getElementById("next").disabled).toBe(false);
 
-        view.audioDetector.dispatchEvent(new Event("audio.heard"));
-        expect(document.getElementById("next").style.visibility).toBe("hidden");
+        receive({ event: "question.feedback", correctness: null });
+        expect(view.currentQuestion.id).toBe(20);
 
         await view.onQuestionComplete();
 
@@ -374,9 +359,6 @@ describe("DyslexiaTestView", () => {
         });
         await view.showQuestion(true, 0);
         expect(mediaRecorder.start).toHaveBeenCalled();
-
-        view.audioDetector.dispatchEvent(new Event("audio.heard"));
-        expect(document.getElementById("next").style.visibility).toBe("visible");
     });
 
     it("completes the part after the last word", async () => {
@@ -385,14 +367,10 @@ describe("DyslexiaTestView", () => {
         const onPartComplete = vi.spyOn(view, "onPartComplete");
         vi.spyOn(view, "onTestComplete").mockImplementation(() => {});
 
-        view.audioDetector.dispatchEvent(new Event("audio.heard"));
-        await view.onQuestionComplete();
+        receive({ event: "question.feedback", correctness: "correct" });
+        await vi.waitFor(() => expect(onPartComplete).toHaveBeenCalled());
 
-        expect(onPartComplete).toHaveBeenCalled();
         expect(sent("part.complete")).toHaveLength(1);
-
-        view.audioDetector.dispatchEvent(new Event("audio.heard"));
-        expect(document.getElementById("next").style.visibility).toBe("hidden");
     });
 
     it("follows the test leader to another question", async () => {

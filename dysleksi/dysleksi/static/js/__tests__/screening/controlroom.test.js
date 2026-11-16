@@ -1843,23 +1843,40 @@ describe("Teacher dyslexia test View", () => {
         expect(isDisabled("next")).toBe(true);
     });
 
-    it("leaves the words read aloud to the student", () => {
-        display(1, 0, false);
-
-        expect(isDisabled("correct")).toBe(true);
+    it("lets the test leader move on from the words read aloud", () => {
+        display(1, 0, true);
+        receive({ event: "instructions.started" });
         expect(isDisabled("next")).toBe(true);
+        receive({ event: "instructions.completed" });
+        expect(isDisabled("correct")).toBe(true);
+        expect(isDisabled("next")).toBe(false);
+
+        display(1, 0, false);
+        expect(isDisabled("next")).toBe(true);
+        buttons.correctButton().click();
+        buttons.nextButton().click();
+
+        expect(channel.send).toHaveBeenCalledWith(
+            expect.objectContaining({
+                event: "question.feedback",
+                questionId: 21,
+                correctness: "correct",
+            }),
+        );
 
         receive({
             event: "question.answered",
             recordingBase64: "data:audio/wav;base64,UklGR...",
-            correctness: null,
             partIndex: 1,
             questionIndex: 0,
         });
 
-        const row = document.querySelector("#events tbody tr");
-        expect(row.querySelector("td.result").textContent).toBe("");
-        expect(row.querySelector("td.answer audio")).not.toBeNull();
+        const rows = document.querySelectorAll("#events tbody tr");
+        expect(rows).toHaveLength(1);
+        expect(rows[0].querySelector("td.result button").dataset.correctness).toBe(
+            "correct",
+        );
+        expect(rows[0].querySelector("td.answer audio")).not.toBeNull();
     });
 
     it("lets the test leader answer the questionnaire", () => {

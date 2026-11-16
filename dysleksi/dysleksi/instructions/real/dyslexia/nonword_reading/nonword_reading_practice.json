@@ -3,12 +3,8 @@
         "question_type": "no_input_required",
         "text": "ipa",
         "continue_when_instruction_is_complete": false,
+        "advance_automatically": true,
         "instruction_sequence": [
-            {
-                "action": "hide",
-                "delayAfter": 0,
-                "element": "next"
-            },
             {
                 "action": "hide",
                 "delayAfter": 0,
@@ -35,12 +31,7 @@
             {
                 "action": "playSound",
                 "resource": "resources/Enhanced L500-L506/L502.mp3",
-                "delayAfter": 0
-            },
-            {
-                "action": "show",
-                "delayAfter": 0,
-                "element": "next"
+                "delayAfter": 1500
             }
         ]
     },
@@ -49,11 +40,6 @@
         "text": "univoq",
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
-            {
-                "action": "hide",
-                "delayAfter": 0,
-                "element": "next"
-            },
             // Eksempel
             {
                 "action": "playSound",
@@ -71,11 +57,6 @@
                 "action": "playSound",
                 "resource": "resources/Enhanced L500-L506/L504.mp3",
                 "delayAfter": 750
-            },
-            {
-                "action": "show",
-                "delayAfter": 0,
-                "element": "next"
             }
         ]
     },
@@ -87,11 +68,6 @@
         "question_type": "no_input_required",
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
-            {
-                "action": "hide",
-                "delayAfter": 0,
-                "element": "next"
-            },
             // Nu skal du prøve opgaven.
             {
                 "action": "playSound",
@@ -119,43 +95,5 @@
     {
         "text": "misuk",
         "question_type": "no_input_required"
-    },
-    {
-        "question_type": "no_input_required",
-        "instruction_sequence": [
-            {
-                "action": "hide",
-                "delayAfter": 0,
-                "element": "next"
-            },
-            // Nu er øvelsen slut.
-            {
-                "action": "playSound",
-                "resource": "resources/Enhanced L001-L014/L007.mp3",
-                "delayAfter": 750
-            },
-            // Nu begynder selve testen.
-            {
-                "action": "playSound",
-                "resource": "resources/Enhanced L001-L014/L008.mp3",
-                "delayAfter": 750
-            },
-            {
-                "action": "show",
-                "delayAfter": 0,
-                "element": "next"
-            },
-            // Tryk på "Videre" for at starte testen.
-            {
-                "action": "playSound",
-                "resource": "resources/Enhanced L001-L014/L010.mp3",
-                "delayAfter": 0
-            },
-            {
-                "action": "show",
-                "delayAfter": 0,
-                "element": "next"
-            }
-        ]
     }
 ]

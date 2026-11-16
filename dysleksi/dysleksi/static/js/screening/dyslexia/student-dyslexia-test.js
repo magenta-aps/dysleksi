@@ -8,44 +8,22 @@ import { setupRecording } from "../media.js";
 // we just show a question to the student, which the testleader answers (like in an
 // individual test)
 export class DyslexiaTestView extends GroupTestView {
-    readingAloud = false;
     summaryVoiceOver = false;
 
     constructor(test, assignmentId, domElements, mediaRecorder, student) {
         super(test, assignmentId, domElements, student);
-        setupRecording(this, mediaRecorder, () => {
-            if (this.readingAloud) {
-                this.domElements.toggleNextButton(true);
-            }
-        });
-    }
-
-    // Whether the student is expected to read a word aloud
-    isReadAloud(question = this.currentQuestion) {
-        return (
-            question.type === "no_input_required" &&
-            !question.advanceAutomatically &&
-            !question.instruction_sequence?.instructions.some(
-                (instruction) =>
-                    instruction.action === "show" && instruction.element === "next",
-            )
-        );
+        setupRecording(this, mediaRecorder);
     }
 
     // Only a part in which the student reads aloud needs the microphone
     needsMicrophone() {
         return [...this.currentPart.practice, ...this.currentPart.questions].some(
-            (question) => this.isReadAloud(question),
+            (question) => question.isReadAloud(),
         );
     }
 
     startSoundCalibration() {
         this.endSoundCalibration();
-    }
-
-    onPartComplete() {
-        this.readingAloud = false;
-        super.onPartComplete();
     }
 
     onChatMessage(data) {
@@ -55,6 +33,8 @@ export class DyslexiaTestView extends GroupTestView {
                 this.selectedAnswer = this.currentQuestion.possibleAnswers.find(
                     (answer) => answer.id === data.choiceId,
                 );
+                this.onQuestionComplete(this.currentQuestion);
+            } else if (this.currentQuestion.isReadAloud()) {
                 this.onQuestionComplete(this.currentQuestion);
             }
         }
@@ -69,8 +49,7 @@ export class DyslexiaTestView extends GroupTestView {
 
     async showQuestion(isPracticing, questionIndex) {
         const canShow = await super.showQuestion(isPracticing, questionIndex);
-        this.readingAloud = canShow && this.isReadAloud();
-        if (this.readingAloud) {
+        if (canShow && this.currentQuestion.isReadAloud()) {
             if (this.mediaRecorder.micLost) {
                 // The microphone was lost before we got to this part.
                 // Ask the student to restore it before proceeding.
@@ -85,11 +64,9 @@ export class DyslexiaTestView extends GroupTestView {
     }
 
     async onQuestionComplete(question = this.currentQuestion, outOfTime = false) {
-        if (!this.isReadAloud(question)) {
+        if (!question.isReadAloud()) {
             return super.onQuestionComplete(question, outOfTime);
         }
-        this.readingAloud = false;
-        this.domElements.toggleNextButton(false);
         this.answeredAt = document.timeline.currentTime;
         this.recordedAudio = await this.mediaRecorder.interval();
         this.send({
@@ -104,7 +81,6 @@ export class DyslexiaTestView extends GroupTestView {
             displayedAt: this.displayedAt,
             answeredAt: this.answeredAt,
             duration: this.answerDuration(this.answeredAt),
-            correctness: null,
             practice: this.isPracticing,
         });
         if (!(await this.showNextQuestion())) {
