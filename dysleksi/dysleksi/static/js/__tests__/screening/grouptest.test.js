@@ -14,6 +14,7 @@ import * as utils from "../../screening/utils.js";
 import { Student } from "../../screening/model.js";
 import { InstructionSequenceRunner } from "../../screening/instruction.js";
 import { WINDOW_BLOCKED_EVENT } from "../../screening/window-lock.js";
+import { WEBRTC_DEADLINE_MS } from "../../webSocketChannel.js";
 
 const mockP2P = {
     send: vi.fn(),
@@ -876,6 +877,7 @@ describe("GroupTestFlow", () => {
         vi.useFakeTimers();
         const test = new Test(groupTestData);
         const view = new GroupTestView(test, 1, domElements, student);
+        clearTimeout(view.teacherTimeoutId);
         test.parts[0].timeout = 60000;
         testSpy(view);
         view.setPart(0);
@@ -2268,6 +2270,20 @@ describe("The student heartbeat", () => {
         // The overlay goes away once the teacher is back
         view.onChatMessage({ event: "teacher.heartbeat" });
         expect(domElements.connectionLostOverlay.style.display).toBe("none");
+
+        vi.useRealTimers();
+    });
+
+    it("covers the screen when the teacher never answers", async () => {
+        vi.useFakeTimers();
+        const domElements = new GroupTestDomElements();
+        new GroupTestView(new Test(groupTestData), 1, domElements, student);
+
+        await vi.advanceTimersByTimeAsync(WEBRTC_DEADLINE_MS + 3 * utils.PING_MS - 1);
+        expect(domElements.connectionLostOverlay.style.display).toBe("none");
+
+        await vi.advanceTimersByTimeAsync(1);
+        expect(domElements.connectionLostOverlay.style.display).toBe("flex");
 
         vi.useRealTimers();
     });
