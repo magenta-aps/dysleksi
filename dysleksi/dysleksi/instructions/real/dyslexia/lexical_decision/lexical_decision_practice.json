@@ -69,9 +69,14 @@
                 "element": "choices"
             },
             {
-                "action": "clickButton",
+                "action": "select",
                 "delayAfter": 1000,
                 "element": "choice-true"
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
             },
             {
                 "action": "waitForUserClick",
