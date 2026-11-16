@@ -117,6 +117,7 @@ describe("IndividualTestFlow", () => {
 
         test = new Test(individualTestData);
         view = new IndividualTestView(test, 1, domElements, mediaRecorder, student);
+        clearTimeout(view.teacherTimeoutId);
         testSpy(view);
     });
 

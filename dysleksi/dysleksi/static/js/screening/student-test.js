@@ -5,7 +5,7 @@ import { unlockAudioOnGesture } from "./utils.js";
 import { preventDoubleTapZoom } from "./utils.js";
 import { PING_MS } from "./utils.js";
 import { WebRTCPeer } from "../webRTC.js";
-import { fallbackOnWebRTCFailure } from "../webSocketChannel.js";
+import { fallbackOnWebRTCFailure, WEBRTC_DEADLINE_MS } from "../webSocketChannel.js";
 import { WINDOW_BLOCKED_EVENT } from "./window-lock.js";
 import { listenForRedirect } from "../redirect.js";
 import { getAssignmentSocket } from "../ws.js";
@@ -70,6 +70,11 @@ export class StudentTestView {
                 student: student,
             });
         }, PING_MS);
+        // Also notice a teacher who never answers, once WebRTC had time to fall back
+        this.teacherTimeoutId = setTimeout(
+            () => this.onConnectionLost(),
+            WEBRTC_DEADLINE_MS + 3 * PING_MS,
+        );
         document.addEventListener(WINDOW_BLOCKED_EVENT, () => {
             this.windowBlocked = true;
             clearInterval(this.heartbeatIntervalId);
