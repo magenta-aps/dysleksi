@@ -1,302 +1,302 @@
 [
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3",
+        "sound": "resources/L413-472 Stav nonord/L413.mp3",
         "correct": "ma"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.2.mp3",
+        "sound": "resources/L413-472 Stav nonord/L414.mp3",
         "correct": "pu"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L415.mp3",
         "correct": "ipa"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L416.mp3",
         "correct": "uki"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L417.mp3",
         "correct": "maru"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L418.mp3",
         "correct": "sina"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L419.mp3",
         "correct": "samik"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L420.mp3",
         "correct": "iguut"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L421.mp3",
         "correct": "talasi"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L422.mp3",
         "correct": "equlak"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L423.mp3",
         "correct": "tapiluk"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L424.mp3",
         "correct": "kagutai"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L425.mp3",
         "correct": "terrivik"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L426.mp3",
         "correct": "navaataq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L427.mp3",
         "correct": "kummeqqat"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.3.mp3",
+        "sound": "resources/L413-472 Stav nonord/L428.mp3",
         "correct": "ni"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.4.mp3",
+        "sound": "resources/L413-472 Stav nonord/L429.mp3",
         "correct": "aq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L430.mp3",
         "correct": "agu"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L431.mp3",
         "correct": "muu"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L432.mp3",
         "correct": "ikut"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L433.mp3",
         "correct": "uumi"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L434.mp3",
         "correct": "qasut"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L435.mp3",
         "correct": "ungut"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L436.mp3",
         "correct": "matseq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L437.mp3",
         "correct": "pimmut"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L438.mp3",
         "correct": "armuseq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L439.mp3",
         "correct": "parngut"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L440.mp3",
         "correct": "illoriaq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L441.mp3",
         "correct": "oqqaavik"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L442.mp3",
         "correct": "tullugiaq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.5.mp3",
+        "sound": "resources/L413-472 Stav nonord/L443.mp3",
         "correct": "uu"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.6.mp3",
+        "sound": "resources/L413-472 Stav nonord/L444.mp3",
         "correct": "ua"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L445.mp3",
         "correct": "kuk"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L446.mp3",
         "correct": "sat"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L447.mp3",
         "correct": "miaq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L448.mp3",
         "correct": "atsu"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L449.mp3",
         "correct": "arfoq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L450.mp3",
         "correct": "sikku"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L451.mp3",
         "correct": "uuggat"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L452.mp3",
         "correct": "ukuleq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L453.mp3",
         "correct": "saaluki"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L454.mp3",
         "correct": "soqineq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L455.mp3",
         "correct": "suuniluk"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L456.mp3",
         "correct": "kuppasoq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L457.mp3",
         "correct": "uulisagaq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L458.mp3",
         "correct": "ooq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L459.mp3",
         "correct": "sui"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L460.mp3",
         "correct": "apaa"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L461.mp3",
         "correct": "kooq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L462.mp3",
         "correct": "piteq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L463.mp3",
         "correct": "saasoq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L464.mp3",
         "correct": "talugaq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L465.mp3",
         "correct": "uggavik"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L466.mp3",
         "correct": "utiliaq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L467.mp3",
         "correct": "naarusuk"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L468.mp3",
         "correct": "qaattuaq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L469.mp3",
         "correct": "paleralik"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L470.mp3",
         "correct": "orlavik"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L471.mp3",
         "correct": "innoraaq"
     },
     {
         "question_type": "free_text",
-        "sound": "resources/nonwordspelling/Nonord/4f.1.mp3", // TODO: Replace me
+        "sound": "resources/L413-472 Stav nonord/L472.mp3",
         "correct": "eqaleraq"
     }
 ]
