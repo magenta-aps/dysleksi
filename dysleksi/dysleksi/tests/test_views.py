@@ -10,6 +10,8 @@ from uuid import uuid4
 
 from bs4 import BeautifulSoup
 from django.contrib.auth.models import AnonymousUser
+from django.contrib.sessions.backends.signed_cookies import SessionStore
+from django.contrib.sessions.middleware import SessionMiddleware
 from django.core.cache import caches
 from django.core.exceptions import ImproperlyConfigured, PermissionDenied
 from django.core.files.base import ContentFile
@@ -29,6 +31,7 @@ from openpyxl import load_workbook
 
 from dysleksi.models import (
     Class,
+    ConsentResponse,
     Correctness,
     CorrectnessCategory,
     Gender,
@@ -47,7 +50,7 @@ from dysleksi.models import (
     User,
 )
 from dysleksi.tables import PartResultTable, StudentTestResponseTable, TestResultTable
-from dysleksi.tests.base import DysleksiTest, ResponseTest
+from dysleksi.tests.base import ConsentTest, DysleksiTest, ResponseTest
 from dysleksi.views import (
     AssignmentPartResultsView,
     AssignmentResultListView,
@@ -57,6 +60,9 @@ from dysleksi.views import (
     ClassDetailView,
     ClassListView,
     ClientErrorLogView,
+    ConsentConfirm,
+    ConsentDone,
+    ConsentStart,
     PaginationMixin,
     PartResponseView,
     QuestionResponseAnswerSoundDetail,
@@ -2751,3 +2757,108 @@ class TestQuestionResponseUpdateView(ResponseTest):
         view = QuestionResponseUpdateView()
         view.setup(request)
         return view.post(request)
+
+
+class TestConsentStart(ConsentTest):
+    def get_view_instance(self):
+        request_factory = RequestFactory()
+        request = request_factory.get("")
+        request.user = self.parent_or_guardian
+        middleware = SessionMiddleware(lambda x: None)
+        middleware.process_request(request)
+        view = ConsentStart()
+        view.setup(request, pk=self.consent_request.pk)
+        return view
+
+    def test_session_is_populated(self):
+        view = self.get_view_instance()
+        view.get(view.request)
+        self.assertIn("oidc_login_next_consent", view.request.session)
+        self.assertEqual(
+            view.request.session["oidc_login_next_consent"],
+            reverse(
+                "dysleksi:consent_confirm",
+                kwargs={"pk": self.consent_request.pk},
+            ),
+        )
+
+
+class TestConsentConfirm(ConsentTest):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.consent_request.recipients.add(cls.parent_or_guardian)
+
+    def get_view_instance(self, user=None):
+        if user is None:
+            user = self.parent_or_guardian
+        return self.setup_view(ConsentConfirm, user, pk=self.consent_request.pk)
+
+    def test_setup(self):
+        view = self.get_view_instance()
+        self.assertEqual(view.consent_request, self.consent_request)
+
+    def test_get_other_parent_returns_403(self):
+        with self.assertRaises(PermissionDenied):
+            self.get_view_instance(self.other_parent_or_guardian)
+
+    def test_get_when_no_consent_response(self):
+        view = self.get_view_instance()
+        self.assertEqual(view.response.status_code, HttpResponse.status_code)  # 200
+
+    def test_get_when_consent_response_exists(self):
+        ConsentResponse.objects.get_or_create(
+            request=self.consent_request,
+            defaults={"given_by": self.parent_or_guardian},
+        )
+        view = self.get_view_instance()
+        self.assertEqual(view.response.status_code, HttpResponseRedirect.status_code)
+
+    def test_get_form_kwargs(self):
+        view = self.get_view_instance()
+        form_kwargs = view.get_form_kwargs()
+        self.assertEqual(form_kwargs["consent_request"], self.consent_request)
+        self.assertEqual(form_kwargs["given_by"], self.parent_or_guardian)
+
+    def test_get_context_data(self):
+        view = self.get_view_instance()
+        context_data = view.get_context_data()
+        self.assertEqual(
+            context_data["person"].subclass_instance(), self.consent_request.test_person
+        )
+
+    def test_submit_form(self):
+        request = RequestFactory().post("", data={"confirm": "y"})
+        request.user = self.parent_or_guardian
+        request.session = SessionStore()
+        view = ConsentConfirm()
+        view.setup(request, pk=self.consent_request.pk)
+        response = view.post(request)
+        self.assertTrue(view.request.session["consent_just_given"])
+        self.assertEqual(response.status_code, HttpResponseRedirect.status_code)
+
+
+class TestConsentDone(ConsentTest):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.consent_request.recipients.add(cls.parent_or_guardian)
+        cls.consent_request.response, _ = ConsentResponse.objects.get_or_create(
+            request=cls.consent_request,
+            given_by=cls.parent_or_guardian,
+        )
+        cls.consent_request.save()
+
+    def get_view_instance(self, user=None):
+        if user is None:
+            user = self.parent_or_guardian
+        return self.setup_view(ConsentDone, user, pk=self.consent_request.response.pk)
+
+    def test_get_other_parent_returns_403(self):
+        with self.assertRaises(PermissionDenied):
+            self.get_view_instance(self.other_parent_or_guardian)
+
+    def test_get_reads_session_variable(self):
+        view = self.get_view_instance()
+        view.request.session["consent_just_given"] = True
+        self.assertTrue(view.get_context_data()["consent_just_given"])

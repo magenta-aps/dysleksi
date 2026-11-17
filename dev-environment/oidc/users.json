@@ -25,5 +25,14 @@
     "uniid": "1a3b5c7d9e",
     "password": "elev",
     "groups": [ "Elever" ]
+  },
+  {
+    "id": "parent_or_guardian",
+    "email": "parent_or_guardian@dys.gl",
+    "email_verified": true,
+    "name": "Parent Or Guardian",
+    "uniid": "0222222226",
+    "password": "parent_or_guardian",
+    "groups": [ "Forældre/værger" ]
   }
 ]

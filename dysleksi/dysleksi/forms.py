@@ -18,6 +18,7 @@ from dynamic_forms import DynamicField, DynamicFormMixin
 from dysleksi.models import (
     GRADES,
     Class,
+    ConsentResponse,
     Gender,
     Institution,
     PlannedDateTime,
@@ -439,3 +440,35 @@ class StatsFilterForm(forms.Form):
             name: self.get_initial_for_field(field, name)
             for name, field in self.fields.items()
         }
+
+
+class ConsentForm(DynamicFormMixin, forms.ModelForm):
+    class Meta:
+        model = ConsentResponse
+        fields: list[str] = []
+
+    confirm = DynamicField(
+        forms.BooleanField,
+        required=False,
+        label=lambda form: _(
+            "Jeg afgiver mit samtykke til at {name} (CPR {cpr}) må tage ordblindetest"
+        ).format(
+            name=form.consent_request.test_person.get_full_name(),
+            cpr=form.consent_request.test_person.cpr,
+        ),
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.consent_request = kwargs.pop("consent_request", None)
+        self.given_by = kwargs.pop("given_by", None)
+        super().__init__(*args, **kwargs)
+
+    def save(self, commit=True):
+        self.instance, _ = ConsentResponse.objects.update_or_create(
+            request=self.consent_request,
+            defaults={
+                "given_by": self.given_by,
+                "accepted": self.cleaned_data["confirm"],
+            },
+        )
+        return self.instance

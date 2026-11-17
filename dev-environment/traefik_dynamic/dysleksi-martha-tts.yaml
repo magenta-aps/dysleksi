@@ -1,0 +1,20 @@
+http:
+  routers:
+    dysleksi-martha-tts:
+      rule: "Host(`dysleksi-web`) && PathPrefix(`/martha/tts/`)"
+      service: dysleksi-martha-tts
+      entryPoints:
+        - websecure
+      priority: 35
+      middlewares:
+        - stripprefix-martha-tts
+  services:
+    dysleksi-martha-tts:
+      loadBalancer:
+        servers:
+          - url: "http://dysleksi-martha-tts:8000"
+  middlewares:
+    stripprefix-martha-tts:
+      stripPrefix:
+        prefixes:
+          - "/martha/tts"

@@ -26,11 +26,11 @@ msgstr ""
 msgid "Vælg venligst mindst én elev"
 msgstr ""
 
-#: dysleksi/forms.py
+#: dysleksi/forms.py dysleksi/templates/dysleksi/consent/confirm.html
 msgid "Nej"
 msgstr ""
 
-#: dysleksi/forms.py
+#: dysleksi/forms.py dysleksi/templates/dysleksi/consent/confirm.html
 msgid "Ja"
 msgstr ""
 
@@ -136,6 +136,12 @@ msgstr ""
 
 #: dysleksi/forms.py
 msgid "Begge"
+msgstr ""
+
+#: dysleksi/forms.py
+#, python-brace-format
+msgid ""
+"Jeg afgiver mit samtykke til at {name} (CPR {cpr}) må tage ordblindetest"
 msgstr ""
 
 #: dysleksi/management/commands/create_result_categories.py
@@ -252,6 +258,14 @@ msgstr ""
 
 #: dysleksi/models.py
 msgid "testpersoner"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "forælder/værge"
+msgstr ""
+
+#: dysleksi/models.py
+msgid "forældre/værger"
 msgstr ""
 
 #: dysleksi/models.py dysleksi/templates/dysleksi/admin/stats/stats.html
@@ -600,6 +614,7 @@ msgid "Statistik"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/base.html
+#: dysleksi/templates/dysleksi/consent/base.html
 #: dysleksi/templates/dysleksi/screening/student.html
 msgid "Log ud"
 msgstr ""
@@ -1187,6 +1202,79 @@ msgstr ""
 
 #: dysleksi/templates/dysleksi/admin/test_responses/group/list.html
 msgid "Samlet overblik over score i deltest"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/base.html
+msgid "Læs op"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/confirm.html
+#, python-format
+msgid "Giv dit samtykke til at %(name)s (CPR %(cpr)s) må tage ordblindetest"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/confirm.html
+msgid "Vil du give samtykke til dette?"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/done.html
+#, python-format
+msgid "Tak for dit samtykke på vegne af %(name)s (CPR %(cpr)s)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/done.html
+#, python-format
+msgid "Samtykke for %(name)s (CPR %(cpr)s) er allerede givet"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/done.html
+#, python-format
+msgid ""
+"Vi bekræfter, at du ikke har givet samtykke på vegne af %(name)s (CPR "
+"%(cpr)s)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/done.html
+#, python-format
+msgid "Der er allerede afvist et samtykke for %(name)s (CPR %(cpr)s)"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/done.html
+#, python-format
+msgid ""
+"Samtykke til at %(name)s (CPR %(cpr)s) må tage ordblindetest blev givet af "
+"%(given_by)s d. %(given_at)s."
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/done.html
+#, python-format
+msgid ""
+"Samtykke til at %(name)s (CPR %(cpr)s) må tage ordblindetest blev afvist af "
+"%(given_by)s d. %(given_at)s."
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/done.html
+msgid "Du behøver derfor ikke foretage dig noget, og kan forlade siden."
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/done.html
+msgid "Læs betingelserne for ordblindetesten her"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/done.html
+msgid "Log ud og forlad siden"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/start.html
+msgid "Log ind med MitID for at give forældresamtykke til ordblindetest"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/start.html
+msgid "Tryk på knappen nedenunder for at blive viderestillet til MitID"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/consent/start.html
+msgid "Log ind med MitID"
 msgstr ""
 
 #: dysleksi/templates/dysleksi/lobby/staff.html

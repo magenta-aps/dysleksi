@@ -197,6 +197,21 @@ services:
     networks:
       - default
 
+  dysleksi-martha-tts:
+    container_name: dysleksi-martha-tts
+    image: oqaasileriffik/martha
+    volumes:
+      - martha-data:/cache/:rw
+    networks:
+      - default
+
+  dysleksi-martha-data:
+    container_name: dysleksi-martha-data
+    image: halverneus/static-file-server:latest
+    volumes:
+      - martha-data:/web:ro
+    networks:
+      - default
 
 volumes:
   postgres-data:
@@ -206,6 +221,7 @@ volumes:
   lobby-bots-modules:
   static-copy:
   postgres-var:
+  martha-data:
 
 networks:
   default:

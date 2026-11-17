@@ -1,0 +1,8 @@
+{% extends "dysleksi/consent/base.html" %}
+{% load i18n %}
+
+{% block inner_content %}
+<h1 class="my-4">{% translate "Log ind med MitID for at give forældresamtykke til ordblindetest" %}</h1>
+<p>{% translate "Tryk på knappen nedenunder for at blive viderestillet til MitID" %}</p>
+<a href="{% url 'login:login' %}" class="btn btn-primary my-3">{% translate "Log ind med MitID" %}</a>
+{% endblock %}

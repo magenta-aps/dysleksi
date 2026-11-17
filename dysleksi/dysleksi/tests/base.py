@@ -15,6 +15,7 @@ from django.test.client import RequestFactory
 from django.utils import timezone
 
 from dysleksi.models import (
+    PARENTS_OR_GUARDIANS,
     READING_SUPERVISORS,
     STUDENTS,
     TEACHERS,
@@ -22,8 +23,10 @@ from dysleksi.models import (
     TEST_PERSONS,
     CategoryColorChoice,
     Class,
+    ConsentRequest,
     Correctness,
     Institution,
+    ParentOrGuardian,
     PartResponse,
     PossibleAnswer,
     QuestionResponse,
@@ -54,6 +57,7 @@ class DysleksiTest(TestCase):
         Group.objects.get_or_create(name=READING_SUPERVISORS)
         Group.objects.get_or_create(name=TEST_LEADERS)
         Group.objects.get_or_create(name=TEST_PERSONS)
+        Group.objects.get_or_create(name=PARENTS_OR_GUARDIANS)
         cls.school = cls.create_school(number="test123", name="TestSkolen")
         cls.klasse = cls.create_class(2025, "1.A", is_main=True)
         cls.student1 = cls.create_student(
@@ -828,3 +832,35 @@ class ResponseTest(DysleksiTest):
             2026, 5, 1, 12, 0, 10, tzinfo=tz
         )
         cls.wordreading_questionresponse_1.save()
+
+
+class ConsentTest(DysleksiTest):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.test_leader, _ = TestLeader.objects.get_or_create(
+            username="TestLeader",
+            first_name="Test",
+            last_name="Leader",
+        )
+        cls.test_person, _ = TestPerson.objects.get_or_create(
+            username="TestPerson",
+            first_name="Test",
+            last_name="Person",
+            cpr="0222222226",
+            uniid="0222222226",
+        )
+        cls.parent_or_guardian, _ = ParentOrGuardian.objects.get_or_create(
+            username="ParentOrGuardian",
+            first_name="Parent",
+            last_name="Or Guardian",
+        )
+        cls.other_parent_or_guardian, _ = ParentOrGuardian.objects.get_or_create(
+            username="OtherParentOrGuardian",
+            first_name="Other Parent",
+            last_name="Or Guardian",
+        )
+        cls.consent_request, _ = ConsentRequest.objects.get_or_create(
+            requested_by=cls.test_leader,
+            test_person=cls.test_person,
+        )

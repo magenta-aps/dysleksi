@@ -8,7 +8,9 @@ from django.core.management.base import BaseCommand
 from dysleksi.models import (
     GRADES,
     Class,
+    ConsentRequest,
     Institution,
+    ParentOrGuardian,
     ReadingSupervisor,
     Student,
     Teacher,
@@ -103,12 +105,27 @@ class Command(BaseCommand):
             username="testperson",
             defaults={
                 "first_name": "Test",
-                "last_name": "Persen",
+                "last_name": "Person",
+                "cpr": "0222222220",
+                "uniid": "0222222220",
             },
         )
         if created:
             test_person.set_password("testperson")
             test_person.save()
+
+        parent_or_guardian, created = ParentOrGuardian.objects.update_or_create(
+            username="parent_or_guardian",
+            defaults={
+                "first_name": "Parent",
+                "last_name": "Or Guardian",
+                "cpr": "0222222226",
+                "uniid": "0222222226",
+            },
+        )
+        if created:
+            parent_or_guardian.set_password("parent_or_guardian")
+            parent_or_guardian.save()
 
         # Create student who is in idp
         student, created = Student.objects.update_or_create(
@@ -271,3 +288,10 @@ class Command(BaseCommand):
         for group_test_student in group_test_students:
             klasse.students.add(group_test_student)
             secondary_class.students.add(group_test_student)
+
+        # Add consent request for manual testing
+        consent_request, _ = ConsentRequest.objects.get_or_create(
+            requested_by=test_leader,
+            test_person=test_person,
+        )
+        consent_request.recipients.add(parent_or_guardian)

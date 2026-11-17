@@ -30,18 +30,20 @@ well. Log in using the student's credentials.
 
 To login using username/password, go to https://dysleksi-web/login/forward/django instead.
 
-| Role                                    | Login type        | Teacher username | Teacher password |
-|-----------------------------------------|:------------------|------------------|------------------|
-| Teacher 1                               | UniLogin/MitID    | `laerer@dys.gl`  | `laerer`         |
-| Teacher 1                               | Username/password | `0222222222`     | `lærer`          |
-| Teacher 2                               | Username/password | `lærer`          | `lærer`          |
-| Teacher 3 (admin)                       | Username/password | `admin`          | `admin`          |
-| Læsevejleder (sees all classes)         | Username/password | `læsevejleder`   | `læsevejleder`   |
-| Student 1                               | UniLogin/MitID    | `elev@dys.gl`    | `elev`           |
-| Student 2                               | UniLogin/MitID    | `elev2@dys.gl`   | `elev2`          |
-| Student 3 ("Steve Jobs", iPad testing)  | Username/password | `elev`           | `elev`           |
-| Test leader (dyslexia test)             | Username/password | `testleder`      | `testleder`      |
-| Test person (dyslexia test)             | Username/password | `testperson`     | `testperson`     |
+| Role                                    | Login type        | Teacher username            | Teacher password     |
+|-----------------------------------------|:------------------|-----------------------------|----------------------|
+| Teacher 1                               | UniLogin/MitID    | `laerer@dys.gl`             | `laerer`             |
+| Teacher 1                               | Username/password | `0222222222`                | `lærer`              |
+| Teacher 2                               | Username/password | `lærer`                     | `lærer`              |
+| Teacher 3 (admin)                       | Username/password | `admin`                     | `admin`              |
+| Læsevejleder (sees all classes)         | Username/password | `læsevejleder`              | `læsevejleder`       |
+| Student 1                               | UniLogin/MitID    | `elev@dys.gl`               | `elev`               |
+| Student 2                               | UniLogin/MitID    | `elev2@dys.gl`              | `elev2`              |
+| Student 3 ("Steve Jobs", iPad testing)  | Username/password | `elev`                      | `elev`               |
+| Test leader (dyslexia test)             | Username/password | `testleder`                 | `testleder`          |
+| Test person (dyslexia test)             | Username/password | `testperson`                | `testperson`         |
+| Parent or guardian (dyslexia test)      | UniLogin/MitID    | `parent_or_guardian@dys.gl` | `parent_or_guardian` |
+| Parent or guardian (dyslexia test)      | Username/password | `parent_or_guardian`        | `parent_or_guardian` |
 
 To begin a screening session, click "Start individueltest" in the teacher window. The "student window" should now automatically switch to a screening session.
 

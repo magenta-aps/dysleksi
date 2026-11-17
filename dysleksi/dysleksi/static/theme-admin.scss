@@ -2241,26 +2241,32 @@ $border-radius-student-card: $spacer / 4 * 3;
     text-transform: uppercase;
     vertical-align: middle;
   }
+
   thead tr:first-child th {
     font-size: 0.875 * $spacer;
     text-align: left;
     text-transform: none;
   }
+
   td:not(:first-child, :nth-child(2)),
   th:not(:first-child, :nth-child(2)) {
     text-align: right;
   }
+
   th,
   td {
     padding: 0.75 * $spacer;
   }
+
   td {
     border-bottom: 0;
     border-top: 1px solid $mono-gray-lighter;
   }
+
   .group-start {
     border-left: 1px solid $mono-gray-lighter;
   }
+
   .grade-heading td {
     background: $mono-white;
     font-family: "DM Sans SemiBold", "Helvetica", sans-serif;
@@ -2274,6 +2280,7 @@ $border-radius-student-card: $spacer / 4 * 3;
     .test-package {
       visibility: hidden;
     }
+
     td {
       border-top-style: dotted;
     }
@@ -2291,5 +2298,50 @@ $border-radius-student-card: $spacer / 4 * 3;
   &[data-test-type="individual"] .col-group,
   &[data-untested="false"] .col-untested {
     display: none;
+  }
+}
+
+/* Consent styles */
+.consent {
+  .brand {
+    padding: $spacer 3 * $spacer;
+    background: $mono-gray-dark-3;
+
+    .logo {
+      height: 5 * $spacer;
+      background: url("./images/Nanoq_logo_hvid-outline.svg") left top / contain no-repeat;
+    }
+
+    .user {
+      color: $mono-gray-lightest;
+    }
+  }
+
+  .inner-content {
+    padding: $spacer 3 * $spacer;
+    background: $mono-white;
+
+    .terms {
+      max-height: 60vh;
+      overflow-y: scroll;
+      padding: 2 * $spacer 4 * $spacer;
+      border: 6px solid $mono-gray-lightest;
+      border-radius: $spacer;
+      background: $white;
+      color: $mono-gray-darkest;
+    }
+
+    .form-check-input:checked {
+      background-color: $blue-dark;
+      background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'%3e%3cpath fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='3' d='m6 10 3 3 6-6'/%3e%3c/svg%3e")
+    }
+
+    a.terms-download {
+      padding: $spacer;
+      background: $white;
+      color: $blue-darkest;
+      border: 1px solid $mono-gray-lightest;
+      text-decoration: none;
+    }
   }
 }
