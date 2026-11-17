@@ -1,13 +1,14 @@
 [
     {
         "question_type": "multiple_choice",
-        "correct": "numi",
-        "sound": "resources/Enhanced L100-L109/L104.mp3",
+        "correct": "kavaallit",
+        "sound": "resources/Enhanced L600-L611/L604.mp3",
         "correct_index": 3,
-        "wrong": ["tupi", "tagi", "taga", "tati"],
+        "wrong": ["kalaallit", "kalaaleq", "kalaallisut", "qallunaat"], // Claude
         "continue_when_instruction_is_complete": false,
         "confirm_correct_answer": false,
         "play_sound_when_instruction_is_complete": false,
+        "advance_automatically": true,
         "instruction_sequence": [
             {
                 "action": "hide",
@@ -43,8 +44,41 @@
             },
             {
                 "action": "show",
-                "delayAfter": 0,
+                "delayAfter": 1000,
                 "element": "challenge-sound-btn"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 2500,
+                "element": "challenge-sound-btn"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 3500,
+                "element": "choice-kavaallit"
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 1000,
+                "element": "next"
+            }
+        ]
+    },
+
+    {
+        "question_type": "multiple_choice",
+        "correct": "numi",
+        "sound": "resources/Enhanced L100-L109/L104.mp3",
+        "correct_index": 3,
+        "wrong": ["tupi", "tagi", "taga", "tati"],
+        "continue_when_instruction_is_complete": false,
+        "confirm_correct_answer": false,
+        "play_sound_when_instruction_is_complete": false,
+        "instruction_sequence": [
+            {
+                "action": "show",
+                "delayAfter": 1500,
+                "element": "choices"
             },
             // Eksempel
             {
