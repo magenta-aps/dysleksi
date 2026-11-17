@@ -1365,25 +1365,18 @@ class TestPart(models.Model):
         }
 
     @staticmethod
-    def dyslexia_instruction_sequence_outro(start_test):
+    def dyslexia_instruction_sequence_outro():
         sounds = "resources/Enhanced L001-L014"
-        sequence = [
-            {"action": "show", "element": "next"},
-            {"action": "show", "element": "repeat"},
-            {"action": "setRepeatButtonDestination", "data": "0"},
-            {"action": "playSound", "resource": f"{sounds}/L014.mp3"},
-            {"action": "highlight", "element": "repeat"},
-            {"action": "highlight", "element": "next", "delayAfter": 750},
-        ]
-        if start_test:
-            # A part without practice questions starts the test right away
-            sequence += [
-                {"action": "playSound", "resource": f"{sounds}/L001.mp3"},
-                {"action": "highlight", "element": "next"},
-            ]
         return {
             "question_type": QuestionType.NO_INPUT_REQUIRED,
-            "instruction_sequence": sequence,
+            "instruction_sequence": [
+                {"action": "show", "element": "next"},
+                {"action": "show", "element": "repeat"},
+                {"action": "setRepeatButtonDestination", "data": "0"},
+                {"action": "playSound", "resource": f"{sounds}/L014.mp3"},
+                {"action": "highlight", "element": "repeat"},
+                {"action": "highlight", "element": "next", "delayAfter": 750},
+            ],
         }
 
     def update_or_create_test_resources(self, questions_data, is_practice=False):
@@ -1405,9 +1398,7 @@ class TestPart(models.Model):
             if data.get("question_type") == "instruction_sequence_outro":
                 data = self.instruction_sequence_outro(data["sounds"])
             elif data.get("question_type") == "dyslexia_instruction_sequence_outro":
-                data = self.dyslexia_instruction_sequence_outro(
-                    data.get("start_test", False)
-                )
+                data = self.dyslexia_instruction_sequence_outro()
 
             question = {"part_id": self.pk, "is_practice": is_practice, "order": order}
 
