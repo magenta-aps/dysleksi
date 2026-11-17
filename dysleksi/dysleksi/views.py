@@ -62,7 +62,6 @@ from openpyxl import Workbook
 from weasyprint import HTML
 
 from dysleksi.forms import (
-    ClassStudentFormSet,
     ConsentForm,
     StartDyslexiaTestForm,
     StartRoomForm,
@@ -662,10 +661,6 @@ class StartAssignmentView(GroupRequiredMixin, NavigationMixin, CreateView):
 
     def get_context_data(self, **kwargs):
         context_data = super().get_context_data(**kwargs)
-        context_data["class_student_formset"] = ClassStudentFormSet(
-            self.request.POST if self.request.method == "POST" else None,
-            queryset=self.user.accessible_classes,
-        )
         self.add_navigation_context(context_data, None, None)
         return context_data
 
@@ -745,25 +740,11 @@ class StartAssignmentView(GroupRequiredMixin, NavigationMixin, CreateView):
             )
 
     def _get_student_subset(self, form) -> QuerySet[Student]:
-        if (
-            form.cleaned_data["test_type"] != TestType.GROUP
-            or form.cleaned_data["klasse"] is None
-        ):
-            logger.info("not returning student subset for %r", form)
-        else:
-            class_student_formset = ClassStudentFormSet(self.request.POST)
-            class_student_formset.is_valid()
-            cls = form.cleaned_data["klasse"]
-            for class_student_form in class_student_formset.forms:
-                if class_student_form.is_valid() and class_student_form.instance == cls:
-                    student_subset = class_student_form.cleaned_data["students"]
-                    if student_subset.count() == cls.students.count():
-                        logger.info("all students in %r selected, returning None", cls)
-                        return Student.objects.none()
-                    return student_subset
-                else:
-                    pass  # pragma: no cover
-        return Student.objects.none()
+        students = form.cleaned_data["students"]
+        klasse = form.cleaned_data["klasse"]
+        if klasse is None or students.count() == klasse.students.count():
+            return Student.objects.none()
+        return students
 
 
 class PaginationMixin:

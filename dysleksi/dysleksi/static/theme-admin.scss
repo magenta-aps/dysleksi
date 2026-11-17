@@ -427,16 +427,56 @@ textarea.form-control {
 .input-group-text:has(+ .form-control:focus) {
   border: $border-width solid #80adc2;
 }
-// Grid layout containing checkboxes
-form .grid {
-  &.border {
-    padding: 0.5 * $spacer;
-    border: 1px solid $mono-gray-dark-1;
-    border-radius: 0.75 * $spacer;
-    columns: 3;
+// Let the student dropdown overflow the form card
+.start-room .table-container {
+  overflow: visible !important;
+}
+// Dropdown for selecting students, grouped by class
+.student-picker {
+  position: relative;
+  .picker-panel {
+    position: absolute;
+    z-index: 10;
+    left: 0;
+    right: 0;
+    margin-top: 0.25 * $spacer;
+    background-color: $white;
+    border: 1px solid $mono-gray-lighter;
+    border-radius: 0.5 * $spacer;
+    box-shadow: 0 0.25 * $spacer $spacer rgba(0, 0, 0, 0.1);
   }
-  .form-check {
-    break-inside: avoid;
+  .picker-list {
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 0.5 * $spacer $spacer;
+  }
+  .picker-class-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5 * $spacer;
+    padding: 0.5 * $spacer 0;
+    cursor: pointer;
+    .form-check-input {
+      margin-top: 0;
+    }
+  }
+  .picker-class.folded {
+    .picker-students {
+      display: none;
+    }
+    .ph-caret-up {
+      transform: rotate(180deg);
+    }
+  }
+  .picker-students {
+    columns: 3;
+    padding-left: 2 * $spacer;
+    .form-check {
+      break-inside: avoid;
+    }
+  }
+  &.single .class-check {
+    display: none;
   }
 }
 // Contents of the selected test

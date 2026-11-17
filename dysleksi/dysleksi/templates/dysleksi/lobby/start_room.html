@@ -22,22 +22,41 @@
             {% endif %}
 
             {% bootstrap_field form.test_type wrapper_class="test-type-choice" field_class="d-flex" %}
-            {% if form.is_group %}
-            {% bootstrap_field form.klasse wrapper_class="class-choice" %}
-            {% bootstrap_field form.student wrapper_class="student-choice d-none" %}
-            {% else %}
-            {% bootstrap_field form.klasse wrapper_class="class-choice d-none" %}
-            {% bootstrap_field form.student wrapper_class="student-choice" %}
-            {% endif %}
-
-            {{ class_student_formset.management_form }}
-            {% for class_student_form in class_student_formset %}
-            <div data-class-pk="{{ class_student_form.instance.pk }}"
-                 class="{% if not form.is_group or form.class_pk is None or form.class_pk != class_student_form.instance.pk %}d-none{% endif %}">
-                {% bootstrap_field class_student_form.students label="" %}
-                {% bootstrap_field class_student_form.id %}
+            <div class="student-picker mb-3{% if not form.is_group %} single{% endif %}">
+                <label class="form-label" for="student-picker-toggle">{{ form.students.label }}</label>
+                <button type="button" id="student-picker-toggle" class="form-select text-start picker-toggle"
+                        data-group-placeholder="{% translate 'Vælg klasser og/eller elever fra listen' %}"
+                        data-single-placeholder="{% translate 'Vælg en elev fra listen' %}"
+                        data-count="{% translate '%(count)s valgt' %}"></button>
+                <div class="picker-panel d-none">
+                    <div class="picker-list">
+                        {% for klasse, selected in form.student_groups %}
+                        <div class="picker-class" data-class-pk="{{ klasse.pk }}" data-class-name="{{ klasse.name }}">
+                            <div class="picker-class-header">
+                                <input type="checkbox" class="form-check-input class-check" aria-label="{{ klasse.name }}">
+                                <span class="flex-grow-1">
+                                    {% blocktranslate count n=klasse.students.all|length with name=klasse.name %}{{ name }} ({{ n }} elev){% plural %}{{ name }} ({{ n }} elever){% endblocktranslate %}
+                                </span>
+                                <i class="ph-fill ph-caret-up"></i>
+                            </div>
+                            <div class="picker-students">
+                                {% for student in klasse.students.all %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="students" value="{{ student.pk }}"
+                                           id="student-{{ klasse.pk }}-{{ student.pk }}"{% if student.pk|stringformat:"d" in selected %} checked{% endif %}>
+                                    <label class="form-check-label" for="student-{{ klasse.pk }}-{{ student.pk }}">{{ student.get_full_name }}</label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                {{ form.klasse }}
+                {% for error in form.students.errors %}
+                <div class="invalid-feedback d-block">{{ error }}</div>
+                {% endfor %}
             </div>
-            {% endfor %}
 
             {% bootstrap_field form.is_test_part wrapper_class="mt-3 is-test-part-choice" field_class="d-flex" %}
             <div class="my-3 class-test-choice {% if not form.is_group or not form.is_test %}d-none{% endif %}">

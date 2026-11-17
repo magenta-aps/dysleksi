@@ -11,25 +11,17 @@ const mockDoc = `
             <input class="form-check-input" type="radio" name="test_type" value="individual" required id="id_test_type_1">
         </div>
         </div>
-        <div class="class-choice">
-            <select name="klasse" class="form-select" id="id_klasse">
-                <option value="" selected>- Vælg en valgmulighed -</option>
-                <option value="22">Dansk 1</option>
-            </select>
-        </div>
-        <div class="student-choice d-none">
-            <select name="student" class="form-select" id="id_student">
-                <option value="" selected>- Vælg en valgmulighed -</option>
-                <option value="8">Dummy0 Student0 (0.C)</option>
-            </select>
-        </div>
-        <div data-class-pk="22" class="d-none">
-            <input class="form-check-input" type="checkbox" name="form-0-students" value="7" id="id_form-0-students_0" checked>
-            <input class="form-check-input" type="checkbox" name="form-0-students" value="8" id="id_form-0-students_1" checked>
-        </div>
-        <div data-class-pk="23" class="d-none">
-            <input class="form-check-input" type="checkbox" name="form-0-students" value="7" id="id_form-0-students_0" checked>
-            <input class="form-check-input" type="checkbox" name="form-0-students" value="8" id="id_form-0-students_1" checked>
+        <div class="student-picker">
+            <button class="picker-toggle"></button>
+            <div class="picker-panel d-none">
+                <div class="picker-class" data-class-pk="22" data-class-name="1.A">
+                    <div class="picker-class-header"><input type="checkbox" class="class-check"></div>
+                    <div class="picker-students">
+                        <div><input type="checkbox" name="students" value="7" id="s7"><label for="s7">Elev Et</label></div>
+                    </div>
+                </div>
+            </div>
+            <input type="hidden" name="klasse">
         </div>
         <div class="is-test-part-choice">
             <input class="form-check-input" type="radio" name="is_test_part" value="test" required id="id_is_test_part_0" checked>
@@ -84,8 +76,7 @@ describe("Form", () => {
     it("initializes", () => {
         const form = getInstance();
         expect(form.domElem).not.toBeNull();
-        expect(form.classChoice).not.toBeNull();
-        expect(form.studentChoice).not.toBeNull();
+        expect(form.studentPicker).not.toBeNull();
         expect(form.classTestChoice).not.toBeNull();
         expect(form.classTestPartChoice).not.toBeNull();
         expect(form.studentTestChoice).not.toBeNull();
@@ -102,26 +93,18 @@ describe("Form", () => {
 
     it("handles the group/individual choice", () => {
         const form = getInstance();
-        const studentList1 = form.domElem.querySelector("div[data-class-pk='22']");
-        const studentList2 = form.domElem.querySelector("div[data-class-pk='23']");
         const group = form.domElem.querySelector("input[name=test_type][value=group]");
         const individual = form.domElem.querySelector(
             "input[name=test_type][value=individual]",
         );
 
-        // 1. Select "individual"
         individual.dispatchEvent(new Event("click", { bubbles: true }));
         expect(form.state["isGroup"]).toBeFalsy();
-        // Both class student lists are hidden
-        expect(studentList1.classList).to.include(["d-none"]);
-        expect(studentList2.classList).to.include(["d-none"]);
+        expect(form.studentPicker.single).toBeTruthy();
 
-        // 2. Select "group"
         group.dispatchEvent(new Event("click", { bubbles: true }));
         expect(form.state["isGroup"]).toBeTruthy();
-        form.updateClassChoice({ target: { value: "23" } }); // Select class in dropdown
-        expect(studentList1.classList).to.include(["d-none"]);
-        expect(studentList2.classList).not.to.include(["d-none"]);
+        expect(form.studentPicker.single).toBeFalsy();
     });
 
     it("handles the test/part choice", () => {
@@ -180,17 +163,6 @@ describe("Form", () => {
         const form = getInstance();
         const evt = { target: { value: undefined } };
         form.updateState(evt);
-    });
-
-    it("updates the student list every time another class is selected", () => {
-        const form = getInstance();
-        const studentList1 = form.domElem.querySelector("div[data-class-pk='22']");
-        const studentList2 = form.domElem.querySelector("div[data-class-pk='23']");
-        // Act: simulate selecting (another) class in dropdown
-        form.updateClassChoice({ target: { value: "22" } });
-        // Assert: check that matching student list is shown
-        expect(studentList1.classList).not.to.include(["d-none"]);
-        expect(studentList2.classList).to.include(["d-none"]);
     });
 
     it("shows the contents of the selected test", () => {
