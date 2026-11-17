@@ -181,9 +181,9 @@
                 "delayAfter": 0
             },
             {
-                "action": "clickButton",
+                "action": "playSound",
                 "delayAfter": 1500,
-                "element": "challenge-sound-btn"
+                "resource": "resources/letter_sound/Instruktion/1b.9.mp3"
             },
             {
                 // Du

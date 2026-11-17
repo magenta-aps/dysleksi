@@ -256,6 +256,9 @@ body.show-instructions {
        but we should not set them in a faded color then */
       color: black !important;
       border-color: $student-blue-dark !important;
+    }
+
+    &:disabled:not(.selected) {
       background-color: white !important;
     }
   }
