@@ -6,6 +6,7 @@ from django.contrib.auth.models import Group
 from django.core.management.base import BaseCommand
 
 from dysleksi.models import (
+    PARENTS_OR_GUARDIANS,
     READING_SUPERVISORS,
     STUDENTS,
     TEACHERS,
@@ -31,3 +32,4 @@ class Command(BaseCommand):
         )
         Group.objects.update_or_create(name=TEST_LEADERS)
         Group.objects.update_or_create(name=TEST_PERSONS)
+        Group.objects.update_or_create(name=PARENTS_OR_GUARDIANS)

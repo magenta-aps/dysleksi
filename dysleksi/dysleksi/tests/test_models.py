@@ -32,6 +32,7 @@ from dysleksi.models import (
     InstructionAction,
     InstructionSequence,
     Message,
+    ParentOrGuardian,
     PartResponse,
     PlannedDateTime,
     PossibleAnswer,
@@ -227,6 +228,26 @@ class TestStudent(DysleksiTest):
         self.assertEqual(self.student2.gender, Gender.MALE)
 
         self.assertEqual(Student(cpr=None).gender, Gender.UNKNOWN)
+
+
+class TestParentOrGuardian(DysleksiTest):
+    @classmethod
+    def setUpTestData(cls):
+        super().setUpTestData()
+        cls.parent_or_guardian, _ = ParentOrGuardian.objects.get_or_create(
+            username="ParentOrGuardian",
+            first_name="Parent",
+            last_name="Or Guardian",
+        )
+
+    def test_user_type(self):
+        self.assertEqual(self.parent_or_guardian.user_type, "Forældre/værge")
+
+    def test_subclass_instance(self):
+        user = User.objects.get(pk=self.parent_or_guardian.pk)
+        subclass_instance = user.subclass_instance()
+        self.assertIsInstance(subclass_instance, ParentOrGuardian)
+        self.assertEqual(subclass_instance, self.parent_or_guardian)
 
 
 class TestStudentQuerySet(DysleksiTest):

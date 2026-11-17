@@ -14,6 +14,9 @@ from dysleksi.views import (
     ClassDetailView,
     ClassListView,
     ClientErrorLogView,
+    ConsentConfirm,
+    ConsentDone,
+    ConsentStart,
     MessageStorageView,
     PartResponseView,
     QuestionResponseAnswerSoundDetail,
@@ -105,5 +108,20 @@ urlpatterns: list[URLResolver | URLPattern] = [
         "answer/<int:pk>",
         QuestionResponseAnswerSoundDetail.as_view(),
         name="question_response_answer_sound_detail",
+    ),
+    path(
+        "consent/start/<str:pk>/",
+        ConsentStart.as_view(),
+        name="consent_start",
+    ),
+    path(
+        "consent/confirm/<str:pk>/",
+        ConsentConfirm.as_view(),
+        name="consent_confirm",
+    ),
+    path(
+        "consent/done/<int:pk>/",
+        ConsentDone.as_view(),
+        name="consent_done",
     ),
 ]

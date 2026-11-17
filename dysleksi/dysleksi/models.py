@@ -6,6 +6,7 @@ import logging
 import mimetypes
 import os
 import re
+import sys
 import uuid
 from base64 import b64decode
 from collections import defaultdict
@@ -14,6 +15,7 @@ from datetime import date
 from functools import partial
 from io import BytesIO
 from math import floor
+from random import randint
 from typing import Any, Dict, List, Self, Tuple
 
 from django.conf import settings
@@ -46,6 +48,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.functional import cached_property
+from django.utils.http import int_to_base36
 from django.utils.translation import get_language, gettext
 from django.utils.translation import gettext_lazy as _
 from integrations.eboks.client import EboksClient, MessageFailureException
@@ -62,6 +65,7 @@ STUDENTS = "Elever"
 READING_SUPERVISORS = "Læsevejledere"
 TEST_LEADERS = "Testledere"
 TEST_PERSONS = "Testpersoner"
+PARENTS_OR_GUARDIANS = "Forældre/værger"
 
 # Adults and children are given different questionnaires in the dyslexia test
 DYSLEXIA_TEST_ADULT = "Dysleksitest (voksen)"
@@ -205,6 +209,8 @@ class User(AbstractUser):
             return "Testperson"
         if self.is_student:
             return "Elev"
+        if self.is_parent_or_guardian:
+            return "Forældre/værge"
         return "Ukendt brugertype"
 
     @cached_property
@@ -227,6 +233,10 @@ class User(AbstractUser):
     def is_test_person(self):
         return self.has_group(TEST_PERSONS)
 
+    @cached_property
+    def is_parent_or_guardian(self):
+        return self.has_group(PARENTS_OR_GUARDIANS)
+
     def __str__(self) -> str:
         return (
             f"{' '.join(filter(None, [self.first_name, self.last_name]))} "
@@ -246,6 +256,8 @@ class User(AbstractUser):
             return TestPerson.objects.get(user_ptr=self)
         elif self.is_student:
             return Student.objects.get_or_create(user_ptr=self)[0]
+        elif self.is_parent_or_guardian:
+            return ParentOrGuardian.objects.get_or_create(user_ptr=self)[0]
         return self
 
 
@@ -473,6 +485,7 @@ class TestLeader(User):
     is_reading_supervisor = False
     is_test_leader = True
     is_test_person = False
+    is_parent_or_guardian = False
 
     class Meta:
         verbose_name = _("testleder")
@@ -490,6 +503,7 @@ class TestPerson(Student):
 
     is_test_leader = False
     is_test_person = True
+    is_parent_or_guardian = False
 
     class Meta:
         verbose_name = _("testperson")
@@ -502,6 +516,27 @@ def on_update_test_person(sender, instance: TestPerson, created: bool, **kwargs)
         instance.groups.add(
             Group.objects.get(name=STUDENTS), Group.objects.get(name=TEST_PERSONS)
         )
+
+
+class ParentOrGuardian(User):
+    is_student = False
+    is_teacher = False
+    is_reading_supervisor = False
+    is_test_leader = False
+    is_test_person = False
+    is_parent_or_guardian = True
+
+    class Meta:
+        verbose_name = _("forælder/værge")
+        verbose_name_plural = _("forældre/værger")
+
+
+@receiver(post_save, sender=ParentOrGuardian)
+def on_update_parent_or_guardian(
+    sender, instance: ParentOrGuardian, created: bool, **kwargs
+):
+    if created:  # pragma: no branch
+        instance.groups.add(Group.objects.get(name=PARENTS_OR_GUARDIANS))
 
 
 class ClassQuerySet(PermissionsQuerySet):
@@ -2965,3 +3000,89 @@ class EboksMessage(PermissionsMixin, models.Model):
                             "is_postprocessing",
                         ]
                     )
+
+
+class ConsentRequestQuerySet(PermissionsQuerySet):
+    @property
+    def model_name(self):
+        return "ConsentRequest"
+
+    def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_parent_or_guardian:
+            return self.filter(recipients=user)
+        return self.none()  # pragma: no cover
+
+
+def get_consent_request_id():
+    return int_to_base36(randint(0, sys.maxsize))
+
+
+class ConsentRequest(PermissionsMixin, models.Model):
+    objects = ConsentRequestQuerySet.as_manager()  # type: ignore
+
+    id = models.CharField(
+        primary_key=True,
+        max_length=32,
+        default=get_consent_request_id,
+        db_index=True,
+        editable=False,
+    )
+
+    requested_by = models.ForeignKey(
+        TestLeader,
+        on_delete=models.CASCADE,
+        related_name="consent_requests",
+    )
+
+    test_person = models.ForeignKey(
+        TestPerson,
+        on_delete=models.CASCADE,
+        related_name="consents",
+    )
+
+    recipients = models.ManyToManyField(
+        ParentOrGuardian,
+    )
+
+    created_at = models.DateTimeField(
+        auto_now_add=True,
+    )
+
+    message_sent_at = models.DateTimeField(
+        null=True,
+        blank=True,
+    )
+
+
+class ConsentResponseQuerySet(PermissionsQuerySet):
+    @property
+    def model_name(self):
+        return "ConsentResponse"  # pragma: no cover
+
+    def filter_user_object_permissions(self, user: User, action: str):
+        if user.is_parent_or_guardian:
+            return self.filter(request__recipients=user)
+        return self.none()  # pragma: no cover
+
+
+class ConsentResponse(PermissionsMixin, models.Model):
+    objects = ConsentResponseQuerySet.as_manager()  # type: ignore
+
+    request = models.OneToOneField(
+        ConsentRequest,
+        on_delete=models.CASCADE,
+        related_name="response",
+    )
+
+    accepted = models.BooleanField(
+        default=False,
+    )
+
+    given_by = models.ForeignKey(
+        ParentOrGuardian,
+        on_delete=models.CASCADE,
+    )
+
+    given_at = models.DateTimeField(
+        auto_now_add=True,
+    )

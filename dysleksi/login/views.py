@@ -11,6 +11,7 @@ from django.urls import reverse
 from django.views.csrf import csrf_failure as django_csrf_failure
 from django.views.generic import RedirectView
 from login.forms import AuthenticationForm
+from mozilla_django_oidc.views import OIDCAuthenticationCallbackView
 
 
 class LoginView(DjangoLoginView):
@@ -140,3 +141,12 @@ def csrf_failure(request, reason=""):
     if request.user.is_authenticated and request.resolver_match.namespace == "login":
         return redirect(request.get_full_path())
     return django_csrf_failure(request, reason)
+
+
+class DysleksiOIDCAuthenticationCallbackView(OIDCAuthenticationCallbackView):
+    @property
+    def success_url(self):
+        oidc_login_next_consent = self.request.session.get("oidc_login_next_consent")
+        if oidc_login_next_consent:
+            return oidc_login_next_consent
+        return super().success_url  # pragma: no cover

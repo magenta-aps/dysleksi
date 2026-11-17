@@ -1,0 +1,22 @@
+{% extends "dysleksi/consent/base.html" %}
+{% load i18n %}
+{% load django_bootstrap5 %}
+
+{% block inner_content %}
+<h1 class="my-4">
+    {% blocktranslate trimmed with name=person.get_full_name cpr=person.cpr %}
+    Giv dit samtykke til at {{ name }} (CPR {{ cpr }}) må tage ordblindetest
+    {% endblocktranslate %}
+</h1>
+<div class="terms">
+    {# TODO: replace with actual terms #}
+    <h2>Betingelser for ordblindetest</h2>
+    {% lorem 10 p %}
+</div>
+<form class="form my-4" method="post" action="." novalidate>
+    {% csrf_token %}
+    <p>{% translate "Vil du give samtykke til dette?" %}</p>
+    <button type="submit" name="confirm" value="y" class="btn btn-primary">{% translate "Ja" %}</button>
+    <button type="submit" name="confirm" value="" class="btn btn-outline-primary">{% translate "Nej" %}</button>
+</form>
+{% endblock %}

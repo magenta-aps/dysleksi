@@ -1,0 +1,54 @@
+{% extends "dysleksi/consent/base.html" %}
+{% load i18n %}
+
+{% block inner_content %}
+<h1 class="my-4">
+{% if consent_response.accepted %}
+    {% if consent_just_given %}
+        {% blocktranslate trimmed with name=consent_response.request.test_person.get_full_name cpr=consent_response.request.test_person.cpr %}
+        Tak for dit samtykke på vegne af {{ name }} (CPR {{ cpr }})
+        {% endblocktranslate %}
+    {% else %}
+        {% blocktranslate trimmed with name=consent_response.request.test_person.get_full_name cpr=consent_response.request.test_person.cpr %}
+        Samtykke for {{ name }} (CPR {{ cpr }}) er allerede givet
+        {% endblocktranslate %}
+    {% endif %}
+{% else %}
+    {% if consent_just_given %}
+        {% blocktranslate trimmed with name=consent_response.request.test_person.get_full_name cpr=consent_response.request.test_person.cpr %}
+        Vi bekræfter, at du ikke har givet samtykke på vegne af {{ name }} (CPR {{ cpr }})
+        {% endblocktranslate %}
+    {% else %}
+        {% blocktranslate trimmed with name=consent_response.request.test_person.get_full_name cpr=consent_response.request.test_person.cpr %}
+        Der er allerede afvist et samtykke for {{ name }} (CPR {{ cpr }})
+        {% endblocktranslate %}
+    {% endif %}
+{% endif %}
+</h1>
+{% if not consent_just_given %}
+<p>
+    {% if consent_response.accepted %}
+        {% blocktranslate trimmed with name=consent_response.request.test_person.get_full_name cpr=consent_response.request.test_person.cpr given_by=consent_response.given_by.get_full_name given_at=consent_response.given_at|date:"DATETIME_FORMAT" %}
+        Samtykke til at {{ name }} (CPR {{ cpr }}) må tage ordblindetest blev givet
+        af {{ given_by }} d. {{ given_at }}.
+        {% endblocktranslate %}
+    {% else %}
+        {% blocktranslate trimmed with name=consent_response.request.test_person.get_full_name cpr=consent_response.request.test_person.cpr given_by=consent_response.given_by.get_full_name given_at=consent_response.given_at|date:"DATETIME_FORMAT" %}
+        Samtykke til at {{ name }} (CPR {{ cpr }}) må tage ordblindetest blev afvist
+        af {{ given_by }} d. {{ given_at }}.
+        {% endblocktranslate %}
+    {% endif %}
+    <br>
+    {% blocktranslate trimmed %}
+    Du behøver derfor ikke foretage dig noget, og kan forlade siden.
+    {% endblocktranslate %}
+</p>
+{% endif %}
+<div class="my-5">
+    <a href="#" class="terms-download">
+        <i class="ph ph-download-simple"></i>
+        <span>{% translate "Læs betingelserne for ordblindetesten her" %}</span>
+    </a>
+</div>
+<a href="{% url 'login:logout' %}" class="btn btn-primary my-3">{% translate "Log ud og forlad siden" %}</a>
+{% endblock %}

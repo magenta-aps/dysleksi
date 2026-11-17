@@ -69,6 +69,7 @@ OIDC_OP_LOGOUT_URL_METHOD = os.environ.get(
 )
 OIDC_OP_LOGOUT_URL = os.environ.get("OIDC_OP_LOGOUT_URL", "")
 OIDC_AUTHENTICATION_CALLBACK_URL = "login:unilogin:oidc_authentication_callback"
+OIDC_CALLBACK_CLASS = "login.views.DysleksiOIDCAuthenticationCallbackView"
 OIDC_VERIFY_SSL = not DEBUG
 OIDC_TOKEN_USE_BASIC_AUTH = DEBUG
 OIDC_STORE_ID_TOKEN = os.environ.get("OIDC_STORE_ID_TOKEN", True)

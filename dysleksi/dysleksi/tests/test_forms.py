@@ -3,9 +3,14 @@
 # SPDX-License-Identifier: MPL-2.0
 from django.utils.translation import gettext_lazy as _
 
-from dysleksi.forms import ClassStudentFormSet, StartRoomForm, StudentChoiceField
-from dysleksi.models import Class, Student
-from dysleksi.tests.base import DysleksiTest
+from dysleksi.forms import (
+    ClassStudentFormSet,
+    ConsentForm,
+    StartRoomForm,
+    StudentChoiceField,
+)
+from dysleksi.models import Class, ConsentResponse, Student
+from dysleksi.tests.base import ConsentTest, DysleksiTest
 
 
 class TestStudentChoiceField(DysleksiTest):
@@ -128,4 +133,38 @@ class TestClassStudentFormSet(DysleksiTest):
         )
         self.assertFormSetError(
             instance, 0, "students", _("Vælg venligst mindst én elev")
+        )
+
+
+class TestConsentForm(ConsentTest):
+    def get_form(self, **data):
+        form = ConsentForm(
+            consent_request=self.consent_request,
+            given_by=self.parent_or_guardian,
+            data=data,
+        )
+        form.full_clean()
+        return form
+
+    def test_init(self):
+        form = self.get_form()
+        self.assertEqual(form.consent_request, self.consent_request)
+        self.assertEqual(form.given_by, self.parent_or_guardian)
+
+    def test_save(self):
+        for accepted in (False, True):
+            with self.subTest(accepted=accepted):
+                form = self.get_form(confirm=accepted)
+                obj = form.save()
+                self.assertIsInstance(obj, ConsentResponse)
+                self.assertEqual(obj.given_by, self.parent_or_guardian)
+                self.assertEqual(obj.accepted, accepted)
+
+    def test_dynamic_label(self):
+        form = self.get_form()
+        field = form.fields["confirm"]
+        self.assertEqual(
+            field.label,
+            "Jeg afgiver mit samtykke til at Test Person (CPR 0222222226) må tage "
+            "ordblindetest",
         )

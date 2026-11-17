@@ -47,9 +47,14 @@ from django.utils.functional import Promise
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.views import View
-from django.views.generic import CreateView, DetailView, ListView, TemplateView
+from django.views.generic import (
+    CreateView,
+    DetailView,
+    ListView,
+    TemplateView,
+    UpdateView,
+)
 from django.views.generic.detail import SingleObjectMixin
-from django.views.generic.edit import UpdateView
 from django_stubs_ext import StrOrPromise
 from django_tables2 import Column, SingleTableMixin, SingleTableView
 from login.view_mixins import GroupRequiredMixin, LoginRequiredMixin
@@ -58,18 +63,22 @@ from weasyprint import HTML
 
 from dysleksi.forms import (
     ClassStudentFormSet,
+    ConsentForm,
     StartDyslexiaTestForm,
     StartRoomForm,
     StatsFilterForm,
 )
 from dysleksi.models import (
     GRADES,
+    PARENTS_OR_GUARDIANS,
     PARTIAL_SCORE,
     READING_SUPERVISORS,
     TEACHERS,
     TEST_LEADERS,
     TEST_PERIODS,
     Class,
+    ConsentRequest,
+    ConsentResponse,
     Correctness,
     CorrectnessCategory,
     Gender,
@@ -2289,3 +2298,74 @@ class QuestionResponseAnswerSoundDetail(
         except ValueError:
             # "The 'answer_sound' attribute has no file associated with it."
             raise Http404(f"No `answer_sound` for question response {self.object.pk}")
+
+
+class ConsentStart(DetailView):
+    template_name = "dysleksi/consent/start.html"
+    model = ConsentRequest
+
+    def get(self, request, *args, **kwargs):
+        # Store "return URL" in session. This is read by
+        # `login.views.DysleksiOIDCAuthenticationCallbackView` upon a successful login
+        # using OIDC (MitID.)
+        consent_request = self.get_object()
+        self.request.session["oidc_login_next_consent"] = reverse(
+            "dysleksi:consent_confirm",
+            kwargs={"pk": consent_request.pk},
+        )
+        self.request.session.save()
+        return super().get(request, *args, **kwargs)
+
+
+class ConsentConfirm(GroupRequiredMixin, ObjectPermissionsMixin, UpdateView):
+    template_name = "dysleksi/consent/confirm.html"
+    model = ConsentRequest
+    form_class = ConsentForm
+    groups_required = [PARENTS_OR_GUARDIANS]
+
+    def setup(self, request, *args, **kwargs):
+        super().setup(request, *args, **kwargs)
+        self.consent_request = self.get_object()
+
+    def get(self, request, *args, **kwargs):
+        # Check if we already have a consent response for this consent request
+        try:
+            self.consent_request.response
+        except ConsentResponse.DoesNotExist:
+            return super().get(request, *args, **kwargs)
+        else:
+            return redirect(self.get_success_url())
+
+    def get_form_kwargs(self):
+        form_kwargs = super().get_form_kwargs()
+        form_kwargs["consent_request"] = self.consent_request
+        form_kwargs["given_by"] = self.request.user
+        return form_kwargs
+
+    def form_valid(self, form):
+        self.request.session["consent_just_given"] = True
+        self.request.session.save()
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        consent_response = getattr(self, "object", self.consent_request.response)
+        return reverse("dysleksi:consent_done", kwargs={"pk": consent_response.pk})
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data["person"] = self.consent_request.test_person
+        return context_data
+
+
+class ConsentDone(GroupRequiredMixin, ObjectPermissionsMixin, DetailView):
+    template_name = "dysleksi/consent/done.html"
+    context_object_name = "consent_response"
+    model = ConsentResponse
+    groups_required = [PARENTS_OR_GUARDIANS]
+
+    def get_context_data(self, **kwargs):
+        context_data = super().get_context_data(**kwargs)
+        context_data["consent_just_given"] = self.request.session.get(
+            "consent_just_given", False
+        )
+        return context_data

@@ -1,0 +1,20 @@
+http:
+  routers:
+    dysleksi-martha-data:
+      rule: "Host(`dysleksi-web`) && PathPrefix(`/martha/data/`)"
+      service: dysleksi-martha-data
+      entryPoints:
+        - websecure
+      priority: 40
+      middlewares:
+        - stripprefix-martha-data
+  services:
+    dysleksi-martha-data:
+      loadBalancer:
+        servers:
+          - url: "http://dysleksi-martha-data:8080"
+  middlewares:
+    stripprefix-martha-data:
+      stripPrefix:
+        prefixes:
+          - "/martha/data"

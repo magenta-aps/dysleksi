@@ -1,0 +1,33 @@
+{% extends "dysleksi/base.html" %}
+{% load static %}
+{% load i18n %}
+{% load compress %}
+
+{% block css %}
+{% compress css %}
+<link type="text/x-scss" href="{% static 'theme-admin.scss' %}" rel="stylesheet" media="screen">
+{% endcompress %}
+{% endblock %}
+
+{% block js %}
+<script src="{% static "vendor/js/martha/martha.js" %}"></script>
+{% endblock %}
+
+{% block content %}
+<div class="consent">
+    <div class="brand d-flex justify-items-between">
+        <div class="logo flex-grow-1"></div>
+        <div class="user d-flex justify-items-between align-items-center">
+            {% if request.user.is_authenticated %}
+            <span class="me-3">{{ request.user.get_full_name  }}</span>
+            <a href="{% url 'login:logout' %}" class="btn btn-outline-light">{% translate "Log ud" %}</a>
+            {% endif %}
+        </div>
+    </div>
+    <div class="inner-content martha-article">
+        <button class="btn btn-outline-secondary martha-button martha-skip">{% translate "Læs op" %}</button>
+        {% block inner_content %}
+        {% endblock %}
+    </div>
+</div>
+{% endblock  %}

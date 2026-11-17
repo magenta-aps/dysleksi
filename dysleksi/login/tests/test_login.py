@@ -1,13 +1,16 @@
 # SPDX-FileCopyrightText: 2025 Magenta ApS <info@magenta.dk>
 #
 # SPDX-License-Identifier: MPL-2.0
+import time
+from unittest.mock import patch
 
 from bs4 import BeautifulSoup
 from django.conf import settings
 from django.contrib.auth import BACKEND_SESSION_KEY
-from django.test import Client, TestCase
+from django.test import Client, RequestFactory, TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
+from login.views import DysleksiOIDCAuthenticationCallbackView
 
 from dysleksi.models import User
 
@@ -228,3 +231,45 @@ class DjangoLoginTest(LoginTest):
         response = self.client.get(reverse("login:login"))
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response.headers["Location"], "/foobaz")
+
+
+class TestDysleksiOIDCAuthenticationCallbackView(LoginTest):
+    def test_callback_redirects_to_session_url(self):
+        # This is heavily based on
+        # https://github.com/mozilla/mozilla-django-oidc/blob/main/tests/test_views.py,
+        # specifically the `OIDCAuthorizationCallbackViewTestCase.test_get_auth_success`
+        # test.
+
+        # Arrange
+        TEST_CODE_VERIFIER = "ThisStringIsURLSafeAndAtLeast43Characters00"
+        user = User.objects.create_user("example_username")
+        get_data = {"code": "example_code", "state": "example_state"}
+        url = reverse("login:unilogin:oidc_authentication_callback")
+        request = RequestFactory().get(url, get_data)
+        client = Client()
+        request.session = client.session
+        request.session["oidc_states"] = {
+            "example_state": {
+                "code_verifier": TEST_CODE_VERIFIER,
+                "nonce": None,
+                "added_on": time.time(),
+            },
+        }
+        # Arrange: add our special session variable
+        expected_url = "/foobar/"
+        request.session["oidc_login_next_consent"] = expected_url
+        # Act
+        callback_view = DysleksiOIDCAuthenticationCallbackView.as_view()
+        with patch("mozilla_django_oidc.views.auth.authenticate") as mock_auth:
+            with patch("mozilla_django_oidc.views.auth.login") as mock_login:
+                mock_auth.return_value = user
+                response = callback_view(request)
+                mock_auth.assert_called_once_with(
+                    code_verifier=TEST_CODE_VERIFIER,
+                    nonce=None,
+                    request=request,
+                )
+                mock_login.assert_called_once_with(request, user)
+        # Assert: we are redirected to the expected URL
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, expected_url)
