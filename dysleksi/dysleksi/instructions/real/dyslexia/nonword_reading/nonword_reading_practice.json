@@ -68,6 +68,11 @@
         "question_type": "no_input_required",
         "continue_when_instruction_is_complete": false,
         "instruction_sequence": [
+            {
+              "action": "hide",
+              "element": "challenge-text",
+              "delayAfter": 0
+            },
             // Nu skal du prøve opgaven.
             {
                 "action": "playSound",
@@ -79,6 +84,11 @@
                 "action": "playSound",
                 "resource": "resources/Enhanced L500-L506/L505.mp3",
                 "delayAfter": 750
+            },
+            {
+              "action": "show",
+              "element": "challenge-text",
+              "delayAfter": 0
             },
             // Du skal læse nonordet højt - begynd.
             {
