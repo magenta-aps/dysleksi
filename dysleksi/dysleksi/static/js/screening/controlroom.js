@@ -167,8 +167,7 @@ export class EventTable extends EventTarget {
         // Update `question` cell
         this.updateQuestionEl(questionEl, question);
 
-        // A word read aloud has no result
-        if (answeredByStudent && data.correctness !== null) {
+        if (answeredByStudent) {
             resultEl.textContent =
                 data.textAnswer || this.correctnessLabel(data.correctness);
         }
@@ -1750,8 +1749,12 @@ export class TeacherView {
                     ) {
                         this.elapsedTimeView.start();
                     }
-                    // In a dyslexia test the student moves on from the instructions
-                    if (this.test.testType !== "dyslexia") {
+                    // In a dyslexia test the student moves on from the instructions,
+                    // unless they read aloud
+                    if (
+                        this.test.testType !== "dyslexia" ||
+                        this.currentQuestion.isReadAloud()
+                    ) {
                         this.buttons.enableNextButton();
                     }
                 }
@@ -1787,12 +1790,17 @@ export class TeacherView {
                         Boolean(this.currentQuestion.isQuestionnaire),
                     );
                     if (this.test.testType === "dyslexia") {
-                        this.buttons.toggleCorrectnessChoices(false);
                         this.buttons.showQuestionnaireChoices(
                             this.currentQuestion.isQuestionnaire
                                 ? this.currentQuestion.possibleAnswers
                                 : [],
                         );
+                    }
+                    if (
+                        this.test.testType === "dyslexia" &&
+                        !this.currentQuestion.isReadAloud()
+                    ) {
+                        this.buttons.toggleCorrectnessChoices(false);
                     } else if (this.currentQuestionRequiresNoStudentInput()) {
                         // Disable "correct", "wrong", "skipped" buttons during practice questions
                         this.buttons.toggleCorrectnessChoices(!data.practice);

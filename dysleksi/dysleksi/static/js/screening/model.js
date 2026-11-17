@@ -357,6 +357,19 @@ export class Question {
         return PossibleAnswer;
     }
 
+    // The student is expected to read aloud if no input is required AND the instruction
+    // sequence does not show the next-button to the student
+    isReadAloud() {
+        return (
+            this.type === "no_input_required" &&
+            !this.advanceAutomatically &&
+            !this.instruction_sequence?.instructions.some(
+                (instruction) =>
+                    instruction.action === "show" && instruction.element === "next",
+            )
+        );
+    }
+
     answeredByStudent(student) {
         return student.id in this.existingAnswers;
     }

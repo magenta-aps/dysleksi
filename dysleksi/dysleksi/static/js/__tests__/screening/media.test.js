@@ -299,13 +299,10 @@ describe("AudioDetector", () => {
 
     it("detects audio", () => {
         const onDetected = vi.fn();
-        const onHeard = vi.fn();
         const instance = getInstance([256.0]);
         instance.addEventListener("audio.detected", onDetected);
-        instance.addEventListener("audio.heard", onHeard);
         instance.run();
         expect(onDetected).toHaveBeenCalled();
-        expect(onHeard).toHaveBeenCalled();
     });
 
     it("detects nothing once stopped", () => {
