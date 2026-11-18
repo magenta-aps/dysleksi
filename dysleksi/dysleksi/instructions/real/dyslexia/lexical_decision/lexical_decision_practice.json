@@ -1,11 +1,12 @@
 [
     {
         "question_type": "multiple_choice",
-        "text": "nasaq",
+        "text": "nuka",
         "correct": "true",
         "wrong": ["false"],
         "continue_when_instruction_is_complete": false,
         "confirm_correct_answer": false,
+        "advance_automatically": true,
         "instruction_sequence": [
             {
                 "action": "hide",
@@ -34,6 +35,63 @@
                 "resource": "resources/Enhanced L300-L309/L301.mp3",
                 "delayAfter": 750
             },
+            {
+                "action": "show",
+                "delayAfter": 1500,
+                "element": "question-challenge"
+            },
+            {
+                "action": "show",
+                "delayAfter": 1500,
+                "element": "choices"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 2500,
+                "element": "choice-true"
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 1000,
+                "element": "next"
+            }
+        ]
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "muivoq",
+        "correct": "false",
+        "wrong": ["true"],
+        "continue_when_instruction_is_complete": false,
+        "confirm_correct_answer": false,
+        "advance_automatically": true,
+        "instruction_sequence": [
+            {
+                "action": "show",
+                "delayAfter": 2500,
+                "element": "question-challenge"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 2500,
+                "element": "choice-false"
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 1000,
+                "element": "next"
+            }
+
+        ]
+    },
+    {
+        "question_type": "multiple_choice",
+        "text": "nasaq",
+        "correct": "true",
+        "wrong": ["false"],
+        "continue_when_instruction_is_complete": false,
+        "confirm_correct_answer": false,
+        "instruction_sequence": [
             // Eksempel
             {
                 "action": "playSound",
@@ -69,7 +127,7 @@
                 "element": "choices"
             },
             {
-                "action": "select",
+                "action": "clickButton",
                 "delayAfter": 1000,
                 "element": "choice-true"
             },
