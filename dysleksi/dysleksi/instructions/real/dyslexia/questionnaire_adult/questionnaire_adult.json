@@ -32,7 +32,7 @@
     },
     {
         "question_type": "multiple_choice",
-        "text": "Atuartuunerpit nalaani allanniarnikkut ajornartorsiuteqartanikuuit?",
+        "text": "Atuartuunerpit nalaani allanniarnikkut ajornartorsiuteqartarnikuuit?",
         "text_da": "Havde du vanskeligheder med at skrive, da du gik i skole?",
         "options": [
             "Aap",
@@ -56,7 +56,7 @@
     },
     {
         "question_type": "multiple_choice",
-        "text": "Atuartuunerpit nalaani atuarniarniarnikkut ajornartorsiuteqarnikuuit?",
+        "text": "Atuartuunerpit nalaani atuarniarnikkut ajornartorsiuteqarnikuuit?",
         "text_da": "Havde du vanskeligheder med at læse, da du gik i skole?",
         "options": [
             "Aap",
@@ -80,7 +80,7 @@
     },
     {
         "question_type": "multiple_choice",
-        "text": "Atuarniarnikkut allanniarnikkullu immikkut ikiorneqartanikuuit?",
+        "text": "Atuarniarnikkut allanniarnikkullu immikkut ikiorneqartarnikuuit?",
         "text_da": "Har du modtaget særlig støtte eller specialundervisning i læsning og skrivning?",
         "options": [
             "Aap",
@@ -245,7 +245,7 @@
     },
     {
         "question_type": "multiple_choice",
-        "text": "Ilimagisarpiuk naqinnerninik ilisarsisinnaanngitsuullutit?",
+        "text": "Ilimagisarpiuk naqinnernik ilisarsisinnaanngitsuullutit?",
         "text_da": "Mistænker du, at du er ordblind?",
         "options": [
             "Aap",
@@ -306,7 +306,7 @@
     },
     {
         "question_type": "multiple_choice",
-        "text": "Ullumikkut atuakkat paasiniaraangakku atuagasat uteqattaartarpiuk?",
+        "text": "Ullumikkut atuakkat paasiniaraangakku atuagassat uteqattaartarpiuk?",
         "text_da": "Når du læser, må du ofte læse den samme tekst flere gange for at forstå den?",
         "options": [
             "Aap",
@@ -330,7 +330,7 @@
     },
     {
         "question_type": "multiple_choice",
-        "text": "Atuagassaqartillutit atuagassat qanoq allaqanersoq eqqoriartarpiuk?",
+        "text": "Atuagassaqartillutit atuagassat qanoq allaqqanersoq eqqoriartarpiuk?",
         "text_da": "Når du læser, gætter du så ofte på, hvad der står i teksten, i stedet for at læse ordene?",
         "options": [
             "Aap",
