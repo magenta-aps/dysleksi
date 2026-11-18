@@ -22,10 +22,6 @@ msgstr ""
 msgid "Dysleksi"
 msgstr ""
 
-#: dysleksi/forms.py dysleksi/tests/test_forms.py
-msgid "Vælg venligst mindst én elev"
-msgstr ""
-
 #: dysleksi/forms.py dysleksi/templates/dysleksi/consent/confirm.html
 msgid "Nej"
 msgstr ""
@@ -56,11 +52,7 @@ msgid "Vælg testtype"
 msgstr ""
 
 #: dysleksi/forms.py
-msgid "Vælg klasse"
-msgstr ""
-
-#: dysleksi/forms.py
-msgid "Vælg elev"
+msgid "Vælg testdeltagere"
 msgstr ""
 
 #: dysleksi/forms.py
@@ -116,6 +108,14 @@ msgstr ""
 
 #: dysleksi/forms.py dysleksi/tests/test_forms.py
 msgid "Slutdato kan ikke være før startdato"
+msgstr ""
+
+#: dysleksi/forms.py dysleksi/tests/test_forms.py
+msgid "Vælg venligst mindst én elev"
+msgstr ""
+
+#: dysleksi/forms.py dysleksi/tests/test_forms.py
+msgid "Vælg venligst én elev"
 msgstr ""
 
 #: dysleksi/forms.py dysleksi/tables.py
@@ -1284,6 +1284,26 @@ msgstr ""
 #: dysleksi/templates/dysleksi/lobby/start_room.html
 msgid "Opret test:"
 msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/start_room.html
+msgid "Vælg klasser og/eller elever fra listen"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/start_room.html
+msgid "Vælg en elev fra listen"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/start_room.html
+#, python-format
+msgid "%%(count)s valgt"
+msgstr ""
+
+#: dysleksi/templates/dysleksi/lobby/start_room.html
+#, python-format
+msgid "%(name)s (%(n)s elev)"
+msgid_plural "%(name)s (%(n)s elever)"
+msgstr[0] ""
+msgstr[1] ""
 
 #: dysleksi/templates/dysleksi/lobby/start_room.html
 msgid "Tilføj sluttidspunkt"

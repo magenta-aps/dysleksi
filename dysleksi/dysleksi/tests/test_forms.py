@@ -3,26 +3,9 @@
 # SPDX-License-Identifier: MPL-2.0
 from django.utils.translation import gettext_lazy as _
 
-from dysleksi.forms import (
-    ClassStudentFormSet,
-    ConsentForm,
-    StartRoomForm,
-    StudentChoiceField,
-)
-from dysleksi.models import Class, ConsentResponse, Student
+from dysleksi.forms import ConsentForm, StartRoomForm
+from dysleksi.models import ConsentResponse
 from dysleksi.tests.base import ConsentTest, DysleksiTest
-
-
-class TestStudentChoiceField(DysleksiTest):
-    def setUp(self):
-        super().setUp()
-        self.instance = StudentChoiceField(Student.objects.none())
-
-    def test_label_from_instance_includes_main_class_name(self):
-        self.assertEqual(
-            self.instance.label_from_instance(self.student1),
-            "Test1 Elev (1.A)",
-        )
 
 
 class TestStartRoomForm(DysleksiTest):
@@ -67,7 +50,6 @@ class TestStartRoomForm(DysleksiTest):
 
     def test_clean_removes_student_fields_on_group_assignment(self):
         data = {
-            "student": self.student1.pk,
             "student_test": self.individual_test,
             "start_datetime": "2030-01-01T00:00:00",
             "end_datetime": "",
@@ -81,22 +63,32 @@ class TestStartRoomForm(DysleksiTest):
 
     def test_clean_removes_class_fields_on_individual_assignment(self):
         data = {
-            "student": self.student1.pk,
             "student_test": self.individual_test,
             "start_datetime": "2030-01-01T00:00:00",
             "end_datetime": "",
             **self.base_form_data,
         }
         data["test_type"] = "individual"
+        data["students"] = [self.student1.pk]
         instance = StartRoomForm(self.teacher, data=data)
         instance.is_valid()
+        self.assertEqual(instance.cleaned_data["student"], self.student1)
         self.assertIsNone(instance.cleaned_data["klasse"])
         self.assertIsNone(instance.cleaned_data["class_test"])
         self.assertIsNone(instance.cleaned_data["class_test_parts"])
 
+    def test_group_assignment_requires_a_student(self):
+        data = {**self.base_form_data, "students": []}
+        instance = StartRoomForm(self.teacher, data=data)
+        self.assertFormError(instance, "students", _("Vælg venligst mindst én elev"))
+
+    def test_individual_assignment_requires_a_single_student(self):
+        data = {**self.base_form_data, "test_type": "individual"}
+        instance = StartRoomForm(self.teacher, data=data)
+        self.assertFormError(instance, "students", _("Vælg venligst én elev"))
+
     def test_hide_end_datetime_is_false_if_not_has_end(self):
         data = {
-            "student": self.student1.pk,
             "student_test": self.individual_test,
             "start_datetime": "2030-01-01T00:00:00",
             "end_datetime": "",
@@ -111,29 +103,12 @@ class TestStartRoomForm(DysleksiTest):
         return {
             "test_type": "group",
             "klasse": self.klasse.pk,
+            "students": [self.student1.pk, self.student2.pk],
             "class_test": self.group_test,
             "is_test_part": "test",
             "is_immediate": "n",
             "has_end": "n",
         }
-
-
-class TestClassStudentFormSet(DysleksiTest):
-    def test_requires_at_least_one_student(self):
-        instance = ClassStudentFormSet(
-            data={
-                "form-TOTAL_FORMS": "1",
-                "form-INITIAL_FORMS": "1",
-                "form-MIN_NUM_FORMS": "0",
-                "form-MAX_NUM_FORMS": "1000",
-                "form-0-id": self.klasse.pk,
-                "form-0-students": [],  # No students selected
-            },
-            queryset=Class.objects.filter(pk=self.klasse.pk),
-        )
-        self.assertFormSetError(
-            instance, 0, "students", _("Vælg venligst mindst én elev")
-        )
 
 
 class TestConsentForm(ConsentTest):

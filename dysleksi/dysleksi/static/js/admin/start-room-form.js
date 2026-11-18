@@ -1,3 +1,5 @@
+import { StudentPicker } from "./student-picker.js";
+
 export class Form {
     constructor(domElem) {
         this.domElem = domElem;
@@ -14,11 +16,10 @@ export class Form {
         );
         this.addEndBtn = this.element(".add-end", this.addEnd);
         this.removeEndBtn = this.element(".remove-end", this.removeEnd);
-        this.classChoice = this.element(".class-choice", this.updateClassChoice);
         this.domElem.addEventListener("submit", () => this.disableSubmit());
 
         // Elements that are updated by event handlers
-        this.studentChoice = this.element(".student-choice");
+        this.studentPicker = new StudentPicker(this.element(".student-picker"));
         this.classTestChoice = this.element(".class-test-choice");
         this.classTestPartChoice = this.element(".class-test-part-choice");
         this.studentTestChoice = this.element(".student-test-choice");
@@ -45,28 +46,18 @@ export class Form {
     updateTestType(evt) {
         this.updateState(evt, "isGroup", "group");
 
-        this.display(this.classChoice, this.state.isGroup);
+        this.studentPicker.setSingle(!this.state.isGroup);
         this.display(this.classTestChoice, this.state.isGroup && this.state.isTest);
         this.display(
             this.classTestPartChoice,
             this.state.isGroup && !this.state.isTest,
         );
 
-        this.display(this.studentChoice, !this.state.isGroup);
         this.display(this.studentTestChoice, !this.state.isGroup && this.state.isTest);
         this.display(
             this.studentTestPartChoice,
             !this.state.isGroup && !this.state.isTest,
         );
-
-        this.displayMultiple("[data-class-pk]", (elem) => {
-            if (this.state.isGroup) {
-                const select = this.classChoice.querySelector("select");
-                const currentClassPk = select.options[select.selectedIndex].value;
-                return elem.dataset["classPk"] === currentClassPk;
-            }
-            return false;
-        });
     }
 
     updateIsTestPart(evt) {
@@ -105,12 +96,6 @@ export class Form {
             this.#toggleEnd(false);
             this.clearDateValue(this.startDateTime);
         }
-    }
-
-    updateClassChoice(evt) {
-        this.displayMultiple("[data-class-pk]", (elem) => {
-            return elem.dataset["classPk"] === evt.target.value;
-        });
     }
 
     addEnd(evt) {
@@ -154,13 +139,6 @@ export class Form {
 
     display(element, state) {
         element.classList.toggle("d-none", !state);
-    }
-
-    displayMultiple(selector, callback) {
-        const elems = this.domElem.querySelectorAll(selector);
-        for (const elem of elems) {
-            elem.classList.toggle("d-none", !callback(elem));
-        }
     }
 
     clearDateValue(element) {

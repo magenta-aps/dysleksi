@@ -4,10 +4,8 @@ from django import forms
 from django.db.models import Prefetch
 from django.forms import (
     ModelChoiceField,
-    ModelForm,
     ModelMultipleChoiceField,
     ValidationError,
-    modelformset_factory,
     widgets,
 )
 from django.utils import timezone
@@ -51,55 +49,6 @@ class TestSelect(forms.Select):
         return option
 
 
-class StudentChoiceField(ModelChoiceField):
-    def label_from_instance(self, obj: Student) -> str:
-        # Join all student "main" class names (only one "main" class is expected for
-        # each student.)
-        main_class_name = ", ".join(
-            obj.classes.filter(is_main=True).values_list("name", flat=True)
-        )
-        return f"{obj.first_name} {obj.last_name} ({main_class_name})"
-
-
-class ClassStudentMultipleChoiceField(ModelMultipleChoiceField):
-    def label_from_instance(self, obj: Student) -> str:
-        return obj.get_full_name()
-
-
-class ClassStudentForm(DynamicFormMixin, ModelForm):
-    class Meta:
-        model = Class
-        fields = ["id", "students"]
-
-    id = forms.IntegerField(widget=forms.HiddenInput())
-
-    students = DynamicField(
-        ClassStudentMultipleChoiceField,
-        required=False,
-        queryset=lambda form: (
-            # Display all students in class
-            form.instance.students.all()
-            if form.instance.pk
-            else Student.objects.none()
-        ),
-        widget=forms.CheckboxSelectMultiple(attrs={"class": "grid border"}),
-    )
-
-    def clean_students(self):
-        students = self.cleaned_data["students"]
-        if students.count() == 0:
-            raise ValidationError(_("Vælg venligst mindst én elev"))
-        return students
-
-
-ClassStudentFormSet = modelformset_factory(
-    Class,
-    form=ClassStudentForm,
-    extra=0,
-    edit_only=True,
-)
-
-
 def tests_of_type(test_type: TestType):
     return Test.objects.filter(test_type=test_type, custom=False).prefetch_related(
         Prefetch("parts", queryset=TestPart.objects.order_by("id"))
@@ -109,7 +58,7 @@ def tests_of_type(test_type: TestType):
 class StartRoomForm(DynamicFormMixin, forms.ModelForm):
     class Meta:
         model = TestAssignment
-        exclude = ("teacher", "test", "student_subset")
+        exclude = ("teacher", "test", "student", "student_subset")
 
     on_behalf_of_teacher = forms.ChoiceField(
         initial="n",
@@ -143,21 +92,18 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
 
     klasse = DynamicField(
         ModelChoiceField,
-        required=lambda form: form.data.get("test_type") == TestType.GROUP,
-        queryset=lambda form: form.teacher.accessible_classes.order_by("name"),
-        label=_("Vælg klasse"),
+        required=False,
+        queryset=lambda form: form.teacher.accessible_classes,
+        widget=forms.HiddenInput(),
     )
 
-    student = DynamicField(
-        StudentChoiceField,
-        required=lambda form: form.data.get("test_type") == TestType.INDIVIDUAL,
+    students = DynamicField(
+        ModelMultipleChoiceField,
+        required=False,
         queryset=lambda form: Student.objects.filter(
-            classes__in=form.teacher.accessible_classes,
-        )
-        .distinct()
-        .prefetch_related("classes")
-        .order_by("first_name"),
-        label=_("Vælg elev"),
+            classes__in=form.teacher.accessible_classes
+        ).distinct(),
+        label=_("Vælg testdeltagere"),
     )
 
     is_test_part = forms.ChoiceField(
@@ -197,7 +143,7 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
         required=lambda form: (
             form.data.get("test_type") == TestType.INDIVIDUAL
             and form.data.get("is_test_part") == "test"
-            and form.data.get("student") is not None
+            and form.data.get("students") is not None
         ),
         queryset=tests_of_type(TestType.INDIVIDUAL),
         label=_("Vælg testpakke"),
@@ -209,7 +155,7 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
         required=lambda form: (
             form.data.get("test_type") == TestType.INDIVIDUAL
             and form.data.get("is_test_part") == "part"
-            and form.data.get("student") is not None
+            and form.data.get("students") is not None
         ),
         queryset=TestPart.objects.filter(
             tests__test_type=TestType.INDIVIDUAL
@@ -283,6 +229,13 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
 
     def clean(self):
         cleaned_data = super().clean()
+        students = cleaned_data.get("students") or Student.objects.none()
+        if cleaned_data["test_type"] == TestType.GROUP and not students:
+            self.add_error("students", _("Vælg venligst mindst én elev"))
+        if cleaned_data["test_type"] == TestType.INDIVIDUAL:
+            if students.count() != 1:
+                self.add_error("students", _("Vælg venligst én elev"))
+            cleaned_data["student"] = students.first()
         # Populate keys used by `StartAssignmentView` and the Django `CreateView`
         cleaned_data["test"] = self._get_test(cleaned_data)
         cleaned_data["test_parts"] = self._get_test_parts(cleaned_data)
@@ -301,6 +254,7 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
 
     def save(self, commit=True):
         self.instance.planned_date_time = self.get_planned_date_time()
+        self.instance.student = self.cleaned_data["student"]
         if self.cleaned_data["test"] is not None:
             self.instance.test = self.cleaned_data["test"]
         return super().save(commit=commit)
@@ -324,9 +278,16 @@ class StartRoomForm(DynamicFormMixin, forms.ModelForm):
         return self.data.get("end_datetime") in (None, "")
 
     @property
-    def class_pk(self) -> int | None:
-        val = self.data.get("klasse")
-        return int(val) if val else None
+    def student_groups(self):
+        selected = self["students"].value() or []
+        class_pk = self["klasse"].value()
+        classes = self.teacher.accessible_classes.order_by("name").prefetch_related(
+            Prefetch("students", queryset=Student.objects.order_by("first_name"))
+        )
+        return [
+            (klasse, selected if str(klasse.pk) == class_pk else [])
+            for klasse in classes
+        ]
 
     def get_planned_date_time(self):
         if self.period is None or self.cleaned_data["start_datetime"] is None:

@@ -862,12 +862,14 @@ class TestStartRoomView(DysleksiTest):
         self.client.force_login(self.teacher)
         response = self.client.get(reverse("dysleksi:start_room"))
         self.assertIn("form", response.context_data)
-        self.assertIn("class_student_formset", response.context_data)
+        self.assertEqual(
+            response.context_data["form"].student_groups, [(self.klasse, [])]
+        )
 
     def test_create_individual_room_immediate(self):
         data = {
             "test_type": "individual",
-            "student": self.student1.id,
+            "students": [self.student1.id],
             "student_test": self.individual_test.id,
             "student_test_parts": [],
             "is_test_part": "test",
@@ -885,7 +887,7 @@ class TestStartRoomView(DysleksiTest):
     def test_create_individual_room_planned_date_time(self):
         data = {
             "test_type": "individual",
-            "student": self.student1.id,
+            "students": [self.student1.id],
             "student_test": self.individual_test.id,
             "student_test_parts": [],
             "is_test_part": "test",
@@ -909,7 +911,7 @@ class TestStartRoomView(DysleksiTest):
     def test_create_individual_room_test_parts(self):
         data = {
             "test_type": "individual",
-            "student": self.student1.id,
+            "students": [self.student1.id],
             "student_test": "",
             "student_test_parts": [str(self.part.pk)],
             "is_test_part": "part",
@@ -932,6 +934,7 @@ class TestStartRoomView(DysleksiTest):
         data = {
             "test_type": "group",
             "klasse": self.klasse.id,
+            "students": [self.student1.pk, self.student2.pk],
             "class_test": self.group_test.id,
             "class_test_parts": [],
             "is_test_part": "test",
@@ -950,6 +953,7 @@ class TestStartRoomView(DysleksiTest):
         data = {
             "test_type": "group",
             "klasse": self.klasse.id,
+            "students": [self.student1.pk, self.student2.pk],
             "class_test": self.group_test.id,
             "class_test_parts": [],
             "is_test_part": "test",
@@ -974,6 +978,7 @@ class TestStartRoomView(DysleksiTest):
         data = {
             "test_type": "group",
             "klasse": self.klasse.id,
+            "students": [self.student1.pk, self.student2.pk],
             "class_test": "",
             "class_test_parts": [
                 str(self.group_test_part.pk),
@@ -999,6 +1004,7 @@ class TestStartRoomView(DysleksiTest):
         data = {
             "test_type": "group",
             "klasse": self.klasse.id,
+            "students": [self.student2.pk],
             "class_test": self.group_test.id,
             "class_test_parts": [],
             "is_test_part": "test",
@@ -1006,13 +1012,6 @@ class TestStartRoomView(DysleksiTest):
             "has_end": "n",
             "start_datetime": "",
             "end_datetime": "",
-            # `ClassStudentFormSet` data
-            "form-TOTAL_FORMS": "1",
-            "form-INITIAL_FORMS": "1",
-            "form-MIN_NUM_FORMS": "0",
-            "form-MAX_NUM_FORMS": "1000",
-            "form-0-id": self.klasse.pk,
-            "form-0-students": [self.student2.pk],  # Use subset of students 1 and 2
         }
         self.client.force_login(self.teacher)
         response = self.client.post(reverse("dysleksi:start_room"), data=data)
@@ -1029,6 +1028,7 @@ class TestStartRoomView(DysleksiTest):
         data = {
             "test_type": "group",
             "klasse": self.klasse.id,
+            "students": [self.student2.pk],
             "class_test": "",
             "class_test_parts": [
                 str(self.group_test_part.pk),
@@ -1039,13 +1039,6 @@ class TestStartRoomView(DysleksiTest):
             "has_end": "n",
             "start_datetime": "",
             "end_datetime": "",
-            # `ClassStudentFormSet` data
-            "form-TOTAL_FORMS": "1",
-            "form-INITIAL_FORMS": "1",
-            "form-MIN_NUM_FORMS": "0",
-            "form-MAX_NUM_FORMS": "1000",
-            "form-0-id": self.klasse.pk,
-            "form-0-students": [self.student2.pk],  # Use subset of students 1 and 2
         }
         self.client.force_login(self.teacher)
         response = self.client.post(reverse("dysleksi:start_room"), data=data)
@@ -1062,6 +1055,7 @@ class TestStartRoomView(DysleksiTest):
         data = {
             "test_type": "group",
             "klasse": self.klasse.id,
+            "students": [self.student1.pk, self.student2.pk],
             "class_test": self.group_test.id,
             "class_test_parts": [],
             "is_test_part": "test",
@@ -1069,13 +1063,6 @@ class TestStartRoomView(DysleksiTest):
             "has_end": "n",
             "start_datetime": "",
             "end_datetime": "",
-            # `ClassStudentFormSet` data
-            "form-TOTAL_FORMS": "1",
-            "form-INITIAL_FORMS": "1",
-            "form-MIN_NUM_FORMS": "0",
-            "form-MAX_NUM_FORMS": "1000",
-            "form-0-id": self.klasse.pk,
-            "form-0-students": [self.student1.pk, self.student2.pk],  # Use entire class
         }
         self.client.force_login(self.teacher)
         response = self.client.post(reverse("dysleksi:start_room"), data=data)
@@ -1092,6 +1079,7 @@ class TestStartRoomView(DysleksiTest):
         data = {
             "test_type": "group",
             "klasse": self.klasse.id,
+            "students": [self.student1.pk, self.student2.pk],
             "class_test": self.group_test.id,
             "is_test_part": "test",
             "is_immediate": "n",
@@ -1102,6 +1090,10 @@ class TestStartRoomView(DysleksiTest):
         self.client.force_login(self.teacher)
         response = self.client.post(reverse("dysleksi:start_room"), data=data)
         self.assertIsInstance(response, HttpResponse)
+        for student in (self.student1, self.student2):
+            self.assertContains(
+                response, f'id="student-{self.klasse.pk}-{student.pk}" checked>'
+            )
         self.assertFormError(
             response.context_data["form"],
             "start_datetime",
@@ -1113,6 +1105,7 @@ class TestStartRoomView(DysleksiTest):
             "on_behalf_of_teacher": "y",
             "test_type": "group",
             "klasse": self.klasse.id,
+            "students": [self.student1.pk, self.student2.pk],
             "class_test": self.group_test.id,
             "class_test_parts": [],
             "is_test_part": "test",
