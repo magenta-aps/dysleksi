@@ -1366,7 +1366,7 @@ class TestPart(models.Model):
 
     @staticmethod
     def dyslexia_instruction_sequence_outro():
-        sounds = "resources/Enhanced L001-L014"
+        sounds = "resources/L014-015 Gentag og Videre knap"
         return {
             "question_type": QuestionType.NO_INPUT_REQUIRED,
             "instruction_sequence": [
@@ -1374,7 +1374,8 @@ class TestPart(models.Model):
                 {"action": "show", "element": "repeat"},
                 {"action": "setRepeatButtonDestination", "data": "0"},
                 {"action": "playSound", "resource": f"{sounds}/L014.mp3"},
-                {"action": "highlight", "element": "repeat"},
+                {"action": "highlight", "element": "repeat", "delayAfter": 750},
+                {"action": "playSound", "resource": f"{sounds}/L015.mp3"},
                 {"action": "highlight", "element": "next", "delayAfter": 750},
             ],
         }
