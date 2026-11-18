@@ -445,7 +445,7 @@
         "sound": "resources/L110-185 Stavemåde/L165.mp3",
         "correct": "ammissak",
         "correct_index": 1,
-        "wrong": ["ammisaaq", "amiissak", "ammassak", "ammisaak"]
+        "wrong": ["ammisaaq", "amiissak", "amaassak", "ammisaak"]
     },
     // Opgave 57
     {
