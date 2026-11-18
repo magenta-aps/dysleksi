@@ -7,6 +7,7 @@
         "continue_when_instruction_is_complete": false,
         "play_sound_when_instruction_is_complete": false,
         "confirm_correct_answer": false,
+        "advance_automatically": true,
         "instruction_sequence": [
             {
                 "action": "hide",
@@ -80,8 +81,13 @@
             },
             {
                 "action": "clickButton",
-                "delayAfter": 0,
+                "delayAfter": 1500,
                 "element": "choice-false"
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 1500,
+                "element": "next"
             }
         ]
     },
@@ -93,6 +99,7 @@
         "continue_when_instruction_is_complete": false,
         "play_sound_when_instruction_is_complete": false,
         "confirm_correct_answer": false,
+        "advance_automatically": true,
         "instruction_sequence": [
             {
                 "action": "hide",
@@ -118,13 +125,44 @@
             },
             {
                 "action": "clickButton",
-                "delayAfter": 0,
+                "delayAfter": 1500,
                 "element": "choice-true"
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 1500,
+                "element": "next"
             }
         ]
     },
     {
-        "question_type": "dyslexia_instruction_sequence_outro",
-        "start_test": true
+        "question_type": "dyslexia_instruction_sequence_outro"
+    },
+    {
+        "question_type": "no_input_required",
+        "text": "hide me",
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "hide",
+                "delayAfter": 500,
+                "element": "challenge-text"
+            },
+            // Tryk på start knappen for at starte testen
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L001.mp3",
+                "delayAfter": 500
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            }
+        ]
     }
 ]
