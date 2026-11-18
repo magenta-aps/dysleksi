@@ -1365,14 +1365,14 @@ class TestPart(models.Model):
         }
 
     @staticmethod
-    def dyslexia_instruction_sequence_outro():
+    def dyslexia_instruction_sequence_outro(repeat_destination):
         sounds = "resources/L014-015 Gentag og Videre knap"
         return {
             "question_type": QuestionType.NO_INPUT_REQUIRED,
             "instruction_sequence": [
                 {"action": "show", "element": "next"},
                 {"action": "show", "element": "repeat"},
-                {"action": "setRepeatButtonDestination", "data": "0"},
+                {"action": "setRepeatButtonDestination", "data": repeat_destination},
                 {"action": "playSound", "resource": f"{sounds}/L014.mp3"},
                 {"action": "highlight", "element": "repeat", "delayAfter": 750},
                 {"action": "playSound", "resource": f"{sounds}/L015.mp3"},
@@ -1399,7 +1399,9 @@ class TestPart(models.Model):
             if data.get("question_type") == "instruction_sequence_outro":
                 data = self.instruction_sequence_outro(data["sounds"])
             elif data.get("question_type") == "dyslexia_instruction_sequence_outro":
-                data = self.dyslexia_instruction_sequence_outro()
+                data = self.dyslexia_instruction_sequence_outro(
+                    data.get("repeat_destination", "0")
+                )
 
             question = {"part_id": self.pk, "is_practice": is_practice, "order": order}
 

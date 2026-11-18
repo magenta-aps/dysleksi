@@ -97,11 +97,13 @@ a `no_input_required` question with a fixed instruction sequence (see
 
 `dyslexia_instruction_sequence_outro` follows the examples of a part of the dyslexia
 test. It shows the "repeat" and "next" buttons, and tells that the examples can be
-seen again (see `TestPart.dyslexia_instruction_sequence_outro`):
+seen again (see `TestPart.dyslexia_instruction_sequence_outro`). The "repeat" button
+goes to the first question unless `repeat_destination` is set to another question index:
 
 ```
 {
-    "question_type": "dyslexia_instruction_sequence_outro"
+    "question_type": "dyslexia_instruction_sequence_outro",
+    "repeat_destination": "1"
 }
 ```
 
