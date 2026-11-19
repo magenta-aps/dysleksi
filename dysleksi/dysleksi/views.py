@@ -456,6 +456,8 @@ class ClassListView(GroupRequiredMixin, NavigationMixin, SingleTableView):
 
     def get_queryset(self):
         qs = super().get_queryset().filter_user_permissions(self.user, "view")
+        if not self.user.is_reading_supervisor:
+            qs = qs.filter(is_main=True)
         qs = qs.annotate_test_status()
         return qs
 

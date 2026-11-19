@@ -432,7 +432,7 @@ class Teacher(User):
 
     @property
     def accessible_classes(self) -> "QuerySet[Class]":
-        return self.classes.all()
+        return self.classes.filter(is_main=True)
 
     @property
     def accessible_assignments(self) -> "QuerySet[TestAssignment]":
