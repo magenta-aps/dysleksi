@@ -196,6 +196,21 @@ describe("DyslexiaTestView", () => {
         expect(playSound).not.toHaveBeenCalled();
     });
 
+    it("skips the 'break' screens", async () => {
+        const showTestBreak = vi.spyOn(view.domElements, "showTestBreak");
+        const hideTestBreak = vi.spyOn(view.domElements, "hideTestBreak");
+        const showFirstQuestion = vi.spyOn(view, "showFirstQuestion");
+
+        // Starting break does not update DOM
+        view.startBreak();
+        expect(showTestBreak).not.toHaveBeenCalled();
+
+        // Ending break resumes user at the first question (of next test part)
+        view.endBreak();
+        expect(hideTestBreak).not.toHaveBeenCalled();
+        expect(showFirstQuestion).toHaveBeenCalled();
+    });
+
     it("only shows the questionnaire question, which the test leader answers", async () => {
         await view.showQuestion(false, 0);
         expect(document.getElementById("choices").children).toHaveLength(0);
