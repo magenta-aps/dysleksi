@@ -348,16 +348,13 @@ class TestClassListView(DysleksiTest):
         self.assertEqual(view.get_template_names()[0], "dysleksi/admin/class/list.html")
 
     def test_teacher_view(self):
+        self.create_class(2025, "Matematik", is_main=False).teachers.add(self.teacher)
         view = self.setup_view(ClassListView, self.teacher)
-        self.assertQuerySetEqual(
-            view.get_context_data()["object_list"], self.teacher.classes.all()
-        )
+        self.assertQuerySetEqual(view.get_context_data()["object_list"], [self.klasse])
         self.client.force_login(self.teacher)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, 200)
-        self.assertQuerySetEqual(
-            response.context_data["object_list"], self.teacher.classes.all()
-        )
+        self.assertQuerySetEqual(response.context_data["object_list"], [self.klasse])
 
     def test_student_view(self):
         self.client.force_login(self.student1)
@@ -374,7 +371,7 @@ class TestClassListView(DysleksiTest):
 
     def test_reading_supervisor_view(self):
         # A class at `cls.school` that nobody teaches
-        other_class = self.create_class(2025, "9.Z", is_main=True)
+        other_class = self.create_class(2025, "9.Z", is_main=False)
         # A class at a school the læsevejleder is not linked to
         other_school = Institution.objects.create(number="test456", name="AndenSkole")
         Class.objects.create(
@@ -859,6 +856,7 @@ class TestStartRoomView(DysleksiTest):
         cls.group_test.parts.add(cls.group_test_part_2)
 
     def test_get(self):
+        self.create_class(2025, "Matematik", is_main=False).teachers.add(self.teacher)
         self.client.force_login(self.teacher)
         response = self.client.get(reverse("dysleksi:start_room"))
         self.assertIn("form", response.context_data)

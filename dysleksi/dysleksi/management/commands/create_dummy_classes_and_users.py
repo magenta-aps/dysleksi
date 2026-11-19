@@ -266,7 +266,16 @@ class Command(BaseCommand):
             is_main=False,
             institution=school,
         )
-        secondary_class.teachers.set([teacher, teacher3])
+        secondary_class.teachers.set([teacher, teacher2, teacher3])
+
+        for name in ("Matematik 1", "Engelsk 1"):
+            Class.objects.get_or_create(
+                group_id=f"{name}_{school.name}_{school_year_start}",
+                school_year_start=school_year_start,
+                name=name,
+                is_main=False,
+                institution=school,
+            )[0].teachers.add(teacher2)
 
         klasse = Class.objects.get(
             institution=school, school_year_start=school_year_start, name="2.A"
