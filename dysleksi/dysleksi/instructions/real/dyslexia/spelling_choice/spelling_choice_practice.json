@@ -128,7 +128,8 @@
         ]
     },
     {
-        "question_type": "dyslexia_instruction_sequence_outro"
+        "question_type": "dyslexia_instruction_sequence_outro",
+        "repeat_destination": "1"
     },
     {
         "question_type": "multiple_choice",
