@@ -22,6 +22,15 @@ export class DyslexiaTestView extends GroupTestView {
         );
     }
 
+    startBreak() {
+        // Do nothing - dyslexia tests do not use the "break" screen between test parts
+        this.endBreak();
+    }
+
+    endBreak() {
+        this.showFirstQuestion(this.canPractice());
+    }
+
     startSoundCalibration() {
         this.endSoundCalibration();
     }
