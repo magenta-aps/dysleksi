@@ -1186,6 +1186,39 @@ div.type-dyslexia {
 
       button {
         min-width: 25vw;
+
+        &.selected {
+          outline: none !important;
+
+          &.correctness-correct {
+            background: $student-green-lighter !important;
+            box-shadow: $green-button-shadow;
+          }
+
+          &.correctness-wrong {
+            background: $student-red-lighter !important;
+            box-shadow: $red-button-shadow;
+          }
+        }
+
+        // Only apply hover styling on devices with a real hovering pointer (mouse).
+        // On touch devices the :hover state "sticks" after a tap/long-press, which
+        // makes a button look selected even though it isn't.
+        @media (hover: hover) {
+          &:not(.no-hover):hover {
+            outline: none !important;
+          }
+
+          &.selected.correctness-correct:not(.no-hover):hover {
+            background: $student-green-lighter;
+            box-shadow: $green-button-shadow;
+          }
+
+          &.selected.correctness-wrong:not(.no-hover):hover {
+            background: $student-red-lighter !important;
+            box-shadow: $red-button-shadow;
+          }
+        }
       }
     }
 

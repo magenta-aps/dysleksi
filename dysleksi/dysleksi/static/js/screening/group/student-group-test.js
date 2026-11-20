@@ -115,6 +115,9 @@ export class GroupTestView extends StudentTestView {
                     if (this.currentQuestion.challengeSoundUrl) {
                         button.disabled = true;
                     }
+                    if (isPracticing && answer.hasOwnProperty("correctness")) {
+                        button.classList.add(`correctness-${answer.correctness}`);
+                    }
                     this.answerButtons.push({ button: button, answer: answer });
                 });
             } else if (this.currentQuestion.type === "free_text") {
