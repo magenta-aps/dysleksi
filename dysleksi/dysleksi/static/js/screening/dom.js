@@ -984,7 +984,7 @@ export class GroupTestDomElements extends TestDomElements {
             row.className = "choices-row";
             this.choicesEl.append(row);
         }
-        const topCount = Math.floor(answerCount / 2);
+        const topCount = Math.ceil(answerCount / 2);
         return Array.from(
             { length: answerCount },
             (_, i) => rows[i < topCount ? 0 : 1],

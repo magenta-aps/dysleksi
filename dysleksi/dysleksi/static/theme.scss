@@ -1165,3 +1165,53 @@ body.show-instructions .sound-btn.pulse {
     }
   }
 }
+
+.nav-btns {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+// Layout tweaks for dyslexia tests
+div.type-dyslexia {
+  #question-challenge {
+    margin-bottom: 5 * $spacer;
+  }
+
+  .multiple-choice-choices {
+    gap: 3 * $spacer;
+
+    &.two-row-layout {
+      flex-direction: column;
+
+      button {
+        min-width: 25vw;
+      }
+    }
+
+    .choices-row {
+      display: flex;
+      width: auto;
+      gap: 3 * $spacer;
+    }
+  }
+
+  .next-btn {
+    position: relative;
+    bottom: 0;
+    margin: 5 * $spacer auto;
+  }
+
+  .start-part-btn {
+    background-position-y: center;
+    // Use same background and size as the "next" button
+    background-image: var(--bg-next-btn);
+    width: 144px;
+    height: 64px;
+  }
+
+  .nav-btns {
+    flex-direction: row-reverse;
+    gap: 3 * $spacer;
+  }
+}

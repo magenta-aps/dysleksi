@@ -973,8 +973,8 @@ describe("GroupTestFlow", () => {
         view.showFirstQuestion(false);
         const rows = domElements.choicesEl.querySelectorAll(".choices-row");
         expect(domElements.choicesEl.classList).toContain("two-row-layout");
-        expect(rows[0].children.length).toBe(2);
-        expect(rows[1].children.length).toBe(3);
+        expect(rows[0].children.length).toBe(3);
+        expect(rows[1].children.length).toBe(2);
 
         domElements.clearQuestionChoices();
         expect(domElements.choicesEl.classList).not.toContain("two-row-layout");
