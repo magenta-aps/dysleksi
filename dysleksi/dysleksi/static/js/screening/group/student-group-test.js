@@ -212,7 +212,7 @@ export class GroupTestView extends StudentTestView {
         }
     }
 
-    async onQuestionComplete(question, outOfTime = false) {
+    async onQuestionComplete(question, outOfTime = false, playSound = true) {
         const questionAnsweredAt = document.timeline.currentTime;
         this.domElements.interruptSound();
 
@@ -239,13 +239,14 @@ export class GroupTestView extends StudentTestView {
                             this.getSelectedButtons().forEach((btn) =>
                                 this.domElements.makeButtonHappy(btn.id),
                             );
-
-                            // Play "you guessed correct" sound snippet
-                            await this.domElements.playSound(
-                                this.currentPart.practiceCorrectFeedbackSource ||
-                                    "/static/audio/7c.4.wav",
-                                this.audioContext,
-                            );
+                            if (playSound) {
+                                // Play "you guessed correct" sound snippet
+                                await this.domElements.playSound(
+                                    this.currentPart.practiceCorrectFeedbackSource ||
+                                        "/static/audio/7c.4.wav",
+                                    this.audioContext,
+                                );
+                            }
                             this.domElements.unlockInput();
                         }
                     } else {
@@ -279,7 +280,7 @@ export class GroupTestView extends StudentTestView {
                             }
                         } else {
                             this.getSelectedButtons().forEach((btn) =>
-                                this.rejectAnswer(btn.id),
+                                this.rejectAnswer(btn.id, playSound),
                             );
                         }
 
@@ -350,13 +351,17 @@ export class GroupTestView extends StudentTestView {
         }
     }
 
-    rejectAnswer(buttonId) {
+    rejectAnswer(buttonId, playSound = true) {
         this.domElements.makeButtonAngry(buttonId);
-        // Play "you guessed wrong" sound snippet
-        this.domElements.playSound(
-            this.currentPart.practiceWrongFeedbackSource || "/static/audio/7c.3.wav",
-            this.audioContext,
-        );
+        /* istanbul ignore else */
+        if (playSound) {
+            // Play "you guessed wrong" sound snippet
+            this.domElements.playSound(
+                this.currentPart.practiceWrongFeedbackSource ||
+                    "/static/audio/7c.3.wav",
+                this.audioContext,
+            );
+        }
     }
 
     correctText() {
