@@ -31,6 +31,22 @@ export class DyslexiaTestView extends GroupTestView {
         this.showFirstQuestion(this.canPractice());
     }
 
+    startTestPartOutro() {
+        // If previous part contained no actual questions, don't show redundant "next" button.
+        // Just go to first question of the current part instead.
+        if (this.previousPart && this.previousPart.questions.length === 0) {
+            this.showFirstQuestion(this.canPractice());
+        } else {
+            super.startTestPartOutro();
+        }
+    }
+
+    showTestPartOutroUI() {
+        // In dyslexia tests, don't show smiley image, and don't play "completion" sound once
+        // a test part is completed.
+        this.domElements.hideTestPartOutroImage();
+    }
+
     startSoundCalibration() {
         this.endSoundCalibration();
     }

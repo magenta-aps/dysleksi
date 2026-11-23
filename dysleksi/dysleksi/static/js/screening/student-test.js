@@ -339,6 +339,10 @@ export class StudentTestView {
             () => this.endTestPartOutro(),
         );
 
+        this.showTestPartOutroUI();
+    }
+
+    showTestPartOutroUI() {
         if (this.previousPart) {
             this.domElements.setTestPartOutroText(
                 this.previousPart.name +
