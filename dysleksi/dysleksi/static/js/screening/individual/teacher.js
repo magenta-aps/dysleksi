@@ -2,7 +2,6 @@ import {
     AudioIndicator,
     EventTable,
     ActionButtons,
-    ElapsedTimeView,
     TeacherView,
     QuestionView,
 } from "../controlroom.js";
@@ -20,7 +19,6 @@ export function initTeacher(assignmentId, test, students) {
         "#current-test-part-number",
         "#current-test-question-number",
     );
-    const elapsedTimeView = new ElapsedTimeView("#total-elapsed-time");
     const audioIndicator = new AudioIndicator("#audio-indicator");
 
     buttons.showButtons();
@@ -33,7 +31,6 @@ export function initTeacher(assignmentId, test, students) {
         buttons,
         null,
         questionView,
-        elapsedTimeView,
         audioIndicator,
         students,
     );

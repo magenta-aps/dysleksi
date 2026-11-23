@@ -20,6 +20,15 @@ describe("NavigateAwayWarning: beforeunload event", () => {
         global.window.dispatchEvent(new Event("beforeunload"));
         expect(spyHandleBeforeUnload).not.toBeCalled();
     });
+
+    it("intercepts navigation if toggled on twice", () => {
+        const instance = new NavigateAwayWarning();
+        const spyHandleBeforeUnload = vi.spyOn(instance, "handleBeforeUnload");
+        instance.toggle(true);
+        instance.toggle(true);
+        global.window.dispatchEvent(new Event("beforeunload"));
+        expect(spyHandleBeforeUnload).toBeCalled();
+    });
 });
 
 class MockEvent extends Event {
