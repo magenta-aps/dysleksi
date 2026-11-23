@@ -170,7 +170,7 @@
             }
         ],
         "continue_when_instruction_is_complete": false,
-        "allow_replaying_instruction_sequence": true
+        "allow_replaying_instruction_sequence": false
     },
     {
         "question_type": "multiple_choice",
@@ -186,7 +186,7 @@
             }
         ],
         "continue_when_instruction_is_complete": false,
-        "allow_replaying_instruction_sequence": true
+        "allow_replaying_instruction_sequence": false
     },
     {
         "question_type": "no_input_required",
