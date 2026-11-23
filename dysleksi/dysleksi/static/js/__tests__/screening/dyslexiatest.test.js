@@ -324,6 +324,20 @@ describe("DyslexiaTestView", () => {
         expect(view.onPartComplete).toHaveBeenCalled();
     });
 
+    it("shows the test part outro if the part has actual questions", () => {
+        const spyShowFirstQuestion = vi.spyOn(view, "showFirstQuestion");
+        view.startTestPartOutro();
+        expect(spyShowFirstQuestion).not.toHaveBeenCalled();
+    });
+
+    it("skips the test part outro if the part has no actual questions", () => {
+        const spyShowFirstQuestion = vi.spyOn(view, "showFirstQuestion");
+        view.currentPart.questions = [];
+        view.setPart(1);
+        view.startTestPartOutro();
+        expect(spyShowFirstQuestion).toHaveBeenCalled();
+    });
+
     it("lets the student move on from their own answers", async () => {
         await view.showQuestion(false, 1);
         const button = document.getElementById("choice-Aap");
