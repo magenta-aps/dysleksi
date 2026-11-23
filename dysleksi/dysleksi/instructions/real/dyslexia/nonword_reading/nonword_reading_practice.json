@@ -57,11 +57,17 @@
                 "action": "playSound",
                 "resource": "resources/Enhanced L500-L506/L504.mp3",
                 "delayAfter": 750
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
             }
         ]
     },
     {
-        "question_type": "dyslexia_instruction_sequence_outro"
+        "question_type": "dyslexia_instruction_sequence_outro",
+        "repeat_destination": "1"
     },
     {
         "text": "ni",

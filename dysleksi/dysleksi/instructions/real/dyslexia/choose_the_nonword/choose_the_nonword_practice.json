@@ -4,8 +4,10 @@
         "correct": "pisik",
         "correct_index": 2,
         "wrong": ["kamik", "suluk", "tumit", "qisuk"],
-        "continue_when_instruction_is_complete": false,
+        "continue_when_instruction_is_complete": true,
         "confirm_correct_answer": false,
+        "play_sound_when_instruction_is_complete": false,
+        "advance_automatically": true,
         "instruction_sequence": [
             {
                 "action": "hide",
@@ -28,7 +30,18 @@
                 "action": "playSound",
                 "resource": "resources/Enhanced L200-L205/L201.mp3",
                 "delayAfter": 750
-            },
+            }
+        ]
+    },
+    {
+        "question_type": "multiple_choice",
+        "correct": "pisik",
+        "correct_index": 2,
+        "wrong": ["kamik", "suluk", "tumit", "qisuk"],
+        "continue_when_instruction_is_complete": false,
+        "confirm_correct_answer": false,
+        "play_sound_when_instruction_is_complete": false,
+        "instruction_sequence": [
             {
                 "action": "show",
                 "delayAfter": 0,
@@ -82,7 +95,8 @@
         ]
     },
     {
-        "question_type": "dyslexia_instruction_sequence_outro"
+        "question_type": "dyslexia_instruction_sequence_outro",
+        "repeat_destination": "1"
     },
     {
         "question_type": "multiple_choice",
