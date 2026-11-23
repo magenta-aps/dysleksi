@@ -8,7 +8,6 @@ import {
     TeacherView,
     NoteField,
     QuestionView,
-    ElapsedTimeView,
     AudioIndicator,
 } from "../../screening/controlroom.js";
 import * as groupTestData from "./grouptest.json" with { type: "json" };
@@ -432,140 +431,6 @@ describe("ActionButtons", () => {
     });
 });
 
-describe("ElapsedTimeView", () => {
-    const mockDoc = `<div id="elapsed-time"></div>`;
-    let instance;
-
-    const getInstance = () => {
-        return new ElapsedTimeView("#elapsed-time");
-    };
-
-    beforeEach(() => {
-        vi.useFakeTimers();
-        document.body.innerHTML = mockDoc;
-        instance = getInstance();
-    });
-
-    afterEach(() => {
-        vi.clearAllTimers();
-
-        if (instance && instance.interval) {
-            clearInterval(instance.interval);
-        }
-
-        vi.useRealTimers();
-        vi.restoreAllMocks();
-    });
-
-    it("initializes", () => {
-        expect(instance.domElement).not.toBeNull();
-        expect(instance.running).toBeFalsy();
-        expect(instance.t1).toBeNull();
-        expect(instance.interval).not.toBeNull();
-    });
-
-    it("can start", () => {
-        // Start from first stopped state: initializes `instance.t1`
-        instance.stop();
-        instance.start();
-        expect(instance.running).toBeTruthy();
-        expect(instance.t1).not.toBeNull();
-        expect(instance.t1 <= new Date()).toBeTruthy();
-        const oldT1 = instance.t1;
-        // Start from second stopped state: keeps previous `instance.t1`
-        instance.stop();
-        instance.start();
-        expect(instance.running).toBeTruthy();
-        expect(instance.t1 >= oldT1).toBeTruthy();
-    });
-
-    it("can stop", () => {
-        instance.start();
-        instance.stop();
-        expect(instance.running).toBeFalsy();
-        expect(instance.t1).not.toBeNull();
-        expect(instance.t1 <= new Date()).toBeTruthy();
-    });
-
-    it("updates its DOM element", () => {
-        // Test update when timer is stopped
-        instance.stop();
-        instance.update();
-        expect(instance.domElement.innerText).toBeFalsy();
-        // Test update when timer is started
-        instance.start();
-        instance.update();
-        expect(instance.domElement.innerText).toMatch(/^\d{2}:\d{2}:\d{2}$/);
-    });
-
-    it("formats the elapsed time independently of the local timezone", () => {
-        const originalTZ = process.env.TZ;
-        process.env.TZ = "America/Nuuk";
-        try {
-            instance.start();
-            vi.advanceTimersByTime(3600000 + 5000);
-            instance.update();
-            expect(instance.domElement.innerText).toBe("01:00:05");
-        } finally {
-            process.env.TZ = originalTZ;
-        }
-    });
-
-    it("updates its DOM element on an interval", () => {
-        const spyUpdate = vi.spyOn(instance, "update");
-        // Let time pass
-        vi.advanceTimersByTime(1000);
-        // Assert: update was called by the interval
-        expect(spyUpdate).toHaveBeenCalled();
-    });
-
-    it("can pause and resume", () => {
-        instance.start();
-        // Pausing a running timer freezes it and records when the pause began
-        instance.pause();
-        expect(instance.running).toBeFalsy();
-        expect(instance.pauseStart).not.toBeNull();
-
-        // Pausing again while already paused is a no-op
-        const firstPauseStart = instance.pauseStart;
-        instance.pause();
-        expect(instance.pauseStart).toBe(firstPauseStart);
-
-        // Resuming starts the timer again and banks the paused duration
-        instance.resume();
-        expect(instance.running).toBeTruthy();
-        expect(instance.pauseStart).toBeNull();
-        expect(instance.pausedDuration).toBeGreaterThanOrEqual(0);
-
-        // Resuming again while already running does nothing
-        const bankedDuration = instance.pausedDuration;
-        instance.resume();
-        expect(instance.pausedDuration).toBe(bankedDuration);
-    });
-
-    it("excludes paused time from the elapsed time", () => {
-        instance.start();
-        // Run for 5 seconds
-        vi.advanceTimersByTime(5000);
-        instance.pause();
-        // Stay paused for 10 seconds
-        vi.advanceTimersByTime(10000);
-        instance.resume();
-        // Run for 2 more seconds
-        vi.advanceTimersByTime(2000);
-        instance.update();
-        // Only the 7 running seconds should be counted, not the 10 paused ones
-        expect(instance.domElement.innerText).toBe("00:00:07");
-    });
-
-    it("initialises the timer when resume is the first call", () => {
-        expect(instance.t1).toBeNull();
-        instance.resume();
-        expect(instance.t1).not.toBeNull();
-        expect(instance.running).toBeTruthy();
-    });
-});
-
 describe("NoteField", () => {
     it("handles a present #note UI element", () => {
         document.body.innerHTML = `<textarea id="note" class="d-none">Min note</textarea>`;
@@ -638,7 +503,6 @@ describe("Teacher Individual test View", () => {
     let buttons;
     let note;
     let questionView;
-    let elapsedTimeView;
     let audioIndicator;
     let view;
     let individualTest;
@@ -677,7 +541,6 @@ describe("Teacher Individual test View", () => {
         buttons = new ActionButtons();
         note = new NoteField();
         questionView = new QuestionView();
-        elapsedTimeView = new ElapsedTimeView("#elapsed-time");
         audioIndicator = new AudioIndicator("#audio-indicator");
 
         view = new TeacherView(
@@ -687,7 +550,6 @@ describe("Teacher Individual test View", () => {
             buttons,
             note,
             questionView,
-            elapsedTimeView,
             audioIndicator,
         );
 
@@ -1058,118 +920,6 @@ describe("Teacher Individual test View", () => {
         expect(p2pChannel.send).not.toHaveBeenCalled();
     });
 
-    it("unpauses the total elapsed time on `question.displayed`", () => {
-        // Arrange
-        const spyStart = vi.spyOn(elapsedTimeView, "start");
-        // Act: send "question.displayed"
-        sendFromStudent({
-            event: "question.displayed",
-            partIndex: 0,
-            questionIndex: 0,
-            practice: false,
-        });
-        // Assert
-        expect(spyStart).toHaveBeenCalled();
-    });
-
-    it("starts the elapsed time once the instructions have played", () => {
-        const spyStart = vi.spyOn(elapsedTimeView, "start");
-        view.test.parts[0].questions[0].instruction_sequence = { instructions: [] };
-
-        sendFromStudent({
-            event: "question.displayed",
-            partIndex: 0,
-            questionIndex: 0,
-            practice: false,
-        });
-        expect(spyStart).not.toHaveBeenCalled();
-
-        sendFromStudent({ event: "instructions.completed" });
-        expect(spyStart).toHaveBeenCalledTimes(1);
-
-        // E.g. the student replays the instructions
-        sendFromStudent({ event: "instructions.completed" });
-        expect(spyStart).toHaveBeenCalledTimes(1);
-    });
-
-    it("pauses the total elapsed time on `question.answered`", () => {
-        // Arrange
-        const spyStop = vi.spyOn(elapsedTimeView, "stop");
-        // Act: send "question.answered"
-        sendFromStudent({
-            event: "question.answered",
-            partIndex: 0,
-            questionIndex: 0,
-            practice: false,
-        });
-        // Assert
-        expect(spyStop).toHaveBeenCalled();
-    });
-
-    it("does not start or stop the elapsed time during practice questions", () => {
-        // Arrange
-        const spyStart = vi.spyOn(elapsedTimeView, "start");
-        const spyStop = vi.spyOn(elapsedTimeView, "stop");
-        // Act: send "question.displayed"
-        sendFromStudent({
-            event: "question.displayed",
-            partIndex: 0,
-            questionIndex: 0,
-            practice: true,
-        });
-        // Assert
-        expect(spyStart).not.toHaveBeenCalled();
-        // Act: send "question.answered"
-        sendFromStudent({
-            event: "question.answered",
-            partIndex: 0,
-            questionIndex: 0,
-            practice: true,
-        });
-        // Assert
-        expect(spyStop).not.toHaveBeenCalled();
-    });
-
-    it("does not update the elapsed time on practice questions", () => {
-        // Arrange
-        const spyStart = vi.spyOn(elapsedTimeView, "stop");
-        const spyStop = vi.spyOn(elapsedTimeView, "stop");
-        // Act: send "question.displayed"
-        sendFromStudent({
-            event: "question.displayed",
-            partIndex: 0,
-            questionIndex: 0,
-            practice: true,
-        });
-        expect(spyStart).not.toHaveBeenCalled();
-        expect(spyStop).not.toHaveBeenCalled();
-        // Act: send practice "question.answered"
-        sendFromStudent({
-            event: "question.answered",
-            partIndex: 0,
-            questionIndex: 0,
-            practice: true,
-        });
-        // Assert
-        expect(spyStart).not.toHaveBeenCalled();
-        expect(spyStop).not.toHaveBeenCalled();
-    });
-
-    it("does not update elapsed time if the UI component is null", () => {
-        // Arrange: configure view without elapsed time component
-        view.elapsedTimeView = null;
-        const spyStart = vi.spyOn(elapsedTimeView, "stop");
-        // Act: send relevant message
-        sendFromStudent({
-            event: "question.displayed",
-            partIndex: 0,
-            questionIndex: 0,
-            practice: false,
-        });
-        // Assert
-        expect(spyStart).not.toHaveBeenCalled();
-    });
-
     it("sends message and disables buttons when the cancellation is confirmed", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID123");
 
@@ -1200,8 +950,6 @@ describe("Teacher Individual test View", () => {
 
     it("pauses and resumes the test when the pause button is clicked", () => {
         vi.spyOn(global.crypto, "randomUUID").mockReturnValue("UUID-PAUSE");
-        const spyPause = vi.spyOn(elapsedTimeView, "pause");
-        const spyResume = vi.spyOn(elapsedTimeView, "resume");
         const pauseButton = buttons.pauseButton();
 
         sendFromStudent({
@@ -1217,7 +965,6 @@ describe("Teacher Individual test View", () => {
 
         // Assert: the test is paused, the timer stops and the icon becomes 'play'
         expect(view.testPaused).toBe(true);
-        expect(spyPause).toHaveBeenCalled();
         expect(pauseButton.classList.contains("is-paused")).toBe(true);
         expect(pauseButton.querySelector("i").className).toBe("ph-fill ph-play");
         expect(p2pChannel.send).toHaveBeenCalledWith({
@@ -1231,7 +978,6 @@ describe("Teacher Individual test View", () => {
 
         // Assert: the test is running again, the timer resumes and the icon becomes 'pause'
         expect(view.testPaused).toBe(false);
-        expect(spyResume).toHaveBeenCalled();
         expect(pauseButton.classList.contains("is-paused")).toBe(false);
         expect(pauseButton.querySelector("i").className).toBe("ph-fill ph-pause");
         expect(p2pChannel.send).toHaveBeenCalledWith({
@@ -1805,7 +1551,6 @@ describe("Teacher dyslexia test View", () => {
             buttons,
             note,
             new QuestionView(),
-            new ElapsedTimeView("#elapsed-time"),
             new AudioIndicator("#audio-indicator"),
         );
         getMainSocketHandler(socket)({
@@ -2249,8 +1994,6 @@ describe("TeacherView socket 'test.started' handling", () => {
 
         socket = mockSocket(1);
 
-        const elapsedTimeView = new ElapsedTimeView("#elapsed-time");
-
         view = new TeacherView(
             {
                 testType: "group",
@@ -2266,7 +2009,6 @@ describe("TeacherView socket 'test.started' handling", () => {
             new ActionButtons(),
             new NoteField(),
             new QuestionView(),
-            elapsedTimeView,
             null,
         );
 
@@ -2314,39 +2056,6 @@ describe("TeacherView socket 'test.started' handling", () => {
         );
 
         expect(spy).toHaveBeenCalledWith(messageData);
-    });
-
-    it("Starts the timer when 'test.started' message is received", () => {
-        const spy = vi.spyOn(view.elapsedTimeView, "start");
-
-        // simulate 'test.started' message
-        const messageData = {
-            event: "test.started",
-            student: {
-                id: 1,
-                firstName: "Alice",
-                lastName: "Smith",
-                progress: 0,
-                currentPartIndex: 0,
-                currentQuestionIndex: 0,
-                resultsByPart: {},
-            },
-        };
-
-        // Send two test.started events (simulating two students)
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: messageData,
-            }),
-        );
-        p2pChannel.dispatchEvent(
-            new CustomEvent("message", {
-                detail: messageData,
-            }),
-        );
-
-        // Validate that the timer is only started ONCE
-        expect(spy).toHaveBeenCalledOnce();
     });
 
     it("sends a paused message to newly joined students when the test is paused", () => {
@@ -2469,7 +2178,6 @@ describe("TeacherView student presence", () => {
             new ActionButtons(),
             new NoteField(),
             new QuestionView(),
-            new ElapsedTimeView("#elapsed-time"),
             null,
         );
 
@@ -2596,7 +2304,6 @@ describe("TeacherView cancel test modal", () => {
             new ActionButtons(),
             new NoteField(),
             new QuestionView(),
-            new ElapsedTimeView("#elapsed-time"),
             null,
             students,
         );

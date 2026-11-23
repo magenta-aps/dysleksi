@@ -1212,64 +1212,6 @@ export class QuestionView {
     }
 }
 
-export class ElapsedTimeView {
-    domElement;
-
-    constructor(selector) {
-        this.domElement = document.querySelector(selector);
-        this.running = false;
-        this.t1 = null;
-        // Total time spent paused, subtracted from the elapsed time so that
-        // pausing and resuming does not count the time spent paused.
-        this.pausedDuration = 0;
-        this.pauseStart = null;
-        this.interval = window.setInterval(() => {
-            this.update();
-        }, 1000);
-    }
-
-    start() {
-        this.running = true;
-        // On first call to `start`, set `t1` to current time
-        if (this.t1 === null) {
-            this.t1 = new Date();
-        }
-    }
-
-    stop() {
-        this.running = false;
-    }
-
-    pause() {
-        if (!this.running) {
-            return;
-        }
-        this.running = false;
-        this.pauseStart = new Date();
-    }
-
-    resume() {
-        if (this.running) {
-            return;
-        }
-        this.running = true;
-        if (this.t1 === null) {
-            this.t1 = new Date();
-        }
-        if (this.pauseStart !== null) {
-            this.pausedDuration += new Date() - this.pauseStart;
-            this.pauseStart = null;
-        }
-    }
-
-    update() {
-        if (this.running && this.t1 !== null) {
-            const delta = new Date() - this.t1 - this.pausedDuration;
-            this.domElement.innerText = formatDuration(delta);
-        }
-    }
-}
-
 export class DetailsPopup {
     constructor(toggleSelector = "#details-toggle", popupSelector = "#details-popup") {
         this.toggle = document.querySelector(toggleSelector);
@@ -1495,7 +1437,6 @@ export class TeacherView {
         buttons,
         noteField,
         questionView,
-        elapsedTimeView = null,
         audioIndicator = null,
         students = [],
     ) {
@@ -1538,7 +1479,6 @@ export class TeacherView {
         this.buttons = buttons || new ActionButtons();
         this.noteField = noteField || new NoteField();
         this.questionView = questionView || new QuestionView();
-        this.elapsedTimeView = elapsedTimeView;
         this.audioIndicator = audioIndicator;
         this.detailsPopup = new DetailsPopup();
         this.studentPresence = new StudentPresenceIndicator();
@@ -1587,7 +1527,6 @@ export class TeacherView {
 
     pauseTest() {
         this.testPaused = true;
-        this.elapsedTimeView.pause();
         this.buttons.freezeQuestionFlow();
         this.updateGotoNextResultGroupButtonState();
         this.buttons.pauseButton().classList.add("is-paused");
@@ -1597,7 +1536,6 @@ export class TeacherView {
 
     resumeTest() {
         this.testPaused = false;
-        this.elapsedTimeView.resume();
         this.buttons.unfreezeQuestionFlow();
         this.updateGotoNextResultGroupButtonState();
         this.buttons.pauseButton().classList.remove("is-paused");
@@ -1742,13 +1680,6 @@ export class TeacherView {
                 }
                 if (data.event === "instructions.completed") {
                     this.showingInstructions = false;
-                    if (
-                        this.elapsedTimeView !== null &&
-                        !this.currentIsPractice &&
-                        !this.elapsedTimeView.running
-                    ) {
-                        this.elapsedTimeView.start();
-                    }
                     // In a dyslexia test the student moves on from the instructions,
                     // unless they read aloud
                     if (
@@ -1824,21 +1755,6 @@ export class TeacherView {
                     }
                     this.showQuestion();
                 }
-
-                // Update "elapsed time". It starts once the instructions have played.
-                if (this.elapsedTimeView !== null) {
-                    if (!data.practice) {
-                        if (
-                            data.event === "question.displayed" &&
-                            !this.currentQuestion.instruction_sequence
-                        ) {
-                            this.elapsedTimeView.start();
-                        }
-                        if (data.event === "question.answered") {
-                            this.elapsedTimeView.stop();
-                        }
-                    }
-                }
             }
 
             if (
@@ -1858,12 +1774,7 @@ export class TeacherView {
 
                 testComplete = this.groupTestContainer.allStudentsFinished();
 
-                if (
-                    data.event === "test.started" &&
-                    this.elapsedTimeView.running === false &&
-                    this.testPaused === false
-                ) {
-                    this.elapsedTimeView.start();
+                if (data.event === "test.started" && this.testPaused === false) {
                     this.buttons.pauseButton().disabled = false;
                     this.buttons.cancelButton().disabled = false;
                 }
@@ -2223,7 +2134,6 @@ export class TeacherView {
                     await this.sendTestCancelled();
                     this.buttons.disableButtons();
                     this.buttons.pauseButton().disabled = true;
-                    this.elapsedTimeView.stop();
                     await this._leaveCancelledTest();
                 });
             } else if (val === "paused") {
