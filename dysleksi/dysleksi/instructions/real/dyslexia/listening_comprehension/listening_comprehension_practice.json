@@ -136,6 +136,10 @@
         ]
     },
     {
+        "question_type": "dyslexia_instruction_sequence_outro",
+        "repeat_destination": "0"
+    },
+    {
         "question_type": "no_input_required",
         "text": "hide me",
         "instruction_sequence": [

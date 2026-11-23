@@ -5,6 +5,7 @@
         "correct": "ukaloq",
         "continue_when_instruction_is_complete": false,
         "play_sound_when_instruction_is_complete": false,
+        "advance_automatically": true,
         "instruction_sequence": [
             {
                 "action": "hide",
@@ -184,7 +185,8 @@
         ]
     },
     {
-        "question_type": "dyslexia_instruction_sequence_outro"
+        "question_type": "dyslexia_instruction_sequence_outro",
+        "repeat_destination": "1"
     },
     {
         "question_type": "free_text",
