@@ -211,6 +211,36 @@ describe("DyslexiaTestView", () => {
         expect(showFirstQuestion).toHaveBeenCalled();
     });
 
+    it("does not play the 'correct' answer sound in practice questions", async () => {
+        const spyPlaySound = vi.spyOn(view.domElements, "playSound");
+        const spyLockInput = vi.spyOn(view.domElements, "lockInput");
+
+        view.setPart(1); // has a practice question
+        view.setQuestion(true, 0);
+        view.currentQuestion.type = "multiple_choice";
+        view.currentQuestion.confirmCorrectAnswer = true;
+        view.textAnswer = null;
+
+        view.selectedAnswer = { correctness: "correct" };
+        await view.onQuestionComplete(view.currentQuestion);
+        expect(spyLockInput).toHaveBeenCalled();
+        expect(spyPlaySound).not.toHaveBeenCalled();
+    });
+
+    it("does not play the 'wrong' answer sound in practice questions", async () => {
+        const spyPlaySound = vi.spyOn(view.domElements, "playSound");
+
+        view.setPart(1); // has a practice question
+        view.setQuestion(true, 0);
+        view.currentQuestion.type = "multiple_choice";
+        view.currentQuestion.confirmCorrectAnswer = true;
+        view.textAnswer = null;
+
+        view.selectedAnswer = { correctness: "wrong" };
+        await view.onQuestionComplete(view.currentQuestion);
+        expect(spyPlaySound).not.toHaveBeenCalled();
+    });
+
     it("only shows the questionnaire question, which the test leader answers", async () => {
         await view.showQuestion(false, 0);
         expect(document.getElementById("choices").children).toHaveLength(0);

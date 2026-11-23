@@ -74,7 +74,7 @@ export class DyslexiaTestView extends GroupTestView {
 
     async onQuestionComplete(question = this.currentQuestion, outOfTime = false) {
         if (!question.isReadAloud()) {
-            return super.onQuestionComplete(question, outOfTime);
+            return super.onQuestionComplete(question, outOfTime, false);
         }
         this.answeredAt = document.timeline.currentTime;
         this.recordedAudio = await this.mediaRecorder.interval();
