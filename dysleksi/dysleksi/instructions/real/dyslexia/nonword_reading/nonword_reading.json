@@ -1,7 +1,20 @@
 [
     {
         "text": "ali",
-        "question_type": "no_input_required"
+        "question_type": "no_input_required",
+        "continue_when_instruction_is_complete": false,
+        "instruction_sequence": [
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L008.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L010.mp3",
+                "delayAfter": 1250
+            }
+        ]
     },
     {
         "text": "aqu",
