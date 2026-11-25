@@ -41,14 +41,14 @@
             },
             {
                 "action": "show",
-                "delayAfter": 0,
+                "delayAfter": 500,
                 "element": "challenge-sound-btn"
             },
             // ukaloq
             {
-                "action": "waitForUserClick",
+                "action": "clickButton",
                 "element": "challenge-sound-btn",
-                "delayAfter": 2000
+                "delayAfter": 1250
             },
             {
                 "action": "clickButton",
@@ -86,9 +86,9 @@
                 "element": "next"
             },
             {
-                "action": "waitForUserClick",
+                "action": "highlight",
                 "element": "next",
-                "delayAfter": 0
+                "delayAfter": 2000
             }
         ]
     },
@@ -178,8 +178,8 @@
                 "element": "next"
             },
             {
-                "action": "waitForUserClick",
-                "delayAfter": 0,
+                "action": "highlight",
+                "delayAfter": 2000,
                 "element": "next"
             }
         ]
