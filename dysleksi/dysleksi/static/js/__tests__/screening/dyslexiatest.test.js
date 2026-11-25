@@ -457,4 +457,10 @@ describe("DyslexiaTestView", () => {
         expect(view.instructionRunner.skipToEnd).toHaveBeenCalled();
         expect(onPartComplete).toHaveBeenCalled();
     });
+
+    it("never shows the student header", () => {
+        const spyDomSetStudentHeader = vi.spyOn(view.domElements, "setStudentHeader");
+        view.setStudentHeader();
+        expect(spyDomSetStudentHeader).not.toHaveBeenCalled();
+    });
 });

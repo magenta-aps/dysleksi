@@ -51,6 +51,10 @@ export class DyslexiaTestView extends GroupTestView {
         this.endSoundCalibration();
     }
 
+    setStudentHeader() {
+        // Do nothing in dyslexia tests
+    }
+
     onChatMessage(data) {
         super.onChatMessage(data);
         if (data.event === "question.feedback") {
