@@ -25,11 +25,41 @@
                 "resource": "resources/Enhanced L200-L205/L200.mp3",
                 "delayAfter": 500
             },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "choices"
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 1250,
+                "element": "choices"
+            },
             // I denne test skal du vælge nonordet.
             {
                 "action": "playSound",
                 "resource": "resources/Enhanced L200-L205/L201.mp3",
                 "delayAfter": 750
+            },
+            {
+                "action": "clickButton",
+                "element": "choice-pisik",
+                "delayAfter": 750
+            },
+            {
+                "action": "show",
+                "delayAfter": 0,
+                "element": "next"
+            },
+            {
+                "action": "fadeIn",
+                "delayAfter": 500,
+                "element": "next"
+            },
+            {
+                "action": "highlight",
+                "delayAfter": 2000,
+                "element": "next"
             }
         ]
     },
@@ -42,11 +72,6 @@
         "confirm_correct_answer": false,
         "play_sound_when_instruction_is_complete": false,
         "instruction_sequence": [
-            {
-                "action": "show",
-                "delayAfter": 0,
-                "element": "choices"
-            },
             // Eksempel
             {
                 "action": "playSound",
