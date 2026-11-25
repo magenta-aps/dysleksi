@@ -82,7 +82,7 @@
             },
             {
                 "action": "show",
-                "delayAfter": 0,
+                "delayAfter": 1250,
                 "element": "next"
             },
             {
@@ -98,6 +98,7 @@
         "correct": "tutilak",
         "continue_when_instruction_is_complete": false,
         "play_sound_when_instruction_is_complete": false,
+        "advance_automatically": true,
         "instruction_sequence": [
             // Eksempel
             {
@@ -179,7 +180,7 @@
             },
             {
                 "action": "highlight",
-                "delayAfter": 2000,
+                "delayAfter": 1250,
                 "element": "next"
             }
         ]
