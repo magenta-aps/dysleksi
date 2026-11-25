@@ -111,5 +111,27 @@
     {
         "text": "misuk",
         "question_type": "no_input_required"
+    },
+    {
+        "text": "misuk",
+        "question_type": "no_input_required",
+        "advance_automatically": true,
+        "instruction_sequence": [
+            {
+                "action": "hide",
+                "element": "challenge-text",
+                "delayAfter": 0
+            },
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L001-L014/L007.mp3",
+                "delayAfter": 750
+            },
+            {
+                "action": "show",
+                "element": "next",
+                "delayAfter": 0
+            }
+        ]
     }
 ]
