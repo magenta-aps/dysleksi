@@ -123,7 +123,7 @@
         "question_type": "multiple_choice",
         "correct": "agivoq",
         "correct_index": 1,
-        "wrong": ["igavoq", "anivoq", "qiavoq", "anivoq"]
+        "wrong": ["igavoq", "anivoq", "qiavoq", "quivoq"]
     },
     // Opgave 19
     {
