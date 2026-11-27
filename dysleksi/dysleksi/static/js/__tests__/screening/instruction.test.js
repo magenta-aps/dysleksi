@@ -89,6 +89,7 @@ describe("InstructionSequenceRunner", () => {
             { action: "fadeOut", element: "el1" },
             { action: "highlight", element: "el1" },
             { action: "select", element: "btn1" },
+            { action: "deselect", element: "btn1" },
             { action: "makeButtonAngry", element: "btn1" },
             { action: "makeButtonHappy", element: "btn1" },
             { action: "showFaded", element: "btn1" },
@@ -115,6 +116,10 @@ describe("InstructionSequenceRunner", () => {
         expect(domElements.toggleButtonSelected).toHaveBeenCalledWith(
             document.getElementById("btn1"),
             true,
+        );
+        expect(domElements.toggleButtonSelected).toHaveBeenCalledWith(
+            document.getElementById("btn1"),
+            false,
         );
         expect(domElements.makeButtonAngry).toHaveBeenCalledWith("btn1");
         expect(domElements.makeButtonHappy).toHaveBeenCalledWith("btn1");

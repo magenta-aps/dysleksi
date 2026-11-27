@@ -193,6 +193,9 @@
         "correct": "isii",
         "correct_index": 2,
         "wrong": ["isuu", "itii", "isiu", "ipii"],
+        "continue_when_instruction_is_complete": false,
+        "confirm_correct_answer": false,
+        "play_sound_when_instruction_is_complete": false,
         "instruction_sequence": [
             {
                 "action": "hide",
@@ -212,18 +215,18 @@
                 "delayAfter": 750
             },
             {
-                "action": "clickButton",
-                "delayAfter": 1500,
-                "element": "challenge-sound-btn"
-            },
-            {
-                "action": "clickButton",
+                "action": "select",
                 "delayAfter": 750,
                 "element": "choice-isuu"
             },
             {
                 "action": "makeButtonAngry",
                 "delayAfter": 1250,
+                "element": "choice-isuu"
+            },
+            {
+                "action": "deselect",
+                "delayAfter": 0,
                 "element": "choice-isuu"
             },
             // Når du svarer rigtigt, bliver svaret grønt.
@@ -233,7 +236,7 @@
                 "delayAfter": 750
             },
             {
-                "action": "clickButton",
+                "action": "select",
                 "delayAfter": 750,
                 "element": "choice-isii"
             },
@@ -242,16 +245,18 @@
                 "delayAfter": 1250,
                 "element": "choice-isii"
             },
+            {
+                "action": "deselect",
+                "delayAfter": 0,
+                "element": "choice-isii"
+            },
             // Du skal klikke på det nonord, som du hører.
             {
                 "action": "playSound",
                 "resource": "resources/Enhanced L100-L109/L106.mp3",
                 "delayAfter": 1500
             }
-        ],
-        "continue_when_instruction_is_complete": false,
-        "confirm_correct_answer": false,
-        "play_sound_when_instruction_is_complete": false
+        ]
     },
     {
         "question_type": "multiple_choice",
