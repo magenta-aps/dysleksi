@@ -155,13 +155,23 @@
             {
                 "action": "clickButton",
                 "delayAfter": 750,
-                "element": "free-text-q"
+                "element": "free-text-k"
             },
             // Hvis du vil ændre dit svar, kan du slette det, du har skrevet, og skrive igen.
             {
                 "action": "playSound",
                 "resource": "resources/Enhanced L400-L412/L405.mp3",
                 "delayAfter": 500
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 1250,
+                "element": "free-text-erase-btn"
+            },
+            {
+                "action": "clickButton",
+                "delayAfter": 2000,
+                "element": "free-text-q"
             },
             {
                 "action": "clickButton",
