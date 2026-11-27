@@ -103,6 +103,10 @@ export class InstructionSequenceRunner {
                 this.domElements.toggleButtonSelected(this.getEl(element), true);
                 break;
 
+            case "deselect":
+                this.domElements.toggleButtonSelected(this.getEl(element), false);
+                break;
+
             case "makeButtonAngry":
                 this.domElements.makeButtonAngry(element);
                 break;

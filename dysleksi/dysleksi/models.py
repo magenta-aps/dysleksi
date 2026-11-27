@@ -101,6 +101,7 @@ class InstructionAction(TextChoices):
     HIGHLIGHT = "highlight"
     EXPLICIT_HIGHLIGHT = "explicitHighlight"
     SELECT = "select"
+    DESELECT = "deselect"
     MAKE_BUTTON_ANGRY = "makeButtonAngry"
     MAKE_BUTTON_HAPPY = "makeButtonHappy"
     SET_TEXT = "setText"
