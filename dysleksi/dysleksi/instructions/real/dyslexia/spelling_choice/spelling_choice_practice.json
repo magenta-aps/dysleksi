@@ -71,6 +71,7 @@
         "sound": "resources/Enhanced L100-L109/L104.mp3",
         "correct_index": 3,
         "wrong": ["tupi", "tagi", "taga", "tati"],
+        "advance_automatically": true,
         "continue_when_instruction_is_complete": false,
         "confirm_correct_answer": false,
         "play_sound_when_instruction_is_complete": false,
@@ -177,7 +178,7 @@
             },
             {
                 "action": "clickButton",
-                "delayAfter": 0,
+                "delayAfter": 1500,
                 "element": "choice-numi"
             }
         ]
