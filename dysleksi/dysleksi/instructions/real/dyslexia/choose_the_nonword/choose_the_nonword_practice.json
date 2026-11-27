@@ -95,18 +95,67 @@
                 "resource": "resources/Enhanced L200-L205/L203.mp3",
                 "delayAfter": 750
             },
-            // kamik, suluk, pisik, tumit, qisuk
+            // kamik
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-kamik"
+            },
             {
                 "action": "playSound",
-                "resource": "resources/Enhanced L200-L205/L204.mp3",
-                "delayAfter": 750
+                "resource": "resources/Enhanced L200-L205/L204-00.mp3",
+                "delayAfter": 250
             },
+            // suluk
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-suluk"
+            },
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L200-L205/L204-01.mp3",
+                "delayAfter": 250
+            },
+            // pisik
             {
                 "action": "highlight",
                 "delayAfter": 0,
                 "element": "choice-pisik"
             },
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L200-L205/L204-02.mp3",
+                "delayAfter": 250
+            },
+            // tumit
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-tumit"
+            },
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L200-L205/L204-03.mp3",
+                "delayAfter": 250
+            },
+            // qisuk
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-qisuk"
+            },
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L200-L205/L204-04.mp3",
+                "delayAfter": 1500
+            },
             // "pisik" vælges, fordi det er et nonord.
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-pisik"
+            },
             {
                 "action": "playSound",
                 "resource": "resources/Enhanced L200-L205/L205.mp3",
