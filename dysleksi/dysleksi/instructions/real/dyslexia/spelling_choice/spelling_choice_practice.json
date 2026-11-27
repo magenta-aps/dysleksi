@@ -91,10 +91,65 @@
                 "delayAfter": 0,
                 "element": "choices"
             },
-            // Her ser du fem nonord: tupi, tagi, taga, numi, tati.
+            // Her ser du fem nonord:
             {
                 "action": "playSound",
-                "resource": "resources/Enhanced L100-L109/L102.mp3",
+                "resource": "resources/Enhanced L100-L109/L102-00.mp3",
+                "delayAfter": 750
+            },
+            // tupi
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-tupi"
+            },
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L100-L109/L102-01.mp3",
+                "delayAfter": 750
+            },
+            // tagi
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-tagi"
+            },
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L100-L109/L102-02.mp3",
+                "delayAfter": 750
+            },
+            // taga
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-taga"
+            },
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L100-L109/L102-03.mp3",
+                "delayAfter": 750
+            },
+            // numi
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-numi"
+            },
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L100-L109/L102-04.mp3",
+                "delayAfter": 750
+            },
+            // tati.
+            {
+                "action": "highlight",
+                "delayAfter": 0,
+                "element": "choice-tati"
+            },
+            {
+                "action": "playSound",
+                "resource": "resources/Enhanced L100-L109/L102-05.mp3",
                 "delayAfter": 750
             },
             // Det nonord, du skal vælge, siges:
