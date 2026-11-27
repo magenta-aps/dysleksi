@@ -1605,17 +1605,14 @@ class TestPart(models.Model):
                 question__in=question_ids.values()
             )
         }
-        desired_possible_answers = {}
+        desired_possible_answers = defaultdict(dict)
         for question, instructions, possible_answers in questions:
             question_id = question_ids[question["order"]]
             for lookup, values in possible_answers:
                 resource_id = resource_pks[lookup]
                 key = (question_id, resource_id)
-                if key not in desired_possible_answers:
-                    desired_possible_answers[key] = {
-                        "question_id": question_id,
-                        "resource_id": resource_id,
-                    }
+                desired_possible_answers[key]["question_id"] = question_id
+                desired_possible_answers[key]["resource_id"] = resource_id
                 desired_possible_answers[key].update(values)
         sync_rows(PossibleAnswer, existing_possible_answers, desired_possible_answers)
 
