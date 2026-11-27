@@ -39,6 +39,7 @@
         "question_type": "no_input_required",
         "text": "univoq",
         "continue_when_instruction_is_complete": false,
+        "advance_automatically": true,
         "instruction_sequence": [
             // Eksempel
             {
@@ -57,11 +58,6 @@
                 "action": "playSound",
                 "resource": "resources/Enhanced L500-L506/L504.mp3",
                 "delayAfter": 750
-            },
-            {
-                "action": "show",
-                "delayAfter": 0,
-                "element": "next"
             }
         ]
     },
